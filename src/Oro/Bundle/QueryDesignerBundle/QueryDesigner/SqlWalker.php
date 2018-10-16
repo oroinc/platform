@@ -43,7 +43,7 @@ class SqlWalker extends TranslationWalker
      */
     public function getExecutor($AST)
     {
-        if (!$AST instanceof SelectStatement) {
+        if ($AST instanceof SelectStatement) {
             return parent::getExecutor($AST);
         }
 
