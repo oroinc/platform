@@ -9,6 +9,7 @@ use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EmailBundle\Tests\Behat\Mock\Mailer\DirectMailerDecorator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
+use Symfony\Component\VarDumper\VarDumper;
 
 class EmailContext extends OroFeatureContext implements KernelAwareContext
 {
@@ -57,6 +58,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             );
 
             $found = (bool) preg_match($pattern, implode(' ', $data));
+            VarDumper::dump(implode(' ', $data));
             if ($found !== false) {
                 break;
             }
