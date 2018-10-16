@@ -16,12 +16,16 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Response;
+use Twig_Error_Loader;
+use Twig_Error_Runtime;
+use Twig_Error_Syntax;
 
 /**
+ * Controller to work with email templates.
+ * Provides delete, list, compile, variables actions for email templates.
+ *
  * @RouteResource("emailtemplate")
  * @NamePrefix("oro_api_")
- *
- * Controller to work with email templates
  */
 class EmailTemplateController extends RestController
 {
@@ -187,18 +191,27 @@ class EmailTemplateController extends RestController
             );
         }
 
-        list($subject, $body) = $this->get('oro_email.email_renderer')
-            ->compileMessage($emailTemplate, $templateParams);
+        try {
+            [$subject, $body] = $this->get('oro_email.email_renderer')->compileMessage($emailTemplate, $templateParams);
 
-        $data = [
-            'subject' => $subject,
-            'body'    => $body,
-            'type'    => $emailTemplate->getType(),
-        ];
+            $view = $this->view(
+                [
+                    'subject' => $subject,
+                    'body' => $body,
+                    'type' => $emailTemplate->getType(),
+                ],
+                Codes::HTTP_OK
+            );
+        } catch (Twig_Error_Syntax|Twig_Error_Loader|Twig_Error_Runtime $e) {
+            $view = $this->view(
+                [
+                    'reason' => $this->get('translator')->trans('oro.email.emailtemplate.failed_to_compile'),
+                ],
+                Codes::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
 
-        return $this->handleView(
-            $this->view($data, Codes::HTTP_OK)
-        );
+        return $this->handleView($view);
     }
 
     /**
