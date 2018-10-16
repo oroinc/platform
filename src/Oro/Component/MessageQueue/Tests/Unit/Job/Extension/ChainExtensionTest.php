@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Component\MessageQueue\Tests\Unit\Job;
+namespace Oro\Component\MessageQueue\Tests\Unit\Job\Extension;
 
-use Oro\Component\MessageQueue\Job\ChainExtension;
-use Oro\Component\MessageQueue\Job\ExtensionInterface;
+use Oro\Component\MessageQueue\Job\Extension\ChainExtension;
+use Oro\Component\MessageQueue\Job\Extension\ExtensionInterface;
 use Oro\Component\MessageQueue\Job\Job;
 
 class ChainExtensionTest extends \PHPUnit\Framework\TestCase
@@ -84,5 +84,28 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
             ->with($job, true);
 
         $this->chainExtension->onPostCreateDelayed($job, true);
+    }
+
+    public function testOnCancel()
+    {
+        $job = new Job();
+
+        $this->subExtension->expects($this->once())
+            ->method('onCancel')
+            ->with($job);
+
+        $this->chainExtension->onCancel($job);
+    }
+
+
+    public function testOnError()
+    {
+        $job = new Job();
+
+        $this->subExtension->expects($this->once())
+            ->method('onError')
+            ->with($job);
+
+        $this->chainExtension->onError($job);
     }
 }

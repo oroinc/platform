@@ -20,9 +20,9 @@ class SqlWalker extends TranslationWalker
     /**
      * {@inheritdoc}
      */
-    public function walkSubselect($subselect)
+    public function walkSubselect($selectClause)
     {
-        $sql = parent::walkSubselect($subselect);
+        $sql = parent::walkSubselect($selectClause);
         $hookIdentifier = $this->getQuery()->getHint(self::WALKER_HOOK_LIMIT_KEY);
         $limitValue = $this->getQuery()->getHint(self::WALKER_HOOK_LIMIT_VALUE);
         $identifierField = $this->getQuery()->getHint(self::WALKER_HOOK_LIMIT_ID);
@@ -35,4 +35,6 @@ class SqlWalker extends TranslationWalker
 
         return $this->hookUnion($sql);
     }
+
+
 }

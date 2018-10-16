@@ -377,6 +377,26 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @When /^(?:|I )check records in grid:$/
+     * @When /^(?:|I )check records in "(?P<gridName>[\w\s]+)":$/
+     * @When /^(?:|I )check records in "(?P<gridName>[\w\s]+)" grid:$/
+     *
+     * @param TableNode $table
+     * @param string $gridName
+     */
+    public function iCheckRecordsInGrid(TableNode $table, ?string $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        if (!count($grid->getRows())) {
+            self::fail('Grid has no records to check');
+        }
+        foreach ($table->getRows() as $row) {
+            $first = reset($row);
+            $grid->checkRecord($first);
+        }
+    }
+
+    /**
      * @Then /^(?:|I )uncheck (?P<content>\S+) record in grid$/
      * @Then /^(?:|I )uncheck (?P<content>\S+) record in "(?P<gridName>[\w\s]+)" grid$/
      * @Then /^(?:|I )uncheck (?P<content>\S+) record in "(?P<gridName>[\w\s]+)"$/
@@ -1928,5 +1948,37 @@ TEXT;
             $this->getGrid($gridName)->getRowByContent($content)->hasMassActionCheckbox(),
             sprintf('Grid row with "%s" content has mass action checkbox in it', $content)
         );
+    }
+
+    /**
+     * Example: I should see next options in "Some select element":
+     *   | Please select |
+     *   | Option A      |
+     *   | Option B      |
+     *
+     * @Then /^(?:|I )should see next options in "(?P<selectElementName>[\w\s]+)"/
+     * @param TableNode $expectedTableNode
+     * @param string $selectElementName
+     */
+    public function iShouldSeeNextOptionsInSelect(TableNode $expectedTableNode, $selectElementName)
+    {
+        $selectElement = $this->createElement($selectElementName);
+        /** @var Element[] $optionElements */
+        $optionElements = $selectElement->findAll('css', 'option');
+
+        $optionValues = [];
+        foreach ($optionElements as $optionElement) {
+            $optionValues[] = trim($optionElement->getText()); //Removes spaces at the beginning
+        }
+
+        $expectedRows = $expectedTableNode->getRows();
+
+        foreach ($expectedRows as $rowKey => $expectedRow) {
+            self::assertContains(
+                $expectedRow[0],
+                $optionValues,
+                sprintf('There is no such sorting option: "%s"', $expectedRow[0])
+            );
+        }
     }
 }

@@ -229,7 +229,21 @@ class SegmentManager
 
         $qb = $this->applyOrderByParts($segment, $qb, $alias);
 
-        return $qb->where($qb->expr()->in($alias . '.' . $identifier, $subQuery));
+
+        $return =  $qb->where($qb->expr()->in($alias . '.' . $identifier, $subQuery));
+
+        $query = $qb->getQuery();
+
+        if ($segment->getRecordsLimit()) {
+            $this->subqueryLimitHelper->setLimit(
+                $query,
+                $segment->getRecordsLimit(),
+                $identifier
+            );
+        }
+        $hints = $query->getHints();
+
+        return $return;
     }
 
     /**
@@ -295,14 +309,6 @@ class SegmentManager
             $queryBuilder->resetDQLParts(['select']);
             $queryBuilder->select($tableIdentifier);
 
-            if ($segment->getRecordsLimit()) {
-                $queryBuilder = $this->subqueryLimitHelper->setLimit(
-                    $queryBuilder,
-                    $segment->getRecordsLimit(),
-                    $identifier
-                );
-            }
-
             $subQuery = $queryBuilder->getDQL();
         } else {
             $subQuery = $queryBuilder->getDQL();
@@ -314,7 +320,7 @@ class SegmentManager
             $externalQueryBuilder->setParameter($param->getName(), $param->getValue(), $param->getType());
         }
 
-        return $subQuery;
+        return $subQuery . ' LIMIT(7)';
     }
 
     /**

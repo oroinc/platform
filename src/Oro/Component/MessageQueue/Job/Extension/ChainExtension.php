@@ -1,6 +1,8 @@
 <?php
 
-namespace Oro\Component\MessageQueue\Job;
+namespace Oro\Component\MessageQueue\Job\Extension;
+
+use Oro\Component\MessageQueue\Job\Job;
 
 /**
  * MQ job extension that contains all job extensions and process them.
@@ -75,6 +77,26 @@ class ChainExtension implements ExtensionInterface
     {
         foreach ($this->extensions as $extension) {
             $extension->onPostRunDelayed($job, $jobResult);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onCancel(Job $job)
+    {
+        foreach ($this->extensions as $extension) {
+            $extension->onCancel($job);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onError(Job $job)
+    {
+        foreach ($this->extensions as $extension) {
+            $extension->onError($job);
         }
     }
 }
