@@ -7,10 +7,16 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\SearchResultProperty;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+/**
+ * Property formatter for tags for datagrid
+ */
 class TagSearchResultProperty extends SearchResultProperty
 {
     /** @var ConfigProvider */
     protected $entityConfigProvider;
+
+    /** @var string */
+    private $defaultTemplate;
 
     /**
      * @param \Twig_Environment $environment
@@ -19,7 +25,7 @@ class TagSearchResultProperty extends SearchResultProperty
      */
     public function __construct(\Twig_Environment $environment, ConfigProvider $configProvider, $defaultTemplate)
     {
-        parent::__construct($environment, []);
+        parent::__construct($environment);
 
         $this->entityConfigProvider = $configProvider;
         $this->defaultTemplate      = $defaultTemplate;
