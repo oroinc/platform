@@ -10,7 +10,7 @@ use Oro\Bundle\AddressBundle\Entity\Country;
 /**
  * Entity repository for Country dictionary.
  */
-class CountryRepository extends EntityRepository
+class CountryRepository extends EntityRepository implements IdentityAwareTranslationRepositoryInterface
 {
     /**
      * @return Country[]
@@ -51,10 +51,12 @@ class CountryRepository extends EntityRepository
     }
 
     /**
-     * @param array $data
+     * {@inheritdoc}
      */
-    public function updateTranslations(array $data)
+    public function updateTranslations(array $data, string $locale = null)
     {
+//        @\Symfony\Component\VarDumper\VarDumper::dump($data);
+
         if (!$data) {
             return;
         }

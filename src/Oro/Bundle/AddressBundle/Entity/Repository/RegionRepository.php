@@ -12,7 +12,7 @@ use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 /**
  * Entity repository for Region dictionary.
  */
-class RegionRepository extends EntityRepository
+class RegionRepository extends EntityRepository implements IdentityAwareTranslationRepositoryInterface
 {
     use TranslatableQueryTrait;
 
@@ -59,9 +59,9 @@ class RegionRepository extends EntityRepository
 
 
     /**
-     * @param array $data
+     * {@inheritdoc}
      */
-    public function updateTranslations(array $data)
+    public function updateTranslations(array $data, string $locale = null)
     {
         if (!$data) {
             return;
