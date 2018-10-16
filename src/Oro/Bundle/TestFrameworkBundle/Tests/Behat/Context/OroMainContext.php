@@ -256,7 +256,7 @@ class OroMainContext extends MinkContext implements
     /**
      * Example: I follow "My Configuration" link within flash message
      *
-     * @Then /^(?:|I )follow "(?P<title>[^"]+)" link within flash message "(?P<message>[^"]+)"$/
+     * @Then /^(?:|I )follow "(?P<title>[^"]+)" link within flash message "(?P<message>([^"\\]|\\.)*)"$/
      *
      * @param string $title
      * @param string $message
@@ -353,7 +353,7 @@ class OroMainContext extends MinkContext implements
                 foreach ($flashMessages as $flashMessage) {
                     if ($flashMessage->isValid() && $flashMessage->isVisible()) {
                         $text = $flashMessage->getText();
-                        if (false !== stripos($text, $title)) {
+                        if (false !== stripos($text, $title) || false !== stripos($text, stripslashes($title))) {
                             return $flashMessage;
                         }
                     }

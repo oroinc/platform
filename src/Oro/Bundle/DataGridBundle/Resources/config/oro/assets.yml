@@ -2,4 +2,4 @@ assets:
     css:
       'orodatagrid':
           - 'bundles/orodatagrid/css/scss/main.scss'
-          # - 'bundles/orodatagrid/css/scss/inline-editing-help.scss'
+          # - 'bundles/orodatagrid/css/scss/inline-editing-help.scss' component temporary not in use

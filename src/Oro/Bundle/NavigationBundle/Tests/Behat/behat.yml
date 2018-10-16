@@ -94,6 +94,18 @@ oro_behat_extension:
       selector: '.jstree-wrapper .jstree-container-ul .jstree-anchor'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    Scrollspy Link:
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+      selector:
+        locator: '//div[contains(@class,"scrollspy-nav")]/nav/a'
+        type: xpath
+
+    Tab Link:
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+      selector:
+        locator: '//div[contains(@class,"oro-tabs__head")]/ul/li/a'
+        type: xpath
+
   pages:
     Shortcut Actionslist:
       class: Oro\Bundle\NavigationBundle\Tests\Behat\Page\ShortcutActionslist
