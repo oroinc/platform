@@ -984,6 +984,15 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: When I scroll to bottom
+     * @When /^I scroll to bottom/
+     */
+    public function scrollBottom()
+    {
+        $this->getSession()->executeScript('window.scrollTo(0,document.body.scrollHeight);');
+    }
+
+    /**
      * Click on button in modal window
      * Example: Given I click "Edit" in modal window
      * Example: When I click "Save and Close" in modal window
