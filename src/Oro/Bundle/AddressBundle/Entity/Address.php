@@ -11,7 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * Address
  *
  * @ORM\Table("oro_address")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\AddressTypeRepository")
  * @Config(
  *      defaultValues={
  *          "entity"={

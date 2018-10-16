@@ -9,7 +9,7 @@ use Gedmo\Translatable\Entity\MappedSuperclass\AbstractTranslation;
  * @ORM\Table(name="oro_address_type_translation", indexes={
  *      @ORM\Index(name="address_type_translation_idx", columns={"locale", "object_class", "field", "foreign_key"})
  * })
- * @ORM\Entity(repositoryClass="Gedmo\Translatable\Entity\Repository\TranslationRepository")
+ * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\AddressTypeTranslationRepository")
  */
 class AddressTypeTranslation extends AbstractTranslation
 {

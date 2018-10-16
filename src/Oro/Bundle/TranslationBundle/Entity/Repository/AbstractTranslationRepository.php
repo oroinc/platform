@@ -18,6 +18,9 @@ abstract class AbstractTranslationRepository extends TranslationRepository
      */
     protected function doUpdateTranslations(string $className, string $fieldName, array $data, string $locale)
     {
+//        @\Symfony\Component\VarDumper\VarDumper::dump($className);
+//        @\Symfony\Component\VarDumper\VarDumper::dump($fieldName);
+
         if (!$data) {
             return;
         }
