@@ -2,35 +2,33 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\Mapping\ClassMetadata;
+
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider as Provider;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $cache;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityConfigProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $extendConfigProvider;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrine;
 
     /** @var EntitySecurityMetadata */
@@ -41,14 +39,17 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected $extendConfig;
 
-    /** @var AclGroupProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
-    private $aclGroupProvider;
-
     protected function setUp()
     {
-        $this->securityConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->securityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->extendConfig = new Config(new EntityConfigId('extend', \stdClass::class));
         $this->extendConfig->set('state', ExtendScope::STATE_ACTIVE);
         $this->cache = $this->getMockForAbstractClass(
@@ -61,8 +62,9 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             array('fetch', 'save', 'delete', 'deleteAll')
         );
 
-        $this->doctrine = $this->createMock(ManagerRegistry::class);
-        $this->aclGroupProvider = $this->createMock(AclGroupProviderInterface::class);
+        $this->doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->entity = new EntitySecurityMetadata(
             Provider::ACL_SECURITY_TYPE,
@@ -73,7 +75,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             null,
             '',
             [
-                'cityName' => new FieldSecurityMetadata(
+                'cityName'  => new FieldSecurityMetadata(
                     'cityName',
                     'translated: stdclass.city_name.label',
                     []
@@ -83,7 +85,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
                     'translated: stdclass.first_name.label',
                     ['VIEW', 'CREATE']
                 ),
-                'lastName' => new FieldSecurityMetadata(
+                'lastName'  => new FieldSecurityMetadata(
                     'lastName',
                     'translated: stdclass.last_name.label',
                     []
@@ -96,19 +98,12 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->extendConfig));
     }
 
-    /**
-     * @dataProvider groupDataProvider
-     *
-     * @param string $class
-     * @param string $group
-     * @param bool $expected
-     */
-    public function testIsProtectedEntity($class, $group, $expected)
+    public function testIsProtectedEntity()
     {
         $this->cache->expects($this->any())
             ->method('fetch')
             ->with(Provider::ACL_SECURITY_TYPE)
-            ->will($this->returnValue(array(\stdClass::class => $this->entity)));
+            ->will($this->returnValue(array(\stdClass::class => new EntitySecurityMetadata())));
 
         $eventDispatcher = $this->getMockForAbstractClass(
             'Symfony\Component\EventDispatcher\EventDispatcherInterface'
@@ -123,27 +118,9 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             $this->cache,
             $eventDispatcher
         );
-        $provider->setAclGroupProvider($this->aclGroupProvider);
 
-        $this->aclGroupProvider->expects($this->any())
-            ->method('getGroup')
-            ->willReturn($group);
-
-        $this->assertSame($expected, $provider->isProtectedEntity($class));
-    }
-
-    /**
-     * @return array
-     */
-    public function groupDataProvider(): array
-    {
-        return [
-            'no group supported' => [\stdClass::class, '', true],
-            'no group unsupported' => ['UnknownClass', '', false],
-            'supported group supported entity' => [\stdClass::class, 'SomeGroup', true],
-            'supported group unsupported entity' => ['UnknownClass', 'SomeGroup', false],
-            'unsupported group supported entity' => [\stdClass::class, 'UnsupportedGroup', false],
-        ];
+        $this->assertTrue($provider->isProtectedEntity(\stdClass::class));
+        $this->assertFalse($provider->isProtectedEntity('UnknownClass'));
     }
 
     public function testGetEntities()
