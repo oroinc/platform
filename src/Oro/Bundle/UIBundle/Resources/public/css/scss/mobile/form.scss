@@ -27,6 +27,31 @@
     }
 }
 
+/**
+    Uploader uniform
+**/
+.uploader {
+    width: 100%;
+    height: 40px;
+    font-size: $base-font-size--m;
+
+    .filename {
+        width: 100%;
+    }
+
+    .action {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+
+    .filename,
+    .action {
+        height: 36px;
+        line-height: 36px;
+    }
+}
+
 .input-append,
 .input-prepend {
     .add-on,
@@ -53,9 +78,12 @@
     .control-group {
         max-width: $form-horizontal-control-group-max-width;
         margin: $form-horizontal-control-group-offset;
+        display: $form-horizontal-control-group-display;
 
-        label.control-label {
+        .control-label {
             width: $form-horizontal-control-label-width;
+            padding-bottom: $form-horizontal-control-label-inner-offset-bottom;
+            text-align: #{$start};
         }
 
         .controls {

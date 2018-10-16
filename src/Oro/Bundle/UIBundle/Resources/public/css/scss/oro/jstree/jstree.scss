@@ -139,6 +139,7 @@
 
 .jstree-search-component {
     position: $jstree-search-component-position;
+    margin-bottom: $jstree-search-component-bottom-offset;
 
     &.active-search & {
         &__clear-icon {
@@ -151,7 +152,10 @@
     }
 
     &__input {
-        width: $jstree-search-component-input-width;
+        &:not(textarea) {
+            width: $jstree-search-component-input-width;
+            margin-bottom: $jstree-search-component-input-bottom-offset;
+        }
 
         &::-ms-clear {
             display: $jstree-search-component-clear-active-input-display;

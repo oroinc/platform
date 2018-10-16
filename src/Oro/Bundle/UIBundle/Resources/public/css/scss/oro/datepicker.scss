@@ -356,8 +356,11 @@ body .ui-datepicker {
         color: #555;
     }
 
-    .datepicker-input + .timepicker-input {
-        margin-left: 5px;
+    .datepicker-input {
+        margin-right: 5px;
+    }
+
+    .timepicker-input {
         min-width: 70px;
     }
 }

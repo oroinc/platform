@@ -19,47 +19,32 @@
 }
 
 .form-horizontal {
-    .controls {
-        padding-top: 7px;
+    .control-group {
+        display: flex;
 
-        .controls {
-            padding-top: 0;
+        > .control-label {
+            width: 200px;
+            min-width: 150px;
+            font-weight: normal;
+            text-align: #{$end};
         }
 
-        input:not([type=checkbox]):not([type=radio]),
-        textarea,
-        .selector,
-        .select2-container,
-        .input-append {
-            margin-top: -6px;
+        label.control-label {
+            margin-bottom: 0;
+            padding-top: 9px;
 
-            + .fallback-status {
-                margin-top: -6px;
+            .desktop-version & + .controls {
+                padding-top: 9px;
             }
         }
 
-        .input-append .select2-container,
-        .select2-container input:not([type=checkbox]):not([type=radio]) {
-            margin-top: 0;
-        }
-    }
-
-    .control-group {
-        label.control-label {
-            float: left;
-            width: 160px;
-            margin-bottom: 0;
-            padding-top: 9px;
-            font-weight: normal;
-            text-align: right;
-        }
-
         .control-label.wrap {
-            float: left;
             padding-top: 6px;
-            font-weight: normal;
             line-height: 20px;
-            text-align: right;
+
+            .desktop-version & + .controls {
+                padding-top: 6px;
+            }
 
             .tooltip-icon {
                 margin-right: 5px;
@@ -71,9 +56,13 @@
         }
 
         .controls {
-            margin-#{$start}: 170px;
+            margin-#{$start}: 13px;
 
             text-align: #{$start};
+
+            &:first-child {
+                margin-#{$start}: 169px;
+            }
 
             &.autocomplete-box {
                 margin-bottom: 10px;
@@ -81,11 +70,6 @@
             }
 
             .control-label {
-                width: 100%;
-                word-wrap: break-word;
-                padding-left: 5px; // to get nice hover background
-                padding-top: 0;
-
                 &.html-property {
                     overflow: auto;
                 }
@@ -105,21 +89,22 @@
                     margin-right: 5px;
                 }
             }
-
-            .control-label.wrap {
-                width: auto;
-                padding-left: 0;
-                padding-right: 5px;
-            }
-
-            label.control-label {
-                width: auto;
-            }
         }
 
         &.attribute-row label.control-label {
             cursor: default;
             color: $primary-550;
+        }
+
+        &.control-group-datetime {
+            input[type="text"] {
+                &.datepicker-input {
+                    width: 189px;
+                }
+                &.timepicker-input {
+                    width: 100px;
+                }
+            }
         }
     }
 }
@@ -127,14 +112,6 @@
 .form-horizontal-large {
     .control-group {
         max-width: 100%;
-
-        .controls {
-            margin-left: 240px;
-
-            div.control-label {
-                text-align: left;
-            }
-        }
 
         div.control-label,
         label.control-label {
@@ -172,4 +149,16 @@ input[type='checkbox'] + label {
 
 .form-row {
     padding: 0 0 $margin-bottom-box/2;
+}
+
+@media only screen and (max-width: 1200px) {
+    .form-horizontal {
+        .control-group {
+            > div.control-label,
+            > label.control-label {
+                width: 150px;
+                min-width: 150px;
+            }
+        }
+    }
 }

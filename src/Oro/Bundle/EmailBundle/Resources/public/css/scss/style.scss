@@ -159,7 +159,6 @@
         }
 
         .tab-pane {
-            input,
             textarea {
                 width: 100%;
                 box-sizing: border-box;
@@ -264,10 +263,8 @@
             }
         }
 
-        input,
-        textarea,
-        .uneditable-input {
-            width: 97%;
+        input[type=radio] {
+            width: auto;
         }
     }
 
@@ -279,10 +276,6 @@
 }
 
 .select2-container.select2-container-multi.taggable-email {
-    width: calc(97% + 12px);
-    max-width: none;
-    position: relative;
-
     ul.select2-choices {
         padding-right: 60px;
     }

@@ -124,3 +124,15 @@
         }
     }
 }
+
+@media only screen and (max-width: $small-devices-media-breakpoint) {
+    .select2 {
+        &-container {
+            .select2-choice {
+                .select2-chosen {
+                    max-width: 200px;
+                }
+            }
+        }
+    }
+}

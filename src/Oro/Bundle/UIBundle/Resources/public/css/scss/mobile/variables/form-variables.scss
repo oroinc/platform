@@ -22,9 +22,12 @@ $controls-fields-row-input-small-width: 140px;
 $form-horizontal-max-width: 100%;
 $form-horizontal-control-group-max-width: initial;
 $form-horizontal-control-group-offset: 0 0 7px;
-$form-horizontal-control-label-width: 85px;
+$form-horizontal-control-group-display: block;
 
-$form-horizontal-controls-offset-left: 95px;
+$form-horizontal-control-label-width: auto;
+$form-horizontal-control-label-inner-offset-bottom: 6px;
+
+$form-horizontal-controls-offset-left: 0;
 
 $control-group-checkbox-position: relative;
 $control-group-checkbox-display: inline-block;
@@ -35,7 +38,7 @@ $control-group-checkbox-label-offset-right: 2px;
 $control-group-checkbox-label-line-height: 18px;
 
 $control-group-checkbox-controls-position: absolute;
-$control-group-checkbox-controls-top: 0;
+$control-group-checkbox-controls-top: 6px;
 $control-group-checkbox-controls-right: 0;
 
 $control-select2-container-width: 100%;

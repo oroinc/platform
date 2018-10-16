@@ -31,6 +31,11 @@
 }
 
 .widget-configuration {
+    .widget-title-widget {
+        float: none;
+        margin-#{$end}: 0;
+    }
+
     .date-range-filter {
         max-width: 300px;
 

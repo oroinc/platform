@@ -58,6 +58,7 @@ $uploader-action-active-background: $additional-extra-light !default;
 $uploader-action-active-color: $primary-400 !default;
 $uploader-action-active-border-color: $additional-extra-light !default;
 
+$select-width: $field-width - 15px !default;
 $selector-line-height: $field-size !default;
 $selector-height: $field-size !default;
 $selector-width: 235px !default;
@@ -93,10 +94,8 @@ $selector-uniform-arrow-right: 5px !default;
 $selector-uniform-arrow-color: $primary-400 !default;
 $selector-uniform-line-height: 1 !default;
 
-$selector-widget-select-width: 100% !default;
-
 // Add-on field button
-$add-on-vertical-align: middle !default;
+$add-on-vertical-align: baseline !default;
 $add-on-float: none !default;
 $add-on-border: 2px solid $primary-750 !default;
 $add-on-background-color: $primary-inverse !default;

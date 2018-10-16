@@ -11,6 +11,7 @@
     margin-bottom: $input-outer-offset-bottom;
     box-sizing: $input-box-sizing;
     outline: $input-outline;
+    width: $field-width;
 
     &:not(textarea) {
         height: $field-size;
@@ -169,10 +170,6 @@ input[type="color"],
         }
     }
 
-    &.input-widget-select select {
-        width: $selector-widget-select-width;
-    }
-
     &.focus,
     &.hover,
     &:hover {
@@ -316,13 +313,7 @@ input[type="color"],
 /* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
 .controls {
     select {
-        width: $controls-width;
-    }
-
-    .selector {
-        select {
-            width: $controls-selector-width;
-        }
+        width: $select-width;
     }
 }
 // Need refactor

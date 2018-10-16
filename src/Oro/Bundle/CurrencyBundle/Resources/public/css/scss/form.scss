@@ -4,7 +4,7 @@
     .input-append,
     .base-currency {
         input:first-child {
-            width: 219px;
+            width: $field-width - 60px;
         }
 
         select {

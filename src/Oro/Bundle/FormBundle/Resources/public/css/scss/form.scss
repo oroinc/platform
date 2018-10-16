@@ -122,10 +122,15 @@
         td {
             padding-top: $controls-list-group-inner-offset-top;
             padding-bottom: $controls-list-group-inner-offset-bottom;
+            vertical-align: $controls-list-group-vertical-align;
 
             &:first-child,
             &.fallback-item-value {
                 padding-left: $controls-list-group-fallback-item-value-inner-offset-left;
+            }
+
+            label {
+                margin-bottom: $controls-list-group-label-bottom-offset;
             }
         }
     }
