@@ -8,7 +8,7 @@ define(function(require) {
     AbstractConditionContainerView = BaseView.extend({
         tagName: 'li',
 
-        className: 'condition controls',
+        className: 'condition',
 
         /**
          * @type {string}

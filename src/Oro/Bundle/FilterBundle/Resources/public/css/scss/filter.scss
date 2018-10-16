@@ -649,6 +649,7 @@
 
     i {
         cursor: $field-condition-date-popover-cursor;
+        color: $field-condition-date-popover-trigger-color;
     }
 }
 
@@ -661,6 +662,13 @@
 }
 
 .filter-date-range {
+    .filter-separator {
+        display: $filter-date-range-filter-separator-display;
+    }
+}
+
+.filter-start-date,
+.filter-end-date {
     .datetime-visual-element {
         width: $filter-date-range-datetime-visual-element-width;
         margin-bottom: $filter-date-range-datetime-visual-element-offset-bottom;
@@ -669,10 +677,6 @@
     .timepicker-input {
         width: $filter-date-range-timepicker-input-width;
         margin: $filter-date-range-timepicker-input-offset;
-    }
-
-    .filter-separator {
-        display: $filter-date-range-filter-separator-display;
     }
 }
 

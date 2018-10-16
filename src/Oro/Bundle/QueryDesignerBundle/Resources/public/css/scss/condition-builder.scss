@@ -42,14 +42,16 @@
             background-color: $condition-builder-drag-n-drop-target-background-color;
         }
     }
+
+    > .conditions-group {
+        padding: 0 $condition-builder-condition-container-space;
+    }
 }
 
 .conditions-group {
     width: 100%;
     list-style: none;
     margin: 0;
-    padding: 0 $condition-builder-condition-container-space;
-    box-sizing: border-box;
 
     &:before,
     &:after {
@@ -110,21 +112,8 @@
 
         .conditions-group {
             min-height: $condition-builder-conditions-group-min-height;
-        }
-
-        .condition-item {
-            border: $condition-builder-condition-item-border;
-            border-radius: $condition-builder-condition-item-border-radius;
-            padding: $horizontal-padding * .5 $vertical-padding * .8;
-
-            input[type='text'] {
-                margin-bottom: 0;
-            }
-        }
-
-        & > .conditions-group {
             border-#{$start}: $condition-builder-conditions-group-start-border;
-            padding-#{$start}: $vertical-padding * .8;
+            padding-#{$start}: $condition-builder-conditions-group-start-padding;
         }
 
         & > .btn-close {
@@ -210,6 +199,15 @@
 }
 
 .condition-item {
+    border: $condition-builder-condition-item-border;
+    border-radius: $condition-builder-condition-item-border-radius;
+    padding: $condition-builder-condition-item-padding;
+
+    input[type='text'] {
+        margin-top: $condition-builder-condition-item-input-margin-top;
+        margin-bottom: 0;
+    }
+
     .select2-container,
     .select2-choice,
     .select2-chosen {
@@ -221,9 +219,9 @@
         width: $condition-builder-condition-item-select2-container-width;
         max-width: $condition-builder-condition-item-select2-container-max-width;
         min-width: $condition-builder-condition-item-select2-container-min-width;
+        height: $condition-builder-condition-item-select2-container-height;
         vertical-align: initial;
         display: block;
-        margin-bottom: $condition-builder-condition-item-select2-container-margin-bottom;
 
         .select2-choice {
             box-shadow: none;
@@ -248,6 +246,7 @@
 
         .select2-choice,
         .select2-chosen {
+            padding-left: 0;
             line-height: $condition-builder-condition-item-select2-chose-line-height;
             display: inline;
             white-space: normal;
@@ -296,13 +295,9 @@
 
         .fields-row > .datefilter {
             display: inline-block;
-            margin-bottom:  $condition-builder-condition-item-datefilter-margin-bottom;
         }
 
-        .caret {
-            display: none;
-        }
-
+        .dropdown-toggle:after,
         .filter-update {
             display: none;
         }

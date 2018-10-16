@@ -203,14 +203,15 @@
     }
 }
 
-li[data-criteria="condition-activity"] {
+.condition-item.condition-activity {
     .btn.filter-select {
         border: none;
-        background: none;
+        background: none transparent;
         font-weight: normal;
         padding-#{$start}: 0;
         padding-#{$end}: 0;
         color: $activity-filter-select-color;
+        box-shadow: none;
     }
 
     .filter-item {
@@ -219,5 +220,9 @@ li[data-criteria="condition-activity"] {
         .fa-close {
             margin-#{$end}: 0;
         }
+    }
+
+    .dropdown-toggle:after {
+        display: none;
     }
 }
