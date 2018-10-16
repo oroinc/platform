@@ -19,19 +19,6 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 class EmailTemplateRepository extends EntityRepository
 {
     /**
-     * @var AclHelper;
-     */
-    private $aclHelper;
-
-    /**
-     * @param AclHelper $aclHelper
-     */
-    public function setAclHelper(AclHelper $aclHelper)
-    {
-        $this->aclHelper = $aclHelper;
-    }
-
-    /**
      * Gets a template by its name
      * This method can return null if the requested template does not exist
      *
@@ -46,14 +33,16 @@ class EmailTemplateRepository extends EntityRepository
     /**
      * Load templates by entity name
      *
-     * @param string       $entityName
+     * @param AclHelper $aclHelper
+     * @param string $entityName
      * @param Organization $organization
-     * @param bool         $includeNonEntity
-     * @param bool         $includeSystemTemplates
+     * @param bool $includeNonEntity
+     * @param bool $includeSystemTemplates
      *
      * @return EmailTemplate[]
      */
     public function getTemplateByEntityName(
+        AclHelper $aclHelper,
         $entityName,
         Organization $organization,
         $includeNonEntity = false,
@@ -66,11 +55,11 @@ class EmailTemplateRepository extends EntityRepository
             $includeSystemTemplates
         );
 
-        if ($this->aclHelper === null) {
+        if ($aclHelper === null) {
             return $qb->getQuery()->getResult();
         }
 
-        return $this->aclHelper->apply($qb)->getResult();
+        return $aclHelper->apply($qb)->getResult();
     }
 
     /**

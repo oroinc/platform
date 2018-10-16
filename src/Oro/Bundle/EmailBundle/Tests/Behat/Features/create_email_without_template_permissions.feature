@@ -1,6 +1,7 @@
 @fixture-OroUserBundle:user.yml
 Feature: Create email without template permissions
-  As user
+  In order to ensure email templates can be used only by users who have permissions
+  As a user
   I need to be able to create email but if I do not have email template permissions I can not choose email templates
 
   Scenario: Disable template permissions for Sales Rep role
@@ -20,7 +21,7 @@ Feature: Create email without template permissions
     And I should not see "Apply template"
     And fill "Email Form" with:
       | Body    | Create new email without template permissions |
-      | To      | Charlie Sheen                 |
-      | Subject | Behat test                    |
+      | To      | Charlie Sheen                                 |
+      | Subject | Behat test                                    |
     And click "Send"
     Then I should see "The email was sent" flash message

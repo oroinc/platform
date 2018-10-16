@@ -49,6 +49,7 @@ class EmailTemplateRepositoryTest extends WebTestCase
         $owner = $this->getReference(LoadEmailTemplateData::OWNER_USER_REFERENCE);
 
         $actualResult = $this->getRepository()->getTemplateByEntityName(
+            self::getContainer()->get('oro_security.acl_helper'),
             LoadEmailTemplateData::ENTITY_NAME,
             $owner->getOrganization(),
             true,
@@ -91,6 +92,7 @@ class EmailTemplateRepositoryTest extends WebTestCase
         $owner = $this->getReference(LoadEmailTemplateData::OWNER_USER_REFERENCE);
 
         $actualResult = $this->getRepository()->getTemplateByEntityName(
+            self::getContainer()->get('oro_security.acl_helper'),
             'Entity\Name',
             $owner->getOrganization(),
             $includeNonEntity,

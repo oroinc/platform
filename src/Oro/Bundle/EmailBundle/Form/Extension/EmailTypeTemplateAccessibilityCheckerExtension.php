@@ -14,9 +14,6 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class EmailTypeTemplateAccessibilityCheckerExtension extends AbstractTypeExtension
 {
-    private const FIELD_NAME  = 'template';
-    private const PERMISSIONS = ['VIEW'];
-
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
 
@@ -41,8 +38,8 @@ class EmailTypeTemplateAccessibilityCheckerExtension extends AbstractTypeExtensi
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (!$this->authorizationChecker->isGranted(self::PERMISSIONS, 'entity:' . EmailTemplate::class)) {
-            $builder->remove(self::FIELD_NAME);
+        if (!$this->authorizationChecker->isGranted('VIEW', 'entity:' . EmailTemplate::class)) {
+            $builder->remove('template');
         }
     }
 }
