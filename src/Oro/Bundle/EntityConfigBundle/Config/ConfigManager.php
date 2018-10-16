@@ -577,6 +577,8 @@ class ConfigManager
     protected function prepareFlush(&$models)
     {
         $groupedConfigs = [];
+        $persistConfigsCount = count($this->persistConfigs);
+
         foreach ($this->persistConfigs as $config) {
             $this->calculateConfigChangeSet($config);
 
@@ -631,7 +633,9 @@ class ConfigManager
             }
         }
 
-        if (count($this->persistConfigs) !== count($this->configChangeSets)) {
+        if (count($this->persistConfigs) !== count($this->configChangeSets)
+            || count($this->persistConfigs) !== $persistConfigsCount
+        ) {
             $this->prepareFlush($models);
         }
     }
