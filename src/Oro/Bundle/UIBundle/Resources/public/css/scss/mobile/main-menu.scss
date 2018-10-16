@@ -48,6 +48,12 @@
 
     .accordion {
         .title {
+            margin: 0;
+
+            font-weight: normal;
+
+            background-color: transparent;
+
             @include text-line-truncate();
         }
 

@@ -72,7 +72,6 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function($, Backbone, 
                         'id': headerId,
                         'data-toggle': 'collapse',
                         'data-target': '#' + targetId,
-                        'data-parent': autoCollapse ? $header.closest('.accordion').attr('id') : null,
                         'aria-controls': targetId,
                         'aria-expanded': isActive
                     })
@@ -81,6 +80,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function($, Backbone, 
                 $target.attr({
                     'id': targetId,
                     'role': 'menu',
+                    'data-parent': autoCollapse ? '#' + $header.closest('.accordion').attr('id') : null,
                     'aria-labelledby': headerId
                 }).toggleClass('show', isActive);
 

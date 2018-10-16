@@ -23,6 +23,11 @@
         border: 0;
         border-radius: corner-values(0 2px 2px 2px);
         box-shadow: $menu-dropdown-box-shadow;
+
+        &:before,
+        &:after {
+            content: none;
+        }
     }
 
     .title {
@@ -268,6 +273,8 @@
                         color: $menu-item-text-color;
 
                         content: none;
+
+                        @include reset-caret();
                     }
                 }
             }
