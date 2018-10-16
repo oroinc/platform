@@ -63,9 +63,6 @@ class TranslatorCatalogueListener
 
         $ids = $repository->getAllIdentities();
 
-//        @\Symfony\Component\VarDumper\VarDumper::dump($className);
-//        @\Symfony\Component\VarDumper\VarDumper::dump($prefix);
-
         $data = array_combine(
             $ids,
             array_map(
@@ -75,8 +72,6 @@ class TranslatorCatalogueListener
                 $ids
             )
         );
-
-//        @\Symfony\Component\VarDumper\VarDumper::dump($catalogue->getLocale());
 
         if ($catalogue->getLocale() !== Translator::DEFAULT_LOCALE) {
             $repository = $this->getRepository($className.'Translation');

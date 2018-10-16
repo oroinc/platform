@@ -55,8 +55,6 @@ class CountryRepository extends EntityRepository implements IdentityAwareTransla
      */
     public function updateTranslations(array $data, string $locale = null)
     {
-//        @\Symfony\Component\VarDumper\VarDumper::dump($data);
-
         if (!$data) {
             return;
         }
