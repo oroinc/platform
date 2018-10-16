@@ -20,6 +20,21 @@
         min-width: $dialog-form-mobile-min-width;
     }
 
+    &.ui-dialog-minimized {
+        width: auto !important;
+        min-height: 0 !important;
+        flex-grow: 1;
+
+        .ui-widget-header {
+            padding: 3px 11px 3px 12px;
+            position: static !important;
+        }
+
+        .loading-bar {
+            display: none !important;
+        }
+    }
+
     .ui-dialog-titlebar-maximize,
     .ui-dialog-titlebar-restore,
     .ui-dialog-titlebar-minimize {
@@ -86,6 +101,13 @@
             border: $dialog-mobile-actions-btn-border;
         }
     }
+}
+
+.ui-dialog-minimize-container {
+    width: 100%;
+    position: fixed;
+    bottom: 2px;
+    z-index: 9999;
 }
 
 .ui-widget-overlay {
