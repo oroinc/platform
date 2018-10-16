@@ -106,7 +106,7 @@ body {
         }
 
         .ui-datepicker-header {
-            background: linear-gradient(#fff, #f8f8f8);
+            background: linear-gradient(#fff, $primary-900);
             border: solid #dedede;
             border-width: 0 0 1px;
             border-radius: 0;
@@ -378,7 +378,7 @@ body .ui-datepicker {
 }
 
 .ui-timepicker-div {
-    border: solid #f3f3f3;
+    border: solid $primary-860;
     border-width: 1px 0;
     padding: 0 12px;
 

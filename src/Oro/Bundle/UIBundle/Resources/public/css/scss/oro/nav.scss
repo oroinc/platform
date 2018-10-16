@@ -59,11 +59,10 @@
 
     &-extra {
         padding: 0;
-        margin-bottom: 5px;
+        margin-bottom: $content-padding-small;
 
         > .row > div {
-            margin-top: 10px;
-            margin-bottom: 5px;
+            margin-bottom: $content-padding-small;
         }
     }
 
@@ -72,7 +71,7 @@
 
         .title-buttons-container {
             .btn-group {
-                margin-left: 8px;
+                margin-left: $content-padding-small;
             }
 
             .btn-group .btn-group {

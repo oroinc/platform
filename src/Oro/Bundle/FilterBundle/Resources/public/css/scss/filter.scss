@@ -5,8 +5,6 @@
 }
 
 .filter-box {
-    padding: $filter-box-offset;
-
     .filter-criteria {
         position: $filter-box-criteria-position;
         font-size: $filter-box-criteria-font-size;
@@ -366,6 +364,11 @@
             text-transform: $filter-item-btn-text-transform;
             border: $filter-item-btn-border;
             background-color: $filter-item-btn-background-color;
+
+
+            &:hover {
+                background-color: $filter-item-btn-hover-background-color;
+            }
         }
     }
 

@@ -353,6 +353,7 @@ define(function(require) {
         /**
          * Triggers when filter select is changed
          *
+         * @param {Array} filters
          * @protected
          */
         _onChangeFilterSelect: function(filters) {
@@ -723,6 +724,7 @@ define(function(require) {
         /**
          * Activate/deactivate all filter depends on its status
          *
+         * @param {Array} activeFilters
          * @protected
          */
         _processFilterStatus: function(activeFilters) {
@@ -741,6 +743,7 @@ define(function(require) {
 
         /**
          * Reset button click handler
+         * @param {jQuery.Event} e
          */
         _onReset: function(e) {
             e.stopPropagation();

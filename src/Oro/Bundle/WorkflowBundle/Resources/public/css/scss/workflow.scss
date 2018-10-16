@@ -349,13 +349,13 @@ table.grid {
 
             .workflow-steps-item-arrow-container {
                 color: #909092;
-                background: #f3f3f3;
-                border-top: 1px solid #f3f3f3;
-                border-bottom: 1px solid #f3f3f3;
+                background: $primary-860;
+                border-top: 1px solid $primary-860;
+                border-bottom: 1px solid $primary-860;
 
                 .workflow-step-arrow-right {
                     &:after {
-                        border-left: 9px solid #f3f3f3;
+                        border-left: 9px solid $primary-860;
                     }
                 }
             }
@@ -425,21 +425,21 @@ table.grid {
 
 .workflow-not-started {
     .workflow-steps-item-arrow-container {
-        border-top: 1px solid #f3f3f3;
-        border-bottom: 1px solid #f3f3f3;
+        border-top: 1px solid $primary-860;
+        border-bottom: 1px solid $primary-860;
         color: #909092;
-        background: #f3f3f3;
+        background: $primary-860;
 
         .workflow-step-arrow-right {
             &:after {
-                border-left: 9px solid #f3f3f3;
+                border-left: 9px solid $primary-860;
             }
         }
     }
 
     .workflow-unordered-step-name {
         color: #909092;
-        background: #f3f3f3;
+        background: $primary-860;
     }
 }
 

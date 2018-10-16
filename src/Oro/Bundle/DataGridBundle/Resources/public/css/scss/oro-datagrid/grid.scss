@@ -84,10 +84,12 @@
 
     &:first-child {
         border-top-#{$start}-radius: $oro-datagrid-header-cell-radius;
+        border-bottom-#{$start}-radius: $oro-datagrid-header-cell-radius;
     }
 
     &:last-child {
         border-top-#{$end}-radius: $oro-datagrid-header-cell-radius;
+        border-bottom-#{$end}-radius: $oro-datagrid-header-cell-radius;
     }
 }
 

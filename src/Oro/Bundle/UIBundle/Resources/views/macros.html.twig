@@ -1013,7 +1013,9 @@
         {% if data.formErrors is defined and data.formErrors | length%}
             <div class="customer-info-actions container-fluid well-small alert-wrap" role="alert">
                 <div class="alert alert-error alert-dismissible">
-                    <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap" aria-label="{{ 'Close'|trans }}"><span aria-hidden="true">&times;</span></button>
+                    <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap" aria-label="{{ 'Close'|trans }}">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                     {{ data.formErrors|raw }}
                 </div>
             </div>

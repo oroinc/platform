@@ -150,12 +150,12 @@
             .accordion-body {
                 .message {
                     display: none;
-                    padding-top: $content-padding-medium / 2;
+                    padding-top: $content-padding-small;
                     overflow-x: auto;
                 }
 
                 .details {
-                    padding-top: $content-padding-medium / 2;
+                    padding-top: $content-padding-small;
                 }
             }
 

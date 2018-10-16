@@ -1,5 +1,9 @@
 /* @theme: admin.oro; */
 
+body {
+    min-width: $width-body-page-mobile;
+}
+
 & {
     min-height: 100vh;
 }

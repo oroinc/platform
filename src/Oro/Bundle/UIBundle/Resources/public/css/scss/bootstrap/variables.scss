@@ -6,6 +6,7 @@
 // Global variables
 $content-padding: 24px;
 $content-padding-medium: 16px;
+$content-padding-small: $content-padding-medium / 2;
 $horizontal-padding: $content-padding;
 $vertical-padding: $content-padding;
 $top-padding: $content-padding;
@@ -15,7 +16,7 @@ $margin-bottom-box: $content-padding;
 // Your variable overrides
 $border-radius: 4px;
 $btn-border-radius: 16px;
-$btn-border-width: 2px;
+$btn-border-width: 0;
 $font-family-sans-serif: Helvetica, Arial, sans-serif;
 $font-size-base: 14px;
 $line-height-base: 1.57;
@@ -37,7 +38,7 @@ $input-focus-border-color: $secondary;
 
 $btn-padding-y-mini: 0;
 $btn-padding-x-mini: 16px;
-$btn-line-height: 28px;
+$btn-line-height: 32px;
 $btn-line-height-mini: 20px;
 $btn-border-radius-mini: $btn-border-radius;
 
@@ -54,7 +55,7 @@ $pagination-current-padding-y: 5.5px;
 
 $breadcrumb-bg: transparent;
 $breadcrumb-font-size: 13px;
-$breadcrumb-padding-y: $content-padding-medium;
+$breadcrumb-padding-y: $content-padding-small;
 $breadcrumb-padding-x: $content-padding;
 $breadcrumb-color: $primary-550;
 $breadcrumb-divider-color: $primary-550;
@@ -156,7 +157,7 @@ $width-left-panel2:                     210;
 $width-input:                           280px;
 $body-color:                            $primary-200;
 $body-background:                       #3e434a;
-$well-background:                       #f8f8f8;
+$well-background:                       $primary-900;
 $base-gradient-color-start:             #39464f;
 $base-gradient-color-end:               #333e48;
 $base-gradient-color-border:            #1e2833;
@@ -177,7 +178,7 @@ $progress-bar-gradient-start:           #dcdcdc;
 $progress-bar-gradient-end:             #d3d3d3;
 
 $page-border-color:                     #ccc;
-$navigation-background-color:           #f8f8f8;
+$navigation-background-color:           $primary-900;
 $page-sidebar-background-color:         $navigation-background-color;
 
 $base-font-size:                        14px;

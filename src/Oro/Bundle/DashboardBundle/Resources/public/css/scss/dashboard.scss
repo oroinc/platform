@@ -46,11 +46,11 @@
     .responsive-section:not(.responsive-small) {
         .dashboard-column {
             &:first-child {
-                padding-#{$end}: $content-padding-medium / 2;
+                padding-#{$end}: $content-padding-small;
             }
 
             &:last-child {
-                padding-#{$start}: $content-padding-medium / 2;
+                padding-#{$start}: $content-padding-small;
             }
         }
     }

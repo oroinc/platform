@@ -83,7 +83,7 @@ define(function(require) {
         },
 
         /**
-         * Set sorting data
+         * Highlight of found label
          * @param {String} label
          * @param {Number} searchString
          */

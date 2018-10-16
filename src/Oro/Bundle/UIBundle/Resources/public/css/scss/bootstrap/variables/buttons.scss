@@ -1,8 +1,11 @@
 /* @theme: admin.oro; */
 
-$btn-not-btn-icon-fa-offset: side-values(0 6px 0 0) !default;
-$btn-not-btn-icon-end-fa-offset: side-values(0 0 0 6px) !default;
-$btn-dropdown-toggle-padding: 0 12px !default;
+$btn-fa-icon-font-size: $base-font-size--m - 1 !default;
+$btn-fa-icon-line-height: $btn-line-height - 1 !default;
+$btn-fa-icon-vertical-align: middle !default;
+
+$btn-not-btn-icon-fa-offset: side-values(0 $content-padding-small 0 0) !default;
+$btn-not-btn-icon-end-fa-offset: side-values(0 0 0 $content-padding-small) !default;
 
 $btn-icon-width: 32px !default;
 $btn-icon-height: 32px !default;

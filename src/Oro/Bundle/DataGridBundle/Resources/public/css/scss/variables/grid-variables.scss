@@ -17,13 +17,13 @@ $oro-datagrid-label-color: $primary-inverse !default;
 $oro-datagrid-label-active-color: $extra-100 !default;
 
 $oro-datagrid-cell-border-color: $primary-830 !default;
-$oro-datagrid-cell-background-hover: $primary-860 !default;
+$oro-datagrid-cell-background-hover: $primary-900 !default;
 
 $oro-datagrid-header-cell-highlight: $extra-dark !default;
 $oro-datagrid-header-cell-inner-offset: 11px 8px !default;
 $oro-datagrid-header-cell-radius: 2px !default;
 
-$oro-datagrid-body-cell-inner-offset: 10px 8px !default;
+$oro-datagrid-body-cell-inner-offset: 11px 8px 10px 8px !default;
 $oro-datagrid-body-cell-border: 1px solid $oro-datagrid-cell-border-color !default;
 
 $oro-datagrid-footer-cell-inner-offset: 7px 8px !default;

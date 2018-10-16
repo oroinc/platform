@@ -3,7 +3,6 @@
 .filter-box {
     background-color: $mobile-filter-box-background-color;
     border-bottom-width: $mobile-filter-box-border-bottom-width;
-    padding: $mobile-filter-box-inner-offset;
 
     &.ui-dialog {
         padding: $mobile-filter-box-ui-dialog-inner-offset;

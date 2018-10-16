@@ -1,5 +1,9 @@
 /* @theme: admin.oro; */
 
+body {
+    min-width: $width-body-page;
+}
+
 &,
 .app-page,
 .app-page__central-panel {
@@ -24,11 +28,11 @@
     min-width: 340px;
 
     &:first-child {
-        padding-#{$end}: $content-padding-medium / 2;
+        padding-#{$end}: $content-padding-small;
     }
 
     &:last-child {
-        padding-#{$start}: $content-padding-medium / 2;
+        padding-#{$start}: $content-padding-small;
     }
     &:only-child {
         padding: 0;

@@ -288,8 +288,9 @@ footer {
     clear: #{$end};
 
     .inline-decorate-container {
-        margin-top: 10px;
         margin-bottom: -10px;
+        font-size: $base-font-size--s;
+        color: $primary-700;
 
         .inline-decorate {
             margin-bottom: 10px;
