@@ -37,7 +37,7 @@
         {% set details_anchor = details_anchor|default(null) %}
         {% set details_link = details_link|default(null) %}
         {% set details_enabled = details_enabled|default(false) %}
-        {% set tooltip_placement = tooltip_placement|default(null) %}
+        {% set tooltip_placement = isMobileVersion() ? 'top' : tooltip_placement|default(null) %}
 
         {# Help link logic #}
         {% if details_enabled or details_anchor or details_link %}

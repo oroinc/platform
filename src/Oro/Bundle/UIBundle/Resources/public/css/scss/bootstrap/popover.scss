@@ -2,13 +2,9 @@
 
 @import "bowerassets/bootstrap/scss/popover";
 
-#container .popover {
-    // prevent menu and loading wrapper overlapping
-    z-index: $popover-z-index;
-}
-
 .popover {
     box-shadow: $popover-box-shadow;
+    z-index: $popover-z-index;
 
     .arrow {
         z-index: $popover-arrow-z-index;
