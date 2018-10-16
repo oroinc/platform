@@ -209,10 +209,12 @@ input[type="color"],
     }
 }
 
+.add-on {
+    vertical-align: $add-on-vertical-align;
+}
+
 .add-on,
 .btn {
-    vertical-align: $add-on-vertical-align;
-
     .input-append &,
     .input-prepend & {
         float: $add-on-float;

@@ -606,11 +606,6 @@ label.required em,
     line-height: 1px;
 }
 
-.controls .removeRow {
-    position: relative;
-    margin: side-values(0 0 0 -24px);
-}
-
 body .mce-tinymce {
     width: 292px;
 }
@@ -865,19 +860,19 @@ label.radio.error {
     .add-list-item {
         margin-#{$start}: 183px;
     }
-
-    .removeRow {
-        font-size: 0;
-        line-height: 0;
-        margin: 0;
-
-        &:after {
-            display: inline-block;
-            font: 14px/1em FontAwesome;
-            content: '\f00d';
-            text-indent: 0;
-        }
-    }
+    //
+    //.removeRow {
+    //    font-size: 0;
+    //    line-height: 0;
+    //    margin: 0;
+    //
+    //    &:after {
+    //        display: inline-block;
+    //        font: 14px/1em FontAwesome;
+    //        content: '\f00d';
+    //        text-indent: 0;
+    //    }
+    //}
 
     .addAfterRow {
         text-indent: -999;
