@@ -14,7 +14,8 @@
     &--sidebar {
         max-width: $content-sidebar-mobile-max-width;
         min-height: $content-sidebar-mobile-min-height;
-        margin-left: $content-sidebar-mobile-margin-left;
+        margin: $content-sidebar-mobile-margin;
+
         overflow: visible;
 
         &.content-sidebar-maximized {
