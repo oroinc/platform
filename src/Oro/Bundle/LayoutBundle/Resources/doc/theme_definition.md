@@ -2,7 +2,7 @@
 
 ## Overview
 
-This documentation describes **what a theme is**, and how to define and develop layout themes for *Oro Platform*.
+This documentation describes **what a theme is**, and how to define and develop layout themes for *OroPlatform*.
 
 A **theme** is a collection of files that declares the visual presentation for a single page or a group of pages.
 Basically, think of a **theme** as a skin for your application. Files, that the theme consists of, are [layout updates](./layout_update.md), **styles**, **scripts** and anything else related to the look and feel of the page.
@@ -36,7 +36,7 @@ label:  ~ # this is a "hidden" theme
 groups: [ main ]
 
 # src/Acme/Bundle/DemoBundle/Resources/views/layouts/oro/theme.yml
-# Default layout theme for the Oro Platform
+# Default layout theme for OroPlatform
 label:  Oro Theme
 icon:   bundles/oroui/themes/oro/images/favicon.ico
 parent: base

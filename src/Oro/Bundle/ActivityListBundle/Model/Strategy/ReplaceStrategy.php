@@ -9,9 +9,13 @@ use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
-use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+/**
+ * Realization of EntityMergeBundle FieldData merge StrategyInterface
+ * Does db update plain SQL query, using activityListManager
+ * updates targetField of association (has FieldData.sourceEntity.id) with FieldData.masterEntity.id
+ */
 class ReplaceStrategy implements StrategyInterface
 {
     /** @var ActivityListManager  */
@@ -52,7 +56,7 @@ class ReplaceStrategy implements StrategyInterface
             $activityClass = $fieldMetadata->get('type');
 
             $activityListItems = $this->getActivitiesByEntity($masterEntity, $activityClass);
-            $activityIds = ArrayUtil::arrayColumn($activityListItems, 'relatedActivityId');
+            $activityIds = \array_column($activityListItems, 'relatedActivityId');
 
             $activities = $this->doctrineHelper->getEntityRepository($activityClass)->findBy(['id' => $activityIds]);
             foreach ($activities as $activity) {
@@ -61,7 +65,7 @@ class ReplaceStrategy implements StrategyInterface
 
             $activityListItems = $this->getActivitiesByEntity($sourceEntity, $activityClass);
 
-            $activityIds = ArrayUtil::arrayColumn($activityListItems, 'id');
+            $activityIds = \array_column($activityListItems, 'id');
             $entityClass = ClassUtils::getRealClass($masterEntity);
             $this->activityListManager
                 ->replaceActivityTargetWithPlainQuery(
@@ -71,7 +75,7 @@ class ReplaceStrategy implements StrategyInterface
                     $masterEntity->getId()
                 );
 
-            $activityIds = ArrayUtil::arrayColumn($activityListItems, 'relatedActivityId');
+            $activityIds = \array_column($activityListItems, 'relatedActivityId');
             $this->activityListManager
                 ->replaceActivityTargetWithPlainQuery(
                     $activityIds,

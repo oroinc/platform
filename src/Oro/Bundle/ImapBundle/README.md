@@ -57,7 +57,7 @@ During the synchronization, Oro application loads emails from the user's inbox a
 
  - If a user's mailbox is synchronized for the first time, Oro application loads emails sent and received last year only.
  - Only emails in the folders that are enabled for synchronization in the User Configuration settings are synchronized. To check the settings,select **My user** in the user menu, click **Edit** on the user details page, and navigate to the Email Synchronization Settings section.
- - When an empty folder is deleted on the email server, during the synchronization via IMAP it gets deleted in the OroCRM. Folders with the existing emails that have already been synchronized remain intact and are kept by the OroCRM.
+ - When an empty folder is deleted on the email server, during the synchronization via IMAP it gets deleted in OroCRM. Folders with the existing emails that have already been synchronized remain intact and are kept by OroCRM.
  - When the synchronization settings change, folders are synchronized automatically, but not the emails.
 
 By default the synchronization is executed by a CRON job every 30 minutes. Outside that schedule, launch synchronization manually using the following command:
