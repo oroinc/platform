@@ -29,8 +29,6 @@ class AddressTypeRepository extends EntityRepository implements IdentityAwareTra
      */
     public function updateTranslations(array $data, string $locale = null)
     {
-//        @\Symfony\Component\VarDumper\VarDumper::dump($data);
-
         if (!$data) {
             return;
         }
@@ -45,8 +43,6 @@ class AddressTypeRepository extends EntityRepository implements IdentityAwareTra
                 ->setParameter('name', array_keys($data));
 
             $result = $qb->getQuery()->getArrayResult();
-
-//            @\Symfony\Component\VarDumper\VarDumper::dump($result);
 
             foreach ($result as $type) {
                 $value = $data[$type['name']];
