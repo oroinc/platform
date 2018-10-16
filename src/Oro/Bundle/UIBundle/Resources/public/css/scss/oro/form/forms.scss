@@ -22,6 +22,10 @@
     .controls {
         padding-top: 7px;
 
+        .controls {
+            padding-top: 0;
+        }
+
         input:not([type=checkbox]):not([type=radio]),
         textarea,
         .selector,
