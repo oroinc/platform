@@ -60,8 +60,11 @@ class ChainAclGroupProvider implements AclGroupProviderInterface
     {
         foreach ($this->providers as $provider) {
             if ($provider->supports()) {
-                return $provider;
+                $this->supportedProvider = $provider;
+                break;
             }
         }
+
+        return $this->supportedProvider;
     }
 }

@@ -102,18 +102,32 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
      */
     public function supports($type, $id)
     {
+        // For (root) check given id only
         if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             return $id === $this->getExtensionKey();
         }
 
-        $type = ClassUtils::getRealClass(
-            ObjectIdentityHelper::removeGroupName(ObjectIdentityHelper::removeFieldName($type))
-        );
+        // Get requested group and type (entity class)
+        list($type, $group) = ObjectIdentityHelper::parseType(ObjectIdentityHelper::removeFieldName($type));
+
+        // Get real entity class name
+        $type = ClassUtils::getRealClass($type);
         if ($id === $this->getExtensionKey()) {
             $type = $this->entityClassResolver->getEntityClass($type);
         }
 
-        return $this->entityMetadataProvider->isProtectedEntity($type);
+        // For entities under protection check that requested group is configured for entity
+        if ($this->entityMetadataProvider->isProtectedEntity($type)) {
+            if ($group) {
+                $metadata = $this->entityMetadataProvider->getMetadata($type);
+
+                return $metadata->getGroup() === $group;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
