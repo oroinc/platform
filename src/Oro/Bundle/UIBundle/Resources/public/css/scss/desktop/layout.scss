@@ -1,61 +1,123 @@
 /* @theme: admin.oro; */
 
+body:not(.login-page) {
+    min-width: $width-body-page;
+}
+
 &,
 .app-page,
 .app-page__central-panel {
-  height: 100%;
-  overflow: hidden; // prevents scroll bar appearance
+    height: 100%;
+    overflow: hidden; // prevents scroll bar appearance
 }
 
 & {
-  overflow-x: auto;
+    overflow-x: auto;
 }
 
-.responsive-block{
-  min-width: 340px;
-  padding-right: 5px;
-  &.border-right {
-    border-right: 2px solid #f4f4f4;
-  }
+.responsive-section {
+    .responsive-cell {
+        &:nth-last-child(1),
+        &:nth-last-child(2) {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.responsive-block {
+    min-width: 340px;
+
+    &:first-child {
+        padding-#{$end}: $content-padding-small;
+    }
+
+    &:last-child {
+        padding-#{$start}: $content-padding-small;
+    }
+    &:only-child {
+        padding: 0;
+    }
+
+    &.border-right {
+        border-#{$end}: 2px solid $primary-860;
+    }
 }
 
 .app-page {
-  box-sizing: border-box;
-  display: flex;
-  &__content-side {
-    flex-shrink: 0;
-  }
-  &__content {
-    flex-grow: 1;
-    overflow: inherit;
-  }
-
-  &__main {
+    box-sizing: border-box;
     display: flex;
-    width: 100%;
-  }
-  &__left-panel,
-  &__right-panel {
-    overflow: visible;
-  }
-  &__central-panel {
-    flex-grow: 1;
-  }
+
+    &__content-side {
+        flex-shrink: 0;
+    }
+
+    &__content {
+        flex-grow: 1;
+        overflow: inherit;
+    }
+
+    &__main {
+        display: flex;
+        width: 100%;
+    }
+
+    &__left-panel,
+    &__right-panel {
+        overflow: visible;
+    }
+
+    &__central-panel {
+        flex-grow: 1;
+    }
+}
+
+
+.layout-content {
+    > .scrollable-container {
+        padding-#{$start}: $content-padding;
+        padding-#{$end}: $content-padding;
+    }
+
+    // Update offset on pages with sidebar
+    > .sidebar-container .category-data {
+        padding-#{$start}: $content-padding;
+    }
+
+    //  Update offset on view pages
+    .layout-content .scrollspy-main-container > .scrollable-container {
+        margin-#{$start}: -$content-padding;
+        margin-#{$end}: -$content-padding;
+        padding-#{$start}: $content-padding;
+        padding-#{$end}: $content-padding;
+    }
+}
+
+//  Update offset on create / update pages
+form > .layout-content {
+    padding-#{$start}: $content-padding;
+    padding-#{$end}: $content-padding;
+
+    .scrollspy-main-container > .scrollable-container {
+        margin-#{$start}: -$content-padding;
+        margin-#{$end}: -$content-padding;
+        padding-#{$start}: $content-padding;
+        padding-#{$end}: $content-padding;
+    }
+}
+
+.page-title + [data-bound-component*="datagrid"] {
+    padding-#{$start}: $content-padding;
+    padding-#{$end}: $content-padding;
 }
 
 .oro-page {
-  &.collapsible-sidebar {
-    .oro-page-sidebar {
-      > .dropdown-menu {
-        display: block !important;
-        z-index: inherit;
-        width: 100%;
-      }
+    &.collapsible-sidebar {
+        .oro-page-sidebar {
+            > .dropdown-menu {
+                display: block !important;
+                z-index: inherit;
+                width: 100%;
+            }
+        }
     }
-  }
-}
-
-.container-fluid {
-  padding-right: $contentPadding;
-  padding-left: $contentPadding;
 }

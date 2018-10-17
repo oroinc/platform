@@ -1,4 +1,8 @@
 config:
+    map:
+        '*':
+            'orodatagrid/templates/datagrid/grid.html': 'orodatagrid/blank/templates/datagrid/grid.html'
+            'orodatagrid/templates/datagrid/no-data.html': 'orodatagrid/blank/templates/datagrid/no-data.html'
     paths:
         'backbone-pageable-collection': 'bundles/bowerassets/backbone-pageable/lib/backbone-pageable.js'
         'backgrid': 'bundles/orodatagrid/js/extend/backgrid.js'

@@ -42,6 +42,14 @@ define(function(require) {
                 multi: true
             });
 
+            var controlTabPanel = options.controlTabPanel;
+            categories = _.each(categories, function(category) {
+                category.uniqueId = _.uniqueId(category.id);
+                if (typeof controlTabPanel === 'string') {
+                    category.controlTabPanel = controlTabPanel;
+                }
+            }, this);
+
             this.categories = new BaseCollection(categories);
 
             this.view = new TabCollectionView({

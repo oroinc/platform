@@ -1,35 +1,36 @@
 /* @theme: admin.demo; */
 
-.navbar.app-header {
-  color: $app-header-text-color;
-  background-color: $app-header-bg-color;
+.app-header {
+    color: $app-header-text-color;
+    background-color: $app-header-bg-color;
 
-  .logo {
-    color: $app-header-logo-text-color;
-  }
-
-  .nav.top-search {
-    a.dropdown-toggle {
-      &:hover,
-      &:active {
-        color: $app-header-text-hover-color;
-      }
+    .logo {
+        color: $app-header-logo-text-color;
     }
-  }
 
-  .nav.user-menu {
-    > li {
-      > a {
-        &:hover {
-          color: $app-header-text-hover-color;
+    &__search-and-shortcuts {
+        .dropdown-toggle {
+            &:hover,
+            &:active {
+                color: $app-header-text-hover-color;
+            }
         }
-      }
     }
-  }
 
-  .user-menu-dropdown {
-    &:before {
-      border-left: 1px solid $app-header-divider-color;
+    .user-menu {
+        > li {
+            > .dropdown-toggle,
+            > .help {
+                &:hover {
+                    color: $app-header-text-hover-color;
+                }
+            }
+        }
     }
-  }
+
+    .user-menu-dropdown {
+        &:before {
+            border-#{$start}-color: $app-header-divider-color;
+        }
+    }
 }

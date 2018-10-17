@@ -1,0 +1,19 @@
+/* @theme: admin.oro; */
+
+.accordion {
+    &-toggle {
+        background: $accordion-toggle-background;
+        font-size: $accordion-toggle-font-size;
+        font-weight: $accordion-toggle-font-weight;
+        margin: $accordion-toggle-offset;
+        display: block;
+    }
+
+    &-group {
+        &.responsive-section {
+            border-radius: $accordion-group-responsive-section-border-radius;
+            margin-bottom: $accordion-group-responsive-section-offset-bottom;
+            border: $accordion-group-responsive-section-border;
+        }
+    }
+}

@@ -2,6 +2,7 @@ oro:
     comment:
         plural_label: Comment
         entity_plural_label: Comments
+        actions_label: Comment actions
         action:
             delete: Delete Comment
             update: Update Comment

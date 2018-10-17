@@ -3,7 +3,8 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    require('bootstrap');
+
+    require('bootstrap-typeahead');
 
     /**
      * This customization allows to define own functions for Typeahead
