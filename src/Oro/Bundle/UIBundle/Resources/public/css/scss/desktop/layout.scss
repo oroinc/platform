@@ -1,6 +1,6 @@
 /* @theme: admin.oro; */
 
-body {
+body:not(.login-page) {
     min-width: $width-body-page;
 }
 
