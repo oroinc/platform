@@ -4,7 +4,7 @@
     display: flex;
     flex-grow: 1;
     overflow: hidden;
-    flex-shrink: 0;
+    flex-shrink: 1;
 
     .pin-holder {
         position: relative;
@@ -81,6 +81,16 @@
         &:hover {
             cursor: pointer;
             color: $pin-item-close-hover-color;
+        }
+    }
+
+    .dropdown-menu {
+        #{$start}: auto;
+        #{$end}: $pin-item-show-more-menu-offset;
+
+        &:before {
+            #{$start}: auto;
+            #{$end}: $pin-item-show-more-menu-arrow-end;
         }
     }
 
