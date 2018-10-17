@@ -632,7 +632,9 @@ define(function(require) {
          * @protected
          */
         _refreshSelectWidget: function() {
-            this.selectWidget.multiselect('refresh');
+            if (this.selectWidget) {
+                this.selectWidget.multiselect('refresh');
+            }
         },
 
         /**
