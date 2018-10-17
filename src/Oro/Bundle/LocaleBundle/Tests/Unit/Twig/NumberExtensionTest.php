@@ -46,6 +46,28 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetAttributeWithOptions()
+    {
+        $attribute = 'grouping_used';
+        $style = 'decimal';
+        $locale = 'fr_CA';
+        $attributes = ['decimal_digits' => 4];
+        $expectedResult = 1;
+
+        $this->formatter->expects($this->once())->method('getAttributeWithOptions')
+            ->with($attribute, $style, $locale, $attributes)
+            ->will($this->returnValue($expectedResult));
+
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFunction(
+                $this->extension,
+                'oro_locale_number_attribute_with_options',
+                [$attribute, $style, $locale, $attributes]
+            )
+        );
+    }
+
     public function testGetTextAttribute()
     {
         $attribute = 'currency_code';
