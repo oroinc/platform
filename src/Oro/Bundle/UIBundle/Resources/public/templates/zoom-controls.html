@@ -1,17 +1,18 @@
-<button type="button" class="btn btn-default btn-zoom-in"><i class="fa-search-plus"></i></button>
-<!--<span class="zoom-level"><%= Math.round(zoom * 100) %>%</span>-->
+<% var togglerId = _.uniqueId('dropdown-') %>
+<button class="btn btn-icon btn-zoom-in" title="<%- _.__('oro.ui.zoom.in') %>"><span class="fa-search-plus" aria-hidden="true"></span></button>
 <div class="btn-group">
-    <button data-toggle="dropdown" class="btn dropdown-toggle ">
-        <%= Math.round(zoom * 100) %>%<span class="caret"></span>
+    <button id="<%- togglerId %>" data-toggle="dropdown" class="btn dropdown-toggle "
+            aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('oro.ui.zoom.steps') %>">
+        <%= Math.round(zoom * 100) %>%
     </button>
-    <ul class="dropdown-menu pull-right">
-        <li><a href="#" class="btn-set-zoom" data-size="50">50%</a></li>
-        <li><a href="#" class="btn-set-zoom" data-size="75">75%</a></li>
-        <li><a href="#" class="btn-set-zoom" data-size="100">100%</a></li>
-        <li><a href="#" class="btn-set-zoom" data-size="150">150%</a></li>
-        <li><a href="#" class="btn-set-zoom" data-size="200">200%</a></li>
+    <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="<%- togglerId %>">
+        <li><a href="#" role="button" class="btn-set-zoom" data-size="50">50%</a></li>
+        <li><a href="#" role="button" class="btn-set-zoom" data-size="75">75%</a></li>
+        <li><a href="#" role="button" class="btn-set-zoom" data-size="100">100%</a></li>
+        <li><a href="#" role="button" class="btn-set-zoom" data-size="150">150%</a></li>
+        <li><a href="#" role="button" class="btn-set-zoom" data-size="200">200%</a></li>
     </ul>
 </div>
-<button type="button" class="btn btn-default btn-zoom-out"><i class="fa-search-minus"></i></button>
-<button type="button" class="btn btn-default btn-auto-zoom"><i class="fa-expand"></i></button>
+<button class="btn btn-icon btn-zoom-out" title="<%- _.__('oro.ui.zoom.out') %>"><span class="fa-search-minus" aria-hidden="true"></span></button>
+<button class="btn btn-icon btn-auto-zoom" title="<%- _.__('oro.ui.zoom.auto') %>"><span class="fa-expand" aria-hidden="true"></span></button>
 

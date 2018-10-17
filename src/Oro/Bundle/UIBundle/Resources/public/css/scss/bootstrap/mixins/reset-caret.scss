@@ -1,0 +1,12 @@
+/* @theme: admin.oro; */
+
+@mixin reset-caret() {
+    width: auto;
+    height: auto;
+
+    margin-#{$start}: 0;
+
+    border-width: 0;
+
+    vertical-align: inherit;
+}

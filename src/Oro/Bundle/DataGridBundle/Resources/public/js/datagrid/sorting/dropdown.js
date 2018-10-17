@@ -10,7 +10,7 @@ define(function(require) {
         hasSortingOrderButton: true,
         inlineSortingLabel: false, // Draws inline label for sorter if soring order button (previous option) is not enabled
         disableNotSelectedOption: false,
-        className: 'sorting-select-control',
+        className: 'sorting-select sorting-select-control',
         dropdownClassName: 'sorting-select-control'
     });
 
@@ -191,7 +191,7 @@ define(function(require) {
         },
 
         _updateDisplayDirection: function() {
-            this.$('[data-name=order-toggle]')
+            this.$('[data-name=order-toggle-icon]')
                 .toggleClass('fa-sort-amount-asc', this.currentDirection === this.DIRECTIONS[0])
                 .toggleClass('fa-sort-amount-desc', this.currentDirection === this.DIRECTIONS[1]);
         },

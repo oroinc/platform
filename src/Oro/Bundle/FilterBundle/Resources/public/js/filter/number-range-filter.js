@@ -266,7 +266,7 @@ define(function(require) {
             var parentDiv = a.parent().parent().parent();
             var choiceName = a.html();
             choiceName += this.caret;
-            parentDiv.find('.dropdown-toggle').html(choiceName);
+            parentDiv.find('[data-toggle="dropdown"]').html(choiceName);
         },
 
         /**

@@ -2,11 +2,14 @@
 
 {% block root %}
     {% if isDesktopVersion() and item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
+    {% set togglerId = 'dropdown-'|uniqid %}
     <li class="dot-menu dropdown">
-        <a href="#" class="oro-dropdown-toggle">
-            <i class="fa-bars"></i>
+        <a href="#" role="button" id="{{ togglerId }}" data-toggle="dropdown" class="dropdown-toggle dropdown-toggle--no-caret"
+           title="{{ 'oro.navigation.menu.recent_pages.label'|trans }}"
+           aria-label="{{ 'oro.navigation.menu.recent_pages.label'|trans }}" aria-haspopup="true" aria-expanded="false">
+            <span class="fa-bars" aria-hidden="true"></span>
         </a>
-        <div class="dropdown-menu" tabindex="0">
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="{{ togglerId }}"  tabindex="0">
             <div class="tabbable tabs-left">
                 {{ block('navbar_tabs') }}
                 {{ block('navbar_tabs_content') }}

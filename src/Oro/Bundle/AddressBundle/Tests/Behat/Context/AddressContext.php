@@ -50,7 +50,7 @@ class AddressContext extends OroFeatureContext implements OroPageObjectAware
             if (false !== stripos($actualAddress->getText(), $address)) {
                 self::assertEquals(
                     'Primary',
-                    $actualAddress->find('css', 'ul.inline')->getText(),
+                    $actualAddress->find('css', 'ul.address-book-item__labels')->getText(),
                     sprintf('Address "%s" was found but it is not primary', $address)
                 );
 

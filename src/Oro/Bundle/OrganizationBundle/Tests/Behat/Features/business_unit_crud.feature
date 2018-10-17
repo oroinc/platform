@@ -35,7 +35,7 @@ Feature: Business Unit crud
 
   Scenario: Checking user business units
     Given I go to System/ User Management/ Users
-    When I click on John in grid
+    When I click View John in grid
     Then I should see User with:
       | Username       | admin                   |
       | Business Units | Main Acme Business Unit |
@@ -63,7 +63,7 @@ Feature: Business Unit crud
 
   Scenario: Checking user business units
     Given I go to System/ User Management/ Users
-    When I click on John in grid
+    When I click View John in grid
     Then I should see User with:
       | Username       | admin                   |
       | Business Units | Main Demo Business Unit |

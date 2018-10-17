@@ -299,6 +299,7 @@ define(function(require) {
          * @protected
          */
         _showCriteria: function() {
+            $(document).trigger('clearMenus'); // hides all opened dropdown menus
             this.trigger('showCriteria', this);
             this.$(this.criteriaSelector).css('visibility', 'visible');
             this._alignCriteria();

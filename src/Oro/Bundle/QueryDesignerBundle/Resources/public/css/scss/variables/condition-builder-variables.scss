@@ -1,0 +1,59 @@
+/* @theme: admin.oro; */
+
+$condition-builder-min-width: 582px !default;
+$condition-builder-condition-container-background-color: $primary-inverse !default;
+$condition-builder-condition-container-space: 8px !default;
+$condition-builder-condition-container-border: 2px solid $primary-750 !default; // #d9d9da
+$condition-builder-condition-container-margin-start: 10px !default;
+$condition-builder-drag-n-drop-hint-width: 200px !default;
+$condition-builder-drag-n-drop-hint-text-transform: capitalize !default;
+$condition-builder-drag-n-drop-target-border: 2px dashed $primary-750 !default;
+$condition-builder-drag-n-drop-target-background-color: $primary-860 !default;
+$condition-builder-drag-n-drop-target-space: 34px !default;
+$condition-builder-drag-n-drop-target-min-height: 50px !default;
+$condition-builder-filter-criteria-width: 211px !default;
+$condition-builder-filter-criteria-padding: 16px !default;
+$condition-builder-filter-criteria-background-color: $primary-900 !default; // #f8f8f8
+$condition-builder-filter-criteria-option-padding: 6px 14px !default;
+$condition-builder-filter-criteria-option-margin-bottom: 8px !default;
+$condition-builder-filter-criteria-option-border-radius:  16px !default;
+$condition-builder-filter-criteria-option-border-color: $primary-830 !default; // #eeeeee
+$condition-builder-filter-criteria-option-border: 1px solid $condition-builder-filter-criteria-option-border-color !default;
+$condition-builder-filter-criteria-option-font-size: 12px !default;
+$condition-builder-filter-criteria-option-font-weight: bold !default;
+$condition-builder-filter-criteria-option-text-transform: uppercase !default;
+$condition-builder-filter-criteria-option-color: $primary-400 !default; // #68686a
+$condition-builder-filter-criteria-option-disabled-color: $primary-700 !default; // #bababb
+$condition-builder-filter-criteria-option-background-color: $primary-830 !default; // #eeeeee
+$condition-builder-filter-criteria-option-dragging-background-color: $primary-inverse !default; // #ffffff
+$condition-builder-filter-criteria-option-dragging-border-color: $primary-750 !default; // #d9d9da
+$condition-builder-filter-criteria-option-dragging-border: 1px solid $condition-builder-filter-criteria-option-dragging-border-color !default;
+$condition-builder-filter-criteria-option-dragging-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, 0.08) !default;
+$condition-builder-filter-criteria-option-dragging-z-index: 1200 !default;
+$condition-builder-condition-operator-padding: 6px !default;
+$condition-builder-condition-operator-v-margin: 6px !default;
+$condition-builder-condition-border-color: $primary-800 !default;
+$condition-builder-condition-item-padding: 8px 12px !default;
+$condition-builder-condition-item-border: 2px solid $primary-860 !default;
+$condition-builder-condition-item-border-radius: 5px !default;
+$condition-builder-condition-item-loader-size: 24px !default;
+$condition-builder-condition-item-loader-width: 5px !default;
+$condition-builder-condition-item-select2-container-width: auto !default;
+$condition-builder-condition-item-select2-container-max-width: none !default;
+$condition-builder-condition-item-select2-container-min-width: 32px !default;
+$condition-builder-condition-item-select2-container-height: 24px !default;
+$condition-builder-condition-item-select2-chosen-padding-end: 8px !default;
+$condition-builder-condition-item-select2-chose-line-height: 20px !default;
+$condition-builder-condition-item-datetime-visual-element-width: 120px !default;
+$condition-builder-condition-item-choice-filter-dropdown-toggle-padding-end: 5px !default;
+$condition-builder-condition-item-choice-filter-dropdown-menu-margin-top: 13px !default;
+$condition-builder-condition-item-input-margin-top: 8px !default;
+$condition-builder-conditions-group-min-height: 138px !default;
+$condition-builder-conditions-group-start-border-width: 4px !default;
+$condition-builder-conditions-group-start-border: $condition-builder-conditions-group-start-border-width solid $condition-builder-condition-border-color !default;
+$condition-builder-conditions-group-start-padding: 14px !default;
+$condition-builder-close-item-size: 16px !default;
+$condition-builder-close-item-color: $primary-700 !default;
+$condition-builder-close-item-hovered-color: $primary-600 !default;
+$condition-builder-close-item-margin: 2px 6px !default;
+$condition-builder-close-invalid-group-margin-top: -17px !default;

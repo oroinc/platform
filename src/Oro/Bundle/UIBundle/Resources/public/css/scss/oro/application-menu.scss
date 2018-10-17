@@ -1,0 +1,106 @@
+/* @theme: admin.oro; */
+
+.application-menu {
+    background-color: #232426;
+    margin: 0;
+
+    .container {
+        padding: 6px 5px 0;
+    }
+
+    .nav-tabs {
+        border-color: #000;
+
+        & > li > a {
+            border-radius: 5px 5px 0 0;
+            border: solid #000;
+            border-width: 1px 1px 0 1px;
+            height: 26px;
+            color: #b8b8b8;
+            font-size: $base-font-size;
+            line-height: 26px;
+            text-shadow: 1px 1px 2px #00324d;
+            background-color: #232426;
+            padding: 0 15px;
+            box-shadow: none;
+            font-weight: bold;
+        }
+    }
+
+    .nav-tabs > li {
+        > a.empty,
+        &.active > a.empty,
+        &.active > a.empty:hover,
+        > a.empty:hover,
+        > a.empty:focus {
+            border-radius: 5px;
+            height: 23px;
+            border-width: 1px;
+        }
+
+        &.active > a,
+        &.active > a:hover,
+        > a:hover,
+        > a:focus {
+            height: 26px;
+            border: solid #000;
+            border-width: 1px 1px 0 1px;
+            background-color: #7a95b5;
+            color: #fff;
+            box-shadow: none;
+        }
+    }
+
+    .tab-content {
+        background-color: #7c96b4;
+
+        > .tab-pane > .nav {
+            margin: 0;
+
+            a {
+                color: #dedddd;
+                font-size: $base-font-size;
+                font-weight: bold;
+
+                &:hover {
+                    background-color: #447fe9;
+                }
+            }
+
+            .current a {
+                background: #3b6fe5;
+                color: #fff;
+            }
+        }
+    }
+
+    .home {
+        a {
+            padding: 0 5px !important;
+        }
+
+        span {
+            display: block;
+            margin: 4px 0 0;
+            width: 17px;
+            height: 19px;
+            text-indent: -9999px;
+            font-size: 0;
+            line-height: 0;
+            background: url(../../img/general-sprite.png) no-repeat 0 -156px;
+        }
+    }
+
+    .tab-content > .tab-pane > .nav {
+        a:hover {
+            background: #447fe9;
+            color: #fff;
+        }
+
+        .active a {
+            background: #3b6fe5;
+            color: #fff;
+        }
+    }
+}
+

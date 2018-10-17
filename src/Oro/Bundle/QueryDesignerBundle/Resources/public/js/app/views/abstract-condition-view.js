@@ -56,6 +56,10 @@ define(function(require) {
             return this;
         },
 
+        initControls: function() {
+            // all controls are defined by subviews
+        },
+
         onChoiceInputReady: function(choiceInputView) {
             this.subview('choice-input', choiceInputView);
             this.listenTo(choiceInputView, 'change', this._onChoiceInputChanged);
