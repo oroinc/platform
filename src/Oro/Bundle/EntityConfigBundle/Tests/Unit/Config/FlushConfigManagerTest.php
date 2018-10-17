@@ -46,14 +46,14 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityConfigProvider->expects($this->any())
+        $this->entityConfigProvider->expects($this->atLeast(1))
             ->method('getScope')
             ->will($this->returnValue('entity'));
 
         $this->testConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->testConfigProvider->expects($this->any())
+        $this->testConfigProvider->expects($this->atLeast(1))
             ->method('getScope')
             ->will($this->returnValue('test'));
 
@@ -133,7 +133,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->modelManager->expects($this->any())
+        $this->modelManager->expects($this->atLeast(1))
             ->method('getEntityManager')
             ->will($this->returnValue($em));
 
