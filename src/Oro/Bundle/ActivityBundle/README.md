@@ -106,7 +106,7 @@ Your entity is now recognized as the activity entity. To make sure that the acti
 ## How to Configure UI for the Activity Entity
 
 
-Before the new activity entity can be used in ORO platform, you need to configure two things for entities that this activity can be assigned to:
+Before the new activity entity can be used in OroPlatform, you need to configure two things for entities that this activity can be assigned to:
 
  - [The activity list section](#how-to-configure-ui-for-activity-list-section)
  - [The add activity button](#how-to-configure-ui-for-activity-button)

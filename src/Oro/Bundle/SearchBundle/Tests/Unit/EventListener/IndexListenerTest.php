@@ -204,23 +204,12 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertAttributeEmpty('deletedEntities', $listener);
     }
 
-    public function testSetEntitiesConfig()
-    {
-        $listener = $this->createListener();
-        $config = ['key' => 'value'];
-
-        $this->assertAttributeEquals($this->entitiesMapping, 'entitiesConfig', $listener);
-        $listener->setEntitiesConfig($config);
-        $this->assertAttributeEquals($config, 'entitiesConfig', $listener);
-    }
-
     /**
      * @return IndexListener
      */
     protected function createListener()
     {
         $listener = new IndexListener($this->doctrineHelper, $this->searchIndexer, new PropertyAccessor());
-        $listener->setEntitiesConfig($this->entitiesMapping);
 
         $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()->getMock();
