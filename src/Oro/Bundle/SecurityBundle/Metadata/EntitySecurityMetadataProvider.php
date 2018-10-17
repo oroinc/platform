@@ -15,6 +15,9 @@ use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
 
+/**
+ * ACL metadata provider for entities.
+ */
 class EntitySecurityMetadataProvider
 {
     const ACL_SECURITY_TYPE = 'ACL';
