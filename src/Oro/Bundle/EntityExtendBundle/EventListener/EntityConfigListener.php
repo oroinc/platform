@@ -12,6 +12,9 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Updates entity config state on actions with entities and fields
+ */
 class EntityConfigListener
 {
     /** @var EventDispatcherInterface */
