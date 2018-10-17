@@ -206,8 +206,6 @@ define(function(require) {
             return edge;
         },
 
-        
-
         /**
          * Loads dynamic list of modules and execute callback function with passed modules
          *
