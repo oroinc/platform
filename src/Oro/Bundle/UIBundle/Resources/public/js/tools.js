@@ -5,6 +5,7 @@ define(function(require) {
     var _ = require('underscore');
     var tools = {};
     var iOS = /(iPad|iPhone)/.test(navigator.userAgent);
+    var edge = /(Edge\/)/.test(navigator.userAgent);
 
     /**
      * @export oroui/js/tools
@@ -198,6 +199,15 @@ define(function(require) {
         isIOS: function() {
             return iOS;
         },
+
+        /**
+         * Are we currently on EDGE browser
+         */
+        isEDGE: function() {
+            return edge;
+        },
+
+        
 
         /**
          * Loads dynamic list of modules and execute callback function with passed modules
