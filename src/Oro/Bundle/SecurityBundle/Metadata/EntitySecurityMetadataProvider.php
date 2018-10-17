@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * ACL metadata provider for entities.
@@ -55,12 +53,12 @@ class EntitySecurityMetadataProvider
     protected $eventDispatcher;
 
     /**
-     * @param ConfigProvider      $securityConfigProvider
-     * @param ConfigProvider      $entityConfigProvider
-     * @param ConfigProvider      $extendConfigProvider
-     * @param ManagerRegistry     $doctrine
+     * @param ConfigProvider $securityConfigProvider
+     * @param ConfigProvider $entityConfigProvider
+     * @param ConfigProvider $extendConfigProvider
+     * @param ManagerRegistry $doctrine
      * @param TranslatorInterface $translator
-     * @param CacheProvider|null  $cache
+     * @param CacheProvider|null $cache
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
@@ -69,7 +67,7 @@ class EntitySecurityMetadataProvider
         ConfigProvider $extendConfigProvider,
         ManagerRegistry $doctrine,
         TranslatorInterface $translator,
-        CacheProvider  $cache = null,
+        CacheProvider $cache = null,
         EventDispatcherInterface $eventDispatcher
     ) {
         $this->securityConfigProvider = $securityConfigProvider;
@@ -84,7 +82,7 @@ class EntitySecurityMetadataProvider
     /**
      * Checks whether an entity is protected using the given security type.
      *
-     * @param string $className    The entity class name
+     * @param string $className The entity class name
      * @param string $securityType The security type. Defaults to ACL.
      *
      * @return bool
@@ -290,7 +288,7 @@ class EntitySecurityMetadataProvider
      * Gets a label of a field.
      *
      * @param ClassMetadata $metadata
-     * @param string        $fieldName
+     * @param string $fieldName
      *
      * @return string
      */
