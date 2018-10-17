@@ -7,12 +7,17 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 
+/**
+ * Provides short form of metadata that can be used to check whether a manageable entity
+ * is a final entity or a mapped superclass.
+ * @see \Oro\Bundle\EntityBundle\ORM\ShortClassMetadata
+ */
 class ShortMetadataProvider
 {
-    const ALL_SHORT_METADATA_CACHE_KEY = 'oro_entity.all_short_metadata';
+    private const ALL_SHORT_METADATA_CACHE_KEY = 'oro_entity.all_short_metadata';
 
     /** @var array */
-    protected $metadataCache;
+    private $metadataCache;
 
     /**
      * Gets short form of metadata for all entities registered in a given entity manager.
@@ -30,38 +35,47 @@ class ShortMetadataProvider
                 ? $metadataFactory->getCacheDriver()
                 : null;
             if ($cacheDriver) {
-                $this->metadataCache = $cacheDriver->fetch(static::ALL_SHORT_METADATA_CACHE_KEY);
-                if (false === $this->metadataCache) {
-                    $this->metadataCache = $this->loadAllShortMetadata($manager, $throwException);
-                    $cacheDriver->save(static::ALL_SHORT_METADATA_CACHE_KEY, $this->metadataCache);
+                $metadataCache = $cacheDriver->fetch(static::ALL_SHORT_METADATA_CACHE_KEY);
+                if (false === $metadataCache) {
+                    $metadataCache = $this->loadAllShortMetadata($manager, $throwException);
+                    if (null !== $metadataCache) {
+                        $cacheDriver->save(static::ALL_SHORT_METADATA_CACHE_KEY, $metadataCache);
+                    }
                 }
+                $this->metadataCache = $metadataCache;
             } else {
                 $this->metadataCache = $this->loadAllShortMetadata($manager, $throwException);
             }
         }
 
-        return $this->metadataCache;
+        return $this->metadataCache ?? [];
     }
 
     /**
      * @param ObjectManager $manager
      * @param bool          $throwException
      *
-     * @return ShortClassMetadata[]
+     * @return ShortClassMetadata[]|null
      */
-    protected function loadAllShortMetadata(ObjectManager $manager, $throwException)
+    private function loadAllShortMetadata(ObjectManager $manager, $throwException)
     {
-        $result = [];
+        if ($throwException) {
+            $allMetadata = $manager->getMetadataFactory()->getAllMetadata();
+        } else {
+            $allMetadata = SafeDatabaseChecker::safeDatabaseExtendCallable(function () use ($manager) {
+                return $manager->getMetadataFactory()->getAllMetadata();
+            });
+            if (null === $allMetadata) {
+                return null;
+            }
+        }
 
-        $allMetadata = $throwException
-            ? $manager->getMetadataFactory()->getAllMetadata()
-            : SafeDatabaseChecker::getAllMetadata($manager);
+        $result = [];
         foreach ($allMetadata as $metadata) {
             $shortMetadata = new ShortClassMetadata($metadata->getName());
             if ($metadata instanceof ClassMetadata && $metadata->isMappedSuperclass) {
                 $shortMetadata->isMappedSuperclass = true;
             }
-
             $result[] = $shortMetadata;
         }
 
