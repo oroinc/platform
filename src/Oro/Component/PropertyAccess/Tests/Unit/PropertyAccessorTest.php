@@ -210,7 +210,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetValueWithReadPropertyCache()
     {
-        /** @var PropertyAccessor|\PHPUnit_Framework_MockObject_MockObject $propertyAccessor */
+        /** @var PropertyAccessor|\PHPUnit\Framework\MockObject\MockObject $propertyAccessor */
         $propertyAccessor = $this->getMockBuilder(PropertyAccessor::class)
             ->setMethods(['camelize'])
             ->getMock();
@@ -818,7 +818,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetValueWithWritePropertyCache()
     {
-        /** @var PropertyAccessor|\PHPUnit_Framework_MockObject_MockObject $propertyAccessor */
+        /** @var PropertyAccessor|\PHPUnit\Framework\MockObject\MockObject $propertyAccessor */
         $propertyAccessor = $this->getMockBuilder(PropertyAccessor::class)
             ->setMethods(['camelize'])
             ->getMock();

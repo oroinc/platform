@@ -27,7 +27,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $featureChecker;
 
-    /** @var ExclusionProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $exclusionProvider;
 
     /**

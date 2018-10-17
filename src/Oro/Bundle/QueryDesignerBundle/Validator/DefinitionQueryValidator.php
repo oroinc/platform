@@ -4,7 +4,6 @@ namespace Oro\Bundle\QueryDesignerBundle\Validator;
 
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\DefinitionQueryConstraint;
@@ -17,18 +16,6 @@ use Symfony\Component\Validator\ConstraintValidator;
 class DefinitionQueryValidator extends ConstraintValidator
 {
     /**
-     * @deprecated since 2.6. Will be removed in 3.1
-     * @var EntityWithFieldsProvider
-     */
-    protected $fieldsProvider;
-
-    /**
-     * @deprecated since 2.6. Will be removed in 3.1
-     * @var array The local cache of available in query designer entities and fields
-     */
-    protected $availableEntityFields;
-
-    /**
      * @var ConfigProvider
      */
     private $entityConfigProvider;
@@ -39,29 +26,14 @@ class DefinitionQueryValidator extends ConstraintValidator
     private $fieldProvider;
 
     /**
-     * DefinitionQueryValidator constructor.
-     *
-     * @param EntityWithFieldsProvider $fieldsProvider
-     */
-    public function __construct(
-        EntityWithFieldsProvider $fieldsProvider
-    ) {
-        $this->fieldsProvider = $fieldsProvider;
-    }
-
-    /**
      * @param ConfigProvider $entityConfigProvider
-     */
-    public function setEntityConfigProvider(ConfigProvider $entityConfigProvider)
-    {
-        $this->entityConfigProvider = $entityConfigProvider;
-    }
-
-    /**
      * @param EntityFieldProvider $fieldProvider
      */
-    public function setFieldProvider(EntityFieldProvider $fieldProvider)
-    {
+    public function __construct(
+        ConfigProvider $entityConfigProvider,
+        EntityFieldProvider $fieldProvider
+    ) {
+        $this->entityConfigProvider = $entityConfigProvider;
         $this->fieldProvider = $fieldProvider;
     }
 
@@ -137,34 +109,6 @@ class DefinitionQueryValidator extends ConstraintValidator
         );
 
         return !empty($foundFieldDefinition);
-    }
-
-    /**
-     * @param string $className
-     * @param string $columnName
-     * @deprecated since 2.6. Will be removed in 3.1
-     * @return bool
-     */
-    protected function isColumnAvailable($className, $columnName)
-    {
-        $foundFieldDefinition = array_filter(
-            $this->availableEntityFields[$className]['fields'],
-            function ($a) use ($columnName) {
-                return $a['name'] === $columnName;
-            }
-        );
-
-        return !empty($foundFieldDefinition);
-    }
-
-    /**
-     * @param string $className
-     * @deprecated since 2.6. Will be removed in 3.1
-     * @return bool
-     */
-    protected function isClassAvailable($className)
-    {
-        return array_key_exists($className, $this->availableEntityFields);
     }
 
     /**

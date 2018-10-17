@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Validator;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
-use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\DefinitionQueryConstraint;
 use Oro\Bundle\QueryDesignerBundle\Validator\DefinitionQueryValidator;
@@ -14,15 +13,9 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 class DefinitionQueryValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var DefinitionQueryValidator|\PHPUnit_Framework_MockObject_MockObject
+     * @var DefinitionQueryValidator
      */
     protected $validator;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     * @var EntityWithFieldsProvider|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $fieldsProvider;
 
     /**
      * @var DefinitionQueryConstraint
@@ -30,39 +23,34 @@ class DefinitionQueryValidatorTest extends \PHPUnit\Framework\TestCase
     protected $constraint;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $context;
 
     /**
-     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $entityConfigProvider;
 
     /**
-     * @var EntityFieldProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fieldProvider;
 
     protected function setUp()
     {
-        $this->fieldsProvider = $this->createMock(EntityWithFieldsProvider::class);
         $this->context = $this->createMock(ExecutionContextInterface::class);
         $this->constraint = new DefinitionQueryConstraint();
 
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
         $this->fieldProvider = $this->createMock(EntityFieldProvider::class);
 
-        $this->validator = new DefinitionQueryValidator($this->fieldsProvider);
-        $this->validator->setEntityConfigProvider($this->entityConfigProvider);
-        $this->validator->setFieldProvider($this->fieldProvider);
+        $this->validator = new DefinitionQueryValidator($this->entityConfigProvider, $this->fieldProvider);
         $this->validator->initialize($this->context);
     }
 
     public function testValidateWithNonAbstractQueryDesignerObject()
     {
-        $this->fieldsProvider->expects($this->never())
-            ->method('getFields');
         $this->context->expects($this->never())
             ->method('buildViolation');
         $this->validator->validate(new \stdClass(), $this->constraint);

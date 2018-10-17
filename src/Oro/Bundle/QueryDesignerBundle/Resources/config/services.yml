@@ -92,10 +92,8 @@ services:
     oro_query_designer.validator.definition_query_validator:
         class: Oro\Bundle\QueryDesignerBundle\Validator\DefinitionQueryValidator
         arguments:
-            - '@oro_query_designer.entity_field_list_provider'
-        calls:
-            - [setEntityConfigProvider, ['@oro_entity_config.provider.entity']]
-            - [setFieldProvider, ['@oro_query_designer.entity_field_provider']]
+            - '@oro_entity_config.provider.entity'
+            - '@oro_query_designer.entity_field_provider'
         tags:
             - { name: validator.constraint_validator, alias: oro_query_designer.definition_query_validator }
 
