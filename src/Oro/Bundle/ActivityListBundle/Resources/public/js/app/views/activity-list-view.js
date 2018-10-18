@@ -271,19 +271,11 @@ define(function(require) {
         },
 
         _togglePrevious: function(enable) {
-            if (_.isUndefined(enable)) {
-                $(this.options.listWidgetSelector + ' .pagination-previous').addClass('disabled');
-            } else {
-                $(this.options.listWidgetSelector + ' .pagination-previous').removeClass('disabled');
-            }
+            $(this.options.listWidgetSelector + ' .pagination-previous').attr('disabled', enable === void 0);
         },
 
         _toggleNext: function(enable) {
-            if (_.isUndefined(enable)) {
-                $(this.options.listWidgetSelector + ' .pagination-next').addClass('disabled');
-            } else {
-                $(this.options.listWidgetSelector + ' .pagination-next').removeClass('disabled');
-            }
+            $(this.options.listWidgetSelector + ' .pagination-next').attr('disabled', enable === void 0);
         },
 
         _reloadOnAdd: function() {

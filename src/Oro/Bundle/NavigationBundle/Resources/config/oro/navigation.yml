@@ -16,6 +16,8 @@ navigation:
                 template: 'OroNavigationBundle:Menu:navbar.html.twig'
             dropdown:
                 template: 'OroNavigationBundle:Menu:dropdown.html.twig'
+            user_menu:
+                template: 'OroNavigationBundle:Menu:user_menu.html.twig'
             horizontal_tabs:
                 template: 'OroNavigationBundle:Menu:horizontal_tabs.html.twig'
             pinbar:

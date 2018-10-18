@@ -1,0 +1,50 @@
+/* @theme: admin.oro; */
+
+.sorting-select {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+
+    .select2-container {
+        height: $sorting-select-container-height;
+        border-width: 0;
+    }
+
+    .select2-choice {
+        height: $sorting-select-choice-height;
+
+        color: inherit;
+    }
+
+    .select2-chosen {
+        height: $sorting-select-choice-height;
+        padding: $sorting-select-choice-offset;
+
+        line-height: $sorting-select-container-height;
+    }
+
+    .select2-arrow {
+        top: $sorting-select-arrow-top;
+        #{$end}: $sorting-select-arrow-end;
+
+        color: $sorting-select-color;
+    }
+
+    .order-toggle {
+        color: $sorting-select-color;
+    }
+
+    .sorting-divider {
+        display: inline-block;
+        padding: $sorting-select-divider-offset;
+
+        line-height: 1;
+        font-size: $sorting-select-divider-font-size;
+
+        color: $sorting-select-divider-color;
+    }
+
+    .sorting-label {
+        flex-shrink: 0;
+    }
+}

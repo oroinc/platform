@@ -331,7 +331,7 @@ define(function(require) {
             });
 
             it('closes condition-item', function() {
-                $condition.find('>a.close').trigger('click');
+                $condition.find('>.btn-close').trigger('click');
                 expect(builderView.getValue()).toEqual([
                     {criteria: 'matrix-condition', great: 10},
                     'AND',
@@ -342,7 +342,7 @@ define(function(require) {
             });
 
             it('closes group', function() {
-                $group.find('>a.close').trigger('click');
+                $group.find('>.btn-close').trigger('click');
                 expect(builderView.getValue()).toEqual([
                     {criteria: 'matrix-condition', great: 10}
                 ]);

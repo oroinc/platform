@@ -90,12 +90,12 @@ class OroEntityExtendBundle extends Bundle
 
     private function ensureInitialized()
     {
+        ExtendClassLoadingUtils::ensureDirExists(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
         if (!CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
             && !CommandExecutor::isCurrentCommand('oro:install')
             && !CommandExecutor::isCurrentCommand('oro:platform:upgrade20')
         ) {
-            ExtendClassLoadingUtils::ensureDirExists(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
-            if (!file_exists(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir))
+            if (!ExtendClassLoadingUtils::aliasesExist($this->cacheDir)
                 && !CommandExecutor::isCommandRunning('oro:entity-extend:update-config')
             ) {
                 $this->checkConfigs();

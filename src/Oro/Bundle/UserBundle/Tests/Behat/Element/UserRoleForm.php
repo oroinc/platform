@@ -69,7 +69,7 @@ class UserRoleForm extends Form
             if (preg_match(sprintf('/%s/i', $action), $label->getText())) {
                 $label->click();
 
-                $dropDown = $this->getPage()->findVisible('css', 'div.dropdown-menu');
+                $dropDown = $this->getPage()->findVisible('css', '.dropdown-menu__permissions-item.show');
                 self::assertNotNull($dropDown, "Visible permission list dropdown not found for $action");
 
                 return $dropDown;

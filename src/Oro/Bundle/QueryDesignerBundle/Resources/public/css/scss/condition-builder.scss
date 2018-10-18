@@ -1,78 +1,50 @@
-@import "oroui/css/scss/variables";
-@import "oroui/css/scss/mixins";
+/* @theme: admin.oro; */
 
-$spacerHeight: 10px;
-
-@mixin btn-link() {
-    background-color: transparent;
-    background-image: none;
-    box-shadow: none;
-    border-color: transparent;
-    cursor: pointer;
-    border-radius: 0;
-    font-weight: normal;
-    outline: none;
-    color: $linkColor;
-
-    &:hover,
-    &:focus {
-        color: $linkColorHover;
-    }
-}
-
-.drop-area-marker {
-    position: absolute;
-    border: dashed 3px #ddd;
-    width: 100%;
-    background-color: rgba(255, 255, 255, .65);
-    z-index: 1;
-    box-sizing: border-box;
-    margin-top: $spacerHeight;
-
-    > span {
-        text-transform: uppercase;
-        font-size: 112%;
-        font-weight: bold;
-        display: block;
-        transform: translate(-50%, -50%);
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        color: #363946;
-    }
-}
-
-.drop-area-over .drop-area-marker {
+.drag-n-drop-hint {
     display: none;
+
+    > div {
+        display: table-cell;
+        vertical-align: middle;
+        text-transform: $condition-builder-drag-n-drop-hint-text-transform;
+        text-align: center;
+    }
+
+    .condition-container.empty & {
+        display: table;
+        position: absolute;
+        #{$start}: 50%;
+        width: $condition-builder-drag-n-drop-hint-width;
+        height: 100%;
+        margin: 0 $condition-builder-drag-n-drop-hint-width / -2;
+    }
 }
 
 .condition-operator {
-    margin: 6px 0;
+    margin: $condition-builder-condition-operator-v-margin 0;
     text-transform: uppercase;
 
-    .btn-group {
-        .btn {
-            font-weight: bold;
-            padding: 0 6px;
-            height: auto;
-            line-height: 20px;
-        }
-
-        .btn-mini .caret {
-            margin-top: 9px;
-        }
-    }
-
-    .dropdown-menu {
-        min-width: initial;
-
-        .selected > a {
-            font-weight: bold;
-        }
+    .select2-container {
+        width: auto;
     }
 
     &.hide-operator {
         display: none;
+    }
+}
+.condition-container {
+    border: $condition-builder-condition-container-border;
+
+    &.drag-start {
+        border: $condition-builder-drag-n-drop-target-border;
+
+        &.empty {
+            background-color: $condition-builder-drag-n-drop-target-background-color;
+        }
+    }
+
+    > .conditions-group {
+        padding: 0 $condition-builder-condition-container-space;
     }
 }
 
@@ -80,28 +52,26 @@ $spacerHeight: 10px;
     width: 100%;
     list-style: none;
     margin: 0;
-    padding: 0;
-    box-sizing: border-box;
 
     &:before,
     &:after {
         content: "";
         display: block;
-        height: $spacerHeight;
+        height: $condition-builder-condition-container-space;
     }
 
     .sortable-placeholder {
-        background-color: transparent;
-        min-height: 50px;
-        border: dashed 3px #e1e1e1;
-        margin: 34px 0 0 0;
+        background-color: $condition-builder-drag-n-drop-target-background-color;
+        min-height: $condition-builder-drag-n-drop-target-min-height;
+        border: $condition-builder-drag-n-drop-target-border;
+        margin: $condition-builder-drag-n-drop-target-space 0 0 0;
         position: relative;
     }
 
     .sortable-placeholder:nth-child(1),
     .condition-operator + .sortable-placeholder {
         margin-top: 0;
-        margin-bottom: 34px;
+        margin-bottom: $condition-builder-drag-n-drop-target-space;
     }
 
     .sortable-placeholder:only-child {
@@ -111,7 +81,7 @@ $spacerHeight: 10px;
     &.drag-start-from-first {
         > li.sortable-placeholder:nth-child(2) {
             margin-top: 0;
-            margin-bottom: 34px;
+            margin-bottom: $condition-builder-drag-n-drop-target-space;
         }
     }
 
@@ -119,10 +89,19 @@ $spacerHeight: 10px;
         position: relative;
 
         &.controls {
-            margin-left: 0;
+            margin-#{$start}: 0;
 
             &.loading {
-                background: transparent url(../../../oroui/img/loader.gif) no-repeat center;
+                &:after {
+                    content: '';
+                    display: block;
+                    position: absolute;
+                    top: 50%;
+                    #{$start}: 50%;
+                    margin: -$condition-builder-condition-item-loader-size / 2;
+
+                    @include loader($condition-builder-condition-item-loader-size, $condition-builder-condition-item-loader-width);
+                }
 
                 .condition-item > * {
                     visibility: hidden;
@@ -132,63 +111,54 @@ $spacerHeight: 10px;
         }
 
         .conditions-group {
-            min-height: 138px;
+            min-height: $condition-builder-conditions-group-min-height;
+            border-#{$start}: $condition-builder-conditions-group-start-border;
+            padding-#{$start}: $condition-builder-conditions-group-start-padding;
         }
 
-        .condition-item {
-            border: 1px solid #e1e1e1;
-            border-radius: 4px;
-            padding: $horizontalPadding * .5 $verticalPadding * .8;
-
-            input[type='text'] {
-                margin-bottom: 0;
-            }
-        }
-
-        & > .conditions-group {
-            border-left: 3px solid #efefef;
-            padding-left: $verticalPadding * .8;
-        }
-
-        & > .close {
+        & > .btn-close {
             position: relative;
-            margin-right: 4px;
+            float: #{$end};
+            margin: $condition-builder-close-item-margin;
+            color: $condition-builder-close-item-color;
             z-index: 1;
+
+            &:before {
+                font-size: $condition-builder-close-item-size;
+            }
+
+            &:hover {
+                color: $condition-builder-close-item-hovered-color;
+            }
         }
 
         &[data-criteria^='conditions-group'] {
-            & > .close {
-                background-color: #fff;
-                color: #ccc;
+            & > .btn-close {
                 opacity: 1;
-                float: left;
+                float: none;
                 position: absolute;
                 top: 50%;
-                margin: -7px 0 0 -4px;
-                height: 14px;
-                line-height: 14px;
+                #{$start}: ceil($condition-builder-conditions-group-start-border-width / 2);
+                margin: $condition-builder-close-item-size / -2;
+                width: $condition-builder-close-item-size;
+                height: $condition-builder-close-item-size;
+                line-height: $condition-builder-close-item-size - 1;
+                background-color: $condition-builder-condition-container-background-color;
                 z-index: 1;
 
-                &:hover {
-                    color: #999;
+                &:before {
+                    line-height: $condition-builder-close-item-size - 1;
                 }
             }
 
-            &.validation-error > .close {
-                margin-top: -17px;
+            &.validation-error > .btn-close {
+                margin-top: $condition-builder-close-invalid-group-margin-top;
             }
         }
     }
 }
 
-.filter-criteria {
-    .hint {
-        text-transform: uppercase;
-        margin: 5px 0 3px 0;
-        font-size: $fontSizeMini;
-        text-align: center;
-    }
-
+.criteria-list-container {
     .criteria-list {
         list-style: none;
         margin: 0;
@@ -200,22 +170,28 @@ $spacerHeight: 10px;
     }
 
     .option[data-criteria] {
-        background-color: #e6eaee;
-        border: 1px solid #d3dbe3;
-        border-radius: 3px;
-        padding: 3px 8px;
-        margin-bottom: 5px;
+        color: $condition-builder-filter-criteria-option-color;
+        font-size: $condition-builder-filter-criteria-option-font-size;
+        font-weight: $condition-builder-filter-criteria-option-font-weight;
+        background-color: $condition-builder-filter-criteria-option-background-color;
+        text-transform: $condition-builder-filter-criteria-option-text-transform;
+        border: $condition-builder-filter-criteria-option-border;
+        border-radius: $condition-builder-filter-criteria-option-border-radius;
+        padding: $condition-builder-filter-criteria-option-padding;
+        margin-bottom: $condition-builder-filter-criteria-option-margin-bottom;
 
         @include cursor-grab();
 
         &.disabled {
             cursor: auto;
-            color: #909090;
+            color: $condition-builder-filter-criteria-option-disabled-color;
         }
 
         &.ui-grabbing {
-            box-shadow: 2px 2px 5px 0 rgba(50, 50, 50, .7);
-            z-index: 1200;
+            border: $condition-builder-filter-criteria-option-dragging-border;
+            background-color: $condition-builder-filter-criteria-option-dragging-background-color;
+            box-shadow: $condition-builder-filter-criteria-option-dragging-box-shadow;
+            z-index: $condition-builder-filter-criteria-option-dragging-z-index;
 
             @include cursor-grabbing();
         }
@@ -223,6 +199,15 @@ $spacerHeight: 10px;
 }
 
 .condition-item {
+    border: $condition-builder-condition-item-border;
+    border-radius: $condition-builder-condition-item-border-radius;
+    padding: $condition-builder-condition-item-padding;
+
+    input[type='text'] {
+        margin-top: $condition-builder-condition-item-input-margin-top;
+        margin-bottom: 0;
+    }
+
     .select2-container,
     .select2-choice,
     .select2-chosen {
@@ -231,23 +216,23 @@ $spacerHeight: 10px;
     }
 
     .select2-container {
-        width: auto;
-        max-width: none;
-        min-width: 32px;
+        width: $condition-builder-condition-item-select2-container-width;
+        max-width: $condition-builder-condition-item-select2-container-max-width;
+        min-width: $condition-builder-condition-item-select2-container-min-width;
+        height: $condition-builder-condition-item-select2-container-height;
         vertical-align: initial;
         display: block;
-        margin-bottom: 4px;
 
         .select2-choice {
             box-shadow: none;
             border: none;
             padding: 0;
-            color: $linkColor;
+            color: $link-color;
             height: auto;
 
             &:hover,
             &:focus {
-                color: $linkColorHover;
+                color: $link-color-hover;
             }
 
             .select2-arrow {
@@ -255,13 +240,14 @@ $spacerHeight: 10px;
             }
 
             .select2-chosen {
-                padding-right: 8px;
+                padding-#{$end}: $condition-builder-condition-item-select2-chosen-padding-end;
             }
         }
 
         .select2-choice,
         .select2-chosen {
-            line-height: 20px;
+            padding-left: 0;
+            line-height: $condition-builder-condition-item-select2-chose-line-height;
             display: inline;
             white-space: normal;
 
@@ -278,11 +264,11 @@ $spacerHeight: 10px;
     }
 
     .datetime-visual-element {
-        width: 120px;
+        width: $condition-builder-condition-item-datetime-visual-element-width;
     }
 
     .filter-item {
-        padding-left: 0;
+        padding-#{$start}: 0;
         vertical-align: baseline;
     }
 
@@ -291,11 +277,10 @@ $spacerHeight: 10px;
     }
 
     button.select-filter-widget {
-        @include btn-link();
-
         vertical-align: baseline;
         line-height: inherit;
         padding: 0;
+        outline: 0 none;
     }
 
     .active-filter {
@@ -310,13 +295,9 @@ $spacerHeight: 10px;
 
         .fields-row > .datefilter {
             display: inline-block;
-            margin-bottom: 11px;
         }
 
-        .caret {
-            display: none;
-        }
-
+        .dropdown-toggle:after,
         .filter-update {
             display: none;
         }
@@ -326,21 +307,33 @@ $spacerHeight: 10px;
                 display: inline;
 
                 .btn.dropdown-toggle {
-                    @include btn-link();
+                    background-color: transparent;
+                    background-image: none;
+                    box-shadow: none;
+                    border-color: transparent;
+                    cursor: pointer;
+                    border-radius: 0;
+                    font-weight: normal;
+                    outline: none;
+                    color: $link-color;
+                    padding-#{$start}: 0;
+                    padding-#{$end}: $condition-builder-condition-item-choice-filter-dropdown-toggle-padding-end;
 
-                    padding-left: 0;
-                    padding-right: 5px;
+                    &:hover,
+                    &:focus {
+                        color: $link-color-hover;
+                    }
                 }
 
                 .dropdown-menu {
-                    margin-top: 13px;
+                    margin-top: $condition-builder-condition-item-choice-filter-dropdown-menu-margin-top;
                 }
             }
 
             .value-field-frame {
                 display: inline;
-                margin-left: 0 !important;
-                padding-left: 0 !important;
+                margin-#{$start}: 0 !important;
+                padding-#{$start}: 0 !important;
             }
 
             .filter-value {
@@ -355,36 +348,36 @@ $spacerHeight: 10px;
 }
 
 .condition-builder {
-    border: 1px solid #c9c9c9;
-    min-width: 582px;/* $TODO temporary solution, will be fixed in CRM-2025 */
-    background-color: #eff2f5;
+    min-width: $condition-builder-min-width;/* $TODO temporary solution, will be fixed in CRM-2025 */
 
-    & > div {
+    > div {
         display: flex;
     }
 
-    .left-area.filter-criteria {
-        padding: 0 $contentPadding * .5 $contentPadding * .5 - 4;
-        width: 150px;
+    .criteria-list-container {
+        padding: $condition-builder-filter-criteria-padding;
+        padding-bottom: $condition-builder-filter-criteria-padding - $condition-builder-filter-criteria-option-margin-bottom;
+        width: $condition-builder-filter-criteria-width;
+
+        background-color: $condition-builder-filter-criteria-background-color;
     }
 
-    .right-area {
+    .condition-container {
         display: flex;
-        width: calc(100% - 150px);
-        padding: 0 10px;
-        border-left: 1px solid #c9c9c9;
-        background-color: #fff;
+        position: relative;
+        width: calc(100% - #{$condition-builder-filter-criteria-width});
+        margin-#{$start}: $condition-builder-condition-container-margin-start;
+        background-color: $condition-builder-condition-container-background-color;
+    }
 
-        > div {
-            position: relative;
-            display: flex;
-            width: 100%;
-        }
+    .filter-start-date,
+    .filter-end-date {
+        display: inline-flex;
     }
 }
 
 .deleted-field {
-    color: $errorText;
+    color: $error-text;
 }
 
 #oro_report-designer .form-horizontal {

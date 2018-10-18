@@ -1,0 +1,12 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/variables";
+
+@import "./variables";
+
+@import "./jsplumb";
+@import "./workflow";
+@import "./permissions-grid";
+
+// Mobile
+@import "./mobile/main";

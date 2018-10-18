@@ -1,123 +1,131 @@
-.controls{
-  .selector{
-    select{
-      width: 100% !important;
-      box-sizing: border-box;
-      -moz-box-sizing: border-box;
-      -webkit-box-sizing: border-box;
-    }
-  }
+/* @theme: admin.oro; */
 
-  select,
-  input[type="text"],
-  input[type="date"],
-  input[type="time"],
-  input[type="number"],
-  input[type="search"],
-  input[type="email"]{
+.input,
+.selector,
+.uneditable-input {
+    height: $input-size;
+    width: $input-width;
+    font-size: $input-font-size;
+    padding: $input-inner-offset;
+    -webkit-appearance: $input-appearance;
+    -moz-appearance: $input-appearance;
+    appearance: $input-appearance;
+}
+
+.selector {
+    padding: $selector-inner-offset;
+
+    span {
+        padding: $selector-span-inner-offset;
+        line-height: $selector-span-line-height;
+        height: $selector-span-height;
+
+        &:after {
+            top: $selector-span-icon-top;
+            font-size: $selector-span-icon-font-size;
+        }
+    }
+}
+
+/**
+    Uploader uniform
+**/
+.uploader {
     width: 100%;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    height: 30px;
-  }
-  textarea, .mce-tinymce {
-    width: 100% !important;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-  }
-  .fields-row {
-    .input-small {
-      width: 140px !important;
+    height: 40px;
+    font-size: $base-font-size--m;
+
+    .filename {
+        width: 100%;
     }
-  }
-  > input[type=checkbox]:only-child {
-    margin-top: 7px;
-  }
+
+    .action {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+
+    .filename,
+    .action {
+        height: 36px;
+        line-height: 36px;
+    }
 }
-.form-horizontal{
-  & > .span6 {
-    max-width: 100%;
-  }
-  .control-group {
-    max-width: initial;
-    margin: 0 0 7px;
-    .control-label {
-      float: none;
-      width: auto;
-      padding-left: 0;
-      text-align: left;
+
+.input-append,
+.input-prepend {
+    .add-on,
+    .btn {
+        height: $input-append-add-on-height;
+        width: $input-append-add-on-width;
+        font-size: $input-append-add-on-font-size;
     }
-    .controls {
-      margin-left: 0;
-      .control-label {
-        padding-top: 6px;
-      }
-    }
-  }
-  .control-group-checkbox {
-    position: relative;
-    display: inline-block;
-    padding-right: 16px;
-    .control-label {
-      width: auto;
-      margin-right: 2px;
-    }
-    label.control-label {
-      line-height: 18px;
-    }
-    .controls {
-      position: absolute;
-      top: 0;
-      right: 0;
-    }
-  }
-  .select2-container{
-    width: 100%;
-    max-width: 100%;
-  }
 }
-.select2-container.select2-allowclear{
-  .select2-arrow{
-    right: 36px;
-  }
-  .select2-search-choice-close{
-    border-left: 1px solid #CCC;
-    height: 28px;
-    width: 28px;
-    top: 0;
-    right: 0;
-    color: #666;
-    &:before{
-      content: "\f00d";
-      font: normal 12px FontAwesome;
-      top: 8px;
-      right: 8px;
+
+.controls {
+    .fields-row {
+        .input-small {
+            width: $controls-fields-row-input-small-width;
+        }
     }
-  }
 }
-.select2-container-multi .select2-choices li {
-  float: none;
-  margin-right: 5px;
+
+.form-horizontal {
+    & > .span6 {
+        max-width: $form-horizontal-max-width;
+    }
+
+    .control-group {
+        max-width: $form-horizontal-control-group-max-width;
+        margin: $form-horizontal-control-group-offset;
+        display: $form-horizontal-control-group-display;
+
+        .control-label {
+            width: $form-horizontal-control-label-width;
+            padding-bottom: $form-horizontal-control-label-inner-offset-bottom;
+            text-align: #{$start};
+        }
+
+        .controls {
+            margin-left: $form-horizontal-controls-offset-left;
+        }
+    }
+
+    .control-group-checkbox {
+        position: $control-group-checkbox-position;
+        display: $control-group-checkbox-display;
+        padding-right: $control-group-checkbox-inner-offset-right;
+
+        .control-label {
+            width: $control-group-checkbox-label-width;
+            margin-right: $control-group-checkbox-label-offset-right;
+        }
+
+        label.control-label {
+            line-height: $control-group-checkbox-label-line-height;
+        }
+
+        .controls {
+            position: $control-group-checkbox-controls-position;
+            top: $control-group-checkbox-controls-top;
+            right: $control-group-checkbox-controls-right;
+        }
+    }
+
+    .select2-container {
+        width: $control-select2-container-width;
+        max-width: $control-select2-container-max-width;
+    }
 }
-.oro-item-collection {
-  input[type="email"],
-  input[type="text"]{
-    width: 225px;
-  }
-}
-.oro-address-collection.oro-item-collection {
-  &>div {
-    padding: 10px 15px 0;
-  }
-}
+
 h5.user-fieldset {
-  margin: 7px 0;
+    margin: $user-fieldset-offset;
 }
+
 .well {
-  margin-bottom: 7px;
-}
-.tags-overlay .well {
-  margin-bottom: 0;
+    margin-bottom: $well-offset-bottom;
+
+    .tags-overlay & {
+        margin-bottom: $well-tags-overlay-offset-bottom;
+    }
 }

@@ -1,0 +1,53 @@
+/* @theme admin.oro; */
+
+.view-loading {
+    height: $loading-view-height;
+}
+
+.loader-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: $loading-mask-z-index;
+
+    display: none;
+
+    overflow: hidden;
+
+    background-color: rgba($loading-mask-background-color, .5);
+
+    .loader-frame {
+        @include loader();
+    }
+
+    .loader-content {
+        display: none;
+    }
+}
+
+.loading {
+    position: relative;
+
+    min-height: $loading-mask-icon-size + 6px;
+
+    body& {
+        height: 100vh;
+    }
+
+    > .loader-mask.shown {
+        // show only first level loaders
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    // hide all nested loaders
+    .loading .loader-mask.shown,
+        // hide rest of first level loaders, except first one
+    > .loader-mask.shown ~ .loader-mask.shown {
+        display: none;
+    }
+}

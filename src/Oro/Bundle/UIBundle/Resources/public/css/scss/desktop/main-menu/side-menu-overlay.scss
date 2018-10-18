@@ -10,7 +10,7 @@
     width: 100vw;
     height: 100vh;
     max-width: 100vw;
-    min-width: $widthBodyPage;
+    min-width: $width-body-page;
 
     font-size: $menu-font-size;
 
@@ -23,7 +23,7 @@
     visibility: hidden;
 
     &.open {
-        z-index: $oroZindexDropdown + 30;
+        z-index: $zindex-dropdown - 70;
 
         visibility: visible;
 
@@ -44,8 +44,8 @@
 
     &__search-icon {
         position: absolute;
-        #{$end}: 0;
-        top: 1px;
+        #{$end}: 8px;
+        top: 0;
         padding: 4px;
 
         background-color: transparent;
@@ -64,7 +64,6 @@
 
     &__field {
         width: 100%;
-        height: 30px;
         padding-#{$end}: 24px;
         margin: 0;
 
@@ -166,7 +165,7 @@
         min-height: 340px;;
         height: inherit;
         margin: 0;
-
+        padding: 0;
         list-style: none;
 
         overflow-x: auto;

@@ -62,6 +62,9 @@ class ManyToManyFilterTest extends \PHPUnit\Framework\TestCase
         $qb->expects($this->any())
             ->method('getDqlPart')
             ->will($this->returnValue([]));
+        $qb->expects($this->any())
+            ->method('getRootAliases')
+            ->will($this->returnValue([]));
 
         $expressionBuilder = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder')
             ->disableOriginalConstructor()
@@ -121,6 +124,9 @@ class ManyToManyFilterTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($em));
         $qb->expects($this->any())
             ->method('getDqlPart')
+            ->will($this->returnValue([]));
+        $qb->expects($this->any())
+            ->method('getRootAliases')
             ->will($this->returnValue([]));
 
         $expressionBuilder = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder')

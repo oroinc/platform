@@ -1,0 +1,37 @@
+/* @theme: admin.oro; */
+
+.oro-tabs {
+    .tab-pane {
+        min-height: $oro-tabs-tab-pane-min-height;
+
+        .fill-tab {
+            border: $oro-tabs-fill-tab-border;
+            box-shadow: $oro-tabs-fill-tab-box-shadow;
+            box-sizing: $oro-tabs-fill-tab-box-sizing;
+            width: $oro-tabs-fill-tab-width;
+        }
+    }
+
+    &__vertical {
+        display: $oro-tabs-vertical-display;
+
+        > .tabs-subtitle {
+            padding: $oro-tabs-subtitle-inner-offset;
+            font-weight: $oro-tabs-subtitle-font-weight;
+        }
+
+        > .oro-tabs__head {
+            width: $oro-tabs-head-width;
+            flex-shrink: $oro-tabs-head-flex-shrink;
+            flex-grow: $oro-tabs-head-flex-grow;
+            margin-#{$end}: $oro-tabs-head-outer-offset-right;
+            position: $oro-tabs-head-position;
+        }
+
+        > .oro-tabs__content {
+            flex-grow: $oro-tabs-content-flex-grow;
+            border-#{$start}: $oro-tabs-content-border-left;
+            padding-#{$start}: $horizontal-padding;
+        }
+    }
+}

@@ -6,6 +6,10 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Class Configuration for create datagrid toolbar configuration tree
+ * @package Oro\Bundle\DataGridBundle\Extension\Toolbar
+ */
 class Configuration implements ConfigurationInterface
 {
     /** @var int */
@@ -31,7 +35,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('hide')->defaultFalse()->end()
                 ->booleanNode('addResetAction')->defaultTrue()->end()
                 ->booleanNode('addRefreshAction')->defaultTrue()->end()
-                ->booleanNode('addColumnManager')->defaultTrue()->end()
+                ->booleanNode('addDatagridSettingsManager')->defaultTrue()->end()
                 ->integerNode('turnOffToolbarRecordsNumber')->defaultValue(0)->end()
                 ->arrayNode('pageSize')->addDefaultsIfNotSet()
                     ->children()
@@ -57,7 +61,7 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('bottom')->defaultFalse()->end()
                     ->end()
                 ->end()
-                ->arrayNode('columnManager')
+                ->arrayNode('datagridSettings')
                     ->children()
                     ->scalarNode('minVisibleColumnsQuantity')->end()
                 ->end()

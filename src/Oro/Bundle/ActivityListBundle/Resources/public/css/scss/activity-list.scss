@@ -1,57 +1,47 @@
-@import "oroui/css/scss/mixins";
+/* @theme: admin.oro; */
 
 .activity-list-widget {
     position: relative;
-
-    .actions-bottom {
-        border-top: 1px solid #ddd;
-    }
 
     .title {
         display: none;
     }
 
+    .grid-toolbar {
+        margin-bottom: $activity-toolbar-offset;
+    }
+
+    .filter-box {
+        padding: 0;
+        width: 33%;
+        flex-grow: 1;
+    }
+
+    .pagination {
+        margin: 0;
+    }
+
+    .actions-panel {
+        width: $activity-filter-box-width;
+        flex-grow: 1;
+        display: flex;
+        justify-content: flex-end;
+        margin: 0;
+    }
+
     .activity-list {
         position: relative;
 
-        .no-data {
-            margin: 20px;
-        }
-
-        .comments-view-header {
-            &,
-            & > h5 {
-                margin-top: 0;
-            }
-
-            & > .no-data {
-                margin: 0;
-            }
-        }
-
-        .filter-box {
-            float: left;
-            margin: 0;
-            padding: 0;
-            background: none;
-            border: none;
-            box-shadow: none;
-        }
-
         .filter-item {
-            margin-bottom: 0;
-            margin-right: 7px;
+            margin-#{$end}: $activity-filter-item-offset;
+
+            &:last-child {
+                margin-#{$end}: 0;
+            }
         }
 
         .info {
-            margin-top: 7px;
-            margin-bottom: 20px;
-        }
-
-        .info.responsive-cell.thread {
-            .items.list-box.list-shaped {
-                border: none;
-            }
+            margin: $activity-filter-info-offset;
         }
 
         .info.responsive-cell {
@@ -62,277 +52,177 @@
     }
 
     .list-box {
-        &.list-shaped {
-            border: solid 1px #ddd;
-            border-radius: 4px;
-
-            .list-item {
-                border-bottom-color: #ddd;
-            }
-        }
-
         &:empty {
             display: none;
         }
+    }
 
-        .list-item {
-            padding: 0;
+    .actions {
+        position: static;
+    }
 
-            &:hover {
-                background-color: transparent;
-            }
+    .user {
+        font-style: normal;
+    }
 
-            .actions {
-                position: static;
+    .date {
+        font-size: $activity-date-font-size;
+    }
 
-                .vertical-actions .dropdown-toggle {
-                    padding: 0;
-                    color: #999;
-                    font-size: 16px;
-                    line-height: .7em;
-                    width: 23px;
-                    height: 19px;
-                    float: left;
+    .list-item:last-child {
+        border-bottom: 0;
+    }
 
-                    &:hover,
-                    &:focus {
-                        border: 0;
-                        text-decoration: none;
-                    }
-                }
+    .icon {
+        width: $activity-icon-size;
 
-                .vertical-actions .dropdown-menu {
-                    right: 30px;
-                    top: -5px;
+        font-size: $activity-icon-font-size;
+        text-align: center;
 
-                    &.pull-right:before {
-                        position: absolute;
-                        top: 9px;
-                        right: -14px;
-                        display: inline-block;
-                        border: 7px solid transparent;
-                        border-left-color: rgba(0, 0, 0, .2);
-                        content: '';
-                    }
+        color: $activity-icon-color;
+    }
 
-                    &.pull-right:after {
-                        position: absolute;
-                        top: 10px;
-                        right: -12px;
-                        display: inline-block;
-                        border: 6px solid transparent;
-                        border-left-color: #fff;
-                        content: '';
-                    }
-                }
-            }
+    .activity-actions {
+        margin-#{$start}: $activity-actions-offset;
 
-            .user {
-                font-style: normal;
-            }
-
-            .date {
-                font-style: normal;
-                font-size: smaller;
-            }
+        .dropdown-toggle {
+            font-size: $activity-icon-font-size;
         }
+    }
 
-        .list-item:last-child {
-            border-bottom: 0;
-        }
+    .comment-count {
+        margin: $activity-count-offset;
 
-        .comment-count {
-            color: #999;
-            margin-left: 5px;
+        color: $activity-count-color;
 
-            .icon {
-                width: auto;
-                font-size: 14px;
-            }
+        .count {
+            margin-#{$start}: $activity-actions-offset;
         }
     }
 
     .accordion {
         padding: 0;
         margin: 0;
-
-        .accordion-group {
-            border: 0;
-            margin: 0;
-        }
     }
 
     .accordion-heading {
-        min-height: 46px;
+        display: flex;
+        align-items: center;
         width: 100%;
-        padding: 5px 10px;
+        min-height: $activity-heading-min-height;
+        padding: $activity-heading-offset;
+
         cursor: pointer;
 
-        &:hover {
-            background-color: #f8f8f8;
+        @include clearfix();
+
+        .details,
+        .message,
+        .message-subject,
+        .actions {
+            @include text-line-truncate(null);
         }
 
-        > .icon,
-        > .accordion-icon,
-        > .details,
-        > .comment-count,
-        > .message,
-        > .created-at,
-        > .actions {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+        .accordion-icon {
+            width: auto;
+            font-size: $activity-icon-font-size;
+            font-weight: normal;
 
-        > .accordion-icon {
-            padding: 0;
-            margin: 8px 0 0 5px;
-            float: left;
-            line-height: 20px;
-            height: 20px;
+            padding: $activity-accordion-icon-offset;
+            margin: 0;
 
-            &:before {
-                content: '\f147';
-                font-family: FontAwesome;
-                font-size: 18px;
-                color: #999;
+            &:hover {
+                color: $activity-accordion-icon-color-hover;
             }
 
-            &:hover:before {
-                color: #444;
-            }
+            @include fa-icon($activity-accordion-icon-expanded);
 
-            &.collapsed:before {
-                content: '\f196';
+            &.collapsed {
+                @include fa-icon($activity-accordion-icon-collapsed);
             }
         }
 
-        > .icon {
-            float: left;
-            width: 27px;
-            font-size: 18px;
-            color: #999;
-            margin: 8px 6px 0 8px;
-        }
+        .actions {
+            margin-#{$start}: auto;
 
-        > .actions {
-            float: right;
-            margin: 8px 0 0 8px;
             overflow: visible;
         }
 
-        > .details {
-            margin: 9px 7px 0 0;
-            max-width: 247px;
-            min-width: 247px;
-            padding-bottom: 1px;
-            float: left;
+        .details {
+            max-width: $activity-details-width;
+            min-width: $activity-details-width;
+
+            margin: $activity-details-offset;
 
             &:hover {
-                background: #fafafa;
                 width: auto;
                 z-index: 1;
             }
         }
 
-        > .extra-info {
-            padding-top: 9px;
-            padding-bottom: 4px;
-            width: calc(100% - 351px);
+        .extra-info {
+            width: $activity-info-width;
             display: flex;
-            flex-flow: row nowrap;
+            align-items: center;
             white-space: nowrap;
+        }
 
-            > .created-at {
-                margin-left: 8px;
-                color: #888;
-                align-self: flex-end;
-            }
+        .created-at {
+            color: $activity-icon-color;
+        }
 
-            > .comment-count {
-                align-self: flex-end;
-            }
+        .message-item {
+            color: $activity-icon-color;
 
-            > .message-item {
-                align-self: stretch;
-                width: 100%;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                color: #888;
+            @include text-line-truncate();
+        }
 
-                strong {
-                    color: #555;
-                }
-            }
+        .message-subject {
+            color: $activity-message-subject-color;
         }
     }
 
     .accordion-body {
         padding: 0;
 
-        > .message {
-            .user-fieldset {
-                margin-top: 5px;
-                margin-right: 20px;
-            }
-
-            .comment {
-                padding: 0 20px 0 0;
-            }
+        .user-fieldset {
+            margin: $activity-user-fieldset-offset;
         }
 
-        .responsive-cell {
-            margin-bottom: 20px;
+        .comment {
+            padding: $activity-comment-offset;
         }
     }
 
-    .grid-toolbar {
-        padding: 0 0 5px;
-        margin: 0;
+    .no-data {
+        @include no-data;
+    }
 
-        .pagination {
-            white-space: nowrap;
-            padding-top: 1px;
-            width: 375px;
-            margin: 0 auto;
-            text-align: center;
-
-            > ul > li a {
-                width: 90px;
-                color: #666;
-                font-weight: bold;
-
-                i {
-                    margin: 0 3px;
-                }
-            }
-
-            > ul > li.disabled a {
-                font-weight: normal;
-            }
-        }
-
-        .filter-container {
-            padding-bottom: 5px;
-        }
+    .responsive-block {
+        margin-bottom: $activity-responsive-block-offset;
     }
 }
 
-li[data-criteria="condition-activity"] {
+.condition-item.condition-activity {
     .btn.filter-select {
         border: none;
-        background: none;
+        background: none transparent;
         font-weight: normal;
-        padding-left: 0;
-        padding-right: 0;
-        color: #444;
+        padding-#{$start}: 0;
+        padding-#{$end}: 0;
+        color: $activity-filter-select-color;
+        box-shadow: none;
     }
 
     .filter-item {
-        margin-right: 0;
+        margin-#{$end}: 0;
 
         .fa-close {
-            margin-right: 0;
+            margin-#{$end}: 0;
         }
+    }
+
+    .dropdown-toggle:after {
+        display: none;
     }
 }

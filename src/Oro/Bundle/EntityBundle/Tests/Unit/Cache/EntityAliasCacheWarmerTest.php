@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\EntityBundle\Cache\EntityAliasCacheWarmer;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 class EntityAliasCacheWarmerTest extends \PHPUnit\Framework\TestCase
 {
@@ -14,9 +15,7 @@ class EntityAliasCacheWarmerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);
 
         $this->cacheWarmer = new EntityAliasCacheWarmer($this->entityAliasResolver);
     }
@@ -33,6 +32,6 @@ class EntityAliasCacheWarmerTest extends \PHPUnit\Framework\TestCase
 
     public function testIsOptional()
     {
-        $this->assertTrue($this->cacheWarmer->isOptional());
+        $this->assertFalse($this->cacheWarmer->isOptional());
     }
 }

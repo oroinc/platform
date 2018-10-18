@@ -1,0 +1,13 @@
+/* @theme: admin.oro; */
+
+$scrollspy-mobile-accordion-group-offset: 8px !default;
+
+$scrollspy-mobile-toggle-offset: 8px 16px !default;
+$scrollspy-mobile-border-radius: 4px !default;
+
+$scrollspy-mobile-toggle-icon-offset: side-values(0 8px 0 0) !default;
+$scrollspy-mobile-toggle-icon-font-size: 18px !default;
+$scrollspy-mobile-toggle-icon-color: $primary-200 !default;
+
+$scrollspy-mobile-toggle-icon: $fa-var-angle-down !default;
+$scrollspy-mobile-toggle-icon-colapsed: if-ltr($fa-var-angle-right, $fa-var-angle-left)  !default;

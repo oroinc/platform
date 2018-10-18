@@ -5,9 +5,10 @@ function Util(rootMessagesElements) {
 
     rootMessagesElements = rootMessagesElements || $('#alerts');
 
-    var messageTemplate = '<div class="alert fade in alert-{message-type}"> ' +
-        '<i class="fa-{message-type}"></i>' +
-        '<button type="button" class="close" data-dismiss="alert">&times;</button> ' +
+    var messageTemplate = '<div class="alert fade in alert-{message-type} alert-dismissible" role="alert"> ' +
+        '<span class="fa-{message-type}" aria-hidden="true"></span>' +
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+        '<span aria-hidden="true">&times;</span></button> ' +
         '{message} ' +
         '</div>';
 
