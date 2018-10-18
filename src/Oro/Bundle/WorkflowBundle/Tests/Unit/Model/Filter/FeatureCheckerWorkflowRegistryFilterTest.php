@@ -7,9 +7,9 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Filter\FeatureCheckerWorkflowRegistryFilter;
 
-class FeatureCheckerWorkflowRegistryFilterTest extends \PHPUnit_Framework_TestCase
+class FeatureCheckerWorkflowRegistryFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $featureChecker;
 
     /** @var FeatureCheckerWorkflowRegistryFilter */

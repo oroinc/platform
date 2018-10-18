@@ -4,9 +4,16 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 
-class ResourceDocProvider implements ResourceDocProviderInterface
+/**
+ * Provides default descriptions in English for API resources.
+ */
+class ResourceDocProvider
 {
-    protected $templates = [
+    private const TEMPLATES = [
+        ApiActions::OPTIONS             => [
+            'description'   => 'Get options',
+            'documentation' => 'Get communication options for a resource'
+        ],
         ApiActions::GET                 => [
             'description'   => 'Get {name}',
             'documentation' => 'Get an entity'
@@ -38,6 +45,27 @@ class ResourceDocProvider implements ResourceDocProviderInterface
                 'collection'  => 'Get a list of related entities'
             ]
         ],
+        ApiActions::DELETE_SUBRESOURCE  => [
+            'description'   => 'Delete {association}',
+            'documentation' => [
+                'single_item' => 'Delete the specified related entity',
+                'collection'  => 'Delete the specified related entities'
+            ]
+        ],
+        ApiActions::ADD_SUBRESOURCE     => [
+            'description'   => 'Add {association}',
+            'documentation' => [
+                'single_item' => 'Add the specified related entity',
+                'collection'  => 'Add the specified related entities'
+            ]
+        ],
+        ApiActions::UPDATE_SUBRESOURCE  => [
+            'description'   => 'Update {association}',
+            'documentation' => [
+                'single_item' => 'Update the specified related entity',
+                'collection'  => 'Update the specified related entities'
+            ]
+        ],
         ApiActions::GET_RELATIONSHIP    => [
             'description'   => 'Get "{association}" relationship',
             'documentation' => 'Get the relationship data'
@@ -59,60 +87,88 @@ class ResourceDocProvider implements ResourceDocProviderInterface
                 'single_item' => 'Update the relationship',
                 'collection'  => 'Completely replace every member of the relationship'
             ]
-        ],
+        ]
     ];
 
     /**
-     * {@inheritdoc}
+     * Gets a short, human-readable description of API resource.
+     *
+     * @param string $action
+     * @param string $entityDescription
+     *
+     * @return string|null
      */
-    public function getResourceDescription($action, $entityDescription)
+    public function getResourceDescription(string $action, string $entityDescription): ?string
     {
-        return isset($this->templates[$action])
-            ? strtr($this->templates[$action]['description'], ['{name}' => $entityDescription])
+        return isset(self::TEMPLATES[$action])
+            ? \strtr(self::TEMPLATES[$action]['description'], ['{name}' => $entityDescription])
             : null;
     }
 
     /**
-     * {@inheritdoc}
+     * Gets a detailed documentation of API resource.
+     *
+     * @param string $action
+     * @param string $entityDescription
+     *
+     * @return string|null
      */
-    public function getResourceDocumentation($action, $entityDescription)
+    public function getResourceDocumentation(string $action, string $entityDescription): ?string
     {
-        return isset($this->templates[$action]['documentation'])
-            ? strtr($this->templates[$action]['documentation'], ['{name}' => $entityDescription])
+        return isset(self::TEMPLATES[$action]['documentation'])
+            ? \strtr(self::TEMPLATES[$action]['documentation'], ['{name}' => $entityDescription])
             : null;
     }
 
     /**
-     * {@inheritdoc}
+     * Gets a short, human-readable description of API sub-resource.
+     *
+     * @param string $action
+     * @param string $associationDescription
+     * @param bool   $isCollection
+     *
+     * @return string|null
      */
-    public function getSubresourceDescription($action, $associationDescription, $isCollection)
-    {
-        if (!isset($this->templates[$action])) {
+    public function getSubresourceDescription(
+        string $action,
+        string $associationDescription,
+        bool $isCollection
+    ): ?string {
+        if (!isset(self::TEMPLATES[$action])) {
             return null;
         }
 
-        $template = $this->templates[$action]['description'];
-        if (is_array($template)) {
+        $template = self::TEMPLATES[$action]['description'];
+        if (\is_array($template)) {
             $template = $isCollection ? $template['collection'] : $template['single_item'];
         }
 
-        return strtr($template, ['{association}' => $associationDescription]);
+        return \strtr($template, ['{association}' => $associationDescription]);
     }
 
     /**
-     * {@inheritdoc}
+     * Gets a detailed documentation of API sub-resource.
+     *
+     * @param string $action
+     * @param string $associationDescription
+     * @param bool   $isCollection
+     *
+     * @return string|null
      */
-    public function getSubresourceDocumentation($action, $associationDescription, $isCollection)
-    {
-        if (!isset($this->templates[$action])) {
+    public function getSubresourceDocumentation(
+        string $action,
+        string $associationDescription,
+        bool $isCollection
+    ): ?string {
+        if (!isset(self::TEMPLATES[$action])) {
             return null;
         }
 
-        $template = $this->templates[$action]['documentation'];
-        if (is_array($template)) {
+        $template = self::TEMPLATES[$action]['documentation'];
+        if (\is_array($template)) {
             $template = $isCollection ? $template['collection'] : $template['single_item'];
         }
 
-        return strtr($template, ['{association}' => $associationDescription]);
+        return \strtr($template, ['{association}' => $associationDescription]);
     }
 }

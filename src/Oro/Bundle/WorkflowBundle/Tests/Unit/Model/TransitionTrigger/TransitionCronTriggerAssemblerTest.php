@@ -8,9 +8,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionCronTriggerAssembler;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerCronVerifier;
 
-class TransitionCronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
+class TransitionCronTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TransitionTriggerCronVerifier|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TransitionTriggerCronVerifier|\PHPUnit\Framework\MockObject\MockObject */
     protected $verifier;
 
     /** @var TransitionCronTriggerAssembler */

@@ -5,7 +5,7 @@ namespace Oro\Bundle\CronBundle\Tests\Unit\Filter;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilter;
 
-class SchedulesByArgumentsFilterTest extends \PHPUnit_Framework_TestCase
+class SchedulesByArgumentsFilterTest extends \PHPUnit\Framework\TestCase
 {
     public function testFilter()
     {

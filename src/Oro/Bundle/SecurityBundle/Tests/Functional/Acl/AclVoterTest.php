@@ -17,7 +17,7 @@ class AclVoterTest extends WebTestCase
 
     public function testNotThrowDomainObject()
     {
-        /** @var RequestMatcherInterface|\PHPUnit_Framework_MockObject_MockObject $alwaysMatcher */
+        /** @var RequestMatcherInterface|\PHPUnit\Framework\MockObject\MockObject $alwaysMatcher */
         $alwaysMatcher = $this->createMock(RequestMatcherInterface::class);
         $alwaysMatcher->expects($this->any())
             ->method('matches')

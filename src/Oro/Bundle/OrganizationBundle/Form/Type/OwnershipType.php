@@ -3,7 +3,9 @@
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class OwnershipType extends AbstractType
 {
@@ -20,9 +22,9 @@ class OwnershipType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'choices' => $this->getOwnershipsArray()
-            )
+            [
+                'choices' => array_flip($this->getOwnershipsArray()),
+            ]
         );
     }
 
@@ -44,7 +46,7 @@ class OwnershipType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**

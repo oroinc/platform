@@ -1,11 +1,5 @@
-OroChartBundle
-====================
+# OroChartBundle
 
-Chart bundle provide functionality for display different types of chart.
-It is solution that allows user to view data in useful chart format.
-Bundle support such chart types as:
-    - line chart
-    - pie chart
-    - flow chart
+OroChartBundle helps display the application data in the UI in the form of charts and enables developers to configure chart settings and source data before the rendering process. The Bundle implements line charts, multiline charts, bar charts, horizontal bar charts, stacked bar charts, pie charts, and flowcharts.
 
 Please see [documentation](./Resources/doc/index.md) for more details.

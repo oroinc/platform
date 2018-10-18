@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigValueRepository;
 
-class ConfigValueRepositoryTest extends \PHPUnit_Framework_TestCase
+class ConfigValueRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ConfigValueRepository

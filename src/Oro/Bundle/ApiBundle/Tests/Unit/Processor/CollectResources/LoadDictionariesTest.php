@@ -5,21 +5,19 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectResources;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\LoadDictionaries;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 
-class LoadDictionariesTest extends \PHPUnit_Framework_TestCase
+class LoadDictionariesTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $dictionaryProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ChainDictionaryValueListProvider */
+    private $dictionaryProvider;
 
     /** @var LoadDictionaries */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
-        $this->dictionaryProvider = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->dictionaryProvider = $this->createMock(ChainDictionaryValueListProvider::class);
 
         $this->processor = new LoadDictionaries($this->dictionaryProvider);
     }
@@ -28,16 +26,16 @@ class LoadDictionariesTest extends \PHPUnit_Framework_TestCase
     {
         $context = new CollectResourcesContext();
 
-        $this->dictionaryProvider->expects($this->once())
+        $this->dictionaryProvider->expects(self::once())
             ->method('getSupportedEntityClasses')
             ->willReturn(['Test\Entity1', 'Test\Entity2']);
 
         $this->processor->process($context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'Test\Entity1' => new ApiResource('Test\Entity1'),
-                'Test\Entity2' => new ApiResource('Test\Entity2'),
+                'Test\Entity2' => new ApiResource('Test\Entity2')
             ],
             $context->getResult()->toArray()
         );

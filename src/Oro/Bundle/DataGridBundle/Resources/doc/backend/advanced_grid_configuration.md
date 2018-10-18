@@ -292,3 +292,45 @@ datagrids:
             skip_acl_apply: true
             
 ```
+
+#### Problem:
+*I need to add new column to datagrid which should be secured by additional ACL resource (e.g. budget fields should be visible only for managers)*
+#### Solution:
+- Create a datagrid event listener listening to the `BuildBefore` event and add columns only if the user has appropriate permissions
+```php
+<?php
+
+namespace Acme\Bundle\AcmeBundle\EventListener\Datagrid;
+
+use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
+class BudgetColumnsListener
+{
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
+
+    /**
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     */
+    public function __construct(AuthorizationCheckerInterface $authorizationChecker)
+    {
+        $this->authorizationChecker = $authorizationChecker;
+    }
+
+    /**
+     * @param BuildBefore $event
+     */
+    public function onBuildBefore(BuildBefore $event)
+    {
+        if (!$this->authorizationChecker->isGranted('acme_bundle_show_budget_columns')) {
+            return;
+        }
+
+        $config = $event->getConfig();
+
+        $this->addSourceQueryConfig($config);
+        $this->addColumnsConfig($config);
+    }
+}
+```

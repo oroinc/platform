@@ -7,6 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler;
+use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Form\FormFactory;
@@ -16,38 +18,40 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
+class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     /**
-     * @var FormFactory|\PHPUnit_Framework_MockObject_MockObject
+     * @var FormFactory|\PHPUnit\Framework\MockObject\MockObject
      */
     private $formFactory;
 
     /**
-     * @var Session|\PHPUnit_Framework_MockObject_MockObject
+     * @var Session|\PHPUnit\Framework\MockObject\MockObject
      */
     private $session;
 
     /**
-     * @var Router|\PHPUnit_Framework_MockObject_MockObject
+     * @var Router|\PHPUnit\Framework\MockObject\MockObject
      */
     private $router;
 
     /**
-     * @var ConfigHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configHelper;
 
     /**
-     * @var FormInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var FormInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $form;
 
     /**
-     * @var Request|\PHPUnit_Framework_MockObject_MockObject
+     * @var Request|\PHPUnit\Framework\MockObject\MockObject
      */
     private $request;
 
@@ -55,6 +59,16 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
      * @var ConfigHelperHandler
      */
     private $handler;
+
+    /**
+     * @var UrlGeneratorInterface
+     */
+    private $urlGenerator;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
 
     protected function setUp()
     {
@@ -79,11 +93,16 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+
         $this->handler = new ConfigHelperHandler(
             $this->formFactory,
             $this->session,
             $this->router,
-            $this->configHelper
+            $this->configHelper,
+            $this->translator,
+            $this->urlGenerator
         );
     }
 
@@ -98,7 +117,7 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('create')
             ->with(
-                'oro_entity_extend_field_type',
+                FieldType::class,
                 $fieldConfigModel,
                 ['class_name' => $entityClassName]
             )
@@ -117,7 +136,7 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('create')
             ->with(
-                'oro_entity_config_type',
+                ConfigType::class,
                 null,
                 ['config_model' => $fieldConfigModel]
             )
@@ -136,7 +155,7 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->form
             ->expects($this->never())
-            ->method('submit');
+            ->method('handleRequest');
 
         $this->assertFalse($this->handler->isFormValidAfterSubmit($this->request, $this->form));
     }
@@ -151,9 +170,12 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->form
             ->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
-
+        $this->form
+            ->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
         $this->form
             ->expects($this->once())
             ->method('isValid')
@@ -172,9 +194,12 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->form
             ->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
-
+        $this->form
+            ->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
         $this->form
             ->expects($this->once())
             ->method('isValid')
@@ -208,13 +233,36 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
         $this->handler->showSuccessMessageAndRedirect($fieldConfigModel, $successMessage);
     }
 
+    public function testShowClearCacheMessage()
+    {
+        $message = 'Translation cache update is required';
+        $flashBag = $this->createMock(FlashBagInterface::class);
+
+        $this->translator
+            ->expects($this->once())
+            ->method('trans')
+            ->will($this->returnValue($message));
+
+        $flashBag
+            ->expects($this->once())
+            ->method('add')
+            ->with('warning', $message);
+
+        $this->session
+            ->expects($this->once())
+            ->method('getFlashBag')
+            ->willReturn($flashBag);
+
+        $this->handler->showClearCacheMessage();
+    }
+
     public function testConstructConfigResponse()
     {
         /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class);
 
         $formView = new FormView();
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form
             ->expects($this->once())

@@ -6,9 +6,9 @@ use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
 use Oro\Component\DependencyInjection\ServiceLinkRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ServiceLinkRegistryTest extends \PHPUnit_Framework_TestCase
+class ServiceLinkRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
     /** @var ServiceLinkRegistry */

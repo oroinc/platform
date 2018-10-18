@@ -3,9 +3,10 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscriber;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormEvents;
 
-class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
+class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_COUNTRY_NAME = 'testCountry';
 
@@ -37,7 +38,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInternalType('array', $result);
         $this->assertArrayHasKey(FormEvents::PRE_SET_DATA, $result);
-        $this->assertArrayHasKey(FormEvents::PRE_BIND, $result);
+        $this->assertArrayHasKey(FormEvents::PRE_SUBMIT, $result);
     }
 
     public function testPreSetDataEmptyAddress()
@@ -99,12 +100,12 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getOptions')
             ->will($this->returnValue(array()));
         $type = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $type->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('oro_region'));
         $configMock->expects($this->any())
             ->method('getType')
             ->will($this->returnValue($type));
+        $type->expects($this->once())
+            ->method('getInnerType')
+            ->willReturn(new SubmitType());
 
         $fieldMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()
@@ -217,12 +218,12 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
         $configMock->expects($this->once())->method('getOptions')
             ->will($this->returnValue(array()));
         $type = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $type->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('oro_region'));
         $configMock->expects($this->any())
             ->method('getType')
             ->will($this->returnValue($type));
+        $type->expects($this->once())
+            ->method('getInnerType')
+            ->willReturn(new SubmitType());
 
         $fieldMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()->getMock();

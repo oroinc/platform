@@ -5,7 +5,7 @@ namespace Oro\Bundle\RequireJSBundle\Tests\Unit\Provider;
 use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
 use Oro\Bundle\RequireJSBundle\Provider\ConfigProviderInterface;
 
-class ConfigProviderManagerTest extends \PHPUnit_Framework_TestCase
+class ConfigProviderManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ConfigProviderManager
@@ -45,7 +45,7 @@ class ConfigProviderManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConfigProviderInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigProviderInterface
      */
     protected function getMockConfigProviderInterface()
     {

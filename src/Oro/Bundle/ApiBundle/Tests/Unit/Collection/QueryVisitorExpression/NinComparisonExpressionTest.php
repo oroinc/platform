@@ -2,37 +2,42 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 
-use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NinComparisonExpression;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class NinComparisonExpressionTest extends \PHPUnit_Framework_TestCase
+class NinComparisonExpressionTest extends \PHPUnit\Framework\TestCase
 {
     public function testWalkComparisonExpression()
     {
         $expression = new NinComparisonExpression();
-        $expressionVisitor = new QueryExpressionVisitor();
-        $comparison = new Comparison('test', 'NIN', [1, 2, 3]);
-        $fieldName = 'a.test';
-        $parameterName = 'test_2';
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+        $field = 'e.test';
+        $expr = 'LOWER(e.test)';
+        $parameterName = 'test_1';
+        $value = [1, 2, 3];
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
-            $comparison,
-            $fieldName,
-            $parameterName
+            $field,
+            $expr,
+            $parameterName,
+            $value
         );
 
-        $this->assertEquals(
-            new Func('a.test NOT IN', [':test_2']),
+        self::assertEquals(
+            new Func($expr . ' NOT IN', [':' . $parameterName]),
             $result
         );
-
-        $this->assertEquals(
-            [new Parameter('test_2', [1, 2, 3], Connection::PARAM_INT_ARRAY)],
+        self::assertEquals(
+            [new Parameter($parameterName, $value, Connection::PARAM_INT_ARRAY)],
             $expressionVisitor->getParameters()
         );
     }

@@ -7,9 +7,9 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionRepositoryCacheInvalidationListener;
 
-class WorkflowDefinitionRepositoryCacheInvalidationListenerTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionRepositoryCacheInvalidationListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var WorkflowDefinitionRepositoryCacheInvalidationListener */

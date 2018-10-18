@@ -66,30 +66,60 @@ class ErrorCompleter extends AbstractErrorCompleter
             );
         } elseif (null !== $source && !$source->getPointer() && $source->getPropertyPath()) {
             $propertyPath = $source->getPropertyPath();
-            if (!$metadata) {
+            if (null === $metadata) {
                 $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));
-                $error->setSource(null);
+                $error->setSource();
             } else {
+                list($normalizedPropertyPath, $path, $pointerPrefix) = $this->normalizePropertyPath($propertyPath);
+
                 $pointer = [];
-                if (in_array($propertyPath, $metadata->getIdentifierFieldNames(), true)) {
+                if (\in_array($normalizedPropertyPath, $metadata->getIdentifierFieldNames(), true)) {
                     $pointer[] = JsonApiDoc::ID;
-                } elseif (array_key_exists($propertyPath, $metadata->getFields())) {
-                    $pointer = [JsonApiDoc::ATTRIBUTES, $propertyPath];
-                } else {
-                    $path = explode('.', $propertyPath);
-                    if (array_key_exists($path[0], $metadata->getAssociations())) {
+                } elseif (\array_key_exists($normalizedPropertyPath, $metadata->getFields())) {
+                    if ($metadata->hasIdentifierFields()) {
+                        $pointer = [JsonApiDoc::ATTRIBUTES, $normalizedPropertyPath];
+                    } else {
+                        $pointer = [$normalizedPropertyPath];
+                    }
+                } elseif (\array_key_exists($path[0], $metadata->getAssociations())) {
+                    if ($metadata->hasIdentifierFields()) {
                         $pointer = $this->getAssociationPointer($path, $metadata->getAssociation($path[0]));
                     } else {
-                        $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));
-                        $error->setSource(null);
+                        $pointer = [$normalizedPropertyPath];
                     }
+                } else {
+                    $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));
+                    $error->setSource();
                 }
                 if (!empty($pointer)) {
-                    $source->setPointer(sprintf('/%s/%s', JsonApiDoc::DATA, implode('/', $pointer)));
+                    $dataSection = $metadata->hasIdentifierFields()
+                        ? JsonApiDoc::DATA
+                        : JsonApiDoc::META;
+                    $source->setPointer(
+                        \sprintf('/%s/%s', $dataSection, \implode('/', \array_merge($pointerPrefix, $pointer)))
+                    );
                     $source->setPropertyPath(null);
                 }
             }
         }
+    }
+
+    /**
+     * @param string $propertyPath
+     *
+     * @return array
+     */
+    private function normalizePropertyPath($propertyPath)
+    {
+        $pointerPrefix = [];
+        $normalizedPropertyPath = $propertyPath;
+        $path = \explode('.', $propertyPath);
+        if (\count($path) > 1 && \is_numeric($path[0])) {
+            $normalizedPropertyPath = \substr($propertyPath, \strlen($path[0]) + 1);
+            $pointerPrefix[] = \array_shift($path);
+        }
+
+        return [$normalizedPropertyPath, $path, $pointerPrefix];
     }
 
     /**
@@ -103,12 +133,10 @@ class ErrorCompleter extends AbstractErrorCompleter
         $pointer = DataType::isAssociationAsField($association->getDataType())
             ? [JsonApiDoc::ATTRIBUTES, $path[0]]
             : [JsonApiDoc::RELATIONSHIPS, $path[0], JsonApiDoc::DATA];
-        if (count($path) > 1) {
+        if (\count($path) > 1) {
             $pointer[] = $path[1];
-            if (DataType::isAssociationAsField($association->getDataType())
-                && !$association->isCollapsed()
-            ) {
-                $pointer = array_merge($pointer, array_slice($path, 2));
+            if (!$association->isCollapsed() && DataType::isAssociationAsField($association->getDataType())) {
+                $pointer = \array_merge($pointer, \array_slice($path, 2));
             }
         }
 
@@ -127,7 +155,7 @@ class ErrorCompleter extends AbstractErrorCompleter
             $message .= '.';
         }
 
-        return sprintf('%s Source: %s.', $message, $source);
+        return \sprintf('%s Source: %s.', $message, $source);
     }
 
     /**
@@ -138,7 +166,7 @@ class ErrorCompleter extends AbstractErrorCompleter
      */
     private function endsWith($haystack, $needle)
     {
-        return substr($haystack, -strlen($needle)) === $needle;
+        return \substr($haystack, -\strlen($needle)) === $needle;
     }
 
     /**
@@ -155,13 +183,13 @@ class ErrorCompleter extends AbstractErrorCompleter
             return AddIncludeFilter::FILTER_KEY;
         }
         if (FilterFieldsConfigExtra::NAME === $e->getOperation()) {
-            return sprintf(
+            return \sprintf(
                 AddFieldsFilter::FILTER_KEY_TEMPLATE,
                 $this->getEntityType($e->getClassName(), $requestType)
             );
         }
 
-        throw new \LogicException(sprintf(
+        throw new \LogicException(\sprintf(
             'Unexpected type of NotSupportedConfigOperationException: %s.',
             $e->getOperation()
         ));

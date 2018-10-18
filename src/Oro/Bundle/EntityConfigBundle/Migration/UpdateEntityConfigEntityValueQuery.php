@@ -36,17 +36,24 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
     protected $connection;
 
     /**
+     * @var null|string
+     */
+    protected $replaceValue;
+
+    /**
      * @param string $entityName
      * @param string $scope
      * @param string $code
      * @param string|array $value
+     * @param string|array $replaceValue if passed, updating will not happen if existing value !== replaceValue
      */
-    public function __construct($entityName, $scope, $code, $value)
+    public function __construct($entityName, $scope, $code, $value, $replaceValue = null)
     {
         $this->entityName = $entityName;
         $this->scope = $scope;
         $this->code = $code;
         $this->value = $value;
+        $this->replaceValue = $replaceValue;
     }
 
     /**
@@ -118,14 +125,17 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
         $this->logQuery($logger, $sql, $parameters);
 
         $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
-        $data[$this->scope][$this->code] = $this->value;
-        $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
 
-        $sql = 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?';
-        $parameters = [$data, $this->entityName];
-        $statement = $this->connection->prepare($sql);
-        $statement->execute($parameters);
-        $this->logQuery($logger, $sql, $parameters);
+        if ($this->isDoUpdate($data)) {
+            $data[$this->scope][$this->code] = $this->value;
+            $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+
+            $sql = 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?';
+            $parameters = [$data, $this->entityName];
+            $statement = $this->connection->prepare($sql);
+            $statement->execute($parameters);
+            $this->logQuery($logger, $sql, $parameters);
+        }
     }
 
     /**
@@ -137,5 +147,16 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
     {
         $message = sprintf('%s with parameters [%s]', $sql, implode(', ', $parameters));
         $logger->debug($message);
+    }
+
+    /**
+     * @param array $data
+     * @return bool
+     */
+    protected function isDoUpdate(array $data)
+    {
+        return !isset($data[$this->scope][$this->code])
+            || $this->replaceValue === null
+            || $this->replaceValue === $data[$this->scope][$this->code];
     }
 }

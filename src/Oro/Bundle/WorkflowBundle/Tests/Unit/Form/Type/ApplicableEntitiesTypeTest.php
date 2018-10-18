@@ -8,9 +8,9 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ApplicableEntitiesTypeTest extends \PHPUnit_Framework_TestCase
+class ApplicableEntitiesTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  WorkflowEntityConnector|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  WorkflowEntityConnector|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConnector;
 
     /** @var ApplicableEntitiesType */
@@ -30,8 +30,8 @@ class ApplicableEntitiesTypeTest extends \PHPUnit_Framework_TestCase
 
         $resolver->setDefaults([
             'choices' => [
-                StubEntity::class => Inflector::tableize(StubEntity::class),
-                \stdClass::class => Inflector::tableize(\stdClass::class)
+                Inflector::tableize(StubEntity::class) => StubEntity::class,
+                Inflector::tableize(\stdClass::class) => \stdClass::class
             ]
         ]);
 
@@ -51,7 +51,7 @@ class ApplicableEntitiesTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                StubEntity::class => Inflector::tableize(StubEntity::class)
+                Inflector::tableize(StubEntity::class) => StubEntity::class,
             ],
             $result['choices']
         );

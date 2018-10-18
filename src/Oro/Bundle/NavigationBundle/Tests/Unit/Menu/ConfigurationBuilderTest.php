@@ -11,7 +11,7 @@ use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Component\Config\Resolver\SystemAwareResolver;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
+class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigurationBuilder */
     protected $configurationBuilder;
@@ -19,13 +19,13 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var MenuFactory */
     protected $factory;
 
-    /** @var FactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $menuFactory;
 
-    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
-    /** @var MenuConfiguration|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var MenuConfiguration|\PHPUnit\Framework\MockObject\MockObject */
     protected $menuConfiguration;
 
     protected function setUp()

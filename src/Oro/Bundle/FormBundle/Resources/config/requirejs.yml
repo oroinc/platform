@@ -1,11 +1,5 @@
 config:
     shim:
-        'jquery.validate':
-            deps:
-                - 'jquery'
-        'jquery.validate-additional-methods':
-            deps:
-                - 'jquery.validate'
         'tinymce/tinymce':
             exports: 'tinymce'
     map:
@@ -15,7 +9,7 @@ config:
             'jquery.validate': 'jquery.validate'
     paths:
         'xregexp': 'bundles/npmassets/xregexp/xregexp-all.js'
-        'tinymce/tinymce': 'bundles/tinymce/tinymce.min.js'
+        'tinymce/tinymce': 'bundles/components/tinymce/tinymce.min.js'
         'jquery.validate': 'bundles/bowerassets/jquery-validate/dist/jquery.validate.js'
         'jquery.validate-additional-methods': 'bundles/bowerassets/jquery-validate/dist/additional-methods.js'
         'oroform/js/validator/count': 'bundles/oroform/js/validator/count.js'
@@ -91,4 +85,3 @@ config:
 build:
     paths:
         'tinymce/tinymce': 'empty:'
-        'tinymce/tinymce.jquery': 'empty:'

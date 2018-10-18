@@ -6,9 +6,9 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\CurrentLocalizationPass
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class CurrentLocalizationPassTest extends \PHPUnit_Framework_TestCase
+class CurrentLocalizationPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $containerBuilder;
 
     /** @var CurrentLocalizationPass */

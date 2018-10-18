@@ -6,9 +6,11 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
+use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\AbstractImportStrategy;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 
 class EntityFieldImportStrategy extends AbstractImportStrategy
 {
@@ -21,8 +23,8 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
     /** @var FieldTypeProvider */
     protected $fieldTypeProvider;
 
-    /** @var bool */
-    protected $isExistingEntity = false;
+    /** @var FieldNameValidationHelper */
+    protected $fieldValidationHelper;
 
     /**
      * @param TranslatorInterface $translator
@@ -49,6 +51,14 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
     }
 
     /**
+     * @param FieldNameValidationHelper $fieldValidationHelper
+     */
+    public function setFieldValidationHelper(FieldNameValidationHelper $fieldValidationHelper)
+    {
+        $this->fieldValidationHelper = $fieldValidationHelper;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function process($entity)
@@ -57,13 +67,18 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
 
         /** @var FieldConfigModel $entity */
         $entity = $this->beforeProcessEntity($entity);
-        $entity = $this->processEntity($entity);
-        $entity = $this->afterProcessEntity($entity);
-        if ($entity) {
-            $entity = $this->validateAndUpdateContext($entity);
+        if (!$entity) {
+            return null;
         }
-
-        return $entity;
+        $entity = $this->processEntity($entity);
+        if (!$entity) {
+            return null;
+        }
+        $entity = $this->afterProcessEntity($entity);
+        if (!$entity) {
+            return null;
+        }
+        return $this->validateAndUpdateContext($entity);
     }
 
     /**
@@ -73,48 +88,12 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
     protected function processEntity(FieldConfigModel $entity)
     {
         $supportedTypes = $this->fieldTypeProvider->getSupportedFieldTypes();
-
-        if ((string)$entity->getFieldName() === '') {
-            $this->addErrors($this->translator->trans('oro.entity_config.import.message.invalid_field_name'));
-
-            return null;
-        }
-
         if (!in_array($entity->getType(), $supportedTypes, true)) {
             $this->addErrors($this->translator->trans('oro.entity_config.import.message.invalid_field_type'));
 
             return null;
         }
-
-        $existingEntity = $this->findExistingEntity($entity);
-        $this->isExistingEntity = (bool)$existingEntity;
-        if ($this->isExistingEntity) {
-            if ($entity->getType() !== $existingEntity->getType()) {
-                $this->addErrors($this->translator->trans('oro.entity_config.import.message.change_type_not_allowed'));
-
-                return null;
-            }
-            if ($this->isSystemField($existingEntity)) {
-                return null;
-            }
-        }
-
-        $this->context->setValue('existingEntity', $existingEntity);
-
         return $entity;
-    }
-
-    /**
-     * @param FieldConfigModel $entity
-     * @param array $searchContext
-     * @return null|FieldConfigModel
-     */
-    protected function findExistingEntity($entity, array $searchContext = [])
-    {
-        return $this->databaseHelper->findOneBy(
-            $this->entityName,
-            ['fieldName' => $entity->getFieldName(), 'entity' => $entity->getEntity()]
-        );
     }
 
     /**
@@ -124,17 +103,23 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
     protected function validateAndUpdateContext(FieldConfigModel $entity)
     {
         $errors = array_merge(
-            (array)$this->strategyHelper->validateEntity($entity, ['FieldConfigModel']),
+            (array)$this->strategyHelper->validateEntity(
+                $entity,
+                null,
+                new GroupSequence(['FieldConfigModel', 'Sql', 'ChangeTypeField'])
+            ),
             $this->validateEntityFields($entity)
         );
 
         if ($errors) {
             $this->addErrors($errors);
-        } else {
-            $this->updateContextCounters();
+            return null;
         }
 
-        return $errors ? null : $entity;
+        $this->updateContextCounters($entity);
+        $this->fieldValidationHelper->registerField($entity);
+
+        return $entity;
     }
 
     /**
@@ -146,9 +131,19 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
         $this->strategyHelper->addValidationErrors((array)$errors, $this->context);
     }
 
-    protected function updateContextCounters()
+    /**
+     * @param FieldConfigModel $entity
+     */
+    protected function updateContextCounters(FieldConfigModel $entity)
     {
-        if ($this->isExistingEntity) {
+        $fieldName = $entity->getFieldName();
+
+        $existingField = $this->fieldValidationHelper->getSimilarExistingFieldData(
+            $entity->getEntity()->getClassName(),
+            $fieldName
+        );
+
+        if ($existingField && $fieldName === $existingField[0] && $entity->getType() === $existingField[1]) {
             $this->context->incrementUpdateCount();
         } else {
             $this->context->incrementAddCount();

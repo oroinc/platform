@@ -3,44 +3,46 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\From;
+use Oro\Bundle\UserBundle\Entity\User as RealUserEntity;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Form\Handler\UserHandler;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class UserHandlerTest extends \PHPUnit_Framework_TestCase
+class UserHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject */
+    const FORM_DATA = ['field' => 'value'];
+
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $form;
 
-    /** @var Request|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
     protected $request;
 
-    /** @var UserManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TemplateEmailManager|\PHPUnit\Framework\MockObject\MockObject */
+    protected $templateEmailManager;
+
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $userConfigManager;
 
-    /** @var DelegatingEngine|\PHPUnit_Framework_MockObject_MockObject */
-    protected $templating;
-
-    /** @var \Swift_Mailer|\PHPUnit_Framework_MockObject_MockObject */
-    protected $mailer;
-
-    /** @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FlashBagInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $flashBag;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
     /** @var UserHandler */
@@ -49,13 +51,12 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->form = $this->createMock(FormInterface::class);
-        $this->request = $this->createMock(Request::class);
+        $this->request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
         $this->manager = $this->createMock(UserManager::class);
+        $this->templateEmailManager = $this->createMock(TemplateEmailManager::class);
         $this->userConfigManager = $this->createMock(ConfigManager::class);
-        $this->templating = $this->createMock(DelegatingEngine::class);
-        $this->mailer = $this->createMock(\Swift_Mailer::class);
         $this->flashBag = $this->createMock(FlashBagInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
@@ -64,9 +65,8 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
             $this->form,
             $requestStack,
             $this->manager,
+            $this->templateEmailManager,
             $this->userConfigManager,
-            $this->templating,
-            $this->mailer,
             $this->flashBag,
             $this->translator,
             $this->logger
@@ -77,9 +77,7 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $user = new User();
 
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->willReturn(Request::METHOD_GET);
+        $this->request->setMethod(Request::METHOD_GET);
 
         $this->manager->expects($this->never())
             ->method($this->anything());
@@ -92,13 +90,12 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
         $user = new User();
         $user->setEmail('test@example.com');
 
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->willReturn(Request::METHOD_POST);
+        $this->request->initialize([], self::FORM_DATA);
+        $this->request->setMethod(Request::METHOD_POST);
 
         $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->request);
+            ->with(self::FORM_DATA);
         $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
@@ -153,14 +150,16 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('updateUser')
             ->with($user);
 
-        $this->templating->expects($this->once())
-            ->method('render')
-            ->with('OroUserBundle:Mail:invite.html.twig', ['user' => $user, 'password' => $plainPassword])
-            ->willReturn('Body rendered template');
-
-        $this->mailer->expects($this->once())
-            ->method('send')
-            ->with($this->isInstanceOf(\Swift_Message::class));
+        $this->templateEmailManager
+            ->expects($this->once())
+            ->method('sendTemplateEmail')
+            ->with(
+                From::emailAddress('admin@example.com', 'John Doe'),
+                [$user],
+                new EmailTemplateCriteria(UserHandler::INVITE_USER_TEMPLATE, RealUserEntity::class),
+                ['user' => $user, 'password' => $plainPassword]
+            )
+            ->willReturn(1);
 
         $this->assertTrue($this->handler->process($user));
     }
@@ -169,13 +168,12 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $user = new User();
 
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->willReturn(Request::METHOD_POST);
+        $this->request->initialize([], self::FORM_DATA);
+        $this->request->setMethod(Request::METHOD_POST);
 
         $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->request);
+            ->with(self::FORM_DATA);
         $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
@@ -214,11 +212,9 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('updateUser')
             ->with($user);
 
-        $this->templating->expects($this->never())
-            ->method('render');
-
-        $this->mailer->expects($this->never())
-            ->method('send');
+        $this->templateEmailManager
+            ->expects($this->never())
+            ->method('sendTemplateEmail');
 
         $this->assertTrue($this->handler->process($user));
     }

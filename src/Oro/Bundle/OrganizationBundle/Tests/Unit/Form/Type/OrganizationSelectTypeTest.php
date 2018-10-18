@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class OrganizationSelectTypeTest extends \PHPUnit_Framework_TestCase
+class OrganizationSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OrganizationSelectType
@@ -32,7 +33,7 @@ class OrganizationSelectTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_jqueryselect2_hidden', $this->type->getParent());
+        $this->assertEquals(OroJquerySelect2HiddenType::class, $this->type->getParent());
     }
 
     public function testGetName()

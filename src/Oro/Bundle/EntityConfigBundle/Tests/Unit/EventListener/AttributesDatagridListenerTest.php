@@ -12,11 +12,11 @@ use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRelationReposi
 use Oro\Bundle\EntityConfigBundle\EventListener\AttributesDatagridListener;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class AttributesDatagridListenerTest extends \PHPUnit_Framework_TestCase
+class AttributesDatagridListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject*/
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject*/
     private $doctrineHelper;
 
     /** @var AttributesDatagridListener */

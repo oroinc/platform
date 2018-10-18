@@ -2,7 +2,7 @@
 
 ## Overview
 
-This documentation describes **what a theme is**, and how to define and develop layout themes for *Oro Platform*.
+This documentation describes **what a theme is**, and how to define and develop layout themes for *OroPlatform*.
 
 A **theme** is a collection of files that declares the visual presentation for a single page or a group of pages.
 Basically, think of a **theme** as a skin for your application. Files, that the theme consists of, are [layout updates](./layout_update.md), **styles**, **scripts** and anything else related to the look and feel of the page.
@@ -23,8 +23,8 @@ Theme folder(name) must match [a-zA-Z][a-zA-Z0-9_\-:]* expression.
 | `parent` | Parent theme identifier | no |
 | `groups` | Group name or names for which it's applicable. By default, theme is available in the `main` group and applicable to the platform  | no |
 
-The `active theme` could be set on the application level in `app/configs/config.yml` under the `oro_layout.active_theme` node.
-You can find additional information if you execute the `app/console config:dump-reference OroLayoutBundle` shell command.
+The `active theme` could be set on the application level in `configs/config.yml` under the `oro_layout.active_theme` node.
+You can find additional information if you execute the `bin/console config:dump-reference OroLayoutBundle` shell command.
 
 **Example:**
 
@@ -36,7 +36,7 @@ label:  ~ # this is a "hidden" theme
 groups: [ main ]
 
 # src/Acme/Bundle/DemoBundle/Resources/views/layouts/oro/theme.yml
-# Default layout theme for the Oro Platform
+# Default layout theme for OroPlatform
 label:  Oro Theme
 icon:   bundles/oroui/themes/oro/images/favicon.ico
 parent: base

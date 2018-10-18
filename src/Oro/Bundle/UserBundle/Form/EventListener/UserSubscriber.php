@@ -5,6 +5,8 @@ namespace Oro\Bundle\UserBundle\Form\EventListener;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -77,11 +79,11 @@ class UserSubscriber implements EventSubscriberInterface
             $form->remove('change_password');
         }
 
-        $enabledChoices = ['oro.user.enabled.disabled', 'oro.user.enabled.enabled'];
+        $enabledChoices = ['oro.user.enabled.disabled' => 0, 'oro.user.enabled.enabled' => 1];
 
         // do not allow editing of Enabled status
         if (!empty($entity->getId())) {
-            $form->add('enabled', 'hidden', ['mapped' => false]);
+            $form->add('enabled', HiddenType::class, ['mapped' => false]);
 
             return;
         }
@@ -89,14 +91,14 @@ class UserSubscriber implements EventSubscriberInterface
         $form->add(
             $this->factory->createNamed(
                 'enabled',
-                'choice',
+                ChoiceType::class,
                 '',
                 [
                     'label' => 'oro.user.enabled.label',
                     'required' => true,
                     'disabled' => false,
                     'choices' => $enabledChoices,
-                    'empty_value' => 'Please select',
+                    'placeholder' => 'Please select',
                     'empty_data' => '',
                     'auto_initialize' => false
                 ]

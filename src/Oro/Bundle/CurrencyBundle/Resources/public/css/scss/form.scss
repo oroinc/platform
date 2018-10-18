@@ -1,0 +1,43 @@
+/* @theme: admin.oro; */
+
+.currency-select-enabled {
+    .input-append,
+    .base-currency {
+        input:first-child {
+            width: $field-width - 60px;
+        }
+
+        select {
+            width: 47px;
+        }
+
+        div.selector {
+            font-size: 13px;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-left: 0 none;
+
+            &.active {
+                background-color: #fafafa;
+                outline: 0 none;
+            }
+        }
+    }
+
+    .default-currency-equivalent {
+        color: #777;
+        margin-top: 4px;
+    }
+
+    .base-currency-field {
+        margin-top: 4px;
+
+        .add-on {
+            display: inline-block;
+            overflow: hidden;
+            width: 62px;
+            padding: 4px 8px;
+            text-align: left;
+        }
+    }
+}

@@ -2,31 +2,25 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Twig extension for filters:
+ *  1) sort_enum - Sorts the given enum value identifiers according priorities specified for an enum values
+ *  2) trans_enum - Translates the given enum value
+ */
 class EnumExtension extends \Twig_Extension
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    /** @var EnumValueProvider */
+    protected $enumValueProvider;
 
     /**
-     * @var array
-     *      key   => enum value entity class name
-     *      value => array // values are sorted by priority
-     *          key   => enum value id
-     *          value => enum value name
-     *
+     * @param EnumValueProvider $enumValueProvider
      */
-    protected $localCache = [];
-
-    /**
-     * @param ManagerRegistry $doctrine
-     */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(EnumValueProvider $enumValueProvider)
     {
-        $this->doctrine = $doctrine;
+        $this->enumValueProvider = $enumValueProvider;
     }
 
     /**
@@ -67,7 +61,7 @@ class EnumExtension extends \Twig_Extension
         $values = $this->getEnumValues($enumValueEntityClassOrEnumCode);
 
         $result = [];
-        foreach ($values as $id => $name) {
+        foreach ($values as $name => $id) {
             if (isset($ids[$id])) {
                 $result[] = $id;
             }
@@ -87,10 +81,9 @@ class EnumExtension extends \Twig_Extension
     public function transEnum($enumValueId, $enumValueEntityClassOrEnumCode)
     {
         $values = $this->getEnumValues($enumValueEntityClassOrEnumCode);
+        $label = array_search($enumValueId, $values);
 
-        return isset($values[$enumValueId])
-            ? $values[$enumValueId]
-            : $enumValueId;
+        return $label !== false ? $label : $enumValueId;
     }
 
     /**
@@ -106,20 +99,7 @@ class EnumExtension extends \Twig_Extension
             $enumValueEntityClassOrEnumCode = ExtendHelper::buildEnumValueClassName($enumValueEntityClassOrEnumCode);
         }
 
-        if (!isset($this->localCache[$enumValueEntityClassOrEnumCode])) {
-            $items      = [];
-            /** @var AbstractEnumValue[] $values */
-            $values = $this->doctrine->getRepository($enumValueEntityClassOrEnumCode)->findAll();
-            usort($values, function ($value1, $value2) {
-                return $value1->getPriority() >= $value2->getPriority();
-            });
-            foreach ($values as $value) {
-                $items[$value->getId()] = $value->getName();
-            }
-            $this->localCache[$enumValueEntityClassOrEnumCode] = $items;
-        }
-
-        return $this->localCache[$enumValueEntityClassOrEnumCode];
+        return $this->enumValueProvider->getEnumChoices($enumValueEntityClassOrEnumCode);
     }
 
     /**

@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
 
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\DelegateStrategy;
 
-class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
+class DelegateStrategyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DelegateStrategy $strategy

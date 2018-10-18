@@ -1,4 +1,4 @@
 assets:
     css:
         'orolocale':
-            - 'bundles/orolocale/css/less/style.less'
+            - 'bundles/orolocale/css/scss/main.scss'

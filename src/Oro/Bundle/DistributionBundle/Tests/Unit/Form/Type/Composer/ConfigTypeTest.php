@@ -3,10 +3,13 @@
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Form\Type\Composer;
 
 use Oro\Bundle\DistributionBundle\Form\Type\Composer\ConfigType;
+use Oro\Bundle\DistributionBundle\Form\Type\Composer\RepositoryType;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class ConfigTypeTest extends \PHPUnit_Framework_TestCase
+class ConfigTypeTest extends \PHPUnit\Framework\TestCase
 {
     use ReflectionHelperTrait;
     use MockHelperTrait;
@@ -42,15 +45,15 @@ class ConfigTypeTest extends \PHPUnit_Framework_TestCase
         $builder = $this->createConstructorLessMock('Symfony\Component\Form\FormBuilder');
         $builder->expects($this->at(0))
             ->method('add')
-            ->with('oauth', 'text', ['label' => 'Github OAuth', 'required' => false])
+            ->with('oauth', TextType::class, ['label' => 'Github OAuth', 'required' => false])
             ->will($this->returnValue($builder));
 
         $builder->expects($this->at(1))
             ->method('add')
             ->with(
                 'repositories',
-                'collection',
-                ['type' => 'oro_composer_repository', 'allow_add' => true, 'allow_delete' => true]
+                CollectionType::class,
+                ['entry_type' => RepositoryType::class, 'allow_add' => true, 'allow_delete' => true]
             );
 
         $type->buildForm($builder, []);

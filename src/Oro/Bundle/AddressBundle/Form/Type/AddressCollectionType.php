@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -15,17 +16,16 @@ class AddressCollectionType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setNormalizers(
-            array(
-                'entry_options' => function (Options $options, $values) {
-                    if (!$values) {
-                        $values = array();
-                    }
-                    $values['single_form'] = false;
-
-                    return $values;
+        $resolver->setNormalizer(
+            'entry_options',
+            function (Options $options, $values) {
+                if (!$values) {
+                    $values = [];
                 }
-            )
+                $values['single_form'] = false;
+
+                return $values;
+            }
         );
     }
 
@@ -34,7 +34,7 @@ class AddressCollectionType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_collection';
+        return CollectionType::class;
     }
 
     /**

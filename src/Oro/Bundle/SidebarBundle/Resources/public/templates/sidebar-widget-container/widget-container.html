@@ -1,0 +1,42 @@
+<% var togglerId = _.uniqueId('dropdown-') %>
+<div class="sidebar-widget__icon" data-role="sidebar-widget-icon"></div>
+<div class="sidebar-widget__popup_wrapper">
+    <div class="sidebar-widget__popup">
+        <div class="sidebar-widget__header" data-role="sidebar-widget-header">
+            <button class="sidebar-widget__header-toggle dropdown-toggle--no-caret" data-role="sidebar-widget-toggle"></button>
+            <div class="sidebar-widget__header-icon" data-role="sidebar-widget-header-icon"></div>
+            <div class="sidebar-widget__header-title" title="<%= title %>"><%= title %></div>
+            <div class="dropdown dropdown--with-arrow">
+                <button id="<%- togglerId %>" class="sidebar-widget__header-actions dropdown-toggle dropdown-toggle--no-caret" data-toggle="dropdown"
+                        aria-label="<%- _.__('oro.sidebar.widget.actions') %>" aria-haspopup="true" aria-expanded="false"
+                        data-placement="bottom-end" data-position-fixed="true"
+                        data-modifiers="<%- JSON.stringify({preventOverflow: {enabled: false}, hide: {enabled: false}}) %>"></button>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="<%- togglerId %>">
+                    <% if (showRefreshButton) { %>
+                    <li>
+                        <a href="#" tabindex="-1" class="dropdown-item" data-role="sidebar-widget-refresh" title="<%- _.__('oro.sidebar.widget.action.refresh') %>">
+                            <span class="fa-refresh"></span> <%- _.__('oro.sidebar.widget.action.refresh') %>
+                        </a>
+                    </li>
+                    <% } %>
+                    <li>
+                        <a href="#" tabindex="-1" class="dropdown-item" data-role="sidebar-widget-configure" title="<%- _.__('oro.sidebar.widget.action.configure') %>">
+                            <span class="fa-cog"></span> <%- _.__('oro.sidebar.widget.action.configure') %>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" tabindex="-1" class="dropdown-item" data-role="sidebar-widget-remove" title="<%- _.__('oro.sidebar.widget.action.remove') %>">
+                            <span class="fa-trash-o"></span> <%- _.__('oro.sidebar.widget.action.remove') %>
+                        </a>
+                    </li>
+                    <li class="sidebar-widget-close">
+                        <a href="#" tabindex="-1" class="dropdown-item" data-role="sidebar-widget-close" title="<%- _.__('oro.sidebar.widget.action.close') %>">
+                            <span class="fa-close"></span> <%- _.__('oro.sidebar.widget.action.close') %>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="sidebar-widget__content" data-role="sidebar-widget-content"></div>
+    </div>
+</div>

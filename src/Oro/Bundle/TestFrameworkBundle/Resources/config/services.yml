@@ -1,18 +1,16 @@
 parameters:
-    test.client.class:         Oro\Bundle\TestFrameworkBundle\Test\Client
     search_item_entity_class:  Oro\Bundle\TestFrameworkBundle\Entity\Item
     oro_test.entity.item.class: Oro\Bundle\TestFrameworkBundle\Entity\Item
     oro_test.entity.item_value.class: Oro\Bundle\TestFrameworkBundle\Entity\ItemValue
     oro_test.provider.exclusion_provider.class: Oro\Bundle\TestFrameworkBundle\Provider\EntityExclusionProvider
     oro_test.test_activity_activity_list.provider.class: Oro\Bundle\TestFrameworkBundle\Provider\TestActivityActivityListProvider
-    test.session.listener.class: Oro\Bundle\TestFrameworkBundle\EventListener\TestSessionListener
 
 services:
     oro_test.provider.exclusion_provider:
-        class: %oro_test.provider.exclusion_provider.class%
+        class: '%oro_test.provider.exclusion_provider.class%'
 
     oro_test.entity_field_list_provider:
-        class: %oro_entity.entity_field_list_provider.class%
+        class: '%oro_entity.entity_field_list_provider.class%'
         arguments:
             - '@oro_test.entity_field_provider'
             - '@oro_test.entity_provider'
@@ -29,7 +27,7 @@ services:
             - [setExclusionProvider, ['@oro_test.provider.exclusion_provider']]
 
     oro_test.test_activity_activity_list.provider:
-        class: %oro_test.test_activity_activity_list.provider.class%
+        class: '%oro_test.test_activity_activity_list.provider.class%'
         arguments:
            - '@oro_entity.doctrine_helper'
            - '@oro_activity.association_helper'
@@ -52,12 +50,10 @@ services:
     oro_test.alice_reference_processor:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceReferenceProcessor
         arguments:
-            - '@kernel'
+            - '@doctrine'
 
     oro_test.alice_to_string_processor:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceToStringProcessor
-        arguments:
-            - '@kernel'
 
     oro_test.alice_fixture_loader:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader
@@ -86,16 +82,13 @@ services:
         tags:
             - { name: oro_integration.transport, type: aType, channel_type: aType }
 
-    oro_test.entity_alias_resolver:
-        class: Oro\Bundle\TestFrameworkBundle\Provider\TestEntityAliasResolver
-        arguments:
-            - '@oro_entity.entity_alias_loader'
-            - '@oro_entity.entity_alias_cache'
+    oro_test.entity_alias_loader:
+        alias: oro_entity.entity_alias_loader
 
     oro_test.provider.container_tags_documentation_information:
         class: Oro\Bundle\TestFrameworkBundle\Provider\ContainerTagsDocumentationInformationProvider
         arguments:
-            - '%kernel.root_dir%/../'
+            - '%kernel.project_dir%/'
 
     oro_search.extension.mass_action.iterable_result_factory.alias:
         alias: oro_search.extension.mass_action.iterable_result_factory
@@ -119,6 +112,7 @@ services:
         arguments:
             - '@oro_message_queue.transport.dbal.connection'
             - '@oro_message_queue.consumption.extensions'
+            - '@oro_message_queue.log.consumer_state'
 
     oro_test.client.message_producer:
         class: 'Oro\Component\MessageQueue\Client\MessageProducer'
@@ -157,3 +151,6 @@ services:
             - default
             - default
             - default
+
+    oro_test.router.default.alias:
+        alias: router.default

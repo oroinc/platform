@@ -1,13 +1,17 @@
 {% extends 'OroActivityListBundle:ActivityList/js:view.html.twig' %}
 
 {% block activityIcon %}
-    <i class="{{ oro_entity_config_value(entityClass|default(), 'icon')|raw }}"></i>
+    <span class="{{ oro_entity_config_value(entityClass|default(), 'icon')|raw }}" aria-hidden="true"></span>
 {% endblock %}
 
 {% block activityActions %}
-    <div class="dropdown vertical-actions activity-actions">
-        <a href="#" data-toggle="dropdown" class="dropdown-toggle activity-item">...</a>
-        <ul class="dropdown-menu activity-item pull-right">
+    <% var togglerId = _.uniqueId('dropdown-') %>
+    <div class="vertical-actions activity-actions">
+        <button id="<%- togglerId %>" data-placement="left-start" data-toggle="dropdown" class="btn btn-light dropdown-toggle dropdown-toggle--no-caret activity-item"
+           aria-haspopup="true" aria-expanded="false" aria-label="{{ 'oro.activitylist.actions.label'|trans }}">
+            <span class="fa fa-ellipsis-h" aria-hidden="true"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-toggle--no-caret activity-item" role="menu" aria-labelledby="<%- togglerId %>">
             {% for action in actions|default([]) %}
                 <li class="activity-action">{{ action|raw }}</li>
             {% endfor %}

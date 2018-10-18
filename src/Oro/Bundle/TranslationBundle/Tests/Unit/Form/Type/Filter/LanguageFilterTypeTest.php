@@ -5,14 +5,14 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type\Filter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\TranslationBundle\Form\Type\Filter\LanguageFilterType;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class LanguageFilterTypeTest extends FormIntegrationTestCase
 {
-    /** @var LanguageCodeFormatter|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageCodeFormatter|\PHPUnit\Framework\MockObject\MockObject */
     protected $formatter;
 
     /** @var LanguageFilterType */
@@ -38,11 +38,6 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
         unset($this->formatter, $this->type);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(LanguageFilterType::NAME, $this->type->getName());
-    }
-
     public function testGetBlockPrefix()
     {
         $this->assertEquals(LanguageFilterType::NAME, $this->type->getBlockPrefix());
@@ -50,7 +45,7 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(EntityFilterType::NAME, $this->type->getParent());
+        $this->assertEquals(EntityFilterType::class, $this->type->getParent());
     }
 
     public function testFinishView()

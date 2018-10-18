@@ -18,14 +18,14 @@ parameters:
 
 services:
     oro_datagrid.extension.formatter:
-        class: %oro_datagrid.extension.formatter.class%
+        class: '%oro_datagrid.extension.formatter.class%'
         arguments:
             - '@translator'
         tags:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.orm_pager:
-        class: %oro_datagrid.extension.orm_pager.class%
+        class: '%oro_datagrid.extension.orm_pager.class%'
         arguments:
             - '@oro_datagrid.extension.pager.orm.pager'
         tags:
@@ -43,24 +43,28 @@ services:
             - '@oro_security.acl_helper'
             - '@oro_batch.orm.query_builder.count_query_optimizer'
             - '@oro_entity.query_hint_resolver'
-        class: %oro_datagrid.extension.pager.orm.pager.class%
+        class: '%oro_datagrid.extension.pager.orm.pager.class%'
 
     oro_datagrid.extension.pager.array.pager:
         public: false
         class: Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource\ArrayPager
 
     oro_datagrid.extension.orm_sorter:
-        class: %oro_datagrid.extension.orm_sorter.class%
+        class: '%oro_datagrid.extension.orm_sorter.class%'
+        arguments:
+            - '@oro_datagrid.provider.state.sorters'
         tags:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.array_sorter:
         class: Oro\Bundle\DataGridBundle\Extension\Sorter\ArraySorterExtension
+        arguments:
+            - '@oro_datagrid.provider.state.sorters'
         tags:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.inline_editing:
-        class: %oro_datagrid.extension.inline_editing.class%
+        class: '%oro_datagrid.extension.inline_editing.class%'
         arguments:
             - '@oro_datagrid.datagrid.inline_edit_column_options_guesser'
             - '@oro_entity.entity_class_name_helper'
@@ -102,14 +106,14 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.toolbar:
-        class: %oro_datagrid.extension.toolbar.class%
+        class: '%oro_datagrid.extension.toolbar.class%'
         arguments:
             - '@oro_config.user'
         tags:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.views:
-        class: %oro_datagrid.extension.views.class%
+        class: '%oro_datagrid.extension.views.class%'
         arguments:
             - '@event_dispatcher'
             - '@security.authorization_checker'
@@ -122,7 +126,7 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.export:
-        class: %oro_datagrid.extension.export.class%
+        class: '%oro_datagrid.extension.export.class%'
         arguments:
             - '@translator'
             - '@security.authorization_checker'
@@ -131,12 +135,12 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.gridparams:
-        class: %oro_datagrid.extension.gridparams.class%
+        class: '%oro_datagrid.extension.gridparams.class%'
         tags:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.totals:
-        class: %oro_datagrid.extension.totals.class%
+        class: '%oro_datagrid.extension.totals.class%'
         arguments:
             - '@translator'
             - '@oro_locale.formatter.number'
@@ -146,17 +150,14 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.columns:
-        class: %oro_datagrid.extension.columns.class%
+        class: '%oro_datagrid.extension.columns.class%'
         arguments:
-            - '@doctrine'
-            - '@oro_security.token_accessor'
-            - '@oro_security.acl_helper'
-            - '@oro_datagrid.columns.helper'
+            - '@oro_datagrid.provider.state.columns'
         tags:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.mode:
-        class: %oro_datagrid.extension.mode.class%
+        class: '%oro_datagrid.extension.mode.class%'
         tags:
             - { name: oro_datagrid.extension }
 
@@ -188,7 +189,7 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.board:
-        class: %oro_datagrid.extension.board.class%
+        class: '%oro_datagrid.extension.board.class%'
         arguments:
             - '@security.authorization_checker'
             - '@translator'
@@ -202,7 +203,7 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.appearance:
-        class: %oro_datagrid.extension.appearance.class%
+        class: '%oro_datagrid.extension.appearance.class%'
         arguments:
             - '@oro_datagrid.datagrid.appearance.configuration'
             - '@translator'

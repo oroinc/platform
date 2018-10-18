@@ -82,7 +82,7 @@ class ActivityListFilterHelper
                     'options'   => [
                         'field_options' => [
                             'multiple' => true,
-                            'choices'  => array_flip($this->chainProvider->getSupportedActivities())
+                            'choices' => $this->chainProvider->getSupportedActivities()
                         ]
                     ]
                 ]

@@ -1,0 +1,8 @@
+/* @theme: admin.oro; */
+
+@mixin no-data {
+    padding: 4px 0;
+    font-size: 13px;
+    color: $primary-550;
+    text-align: center;
+}

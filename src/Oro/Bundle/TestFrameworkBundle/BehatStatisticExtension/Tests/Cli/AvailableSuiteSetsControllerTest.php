@@ -11,7 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Stub\InputStub;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Stub\OutputStub;
 use Symfony\Component\Console\Command\Command;
 
-class AvailableSuiteSetsControllerTest extends \PHPUnit_Framework_TestCase
+class AvailableSuiteSetsControllerTest extends \PHPUnit\Framework\TestCase
 {
     public function testConfigure()
     {
@@ -30,7 +30,7 @@ class AvailableSuiteSetsControllerTest extends \PHPUnit_Framework_TestCase
 
     public function testExecute()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|SuiteConfigurationRegistry $suiteConfigRegistry */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|SuiteConfigurationRegistry $suiteConfigRegistry */
         $suiteConfigRegistry = $this->getMockBuilder(SuiteConfigurationRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -61,7 +61,7 @@ class AvailableSuiteSetsControllerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SuiteConfigurationRegistry
+     * @return \PHPUnit\Framework\MockObject\MockObject|SuiteConfigurationRegistry
      */
     private function getSuiteConfigRegistryMock()
     {
@@ -71,7 +71,7 @@ class AvailableSuiteSetsControllerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FeaturePathLocator
+     * @return \PHPUnit\Framework\MockObject\MockObject|FeaturePathLocator
      */
     private function getFeaturePathLocatorMock()
     {
@@ -86,7 +86,7 @@ class AvailableSuiteSetsControllerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     * @return \PHPUnit\Framework\MockObject\MockObject|Connection
      */
     private function getConnectionMock()
     {

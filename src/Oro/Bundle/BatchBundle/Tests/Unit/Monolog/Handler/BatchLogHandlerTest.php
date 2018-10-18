@@ -4,7 +4,7 @@ namespace Oro\Bundle\BatchBundle\Tests\Unit\Monolog\Handler;
 
 use Oro\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler;
 
-class BatchLogHandlerTest extends \PHPUnit_Framework_TestCase
+class BatchLogHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var BatchLogHandler */
     protected $batchLogHandler;

@@ -255,8 +255,9 @@ define(function(require) {
         getTemplateData: function() {
             var data = MultiCurrencyEditorView.__super__.getTemplateData.apply(this, arguments);
             data.singleCurrency = this.isSingleCurrency();
-            data.currentCurrencyLabel = configuration.get('currency-view-type') === 'symbol' ?
-                localeSettings.getCurrencySymbol(data.value.currency) : data.value.currency;
+            data.currentCurrencyLabel = configuration.get('currency-view-type') === 'symbol'
+                ? localeSettings.getCurrencySymbol(data.value.currency)
+                : data.value.currency;
             return data;
         },
 

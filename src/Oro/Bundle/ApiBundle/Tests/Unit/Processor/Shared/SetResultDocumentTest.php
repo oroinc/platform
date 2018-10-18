@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 class SetResultDocumentTest extends GetProcessorTestCase
 {
     /** @var SetResultDocument */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -30,14 +30,14 @@ class SetResultDocumentTest extends GetProcessorTestCase
     {
         $resultDocument = [];
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
-        $documentBuilder->expects($this->once())
+        $documentBuilder->expects(self::once())
             ->method('getDocument')
             ->willReturn($resultDocument);
 
         $this->context->setResponseDocumentBuilder($documentBuilder);
         $this->processor->process($this->context);
         self::assertSame($resultDocument, $this->context->getResult());
-        $this->assertNull($this->context->getResponseDocumentBuilder());
+        self::assertNull($this->context->getResponseDocumentBuilder());
     }
 
     public function testProcessWhenBothResultAndResponseDocumentBuilderExists()
@@ -45,7 +45,7 @@ class SetResultDocumentTest extends GetProcessorTestCase
         $result = ['result'];
         $resultDocument = ['resultDocument'];
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
-        $documentBuilder->expects($this->once())
+        $documentBuilder->expects(self::once())
             ->method('getDocument')
             ->willReturn($resultDocument);
 
@@ -53,6 +53,6 @@ class SetResultDocumentTest extends GetProcessorTestCase
         $this->context->setResponseDocumentBuilder($documentBuilder);
         $this->processor->process($this->context);
         self::assertSame($resultDocument, $this->context->getResult());
-        $this->assertNull($this->context->getResponseDocumentBuilder());
+        self::assertNull($this->context->getResponseDocumentBuilder());
     }
 }

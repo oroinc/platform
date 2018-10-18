@@ -8,15 +8,16 @@ use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
+use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class MetadataProcessorTestCase extends \PHPUnit_Framework_TestCase
+class MetadataProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
-    const TEST_CLASS_NAME   = 'Test\Class';
-    const TEST_VERSION      = '1.1';
-    const TEST_REQUEST_TYPE = RequestType::REST;
+    protected const TEST_CLASS_NAME   = 'Test\Class';
+    protected const TEST_VERSION      = '1.1';
+    protected const TEST_REQUEST_TYPE = RequestType::REST;
 
     /** @var MetadataContext */
     protected $context;
@@ -35,7 +36,7 @@ class MetadataProcessorTestCase extends \PHPUnit_Framework_TestCase
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $this->configExtensionRegistry = new ConfigExtensionRegistry();
-        $this->configExtensionRegistry->addExtension(new FiltersConfigExtension());
+        $this->configExtensionRegistry->addExtension(new FiltersConfigExtension(new FilterOperatorRegistry([])));
         $this->configExtensionRegistry->addExtension(new SortersConfigExtension());
 
         $this->configLoaderFactory = new ConfigLoaderFactory($this->configExtensionRegistry);
@@ -54,18 +55,16 @@ class MetadataProcessorTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @param string|null $className
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     * @return \PHPUnit\Framework\MockObject\MockObject|ClassMetadata
      */
     protected function getClassMetadataMock($className = null)
     {
         if ($className) {
-            $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->setConstructorArgs([$className])
                 ->getMock();
         } else {
-            $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-                ->disableOriginalConstructor()
-                ->getMock();
+            $classMetadata = $this->createMock(ClassMetadata::class);
         }
         $classMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
 

@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block datagrid_cell_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ''
+    }) %}
     <td <%= attributes('{{ column_name }}', {{ attr|json_encode|raw }}) %>>{{ block_widget(block) }}</td>
 {% endblock %}
 
@@ -19,5 +22,8 @@
 {% endblock %}
 
 {% block datagrid_header_cell_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ''
+    }) %}
     <th <%= attributes('{{ column_name }}', {{ attr|json_encode|raw }}) %>><%= render('{{ column_name }}') %></th>
 {% endblock %}

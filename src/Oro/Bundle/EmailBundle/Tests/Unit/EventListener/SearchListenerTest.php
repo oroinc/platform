@@ -11,7 +11,7 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestOrganization;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 
-class SearchListenerTest extends \PHPUnit_Framework_TestCase
+class SearchListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchListener */
     protected $listener;

@@ -7,7 +7,7 @@ use Oro\Bundle\AddressBundle\ImportExport\TemplateFixture\AddressTypeFixture;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 
-class AddressTypeFixtureTest extends \PHPUnit_Framework_TestCase
+class AddressTypeFixtureTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AddressTypeFixture

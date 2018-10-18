@@ -6,24 +6,26 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Checks whether a string representation of the parent entity identifier exists in the Context,
+ * Checks whether a string representation of the parent entity identifier exists in the context,
  * and if so, converts it to its original type.
  */
 class NormalizeParentEntityId implements ProcessorInterface
 {
-    /** @var EntityIdTransformerInterface */
-    protected $entityIdTransformer;
+    /** @var EntityIdTransformerRegistry */
+    private $entityIdTransformerRegistry;
 
     /**
-     * @param EntityIdTransformerInterface $entityIdTransformer
+     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
      */
-    public function __construct(EntityIdTransformerInterface $entityIdTransformer)
+    public function __construct(EntityIdTransformerRegistry $entityIdTransformerRegistry)
     {
-        $this->entityIdTransformer = $entityIdTransformer;
+        $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
     }
 
     /**
@@ -41,12 +43,23 @@ class NormalizeParentEntityId implements ProcessorInterface
 
         try {
             $context->setParentId(
-                $this->entityIdTransformer->reverseTransform($parentEntityId, $context->getParentMetadata())
+                $this->getEntityIdTransformer($context->getRequestType())
+                    ->reverseTransform($parentEntityId, $context->getParentMetadata())
             );
         } catch (\Exception $e) {
             $context->addError(
                 Error::createValidationError(Constraint::ENTITY_ID)->setInnerException($e)
             );
         }
+    }
+
+    /**
+     * @param RequestType $requestType
+     *
+     * @return EntityIdTransformerInterface
+     */
+    private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
+    {
+        return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 }

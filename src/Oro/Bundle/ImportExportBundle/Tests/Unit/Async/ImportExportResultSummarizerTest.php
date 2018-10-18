@@ -8,7 +8,7 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Symfony\Component\Routing\Router;
 
-class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
+class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
 {
     public function testCanBeConstructedWithRequiredAttributes()
     {
@@ -264,7 +264,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Router
+     * @return \PHPUnit\Framework\MockObject\MockObject|Router
      */
     private function createRouterMock()
     {
@@ -272,7 +272,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConfigManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigManager
      */
     private function createConfigManagerMock()
     {
@@ -280,7 +280,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-    * @return \PHPUnit_Framework_MockObject_MockObject|FileManager
+    * @return \PHPUnit\Framework\MockObject\MockObject|FileManager
     */
     private function createFileManagerMock()
     {

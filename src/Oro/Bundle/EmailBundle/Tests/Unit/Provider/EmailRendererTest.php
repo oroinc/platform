@@ -8,24 +8,24 @@ use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEntityForVariableProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class EmailRendererTest extends \PHPUnit_Framework_TestCase
+class EmailRendererTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $loader;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $variablesProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $variablesProcessorRegistry;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $cache;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $securityPolicy;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $sandbox;
 
     /** @var string */
@@ -293,16 +293,16 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return EmailRenderer|\PHPUnit_Framework_MockObject_MockObject
+     * @return EmailRenderer|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getRendererInstance()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject */
+        /** @var \PHPUnit\Framework\MockObject\MockObject */
         $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject */
+        /** @var \PHPUnit\Framework\MockObject\MockObject */
         $em = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\OroEntityManager')
             ->disableOriginalConstructor()
             ->getMock();

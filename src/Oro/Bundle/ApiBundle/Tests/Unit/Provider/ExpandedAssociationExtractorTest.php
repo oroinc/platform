@@ -5,10 +5,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 
-class ExpandedAssociationExtractorTest extends \PHPUnit_Framework_TestCase
+class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExpandedAssociationExtractor */
-    protected $extractor;
+    private $extractor;
 
     protected function setUp()
     {

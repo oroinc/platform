@@ -8,8 +8,8 @@ parameters:
 
 services:
     oro_importexport.handler.abstract:
-        class: %oro_importexport.handler.abstract.class%
-        absract: true
+        class: '%oro_importexport.handler.abstract.class%'
+        abstract: true
         arguments:
             - '@oro_importexport.job_executor'
             - '@oro_importexport.processor.registry'
@@ -17,36 +17,37 @@ services:
             - '@translator'
             - '@oro_importexport.writer.writer_chain'
             - '@oro_importexport.reader.reader_chain'
-            - '@oro_importexport.file.batch_file_manager'
+            - ~
             - '@oro_importexport.file.file_manager'
 
     oro_importexport.handler.import.abstract:
-        class: %oro_importexport.handler.import.abstract.class%
-        absract: true
+        class: '%oro_importexport.handler.import.abstract.class%'
+        abstract: true
         parent: oro_importexport.handler.abstract
+        arguments:
+            index_6: '@oro_importexport.file.batch_file_manager.import'
 
     oro_importexport.handler.import.http:
-        class: %oro_importexport.handler.import.http.class%
+        class: '%oro_importexport.handler.import.http.class%'
         parent: oro_importexport.handler.import.abstract
         lazy: true
 
     oro_importexport.handler.export:
-        class: %oro_importexport.handler.export.class%
+        class: '%oro_importexport.handler.export.class%'
         parent: oro_importexport.handler.abstract
+        arguments:
+            index_6: '@oro_importexport.file.batch_file_manager.export'
         calls:
             - [setMimeTypeGuesser, ['@oro_importexport.file.mime_type_guesser']]
-            - [setReaderChain, ['@oro_importexport.reader.reader_chain']]
-            - [setFileManager, ['@oro_importexport.file.file_manager']]
-            - [setWriterChain, ['@oro_importexport.writer.writer_chain']]
         lazy: true
 
     oro_importexport.handler.import.cli:
-        class: %oro_importexport.handler.import.cli.class%
+        class: '%oro_importexport.handler.import.cli.class%'
         parent: oro_importexport.handler.import.abstract
         lazy: true
 
     oro_importexport.handler.csv.file:
-        class: %oro_importexport.handler.csv.file.class%
+        class: '%oro_importexport.handler.csv.file.class%'
 
     oro_importexport.handler.postpone:
         class: Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler

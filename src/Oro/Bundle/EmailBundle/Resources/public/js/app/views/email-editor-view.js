@@ -67,11 +67,11 @@ define(function(require) {
             } else {
                 url = routing.generate(
                     'oro_user_profile_configuration',
-                    {activeGroup: 'platform', activeSubGroup: 'email_configuration'}
+                    {activeGroup: 'platform', activeSubGroup: 'user_email_configuration'}
                 );
-                message = this.model.get('isSignatureEditable') ?
-                    __('oro.email.thread.no_signature', {url: url}) :
-                    __('oro.email.thread.no_signature_no_permission');
+                message = this.model.get('isSignatureEditable')
+                    ? __('oro.email.thread.no_signature', {url: url})
+                    : __('oro.email.thread.no_signature_no_permission');
                 mediator.execute('showFlashMessage', 'info', message);
             }
         },

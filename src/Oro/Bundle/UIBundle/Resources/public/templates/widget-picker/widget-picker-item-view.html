@@ -1,34 +1,36 @@
-<table>
-    <tbody>
-    <tr class="widget-picker-title">
-        <td class="widget-picker-small-column">
-            <% if (description) { %>
-            <a class="widget-picker-collapse"></a>
-            <% } %>
-        </td>
-        <td class="widget-picker-small-column">
-            <img src="<%= dialogIcon %>" alt="<%= title %>" title="<%= title %>"/>
-        </td>
-        <td class="widget-picker-large-column">
-            <strong><%= title %></strong>
-            <% if (isNew) { %>
-            <span class="new">New</span>
-            <% } %>
-            <span class="added<% if (!added) { %> hidden <% } %>" >Added <span>(<%= added %>)</span></span>
-        </td>
-        <td class="widget-picker-add-btn-wrapper">
-            <a class="btn widget-picker-add-btn btn-primary">
-                Add
-            </a>
-        </td>
-    </tr>
+<div class="widget-picker__toggler-column">
     <% if (description) { %>
-    <tr class="widget-picker-description">
-        <td colspan="2"></td>
-        <td class="widget-picker-large-column">
-            <%= description %>
-        </td>
-    </tr>
+    <button class="btn btn-icon btn-light widget-picker__description-toggler collapsed" data-role="description-toggler">
+        <span class="fa-icon collapse-action-icon" aria-hidden="true"></span>
+    </button>
     <% } %>
-    </tbody>
-</table>
+</div>
+<div class="widget-picker__icon-column">
+    <% if (iconClass) { %>
+    <i class="<%- iconClass %> widget-picker__icon"></i>
+    <% } else { %>
+    <img src="<%- dialogIcon %>" class="widget-picker__img" alt="<%- title %>" title="<%- title %>"/>
+    <% } %>
+</div>
+<div class="widget-picker__info-column">
+    <div class="widget-picker__title-cell">
+        <h4><%- title %></h4>
+        <% if (isNew) { %>
+        <span class="widget-picker__new-badge"><%- _.__('oro.ui.widget_picker.new') %></span>
+        <% } %>
+        <span class="widget-picker__added-badge<% if (!added) { %> hide <% } %>"
+              data-role="added-badge"><%- _.__('oro.ui.widget_picker.added') %>
+            <span data-role="added-count">(<%- added %>)</span>
+        </span>
+    </div>
+    <% if (description) { %>
+    <p class="widget-picker__description-cell" data-role="description">
+        <%- description %>
+    </p>
+    <% } %>
+</div>
+<div class="widget-picker__actions-column">
+    <button class="btn btn-primary widget-picker__add-action" data-role="add-action">
+        <%- _.__('oro.ui.widget_picker.add') %>
+    </button>
+</div>

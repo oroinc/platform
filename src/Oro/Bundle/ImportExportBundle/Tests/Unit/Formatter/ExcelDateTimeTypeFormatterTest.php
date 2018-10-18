@@ -6,7 +6,7 @@ use Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Translation\Translator;
 
-class ExcelDateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
+class ExcelDateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ExcelDateTimeTypeFormatter
@@ -15,11 +15,11 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject $localeSettings */
+        /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $localeSettings */
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->getMock();
-        /** @var Translator|\PHPUnit_Framework_MockObject_MockObject $translator */
+        /** @var Translator|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator      = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
@@ -27,7 +27,7 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testGetPatternProvider
+     * @dataProvider getPatternProvider
      *
      * @param int    $timeType
      * @param string $locale
@@ -39,7 +39,7 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testGetPatternWithValueProvider
+     * @dataProvider getPatternWithValueProvider
      *
      * @param int    $timeType
      * @param string $locale
@@ -54,7 +54,7 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function testGetPatternProvider()
+    public function getPatternProvider()
     {
         return [
             'locale "de" with time'       => [null, 'de', 'dd.MM.y HH:mm:ss'],
@@ -73,7 +73,7 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function testGetPatternWithValueProvider()
+    public function getPatternWithValueProvider()
     {
         return [
             'with seconds'    => [null, 'en', '20.01.1999 12:00:00', 'MM/dd/y HH:mm:ss'],

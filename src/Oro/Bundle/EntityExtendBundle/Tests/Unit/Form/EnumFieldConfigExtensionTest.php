@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Extension;
 
+use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityExtendBundle\Form\EventListener\EnumFieldConfigSubscriber;
 use Oro\Bundle\EntityExtendBundle\Form\Extension\EnumFieldConfigExtension;
 
-class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
+class EnumFieldConfigExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EnumFieldConfigExtension */
     protected $extension;
@@ -24,7 +25,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetExtendedType()
     {
-        $this->assertEquals('oro_entity_config_type', $this->extension->getExtendedType());
+        $this->assertEquals(ConfigType::class, $this->extension->getExtendedType());
     }
 
     public function testBuildForm()

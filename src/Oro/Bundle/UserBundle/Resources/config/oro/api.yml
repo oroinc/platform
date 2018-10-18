@@ -20,6 +20,8 @@ api:
                     exclusion_policy: all
                     fields:
                         email: ~
+                emailLowercase:
+                    exclude: true
             actions:
                 delete:
                     exclude: false # set manually because this entity is marked as a dictionary

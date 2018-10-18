@@ -28,7 +28,7 @@ class CheckButtonType extends ButtonType
      */
     public function getParent()
     {
-        return 'button';
+        return ButtonType::class;
     }
 
     /**

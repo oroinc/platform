@@ -1,0 +1,93 @@
+/* @theme: admin.oro; */
+
+@media only screen and (max-width: $medium-devices-media-breakpoint) {
+    .launchpad-container {
+
+        .launchpad-first-column,
+        .launchpad-second-column {
+            width: auto;
+            float: none;
+        }
+
+        .launchpad-widget-content {
+            float: none;
+            clear: none;
+            width: auto;
+            max-width: $quick-launchpad-item-width;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+}
+
+@media only screen and (max-width: $small-devices-media-breakpoint) {
+    .quick-launchpad-toolbar {
+        padding: 0 16px;
+
+        &__item {
+            min-width: 100%;
+            margin: 16px 0;
+            padding: 10px 16px;
+
+            text-align: center;
+
+            background: $dashboard-launchpad-icon-bg;
+
+            border-radius: 20px;
+            display: block;
+            vertical-align: middle;
+        }
+
+        &__link {
+            display: block;
+            overflow: hidden;
+        }
+
+        &__icon,
+        &__link:hover .quick-launchpad-toolbar__icon {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+            padding-top: 0;
+
+            font-size: 20px;
+
+            float: #{$start};
+        }
+
+        &__label-wrapper {
+            margin: 0 24px;
+        }
+
+        &__label {
+            margin: 0;
+            padding: 0;
+
+            color: $dashboard-launchpad-bold-label-color;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+
+            border: 0 none;
+
+            display: inline-block;
+        }
+    }
+
+    .launchpad-container {
+
+        .launchpad-first-column,
+        .launchpad-second-column {
+            width: auto;
+            float: none;
+        }
+
+        .launchpad-widget-content {
+            float: none;
+            clear: none;
+            width: auto;
+            max-width: none;
+            margin: $quick-launchpad-item-margin;
+        }
+    }
+}

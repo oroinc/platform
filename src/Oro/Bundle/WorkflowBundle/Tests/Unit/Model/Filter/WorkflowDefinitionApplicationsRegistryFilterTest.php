@@ -7,9 +7,9 @@ use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionApplicationsRegistryFilter;
 
-class WorkflowDefinitionApplicationsRegistryFilterTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionApplicationsRegistryFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CurrentApplicationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $currentApplicationProvider;
 
     /** @var WorkflowDefinitionApplicationsRegistryFilter */

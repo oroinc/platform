@@ -1,0 +1,123 @@
+/* @theme: admin.oro; */
+
+.navbar-extra-right {
+    padding-right: 0;
+}
+
+.pull-left-extra {
+    float: left;
+}
+
+.breadcrumb-pin {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+.container-fluid.page-title {
+    margin-bottom: 10px;
+
+    @include safe-area-offset(padding, $content-padding);
+
+    padding: 0 $content-padding;
+}
+
+.navbar-extra {
+    & > .row > [class^='span'] {
+        margin: 0;
+        width: auto;
+    }
+
+    .user-info-state {
+        display: none;
+    }
+
+    .user-info-state + .title-buttons-container:not(:empty) {
+        margin-top: 10px;
+    }
+
+    .pull-left-extra {
+        margin-left: 0;
+    }
+
+    .grid-views {
+        margin-left: 0;
+
+        .oro-subtitle {
+            display: inline-block;
+        }
+
+        .views-group {
+            vertical-align: baseline;
+
+            & > .dropdown-toggle {
+                height: auto;
+                vertical-align: baseline;
+            }
+        }
+
+        .actions-group {
+            margin-left: 0;
+            vertical-align: baseline;
+        }
+
+        .edited-label,
+        .actions-group .dropdown-toggle {
+            vertical-align: baseline;
+        }
+    }
+}
+
+.page-title {
+    h1 {
+        font-size: $base-font-size--xl;
+        font-weight: bold;
+        margin: 0;
+        line-height: $base-font-size * 2.5;
+        display: block;
+    }
+
+    .sub-title {
+        float: none;
+        font-size: $base-font-size--xl;
+
+        & + .separator {
+            display: none;
+        }
+
+        a {
+            color: #006acc;
+        }
+    }
+
+    ul.inline li {
+        line-height: 18px;
+        display: block;
+        font-size: $base-font-size--s;
+        padding: 0;
+        border: 0;
+    }
+
+    .status-enabled {
+        margin-bottom: 10px;
+        margin-left: 0;
+    }
+}
+
+.title-buttons-container,
+.ui-dialog-buttonpane .widget-actions {
+    .btn [class*="fa-"].hide-text,
+    .btn-group > .dropdown-menu li [class^="fa-"] {
+        width: 20px;
+        text-align: center;
+
+        &:before {
+            font-size: $base-font-size--l;
+        }
+    }
+
+    .dropdown-toggle {
+        .caret {
+            margin-left: 5px;
+        }
+    }
+}

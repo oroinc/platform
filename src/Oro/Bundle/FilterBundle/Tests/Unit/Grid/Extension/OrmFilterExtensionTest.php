@@ -2,286 +2,296 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Grid\Extension;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
-use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 
-class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
+class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $translator;
-
     /** @var OrmFilterExtension */
     protected $extension;
 
+    /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject */
+    private $datasource;
+
     protected function setUp()
     {
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        parent::setUp();
 
-        $configurationProvider = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->extension = new OrmFilterExtension(
+            $this->configurationProvider,
+            $this->filtersStateProvider,
+            $this->translator
+        );
 
-        $this->extension = new OrmFilterExtension($configurationProvider, $this->translator);
+        $this->datasource = $this->createMock(OrmDatasource::class);
     }
 
     /**
-     * @param array $input
-     * @param array $expected
+     * @dataProvider isApplicableDataProvider
      *
-     * @dataProvider setParametersDataProvider
+     * @param array $datagridConfigArray
+     * @param bool $expectedResult
      */
-    public function testSetParameters(array $input, array $expected)
+    public function testIsApplicable(array $datagridConfigArray, bool $expectedResult): void
     {
-        $this->extension->setParameters(new ParameterBag($input));
+        $datagridConfig = $this->createDatagridConfig($datagridConfigArray);
 
-        self::assertEquals($expected, $this->extension->getParameters()->all());
+        $this->extension->setParameters($this->datagridParameters);
+
+        self::assertSame($expectedResult, $this->extension->isApplicable($datagridConfig));
     }
 
     /**
      * @return array
      */
-    public function setParametersDataProvider()
+    public function isApplicableDataProvider(): array
     {
         return [
-            'empty'    => [
-                'input'    => [],
-                'expected' => [],
-            ],
-            'regular'  => [
-                'input'    => [
-                    OrmFilterExtension::FILTER_ROOT_PARAM => [
-                        'firstName' => ['value' => 'John'],
-                    ],
+            'applicable' => [
+                'datagridConfigArray' => [
+                    'source' => ['type' => OrmDatasource::TYPE],
+                    'filters' => ['columns' => []],
                 ],
-                'expected' => [
-                    OrmFilterExtension::FILTER_ROOT_PARAM => [
-                        'firstName' => ['value' => 'John'],
-                    ],
-                ]
+                'expectedResult' => true,
             ],
-            'minified' => [
-                'input'    => [
-                    ParameterBag::MINIFIED_PARAMETERS => [
-                        OrmFilterExtension::MINIFIED_FILTER_PARAM => [
-                            'firstName' => ['value' => 'John'],
-                        ],
-                    ]
+            'unsupported source type' => [
+                'datagridConfigArray' => [
+                    'source' => ['type' => 'sampleType'],
+                    'filters' => ['columns' => []],
                 ],
-                'expected' => [
-                    ParameterBag::MINIFIED_PARAMETERS     => [
-                        OrmFilterExtension::MINIFIED_FILTER_PARAM => [
-                            'firstName' => ['value' => 'John'],
-                        ],
-                    ],
-                    OrmFilterExtension::FILTER_ROOT_PARAM => [
-                        'firstName' => ['value' => 'John'],
-                    ],
-                ]
+                'expectedResult' => false,
+            ],
+            'no columns' => [
+                'datagridConfigArray' => [
+                    'source' => ['type' => 'sampleType'],
+                    'filters' => [],
+                ],
+                'expectedResult' => false,
+            ],
+            'empty config array' => [
+                'datagridConfigArray' => [],
+                'expectedResult' => false,
             ],
         ];
     }
 
-    /**
-     * @param array $gridConfig
-     * @param array $parameters
-     * @param mixed $expected
-     *
-     * @dataProvider valuesDataProvider
-     */
-    public function testGetValuesToApply(array $gridConfig, array $parameters, $expected)
+    public function testVisitDataSourceWhenNoFilters(): void
     {
-        $gridConfig = DatagridConfiguration::create($gridConfig);
+        $datagridConfig = $this->createDatagridConfig(['name' => static::DATAGRID_NAME]);
 
-        $dataSource = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mockFiltersState([]);
+        $this->mockDatasource($this->createMock(QueryBuilder::class), null);
 
-        $filter = $this->createMock('Oro\Bundle\FilterBundle\Filter\FilterInterface');
-        $filter
-            ->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('filter'));
+        $this->extension->setParameters($this->datagridParameters);
+        $this->extension->visitDatasource($datagridConfig, $this->datasource);
+    }
 
-        $form = $this
-            ->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
+    /**
+     * @param array $filtersState
+     */
+    private function mockFiltersState(array $filtersState): void
+    {
+        $this->filtersStateProvider
+            ->expects(self::once())
+            ->method('getStateFromParameters')
+            ->with(self::isInstanceOf(DatagridConfiguration::class), $this->datagridParameters)
+            ->willReturn($filtersState);
+    }
 
-        $form
-            ->expects($this->any())
-            ->method('isSubmitted')
-            ->will($this->returnValue(false));
-
-        if (is_array($expected)) {
-            $form
-                ->expects($this->once())
-                ->method('submit')
-                ->with($this->equalTo($expected));
-        } else {
-            $form
-                ->expects($this->never())
-                ->method('submit');
-        }
-
-        $filter
-            ->expects($this->any())
-            ->method('getForm')
-            ->will($this->returnValue($form));
-
-        $qb = $this
-            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $dataSource
-            ->expects($this->once())
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param QueryBuilder|null $countQueryBuilder
+     */
+    private function mockDatasource(QueryBuilder $queryBuilder, ?QueryBuilder $countQueryBuilder): void
+    {
+        $this->datasource
+            ->expects(self::once())
             ->method('getQueryBuilder')
-            ->will($this->returnValue($qb));
+            ->willReturn($queryBuilder);
 
-        $this->extension->addFilter('string', $filter);
-        $this->extension->setParameters(new ParameterBag($parameters));
-        $this->extension->visitDatasource($gridConfig, $dataSource);
+        $this->datasource
+            ->expects(self::once())
+            ->method('getCountQb')
+            ->willReturn($countQueryBuilder);
+    }
+
+    public function testVisitDataSourceWhenNoState(): void
+    {
+        $datagridConfig = $this->createCommonDatagridConfig();
+        $filter = $this->assertFilterInitialized();
+
+        $this->mockFiltersState([]);
+        $this->mockDatasource($this->createMock(QueryBuilder::class), null);
+
+        $filter
+            ->expects(self::never())
+            ->method('apply');
+
+        $this->extension->addFilter(static::FILTER_TYPE, $filter);
+        $this->extension->setParameters($this->datagridParameters);
+        $this->extension->visitDatasource($datagridConfig, $this->datasource);
+    }
+
+    public function testVisitDataSourceWhenFilterStateNotValid(): void
+    {
+        $datagridConfig = $this->createCommonDatagridConfig();
+        $filter = $this->assertFilterInitialized();
+
+        $this->mockFiltersState([static::FILTER_NAME => ['value' => 'sampleFilterValue1']]);
+        $this->mockDatasource($this->createMock(QueryBuilder::class), null);
+
+        $filterForm = $this->mockFilterForm($filter);
+
+        $filterForm
+            ->expects(self::once())
+            ->method('isValid')
+            ->willReturn(false);
+
+        $filter
+            ->expects(self::never())
+            ->method('apply');
+
+        $this->extension->addFilter(static::FILTER_TYPE, $filter);
+        $this->extension->setParameters($this->datagridParameters);
+        $this->extension->visitDatasource($datagridConfig, $this->datasource);
+    }
+
+    /**
+     * @dataProvider visitDataSourceDataProvider
+     *
+     * @param array $filtersState
+     * @param array $formData
+     * @param array $expectedFormData
+     */
+    public function testVisitDataSourceWhenNoCountQueryBuilder(
+        array $filtersState,
+        array $formData,
+        array $expectedFormData
+    ): void {
+        $datagridConfig = $this->createCommonDatagridConfig();
+        $filter = $this->assertFilterInitialized();
+
+        $this->mockFiltersState($filtersState);
+        $this->mockDatasource($this->createMock(QueryBuilder::class), null);
+
+        $filterForm = $this->mockFilterForm($filter);
+
+        $filterForm
+            ->expects(self::once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $filterForm
+            ->expects(self::once())
+            ->method('getData')
+            ->willReturn($formData);
+
+        $filter
+            ->expects(self::once())
+            ->method('apply')
+            ->with(self::isInstanceOf(OrmFilterDatasourceAdapter::class), $expectedFormData);
+
+        $this->extension->addFilter(static::FILTER_TYPE, $filter);
+        $this->extension->setParameters($this->datagridParameters);
+        $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
 
     /**
      * @return array
-     *
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function valuesDataProvider()
+    public function visitDataSourceDataProvider(): array
     {
         return [
-            'default_filter_no_parameters_modified_grid'  => [
-                [
-                    'filters' => [
-                        'columns' => [
-                            'filter' => [
-                                'type' => 'string'
-                            ],
-                        ],
-                        'default' => [
-                            'filter' => [
-                                'value' => 'filter-value'
-                            ]
-                        ]
-                    ]
-                ],
-                [
-                    PagerInterface::PAGER_ROOT_PARAM => [
-                        PagerInterface::DISABLED_PARAM => true
-                    ]
-                ],
-                ['value' => 'filter-value']
+            'regular filter' => [
+                'filtersState' => [static::FILTER_NAME => ['value' => 'sampleFilterValue1']],
+                'formData' => ['value' => 'sampleFilterValue1'],
+                'expectedFormData' => ['value' => 'sampleFilterValue1'],
             ],
-            'default_filter_no_parameters_new_grid'       => [
-                [
-                    'filters' => [
-                        'columns' => [
-                            'filter' => [
-                                'type' => 'string'
-                            ],
-                        ],
-                        'default' => [
-                            'filter' => [
-                                'value' => 'filter-value'
-                            ]
-                        ]
-                    ]
+            'has date interval start, no date interval end' => [
+                'filtersState' => [static::FILTER_NAME => ['value' => ['start' => 'sampleValue1']]],
+                'formData' => ['value' => ['start' => 'sampleValueSubmitted1']],
+                'expectedFormData' => [
+                    'value' => [
+                        'start' => 'sampleValueSubmitted1',
+                        'start_original' => 'sampleValue1',
+                    ],
                 ],
-                [],
-                ['value' => 'filter-value']
             ],
-            'default_filter_no_parameters_grid_with_default_view'  => [
-                [
-                    'filters' => [
-                        'columns' => [
-                            'filter' => [
-                                'type' => 'string'
-                            ],
-                        ],
-                        'default' => [
-                            'filter' => [
-                                'value' => 'filter-value'
-                            ]
-                        ]
-                    ]
+            'no date interval start, has date interval end' => [
+                'filtersState' => [static::FILTER_NAME => ['value' => ['end' => 'sampleValue1']]],
+                'formData' => ['value' => ['end' => 'sampleValueSubmitted1']],
+                'expectedFormData' => [
+                    'value' => [
+                        'end' => 'sampleValueSubmitted1',
+                        'end_original' => 'sampleValue1',
+                    ],
                 ],
-                [
-                    ParameterBag::ADDITIONAL_PARAMETERS => [
-                        GridViewsExtension::VIEWS_PARAM_KEY => GridViewsExtension::DEFAULT_VIEW_ID
-                    ]
-                ],
-                ['value' => 'filter-value']
             ],
-            'parametrized_without_default_filters'        => [
-                [
-                    'filters' => [
-                        'columns' => [
-                            'filter' => [
-                                'type' => 'string'
-                            ],
-                        ]
-                    ]
-                ],
-                [
-                    OrmFilterExtension::FILTER_ROOT_PARAM => [
-                        'filter' => [
-                            'value' => 'filter-value'
-                        ]
-                    ]
-                ],
-                ['value' => 'filter-value']
-            ],
-            'override_default_filters'                    => [
-                [
-                    'filters' => [
-                        'columns' => [
-                            'filter' => [
-                                'type' => 'string'
-                            ],
+            'has date interval start, has date interval end' => [
+                'filtersState' => [
+                    static::FILTER_NAME => [
+                        'value' => [
+                            'start' => 'sampleValue1',
+                            'end' => 'sampleValue2',
                         ],
-                        'default' => [
-                            'filter' => [
-                                'value' => 'filter-value'
-                            ]
-                        ]
-                    ]
+                    ],
                 ],
-                [
-                    OrmFilterExtension::FILTER_ROOT_PARAM => [
-                        'filter' => [
-                            'value' => 'override-value'
-                        ]
-                    ]
+                'formData' => ['value' => ['start' => 'sampleValueSubmitted1', 'end' => 'sampleValueSubmitted2']],
+                'expectedFormData' => [
+                    'value' => [
+                        'start' => 'sampleValueSubmitted1',
+                        'start_original' => 'sampleValue1',
+                        'end' => 'sampleValueSubmitted2',
+                        'end_original' => 'sampleValue2',
+                    ],
                 ],
-                ['value' => 'override-value']
             ],
-            'empty_parametrized_overrides_default_filter' => [
-                [
-                    'filters' => [
-                        'columns' => [
-                            'filter' => [
-                                'type' => 'string'
-                            ],
-                        ],
-                        'default' => [
-                            'filter' => [
-                                'value' => 'filter-value'
-                            ]
-                        ]
-                    ]
-                ],
-                [
-                    OrmFilterExtension::FILTER_ROOT_PARAM => [
-                        'filter' => []
-                    ]
-                ],
-                []
-            ]
         ];
+    }
+
+    /**
+     * @dataProvider visitDataSourceDataProvider
+     *
+     * @param array $filtersState
+     * @param array $formData
+     * @param array $expectedFormData
+     */
+    public function testVisitDataSourceWhenHasCountQueryBuilder(
+        array $filtersState,
+        array $formData,
+        array $expectedFormData
+    ): void {
+        $datagridConfig = $this->createCommonDatagridConfig();
+        $filter = $this->assertFilterInitialized();
+
+        $this->mockFiltersState($filtersState);
+        $this->mockDatasource($this->createMock(QueryBuilder::class), $this->createMock(QueryBuilder::class));
+
+        $filterForm = $this->mockFilterForm($filter);
+
+        $filterForm
+            ->expects(self::once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $filterForm
+            ->expects(self::once())
+            ->method('getData')
+            ->willReturn($formData);
+
+        $filter
+            ->expects(self::exactly(2))
+            ->method('apply')
+            ->withConsecutive(
+                [self::isInstanceOf(OrmFilterDatasourceAdapter::class), $expectedFormData],
+                [self::isInstanceOf(OrmFilterDatasourceAdapter::class), $expectedFormData]
+            );
+
+        $this->extension->addFilter(static::FILTER_TYPE, $filter);
+        $this->extension->setParameters($this->datagridParameters);
+        $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
 }

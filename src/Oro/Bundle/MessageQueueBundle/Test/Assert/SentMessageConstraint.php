@@ -5,7 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Test\Assert;
 /**
  * Constraint that checks if a message was sent.
  */
-class SentMessageConstraint extends \PHPUnit_Framework_Constraint
+class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
 {
     /**
      * @var array ['topic' => topic name, 'message' => message]
@@ -38,7 +38,7 @@ class SentMessageConstraint extends \PHPUnit_Framework_Constraint
         }
 
         if (array_key_exists('message', $this->message)) {
-            $constraint = new \PHPUnit_Framework_Constraint_IsEqual($this->message);
+            $constraint = new \PHPUnit\Framework\Constraint\IsEqual($this->message);
             foreach ($other as $message) {
                 if ($this->isSubJobMessage && is_array($message['message'])) {
                     if (empty($message['message']['jobId'])) {

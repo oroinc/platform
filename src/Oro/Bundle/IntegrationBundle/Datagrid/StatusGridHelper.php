@@ -38,8 +38,12 @@ class StatusGridHelper
             $type = $params->get('integrationType');
 
             $connectorChoices = $this->typesRegistry->getAvailableConnectorsTypesChoiceList($type);
-            $event->getDatagrid()->getConfig()
-                ->offsetSetByPath('[filters][columns][connector][options][field_options][choices]', $connectorChoices);
+            $config = $event->getDatagrid()->getConfig();
+
+            $config->offsetSetByPath(
+                '[filters][columns][connector][options][field_options][choices]',
+                array_flip($connectorChoices)
+            );
         }
     }
 

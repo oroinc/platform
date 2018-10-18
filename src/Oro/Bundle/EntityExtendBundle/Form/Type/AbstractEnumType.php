@@ -62,46 +62,48 @@ abstract class AbstractEnumType extends AbstractType
                 'query_builder' => function (EnumValueRepository $repo) {
                     return $repo->getValuesQueryBuilder();
                 },
-                'property'      => 'name',
+                'choice_label'  => 'name',
                 'multiple'      => null
             ]
         );
 
-        $resolver->setNormalizers(
-            [
-                'class' => function (Options $options, $value) {
-                    if ($value !== null) {
-                        return $value;
-                    }
-
-                    if (empty($options['enum_code'])) {
-                        throw new InvalidOptionsException('Either "class" or "enum_code" must option must be set.');
-                    }
-
-                    $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
-                    if (!is_a($class, 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', true)) {
-                        throw new InvalidOptionsException(
-                            sprintf(
-                                '"%s" must be a child of "%s"',
-                                $class,
-                                'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
-                            )
-                        );
-                    }
-
-                    return $class;
-                },
-                'multiple' => function (Options $options, $value) {
-                    if ($value === null && !empty($options['class'])) {
-                        $value = $this->configManager
-                            ->getProvider('enum')
-                            ->getConfig($options['class'])
-                            ->is('multiple');
-                    }
-
+        $resolver->setNormalizer(
+            'class',
+            function (Options $options, $value) {
+                if ($value !== null) {
                     return $value;
                 }
-            ]
+
+                if (empty($options['enum_code'])) {
+                    throw new InvalidOptionsException('Either "class" or "enum_code" must option must be set.');
+                }
+
+                $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
+                if (!is_a($class, 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', true)) {
+                    throw new InvalidOptionsException(
+                        sprintf(
+                            '"%s" must be a child of "%s"',
+                            $class,
+                            'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
+                        )
+                    );
+                }
+
+                return $class;
+            }
+        )
+        ->setNormalizer(
+            'multiple',
+            function (Options $options, $value) {
+                if ($value === null && !empty($options['class'])) {
+                    $value = $this->configManager
+                        ->getProvider('enum')
+                        ->getConfig($options['class'])
+                        ->is('multiple');
+                }
+
+                return $value;
+            }
         );
     }
 

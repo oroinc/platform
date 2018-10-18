@@ -7,12 +7,12 @@ use Oro\Bundle\NotificationBundle\Form\Type\RecipientListType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class RecipientListTypeTest extends \PHPUnit_Framework_TestCase
+class RecipientListTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RecipientListType */
     protected $type;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
     protected function setUp()
@@ -21,14 +21,9 @@ class RecipientListTypeTest extends \PHPUnit_Framework_TestCase
         $this->type = new RecipientListType($this->entityManager);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(RecipientListType::NAME, $this->type->getName());
-    }
-
     public function testBuildForm()
     {
-        /** @var FormBuilder|\PHPUnit_Framework_MockObject_MockObject $builder */
+        /** @var FormBuilder|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(3))->method('add');
 
@@ -37,7 +32,7 @@ class RecipientListTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
+        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')

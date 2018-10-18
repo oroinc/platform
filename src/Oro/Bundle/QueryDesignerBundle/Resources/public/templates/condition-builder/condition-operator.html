@@ -1,0 +1,5 @@
+<select<% if (label) { %> aria-label="<%- label %>"<% } %>>
+    <% _.each(operations, function (operation) { %>
+    <option value="<%- operation %>"<% if (operation === selectedOperation) { %> selected="selected"<% } %>><%- operation %></option>
+    <% }); %>
+</select>

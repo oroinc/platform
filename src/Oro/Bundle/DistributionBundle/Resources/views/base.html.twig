@@ -21,32 +21,39 @@
     {% endblock %}
 </head>
 <body class="desktop-version {% block bodyClass %}{% endblock %}">
-<header id="oroplatform-header">
-    <div class="navbar-inner">
-        <h1 class="logo">
-            <a href="/"><i class="fa-home"></i></a>
-            <a href="{{ path('index') }}">
-                {{ 'oro.distribution.installer'|trans }}
-            </a>
-        </h1>
+<header class="app-header thick" id="oroplatform-header">
+    <div class="app-header__inner">
+        <div class="app-header__container">
+            <h1 class="logo">
+                <a href="/"><i class="fa-home"></i></a>
+                <a href="{{ path('index') }}">
+                    {{ 'oro.distribution.installer'|trans }}
+                </a>
+            </h1>
 
-        <div class="pull-right help">
-            <a href="{{ get_help_link() }}" target="_blank">
-                <i class="fa-question-circle" title="{{ 'oro.distribution.menu.get_help'|trans }}"></i>
-            </a>
-            {% if app.user %}
-                <a href="{{ path('oro_distribution_settings_index') }}">
-                    <i class="fa-cogs" title="{{ 'oro.distribution.menu.composer_settings'|trans }}"></i>
-                </a>
-                <a href="{{ path('oro_distribution_security_logout') }}">
-                    <i class="fa-sign-out" title="{{ 'oro.distribution.menu.sign_out'|trans }}"></i>
-                </a>
-            {% endif %}
+            <ul class="nav pull-right user-menu">
+                <li>
+                    <a href="{{ get_help_link() }}" target="_blank">
+                        <i class="fa-question-circle" title="{{ 'oro.distribution.menu.get_help'|trans }}"></i>
+                    </a>
+                </li>
+                {% if app.user %}
+                    <li>
+                        <a href="{{ path('oro_distribution_settings_index') }}">
+                            <i class="fa-cogs" title="{{ 'oro.distribution.menu.composer_settings'|trans }}"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ path('oro_distribution_security_logout') }}">
+                            <i class="fa-sign-out" title="{{ 'oro.distribution.menu.sign_out'|trans }}"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
         </div>
-
     </div>
 </header>
-<div id="page">
+<div id="page" class="app-page">
     {% block page %} {% endblock %}
 </div>
 </body>

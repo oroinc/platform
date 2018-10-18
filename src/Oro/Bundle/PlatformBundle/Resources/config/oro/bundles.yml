@@ -16,6 +16,5 @@ bundles:
     - { name: Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle, priority: -175 }
     - { name: Escape\WSSEAuthenticationBundle\EscapeWSSEAuthenticationBundle, priority: -170 }
     - { name: Liip\ImagineBundle\LiipImagineBundle, priority: -165 }
-    - { name: A2lix\TranslationFormBundle\A2lixTranslationFormBundle, priority: -150 }
     - { name: Lexik\Bundle\MaintenanceBundle\LexikMaintenanceBundle, priority: -145 }
     - { name: Oro\Bundle\PlatformBundle\OroPlatformBundle, priority: -200 }

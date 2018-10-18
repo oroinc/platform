@@ -6,22 +6,30 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\CollectFormErrors;
 use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipTestCase;
+use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 
-class CollectFormErrorsTest extends ChangeRelationshipTestCase
+class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var CollectFormErrors */
-    protected $processor;
+    /** @var ErrorCompleterRegistry */
+    private $errorCompleterRegistry;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    /** @var CollectFormErrors */
+    private $processor;
+
+    protected function setUp()
     {
         parent::setUp();
 
-        $this->processor = new CollectFormErrors(new ConstraintTextExtractor());
+        $this->errorCompleterRegistry = $this->createMock(ErrorCompleterRegistry::class);
+
+        $this->processor = new CollectFormErrors(
+            new ConstraintTextExtractor(),
+            $this->errorCompleterRegistry
+        );
     }
 
     public function testErrorPropertyPathShouldBeEmptyStringForToOneAssociationRelatedError()
@@ -29,7 +37,7 @@ class CollectFormErrorsTest extends ChangeRelationshipTestCase
         $associationName = 'testAssociation';
 
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
-            ->add($associationName, 'text', ['constraints' => [new Constraints\NotBlank()]])
+            ->add($associationName, TextType::class, ['constraints' => [new Constraints\NotBlank()]])
             ->getForm();
         $form->submit([$associationName => null]);
 
@@ -37,9 +45,9 @@ class CollectFormErrorsTest extends ChangeRelationshipTestCase
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertEquals(
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
             [$this->createErrorObject('not blank constraint', 'This value should not be blank.', '')],
             $this->context->getErrors()
         );
@@ -52,9 +60,9 @@ class CollectFormErrorsTest extends ChangeRelationshipTestCase
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(
                 $associationName,
-                'collection',
+                CollectionType::class,
                 [
-                    'entry_type'      => 'text',
+                    'entry_type'      => TextType::class,
                     'entry_options'   => ['constraints' => [new Constraints\NotBlank()]],
                     'allow_add' => true
                 ]
@@ -66,9 +74,9 @@ class CollectFormErrorsTest extends ChangeRelationshipTestCase
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertEquals(
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
             [$this->createErrorObject('not blank constraint', 'This value should not be blank.', '1')],
             $this->context->getErrors()
         );

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Bundle\ActionBundle\Model\Parameter;
 
-class ParameterAssemblerTest extends \PHPUnit_Framework_TestCase
+class ParameterAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ParameterAssembler */
     protected $assembler;

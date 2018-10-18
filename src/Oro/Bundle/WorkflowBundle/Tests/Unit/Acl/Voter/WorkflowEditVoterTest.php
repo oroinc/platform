@@ -6,9 +6,9 @@ use Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEditVoter;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class WorkflowEditVoterTest extends \PHPUnit_Framework_TestCase
+class WorkflowEditVoterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $token;
 
     /** @var WorkflowEditVoter */

@@ -19,17 +19,17 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class EmailNotificationTypeListenerTest extends \PHPUnit_Framework_TestCase
+class EmailNotificationTypeListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowRegistry;
 
     /** @var EmailNotificationTypeListener */
     protected $listener;
 
-    /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $form;
 
     protected function setUp()
@@ -120,11 +120,11 @@ class EmailNotificationTypeListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function assertEventFieldUpdated()
     {
-        /** @var Expr|\PHPUnit_Framework_MockObject_MockObject $expr */
+        /** @var Expr|\PHPUnit\Framework\MockObject\MockObject $expr */
         $expr = $this->createMock(Expr::class);
         $expr->expects($this->once())->method('neq')->with('c.name', ':event')->willReturnSelf();
 
-        /** @var FormConfigInterface|\PHPUnit_Framework_MockObject_MockObject $config */
+        /** @var FormConfigInterface|\PHPUnit\Framework\MockObject\MockObject $config */
         $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())->method('expr')->willReturn($expr);
         $qb->expects($this->once())->method('andWhere')->with($expr)->willReturnSelf();
@@ -132,11 +132,11 @@ class EmailNotificationTypeListenerTest extends \PHPUnit_Framework_TestCase
             ->method('setParameter')
             ->with('event', LoadWorkflowNotificationEvents::TRANSIT_EVENT);
 
-        /** @var FormConfigInterface|\PHPUnit_Framework_MockObject_MockObject $config */
+        /** @var FormConfigInterface|\PHPUnit\Framework\MockObject\MockObject $config */
         $config = $this->createMock(FormConfigInterface::class);
         $config->expects($this->once())->method('getOption')->with('query_builder')->willReturn($qb);
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $eventForm */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $eventForm */
         $eventForm = $this->form->get('event');
         $eventForm->expects($this->once())->method('getConfig')->willReturn($config);
     }
@@ -216,7 +216,7 @@ class EmailNotificationTypeListenerTest extends \PHPUnit_Framework_TestCase
             'options' => [
                 'label' => 'workflow',
                 'required' => true,
-                'empty_value' => '',
+                'placeholder' => '',
                 'constraints' => [new NotBlank()],
                 'configs' => ['allowClear' => true, 'placeholder' => 'oro.workflow.form.choose_workflow'],
                 'attr' => ['autocomplete' => 'off'],
@@ -230,7 +230,7 @@ class EmailNotificationTypeListenerTest extends \PHPUnit_Framework_TestCase
             'options' => [
                 'label' => 'transition',
                 'required' => true,
-                'empty_value' => '',
+                'placeholder' => '',
                 'constraints' => [new NotBlank()],
                 'configs' => ['allowClear' => true, 'placeholder' => 'oro.workflow.form.choose_transition'],
                 'workflowName' => 'test_workflow'
@@ -317,7 +317,7 @@ class EmailNotificationTypeListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param mixed $data
-     * @return \PHPUnit_Framework_MockObject_MockObject|FormEvent
+     * @return \PHPUnit\Framework\MockObject\MockObject|FormEvent
      */
     protected function getEvent($data = null)
     {

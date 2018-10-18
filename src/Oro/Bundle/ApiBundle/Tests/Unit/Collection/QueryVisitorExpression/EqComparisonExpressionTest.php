@@ -2,62 +2,67 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 
-use Doctrine\Common\Collections\Expr\Comparison;
-use Doctrine\ORM\Query\Expr\Comparison as OrmComparison;
+use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EqComparisonExpression;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class EqComparisonExpressionTest extends \PHPUnit_Framework_TestCase
+class EqComparisonExpressionTest extends \PHPUnit\Framework\TestCase
 {
     public function testWalkComparisonExpression()
     {
         $expression = new EqComparisonExpression();
-        $expressionVisitor = new QueryExpressionVisitor();
-        $comparison = new Comparison('test', 'EQ', 'text');
-        $fieldName = 'a.test';
-        $parameterName = 'test_2';
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+        $field = 'e.test';
+        $expr = 'LOWER(e.test)';
+        $parameterName = 'test_1';
+        $value = 'text';
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
-            $comparison,
-            $fieldName,
-            $parameterName
+            $field,
+            $expr,
+            $parameterName,
+            $value
         );
 
-        $this->assertEquals(
-            new OrmComparison('a.test', '=', ':test_2'),
+        self::assertEquals(
+            new Comparison($expr, '=', ':' . $parameterName),
             $result
         );
-
-        $this->assertEquals(
-            [new Parameter('test_2', 'text', \PDO::PARAM_STR)],
+        self::assertEquals(
+            [new Parameter($parameterName, $value, \PDO::PARAM_STR)],
             $expressionVisitor->getParameters()
         );
     }
 
-    public function testWalkComparisonExpressionOnNullValue()
+    public function testWalkComparisonExpressionForNullValue()
     {
         $expression = new EqComparisonExpression();
-        $expressionVisitor = new QueryExpressionVisitor();
-        $comparison = new Comparison('test', 'EQ', null);
-        $fieldName = 'a.test';
-        $parameterName = 'test_2';
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+        $field = 'e.test';
+        $expr = 'LOWER(e.test)';
+        $parameterName = 'test_1';
+        $value = null;
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
-            $comparison,
-            $fieldName,
-            $parameterName
+            $field,
+            $expr,
+            $parameterName,
+            $value
         );
 
-        $this->assertEquals(
-            'a.test IS NULL',
-            $result
-        );
-
-        $this->assertEmpty(
-            $expressionVisitor->getParameters()
-        );
+        self::assertEquals($expr . ' IS NULL', $result);
+        self::assertEmpty($expressionVisitor->getParameters());
     }
 }

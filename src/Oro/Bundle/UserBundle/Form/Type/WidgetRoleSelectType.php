@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Oro\Bundle\DashboardBundle\Form\Type\WidgetEntityJquerySelect2HiddenType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -34,7 +35,7 @@ class WidgetRoleSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_widget_entity_jqueryselect2_hidden';
+        return WidgetEntityJquerySelect2HiddenType::class;
     }
 
     /**

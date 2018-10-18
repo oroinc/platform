@@ -9,6 +9,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * This class is used to check whether there is a workflow associated with this entity.
+ */
 class WorkflowAwareCache implements EventSubscriberInterface
 {
     const ACTIVE_WORKFLOW_RELATED_CLASSES_KEY = 'active_workflow_related';
@@ -61,11 +64,10 @@ class WorkflowAwareCache implements EventSubscriberInterface
         $key = $activeWorkflowsOnly ? self::ACTIVE_WORKFLOW_RELATED_CLASSES_KEY : self::WORKFLOW_RELATED_CLASSES_KEY;
         $class = $this->doctrineHelper->getEntityClass($entity);
 
-        if (!$this->cache->contains($key)) {
+        $classes = $this->cache->fetch($key);
+        if (false === $classes) {
             $classes = $this->fetchClasses($activeWorkflowsOnly);
             $this->cache->save($key, $classes);
-        } else {
-            $classes = $this->cache->fetch($key);
         }
 
         return array_key_exists($class, $classes);

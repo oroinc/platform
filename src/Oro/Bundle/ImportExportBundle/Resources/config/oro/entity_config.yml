@@ -12,7 +12,7 @@ entity_config:
                     options:
                         value_type:         string
                     form:
-                        type:               text
+                        type:               Symfony\Component\Form\Extension\Core\Type\TextType
                         options:
                             label:          oro.importexport.entity_config.header.label
                             required:       false
@@ -23,10 +23,10 @@ entity_config:
                     options:
                         value_type:         integer
                     form:
-                        type:               integer
+                        type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
                         options:
                             label:          oro.importexport.entity_config.order.label
-                            precision:      0
+                            scale:          0
                             empty_data:     ''
                             required:       false
                             block:          import_export
@@ -37,14 +37,14 @@ entity_config:
                         allowed_type:       [string, text, integer, smallint, bigint, boolean, date, float, decimal, money, percent, enum, ref-one, manyToOne]
                         immutable_type:     [ref-one, manyToOne]
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             label:          oro.importexport.entity_config.identity.label
                             choices:
-                                false:      'No'
-                                -1:         oro.importexport.entity_config.identity.only_when_not_empty
-                                true:       oro.importexport.entity_config.identity.always
-                            empty_value:    false
+                                No:         0
+                                oro.importexport.entity_config.identity.only_when_not_empty: -1
+                                oro.importexport.entity_config.identity.always: 1
+                            placeholder:    false
                             required:       false
                             block:          import_export
                             tooltip:        oro.importexport.entity_config.identity.tooltip
@@ -53,13 +53,13 @@ entity_config:
                     options:
                         value_type:         boolean
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             label:          oro.importexport.entity_config.excluded.label
                             choices:
-                                false:      'No'
-                                true:       'Yes'
-                            empty_value:    false
+                                No:         0
+                                Yes:        1
+                            placeholder:    false
                             required:       false
                             block:          import_export
                 # is relation must be represented by all it's fields
@@ -67,13 +67,13 @@ entity_config:
                     options:
                         allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany]
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             label:          oro.importexport.entity_config.full.label
                             choices:
-                                false:      'Identity only'
-                                true:       'All'
-                            empty_value:    false
+                                Identity only: 0
+                                All:        1
+                            placeholder:    false
                             required:       false
                             block:          import_export
                             tooltip:        'oro.importexport.entity_config.full.tooltip'

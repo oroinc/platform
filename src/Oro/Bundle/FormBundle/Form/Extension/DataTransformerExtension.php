@@ -28,7 +28,7 @@ class DataTransformerExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(['data_transformer']);
+        $resolver->setDefined(['data_transformer']);
     }
 
     /**

@@ -11,7 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Checks whether the "include" filter exists and if so,
- * adds the corresponding configuration extra into the Context.
+ * adds the corresponding configuration extra into the context.
  * This filter is used to specify which related entities should be returned.
  */
 class HandleIncludeFilter implements ProcessorInterface
@@ -51,8 +51,11 @@ class HandleIncludeFilter implements ProcessorInterface
             $context->getRequestType(),
             true
         );
-        if (!empty($includes)) {
-            $context->addConfigExtra(new ExpandRelatedEntitiesConfigExtra((array)$includes));
+        if (empty($includes)) {
+            // expanding of related entities was not requested
+            return;
         }
+
+        $context->addConfigExtra(new ExpandRelatedEntitiesConfigExtra((array)$includes));
     }
 }

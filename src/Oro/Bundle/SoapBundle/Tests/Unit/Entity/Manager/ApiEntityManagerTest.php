@@ -7,12 +7,12 @@ use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity;
 
-class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
+class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param  string                                   $class
-     * @param  \PHPUnit_Framework_MockObject_MockObject $metadata
-     * @param  \PHPUnit_Framework_MockObject_MockObject $objectManager
+     * @param  \PHPUnit\Framework\MockObject\MockObject $metadata
+     * @param  \PHPUnit\Framework\MockObject\MockObject $objectManager
      * @return ApiEntityManager
      */
     protected function createApiEntityManager($class, $metadata = null, $objectManager = null)

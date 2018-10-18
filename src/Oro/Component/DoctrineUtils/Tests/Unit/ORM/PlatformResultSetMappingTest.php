@@ -8,7 +8,7 @@ use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Oro\Component\DoctrineUtils\ORM\PlatformResultSetMapping;
 
-class PlatformResultSetMappingTest extends \PHPUnit_Framework_TestCase
+class PlatformResultSetMappingTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider databasePlatformProvider

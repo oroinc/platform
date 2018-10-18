@@ -9,15 +9,15 @@ use Oro\Bundle\UIBundle\Validator\Constraints\MoveToChildValidator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class MoveToChildValidatorTest extends \PHPUnit_Framework_TestCase
+class MoveToChildValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MoveToChildValidator */
     protected $validator;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var ExecutionContextInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $context;
 
     /**

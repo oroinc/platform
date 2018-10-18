@@ -3,7 +3,7 @@ parameters:
 
 services:
     oro_cache.oro_data_cache_manager:
-        class: %oro_cache.oro_data_cache_manager.class%
+        class: '%oro_cache.oro_data_cache_manager.class%'
 
     oro_cache.provider.validation:
         public: false

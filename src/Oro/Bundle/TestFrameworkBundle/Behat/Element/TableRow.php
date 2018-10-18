@@ -76,7 +76,18 @@ class TableRow extends Element
             return (int) $value;
         } elseif (preg_match('/^\p{Sc}(?P<amount>[0-9]+)$/', $value, $matches)) {
             return (int) $matches['amount'];
-        } elseif ($date = date_create($value)) {
+        } elseif (($date = date_create($value)) &&
+            (
+                preg_match(
+                    '/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s([1-3])?[0-9]\,\s[1-2][0-9]{3}/',
+                    $value
+                ) ||
+                preg_match(
+                    '/^[1-2][0-9]{3}-[0-1][0-9]-[0-3][0-9]$/',
+                    $value
+                )
+            )
+        ) {
             return $date;
         }
 

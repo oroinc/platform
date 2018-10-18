@@ -3,7 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Config;
 
 /**
- * An interface for classes that can be used to get the configuration of API resource outside of API processors.
+ * Provides an interface for classes that can be used to get the configuration of Data API resource
+ * outside of API processors.
  */
 interface ConfigAccessorInterface
 {

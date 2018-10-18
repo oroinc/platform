@@ -405,4 +405,13 @@ class GetAttrNodeTest extends AbstractNodeTest
 
         $node->evaluate([], []);
     }
+
+    /**
+     * @return array
+     */
+    public function getDumpData()
+    {
+        // Dumping is not supported yet
+        return [];
+    }
 }

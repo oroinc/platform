@@ -7,9 +7,9 @@ use Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor;
 use Oro\Component\Layout\LayoutContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DependencyInjectionFormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
+class DependencyInjectionFormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     /** @var DependencyInjectionFormContextConfigurator */

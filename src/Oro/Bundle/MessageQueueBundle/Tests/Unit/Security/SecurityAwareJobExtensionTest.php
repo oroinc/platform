@@ -10,15 +10,15 @@ use Oro\Component\MessageQueue\Job\JobStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class SecurityAwareJobExtensionTest extends \PHPUnit_Framework_TestCase
+class SecurityAwareJobExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
     private $tokenStorage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenSerializerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenSerializerInterface */
     private $tokenSerializer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|JobStorage */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|JobStorage */
     private $jobStorage;
 
     /** @var SecurityAwareJobExtension */

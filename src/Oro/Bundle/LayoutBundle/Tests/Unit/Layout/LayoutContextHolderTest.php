@@ -5,7 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout;
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Component\Layout\ContextInterface;
 
-class LayoutContextHolderTest extends \PHPUnit_Framework_TestCase
+class LayoutContextHolderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LayoutContextHolder
@@ -21,7 +21,7 @@ class LayoutContextHolderTest extends \PHPUnit_Framework_TestCase
     {
         $this->layoutContextHolder = new LayoutContextHolder();
 
-        /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context **/
+        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context **/
         $this->context = $this->createMock(ContextInterface::class);
     }
 

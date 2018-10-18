@@ -1,0 +1,6 @@
+services:
+    Oro\Bundle\TestGeneratorBundle\Command\CreateTestCommand:
+        public: false
+        class: Oro\Bundle\TestGeneratorBundle\Command\CreateTestCommand
+        tags:
+            - { name: console.command }

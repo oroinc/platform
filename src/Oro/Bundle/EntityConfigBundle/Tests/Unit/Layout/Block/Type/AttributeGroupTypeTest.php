@@ -21,10 +21,10 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
     /** @var AttributeRenderRegistry */
     protected $attributeRenderRegistry;
 
-    /** @var AttributeManager|\PHPUnit_Framework_MockObject_MockObject $attributeManager */
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject $attributeManager */
     protected $attributeManager;
 
-    /** @var AttributeBlockTypeMapperInterface|\PHPUnit_Framework_MockObject_MockObject $blockTypeMapper */
+    /** @var AttributeBlockTypeMapperInterface|\PHPUnit\Framework\MockObject\MockObject $blockTypeMapper */
     protected $blockTypeMapper;
 
     /**
@@ -193,13 +193,6 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         $this->assertEquals('attribute', $firstAttributeView->vars['fieldName']);
         $this->assertEquals('attributeClassName', $firstAttributeView->vars['className']);
         $this->assertFalse($this->attributeRenderRegistry->isGroupRendered($attributeFamily, $attributeGroup));
-    }
-
-    public function testGetName()
-    {
-        $type = $this->getBlockType(AttributeGroupType::NAME);
-
-        $this->assertSame(AttributeGroupType::NAME, $type->getName());
     }
 
     public function testGetParent()

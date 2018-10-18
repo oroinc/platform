@@ -29,7 +29,11 @@ class SetDeleteLimit implements ProcessorInterface
         }
 
         if (null === $criteria->getMaxResults()) {
-            $limit = $context->getConfig()->getMaxResults();
+            $limit = null;
+            $config = $context->getConfig();
+            if (null !== $config) {
+                $limit = $config->getMaxResults();
+            }
             if (null === $limit) {
                 $limit = $this->getDefaultDeleteLimit();
             }

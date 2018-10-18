@@ -9,6 +9,7 @@ define(function(require) {
     var widgetManager = require('oroui/js/widget-manager');
     var Backbone = require('backbone');
     var tools = require('oroui/js/tools');
+    require('oroui/js/standart-confirmation'); // preload default confirmation dialog module
 
     var ButtonManager = function(options) {
         this.initialize(options);

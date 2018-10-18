@@ -14,5 +14,5 @@ Feature: User configuration
     And I fill "User Config Form" with:
       | Use parent scope for Position | false   |
       | Position                      | Left    |
-    When I press "Save settings"
+    When I click "Save settings"
     Then I should see a "Sided Main Menu" element

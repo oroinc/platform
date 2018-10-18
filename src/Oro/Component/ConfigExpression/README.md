@@ -1,5 +1,4 @@
-Oro Config Expression Component
-===============================
+# Oro Config Expression Component
 
 The Config Expression component provides an engine that can compile and evaluate expressions came from configuration files, for example YAML.
 

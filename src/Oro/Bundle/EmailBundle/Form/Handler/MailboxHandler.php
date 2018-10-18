@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class MailboxHandler implements FormAwareInterface
 {
-    const FORM = 'oro_email_mailbox';
+    const FORM = MailboxType::class;
 
     /** @var Registry */
     protected $doctrine;
@@ -76,7 +76,7 @@ class MailboxHandler implements FormAwareInterface
                 $this->processReload();
             } else {
                 $this->form->handleRequest($request);
-                if ($this->form->isValid()) {
+                if ($this->form->isSubmitted() && $this->form->isValid()) {
                     $this->onSuccess();
 
                     return true;

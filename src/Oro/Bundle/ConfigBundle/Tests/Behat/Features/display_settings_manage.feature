@@ -25,7 +25,7 @@ Feature: Display settings manage
       | Enable WYSIWYG editor | true |
     And save form
     When I go to Activities/Calendar Events
-    And press "Create Calendar event"
+    And click "Create Calendar event"
     Then I should see an "WYSIWYG editor" element
     But I go to System/Configuration
     And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
@@ -33,7 +33,7 @@ Feature: Display settings manage
       | Enable WYSIWYG editor | false |
     And save form
     When I go to Activities/Calendar Events
-    And press "Create Calendar event"
+    And click "Create Calendar event"
     Then I should not see an "WYSIWYG editor" element
 
   Scenario: Change records in grid per page amount
@@ -55,7 +55,7 @@ Feature: Display settings manage
     When I go to System/Configuration
     And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
-      | Lock headers in grids | off |
+      | Lock headers in grids | false |
     And I save form
     And I go to Activities/ Calendar Events
     Then I see that grid header is sticky
@@ -67,7 +67,7 @@ Feature: Display settings manage
     When I go to System/Configuration
     And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
-      | Record Pagination | off |
+      | Record Pagination | false |
     And I save form
     And I go to Activities/ Calendar Events
     And click view 1 in grid
@@ -151,7 +151,7 @@ Feature: Display settings manage
       | Calendar colors | Alizarin Crimson, Beige, Black, Lime, Melrose, Mercury, Apple green, Cornflower Blue, Mauve, Aqua, Aquamarine, Azure |
     And save form
     And go to Activities/ Calendar Events
-    And press "Create Calendar event"
+    And click "Create Calendar event"
     Then I should see following available "Event Form" colors:
       | Apple green, Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black |
     When I click My Calendar in user menu
@@ -166,7 +166,7 @@ Feature: Display settings manage
       | Taxonomy Colors | Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
     And save form
     And go to System/Tags Management/Taxonomies
-    And press "Create Taxonomy"
+    And click "Create Taxonomy"
     Then I should see following available "TaxonomyForm" colors:
       | Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
 

@@ -6,14 +6,14 @@ use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;
 use Oro\Bundle\LocaleBundle\Twig\AddressExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class AddressExtensionTest extends \PHPUnit_Framework_TestCase
+class AddressExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var AddressExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $formatter;
 
     protected function setUp()

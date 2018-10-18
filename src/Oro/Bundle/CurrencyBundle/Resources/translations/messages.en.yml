@@ -15,7 +15,7 @@ oro.currency:
     form:
         tooltip:
             currency: "Select the default currency"
-            currency_display: 'Dispaly currency ISO code like "USD" or currency symbol like "$"'
+            currency_display: 'Select whether to display the currency ISO code (e.g. USD) or the currency symbol (e.g. $)'
 
 oro.entity_extend:
     form:

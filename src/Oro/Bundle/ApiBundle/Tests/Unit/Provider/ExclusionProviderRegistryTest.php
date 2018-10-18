@@ -8,18 +8,18 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ExclusionProviderRegistryTest extends \PHPUnit_Framework_TestCase
+class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ExclusionProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExclusionProviderInterface */
     private $defaultExclusionProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ExclusionProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExclusionProviderInterface */
     private $firstExclusionProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ExclusionProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExclusionProviderInterface */
     private $secondExclusionProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
     protected function setUp()
@@ -46,7 +46,7 @@ class ExclusionProviderRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find a exclusion provider for the request "rest,another".
+     * @expectedExceptionMessage Cannot find an exclusion provider for the request "rest,another".
      */
     public function testGetExclusionProviderForUnsupportedRequestType()
     {

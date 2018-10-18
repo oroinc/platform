@@ -4,10 +4,10 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Component\Action\Event\ExecuteActionEvent;
 
-class ExecuteActionEventTest extends \PHPUnit_Framework_TestCase
+class ExecuteActionEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $action;
 

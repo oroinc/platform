@@ -1,0 +1,65 @@
+{% extends 'OroUIBundle:Default:index.html.twig' %}
+{% oro_title_set({titleTemplate : "%code% - %status%" , params: {'%code%': status_code, '%status%' :status_text }, force : true}) %}
+{% block head %}
+    <meta name="error" content="{{ status_code }}" />
+    {{ parent() }}
+{% endblock %}
+{% block bodyClass %}error-page{% endblock %}
+
+{% block script %}
+{% endblock %}
+
+{% block content_side %}
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block right_panel %}
+{% endblock right_panel %}
+{% block left_panel %}
+{% endblock left_panel %}
+
+{% block before_content %}
+{% endblock %}
+
+{% block content %}
+    <div class="error-page-wrapper">
+        <div class="error-page-main">
+            <div class="error-page-content">
+                {% if oro_theme_logo() %}
+                    <a href="{{ path('oro_default') }}">
+                        <img class="error-page-img" alt="logo" src="{{ asset(oro_theme_logo()) }}"/>
+                    </a>
+                {% endif %}
+                <h1 class="error-page-title">{{ status_code }}. {{ status_text }}</h1>
+                <p class="error-page-description">
+                    {% if status_code == 404 %}
+                        {{ 'The page you requested could not be found. Please make sure the path you used is correct.'|trans }}
+                    {% elseif status_code == 403 %}
+                        {{ "You don't have permission to access this page."|trans }}
+                    {% else %}
+                        {{ 'The System is currently under maintenance and should be available in a few minutes.'|trans }}
+                    {% endif %}
+                </p>
+                {% if status_code == 404 or status_code == 403 %}
+                    <button class="btn btn-primary" onclick="window.history.back(); return false;">
+                        {{ 'Click to go back'|trans }}
+                        <span class="fa-angle-right"></span>
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+        <footer class="error-page-footer">
+            <p>&copy {{ 'now'|date('Y') }} {{ 'Oro Inc. All Rights Reserved.'|trans }}</p>
+        </footer>
+    </div>
+    <script type="application/javascript">
+        document.getElementById('progressbar').style.display = 'none';
+        document.getElementById('page').style.display = '';
+        document.title = "{{ oro_title_render()|e('js') }}";
+    </script>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

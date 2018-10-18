@@ -4,7 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class QueryBagTest extends \PHPUnit_Framework_TestCase
+class QueryBagTest extends \PHPUnit\Framework\TestCase
 {
     public function testBag()
     {

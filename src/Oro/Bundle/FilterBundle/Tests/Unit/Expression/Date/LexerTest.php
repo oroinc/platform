@@ -5,7 +5,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Expression\Date;
 use Oro\Bundle\FilterBundle\Expression\Date\Lexer;
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
 
-class LexerTest extends \PHPUnit_Framework_TestCase
+class LexerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Lexer */
     protected $lexer;

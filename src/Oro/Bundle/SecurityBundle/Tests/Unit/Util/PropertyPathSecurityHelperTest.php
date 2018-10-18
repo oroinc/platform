@@ -9,15 +9,15 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
 use Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
-class PropertyPathSecurityHelperTest extends \PHPUnit_Framework_TestCase
+class PropertyPathSecurityHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $managerRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigProvider;
 
     /** @var PropertyPathSecurityHelper */

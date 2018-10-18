@@ -1,67 +1,70 @@
 <?php
 
+namespace Oro\Sniffs\Commenting;
+
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Standards\PEAR\Sniffs\Commenting\ClassCommentSniff as BaseClassCommentSniff;
+
 /**
  * This sniff checks if class/interface/trait documentation exists ind it have text doc that describes
  * what this class for.
  *
- * @category  PHP
+ * @category PHP
  */
-// @codingStandardsIgnoreStart
-class Oro_Sniffs_Commenting_ClassCommentSniff extends PEAR_Sniffs_Commenting_ClassCommentSniff
+class ClassCommentSniff extends BaseClassCommentSniff
 {
-    // @codingStandardsIgnoreEnd
     /**
      * Tags in correct order and related info.
      * This array cannot be configured from the outside.
      *
      * @var array
      */
-    protected $tags = array(
-        '@category'   => array(
+    protected $tags = [
+        '@category'   => [
             'required'       => false,
             'allow_multiple' => false,
-        ),
-        '@package'    => array(
+        ],
+        '@package'    => [
             'required'       => false,
             'allow_multiple' => false,
-        ),
-        '@subpackage' => array(
+        ],
+        '@subpackage' => [
             'required'       => false,
             'allow_multiple' => false,
-        ),
-        '@author'     => array(
+        ],
+        '@author'     => [
             'required'       => false,
             'allow_multiple' => true,
-        ),
-        '@copyright'  => array(
+        ],
+        '@copyright'  => [
             'required'       => false,
             'allow_multiple' => true,
-        ),
-        '@license'    => array(
+        ],
+        '@license'    => [
             'required'       => false,
             'allow_multiple' => false,
-        ),
-        '@version'    => array(
+        ],
+        '@version'    => [
             'required'       => false,
             'allow_multiple' => false,
-        ),
-        '@link'       => array(
+        ],
+        '@link'       => [
             'required'       => false,
             'allow_multiple' => true,
-        ),
-        '@see'        => array(
+        ],
+        '@see'        => [
             'required'       => false,
             'allow_multiple' => true,
-        ),
-        '@since'      => array(
+        ],
+        '@since'      => [
             'required'       => false,
             'allow_multiple' => false,
-        ),
-        '@deprecated' => array(
+        ],
+        '@deprecated' => [
             'required'       => false,
             'allow_multiple' => false,
-        ),
-    );
+        ],
+    ];
 
     /**
      * {@inheritdoc}
@@ -78,7 +81,7 @@ class Oro_Sniffs_Commenting_ClassCommentSniff extends PEAR_Sniffs_Commenting_Cla
     /**
      * {@inheritdoc}
      */
-    public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
+    public function process(File $phpcsFile, $stackPtr)
     {
         parent::process($phpcsFile, $stackPtr);
 

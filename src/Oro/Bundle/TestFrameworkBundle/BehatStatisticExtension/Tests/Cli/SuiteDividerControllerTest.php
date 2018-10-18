@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Stub\InputStub;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Stub\OutputStub;
 use Symfony\Component\Console\Command\Command;
 
-class SuiteDividerControllerTest extends \PHPUnit_Framework_TestCase
+class SuiteDividerControllerTest extends \PHPUnit\Framework\TestCase
 {
     public function testConfigure()
     {

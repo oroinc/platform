@@ -3,8 +3,9 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AttachmentBundle\Form\Type\FileConfigType;
+use Symfony\Component\Form\FormEvents;
 
-class FileConfigTypeTest extends \PHPUnit_Framework_TestCase
+class FileConfigTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FileConfigType */
     protected $type;
@@ -27,7 +28,7 @@ class FileConfigTypeTest extends \PHPUnit_Framework_TestCase
         $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
         $builder->expects($this->once())
             ->method('addEventListener')
-            ->with('form.post_bind');
+            ->with(FormEvents::POST_SUBMIT);
 
         $options = [];
         $this->type->buildForm($builder, $options);

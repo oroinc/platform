@@ -262,7 +262,7 @@ oro_activity_bundle_api:
         group: activity_association
 ```
 
-And then register a custom Route Option Resolver using `routing.options_resolver` tag to handle this group:
+And then register a custom Route Option Resolver using `oro.api.routing_options_resolver` tag to handle this group:
 ```yaml
     oro_activity.routing.options_resolver.activity_association:
         class: Oro\Bundle\ActivityBundle\Routing\ActivityAssociationRouteOptionsResolver
@@ -271,7 +271,7 @@ And then register a custom Route Option Resolver using `routing.options_resolver
             - @oro_entity_config.provider.grouping
             - @oro_entity.entity_alias_resolver
         tags:
-            - { name: routing.options_resolver }
+            - { name: oro.api.routing_options_resolver, view: default }
 ```
 
 In the route options resolver, in the `resolve()` method, we can check if the route belongs to our group and make changes to the route collection accordingly:

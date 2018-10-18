@@ -12,15 +12,15 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class UpdateFactoryTest extends \PHPUnit_Framework_TestCase
+class UpdateFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormFactory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $formFactory;
 
-    /** @var FormHandlerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormHandlerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $handlerRegistry;
 
-    /** @var FormTemplateDataProviderRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormTemplateDataProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $dataProviderRegistry;
 
     /** @var UpdateFactory */
@@ -42,7 +42,7 @@ class UpdateFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateAutoDefaults()
     {
         $argData = (object)[];
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $argForm */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $argForm */
         $argForm = $this->createMock(FormInterface::class);
         $argHandler = null;
         $argResultProvider = null;
@@ -62,7 +62,7 @@ class UpdateFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateCustomAliases()
     {
         $argData = (object)[];
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $argForm */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $argForm */
         $argForm = 'form_type';
         $argHandler = 'handler_alias';
         $argResultProvider = 'provider_alias';
@@ -85,7 +85,7 @@ class UpdateFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateArgCallbacks()
     {
         $argData = (object)[];
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $argForm */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $argForm */
         $argForm = $this->createMock(FormInterface::class);
         $argHandler = function () {
             return true;
@@ -105,9 +105,9 @@ class UpdateFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @param UpdateInterface $update
      * @param object $formData
-     * @param FormInterface|\PHPUnit_Framework_MockObject_MockObject $form
-     * @param FormHandlerInterface|\PHPUnit_Framework_MockObject_MockObject $handler
-     * @param FormTemplateDataProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider
+     * @param FormInterface|\PHPUnit\Framework\MockObject\MockObject $form
+     * @param FormHandlerInterface|\PHPUnit\Framework\MockObject\MockObject $handler
+     * @param FormTemplateDataProviderInterface|\PHPUnit\Framework\MockObject\MockObject $provider
      */
     protected function assertExpectedConstruction(
         UpdateInterface $update,
@@ -118,7 +118,7 @@ class UpdateFactoryTest extends \PHPUnit_Framework_TestCase
     ) {
         $this->assertSame($formData, $update->getFormData());
         $this->assertSame($form, $update->getForm());
-        /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
+        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
         $handler->expects($this->once())->method('process')->with($formData, $form, $request);
         $provider->expects($this->once())->method('getData')->with($formData, $form, $request);

@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 
-class ExtendOptionsManagerTest extends \PHPUnit_Framework_TestCase
+class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExtendOptionsManager */
     private $manager;
@@ -386,5 +386,27 @@ class ExtendOptionsManagerTest extends \PHPUnit_Framework_TestCase
         $prop->setAccessible(true);
 
         $prop->setValue($obj, $val);
+    }
+
+    public function testHasColumnOptionsWhenNoOptionsExist()
+    {
+        $this->assertFalse($this->manager->hasColumnOptions('some_table', 'some_column'));
+    }
+
+    public function testHasColumnOptionsWhenOptionsExist()
+    {
+        $this->manager->setColumnOptions('some_table', 'some_column', ['some' => ['options']]);
+        $this->assertTrue($this->manager->hasColumnOptions('some_table', 'some_column'));
+    }
+
+    public function testGetColumnOptionsWhenNoOptionsExist()
+    {
+        $this->assertEquals([], $this->manager->getColumnOptions('some_table', 'some_column'));
+    }
+
+    public function testGetColumnOptionsWhenOptionsExist()
+    {
+        $this->manager->setColumnOptions('some_table', 'some_column', ['some' => ['options']]);
+        $this->assertEquals(['some' => ['options']], $this->manager->getColumnOptions('some_table', 'some_column'));
     }
 }

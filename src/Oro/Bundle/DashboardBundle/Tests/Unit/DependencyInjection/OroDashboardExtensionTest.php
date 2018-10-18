@@ -5,7 +5,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\DashboardBundle\DependencyInjection\OroDashboardExtension;
 use Oro\Component\Config\CumulativeResourceManager;
 
-class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
+class OroDashboardExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OroDashboardExtension */
     protected $target;

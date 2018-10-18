@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity\Manager;
 
 use Oro\Bundle\UserBundle\Entity\Manager\GroupManager;
 
-class GroupManagerTest extends \PHPUnit_Framework_TestCase
+class GroupManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Oro\Bundle\UserBundle\Entity\Manager\GroupManager

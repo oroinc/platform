@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 
-class ProcessorBagTest extends \PHPUnit_Framework_TestCase
+class ProcessorBagTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ProcessorBagConfigBuilder */
     protected $builder;

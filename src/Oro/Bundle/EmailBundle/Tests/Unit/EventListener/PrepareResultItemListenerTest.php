@@ -9,18 +9,18 @@ use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Symfony\Component\Routing\Router;
 
-class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
+class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PrepareResultItemListener */
     protected $listener;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Router */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Router */
     protected $router;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Item */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Item */
     protected $item;
 
     public function setUp()

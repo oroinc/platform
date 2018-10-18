@@ -1,0 +1,70 @@
+/* @theme: admin.oro; */
+
+.email-notification-menu {
+    .dropdown-toggle {
+        .mail-icon {
+            @include fa-icon($email-inactive-mail-icon);
+
+            position: relative;
+            padding-top: 3px;
+            display: inline-block;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 16px;
+            line-height: 16px;
+
+            .item-counter {
+                background-color: $email-item-counter-bg;
+                display: none;
+                color: $email-item-counter-text-color;
+            }
+
+            &.has-icon-counter {
+                .item-counter {
+                    display: inline-block;
+                }
+            }
+
+            &.highlight {
+                @include fa-icon($email-active-mail-icon);
+            }
+        }
+    }
+
+    .dropdown-menu {
+        background-color: $email-dropdown-bg;
+        width: $email-recent-emails-popup-width !important;
+        padding: 0;
+        outline: none;
+        #{$end}: -7px;
+
+        .empty {
+            padding: 5px 10px;
+        }
+    }
+
+    .new-email-notification {
+        position: absolute;
+        top: 100%;
+        right: -18px;
+        display: none;
+        width: 160px;
+        padding: 8px 12px;
+        background: $email-dropdown-bg;
+        color: $primary-400;
+        border-radius: 4px;
+        z-index: $zindex-popover;
+        box-shadow: 0 4px 30px 0 rgba(0, 0, 0, .5);
+
+        &:after {
+            content: '';
+            display: inline-block;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid $email-dropdown-bg;
+            position: absolute;
+            top: -6px;
+            right: 24px;
+        }
+    }
+}

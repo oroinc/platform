@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config\Id;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
-class FieldConfigIdTest extends \PHPUnit_Framework_TestCase
+class FieldConfigIdTest extends \PHPUnit\Framework\TestCase
 {
     public function testFieldConfigId()
     {

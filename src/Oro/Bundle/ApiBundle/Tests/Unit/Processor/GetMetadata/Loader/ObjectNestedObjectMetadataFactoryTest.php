@@ -12,25 +12,21 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedObjectMetadataHelper
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedObjectMetadataFactory;
 
-class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $nestedObjectMetadataHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|NestedObjectMetadataHelper */
+    private $nestedObjectMetadataHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $objectMetadataFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataFactory */
+    private $objectMetadataFactory;
 
     /** @var ObjectNestedObjectMetadataFactory */
-    protected $objectNestedObjectMetadataFactory;
+    private $objectNestedObjectMetadataFactory;
 
     protected function setUp()
     {
-        $this->nestedObjectMetadataHelper = $this->getMockBuilder(NestedObjectMetadataHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->objectMetadataFactory = $this->getMockBuilder(ObjectMetadataFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->nestedObjectMetadataHelper = $this->createMock(NestedObjectMetadataHelper::class);
+        $this->objectMetadataFactory = $this->createMock(ObjectMetadataFactory::class);
 
         $this->objectNestedObjectMetadataFactory = new ObjectNestedObjectMetadataFactory(
             $this->nestedObjectMetadataHelper,

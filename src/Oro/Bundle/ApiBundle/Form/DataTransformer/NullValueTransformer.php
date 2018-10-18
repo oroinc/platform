@@ -25,6 +25,26 @@ class NullValueTransformer implements DataTransformerInterface
     }
 
     /**
+     * Gets the wrapped data transformer.
+     *
+     * @return DataTransformerInterface
+     */
+    public function getInnerTransformer()
+    {
+        return $this->transformer;
+    }
+
+    /**
+     * Sets the wrapped data transformer.
+     *
+     * @param DataTransformerInterface $transformer
+     */
+    public function setInnerTransformer(DataTransformerInterface $transformer)
+    {
+        $this->transformer = $transformer;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function transform($value)

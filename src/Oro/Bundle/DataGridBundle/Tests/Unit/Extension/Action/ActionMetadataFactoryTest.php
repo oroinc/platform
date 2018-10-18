@@ -7,9 +7,9 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionMetadataFactory;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ActionMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class ActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     /** @var ActionMetadataFactory */

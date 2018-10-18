@@ -7,20 +7,20 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Board\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\Board\Processor\DefaultProcessor;
 
-class DefaultProcessorTest extends \PHPUnit_Framework_TestCase
+class DefaultProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityClassResolver;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $choiceHelper;
 
@@ -110,9 +110,9 @@ class DefaultProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($targetMetaData, 'group_field')
             ->will($this->returnValue('label'));
         $choices = [
-            'identification_alignment' => 'Identification Alignment',
-            'in_progress' => 'In Progress',
-            'lost' => 'Lost'
+            'Identification Alignment' => 'identification_alignment',
+            'In Progress' => 'in_progress',
+            'Lost' => 'lost',
         ];
         $this->choiceHelper->expects($this->once())
             ->method('getChoices')

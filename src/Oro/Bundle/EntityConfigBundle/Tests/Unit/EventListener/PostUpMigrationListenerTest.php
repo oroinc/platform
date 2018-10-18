@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Migration\WarmUpEntityConfigCacheMigration;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestMigration;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
-class PostUpMigrationListenerTest extends \PHPUnit_Framework_TestCase
+class PostUpMigrationListenerTest extends \PHPUnit\Framework\TestCase
 {
     public function testUpdateConfigs()
     {

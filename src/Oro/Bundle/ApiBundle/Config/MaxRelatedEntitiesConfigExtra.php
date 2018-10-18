@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
 /**
- * An instance of this class can be added to the config extras of the Context
+ * An instance of this class can be added to the config extras of the context
  * to set the maximum number of related entities that can be loaded.
  */
 class MaxRelatedEntitiesConfigExtra implements ConfigExtraInterface

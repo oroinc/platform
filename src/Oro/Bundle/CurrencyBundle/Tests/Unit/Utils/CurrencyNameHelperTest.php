@@ -7,7 +7,7 @@ use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Provider\CurrencyListProviderStub;
 use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 
-class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements ViewTypeProviderInterface
+class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements ViewTypeProviderInterface
 {
     /**
      * @var string
@@ -15,7 +15,7 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
     private $viewType;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\LocaleBundle\Formatter\NumberFormatter
+     * @var \PHPUnit\Framework\MockObject\MockObject|\Oro\Bundle\LocaleBundle\Formatter\NumberFormatter
      */
     protected $formatter;
 
@@ -100,7 +100,7 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
             new CurrencyListProviderStub()
         );
 
-        $this->assertEquals(['USD' => '$', 'EUR' => '€'], $currencyNameHelper->getCurrencyChoices());
+        $this->assertEquals(['$' => 'USD', '€' => 'EUR'], $currencyNameHelper->getCurrencyChoices());
     }
 
     /**
@@ -113,7 +113,7 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
 
     /**
      * @param string $localeCode
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     private function getLocaleStub($localeCode)
     {

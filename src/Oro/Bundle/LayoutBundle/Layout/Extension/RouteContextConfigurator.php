@@ -43,6 +43,6 @@ class RouteContextConfigurator implements ContextConfiguratorInterface
                     }
                 ]
             )
-            ->setAllowedTypes(['route_name' => ['string', 'null']]);
+            ->setAllowedTypes('route_name', ['string', 'null']);
     }
 }

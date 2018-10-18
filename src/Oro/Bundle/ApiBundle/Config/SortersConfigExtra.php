@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * An instance of this class can be added to the config extras of the Context
+ * An instance of this class can be added to the config extras of the context
  * to request an information about fields that can be used to sort a result.
  */
 class SortersConfigExtra implements ConfigExtraSectionInterface

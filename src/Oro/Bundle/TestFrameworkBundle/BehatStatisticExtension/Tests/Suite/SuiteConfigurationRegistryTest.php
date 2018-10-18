@@ -13,7 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\SuiteCo
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Suite\SuiteConfigurationRegistry;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Specification\Stub\SpecificationLocatorFilesystemStub;
 
-class SuiteConfigurationRegistryTest extends \PHPUnit_Framework_TestCase
+class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
 {
     private function getSuiteConfigs()
     {
@@ -259,7 +259,7 @@ class SuiteConfigurationRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FeaturePathLocator
+     * @return \PHPUnit\Framework\MockObject\MockObject|FeaturePathLocator
      */
     private function getFeaturePathLocatorMock()
     {

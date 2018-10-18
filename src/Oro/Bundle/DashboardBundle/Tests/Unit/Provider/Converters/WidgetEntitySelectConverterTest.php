@@ -6,9 +6,9 @@ use Doctrine\ORM\AbstractQuery;
 use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class WidgetEntitySelectConverterTest extends \PHPUnit_Framework_TestCase
+class WidgetEntitySelectConverterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AbstractQuery|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AbstractQuery|\PHPUnit\Framework\MockObject\MockObject */
     protected $query;
 
     /** @var  WidgetEntitySelectConverter */

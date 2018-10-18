@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class DocumentBuilderCompilerPassTest extends \PHPUnit_Framework_TestCase
+class DocumentBuilderCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DocumentBuilderCompilerPass */
     private $compiler;
@@ -29,7 +29,7 @@ class DocumentBuilderCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testProcessWhenNoDataTransformers()
+    public function testProcessWhenNoDocumentBuilders()
     {
         $this->compiler->process($this->container);
 
@@ -67,13 +67,10 @@ class DocumentBuilderCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage The document builder service "document_builder1" should be public and non shared.
-     */
     public function testProcessWhenDocumentBuilderIsNotPublic()
     {
         $documentBuilder1 = $this->container->setDefinition('document_builder1', new Definition());
+        $documentBuilder1->setShared(false);
         $documentBuilder1->setPublic(false);
         $documentBuilder1->addTag(
             'oro.api.document_builder',
@@ -81,11 +78,19 @@ class DocumentBuilderCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->compiler->process($this->container);
+
+        self::assertEquals(
+            [
+                ['document_builder1', 'rest']
+            ],
+            $this->factory->getArgument(0)
+        );
+        self::assertTrue($documentBuilder1->isPublic());
     }
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage The document builder service "document_builder1" should be public and non shared.
+     * @expectedExceptionMessage The document builder service "document_builder1" should be non shared.
      */
     public function testProcessWhenDocumentBuilderIsShared()
     {

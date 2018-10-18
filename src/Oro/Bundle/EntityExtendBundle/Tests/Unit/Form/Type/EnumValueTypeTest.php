@@ -4,10 +4,11 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\Constraint;
@@ -34,9 +35,8 @@ class EnumValueTypeTest extends TypeTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->type = new EnumValueType($this->getConfigProvider());
+        parent::setUp();
     }
 
     protected function getExtensions()
@@ -49,9 +49,11 @@ class EnumValueTypeTest extends TypeTestCase
 
         return [
             new PreloadedExtension(
-                [],
                 [
-                    'form' => [
+                    EnumValueType::class => $this->type
+                ],
+                [
+                    FormType::class => [
                         new FormTypeValidatorExtension($validator)
                     ]
                 ]
@@ -68,7 +70,7 @@ class EnumValueTypeTest extends TypeTestCase
      */
     public function testSubmit(array $inputData, array $expectedData)
     {
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(EnumValueType::class);
         $form->submit($inputData['form']);
 
         $this->assertEquals($expectedData['valid'], $form->isValid());
@@ -82,7 +84,7 @@ class EnumValueTypeTest extends TypeTestCase
             'priority'   => 1
         ];
 
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(EnumValueType::class);
         $form->submit($formData);
         $this->assertTrue($form->isSynchronized());
         $this->assertEquals(
@@ -119,7 +121,7 @@ class EnumValueTypeTest extends TypeTestCase
             'priority'   => 1
         ];
 
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(EnumValueType::class);
         $form->submit($formData);
         $this->assertTrue($form->isSynchronized());
         $this->assertEquals(
@@ -134,14 +136,6 @@ class EnumValueTypeTest extends TypeTestCase
 
         $nameConstraints = $form->get('label')->getConfig()->getOption('constraints');
         $this->assertCount(2, $nameConstraints);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_entity_extend_enum_value',
-            $this->type->getName()
-        );
     }
 
     /**
@@ -159,7 +153,7 @@ class EnumValueTypeTest extends TypeTestCase
         );
 
         $type = new EnumValueType($configProvider);
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(EnumValueType::class);
         $form->setParent($this->getConfiguredForm());
 
         $form->submit($inputData['form']);
@@ -330,9 +324,9 @@ class EnumValueTypeTest extends TypeTestCase
 
     /**
      * @param array                                    $data
-     * @param \PHPUnit_Framework_MockObject_MockObject $form
+     * @param \PHPUnit\Framework\MockObject\MockObject $form
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getFormEvent($data, $form = null)
     {
@@ -354,7 +348,7 @@ class EnumValueTypeTest extends TypeTestCase
      */
     protected function getValidator()
     {
-        /* @var $loader \PHPUnit_Framework_MockObject_MockObject|LoaderInterface */
+        /* @var $loader \PHPUnit\Framework\MockObject\MockObject|LoaderInterface */
         $loader = $this->createMock('Symfony\Component\Validator\Mapping\Loader\LoaderInterface');
         $loader
             ->expects($this->any())
@@ -384,11 +378,11 @@ class EnumValueTypeTest extends TypeTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConstraintValidatorFactoryInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ConstraintValidatorFactoryInterface
      */
     protected function getConstraintValidatorFactory()
     {
-        /* @var $factory \PHPUnit_Framework_MockObject_MockObject|ConstraintValidatorFactoryInterface */
+        /* @var $factory \PHPUnit\Framework\MockObject\MockObject|ConstraintValidatorFactoryInterface */
         $factory = $this->createMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
 
         $factory->expects($this->any())
@@ -448,7 +442,7 @@ class EnumValueTypeTest extends TypeTestCase
      * @param string $enumCode
      * @param string[] $immutableCodes
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProvider($hasConfig = false, $enumCode = '', array $immutableCodes = [])
     {
@@ -485,7 +479,7 @@ class EnumValueTypeTest extends TypeTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfiguredForm()
     {

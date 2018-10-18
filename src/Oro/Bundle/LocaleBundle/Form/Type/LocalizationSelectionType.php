@@ -46,6 +46,14 @@ class LocalizationSelectionType extends AbstractType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getBlockPrefix()
+    {
         return static::NAME;
     }
 
@@ -86,7 +94,7 @@ class LocalizationSelectionType extends AbstractType
             },
             'compact' => false,
             'full_localization_list' => false,
-            'empty_value' => '',
+            'placeholder' => '',
             'translatable_options' => false,
             'configs' => [
                 'placeholder' => 'oro.locale.localization.form.placeholder.select_localization',
@@ -118,10 +126,10 @@ class LocalizationSelectionType extends AbstractType
      */
     protected function checkLocalizations(array $localizations)
     {
-        foreach ($localizations as $id => $label) {
+        foreach ($localizations as $label => $id) {
             $localization = $this->localizationManager->getLocalization($id);
             if (!($localization instanceof Localization)) {
-                unset($localizations[$id]);
+                unset($localizations[$label]);
             }
         }
 
@@ -133,7 +141,7 @@ class LocalizationSelectionType extends AbstractType
      */
     public function getParent()
     {
-        return OroChoiceType::NAME;
+        return OroChoiceType::class;
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Form\Type;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -31,8 +32,8 @@ class WidgetItemsType extends AbstractType
     {
         $builder->addEventSubscriber($this->itemsSubscriber);
 
-        $builder->add('items', 'collection', [
-            'type' => 'oro_type_widget_item',
+        $builder->add('items', CollectionType::class, [
+            'entry_type' => WidgetItemType::class,
         ]);
     }
 
@@ -46,10 +47,8 @@ class WidgetItemsType extends AbstractType
             'item_label',
         ]);
 
-        $resolver->setAllowedTypes([
-            'widget_name' => 'string',
-            'item_label'  => 'string',
-        ]);
+        $resolver->setAllowedTypes('widget_name', 'string');
+        $resolver->setAllowedTypes('item_label', 'string');
     }
 
     /**

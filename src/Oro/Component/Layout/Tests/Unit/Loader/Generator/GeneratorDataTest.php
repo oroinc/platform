@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit\Loader\Generator;
 
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 
-class GeneratorDataTest extends \PHPUnit_Framework_TestCase
+class GeneratorDataTest extends \PHPUnit\Framework\TestCase
 {
     public function testFilenameShouldBeOptional()
     {

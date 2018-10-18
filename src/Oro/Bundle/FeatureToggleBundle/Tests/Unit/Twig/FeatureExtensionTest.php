@@ -6,11 +6,11 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Twig\FeatureExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class FeatureExtensionTest extends \PHPUnit_Framework_TestCase
+class FeatureExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $featureChecker;
 
     /** @var FeatureExtension */

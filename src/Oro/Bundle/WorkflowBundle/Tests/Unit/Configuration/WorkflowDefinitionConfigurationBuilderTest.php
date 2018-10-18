@@ -18,9 +18,9 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 
-class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowAssembler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowAssembler|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowAssembler;
 
     /** @var WorkflowDefinitionConfigurationBuilder */
@@ -95,7 +95,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             );
         }
 
-        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
         $workflow = $this->getMockBuilder(Workflow::class)
             ->disableOriginalConstructor()
             ->setMethods(['getStepManager', 'getAttributeManager', 'getRestrictions', 'getTransitionManager'])

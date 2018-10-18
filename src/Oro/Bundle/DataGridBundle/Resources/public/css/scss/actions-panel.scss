@@ -1,0 +1,13 @@
+/* @theme: admin.oro; */
+
+.actions-panel {
+    margin-#{$start}: $oro-datagrid-actions-panel-offset;
+
+    .action {
+        margin-#{$end}: $oro-datagrid-actions-panel-action-offset;
+
+        &:last-child {
+            margin-#{$end}: 0;
+        }
+    }
+}

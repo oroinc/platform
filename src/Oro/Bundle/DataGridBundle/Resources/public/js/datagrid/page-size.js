@@ -34,6 +34,9 @@ define([
         /** @property */
         hidden: false,
 
+        /** @property */
+        showLabels: false,
+
         /**
          * @inheritDoc
          */
@@ -121,16 +124,16 @@ define([
                 this.items,
                 _.bind(
                     function(item) {
-                        return item.size === undefined ?
-                            this.collection.state.pageSize === item : this.collection.state.pageSize === item.size;
+                        return item.size === undefined
+                            ? this.collection.state.pageSize === item : this.collection.state.pageSize === item.size;
                     },
                     this
                 )
             );
 
             if (currentSizeLabel.length > 0) {
-                currentSizeLabel = _.isUndefined(currentSizeLabel[0].label) ?
-                    currentSizeLabel[0] : currentSizeLabel[0].label;
+                currentSizeLabel = _.isUndefined(currentSizeLabel[0].label)
+                    ? currentSizeLabel[0] : currentSizeLabel[0].label;
             } else {
                 currentSizeLabel = this.items[0];
             }
@@ -139,7 +142,8 @@ define([
                 disabled: !this.enabled || !this.collection.state.totalRecords,
                 collectionState: this.collection.state,
                 items: this.items,
-                currentSizeLabel: currentSizeLabel
+                currentSizeLabel: currentSizeLabel,
+                showLabels: this.showLabels
             })));
 
             if (this.hidden) {

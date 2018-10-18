@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Event\Action\ChannelEnableEvent;
 
-class ChannelEnableEventTest extends \PHPUnit_Framework_TestCase
+class ChannelEnableEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetName()
     {

@@ -6,15 +6,15 @@ use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 
-class ResourceFileImportProcessorTest extends \PHPUnit_Framework_TestCase
+class ResourceFileImportProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigFileReaderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigFileReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $reader;
 
-    /** @var ConfigImportProcessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigImportProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $parentProcessor;
 
-    /** @var \SplFileInfo|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \SplFileInfo|\PHPUnit\Framework\MockObject\MockObject */
     private $contentFile;
 
     /** @var ResourceFileImportProcessor */

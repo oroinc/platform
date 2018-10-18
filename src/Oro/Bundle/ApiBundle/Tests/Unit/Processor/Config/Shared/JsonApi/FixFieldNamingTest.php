@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 class FixFieldNamingTest extends ConfigProcessorTestCase
 {
     /** @var FixFieldNaming */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -41,7 +41,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'id' => null,
+                'id' => null
             ]
         ];
 
@@ -52,7 +52,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             [
                 'exclusion_policy' => 'all',
                 'fields'           => [
-                    'id' => null,
+                    'id' => null
                 ]
             ],
             $this->context->getResult()
@@ -65,7 +65,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             'exclusion_policy'       => 'all',
             'identifier_field_names' => ['id'],
             'fields'                 => [
-                'id' => null,
+                'id' => null
             ]
         ];
 
@@ -77,7 +77,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                 'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
-                    'id' => null,
+                    'id' => null
                 ]
             ],
             $this->context->getResult()
@@ -91,7 +91,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             'identifier_field_names' => ['name'],
             'fields'                 => [
                 'name' => null,
-                'id'   => null,
+                'id'   => null
             ]
         ];
 
@@ -108,7 +108,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                     ],
                     'classId' => [
                         'property_path' => 'id'
-                    ],
+                    ]
                 ]
             ],
             $this->context->getResult()
@@ -121,7 +121,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             'exclusion_policy'       => 'all',
             'identifier_field_names' => ['name'],
             'fields'                 => [
-                'id' => null,
+                'id' => null
             ]
         ];
 
@@ -135,7 +135,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                 'fields'                 => [
                     'classId' => [
                         'property_path' => 'id'
-                    ],
+                    ]
                 ]
             ],
             $this->context->getResult()
@@ -149,7 +149,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             'identifier_field_names' => ['id', 'id1'],
             'fields'                 => [
                 'id'  => null,
-                'id1' => null,
+                'id1' => null
             ]
         ];
 
@@ -164,7 +164,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                     'classId' => [
                         'property_path' => 'id'
                     ],
-                    'id1'     => null,
+                    'id1'     => null
                 ]
             ],
             $this->context->getResult()
@@ -180,7 +180,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                 'id'  => [
                     'property_path' => 'realId'
                 ],
-                'id1' => null,
+                'id1' => null
             ]
         ];
 
@@ -195,7 +195,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                     'classId' => [
                         'property_path' => 'realId'
                     ],
-                    'id1'     => null,
+                    'id1'     => null
                 ]
             ],
             $this->context->getResult()
@@ -209,7 +209,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             'identifier_field_names' => ['id1', 'id2'],
             'fields'                 => [
                 'id1' => null,
-                'id2' => null,
+                'id2' => null
             ]
         ];
 
@@ -222,7 +222,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                 'identifier_field_names' => ['id1', 'id2'],
                 'fields'                 => [
                     'id1' => null,
-                    'id2' => null,
+                    'id2' => null
                 ]
             ],
             $this->context->getResult()
@@ -234,7 +234,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'type' => null,
+                'type' => null
             ]
         ];
 
@@ -247,7 +247,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'classType' => [
                         'property_path' => 'type'
-                    ],
+                    ]
                 ]
             ],
             $this->context->getResult()
@@ -262,7 +262,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             'fields'                 => [
                 'id' => [
                     'property_path' => 'realId'
-                ],
+                ]
             ]
         ];
 
@@ -276,7 +276,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                 'fields'                 => [
                     'id' => [
                         'property_path' => 'realId'
-                    ],
+                    ]
                 ]
             ],
             $this->context->getResult()
@@ -292,7 +292,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                 'name' => null,
                 'id'   => [
                     'property_path' => 'realId'
-                ],
+                ]
             ]
         ];
 
@@ -309,7 +309,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                     ],
                     'classId' => [
                         'property_path' => 'realId'
-                    ],
+                    ]
                 ]
             ],
             $this->context->getResult()
@@ -323,7 +323,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             'fields'           => [
                 'type' => [
                     'property_path' => 'realType'
-                ],
+                ]
             ]
         ];
 
@@ -336,7 +336,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'classType' => [
                         'property_path' => 'realType'
-                    ],
+                    ]
                 ]
             ],
             $this->context->getResult()
@@ -357,7 +357,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             'fields'                 => [
                 'id'      => null,
                 'classId' => null,
-                'name'    => null,
+                'name'    => null
             ]
         ];
 
@@ -377,7 +377,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             'exclusion_policy' => 'all',
             'fields'           => [
                 'type'      => null,
-                'classType' => null,
+                'classType' => null
             ]
         ];
 

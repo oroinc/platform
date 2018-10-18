@@ -7,7 +7,7 @@ use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerI
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity;
 
-class EntityApiHandlerProcessorTest extends \PHPUnit_Framework_TestCase
+class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EntityApiHandlerProcessor
@@ -132,7 +132,7 @@ class EntityApiHandlerProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityApiHandlerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|EntityApiHandlerInterface
      */
     protected function getHandlerMock()
     {

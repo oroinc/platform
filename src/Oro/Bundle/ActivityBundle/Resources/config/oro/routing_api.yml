@@ -1,5 +1,9 @@
-oro_activity_api:
-    resource: Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityController
+oro_activity_target_api:
+    resource: Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityTargetController
+    type:     rest
+
+oro_activity_context_api:
+    resource: Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityContextController
     type:     rest
 
 oro_activity_entity_api:
@@ -10,10 +14,6 @@ oro_activity_search_api:
     resource: Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivitySearchController
     type:     rest
 
-oro_activity_target_api:
-    resource: Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityTargetController
-    type:     rest
-
-oro_activity_context_api:
-    resource: Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityContextController
+oro_activity_api:
+    resource: Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityController
     type:     rest

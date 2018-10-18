@@ -13,18 +13,18 @@ use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class IndexerTest extends \PHPUnit_Framework_TestCase
+class IndexerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Indexer */
     protected $indexService;
 
-    /** @var ObjectMapper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ObjectMapper|\PHPUnit\Framework\MockObject\MockObject */
     protected $mapper;
 
-    /** @var EngineInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EngineInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $engine;
 
-    /** @var SecurityProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var SecurityProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $securityProvider;
 
     /** @var array */
@@ -39,7 +39,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             $this->config
         );
 
-        /** @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject $eventDispatcher */
+        /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
         $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()->getMock();
         $mapperProvider = new SearchMappingProvider($eventDispatcher);
@@ -55,7 +55,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             ->method('isProtectedEntity')
             ->will($this->returnValue(true));
 
-        /** @var AclHelper|\PHPUnit_Framework_MockObject_MockObject $searchAclHelper */
+        /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject $searchAclHelper */
         $searchAclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Search\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();

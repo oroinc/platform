@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
 use Doctrine\DBAL\Connection;
@@ -11,6 +12,9 @@ use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Mysql DB driver used to run search queries for ORM search engine
+ */
 class PdoMysql extends BaseDriver
 {
     const ENGINE_MYISAM = 'MyISAM';
@@ -265,7 +269,9 @@ class PdoMysql extends BaseDriver
         }
 
         if ($setOrderBy) {
-            $qb->addSelect(sprintf('MATCH_AGAINST(%s.value, :value%s) as rankField%s', $joinAlias, $index, $index))
+            $qb->addSelect(
+                sprintf('MATCH_AGAINST(%s.value, :value%s) * search.weight as rankField%s', $joinAlias, $index, $index)
+            )
                 ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
         }
 
@@ -329,7 +335,7 @@ class PdoMysql extends BaseDriver
         $fieldParameter = 'field' . $index;
         $valueParameter = 'value' . $index;
 
-        // TODO Need to clarify requirements for "not contains" in scope of CRM-215
+        // Need to clarify requirements for "not contains" in scope of CRM-215
         $qb->setParameter($valueParameter, '%' . implode('%', $words) . '%');
 
         $whereExpr = "$joinAlias.value NOT LIKE :$valueParameter";

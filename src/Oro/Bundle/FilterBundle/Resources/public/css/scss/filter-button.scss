@@ -1,0 +1,15 @@
+/* @theme: admin.oro; */
+
+.ui-multiselect {
+    &.filter-list,
+    &.select-filter-widget {
+        padding: 9px 0 7px 6px;
+
+        font-size: 13px;
+        font-weight: bold;
+        line-height: 1em;
+
+        background: none;
+        border: none;
+    }
+}

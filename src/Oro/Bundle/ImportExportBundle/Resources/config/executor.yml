@@ -3,7 +3,7 @@ parameters:
 
 services:
     oro_importexport.job_executor:
-        class: %oro_importexport.job_executor.class%
+        class: '%oro_importexport.job_executor.class%'
         arguments:
             - '@akeneo_batch.connectors'
             - '@akeneo_batch.job_repository'

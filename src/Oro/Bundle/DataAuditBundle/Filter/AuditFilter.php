@@ -11,6 +11,7 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
 class AuditFilter extends EntityFilter
@@ -127,7 +128,10 @@ class AuditFilter extends EntityFilter
         );
         $this->applyNewAuditValueFilter($auditDs, $objectClass, $fieldName, $data);
 
-        $this->applyFilterToClause($ds, $ds->expr()->exists($auditQb->getQuery()->getDQL()));
+        $dql = $auditQb->getQuery()->getDQL();
+
+        QueryBuilderUtil::checkParameter($dql);
+        $this->applyFilterToClause($ds, $ds->expr()->exists($dql));
 
         foreach ($auditQb->getParameters() as $parameter) {
             $qb->setParameter(
@@ -229,6 +233,6 @@ class AuditFilter extends EntityFilter
      */
     protected function getFormType()
     {
-        return FilterType::NAME;
+        return FilterType::class;
     }
 }

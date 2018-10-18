@@ -14,13 +14,13 @@ use Psr\Log\LoggerInterface;
  */
 class ComputeFileContent implements ProcessorInterface
 {
-    const CONTENT_FIELD_NAME = 'content';
+    private const CONTENT_FIELD_NAME = 'content';
 
     /** @var FileManager */
-    protected $fileManager;
+    private $fileManager;
 
     /** @var LoggerInterface */
-    protected $logger;
+    private $logger;
 
     /**
      * @param FileManager     $fileManager
@@ -44,20 +44,12 @@ class ComputeFileContent implements ProcessorInterface
             return;
         }
 
-        $config = $context->getConfig();
-
-        $contentField = $config->getField(self::CONTENT_FIELD_NAME);
-        if (null === $contentField
-            || $contentField->isExcluded()
-            || array_key_exists(self::CONTENT_FIELD_NAME, $data)
-        ) {
-            // the content field is undefined, excluded or already added
+        if (!$context->isFieldRequested(self::CONTENT_FIELD_NAME, $data)) {
             return;
         }
 
-        $fileNameFieldName = $config->findFieldNameByPropertyPath('filename');
+        $fileNameFieldName = $context->getResultFieldName('filename');
         if (!$fileNameFieldName || empty($data[$fileNameFieldName])) {
-            // the file name field is undefined or its value is not specified
             return;
         }
 
@@ -73,7 +65,7 @@ class ComputeFileContent implements ProcessorInterface
      *
      * @return string|null
      */
-    protected function getFileContent($fileName)
+    private function getFileContent(string $fileName): ?string
     {
         $content = null;
         try {

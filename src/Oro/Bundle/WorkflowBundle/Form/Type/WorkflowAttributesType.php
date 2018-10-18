@@ -400,15 +400,10 @@ class WorkflowAttributesType extends AbstractType
             ]
         );
 
-        $resolver->setAllowedTypes(
-            [
-                'workflow_item' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
-                'workflow' => 'Oro\Bundle\WorkflowBundle\Model\Workflow',
-                'attribute_fields' => 'array',
-                'attribute_default_values' => 'array',
-                'form_init' => 'Oro\Component\Action\Action\ActionInterface',
-            ]
-        );
+        $resolver->setAllowedTypes('workflow_item', 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
+        $resolver->setAllowedTypes('attribute_fields', 'array');
+        $resolver->setAllowedTypes('attribute_default_values', 'array');
+        $resolver->setAllowedTypes('form_init', 'Oro\Component\Action\Action\ActionInterface');
     }
 
     /**

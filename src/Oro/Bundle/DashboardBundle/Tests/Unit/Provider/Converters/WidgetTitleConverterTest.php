@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\Converters;
 
 use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetTitleConverter;
 
-class WidgetTitleConverterTest extends \PHPUnit_Framework_TestCase
+class WidgetTitleConverterTest extends \PHPUnit\Framework\TestCase
 {
     protected $converter;
 

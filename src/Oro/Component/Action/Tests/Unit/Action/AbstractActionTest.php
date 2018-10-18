@@ -9,14 +9,14 @@ use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayCondition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class AbstractActionTest extends \PHPUnit_Framework_TestCase
+class AbstractActionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var AbstractAction|\PHPUnit_Framework_MockObject_MockObject
+     * @var AbstractAction|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $action;
 
-    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $dispatcher;
 
     protected function setUp()

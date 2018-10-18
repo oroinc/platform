@@ -5,9 +5,9 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclPrivilegeFilterPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class AclPrivilegeFilterPassTest extends \PHPUnit_Framework_TestCase
+class AclPrivilegeFilterPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $builder;
 
     /**
@@ -20,7 +20,7 @@ class AclPrivilegeFilterPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        /* @var $compilerPass AclPrivilegeFilterPass|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $compilerPass AclPrivilegeFilterPass|\PHPUnit\Framework\MockObject\MockObject */
         $compilerPass = $this->getMockBuilder(AclPrivilegeFilterPass::class)
             ->setMethods(['registerTaggedServices'])
             ->getMock();

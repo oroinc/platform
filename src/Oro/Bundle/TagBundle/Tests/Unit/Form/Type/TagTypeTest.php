@@ -4,7 +4,7 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\TagBundle\Form\Type\TagType;
 
-class TagTypeTest extends \PHPUnit_Framework_TestCase
+class TagTypeTest extends \PHPUnit\Framework\TestCase
 {
 
     /**
@@ -30,11 +30,6 @@ class TagTypeTest extends \PHPUnit_Framework_TestCase
             ->with($this->isType('array'));
 
         $this->type->configureOptions($resolver);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_tag_tag', $this->type->getName());
     }
 
     public function testBuildForm()

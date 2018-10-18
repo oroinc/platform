@@ -17,6 +17,9 @@ use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * Doctrine event listener which collects changes and updates search index
+ */
 class IndexListener implements OptionalListenerInterface
 {
     /**
@@ -28,12 +31,6 @@ class IndexListener implements OptionalListenerInterface
      * @var IndexerInterface
      */
     protected $searchIndexer;
-
-    /**
-     * @var array
-     * @deprecated since 1.8 Please use mappingProvider for mapping config
-     */
-    protected $entitiesConfig = [];
 
     /**
      * @var SearchMappingProvider
@@ -84,15 +81,6 @@ class IndexListener implements OptionalListenerInterface
     public function setEnabled($enabled = true)
     {
         $this->enabled = $enabled;
-    }
-
-    /**
-     * @param array $entities
-     * @deprecated since 1.8 Please use mappingProvider for mapping config
-     */
-    public function setEntitiesConfig(array $entities)
-    {
-        $this->entitiesConfig = $entities;
     }
 
     /**

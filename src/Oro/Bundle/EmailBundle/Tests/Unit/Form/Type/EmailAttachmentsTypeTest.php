@@ -5,10 +5,11 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 
-class EmailAttachmentsTypeTest extends \PHPUnit_Framework_TestCase
+class EmailAttachmentsTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailAttachmentsType
@@ -20,14 +21,9 @@ class EmailAttachmentsTypeTest extends \PHPUnit_Framework_TestCase
         $this->emailAttachmentsType = new EmailAttachmentsType();
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_email_attachments', $this->emailAttachmentsType->getName());
-    }
-
     public function testGetParent()
     {
-        $this->assertEquals('collection', $this->emailAttachmentsType->getParent());
+        $this->assertEquals(CollectionType::class, $this->emailAttachmentsType->getParent());
     }
 
     public function testSanitizeAttachmentsWithCorrectExistAttachments()

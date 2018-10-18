@@ -16,10 +16,12 @@ entity_config:
                         filterable:         true
                         show_filter:        false
                     form:
-                        type:               oro_entity_config_choice
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
-                            empty_value:    false
+                            choices:
+                                No:         0
+                                Yes:        1
+                            placeholder:    false
                             block:          other
                             label:          oro.dataaudit.entity_config.entity.items.auditable
 
@@ -43,10 +45,12 @@ entity_config:
                         required:           true
                         sortable:           true
                     form:
-                        type:               oro_entity_config_choice
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
-                            empty_value:    false
+                            choices:
+                                No:         0
+                                Yes:        1
+                            placeholder:    false
                             block:          other
                             label:          oro.dataaudit.entity_config.field.items.auditable
 

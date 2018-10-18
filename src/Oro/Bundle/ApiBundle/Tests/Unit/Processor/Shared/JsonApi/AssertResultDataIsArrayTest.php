@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 class AssertResultDataIsArrayTest extends GetListProcessorTestCase
 {
     /** @var AssertResultDataIsArray */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

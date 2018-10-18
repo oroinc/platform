@@ -13,7 +13,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-class AclManagerTest extends \PHPUnit_Framework_TestCase
+class AclManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AclManager
@@ -21,12 +21,12 @@ class AclManagerTest extends \PHPUnit_Framework_TestCase
     protected $manager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
      */
     protected $doctrineHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|WorkflowRegistry
+     * @var \PHPUnit\Framework\MockObject\MockObject|WorkflowRegistry
      */
     protected $workflowRegistry;
 

@@ -1,10 +1,8 @@
-OroImapBundle
-=============
+# OroImapBundle
 
-This bundle provides a functionality to work with the email servers through IMAP protocol.
+OroImapBundle enables the data synchronization between local user mailboxes provided by OroEmailBundle and remote email servers using the capabilities of the IMAP protocol.
 
-Dependencies
-------------
+## Dependencies
 
 "zendframework/zend-mail": "2.1.5"
 
@@ -12,8 +10,7 @@ Notes:
 - We have to use version 2.1.5 due an issue with *binary* content transfer encoding in version 2.1.6.
 
 
-Usage
------
+## Usage
 
 ``` php
 <?php
@@ -52,21 +49,21 @@ Usage
     $folders = $imapFolderManager->getFolders(null, true);
 ```
 
-Synchronization with IMAP servers
----------------------------------
+## Synchronization with IMAP servers
+
 To synchronize personal emails using Oro application, users need to configure their own IMAP mailbox on the user details page. The required information is the host, port, security type and credentials for the IMAP integration.
 
 During the synchronization, Oro application loads emails from the user's inbox and outbox folders using the following algorithm:
 
  - If a user's mailbox is synchronized for the first time, Oro application loads emails sent and received last year only.
  - Only emails in the folders that are enabled for synchronization in the User Configuration settings are synchronized. To check the settings,select **My user** in the user menu, click **Edit** on the user details page, and navigate to the Email Synchronization Settings section.
- - When an empty folder is deleted on the email server, during the synchronization via IMAP it gets deleted in the OroCRM. Folders with the existing emails that have already been synchronized remain intact and are kept by the OroCRM.
+ - When an empty folder is deleted on the email server, during the synchronization via IMAP it gets deleted in OroCRM. Folders with the existing emails that have already been synchronized remain intact and are kept by OroCRM.
  - When the synchronization settings change, folders are synchronized automatically, but not the emails.
 
 By default the synchronization is executed by a CRON job every 30 minutes. Outside that schedule, launch synchronization manually using the following command:
 
 ```bash
-php app/console oro:cron:imap-sync
+php bin/console oro:cron:imap-sync
 ```
 
 Email synchronization functionality is implemented in the following classes:

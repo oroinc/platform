@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
@@ -14,6 +14,7 @@ use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -26,6 +27,7 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\Testing\Unit\EntityTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -33,8 +35,11 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  * Class PreparingHttpImportMessageProcessorTest
  * @package Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import
  */
-class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class PreHttpImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
+    use EntityTrait;
+    private const USER_ID = 32;
+
     public function testImportProcessCanBeConstructedWithRequiredAttributes()
     {
         $chunkHttpImportMessageProcessor = new PreHttpImportMessageProcessor(
@@ -45,6 +50,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createFileManagerMock(),
             $this->createHttpImportHandlerMock(),
             $this->createWriterChainMock(),
+            $this->createNotificationsettingsStub(),
             100
         );
 
@@ -77,6 +83,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createFileManagerMock(),
             $this->createHttpImportHandlerMock(),
             $this->createWriterChainMock(),
+            $this->createNotificationsettingsStub(),
             100
         );
 
@@ -128,6 +135,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $fileManager,
             $importHandler,
             $writerChain,
+            $this->createNotificationsettingsStub(),
             100
         );
 
@@ -205,6 +213,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $fileManager,
             $handler,
             $writerChain,
+            $this->createNotificationsettingsStub(),
             100
         );
 
@@ -289,6 +298,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $fileManager,
             $handler,
             $writerChain,
+            $this->createNotificationsettingsStub(),
             100
         );
 
@@ -350,14 +360,14 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('An error occurred while reading file test.csv: "test Error"');
 
         $producer = $this->createMessageProducerInterfaceMock();
+        $expectedSender = From::emailAddress('sender_email@example.com', 'sender_name');
         $producer
             ->expects($this->once())
             ->method('send')
             ->with(
                 NotificationTopics::SEND_NOTIFICATION_EMAIL,
                 [
-                    'fromEmail' => 'sender_email@example.com',
-                    'fromName' => 'sender_name',
+                    'sender' => $expectedSender->toArray(),
                     'toEmail' => 'useremail@example.com',
                     'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_ERROR,
                     'body' => [
@@ -365,6 +375,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
                         'error' => 'The import file could not be imported due to a fatal error. ' .
                                    'Please check its integrity and try again!',
                     ],
+                    'recipientUserId' => self::USER_ID,
                     'contentType' => 'text/html',
                 ]
             );
@@ -383,11 +394,11 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $fileManager,
             $handler,
             $writerChain,
+            $this->createNotificationsettingsStub(),
             100
         );
 
-        $user = new User();
-        $user->setEmail('useremail@example.com');
+        $user = $this->getEntity(User::class, ['id' => self::USER_ID, 'email' => 'useremail@example.com']);
 
         $userRepository = $this->createMock(UserRepository::class);
         $userRepository
@@ -408,7 +419,6 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($em);
 
         $processor->setManagerRegistry($managerRegistry);
-        $processor->setConfigManager($this->createConfigManagerStub());
 
         $result = $processor->process($message, $this->createSessionMock());
 
@@ -533,6 +543,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $fileManager,
             $handler,
             $writerChain,
+            $this->createNotificationsettingsStub(),
             100
         );
 
@@ -574,7 +585,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|HttpImportHandler
+     * @return \PHPUnit\Framework\MockObject\MockObject|HttpImportHandler
      */
     protected function createHttpImportHandlerMock()
     {
@@ -582,7 +593,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|WriterChain
+     * @return \PHPUnit\Framework\MockObject\MockObject|WriterChain
      */
     protected function createWriterChainMock()
     {
@@ -590,7 +601,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
      */
     protected function createJobRunnerMock()
     {
@@ -598,7 +609,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
      */
     protected function createMessageProducerInterfaceMock()
     {
@@ -606,7 +617,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     protected function createLoggerInterfaceMock()
     {
@@ -614,7 +625,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|RegistryInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|RegistryInterface
      */
     protected function createDoctrineMock()
     {
@@ -622,7 +633,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DependentJobService
+     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobService
      */
     protected function createDependentJobMock()
     {
@@ -630,7 +641,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageInterface
      */
     private function createMessageMock()
     {
@@ -638,7 +649,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionMock()
     {
@@ -646,7 +657,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DependentJobContext
+     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobContext
      */
     private function createDependentJobContextMock()
     {
@@ -654,7 +665,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FileManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|FileManager
      */
     private function createFileManagerMock()
     {
@@ -662,7 +673,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FileStreamWriter
+     * @return \PHPUnit\Framework\MockObject\MockObject|FileStreamWriter
      */
     private function createWriterMock()
     {
@@ -670,7 +681,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @return \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
      */
     private function createManagerRegistry()
     {
@@ -678,24 +689,16 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConfigManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|NotificationSettings
      */
-    private function createConfigManagerStub()
+    private function createNotificationsettingsStub()
     {
-        $configManager = $this->createMock(ConfigManager::class);
-        $configManager
-            ->expects($this->at(0))
-            ->method('get')
-            ->with($this->equalTo('oro_notification.email_notification_sender_email'))
-            ->willReturn('sender_email@example.com')
-        ;
-        $configManager
-            ->expects($this->at(1))
-            ->method('get')
-            ->with($this->equalTo('oro_notification.email_notification_sender_name'))
-            ->willReturn('sender_name')
-        ;
+        $notificationSettings = $this->createMock(NotificationSettings::class);
+        $notificationSettings
+            ->expects($this->any())
+            ->method('getSender')
+            ->willReturn(From::emailAddress('sender_email@example.com', 'sender_name'));
 
-        return $configManager;
+        return $notificationSettings;
     }
 }

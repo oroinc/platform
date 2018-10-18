@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 use Oro\Bundle\UserBundle\Model\Gender;
 use Oro\Bundle\UserBundle\Provider\GenderProvider;
 
-class GenderProviderTest extends \PHPUnit_Framework_TestCase
+class GenderProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var GenderProvider
@@ -15,16 +15,16 @@ class GenderProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    protected $expectedChoices = array(
-        Gender::MALE   => 'oro.user.gender.male.translated',
-        Gender::FEMALE => 'oro.user.gender.female.translated',
-    );
+    protected $expectedChoices = [
+        'oro.user.gender.male.translated' => Gender::MALE,
+        'oro.user.gender.female.translated' => Gender::FEMALE,
+    ];
 
     protected function setUp()
     {
         $translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
-            ->setMethods(array('trans'))
+            ->setMethods(['trans'])
             ->getMockForAbstractClass();
         $translator->expects($this->exactly(2))
             ->method('trans')
@@ -53,7 +53,8 @@ class GenderProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLabelByName()
     {
-        $this->assertEquals($this->expectedChoices[Gender::MALE], $this->genderProvider->getLabelByName(Gender::MALE));
+        $expectedLabel = array_search(Gender::MALE, $this->expectedChoices, true);
+        $this->assertEquals($expectedLabel, $this->genderProvider->getLabelByName(Gender::MALE));
     }
 
     /**

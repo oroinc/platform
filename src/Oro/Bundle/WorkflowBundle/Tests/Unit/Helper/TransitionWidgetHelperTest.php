@@ -6,9 +6,9 @@ use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper;
 
-class TransitionWidgetHelperTest extends \PHPUnit_Framework_TestCase
+class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var TransitionWidgetHelper */

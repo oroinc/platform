@@ -5,9 +5,9 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 use Doctrine\ORM\Internal\Hydration\IterableResult;
 use Oro\Bundle\EntityBundle\ORM\SingleObjectIterableResultDecorator;
 
-class SingleObjectIterableResultDecoratorTest extends \PHPUnit_Framework_TestCase
+class SingleObjectIterableResultDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var IterableResult|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var IterableResult|\PHPUnit\Framework\MockObject\MockObject */
     protected $iterableResult;
 
     /** @var SingleObjectIterableResultDecorator */

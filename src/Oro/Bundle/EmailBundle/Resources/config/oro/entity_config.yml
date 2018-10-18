@@ -8,10 +8,12 @@ entity_config:
                         default_value:      true
                         allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, file, image, ref-one, manyToOne]
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
-                            empty_value:    false
+                            choices:
+                                No:         0
+                                Yes:        1
+                            placeholder:    false
                             block:          other
                             label:          oro.email.entity_config.email.field.items.available_in_template
     attachment:
@@ -23,10 +25,12 @@ entity_config:
                         priority:               100
                         default_value:          false
                     form:
-                        type:                   oro_email_link_to_scope
+                        type:                   Oro\Bundle\EmailBundle\Form\Type\EmailLinkToScopeType
                         options:
                             block:              attachments
-                            choices:            ['oro.email.system_configuration.attachment_configuration.link_to_scope.choices.manual.label', 'oro.email.system_configuration.attachment_configuration.link_to_scope.choices.auto.label']
-                            empty_value:        false
+                            choices:
+                                oro.email.system_configuration.attachment_configuration.link_to_scope.choices.manual.label: 0
+                                oro.email.system_configuration.attachment_configuration.link_to_scope.choices.auto.label: 1
+                            placeholder:        false
                             required:           true
                             label:              oro.email.system_configuration.attachment_configuration.link_to_scope.label

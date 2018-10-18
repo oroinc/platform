@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\FormBundle\Form\Type\EntityTreeSelectType;
-use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\EntityIdentifierType;
+use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\EntityIdentifierType as EntityIdentifierTypeStub;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class EntityTreeSelectTypeTest extends FormIntegrationTestCase
@@ -27,7 +28,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $entityIdentifierType = new EntityIdentifierType(
+        $entityIdentifierType = new EntityIdentifierTypeStub(
             [
                 1 => new TestEntity(1)
             ]
@@ -36,16 +37,11 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    $entityIdentifierType->getName() => $entityIdentifierType,
+                    EntityIdentifierType::class => $entityIdentifierType,
                 ],
                 []
             )
         ];
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(EntityTreeSelectType::NAME, $this->formType->getName());
     }
 
     public function testGetBlockPrefix()
@@ -55,7 +51,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_entity_identifier', $this->formType->getParent());
+        $this->assertEquals(EntityIdentifierType::class, $this->formType->getParent());
     }
 
     /**
@@ -66,7 +62,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
      */
     public function testOptions(array $options, $data, array $expectedViewVars)
     {
-        $form = $this->factory->create($this->formType, null, $options);
+        $form = $this->factory->create(EntityTreeSelectType::class, null, $options);
         $form->submit($data);
         $view = $form->createView();
 

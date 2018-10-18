@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
+/**
+ * The class that contains a set of methods to simplify execution of console commands in a separate process.
+ */
 class CommandExecutor
 {
     const DEFAULT_TIMEOUT = 300;
@@ -31,13 +34,6 @@ class CommandExecutor
 
     /** @var array */
     protected $defaultOptions;
-
-    /**
-     * @var int
-     *
-     * @deprecated since 1.8. Use {@see getDefaultOption('process-timeout')} instead
-     */
-    protected $defaultTimeout = self::DEFAULT_TIMEOUT;
 
     /**
      * Constructor
@@ -266,25 +262,5 @@ class CommandExecutor
         }
 
         return $phpPath;
-    }
-
-    /**
-     * @return int
-     *
-     * @deprecated since 1.8. Use {@see getDefaultOption('process-timeout')} instead
-     */
-    public function getDefaultTimeout()
-    {
-        return $this->getDefaultOption('process-timeout');
-    }
-
-    /**
-     * @param int $defaultTimeout
-     *
-     * @deprecated since 1.8. Use {@see setDefaultOption('process-timeout', $timeout)} instead
-     */
-    public function setDefaultTimeout($defaultTimeout)
-    {
-        $this->setDefaultOption('process-timeout', $defaultTimeout);
     }
 }

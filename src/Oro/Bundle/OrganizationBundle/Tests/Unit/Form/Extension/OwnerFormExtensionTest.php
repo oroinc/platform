@@ -10,6 +10,7 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
 use Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension;
+use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectAutocomplete;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
@@ -19,6 +20,8 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Form\Type\UserAclSelectType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
@@ -26,27 +29,27 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
+class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OwnershipMetadataProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface */
     private $ownershipMetadataProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|BusinessUnitManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|BusinessUnitManager */
     private $businessUnitManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     private $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
     private $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FormBuilder */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormBuilder */
     private $builder;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|User */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|User */
     private $user;
 
     /** @var array */
@@ -70,7 +73,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var Organization */
     private $organization;
 
-    /** @var EntityOwnerAccessor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityOwnerAccessor|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityOwnerAccessor;
 
     protected function setUp()
@@ -206,7 +209,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->mockConfigs(array('is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_USER));
         $this->builder->expects($this->once())->method('add')->with(
             $this->fieldName,
-            'oro_user_acl_select'
+            UserAclSelectType::class
         );
         $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }
@@ -230,9 +233,9 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->builder->expects($this->once())->method('add')->with(
             $this->fieldName,
-            'oro_type_business_unit_select_autocomplete',
+            BusinessUnitSelectAutocomplete::class,
             array(
-                'empty_value' => 'oro.business_unit.form.choose_business_user',
+                'placeholder' => 'oro.business_unit.form.choose_business_user',
                 'label' => 'oro.user.owner.label',
                 'configs' => [
                     'multiple' => false,
@@ -268,17 +271,17 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($this->entityClassName)
             ->will($this->returnValue($metadata));
 
-        /** @var AclVoter|\PHPUnit_Framework_MockObject_MockObject $aclVoter */
+        /** @var AclVoter|\PHPUnit\Framework\MockObject\MockObject $aclVoter */
         $aclVoter = $this->getMockBuilder(AclVoter::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var OwnerTreeProvider|\PHPUnit_Framework_MockObject_MockObject $treeProvider */
+        /** @var OwnerTreeProvider|\PHPUnit\Framework\MockObject\MockObject $treeProvider */
         $treeProvider = $this->getMockBuilder(OwnerTreeProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var ClassMetadataInfo|\PHPUnit_Framework_MockObject_MockObject $classMetadata */
+        /** @var ClassMetadataInfo|\PHPUnit\Framework\MockObject\MockObject $classMetadata */
         $classMetadata = $this->getMockBuilder(ClassMetadataInfo::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -330,17 +333,18 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->mockConfigs(array('is_granted' => false, 'owner_type' => OwnershipType::OWNER_TYPE_BUSINESS_UNIT));
         $this->builder->expects($this->once())->method('add')->with(
             $this->fieldName,
-            'entity',
-            array(
-                'class' => 'OroOrganizationBundle:BusinessUnit',
+            EntityType::class,
+            [
+                'class' => BusinessUnit::class,
                 'property' => 'name',
-                'choices' => $this->businessUnits,
                 'mapped' => true,
                 'required' => true,
                 'constraints' => array(new NotBlank()),
                 'label' => 'oro.user.owner.label',
-                'translatable_options' => false
-            )
+                'translatable_options' => false,
+                'query_builder' => function () {
+                },
+            ]
         );
         $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }

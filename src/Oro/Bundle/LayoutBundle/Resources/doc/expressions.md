@@ -27,7 +27,7 @@ You can access following variables in your expressions:
 
 ## Encoders
 
-Out of the box **Oro Platform** comes with `json` expression encoder, but encoders for other formats could be easily 
+Out of the box **OroPlatform** comes with `json` expression encoder, but encoders for other formats could be easily 
 added to the system using DI tagging mechanism. An encoder class should implement the
 [ExpressionEncoderInterface](../../Layout/Encoder/ExpressionEncoderInterface.php) and be registered as a service with the
  `layout.expression.encoder`tag. The `format` tag attribute is also required.
@@ -53,7 +53,7 @@ Here, we the *visible* option depends on the context value. The following is an 
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         // this operation better to use on finishView but if you are really sure you can write like this
-        $view->vars['visible'] =  $options->get('visible', false);
+        $view->vars['visible'] =  $options['visible'] ?? false;
     }
     
     public function finishView(BlockView $view, BlockInterface $block)

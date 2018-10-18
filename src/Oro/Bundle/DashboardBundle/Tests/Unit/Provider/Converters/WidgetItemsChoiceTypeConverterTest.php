@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\Converters;
 
 use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetItemsChoiceTypeConverter;
 
-class WidgetItemsChoiceTypeConverterTest extends \PHPUnit_Framework_TestCase
+class WidgetItemsChoiceTypeConverterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetItemsChoiceTypeConverter */
     protected $converter;
@@ -24,8 +24,8 @@ class WidgetItemsChoiceTypeConverterTest extends \PHPUnit_Framework_TestCase
     public function testGetDefaultValue()
     {
         $choises = [
-            [1 => 'first'],
-            [2 => 'second']
+            ['first' => 1],
+            ['second' => 2],
         ];
 
         $config = [

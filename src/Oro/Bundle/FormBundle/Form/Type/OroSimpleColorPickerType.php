@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
@@ -40,14 +41,13 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
                     'custom_color_control' => null // hue, brightness, saturation, or wheel. defaults wheel
                 ]
             )
-            ->setNormalizers(
-                [
-                    'colors' => function (Options $options, $colors) {
-                        return $options['color_schema'] === 'custom'
-                            ? $colors
-                            : $this->getColors($options['color_schema']);
-                    }
-                ]
+            ->setNormalizer(
+                'colors',
+                function (Options $options, $colors) {
+                    return $options['color_schema'] === 'custom'
+                        ? $colors
+                        : $this->getColors($options['color_schema']);
+                }
             );
     }
 
@@ -99,7 +99,7 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
      */
     public function getParent()
     {
-        return 'hidden';
+        return HiddenType::class;
     }
 
     /**

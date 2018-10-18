@@ -23,8 +23,8 @@ define(function(require) {
         },
 
         execute: function() {
-            var newMode = this.datagrid.filterManager.getViewMode() === FiltersManager.STATE_VIEW_MODE ?
-                FiltersManager.MANAGE_VIEW_MODE : FiltersManager.STATE_VIEW_MODE;
+            var newMode = this.datagrid.filterManager.getViewMode() === FiltersManager.STATE_VIEW_MODE
+                ? FiltersManager.MANAGE_VIEW_MODE : FiltersManager.STATE_VIEW_MODE;
 
             this.datagrid.filterManager.setViewMode(newMode);
         },

@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
 use Oro\Component\Layout\Extension\Theme\Model\ResourceIterator;
 
-class ResourceIteratorTest extends \PHPUnit_Framework_TestCase
+class ResourceIteratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array */
     protected $resources = [

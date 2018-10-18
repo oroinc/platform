@@ -1,14 +1,22 @@
 define(function(require) {
     'use strict';
 
+    var PageMessagesView;
     var _ = require('underscore');
     var $ = require('jquery');
     var messenger = require('oroui/js/messenger');
     var PageRegionView = require('oroui/js/app/views/base/page-region-view');
+    var config = require('module').config();
 
-    var MessagesView;
+    config = _.extend({
+        template: null // default template is defined in messenger module
+    }, config);
 
-    MessagesView = PageRegionView.extend({
+    PageMessagesView = PageRegionView.extend({
+        optionNames: PageRegionView.prototype.optionNames.concat(['messages', 'initializeMessenger']),
+
+        initializeMessenger: false,
+
         /**
          * @type {Array}
          */
@@ -30,17 +38,43 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function MessagesView() {
-            MessagesView.__super__.constructor.apply(this, arguments);
+        constructor: function PageMessagesView(options) {
+            PageMessagesView.__super__.constructor.call(this, options);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        initialize: function(options) {
+            if (this.initializeMessenger) {
+                this._initializeMessenger();
+            }
+
+            return PageMessagesView.__super__.initialize.call(this, options);
+        },
+
+        /**
+         * Initialize messenger
+         */
+        _initializeMessenger: function() {
+            var options = {
+                container: this.$el
+            };
+
+            if (config.temlpate) {
+                options.temlpate = config.template;
+            }
+
+            messenger.setup(options);
         },
 
         delegateEvents: function() {
-            MessagesView.__super__.delegateEvents.call(this);
+            PageMessagesView.__super__.delegateEvents.call(this);
             $(window).on('beforeunload' + this.eventNamespace(), this.onBeforePageReload.bind(this));
         },
 
         undelegateEvents: function() {
-            MessagesView.__super__.undelegateEvents.call(this);
+            PageMessagesView.__super__.undelegateEvents.call(this);
             $(window).off('beforeunload' + this.eventNamespace());
         },
 
@@ -48,7 +82,13 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
-            return this;
+            _.each(this.messages, function(message) {
+                messenger.notificationFlashMessage(message.type, message.message, message.options);
+            });
+
+            this.messages = [];
+
+            return PageMessagesView.__super__.render.call(this);
         },
 
         onBeforePageReload: function() {
@@ -59,6 +99,9 @@ define(function(require) {
          * @inheritDoc
          */
         onPageUpdate: function(pageData, actionArgs, jqXHR, promises) {
+            if (this.disposed) {
+                return;
+            }
             this.data = _.pick(pageData, this.pageItems);
             this.actionArgs = actionArgs;
             this.route = actionArgs.route;
@@ -104,5 +147,5 @@ define(function(require) {
         }
     });
 
-    return MessagesView;
+    return PageMessagesView;
 });

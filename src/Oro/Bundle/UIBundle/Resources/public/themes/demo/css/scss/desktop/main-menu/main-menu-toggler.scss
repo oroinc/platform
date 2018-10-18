@@ -1,0 +1,11 @@
+/* @theme: admin.demo; */
+
+.main-menu-toggler {
+    color: $menu-toggler-color;
+
+    &:hover,
+    &:focus {
+        background-color: $menu-dropdown-background-color-active;
+        color: $menu-item-first-level-text-color-active;
+    }
+}

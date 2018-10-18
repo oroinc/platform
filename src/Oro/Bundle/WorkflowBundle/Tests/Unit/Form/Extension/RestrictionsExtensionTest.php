@@ -6,25 +6,26 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Form\Extension\RestrictionsExtension;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class RestrictionsExtensionTest extends FormIntegrationTestCase
 {
     /**
-     * @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $workflowManager;
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 
     /**
-     * @var RestrictionManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $restrictionsManager;
 
@@ -54,7 +55,7 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
     }
 
     /**
-     * @dataProvider testBuildFormDataProvider
+     * @dataProvider buildFormDataProvider
      *
      * @param array $options
      * @param array $fields
@@ -92,8 +93,8 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
 
         foreach ($fields as $field) {
             $this->assertEquals(
-                $field['read_only'],
-                $form->get($field['name'])->getConfig()->getOption('read_only')
+                $field['expectedAttr'],
+                $form->get($field['name'])->getConfig()->getOption('attr')
             );
         }
     }
@@ -108,14 +109,14 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
         $this->extension->configureOptions($resolver);
     }
 
-    public function testBuildFormDataProvider()
+    public function buildFormDataProvider()
     {
         return [
             'enabled extension'          => [
                 ['disable_workflow_restrictions' => false, 'data_class' => 'test'],
                 [
-                    ['name' => 'test_field_1', 'read_only' => true],
-                    ['name' => 'test_field_2', 'read_only' => false]
+                    ['name' => 'test_field_1', 'expectedAttr' => ['readonly' => true]],
+                    ['name' => 'test_field_2', 'expectedAttr' => []]
                 ],
                 [
                     ['field' => 'test_field_1', 'mode' => 'full'],
@@ -124,8 +125,8 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
             'no fields for restrictions' => [
                 ['disable_workflow_restrictions' => false, 'data_class' => 'test'],
                 [
-                    ['name' => 'test_field_1', 'read_only' => false],
-                    ['name' => 'test_field_2', 'read_only' => false]
+                    ['name' => 'test_field_1', 'expectedAttr' => []],
+                    ['name' => 'test_field_2', 'expectedAttr' => []]
                 ],
                 [
                     ['field' => 'test_field_3', 'mode' => 'full'],
@@ -134,15 +135,15 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
             'disabled extension'         => [
                 ['disable_workflow_restrictions' => false],
                 [
-                    ['name' => 'test_field_1', 'read_only' => false],
-                    ['name' => 'test_field_2', 'read_only' => false]
+                    ['name' => 'test_field_1', 'expectedAttr' => []],
+                    ['name' => 'test_field_2', 'expectedAttr' => []]
                 ],
             ],
             'no data_class option'       => [
                 ['disable_workflow_restrictions' => true],
                 [
-                    ['name' => 'test_field_1', 'read_only' => false],
-                    ['name' => 'test_field_2', 'read_only' => false]
+                    ['name' => 'test_field_1', 'expectedAttr' => []],
+                    ['name' => 'test_field_2', 'expectedAttr' => []]
                 ],
             ]
         ];
@@ -153,6 +154,6 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        return [new PreloadedExtension([], ['form' => [$this->extension]])];
+        return [new PreloadedExtension([], [FormType::class => [$this->extension]])];
     }
 }

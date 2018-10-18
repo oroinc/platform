@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 .menu a:hover {
     text-decoration: none;
 }
@@ -9,21 +11,6 @@
 
 header {
     padding: 0;
-}
-
-div.navbar-inner .help {
-    padding: 2px;
-    line-height: 19px;
-}
-
-div.navbar-inner .help a {
-    color: #fff;
-    font-size: 14px;
-    text-decoration: none;
-}
-
-div.navbar-inner .help a:hover {
-    text-decoration: none;
 }
 
 .logo a {
@@ -40,14 +27,11 @@ div.navbar-inner .help a:hover {
     background-color: #fff;
     width: 1127px;
     box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
 }
 
 .wrapper > .content {
     border: 1px solid #dededf;
-    -webkit-border-radius: 7px;
-    border-radius: 7px
+    border-radius: 7px;
 }
 
 .content div.title {
@@ -56,7 +40,7 @@ div.navbar-inner .help a:hover {
     line-height: 20px;
     font-weight: 700;
     padding: 15px 30px;
-    background-color: #fafafa
+    background-color: #fafafa;
 }
 
 .content .body {
@@ -65,47 +49,44 @@ div.navbar-inner .help a:hover {
 
 .content table {
     border: 1px solid #dededf;
-    -webkit-border-radius: 7px;
     border-radius: 7px;
     border-collapse: separate;
-    width: 100%
+    width: 100%;
 }
 
-.table, table.table {
+.table,
+table.table {
     border: 1px solid #e1e1e1;
     width: 100%;
-    -webkit-border-radius: 4px;
-    border-radius: 4px
+    border-radius: 4px;
 }
 
-table.table tr, table.table td, table.table th {
+table.table tr,
+table.table td,
+table.table th {
     border: 1px solid #e1e1e1;
     border-collapse: collapse;
     line-height: 22px;
-    text-align: left
+    text-align: left;
 }
 
-table.table td, table.table th {
+table.table td,
+table.table th {
     padding: 10px 15px;
-    vertical-align: top
+    vertical-align: top;
 }
 
 table.table th {
-    background-color: #f6f6f6;
-    background: -webkit-gradient(linear, 0 0, 0 100%, from(#f6f6f6), to(#f4f4f4));
-    background: -webkit-linear-gradient(top, #f6f6f6, #f4f4f4);
-    background: -moz-linear-gradient(top, #f6f6f6, #f4f4f4);
-    background: -ms-linear-gradient(top, #f6f6f6, #f4f4f4);
-    background: -o-linear-gradient(top, #f6f6f6, #f4f4f4);
-    text-transform: uppercase
+    background: linear-gradient(#f6f6f6, #f4f4f4);
+    text-transform: uppercase;
 }
 
 table.table .dark {
-    background-color: #f9f9f9
+    background-color: #f9f9f9;
 }
 
 table.table {
-    margin-bottom: 30px
+    margin-bottom: 30px;
 }
 
 .content .body table th {
@@ -145,15 +126,13 @@ table.table {
 }
 
 .ajax.update {
-    color: #60a53b
+    color: #60a53b;
 }
 
 #alerts .alert {
     padding: 14px;
     font-size: 14px;
-    -webkit-box-shadow: 0px 1px 3px rgba(90, 90, 90, 0.8);
-    -moz-box-shadow: 0px 1px 3px rgba(90, 90, 90, 0.8);
-    box-shadow: 0px 1px 3px rgba(90, 90, 90, 0.8);
+    box-shadow: 0 1px 3px rgba(90, 90, 90, .8);
 }
 
 #alerts .alert .close {
@@ -169,25 +148,22 @@ table.table {
 }
 
 #alerts .fa-success:before {
-    content: "\f00c"
+    content: "\f00c";
 }
 
 #alerts .fa-error:before {
-    content: "\f06a"
+    content: "\f06a";
 }
 
 .confirm-dialog.modal.fade.in {
     top: 25%;
-    -webkit-box-shadow: 0px 0px 19px rgba(50, 50, 50, 0.75);
-    -moz-box-shadow: 0px 0px 19px rgba(50, 50, 50, 0.75);
-    box-shadow: 0px 0px 19px rgba(50, 50, 50, 0.75);
+    box-shadow: 0 0 19px rgba(50, 50, 50, .75);
 }
 
 .confirm-dialog .modal-dialog .modal-content {
     background-color: #fee0e0;
     border-radius: 5px;
     font-size: 14px;
-
 }
 
 .confirm-dialog .modal-dialog .modal-content .modal-header {
@@ -208,38 +184,38 @@ table.table {
 }
 
 .confirm-dialog .modal-dialog .modal-content .modal-footer button {
-    margin: 0px 7px;
+    margin: 0 7px;
     padding: 0 15px;
     height: 35px;
 }
 
-.modal-backdrop, .modal-backdrop.fade.in {
-    opacity: 0.5;
+.modal-backdrop,
+.modal-backdrop.fade.in {
+    opacity: .5;
 }
 
-.desktop-version #oroplatform-header .logo {
-    font-size: 0;
-}
-
-.desktop-version #oroplatform-header .logo a {
-    display: inline-block;
-    font-size: 17px;
+.desktop-version .app-page {
+    overflow: auto;
 }
 
 #load-demo-data {
     display: none;
 }
+
 #load-demo-data + span {
     font-size: 15px;
 }
+
 #load-demo-data + span:before {
     font-family: 'FontAwesome';
     padding-right: 2px;
     content: "\f096";
 }
+
 #load-demo-data:checked + span:before {
     content: "\f046";
 }
+
 .form {
     width: 420px;
 }
@@ -264,8 +240,9 @@ table.table {
     width: 90px;
 }
 
-.form fieldset .field input[type="text"], .form fieldset .field select {
-    margin-bottom: 0px;
+.form fieldset .field input[type="text"],
+.form fieldset .field select {
+    margin-bottom: 0;
 }
 
 .form fieldset .field .validation-failed {
@@ -277,7 +254,7 @@ table.table {
     color: #1b801b;
 }
 
-#alerts ul{
+#alerts ul {
     margin-left: 50px;
 }
 
@@ -290,11 +267,12 @@ table.table {
 .control-group label {
     padding-top: 5px;
 }
+
 .control-group .controls,
 .control-group .actions {
     padding-left: 10px;
 }
 
-#page {
+.app-page {
     overflow: auto;
 }

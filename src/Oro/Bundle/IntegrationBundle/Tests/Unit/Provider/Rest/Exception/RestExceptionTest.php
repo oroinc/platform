@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Exception;
 
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
 
-class RestExceptionTest extends \PHPUnit_Framework_TestCase
+class RestExceptionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider exceptionDataProvider

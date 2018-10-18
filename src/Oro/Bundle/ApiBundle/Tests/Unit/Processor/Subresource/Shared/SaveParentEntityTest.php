@@ -2,31 +2,31 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\SaveParentEntity;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
-class SaveParentEntityTest extends ChangeRelationshipTestCase
+class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var SaveParentEntity */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->processor = new SaveParentEntity($this->doctrineHelper);
     }
 
     public function testProcessWhenNoParentEntity()
     {
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
 
         $this->processor->process($this->context);
@@ -34,7 +34,7 @@ class SaveParentEntityTest extends ChangeRelationshipTestCase
 
     public function testProcessForNotSupportedParentEntity()
     {
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
 
         $this->context->setParentEntity([]);
@@ -45,9 +45,9 @@ class SaveParentEntityTest extends ChangeRelationshipTestCase
     {
         $entity = new \stdClass();
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
-            ->with($this->identicalTo($entity), false)
+            ->with(self::identicalTo($entity), false)
             ->willReturn(null);
 
         $this->context->setParentEntity($entity);
@@ -58,16 +58,14 @@ class SaveParentEntityTest extends ChangeRelationshipTestCase
     {
         $entity = new \stdClass();
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
-            ->with($this->identicalTo($entity), false)
+            ->with(self::identicalTo($entity), false)
             ->willReturn($em);
 
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('flush')
             ->with(null);
 

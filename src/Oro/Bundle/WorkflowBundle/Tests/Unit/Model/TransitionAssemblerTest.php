@@ -22,20 +22,20 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
+class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var FormOptionsAssembler|\PHPUnit_Framework_MockObject_MockObject
+     * @var FormOptionsAssembler|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $formOptionsAssembler;
 
     /**
-     * @var ExpressionFactory|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExpressionFactory|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $conditionFactory;
 
     /**
-     * @var ActionFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ActionFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $actionFactory;
 
@@ -81,7 +81,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         ]
     ];
 
-    /** @var FormOptionsConfigurationAssembler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormOptionsConfigurationAssembler|\PHPUnit\Framework\MockObject\MockObject */
     protected $formConfigurationAssembler;
 
     protected function setUp()
@@ -99,7 +99,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['assemble'])
             ->getMock();
 
-        /** @var TransitionOptionsResolver|\PHPUnit_Framework_MockObject_MockObject $optionsResolver */
+        /** @var TransitionOptionsResolver|\PHPUnit\Framework\MockObject\MockObject $optionsResolver */
         $optionsResolver = $this->createMock(TransitionOptionsResolver::class);
 
         $this->assembler = new TransitionAssembler(
@@ -338,7 +338,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $configuration = array_merge(
             [
                 'is_start' => false,
-                'form_type' => WorkflowTransitionType::NAME,
+                'form_type' => WorkflowTransitionType::class,
                 'form_options' => [],
                 'frontend_options' => [],
             ],
@@ -652,13 +652,13 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEmpty($actualTransition->getFrontendOptions());
         $this->assertFalse($actualTransition->isStart());
-        $this->assertEquals('oro_workflow_transition', $actualTransition->getFormType());
+        $this->assertEquals(WorkflowTransitionType::class, $actualTransition->getFormType());
         $this->assertEmpty($actualTransition->getFormOptions());
 
         $configuration = array_merge(
             [
                 'is_start' => false,
-                'form_type' => WorkflowTransitionType::NAME,
+                'form_type' => WorkflowTransitionType::class,
                 'form_options' => [],
                 'frontend_options' => [],
             ],
@@ -757,7 +757,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEmpty($actualTransition->getFrontendOptions());
         $this->assertFalse($actualTransition->isStart());
-        $this->assertEquals(WorkflowTransitionType::NAME, $actualTransition->getFormType());
+        $this->assertEquals(WorkflowTransitionType::class, $actualTransition->getFormType());
         $this->assertEquals([], $actualTransition->getFormOptions());
 
         $this->assertTemplate('page', $configuration, $actualTransition);
@@ -897,7 +897,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $actualTransition->getFrontendOptions(), 'Incorrect frontend_options');
         $this->assertTrue($actualTransition->isStart(), 'Incorrect is_start');
 
-        $this->assertEquals(WorkflowTransitionType::NAME, $actualTransition->getFormType(), 'Incorrect form_type');
+        $this->assertEquals(WorkflowTransitionType::class, $actualTransition->getFormType(), 'Incorrect form_type');
         $this->assertEmpty($actualTransition->getFormOptions(), 'Incorrect form_options');
 
         $this->assertTemplate('page', $configuration, $actualTransition);
@@ -1006,7 +1006,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Step
+     * @return \PHPUnit\Framework\MockObject\MockObject|Step
      */
     protected function createStep()
     {
@@ -1014,7 +1014,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Attribute
+     * @return \PHPUnit\Framework\MockObject\MockObject|Attribute
      */
     protected function createAttribute()
     {
@@ -1022,7 +1022,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ExpressionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ExpressionInterface
      */
     protected function createCondition()
     {
@@ -1030,7 +1030,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ActionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ActionInterface
      */
     protected function createAction()
     {

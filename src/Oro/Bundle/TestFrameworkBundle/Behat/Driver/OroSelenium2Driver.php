@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Driver;
 
 use Behat\Mink\Driver\Selenium2Driver;
+use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Selector\Xpath\Escaper;
 use Behat\Mink\Selector\Xpath\Manipulator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
@@ -10,6 +11,9 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\ElementValueInterface;
 use WebDriver\Element;
 use WebDriver\Key;
 
+/**
+ * Contains overrides of some Selenium2Driver methods as well as new methods related to selenium driver functionality
+ */
 class OroSelenium2Driver extends Selenium2Driver
 {
     use AssertTrait;
@@ -69,12 +73,14 @@ class OroSelenium2Driver extends Selenium2Driver
             if ('text' === $element->attribute('type')) {
                 $this->setTextInputElement($element, $value);
                 $this->triggerEvent($xpath, 'keyup');
+                $this->triggerEvent($xpath, 'change');
 
                 return;
             }
         } elseif ('textarea' === $elementName && 'true' === $element->attribute('aria-hidden')) {
             $this->fillTinyMce($element, $value);
             $this->triggerEvent($xpath, 'keyup');
+            $this->triggerEvent($xpath, 'change');
 
             return;
         }
@@ -155,15 +161,19 @@ JS;
                 return false;
             }
             
-            if (typeof(jQuery) == "undefined" || jQuery == null) {		
-                return false;		
+            if (jQuery == null || jQuery.active) {
+                return false;
             }
             
-            if (jQuery(document.body).hasClass('loading')) {
+            if (document.body.classList.contains('loading')) {
                 return false;
             }
 
-            if (0 !== jQuery("div.loader-mask.shown").length) {
+            if (document.querySelector('.loader-mask.shown') !== null) {
+                return false;
+            }
+            
+            if (document.querySelector('div.lazy-loading') !== null) {
                 return false;
             }
             
@@ -189,45 +199,34 @@ JS;
     {
         $jsAppActiveCheck = <<<JS
         (function () {
-            if (document["readyState"] !== "complete") {
+            if (document['readyState'] !== 'complete') {
                 return false;
             }
             
-            if (document.title === "Loading...") {
-                return false;
-            }
-        
-            if (typeof(jQuery) == "undefined" || jQuery == null) {
+            if (document.title === 'Loading...') {
                 return false;
             }
             
-            if (jQuery.active) {
-                return false;
-            }
-            
-            if (jQuery(document.body).hasClass('loading')) {
+            if (document.body.classList.contains('loading')) {
                 return false;
             }
 
-            if (0 !== jQuery("div.loader-mask.shown").length) {
-                return false;
-            }
-            
-            if (0 !== jQuery("div.lazy-loading").length) {
+            if (document.querySelector('.loader-mask.shown, .lazy-loading') !== null) {
                 return false;
             }
             
             try {
+                if (jQuery == null || jQuery.active) {
+                    return false;
+                }
+                
                 if (!window.mediatorCachedForSelenium) {
                     window.mediatorCachedForSelenium = require('oroui/js/mediator');
                 }
                 
                 var isInAction = window.mediatorCachedForSelenium.execute('isInAction')
-                if (typeof(isInAction) !== "boolean") {
-                    return false;
-                }
                 
-                if (isInAction) {
+                if (isInAction !== false || jQuery.active) {
                     return false;
                 }
             } catch (e) {
@@ -387,5 +386,35 @@ var node = {{ELEMENT}};
 triggerEvent(node, '$eventName');
 JS;
         $this->executeJsOnXpath($xpath, $script);
+    }
+
+    /**
+     * @param NodeElement $element
+     */
+    public function switchToIFrameByElement(NodeElement $element)
+    {
+        $id = $element->getAttribute('id');
+
+        if ($id === null) {
+            $elementXpath = $element->getXpath();
+            $id = sprintf('iframe-%s', md5($elementXpath));
+
+            $function = <<<JS
+(function(){
+    var iframeElement = document.evaluate(
+        "{$elementXpath}",
+        document,
+        null,
+        XPathResult.FIRST_ORDERED_NODE_TYPE,
+        null
+    ).singleNodeValue;
+    iframeElement.id = "{$id}";
+})()
+JS;
+
+            $this->executeScript($function);
+        }
+
+        parent::switchToIFrame($id);
     }
 }

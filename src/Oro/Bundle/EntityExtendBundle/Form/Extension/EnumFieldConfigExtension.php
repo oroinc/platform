@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Extension;
 
+use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -31,6 +32,6 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
      */
     public function getExtendedType()
     {
-        return 'oro_entity_config_type';
+        return ConfigType::class;
     }
 }

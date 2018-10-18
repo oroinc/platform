@@ -24,6 +24,7 @@ class OroEntityConfigExtension extends Extension
         $loader->load('importexport.yml');
         $loader->load('block_types.yml');
         $loader->load('attribute_types.yml');
+        $loader->load('commands.yml');
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $this->configureTestEnvironment($container);

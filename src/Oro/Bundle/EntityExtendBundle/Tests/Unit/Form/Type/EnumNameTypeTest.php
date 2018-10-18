@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumNameType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -14,7 +15,7 @@ class EnumNameTypeTest extends TypeTestCase
     /** @var EnumNameType */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $typeHelper;
 
     /** @var ExtendDbIdentifierNameGenerator */
@@ -220,7 +221,7 @@ class EnumNameTypeTest extends TypeTestCase
         );
         $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $context->expects($this->once())->method('addViolation')->with(EnumNameType::INVALID_NAME_MESSAGE);
-        call_user_func($resolvedOptions['constraints'][3]->methods[0], '!@#$', $context);
+        call_user_func($resolvedOptions['constraints'][3]->callback, '!@#$', $context);
 
         $this->assertInstanceOf(
             'Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumName',
@@ -230,18 +231,10 @@ class EnumNameTypeTest extends TypeTestCase
         $this->assertEquals($configId->getFieldName(), $resolvedOptions['constraints'][4]->fieldName);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_entity_extend_enum_name',
-            $this->type->getName()
-        );
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(
-            'text',
+            TextType::class,
             $this->type->getParent()
         );
     }

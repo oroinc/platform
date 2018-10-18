@@ -116,17 +116,9 @@ situations you should add custom application module
 requirejs.yml:
     paths:
         example/js/custom-handler: 'bundles/example/js/custom-handler.js'
-        example/js/custom-module: 'bundles/example/js/custom-module.js'
     config:
         appmodules:
-            - example/js/custom-module
-
-custom-handler.js:
-    define([
-        'oroui/js/app/controllers/base/controller'
-    ], function(BaseController) {
-        BaseController.loadBeforeAction(['example/js/custom-handler'], function() {});
-    });
+            - example/js/custom-handler
 ```
 
 ## Ignore validation section

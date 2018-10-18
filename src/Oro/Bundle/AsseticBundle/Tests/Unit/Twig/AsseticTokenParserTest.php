@@ -6,15 +6,15 @@ use \Twig_Token;
 use \Twig_TokenStream;
 use Oro\Bundle\AsseticBundle\Twig\AsseticTokenParser;
 
-class AsseticTokenParserTest extends \PHPUnit_Framework_TestCase
+class AsseticTokenParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $assetsConfiguration;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $assetFactory;
 
@@ -76,7 +76,7 @@ class AsseticTokenParserTest extends \PHPUnit_Framework_TestCase
             array(
                 new Twig_Token(Twig_Token::NAME_TYPE, 'filter', 31),
                 new Twig_Token(Twig_Token::OPERATOR_TYPE, '=', 31),
-                new Twig_Token(Twig_Token::STRING_TYPE, 'cssrewrite, lessphp, ?cssmin', 31),
+                new Twig_Token(Twig_Token::STRING_TYPE, 'cssrewrite, scssphp, ?cssmin', 31),
                 new Twig_Token(Twig_Token::NAME_TYPE, 'debug', 31),
                 new Twig_Token(Twig_Token::OPERATOR_TYPE, '=', 31),
                 new Twig_Token(Twig_Token::NAME_TYPE, 'false', 31),

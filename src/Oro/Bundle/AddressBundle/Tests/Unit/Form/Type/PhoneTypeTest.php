@@ -2,8 +2,11 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AddressBundle\Form\Type\PhoneType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\RadioType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class PhoneTypeTest extends \PHPUnit_Framework_TestCase
+class PhoneTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PhoneType
@@ -30,21 +33,16 @@ class PhoneTypeTest extends \PHPUnit_Framework_TestCase
 
         $builder->expects($this->at(0))
             ->method('add')
-            ->with('id', 'hidden');
+            ->with('id', HiddenType::class);
 
         $builder->expects($this->at(1))
             ->method('add')
-            ->with('phone', 'text');
+            ->with('phone', TextType::class);
 
         $builder->expects($this->at(2))
             ->method('add')
-            ->with('primary', 'radio');
+            ->with('primary', RadioType::class);
 
         $this->type->buildForm($builder, array());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_phone', $this->type->getName());
     }
 }

@@ -4,7 +4,7 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Event;
 
 use Oro\Bundle\FeatureToggleBundle\Event\FeatureChange;
 
-class FeatureChangeTest extends \PHPUnit_Framework_TestCase
+class FeatureChangeTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetFeatureName()
     {

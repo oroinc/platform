@@ -72,7 +72,7 @@ define(function(require) {
         onWidgetLoad: function(widget) {
             this.resetWidgetFormToActiveTabForm(widget);
 
-            this.$('.nav-tabs a').on('shown .bs.tab', function() {
+            this.$('.nav-tabs a').on('shown.bs.tab', function() {
                 this.resetWidgetFormToActiveTabForm(widget);
                 this.refreshActiveInputWidgets();
             }.bind(this));
@@ -88,9 +88,9 @@ define(function(require) {
             widget._onContentLoad = function(content) {
                 if (_.has(content, 'success')) {
                     if (content.success) {
-                        var message = _.has(content, 'message') ?
-                            content.message :
-                            __('oro.importexport.import.success.message');
+                        var message = _.has(content, 'message')
+                            ? content.message
+                            : __('oro.importexport.import.success.message');
                         Messenger.notificationFlashMessage('success', message);
                     } else {
                         Messenger.notificationFlashMessage('error', __('oro.importexport.import.form_fail.message'));

@@ -7,7 +7,7 @@ use Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface;
 use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
 use Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool;
 
-class DbSpoolTest extends \PHPUnit_Framework_TestCase
+class DbSpoolTest extends \PHPUnit\Framework\TestCase
 {
     const SPOOL_ITEM_CLASS = 'Oro\Bundle\NotificationBundle\Entity\SpoolItem';
 
@@ -17,12 +17,12 @@ class DbSpoolTest extends \PHPUnit_Framework_TestCase
     protected $spool;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityPool;
 
@@ -37,7 +37,7 @@ class DbSpoolTest extends \PHPUnit_Framework_TestCase
     protected $handler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $eventDispatcher;
 

@@ -13,7 +13,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
-class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
@@ -156,7 +156,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionMock()
     {
@@ -164,7 +164,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|AutoResponseManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|AutoResponseManager
      */
     private function createAutoResponseManagerMock()
     {
@@ -172,7 +172,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Registry
+     * @return \PHPUnit\Framework\MockObject\MockObject|Registry
      */
     private function createDoctrineMock()
     {
@@ -180,7 +180,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityRepository
+     * @return \PHPUnit\Framework\MockObject\MockObject|EntityRepository
      */
     private function createEntityRepositoryMock()
     {
@@ -188,7 +188,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
      */
     private function createJobRunnerMock()
     {
@@ -196,7 +196,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     private function createLoggerMock()
     {

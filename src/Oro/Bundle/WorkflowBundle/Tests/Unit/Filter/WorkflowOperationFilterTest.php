@@ -12,9 +12,9 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Filter\WorkflowOperationFilter;
 
-class WorkflowOperationFilterTest extends \PHPUnit_Framework_TestCase
+class WorkflowOperationFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowDefinitionRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
     /** @var WorkflowOperationFilter */
@@ -155,7 +155,7 @@ class WorkflowOperationFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $name
-     * @return \PHPUnit_Framework_MockObject_MockObject|Operation
+     * @return \PHPUnit\Framework\MockObject\MockObject|Operation
      */
     private function createOperation($name)
     {

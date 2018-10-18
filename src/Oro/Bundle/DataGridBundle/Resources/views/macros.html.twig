@@ -31,6 +31,10 @@
         {% else %}
             {% set metaData = metaData|merge({enableFloatingHeaderPlugin: isMobileVersion()}) %}
         {% endif %}
+        {% set metaData = metaData|merge({
+            responsiveGrids: renderParams.responsiveGrids|default({enable: false}),
+            swipeActionsGrid: renderParams.swipeActionsGrid|default({enable: true})
+        }) %}
         {% set data     = oro_datagrid_data(datagrid) %}
         {% set gridId   = oro_datagrid_generate_element_id(datagrid) %}
         {% set enableFilters = renderParams.enableFilters is defined ? renderParams.enableFilters : true %}

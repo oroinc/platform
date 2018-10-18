@@ -8,12 +8,12 @@ use Oro\Bundle\WorkflowBundle\Processor\Transition\FormFactoryProcessor;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
-class FormFactoryProcessorTest extends \PHPUnit_Framework_TestCase
+class FormFactoryProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject */
     protected $context;
 
-    /** @var FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formFactory;
 
     /** @var FormFactoryProcessor */
@@ -31,7 +31,7 @@ class FormFactoryProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $formData = (object)['id' => 42];
 
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('getFormType')->willReturn('FormTypeFQCN');
 

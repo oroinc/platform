@@ -12,37 +12,29 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class LoadMetadataTest extends MetadataProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $objectMetadataLoader;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataLoader */
+    private $objectMetadataLoader;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityMetadataLoader;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadataLoader */
+    private $entityMetadataLoader;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $associationMetadataLoader;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationMetadataLoader */
+    private $associationMetadataLoader;
 
     /** @var LoadMetadata */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->objectMetadataLoader = $this->getMockBuilder(ObjectMetadataLoader::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityMetadataLoader = $this->getMockBuilder(EntityMetadataLoader::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->associationMetadataLoader = $this->getMockBuilder(AssociationMetadataLoader::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->objectMetadataLoader = $this->createMock(ObjectMetadataLoader::class);
+        $this->entityMetadataLoader = $this->createMock(EntityMetadataLoader::class);
+        $this->associationMetadataLoader = $this->createMock(AssociationMetadataLoader::class);
 
         $this->processor = new LoadMetadata(
             $this->doctrineHelper,
@@ -56,28 +48,47 @@ class LoadMetadataTest extends MetadataProcessorTestCase
     {
         $metadata = new EntityMetadata();
 
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('isManageableEntityClass');
 
         $this->context->setResult($metadata);
         $this->processor->process($this->context);
 
-        $this->assertSame($metadata, $this->context->getResult());
+        self::assertSame($metadata, $this->context->getResult());
     }
 
     public function testProcessForNotManageableEntityWithoutFieldsInConfig()
     {
         $config = new EntityDefinitionConfig();
 
-        $this->doctrineHelper->expects($this->once())
+        $entityMetadata = new EntityMetadata();
+
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(false);
+        $this->objectMetadataLoader->expects(self::once())
+            ->method('loadObjectMetadata')
+            ->with(
+                self::TEST_CLASS_NAME,
+                self::identicalTo($config),
+                false,
+                'targetAction'
+            )
+            ->willReturn($entityMetadata);
+        $this->associationMetadataLoader->expects(self::once())
+            ->method('completeAssociationMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                self::identicalTo($config),
+                self::identicalTo($this->context)
+            );
 
         $this->context->setConfig($config);
+        $this->context->setTargetAction('targetAction');
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getResult());
+        self::assertSame($entityMetadata, $this->context->getResult());
     }
 
     public function testProcessForNotManageableEntity()
@@ -87,7 +98,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
 
         $entityMetadata = new EntityMetadata();
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(false);
@@ -113,16 +124,16 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         $this->context->setTargetAction('targetAction');
         $this->processor->process($this->context);
 
-        $this->assertSame($entityMetadata, $this->context->getResult());
+        self::assertSame($entityMetadata, $this->context->getResult());
     }
 
-    public function testProcessForManageableEntityWithConfig()
+    public function testProcessForManageableEntity()
     {
         $config = new EntityDefinitionConfig();
 
         $entityMetadata = new EntityMetadata();
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
@@ -148,6 +159,6 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         $this->context->setTargetAction('targetAction');
         $this->processor->process($this->context);
 
-        $this->assertSame($entityMetadata, $this->context->getResult());
+        self::assertSame($entityMetadata, $this->context->getResult());
     }
 }

@@ -6,14 +6,17 @@ use Doctrine\Common\Collections\Criteria as BaseCriteria;
 use Doctrine\ORM\ORMException;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
+/**
+ * Criteria for filtering data returned by ORM queries.
+ */
 class Criteria extends BaseCriteria
 {
-    const ROOT_ALIAS_PLACEHOLDER   = '{root}';
-    const ENTITY_ALIAS_PLACEHOLDER = '{entity}';
-    const PLACEHOLDER_TEMPLATE     = '{%s}';
+    public const ROOT_ALIAS_PLACEHOLDER   = '{root}';
+    public const ENTITY_ALIAS_PLACEHOLDER = '{entity}';
+    public const PLACEHOLDER_TEMPLATE     = '{%s}';
 
     /** @var EntityClassResolver */
-    protected $entityClassResolver;
+    private $entityClassResolver;
 
     /** @var Join[] */
     private $joins = [];
@@ -34,7 +37,7 @@ class Criteria extends BaseCriteria
      *
      * @return bool
      */
-    public function hasJoin($propertyPath)
+    public function hasJoin(string $propertyPath): bool
     {
         return isset($this->joins[$propertyPath]);
     }
@@ -46,11 +49,9 @@ class Criteria extends BaseCriteria
      *
      * @return Join|null
      */
-    public function getJoin($propertyPath)
+    public function getJoin(string $propertyPath): ?Join
     {
-        return isset($this->joins[$propertyPath])
-            ? $this->joins[$propertyPath]
-            : null;
+        return $this->joins[$propertyPath] ?? null;
     }
 
     /**
@@ -58,7 +59,7 @@ class Criteria extends BaseCriteria
      *
      * @return Join[] [path => Join, ...]
      */
-    public function getJoins()
+    public function getJoins(): array
     {
         return $this->joins;
     }
@@ -78,8 +79,13 @@ class Criteria extends BaseCriteria
      *
      * @return Join
      */
-    public function addInnerJoin($propertyPath, $join, $conditionType = null, $condition = null, $indexBy = null)
-    {
+    public function addInnerJoin(
+        string $propertyPath,
+        string $join,
+        string $conditionType = null,
+        string $condition = null,
+        string $indexBy = null
+    ): Join {
         return $this->addJoin($propertyPath, Join::INNER_JOIN, $join, $conditionType, $condition, $indexBy);
     }
 
@@ -98,8 +104,13 @@ class Criteria extends BaseCriteria
      *
      * @return Join
      */
-    public function addLeftJoin($propertyPath, $join, $conditionType = null, $condition = null, $indexBy = null)
-    {
+    public function addLeftJoin(
+        string $propertyPath,
+        string $join,
+        string $conditionType = null,
+        string $condition = null,
+        string $indexBy = null
+    ): Join {
         return $this->addJoin($propertyPath, Join::LEFT_JOIN, $join, $conditionType, $condition, $indexBy);
     }
 
@@ -112,35 +123,41 @@ class Criteria extends BaseCriteria
      * @param string|null $indexBy       The index for the join.
      *
      * @return Join
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    protected function addJoin(
-        $propertyPath,
-        $joinType,
-        $join,
-        $conditionType = null,
-        $condition = null,
-        $indexBy = null
-    ) {
+    private function addJoin(
+        string $propertyPath,
+        string $joinType,
+        string $join,
+        string $conditionType = null,
+        string $condition = null,
+        string $indexBy = null
+    ): Join {
         if (!$propertyPath) {
-            throw new \InvalidArgumentException('$propertyPath must be specified.');
+            throw new \InvalidArgumentException('The property path must be not empty.');
         }
         if (!$join) {
-            throw new \InvalidArgumentException(
-                sprintf('$join must be specified. Join path: "%s".', $propertyPath)
-            );
-        } elseif (false === strpos($join, '.')) {
+            throw new \InvalidArgumentException(\sprintf(
+                'The join must be be not empty. Join path: "%s".',
+                $propertyPath
+            ));
+        }
+        if (false === \strpos($join, '.')) {
             $entityClass = $this->resolveEntityClass($join);
             if (!$entityClass) {
-                throw new \InvalidArgumentException(
-                    sprintf('"%s" is not valid entity name. Join path: "%s".', $join, $propertyPath)
-                );
+                throw new \InvalidArgumentException(\sprintf(
+                    '"%s" is not valid entity name. Join path: "%s".',
+                    $join,
+                    $propertyPath
+                ));
             }
             $join = $entityClass;
         }
         if ($condition && !$conditionType) {
-            throw new \InvalidArgumentException(
-                sprintf('$conditionType must be specified if $condition exists. Join path: "%s".', $propertyPath)
-            );
+            throw new \InvalidArgumentException(\sprintf(
+                'The condition type must be specified if the condition exists. Join path: "%s".',
+                $propertyPath
+            ));
         }
 
         $joinObject = new Join($joinType, $join, $conditionType, $condition, $indexBy);
@@ -149,19 +166,17 @@ class Criteria extends BaseCriteria
         } else {
             $existingJoinObject = $this->joins[$propertyPath];
             if (!$existingJoinObject->equals($joinObject)) {
-                throw new \LogicException(
-                    sprintf(
-                        'The join definition for "%s" conflicts with already added join. '
-                        . 'Existing join: "%s". New join: "%s".',
-                        $propertyPath,
-                        (string)$existingJoinObject,
-                        (string)$joinObject
-                    )
-                );
+                throw new \LogicException(\sprintf(
+                    'The join definition for "%s" conflicts with already added join. '
+                    . 'Existing join: "%s". New join: "%s".',
+                    $propertyPath,
+                    (string)$existingJoinObject,
+                    (string)$joinObject
+                ));
             }
 
             $existingJoinType = $existingJoinObject->getJoinType();
-            if ($existingJoinType !== $joinType && $existingJoinType === Join::LEFT_JOIN) {
+            if ($existingJoinType !== $joinType && Join::LEFT_JOIN === $existingJoinType) {
                 $existingJoinObject->setJoinType($joinObject->getJoinType());
             }
             $joinObject = $existingJoinObject;
@@ -175,7 +190,7 @@ class Criteria extends BaseCriteria
      *
      * @return string|null
      */
-    protected function resolveEntityClass($entityName)
+    private function resolveEntityClass(string $entityName): ?string
     {
         try {
             return $this->entityClassResolver->getEntityClass($entityName);

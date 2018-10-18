@@ -19,7 +19,7 @@ class ReportChartSchemaCollectionType extends ConfigProviderAwareType
             if ($isAvailable && isset($chartConfig['data_schema'])) {
                 $builder->add(
                     $chartName,
-                    'oro_report_chart_data_schema',
+                    ReportChartSchemaType::class,
                     [
                         'data_schema' => $chartConfig['data_schema']
                     ]

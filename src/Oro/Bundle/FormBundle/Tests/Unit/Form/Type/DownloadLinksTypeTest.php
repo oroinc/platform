@@ -6,12 +6,12 @@ use Oro\Bundle\FormBundle\Form\Type\DownloadLinksType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
+class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DownloadLinksType */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $assetHelper;
 
     protected function setUp()
@@ -25,12 +25,6 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->type, $this->assetHelper);
-    }
-
-    public function testGetName()
-    {
-        $this->assertInternalType('string', $this->type->getName());
-        $this->assertEquals('oro_download_links_type', $this->type->getName());
     }
 
     /**

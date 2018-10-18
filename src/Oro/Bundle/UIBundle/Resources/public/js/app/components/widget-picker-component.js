@@ -39,12 +39,14 @@ define(function(require) {
             var widgetPickerFilterModel = new WidgetPickerFilterModel();
             this.widgetPickerCollectionView = new WidgetPickerCollectionView(
                 _.defaults(options, {
-                    el: $el.find('.widget-picker-containers'),
-                    filterModel: widgetPickerFilterModel
+                    el: $el.find('[data-role="widget-picker-container"]'),
+                    filterModel: widgetPickerFilterModel,
+                    listSelector: '[data-role="widget-picker-results"]',
+                    fallbackSelector: '[data-role="widget-picker-no-results-found"]'
                 })
             );
             this.widgetPickerFilterView = new WidgetPickerFilterView({
-                el: $el.find('.widget-picker-search'),
+                el: $el.find('[data-role="widget-picker-filter"]'),
                 model: widgetPickerFilterModel
             });
         }

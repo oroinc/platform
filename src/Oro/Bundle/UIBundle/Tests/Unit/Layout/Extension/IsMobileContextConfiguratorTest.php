@@ -8,7 +8,7 @@ use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
 use Oro\Component\Layout\ContextInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class IsMobileContextConfiguratorTest extends \PHPUnit_Framework_TestCase
+class IsMobileContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var IsMobileContextConfigurator
@@ -16,12 +16,12 @@ class IsMobileContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     protected $isMobileContextConfigurator;
 
     /**
-     * @var UserAgentProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var UserAgentProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $userAgentProvider;
 
     /**
-     * @var UserAgent|\PHPUnit_Framework_MockObject_MockObject
+     * @var UserAgent|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $userAgent;
 
@@ -38,7 +38,7 @@ class IsMobileContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigureContext()
     {
-        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $optionResolver */
+        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $optionResolver */
         $optionResolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $optionResolver->expects($this->once())
             ->method('setRequired')
@@ -47,10 +47,10 @@ class IsMobileContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $optionResolver->expects($this->once())
             ->method('setAllowedTypes')
-            ->with(['is_mobile' => ['boolean']])
+            ->with('is_mobile', ['boolean'])
             ->willReturn($optionResolver);
 
-        /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock('Oro\Component\Layout\ContextInterface');
         $context->expects($this->once())
             ->method('getResolver')

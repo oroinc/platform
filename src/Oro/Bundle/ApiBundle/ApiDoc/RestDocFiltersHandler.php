@@ -12,8 +12,10 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Oro\Component\PhpUtils\ReflectionUtil;
 
+/**
+ * Adds filters to ApiDoc annotation.
+ */
 class RestDocFiltersHandler
 {
     /** @var RestDocViewDetector */
@@ -78,10 +80,7 @@ class RestDocFiltersHandler
         $filters = $annotation->getFilters();
         if (!empty($filters)) {
             ksort($filters);
-            // unfortunately there is no other way to update filters except to use the reflection
-            $filtersProperty = ReflectionUtil::getProperty(new \ReflectionClass($annotation), 'filters');
-            $filtersProperty->setAccessible(true);
-            $filtersProperty->setValue($annotation, $filters);
+            ApiDocAnnotationUtil::setFilters($annotation, $filters);
         }
     }
 
@@ -108,8 +107,8 @@ class RestDocFiltersHandler
         if ($filter instanceof FieldAwareFilterInterface) {
             $options['type'] = $this->getFilterType($dataType, $isArrayAllowed, $isRangeAllowed);
         }
-        $operators = $filter->getSupportedOperators();
-        if (!empty($operators) && !(count($operators) === 1 && $operators[0] === StandaloneFilter::EQ)) {
+        $operators = $this->getFilterOperators($filter);
+        if (!empty($operators)) {
             $options['operators'] = implode(',', $operators);
         }
         if ($filter instanceof StandaloneFilterWithDefaultValue) {
@@ -196,5 +195,23 @@ class RestDocFiltersHandler
             $this->docViewDetector->getRequestType(),
             false
         );
+    }
+
+    /**
+     * @param StandaloneFilter $filter
+     *
+     * @return string[]
+     */
+    private function getFilterOperators(StandaloneFilter $filter)
+    {
+        $operators = $filter->getSupportedOperators();
+        if (empty($operators)) {
+            return $operators;
+        }
+        if (count($operators) === 1 && $operators[0] === StandaloneFilter::EQ) {
+            return [];
+        }
+
+        return $operators;
     }
 }

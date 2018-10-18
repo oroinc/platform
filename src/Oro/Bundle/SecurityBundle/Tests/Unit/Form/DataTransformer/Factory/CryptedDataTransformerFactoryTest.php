@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Form\DataTransformer\CryptedDataTransformer;
 use Oro\Bundle\SecurityBundle\Form\DataTransformer\Factory\CryptedDataTransformerFactory;
 use Psr\Log\LoggerInterface;
 
-class CryptedDataTransformerFactoryTest extends \PHPUnit_Framework_TestCase
+class CryptedDataTransformerFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CryptedDataTransformerFactory
@@ -15,12 +15,12 @@ class CryptedDataTransformerFactoryTest extends \PHPUnit_Framework_TestCase
     private $factory;
 
     /**
-     * @var SymmetricCrypterInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $crypter;
 
     /**
-     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $logger;
 

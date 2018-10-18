@@ -17,21 +17,21 @@ use Oro\Component\ConfigExpression\ExpressionFactory;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class OperationTest extends \PHPUnit_Framework_TestCase
+class OperationTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationDefinition */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OperationDefinition */
     protected $definition;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionFactory */
     protected $actionFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExpressionFactory */
     protected $conditionFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeAssembler */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AttributeAssembler */
     protected $attributeAssembler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FormOptionsAssembler */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormOptionsAssembler */
     protected $formOptionsAssembler;
 
     /** @var Operation */
@@ -504,15 +504,15 @@ class OperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedRecorder $expects
+     * @param \PHPUnit\Framework\MockObject\Matcher\InvokedRecorder $expects
      * @param ActionData $data
-     * @return ActionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ActionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createAction(
-        \PHPUnit_Framework_MockObject_Matcher_InvokedRecorder $expects,
+        \PHPUnit\Framework\MockObject\Matcher\InvokedRecorder $expects,
         ActionData $data
     ) {
-        /* @var $action ActionInterface|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $action ActionInterface|\PHPUnit\Framework\MockObject\MockObject */
         $action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
             ->disableOriginalConstructor()
             ->getMock();
@@ -525,17 +525,17 @@ class OperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedRecorder $expects
+     * @param \PHPUnit\Framework\MockObject\Matcher\InvokedRecorder $expects
      * @param ActionData $data
      * @param bool $returnValue
-     * @return ConfigurableCondition|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConfigurableCondition|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createCondition(
-        \PHPUnit_Framework_MockObject_Matcher_InvokedRecorder $expects,
+        \PHPUnit\Framework\MockObject\Matcher\InvokedRecorder $expects,
         ActionData $data,
         $returnValue
     ) {
-        /* @var $condition ConfigurableCondition|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $condition ConfigurableCondition|\PHPUnit\Framework\MockObject\MockObject */
         $condition = $this->getMockBuilder('Oro\Component\Action\Condition\Configurable')
             ->disableOriginalConstructor()
             ->getMock();

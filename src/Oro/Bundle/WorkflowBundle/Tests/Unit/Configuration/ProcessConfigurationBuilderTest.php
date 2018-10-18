@@ -10,7 +10,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
+class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_DEFINITION_NAME = 'test_definition';
 

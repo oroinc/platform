@@ -3,14 +3,19 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc\Parser;
 
 use Michelf\MarkdownExtra;
+use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\InheritDocUtil;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
 /**
+ * Extracts Data API resources documentation from Markdown files.
+ * This parser supports Markdown Extra syntax.
+ * @link https://michelf.ca/projects/php-markdown/extra/
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class MarkdownApiDocParser
+class MarkdownApiDocParser implements ResourceDocParserInterface
 {
     /**
      * @var array
@@ -43,13 +48,13 @@ class MarkdownApiDocParser
      *  ...
      * ]
      */
-    protected $loadedData = [];
+    private $loadedData = [];
 
     /** @var FileLocator */
-    protected $fileLocator;
+    private $fileLocator;
 
     /** @var string[] */
-    protected $parsedFiles = [];
+    private $parsedFiles = [];
 
     /**
      * @param FileLocator $fileLocator
@@ -60,74 +65,60 @@ class MarkdownApiDocParser
     }
 
     /**
-     * @param string $className
-     * @param string $actionName
-     *
-     * @return string|null
+     * {@inheritdoc}
      */
-    public function getActionDocumentation($className, $actionName)
+    public function getActionDocumentation(string $className, string $actionName): ?string
     {
         return $this->getDocumentation($className, ConfigUtil::ACTIONS, $actionName);
     }
 
     /**
-     * @param string      $className
-     * @param string      $fieldName
-     * @param string|null $actionName
-     *
-     * @return string|null
+     * {@inheritdoc}
      */
-    public function getFieldDocumentation($className, $fieldName, $actionName = null)
-    {
+    public function getFieldDocumentation(
+        string $className,
+        string $fieldName,
+        ?string $actionName = null
+    ): ?string {
         return $this->getDocumentation($className, ConfigUtil::FIELDS, $fieldName, $actionName ?: 'common');
     }
 
     /**
-     * @param string $className
-     * @param string $filterName
-     *
-     * @return string|null
+     * {@inheritdoc}
      */
-    public function getFilterDocumentation($className, $filterName)
+    public function getFilterDocumentation(string $className, string $filterName): ?string
     {
         return $this->getDocumentation($className, ConfigUtil::FILTERS, $filterName);
     }
 
     /**
-     * @param string $className
-     * @param string $subresourceName
-     * @param string $actionName
-     *
-     * @return string|null
+     * {@inheritdoc}
      */
-    public function getSubresourceDocumentation($className, $subresourceName, $actionName)
-    {
+    public function getSubresourceDocumentation(
+        string $className,
+        string $subresourceName,
+        string $actionName
+    ): ?string {
         return $this->getDocumentation($className, ConfigUtil::SUBRESOURCES, $subresourceName, $actionName);
     }
 
     /**
-     * @param mixed $resource
-     *
-     * @return bool TRUE if the given resource is supported; otherwise, FALSE.
+     * {@inheritdoc}
      */
-    public function parseDocumentationResource($resource)
+    public function registerDocumentationResource(string $resource): bool
     {
-        if (!is_string($resource)) {
-            // unsupported resource type
-            return false;
-        }
-
-        $pos = strrpos($resource, '.md');
+        $pos = \strrpos($resource, '.md');
         if (false === $pos) {
             // unsupported resource
             return false;
         }
 
-        $filePath = $this->fileLocator->locate(substr($resource, 0, $pos + 3));
+        /** @var string $filePath */
+        $filePath = $this->fileLocator->locate(\substr($resource, 0, $pos + 3));
         if (!isset($this->parsedFiles[$filePath])) {
             $existingData = $this->loadedData;
             $this->loadedData = [];
-            $this->parseDocumentation(file_get_contents($filePath));
+            $this->parseDocumentation(\file_get_contents($filePath));
             if (!empty($existingData)) {
                 $newData = $this->loadedData;
                 $this->loadedData = $existingData;
@@ -146,7 +137,7 @@ class MarkdownApiDocParser
     /**
      * @param array $newData
      */
-    protected function merge(array $newData)
+    private function merge(array $newData): void
     {
         foreach ($newData as $className => $classData) {
             foreach ($classData as $section => $sectionData) {
@@ -182,7 +173,7 @@ class MarkdownApiDocParser
     /**
      * @param string $fileContent
      */
-    protected function parseDocumentation($fileContent)
+    private function parseDocumentation(string $fileContent): void
     {
         $parser = new MarkdownExtra();
         $html = $parser->transform($fileContent);
@@ -203,14 +194,14 @@ class MarkdownApiDocParser
                 if ('h1' === $node->tagName) {
                     $state->setClassName($node->nodeValue);
                 } elseif ('h2' === $node->tagName && $state->hasClass()) {
-                    $state->setSection(strtolower($node->nodeValue));
+                    $state->setSection(\strtolower($node->nodeValue));
                 } elseif ('h3' === $node->tagName && $state->hasSection()) {
-                    $state->setElement(strtolower($node->nodeValue));
+                    $state->setElement(\strtolower($node->nodeValue));
                     $section = $state->getSection();
                     $state->setHasSubElements($this->hasSubElements($section));
                 } elseif ($state->hasElement()) {
                     if ('h4' === $node->tagName && $state->hasSubElements()) {
-                        $state->setSubElement(strtolower($node->nodeValue));
+                        $state->setSubElement(\strtolower($node->nodeValue));
                     } else {
                         $this->saveElement($doc, $node, $state);
                     }
@@ -225,16 +216,16 @@ class MarkdownApiDocParser
      *
      * @return bool
      */
-    protected function hasSubElements($section)
+    private function hasSubElements(string $section): bool
     {
         return ConfigUtil::FIELDS === $section || ConfigUtil::SUBRESOURCES === $section;
     }
 
-    protected function normalizeLoadedData()
+    private function normalizeLoadedData(): void
     {
         // strip whitespace from the beginning and end of descriptions
-        array_walk_recursive($this->loadedData, function (&$element) {
-            if (is_string($element) && $element) {
+        \array_walk_recursive($this->loadedData, function (&$element) {
+            if (\is_string($element) && $element) {
                 $element = trim($element);
             }
         });
@@ -245,7 +236,7 @@ class MarkdownApiDocParser
      * @param \DOMNode                  $node
      * @param MarkdownApiDocParserState $state
      */
-    protected function saveElement(\DOMDocument $doc, \DOMNode $node, MarkdownApiDocParserState $state)
+    private function saveElement(\DOMDocument $doc, \DOMNode $node, MarkdownApiDocParserState $state): void
     {
         $className = $state->getClassName();
         $section = $state->getSection();
@@ -269,8 +260,8 @@ class MarkdownApiDocParser
                 if (!$subElement) {
                     $subElement = 'common';
                 }
-                foreach (explode(',', $subElement) as $action) {
-                    $action = trim($action);
+                foreach (\explode(',', $subElement) as $action) {
+                    $action = \trim($action);
                     if (!isset($this->loadedData[$className][$section][$element][$action])) {
                         $this->loadedData[$className][$section][$element][$action] = '';
                     }
@@ -293,20 +284,24 @@ class MarkdownApiDocParser
      *
      * @return string|null
      */
-    protected function getDocumentation($className, $section, $element, $subElement = null)
-    {
+    private function getDocumentation(
+        string $className,
+        string $section,
+        string $element,
+        ?string $subElement = null
+    ): ?string {
         $result = null;
         if (isset($this->loadedData[$className])) {
             $classData = $this->loadedData[$className];
             if (isset($classData[$section])) {
                 $sectionData = $classData[$section];
-                $element = strtolower($element);
+                $element = \strtolower($element);
                 if (isset($sectionData[$element])) {
                     $elementData = $sectionData[$element];
-                    if (!is_array($elementData)) {
+                    if (!\is_array($elementData)) {
                         $result = $elementData;
                     } elseif ($subElement) {
-                        $subElement = strtolower($subElement);
+                        $subElement = \strtolower($subElement);
                         if (isset($elementData[$subElement])) {
                             $result = $elementData[$subElement];
                         }

@@ -7,7 +7,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestUser;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
-class AttachmentTest extends \PHPUnit_Framework_TestCase
+class AttachmentTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Attachment */
     protected $entity;

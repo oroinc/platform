@@ -204,7 +204,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             }
 
             $choices = array_flip($registry->getAvailableTransportTypesChoiceList($type));
-            FormUtils::replaceField($form, 'transportType', ['choices' => $choices], ['choice_list']);
+            FormUtils::replaceField($form, 'transportType', ['choices' => $choices]);
         };
     }
 
@@ -225,7 +225,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             }
 
             $choices = array_flip($registry->getAvailableConnectorsTypesChoiceList($type));
-            FormUtils::replaceField($form, 'connectors', ['choices' => $choices], ['choice_list']);
+            FormUtils::replaceField($form, 'connectors', ['choices' => $choices]);
         };
     }
 
@@ -279,7 +279,11 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
             $fields = $settingsProvider->getFormSettings($formName, $type);
             if ($fields) {
-                $form->add(Inflector::camelize($formName), new IntegrationSettingsDynamicFormType($fields));
+                $form->add(
+                    Inflector::camelize($formName),
+                    IntegrationSettingsDynamicFormType::class,
+                    ['fields' => $fields]
+                );
             }
         };
     }

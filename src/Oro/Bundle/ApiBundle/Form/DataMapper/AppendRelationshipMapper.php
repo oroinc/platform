@@ -6,6 +6,9 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * The data mapper that is used in "add_relationship" Data API action.
+ */
 class AppendRelationshipMapper extends AbstractRelationshipMapper
 {
     /**
@@ -31,7 +34,7 @@ class AppendRelationshipMapper extends AbstractRelationshipMapper
         if ($methods) {
             $formData = $formField->getData();
             foreach ($formData as $value) {
-                $data->{$methods[0]}($value);
+                $data->{$methods[0]}($this->resolveEntity($value));
             }
         } else {
             /** @var Collection $dataValue */
@@ -39,7 +42,7 @@ class AppendRelationshipMapper extends AbstractRelationshipMapper
             $formData = $formField->getData();
             foreach ($formData as $value) {
                 if (!$dataValue->contains($value)) {
-                    $dataValue->add($value);
+                    $dataValue->add($this->resolveEntity($value));
                 }
             }
         }

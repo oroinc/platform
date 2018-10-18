@@ -9,8 +9,9 @@ use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
 use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Form\FormFactory;
@@ -18,17 +19,15 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class ConnectionManager
- *
- * @package Oro\Bundle\ImapBundle\Manager
+ * This class handle connection forms for Gmail and IMAP
  */
 class ConnectionControllerManager
 {
     /** @var FormFactory */
     protected $formFactory;
 
-    /** @var Mcrypt */
-    protected $mcrypt;
+    /** @var SymmetricCrypterInterface */
+    protected $crypter;
 
     /** @var ManagerRegistry */
     protected $doctrine;
@@ -53,7 +52,7 @@ class ConnectionControllerManager
 
     /**
      * @param FormFactory $formFactory
-     * @param Mcrypt $mcrypt
+     * @param SymmetricCrypterInterface $crypter
      * @param ManagerRegistry $doctrineHelper
      * @param ImapConnectorFactory $imapConnectorFactory
      * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
@@ -64,7 +63,7 @@ class ConnectionControllerManager
      */
     public function __construct(
         FormFactory $formFactory,
-        Mcrypt $mcrypt,
+        SymmetricCrypterInterface $crypter,
         ManagerRegistry $doctrineHelper,
         ImapConnectorFactory $imapConnectorFactory,
         ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager,
@@ -74,7 +73,7 @@ class ConnectionControllerManager
         $emailMailboxFormType
     ) {
         $this->formFactory = $formFactory;
-        $this->mcrypt = $mcrypt;
+        $this->crypter = $crypter;
         $this->doctrine = $doctrineHelper;
         $this->imapConnectorFactory = $imapConnectorFactory;
         $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
@@ -98,18 +97,18 @@ class ConnectionControllerManager
             $data = $this->doctrine->getRepository('OroImapBundle:UserEmailOrigin')->find($id);
         }
 
-        $form = $this->formFactory->create('oro_imap_configuration_gmail', null, ['csrf_protection' => false]);
+        $form = $this->formFactory->create(ConfigurationGmailType::class, null, ['csrf_protection' => false]);
         $form->setData($data);
-        $form->submit($request);
+        $form->handleRequest($request);
 
-        if (!$form->isValid()) {
+        if ($form->isSubmitted() && !$form->isValid()) {
             throw new Exception("Incorrect setting for IMAP authentication");
         }
 
         /** @var UserEmailOrigin $origin */
         $origin = $form->getData();
 
-        $password = $this->mcrypt->decryptData($origin->getPassword());
+        $password = $this->crypter->decryptData($origin->getPassword());
 
         $config = new ImapConfig(
             $origin->getImapHost(),

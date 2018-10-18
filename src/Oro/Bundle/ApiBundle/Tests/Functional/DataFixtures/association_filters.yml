@@ -1,0 +1,100 @@
+Extend\Entity\TestApiE2:
+    entity2_1:
+        name: 'Entity 2 (1)'
+    entity2_2:
+        name: 'Entity 2 (2)'
+    entity2_3:
+        name: 'Entity 2 (3)'
+    entity2_4:
+        name: 'Entity 2 (4)'
+Extend\Entity\TestApiE1:
+    entity1_1:
+        name: 'Entity 1 (1)'
+        enumField: '@enum1_1'
+        multiEnumField: ['@enum2_1']
+        uniM2O: '@entity2_1'
+        biM2O: '@entity2_1'
+        uniM2M: ['@entity2_1']
+        default_uniM2M: '@entity2_1'
+        uniM2MnD: ['@entity2_1']
+        biM2M: ['@entity2_1']
+        default_biM2M: '@entity2_1'
+        biM2MnD: ['@entity2_1']
+        uniO2M: ['@entity2_1']
+        default_uniO2M: '@entity2_1'
+        uniO2MnD: ['@entity2_1']
+        biO2M: ['@entity2_1']
+        default_biO2M: '@entity2_1'
+        biO2MnD: ['@entity2_1']
+    entity1_2:
+        name: 'Entity 1 (1)'
+        enumField: '@enum1_1'
+        multiEnumField: ['@enum2_1', '@enum2_2']
+        uniM2O: '@entity2_1'
+        biM2O: '@entity2_1'
+        uniM2M: ['@entity2_1', '@entity2_2']
+        default_uniM2M: '@entity2_1'
+        uniM2MnD: ['@entity2_1', '@entity2_2']
+        biM2M: ['@entity2_1', '@entity2_2']
+        default_biM2M: '@entity2_1'
+        biM2MnD: ['@entity2_1', '@entity2_2']
+        uniO2M: ['@entity2_2']
+        default_uniO2M: '@entity2_2'
+        uniO2MnD: ['@entity2_2']
+        biO2M: ['@entity2_2']
+        default_biO2M: '@entity2_1'
+        biO2MnD: ['@entity2_2']
+    entity1_3:
+        name: 'Entity 1 (3)'
+        enumField: '@enum1_2'
+        multiEnumField: ['@enum2_3']
+        uniM2O: '@entity2_3'
+        biM2O: '@entity2_3'
+        uniM2M: ['@entity2_3']
+        default_uniM2M: '@entity2_3'
+        uniM2MnD: ['@entity2_3']
+        biM2M: ['@entity2_3']
+        default_biM2M: '@entity2_3'
+        biM2MnD: ['@entity2_3']
+        uniO2M: ['@entity2_3']
+        default_uniO2M: '@entity2_3'
+        uniO2MnD: ['@entity2_3']
+        biO2M: ['@entity2_3']
+        default_biO2M: '@entity2_3'
+        biO2MnD: ['@entity2_3']
+    entity1_4:
+        name: 'Entity 1 (4)'
+        enumField: '@enum1_4'
+        multiEnumField: ['@enum2_4']
+        uniM2O: '@entity2_4'
+        biM2O: '@entity2_4'
+        uniM2M: ['@entity2_4']
+        default_uniM2M: '@entity2_4'
+        uniM2MnD: ['@entity2_4']
+        biM2M: ['@entity2_4']
+        default_biM2M: '@entity2_4'
+        biM2MnD: ['@entity2_4']
+        uniO2M: ['@entity2_4']
+        default_uniO2M: '@entity2_4'
+        uniO2MnD: ['@entity2_4']
+        biO2M: ['@entity2_4']
+        default_biO2M: '@entity2_4'
+        biO2MnD: ['@entity2_4']
+    entity1_null:
+        name: 'Entity 1 (null)'
+        enumField: ~
+        multiEnumField: []
+        uniM2O: ~
+        biM2O: ~
+        uniM2M: []
+        default_uniM2M: ~
+        uniM2MnD: []
+        biM2M: []
+        default_biM2M: ~
+        biM2MnD: []
+        uniO2M: []
+        default_uniO2M: ~
+        uniO2MnD: []
+        biO2M: []
+        default_biO2M: ~
+        biO2MnD: []

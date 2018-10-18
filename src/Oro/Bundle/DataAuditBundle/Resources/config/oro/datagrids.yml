@@ -97,9 +97,9 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                create: oro.dataaudit.action.create
-                                update: oro.dataaudit.action.update
-                                remove: oro.dataaudit.action.remove
+                                oro.dataaudit.action.create: create
+                                oro.dataaudit.action.update: update
+                                oro.dataaudit.action.remove: remove
                 version:
                     type: number-range
                     data_name: a.version
@@ -184,6 +184,6 @@ datagrids:
                 loggedAt:
                     data_name: a.loggedAt
             default:
-                loggedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+                loggedAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
 
         filters: ~

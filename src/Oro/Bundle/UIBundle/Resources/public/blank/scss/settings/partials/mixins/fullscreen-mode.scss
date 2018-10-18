@@ -1,0 +1,10 @@
+/* @theme: blank; */
+
+// Wrap element
+@mixin fullscreen-mode {
+    @at-root {
+        .fullscreen-mode {
+            @content;
+        }
+    }
+}

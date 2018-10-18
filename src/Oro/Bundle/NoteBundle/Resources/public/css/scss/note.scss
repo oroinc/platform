@@ -1,0 +1,208 @@
+/* @theme: admin.oro; */
+
+.notes {
+    position: relative;
+
+    .list-box {
+        margin-top: $note-item-margin-top;
+
+        .list-item {
+            padding: $content-padding-medium;
+            display: inline-block;
+
+            .visual {
+                margin-#{$start}: $note-message-padding - ($note-avatar-size + $note-avatar-margin);
+                display: block;
+
+                img {
+                    max-width: $note-avatar-size;
+                    max-height: $note-avatar-size;
+                    display: block;
+                }
+
+                .avatar {
+                    border-radius: $note-avatar-size / 2;
+                    overflow: hidden;
+                    display: inline-block;
+                    float: #{$start};
+                    width: $note-avatar-size;
+                    height: $note-avatar-size;
+                    margin-#{$end}: $note-avatar-margin;
+                    margin-top: ($note-avatar-size - $font-size-base) / 2;
+                }
+            }
+
+            .user {
+                font-style: normal;
+            }
+
+            .date {
+                font-style: normal;
+                font-size: smaller;
+                white-space: nowrap;
+                color: $primary-550;
+            }
+
+            .title-item {
+                white-space: nowrap;
+
+                .details {
+                    padding-#{$start}: 7px;
+                }
+            }
+
+            .actions {
+                white-space: nowrap;
+                float: none;
+                margin: 0;
+            }
+
+            .message-item {
+                width: 100%;
+
+                .message {
+                    color: $primary-550;
+
+                    &:before {
+                        content: '- ';
+                    }
+                }
+            }
+
+            .labels {
+                text-align: #{$end};
+            }
+
+            .label {
+                border-radius: ($badge-font-size / 2) + $badge-padding-y;
+                background: $primary-830;
+                padding: $badge-padding-y $badge-padding-x;
+                font-size: $badge-font-size;
+                line-height: 1;
+                color: $primary-500;
+            }
+        }
+
+        .list-item {
+            display: block;
+            border-top: 1px solid $primary-830;
+            border-bottom: 0;
+        }
+
+        .list-item:last-child {
+            border-bottom: 0;
+        }
+    }
+
+    .accordion {
+        margin-top: $note-item-margin-top;
+
+        .accordion-group {
+            border: 0;
+            margin: 0;
+
+            .accordion-heading {
+                display: table;
+                border-collapse: separate;
+
+                & > div {
+                    display: table-cell;
+
+                    &:not(:first-child) {
+                        padding-#{$start}: $note-heading-margin;
+                    }
+                }
+
+                .message {
+                    display: block;
+                    overflow: hidden;
+                    height: 20px;
+                }
+
+                .accordion-toggle {
+                    display: inline-block;
+                    padding: 0;
+                    min-width: $note-icon-size + 1;
+                    margin-#{$end}: -($note-icon-size + 1);
+                    float: #{$start};
+                    position: relative;
+
+                    &:before {
+                        content: '\f147';
+                        font-family: FontAwesome;
+                        color: #727272;
+                    }
+                }
+
+                .accordion-toggle.collapsed:before {
+                    content: '\f196';
+                }
+            }
+
+            .accordion-heading.in .message {
+                display: none;
+            }
+
+            .accordion-body.collapse {
+                height: auto;
+            }
+
+            .accordion-body {
+                .message {
+                    display: none;
+                    padding-top: $content-padding-small;
+                    overflow-x: auto;
+                }
+
+                .details {
+                    padding-top: $content-padding-small;
+                }
+            }
+
+            .accordion-body.in .message {
+                display: block;
+                padding-#{$start}: $note-message-padding;
+            }
+        }
+    }
+}
+
+.note-attachments {
+    float: left;
+    width: 100%;
+
+    .attachment-item {
+        margin-left: 15px;
+    }
+
+    .thumbnail {
+        background: #eee none repeat scroll 0 0;
+        border: medium none;
+        border-radius: 6px;
+        height: 80px;
+        padding: 0;
+        text-align: center;
+        width: 110px;
+    }
+
+    .link-to-record {
+        padding-top: 10px;
+
+        .fa {
+            color: #444;
+            font-size: 15px;
+            margin-left: 0;
+            margin-right: 1px;
+        }
+    }
+}
+
+.btn.btn-link.fa-close.remove-attachment {
+    text-decoration: none;
+}
+
+.ui-dialog .note-form textarea,
+.ui-dialog .note-form .mce-tinymce {
+    width: 100%;
+    box-sizing: border-box;
+}

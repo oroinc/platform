@@ -8,12 +8,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class StripTagsExtensionTest extends \PHPUnit_Framework_TestCase
+class StripTagsExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  StripTagsExtension */
     protected $formExtension;
 
-    /** @var HtmlTagHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $htmlTagHelper;
 
     protected function setUp()

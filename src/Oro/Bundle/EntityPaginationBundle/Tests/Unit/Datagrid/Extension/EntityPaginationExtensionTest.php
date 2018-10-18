@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 
-class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
+class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EntityPaginationExtension

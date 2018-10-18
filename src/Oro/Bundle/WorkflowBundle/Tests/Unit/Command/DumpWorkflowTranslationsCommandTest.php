@@ -13,27 +13,27 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Yaml;
 
-class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
+class DumpWorkflowTranslationsCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowManager;
 
-    /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflow;
 
-    /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $input;
 
-    /** @var OutputInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $output;
 
     /** @var DumpWorkflowTranslationsCommand */
     protected $command;
 
-    /** @var WorkflowTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowTranslationHelper;
 
     /**

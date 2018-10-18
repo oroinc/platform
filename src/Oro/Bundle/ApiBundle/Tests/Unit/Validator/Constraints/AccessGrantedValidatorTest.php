@@ -9,8 +9,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AccessGrantedValidatorTest extends AbstractConstraintValidatorTest
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $authorizationChecker;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
+    private $authorizationChecker;
 
     protected function setUp()
     {
@@ -31,14 +31,14 @@ class AccessGrantedValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    public function testGranted()
+    public function testGrantedForDefaultPermission()
     {
         $constraint = new AccessGranted();
         $entity = new \stdClass();
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', $this->identicalTo($entity))
+            ->with('VIEW', self::identicalTo($entity))
             ->willReturn(true);
 
         $this->validator->validate($entity, $constraint);
@@ -46,19 +46,52 @@ class AccessGrantedValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    public function testDenied()
+    public function testGrantedForCustomPermission()
+    {
+        $constraint = new AccessGranted(['permission' => 'EDIT']);
+        $entity = new \stdClass();
+
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('EDIT', self::identicalTo($entity))
+            ->willReturn(true);
+
+        $this->validator->validate($entity, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testDeniedForDefaultPermission()
     {
         $constraint = new AccessGranted();
         $entity = new \stdClass();
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', $this->identicalTo($entity))
+            ->with('VIEW', self::identicalTo($entity))
             ->willReturn(false);
 
         $this->validator->validate($entity, $constraint);
 
         $this->buildViolation($constraint->message)
+            ->setParameter('{{ permission }}', 'VIEW')
+            ->assertRaised();
+    }
+
+    public function testDeniedForCustomPermission()
+    {
+        $constraint = new AccessGranted(['permission' => 'EDIT']);
+        $entity = new \stdClass();
+
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('EDIT', self::identicalTo($entity))
+            ->willReturn(false);
+
+        $this->validator->validate($entity, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setParameter('{{ permission }}', 'EDIT')
             ->assertRaised();
     }
 }

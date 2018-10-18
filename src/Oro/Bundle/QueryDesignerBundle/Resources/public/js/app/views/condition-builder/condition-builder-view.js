@@ -8,13 +8,13 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var tools = require('oroui/js/tools');
     var BaseView = require('oroui/js/app/views/base/view');
-    var DropdownSelectView = require('oroui/js/app/views/dropdown-select-view');
     var ConditionItemView = require('oroquerydesigner/js/app/views/condition-builder/condition-item-view');
+    var ConditionOperatorView = require('oroquerydesigner/js/app/views/condition-builder/condition-operator-view');
     var ConditionsGroupView = require('oroquerydesigner/js/app/views/condition-builder/conditions-group-view');
     require('jquery-ui');
 
     /**
-     * @typedef {ConditionBuilderView|ConditionItemView|ConditionsGroupView|DropdownSelectView} ConditionView
+     * @typedef {ConditionBuilderView|ConditionItemView|ConditionsGroupView|ConditionOperatorView} ConditionView
      */
 
     ConditionBuilderView = BaseView.extend({
@@ -95,6 +95,8 @@ define(function(require) {
             }));
 
             this.$criteriaList = this.$(this.options.criteriaListSelector);
+            this.$conditionContainer = this.$(this.options.conditionContainerSelector);
+
             this._initCriteriaList();
 
             this._loadCriteriaModules();
@@ -123,7 +125,7 @@ define(function(require) {
             while (this.subviews.length) {
                 this.removeSubview(_.last(this.subviews));
             }
-            this.$(this.options.conditionContainerSelector).html('');
+            this.$conditionContainer.children('[data-role="condition-content"]').remove();
 
             ConditionBuilderView.__super__.render.call(this);
             this._renderRootConditionsGroup();
@@ -131,6 +133,7 @@ define(function(require) {
             this._deferredRender();
             $.when(this.criteriaModules).done(function() {
                 this._renderValue(this.getValue());
+                this._updateContainerClass();
                 this._resolveDeferredRender();
             }.bind(this));
 
@@ -146,7 +149,7 @@ define(function(require) {
                 change: this._onCriteriaChange.bind(this),
                 update: this._onStructureUpdate.bind(this),
                 over: this._syncDropAreaOver.bind(this),
-                out: this._syncDropAreaOver.bind(this),
+                out: this._syncDropAreaOut.bind(this),
                 appendTo: opts.criteriaListSelector,
                 connectWith: '.' + this.CONDITION_GROUP_CLASS
             });
@@ -155,7 +158,7 @@ define(function(require) {
                 stop: this._onCriteriaDrop.bind(this),
                 change: this._onCriteriaChange.bind(this),
                 over: this._syncDropAreaOver.bind(this),
-                out: this._syncDropAreaOver.bind(this),
+                out: this._syncDropAreaOut.bind(this),
                 connectWith: '.' + this.CONDITION_GROUP_CLASS
             });
             return opts;
@@ -317,11 +320,11 @@ define(function(require) {
         },
 
         _renderRootConditionsGroup: function() {
-            var $container = this.$(this.options.conditionContainerSelector);
-            $container.attr({
+            this.$conditionContainer.attr({
                 'data-condition-cid': this.cid
             });
-            this.$content = $('<ul class="conditions-group" data-role="condition-content"/>').appendTo($container);
+            this.$content = $('<ul class="conditions-group" data-role="condition-content"/>');
+            this.$conditionContainer.append(this.$content);
             this._initConditionsGroup(this.$content);
             this.conditions[this.cid] = this;
         },
@@ -407,18 +410,15 @@ define(function(require) {
             if (beforeCriteria === 'conditions-group-aggregated') {
                 operations = ['AND'];
             }
-            var operatorView = new DropdownSelectView({
+
+            var operatorView = new ConditionOperatorView({
                 autoRender: true,
                 tagName: 'li',
-                attributes: function() {
-                    var attrs = {};
-                    attrs['data-condition-cid'] = this.cid;
-                    return attrs;
-                },
+                label: __('oro.querydesigner.condition_operation'),
                 className: this.CONDITION_OPERATOR_CLASS,
                 buttonClass: 'btn btn-mini',
-                selectOptions: operations,
-                selectedValue: operation || this.options.operations[0] || ''
+                operations: operations,
+                selectedOperation: operation
             });
             this._addConditionToRegistry(operatorView);
             return operatorView;
@@ -473,6 +473,7 @@ define(function(require) {
             }
 
             this._updateOperators();
+            this._updateContainerClass();
             this._checkValueChange();
         },
 
@@ -485,6 +486,7 @@ define(function(require) {
                 return conditionView.subviews.indexOf(closedConditionView) !== -1;
             });
             this._updateOperators();
+            this._updateContainerClass();
             if (parentConditionView) {
                 parentConditionView.unassignConditionSubview(closedConditionView);
             }
@@ -505,21 +507,7 @@ define(function(require) {
                 .insertAfter($origin);
             ui.helper.addClass(this.options.helperClass);
 
-            // createDropAreaMarker
-            this.$content.parent().prepend('<div class="drop-area-marker"><span>' +
-                __('Drop condition here') +
-                '</span></div>');
-            /**
-             * sum of heights of :before,:after condition group pseudo elements
-             */
-            var SPACERS_PSEUDO_ELEMENTS_HEIGHT = 20;
-            this.$content
-                .parent()
-                .find('.drop-area-marker')
-                // please do not replace to $smth.height(value) call because of bugs
-                .css({
-                    height: this.$content.height() - SPACERS_PSEUDO_ELEMENTS_HEIGHT
-                });
+            this.$conditionContainer.addClass('drag-start');
         },
 
         _onCriteriaDrop: function(e, ui) {
@@ -527,7 +515,7 @@ define(function(require) {
             var $origin = ui.item;
             var $clone = $origin.data('clone');
             $clone.removeData('origin').replaceWith($origin.removeData('clone'));
-            this.$content.parent().find('.drop-area-marker').remove();
+            this.$conditionContainer.removeClass('drag-start drop-area-over');
         },
 
         _onConditionsGroupGrab: function(e, ui) {
@@ -565,9 +553,19 @@ define(function(require) {
         },
 
         _syncDropAreaOver: function(e, ui) {
-            this.$content
-                .parent()
-                .toggleClass('drop-area-over', this.$content.find('.sortable-placeholder').length !== 0);
+            var hasPlaceholder = this.$content.find('.sortable-placeholder').length !== 0;
+
+            this.$conditionContainer
+                .toggleClass('drag-start', !hasPlaceholder)
+                .toggleClass('drop-area-over', hasPlaceholder);
+        },
+
+        _syncDropAreaOut: function(e, ui) {
+            var hasPlaceholder = this.$content.find('.sortable-placeholder').length !== 0;
+
+            this.$conditionContainer
+                .removeClass('drag-start')
+                .toggleClass('drop-area-over', hasPlaceholder);
         },
 
         _isPlaceholderInValidPosition: function($condition, $placeholder) {
@@ -622,7 +620,7 @@ define(function(require) {
         },
 
         _updateOperators: function() {
-            var $conditions = this.$content.parent().find('.conditions-group>[data-condition-cid]');
+            var $conditions = this.$conditionContainer.find('.conditions-group>[data-condition-cid]');
 
             // remove operators for first items in groups
             var selector = '.%s:first-child, .%s:last-child, .%s+.%s'.replace(/%s/g, this.CONDITION_OPERATOR_CLASS);
@@ -643,6 +641,10 @@ define(function(require) {
                     group.assignConditionSubview(operator);
                 }
             }.bind(this));
+        },
+
+        _updateContainerClass: function() {
+            this.$conditionContainer.toggleClass('empty', this.$content.is(':empty'));
         }
     });
 

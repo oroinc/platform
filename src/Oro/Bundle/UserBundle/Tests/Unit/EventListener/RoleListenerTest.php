@@ -7,10 +7,10 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\EventListener\RoleListener;
 use Oro\Component\DependencyInjection\ServiceLink;
 
-class RoleListenerTest extends \PHPUnit_Framework_TestCase
+class RoleListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ServiceLink
+     * @var \PHPUnit\Framework\MockObject\MockObject|ServiceLink
      */
     protected $serviceLink;
 
@@ -35,7 +35,7 @@ class RoleListenerTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new \stdClass();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|LifecycleEventArgs $event */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|LifecycleEventArgs $event */
         $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
@@ -81,7 +81,7 @@ class RoleListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param object $entity
      * @param bool $duplicate
-     * @return \PHPUnit_Framework_MockObject_MockObject|LifecycleEventArgs
+     * @return \PHPUnit\Framework\MockObject\MockObject|LifecycleEventArgs
      */
     protected function getPrePersistEvent($entity, $duplicate = false)
     {

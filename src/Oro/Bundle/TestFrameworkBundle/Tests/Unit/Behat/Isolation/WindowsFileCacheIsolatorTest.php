@@ -5,7 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Isolation;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\WindowsFileCacheIsolator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class WindowsFileCacheIsolatorTest extends \PHPUnit_Framework_TestCase
+class WindowsFileCacheIsolatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider onlyFileHandlerIsApplicableProvider

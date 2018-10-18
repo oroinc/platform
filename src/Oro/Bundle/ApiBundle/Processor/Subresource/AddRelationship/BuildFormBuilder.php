@@ -10,7 +10,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Builds the form builder based on the parent entity metadata and configuration
- * and sets it to the Context.
+ * and sets it to the context.
  */
 class BuildFormBuilder extends BaseBuildFormBuilder
 {
@@ -33,7 +33,9 @@ class BuildFormBuilder extends BaseBuildFormBuilder
     protected function getFormBuilder(ChangeRelationshipContext $context)
     {
         $formBuilder = parent::getFormBuilder($context);
-        $formBuilder->setDataMapper(new AppendRelationshipMapper($this->propertyAccessor));
+        $formBuilder->setDataMapper(
+            new AppendRelationshipMapper($this->propertyAccessor, $context->getEntityMapper())
+        );
 
         return $formBuilder;
     }

@@ -7,7 +7,7 @@ use Oro\Bundle\PlatformBundle\EventListener\AbstractDemoDataFixturesListener;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-abstract class DemoDataFixturesListenerTestCase extends \PHPUnit_Framework_TestCase
+abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestCase
 {
     const LISTENERS = [
         'test_listener_1',
@@ -16,10 +16,10 @@ abstract class DemoDataFixturesListenerTestCase extends \PHPUnit_Framework_TestC
 
     use EntityTrait;
 
-    /** @var OptionalListenerManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $listenerManager;
 
-    /** @var MigrationDataFixturesEvent|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var MigrationDataFixturesEvent|\PHPUnit\Framework\MockObject\MockObject */
     protected $event;
 
     /** @var AbstractDemoDataFixturesListener */

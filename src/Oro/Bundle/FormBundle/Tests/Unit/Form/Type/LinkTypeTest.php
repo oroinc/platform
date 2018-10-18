@@ -4,7 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\LinkType;
 
-class LinkTypeTest extends \PHPUnit_Framework_TestCase
+class LinkTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LinkType
@@ -14,11 +14,6 @@ class LinkTypeTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->type = new LinkType();
-    }
-
-    public function testGetName()
-    {
-        $this->assertInternalType('string', $this->type->getName());
     }
 
     public function testGetParent()
@@ -38,7 +33,7 @@ class LinkTypeTest extends \PHPUnit_Framework_TestCase
 
         $resolver
             ->expects($this->once())
-            ->method('setOptional')
+            ->method('setDefined')
             ->with($this->isType('array'))
             ->will($this->returnSelf());
 
@@ -49,9 +44,8 @@ class LinkTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
 
         $resolver
-            ->expects($this->once())
+            ->expects($this->exactly(3))
             ->method('setAllowedTypes')
-            ->with($this->isType('array'))
             ->will($this->returnSelf());
 
         $this->type->configureOptions($resolver);

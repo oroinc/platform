@@ -14,24 +14,24 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
+class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /* @var AbstractGuesser */
     protected $guesser;
 
-    /* @var \PHPUnit_Framework_MockObject_MockObject|FormRegistry */
+    /* @var \PHPUnit\Framework\MockObject\MockObject|FormRegistry */
     protected $formRegistry;
 
-    /* @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    /* @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     protected $managerRegistry;
 
-    /* @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /* @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $entityConfigProvider;
 
-    /* @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /* @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $formConfigProvider;
 
-    /* @var DoctrineTypeMappingProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /* @var DoctrineTypeMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineTypeMappingProvider;
 
     protected function setUp()

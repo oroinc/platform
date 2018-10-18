@@ -12,14 +12,19 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
+ * Manage fields enum, update and sync
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EnumSynchronizer
 {
+    use TranslatableQueryTrait;
+
     /** @var ConfigManager */
     protected $configManager;
 
@@ -193,55 +198,34 @@ class EnumSynchronizer
 
         /** @var EntityManager $em */
         $em = $this->doctrine->getManagerForClass($enumValueClassName);
-        /** @var EnumValueRepository $enumRepo */
-        $enumRepo = $em->getRepository($enumValueClassName);
+        $em->beginTransaction();
 
-        /** @var AbstractEnumValue[] $values */
-        $values = $enumRepo->createQueryBuilder('o')
-            ->getQuery()
-            ->setHint(TranslatableListener::HINT_TRANSLATABLE_LOCALE, $locale)
-            ->getResult();
+        try {
+            /** @var EnumValueRepository $enumRepo */
+            $enumRepo = $em->getRepository($enumValueClassName);
 
-        $ids = [];
-        /** @var AbstractEnumValue[] $changes */
-        $changes = [];
-        foreach ($values as $value) {
-            $id        = $value->getId();
-            $optionKey = $this->getEnumOptionKey($id, $options);
-            if ($optionKey !== null) {
-                $ids[] = $id;
-                if ($this->setEnumValueProperties($value, $options[$optionKey])) {
-                    $changes[] = $value;
+            /** @var AbstractEnumValue[] $values */
+            $values = $enumRepo->createQueryBuilder('o')
+                ->getQuery()
+                ->setHint(TranslatableListener::HINT_TRANSLATABLE_LOCALE, $locale)
+                ->getResult();
+
+            $changes = $this->processValues($values, $options, $em, $enumRepo);
+
+            if (!empty($changes)) {
+                if ($locale !== Translator::DEFAULT_LOCALE) {
+                    foreach ($changes as $value) {
+                        $value->setLocale($locale);
+                    }
                 }
-                unset($options[$optionKey]);
-            } else {
-                $em->remove($value);
-                $changes[] = $value;
+                $em->flush($changes);
+                // mark translation cache dirty
+                $this->translationHelper->invalidateCache($locale);
             }
-        }
-
-        foreach ($options as $option) {
-            $id    = $this->generateEnumValueId($option['label'], $ids);
-            $ids[] = $id;
-            $value = $enumRepo->createEnumValue(
-                $option['label'],
-                $option['priority'],
-                $option['is_default'],
-                $id
-            );
-            $em->persist($value);
-            $changes[] = $value;
-        }
-
-        if (!empty($changes)) {
-            if ($locale !== Translator::DEFAULT_LOCALE) {
-                foreach ($changes as $value) {
-                    $value->setLocale($locale);
-                }
-            }
-            $em->flush($changes);
-            // mark translation cache dirty
-            $this->translationHelper->invalidateCache($locale);
+            $em->commit();
+        } catch (\Exception $e) {
+            $em->rollback();
+            throw $e;
         }
     }
 
@@ -277,21 +261,23 @@ class EnumSynchronizer
         /** @var EntityManager $em */
         $em       = $this->doctrine->getManagerForClass($enumValueClassName);
         $enumRepo = $em->getRepository($enumValueClassName);
-
-        return $enumRepo->createQueryBuilder('e')
+        $query = $enumRepo->createQueryBuilder('e')
             ->select('e.id, e.priority, e.name as label, e.default as is_default')
             ->orderBy('e.priority')
             ->getQuery()
             ->setHint(
                 Query::HINT_CUSTOM_OUTPUT_WALKER,
                 'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
-            )
-            ->getArrayResult();
+            );
+
+        $this->addTranslatableLocaleHint($query, $em);
+
+        return $query->getArrayResult();
     }
 
     /**
      * @param string $id
-     * @param array  $options
+     * @param array $options
      *
      * @return int|null
      */
@@ -354,5 +340,53 @@ class EnumSynchronizer
         }
 
         return $hasChanges;
+    }
+
+    /**
+     * @param AbstractEnumValue[] $values
+     * @param array $options
+     * @param EntityManager $em
+     * @param EnumValueRepository $enumRepo
+     *
+     * @return AbstractEnumValue[]
+     */
+    protected function processValues(array $values, array $options, EntityManager $em, EnumValueRepository $enumRepo)
+    {
+        $ids = [];
+        /** @var AbstractEnumValue[] $changes */
+        $changes = [];
+        /** @var AbstractEnumValue[] $removes */
+        $removes = [];
+        foreach ($values as $value) {
+            $id = $value->getId();
+            $optionKey = $this->getEnumOptionKey($id, $options);
+            if ($optionKey !== null) {
+                $ids[] = $id;
+                if ($this->setEnumValueProperties($value, $options[$optionKey])) {
+                    $changes[] = $value;
+                }
+                unset($options[$optionKey]);
+            } else {
+                $em->remove($value);
+                $removes[] = $value;
+            }
+        }
+        if ($removes) {
+            $em->flush($removes);
+        }
+
+        foreach ($options as $option) {
+            $id = $this->generateEnumValueId($option['label'], $ids);
+            $ids[] = $id;
+            $value = $enumRepo->createEnumValue(
+                $option['label'],
+                $option['priority'],
+                $option['is_default'],
+                $id
+            );
+            $em->persist($value);
+            $changes[] = $value;
+        }
+        return $changes;
     }
 }

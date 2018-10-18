@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Collection\Join;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 
-class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
+class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
 {
     public function testToArray()
     {
@@ -24,7 +24,7 @@ class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
 
     public function testApplyWhere()
     {
-        /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject $qb */
+        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
         $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
         $criteria = new ScopeCriteria(
             [
@@ -64,7 +64,7 @@ class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
 
     public function testApplyWhereWithPriority()
     {
-        /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject $qb */
+        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
         $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
 
         $criteria = new ScopeCriteria(
@@ -210,11 +210,11 @@ class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return QueryBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getBaseQbMock()
     {
-        /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject $qb */
+        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
         $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
         $qb->method('expr')->willReturn(new Expr());
 

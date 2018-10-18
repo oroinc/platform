@@ -1,0 +1,39 @@
+/* @theme: admin.oro; */
+
+.jstree-default {
+    .jstree-node {
+        margin-left: 20px;
+    }
+
+    .jstree-wholerow {
+        min-height: 35px;
+    }
+
+    .jstree-wholerow-hovered,
+    .jstree-node.jstree-open {
+        background: transparent;
+    }
+
+    .jstree-wholerow-clicked {
+        background: $tree-link-bg-color;
+    }
+
+    .jstree-icon.jstree-ocl {
+        position: absolute;
+        right: 10px;
+    }
+
+    .jstree-open > .jstree-ocl:before,
+    .jstree-closed > .jstree-ocl:before {
+        font-size: 21px;
+        font-weight: bold;
+    }
+
+    .jstree-open > .jstree-ocl:before {
+        content: '\f106';
+    }
+
+    .jstree-closed > .jstree-ocl:before {
+        content: '\f105';
+    }
+}

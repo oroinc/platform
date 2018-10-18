@@ -15,33 +15,33 @@ use Oro\Component\Layout\Tests\Unit\Stubs\LayoutContextStub;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
+class LayoutBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LayoutRegistryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $rawLayoutBuilder;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $layoutManipulator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $blockFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $renderer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $expressionProcessor;
 
-    /** @var LayoutBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $layoutBuilder;
 
-    /** @var LayoutBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $layoutBuilderWithoutCache;
 
-    /** @var BlockViewCache|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BlockViewCache|\PHPUnit\Framework\MockObject\MockObject */
     protected $blockViewCache;
 
     protected function setUp()

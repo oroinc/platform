@@ -3,19 +3,22 @@
 namespace Oro\Bundle\ApiBundle\EventListener;
 
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
-use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
+use Oro\Bundle\ApiBundle\ApiDoc\Extractor\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
 
+/**
+ * The event listener that can be used to clear ApiDoc cache.
+ */
 class ApiSourceListener
 {
     /** @var ResourcesCache */
-    protected $resourcesCache;
+    private $resourcesCache;
 
     /** @var ApiDocExtractor */
-    protected $apiDocExtractor;
+    private $apiDocExtractor;
 
     /** @var string[] */
-    protected $apiDocViews;
+    private $apiDocViews;
 
     /**
      * @param ResourcesCache  $resourcesCache

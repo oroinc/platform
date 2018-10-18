@@ -11,9 +11,12 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Renders email template as a twig template in a sandboxed environment.
+ */
 class EmailRenderer extends \Twig_Environment
 {
     const VARIABLE_NOT_FOUND = 'oro.email.variable.not.found';
@@ -155,6 +158,7 @@ class EmailRenderer extends \Twig_Environment
      * @param array                  $templateParams
      *
      * @return array first element is email subject, second - message
+     * @throws \Twig_Error
      */
     public function compileMessage(EmailTemplateInterface $template, array $templateParams = [])
     {

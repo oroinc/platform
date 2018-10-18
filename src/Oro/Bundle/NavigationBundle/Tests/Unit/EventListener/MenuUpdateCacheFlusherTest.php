@@ -10,21 +10,21 @@ use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class MenuUpdateCacheFlusherTest extends \PHPUnit_Framework_TestCase
+class MenuUpdateCacheFlusherTest extends \PHPUnit\Framework\TestCase
 {
     const SCOPE_TYPE = 'custom_scope_type';
     use EntityTrait;
 
-    /** @var MenuUpdateRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var MenuUpdateRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
-    /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var MenuUpdateCacheFlusher */
     private $flusher;
 
-    /** @var ScopeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $scopeManager;
 
     protected function setUp()
@@ -44,7 +44,7 @@ class MenuUpdateCacheFlusherTest extends \PHPUnit_Framework_TestCase
     {
         $context = ['foo' => 'bar'];
 
-        /** @var MenuUpdateChangeEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var MenuUpdateChangeEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(MenuUpdateChangeEvent::class);
         $event->expects($this->any())->method('getMenuName')->willReturn('application_menu');
         $event->expects($this->any())->method('getContext')->willReturn($context);

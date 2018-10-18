@@ -2,6 +2,7 @@
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -21,11 +22,12 @@ class CountryType extends AbstractType
                     return $er->createQueryBuilder('c')
                         ->orderBy('c.name', 'ASC');
                 },
+                'choice_label' => 'name',
                 'configs' => array(
                     'allowClear' => true,
                     'placeholder'   => 'oro.address.form.choose_country'
                 ),
-                'empty_value' => '',
+                'placeholder' => '',
                 'empty_data'  => null
             )
         );
@@ -36,7 +38,7 @@ class CountryType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_translatable_entity';
+        return Select2TranslatableEntityType::class;
     }
 
     /**

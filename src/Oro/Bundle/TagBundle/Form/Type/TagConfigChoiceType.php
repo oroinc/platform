@@ -5,6 +5,7 @@ namespace Oro\Bundle\TagBundle\Form\Type;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AbstractConfigType;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -19,17 +20,19 @@ class TagConfigChoiceType extends AbstractConfigType
 
         $resolver->setDefaults(
             [
-                'empty_value' => false,
-                'choices'     => ['No', 'Yes']
+                'placeholder' => false,
+                'choices' => [
+                    'No' => 0,
+                    'Yes' => 1,
+                ],
             ]
         );
 
-        $resolver->setNormalizers(
-            [
-                'empty_value' => function (Options $options, $value) {
-                    return $this->isImplementsTaggable($options) ? 'Yes' : $value;
-                },
-            ]
+        $resolver->setNormalizer(
+            'placeholder',
+            function (Options $options, $value) {
+                return $this->isImplementsTaggable($options) ? 'Yes' : $value;
+            }
         );
     }
 
@@ -38,7 +41,7 @@ class TagConfigChoiceType extends AbstractConfigType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**
@@ -60,17 +63,17 @@ class TagConfigChoiceType extends AbstractConfigType
     /**
      * {@inheritdoc}
      */
-    protected function isReadOnly($options)
+    protected function isReadOnly(Options $options)
     {
         return $this->isImplementsTaggable($options) || parent::isReadOnly($options);
     }
 
     /**
-     * @param $options
+     * @param Options $options
      *
      * @return bool
      */
-    protected function isImplementsTaggable($options)
+    protected function isImplementsTaggable(Options $options)
     {
         /** @var EntityConfigId $configId */
         $configId  = $options['config_id'];

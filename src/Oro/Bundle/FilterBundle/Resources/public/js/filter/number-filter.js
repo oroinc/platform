@@ -1,11 +1,14 @@
-define([
-    'underscore',
-    './choice-filter',
-    'orofilter/js/formatter/number-formatter'
-], function(_, ChoiceFilter, NumberFormatter) {
+define(function(require) {
     'use strict';
 
     var NumberFilter;
+
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var ChoiceFilter = require('./choice-filter');
+    var NumberFormatter = require('orofilter/js/formatter/number-formatter');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
 
     /**
      * Number filter: formats value as a number
@@ -15,6 +18,11 @@ define([
          * @property {Boolean}
          */
         wrapHintValue: false,
+
+        /**
+         * @property {Number}
+         */
+        precision: null,
 
         /**
          * @inheritDoc
@@ -31,19 +39,13 @@ define([
          *      a string name of formatter (e.g. "integer", "decimal")
          */
         initialize: function(options) {
-            // init formatter options if it was not initialized so far
-            if (_.isUndefined(this.formatterOptions)) {
-                this.formatterOptions = {};
-            }
-            if (_.isUndefined(this.arraySeparator)) {
-                this.arraySeparator = ',';
-            }
-            if (_.isUndefined(this.arrayOperators)) {
-                this.arrayOperators = [];
-            }
-            if (_.isUndefined(this.dataType)) {
-                this.dataType = 'data_integer';
-            }
+            _.defaults(this, {
+                formatterOptions: {},
+                arraySeparator: ',',
+                arrayOperators: [],
+                dataType: 'data_integer'
+            });
+
             this._filterArrayChoices();
             this.formatter = new NumberFormatter(this.formatterOptions);
             NumberFilter.__super__.initialize.apply(this, arguments);
@@ -105,8 +107,9 @@ define([
             }
 
             if (value !== undefined) {
-                value = this.formatter.toRaw(String(value));
+                value = this.formatter.toRaw(value);
             }
+
             return value;
         },
 
@@ -165,10 +168,83 @@ define([
          * @inheritDoc
          */
         _writeDOMValue: function(data) {
-            var value = _.isString(data.value) ? this.formatter.toRaw(data.value) : data.value;
-            this._setInputValue(this.criteriaValueSelectors.value, value);
-            this._setInputValue(this.criteriaValueSelectors.type, data.type);
-            return this;
+            this._initInputWidget();
+
+            return NumberFilter.__super__._writeDOMValue.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         * @returns {boolean}
+         * @private
+         */
+        _isValid: function() {
+            var rawValue = this.formatter.toRaw(this._readDOMValue().value);
+            var validValue = rawValue === void 0 || this._checkNumberRules(rawValue);
+
+            if (!validValue) {
+                return false;
+            } else {
+                return NumberFilter.__super__._isValid.apply(this, arguments);
+            }
+        },
+
+        /**
+         *
+         * @param value
+         * @returns {boolean}
+         * @private
+         */
+        _checkNumberRules: function(value) {
+            if (_.isUndefined(value)) {
+                return true;
+            }
+
+            var result = true;
+
+            if (!_.isNumber(value) || _.isNaN(value)) {
+                this._showNumberWarning();
+                result = false;
+            }
+
+            if (this.formatter.percent && value > 100) {
+                this._showMaxPercentWarning();
+                result = false;
+            }
+
+            return result;
+        },
+
+        /**
+         * @private
+         */
+        _showNumberWarning: function() {
+            mediator.execute(
+                'showFlashMessage',
+                'warning',
+                __('oro.form.number.nan')
+            );
+        },
+
+        /**
+         * @private
+         */
+        _showMaxPercentWarning: function() {
+            mediator.execute(
+                'showFlashMessage',
+                'warning',
+                __('This value should be {{ limit }} or less.', {limit: 100})
+            );
+        },
+
+        _initInputWidget: function() {
+            if (this.precision) {
+                _.each(this.$el.find('input[type="number"]:not([data-precision])'), function(field) {
+                    $(field).attr('data-precision', this.precision);
+                }, this);
+            }
+
+            this.$el.inputWidget('seekAndCreate');
         }
     });
 

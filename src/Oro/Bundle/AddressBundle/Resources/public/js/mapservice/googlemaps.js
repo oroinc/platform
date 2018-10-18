@@ -58,6 +58,7 @@ define(function(require) {
                 _.pick(localeSettings.settings, ['apiKey']),
                 this.options
             );
+
             this.$mapContainer = $('<div class="map-visual"/>')
                 .appendTo(this.$el);
 
@@ -146,7 +147,9 @@ define(function(require) {
                     });
 
                     this.mapsLoadExecuted = false;
-                }, this)
+                }, this),
+                errorHandlerMessage: false,
+                error: this.mapLocationUnknown.bind(this)
             });
         },
 

@@ -14,20 +14,20 @@ use Oro\Bundle\OrganizationBundle\Twig\OrganizationExtension;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class OrganizationExtensionTest extends \PHPUnit_Framework_TestCase
+class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var OrganizationExtension */
     private $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $entityOwnerAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $businessUnitManager;
 
     protected function setUp()

@@ -12,21 +12,21 @@ services:
             - { name: oro_importexport.processor, type: export, entity: datagrid, alias: oro_datagrid }
 
     oro_datagrid.importexport.data_converter:
-        class: %oro_datagrid.importexport.data_converter.class%
+        class: '%oro_datagrid.importexport.data_converter.class%'
+        lazy: true
         arguments:
-            - '@oro_datagrid.datagrid.manager.link'
+            - '@oro_datagrid.importexport.datagrid_columns_from_context_provider'
             - '@translator'
-            - '@oro_datagrid.columns.helper'
             - '@oro_importexport.formatter.formatter_provider'
 
     oro_datagrid.importexport.export_reader:
-        class: %oro_datagrid.importexport.export_reader.class%
+        class: '%oro_datagrid.importexport.export_reader.class%'
         arguments:
             - '@oro_importexport.context_registry'
             - '@oro_datagrid.importexport.export_connector'
 
     oro_datagrid.importexport.export_connector:
-        class: %oro_datagrid.importexport.export_connector.class%
+        class: '%oro_datagrid.importexport.export_connector.class%'
         arguments:
             - '@oro_datagrid.datagrid.manager.link'
 
@@ -35,3 +35,10 @@ services:
         arguments:
             - '@oro_datagrid.datagrid.manager.link'
             - '@event_dispatcher'
+
+    oro_datagrid.importexport.datagrid_columns_from_context_provider:
+        class: 'Oro\Bundle\DataGridBundle\ImportExport\DatagridColumnsFromContextProvider'
+        lazy: true
+        arguments:
+        - '@oro_datagrid.datagrid.manager'
+        - '@oro_datagrid.provider.state.columns'

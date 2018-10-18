@@ -9,7 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter\ByInitialStateFilter;
 
-class ByInitialStateFilterTest extends \PHPUnit_Framework_TestCase
+class ByInitialStateFilterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider applyDataProvider

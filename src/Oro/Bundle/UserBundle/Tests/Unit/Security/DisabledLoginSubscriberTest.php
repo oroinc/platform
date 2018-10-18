@@ -9,12 +9,12 @@ use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class DisabledLoginSubscriberTest extends \PHPUnit_Framework_TestCase
+class DisabledLoginSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  TokenInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $token;
 
-    /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenStorage;
 
     /** @var User */

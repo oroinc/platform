@@ -6,8 +6,8 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 
 /**
- * Builds response based on the Context state
- * and add the response document builder to the Context.
+ * Builds response based on the context state
+ * and add the response document builder to the context.
  */
 class BuildSingleItemResultDocument extends BuildResultDocument
 {
@@ -16,11 +16,10 @@ class BuildSingleItemResultDocument extends BuildResultDocument
      */
     protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context)
     {
-        $result = $context->getResult();
-        if (null === $result) {
-            $documentBuilder->setDataObject($result, $context->getRequestType());
-        } else {
-            $documentBuilder->setDataObject($result, $context->getRequestType(), $context->getMetadata());
-        }
+        $documentBuilder->setDataObject(
+            $context->getResult(),
+            $context->getRequestType(),
+            $context->getMetadata()
+        );
     }
 }

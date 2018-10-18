@@ -5,7 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 use Oro\Bundle\TranslationBundle\Provider\TranslationPackageProvider;
 use Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtensionInterface;
 
-class TranslationPackageProviderTest extends \PHPUnit_Framework_TestCase
+class TranslationPackageProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslationPackageProvider */
     protected $provider;
@@ -71,7 +71,7 @@ class TranslationPackageProviderTest extends \PHPUnit_Framework_TestCase
      *
      * @param array $extensions
      * @param string $name
-     * @param TranslationPackagesProviderExtensionInterface|\PHPUnit_Framework_MockObject_MockObject $expects
+     * @param TranslationPackagesProviderExtensionInterface|\PHPUnit\Framework\MockObject\MockObject $expects
      */
     public function testGetTranslationPackageProviderByPackageName(array $extensions, $name, $expects)
     {
@@ -112,7 +112,7 @@ class TranslationPackageProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array|string[] $names
-     * @return TranslationPackagesProviderExtensionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return TranslationPackagesProviderExtensionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createExtension(array $names)
     {

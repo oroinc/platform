@@ -1,7 +1,4 @@
-Usage
------
-
-OroAddressBundle provides PHP/REST/SOAP API for address CRUD operations.
+## Usage
 
 ### PHP API
 
@@ -21,16 +18,11 @@ OroAddressBundle provides PHP/REST/SOAP API for address CRUD operations.
     $this->get('oro_address.form.address')
 ```
 
-### REST API
-
-<pre>
-    oro_api_get_addresstype   GET           /api/rest/{version}/addresstypes/{name}.{_format}
-    oro_api_get_addresstypes  GET           /api/rest/{version}/addresstypes.{_format}
-</pre>
-
 ### Address collection
-Address collection may be added to form with next three steps
-1) Add field with type oro_address_collection to form
+
+Address collection may be added to a form following the next three steps:
+
+1) Add a field with the oro_address_collection type to a form:
 
 ```php
 $builder->add(
@@ -42,13 +34,14 @@ $builder->add(
     )
 );
 ```
-2) Add AddressCollectionTypeSubscriber. AddressCollectionTypeSubscriber must be initialized with address collection field name and address class name.
+
+2) Add AddressCollectionTypeSubscriber. AddressCollectionTypeSubscriber must be initialized with an address collection field name and an address class name.
 
 ```php
 $builder->addEventSubscriber(new AddressCollectionTypeSubscriber('addresses', $this->addressClass));
 ```
 
-3) In template add OroAddressBundle:Include:fields.html.twig to support address form field typed
+3) Add OroAddressBundle:Include:fields.html.twig to the template to enable address form field types.
 
 ```php
 {% form_theme form with ['OroAddressBundle:Include:fields.html.twig']}

@@ -4,10 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 
-class DescriptionsConfigExtraTest extends \PHPUnit_Framework_TestCase
+class DescriptionsConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DescriptionsConfigExtra */
-    protected $extra;
+    private $extra;
 
     protected function setUp()
     {
@@ -16,16 +16,16 @@ class DescriptionsConfigExtraTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals(DescriptionsConfigExtra::NAME, $this->extra->getName());
+        self::assertEquals(DescriptionsConfigExtra::NAME, $this->extra->getName());
     }
 
     public function testIsPropagable()
     {
-        $this->assertFalse($this->extra->isPropagable());
+        self::assertFalse($this->extra->isPropagable());
     }
 
     public function testCacheKeyPart()
     {
-        $this->assertEquals(DescriptionsConfigExtra::NAME, $this->extra->getCacheKeyPart());
+        self::assertEquals(DescriptionsConfigExtra::NAME, $this->extra->getCacheKeyPart());
     }
 }

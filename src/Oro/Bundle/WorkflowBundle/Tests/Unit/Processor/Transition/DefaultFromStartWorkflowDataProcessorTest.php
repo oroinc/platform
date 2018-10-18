@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormStartHandleProcess
 use Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFromStartWorkflowDataProcessor;
 use Symfony\Component\Form\FormInterface;
 
-class DefaultFromStartWorkflowDataProcessorTest extends \PHPUnit_Framework_TestCase
+class DefaultFromStartWorkflowDataProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  DefaultFormStartHandleProcessor */
     protected $processor;
@@ -21,7 +21,7 @@ class DefaultFromStartWorkflowDataProcessorTest extends \PHPUnit_Framework_TestC
 
     public function testAddData()
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())
             ->method('getFormOptions')
@@ -31,14 +31,14 @@ class DefaultFromStartWorkflowDataProcessorTest extends \PHPUnit_Framework_TestC
         $toPreserve = (object)['name' => 'to preserve'];
         $existent = (object)['name' => 'existent'];
 
-        /** @var WorkflowData|\PHPUnit_Framework_MockObject_MockObject $workflowData */
+        /** @var WorkflowData|\PHPUnit\Framework\MockObject\MockObject $workflowData */
         $workflowData = $this->createMock(WorkflowData::class);
         $workflowData->expects($this->once())
             ->method('getValues')
             ->with(['field_one', 'field_two'])
             ->willReturn(['field_one' => $toOverride, 'field_two' => $toPreserve]);
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('getData')->willReturn($workflowData);
 
@@ -60,7 +60,7 @@ class DefaultFromStartWorkflowDataProcessorTest extends \PHPUnit_Framework_TestC
 
     public function testCreatesInitData()
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())
             ->method('getFormOptions')
@@ -68,14 +68,14 @@ class DefaultFromStartWorkflowDataProcessorTest extends \PHPUnit_Framework_TestC
 
         $toPreserve = (object)['name' => 'to preserve'];
 
-        /** @var WorkflowData|\PHPUnit_Framework_MockObject_MockObject $workflowData */
+        /** @var WorkflowData|\PHPUnit\Framework\MockObject\MockObject $workflowData */
         $workflowData = $this->createMock(WorkflowData::class);
         $workflowData->expects($this->once())
             ->method('getValues')
             ->with(['field_two'])
             ->willReturn(['field_two' => $toPreserve]);
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('getData')->willReturn($workflowData);
 

@@ -3,7 +3,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Connector\Search;
 
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExprValue;
 
-class SearchQueryExprValueTest extends \PHPUnit_Framework_TestCase
+class SearchQueryExprValueTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {

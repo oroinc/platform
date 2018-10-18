@@ -10,15 +10,15 @@ use Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormProcessor;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class DefaultFormProcessorTest extends \PHPUnit_Framework_TestCase
+class DefaultFormProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var DefaultFormProcessor */
     protected $processor;
 
-    /** @var Request|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
     protected $request;
 
     protected function setUp()
@@ -32,16 +32,17 @@ class DefaultFormProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testFormSubmit()
     {
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())->method('submit')->with($this->request);
+        $form->expects($this->once())->method('handleRequest')->with($this->request);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
         $form->expects($this->once())->method('isValid')->willReturn(true);
 
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->once())->method('setUpdated');
 
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('getRequest')->willReturn($this->request);
         $context->expects($this->at(1))->method('setSaved')->with(false);
@@ -49,7 +50,7 @@ class DefaultFormProcessorTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->once())->method('getWorkflowItem')->willReturn($workflowItem);
         $context->expects($this->at(4))->method('setSaved')->with(true);
 
-        /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject $entityManager */
+        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects($this->once())->method('flush');
 
@@ -65,7 +66,7 @@ class DefaultFormProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testEnsureSavedFalse()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('getRequest')->willReturn($this->request);
         $context->expects($this->once())->method('setSaved')->with(false);
@@ -80,9 +81,10 @@ class DefaultFormProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $this->request->expects($this->once())->method('isMethod')->with('POST')->willReturn(true);
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())->method('submit')->with($this->request);
+        $form->expects($this->once())->method('handleRequest')->with($this->request);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
         $form->expects($this->once())->method('isValid')->willReturn(false);
 
         $context = new TransitionContext();

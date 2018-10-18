@@ -32,7 +32,7 @@ class DatagridConfigContextConfigurator implements ContextConfiguratorInterface
 
         $context->getResolver()
             ->setDefined(['grid_config'])
-            ->setAllowedTypes(['grid_config' => ['array']]);
+            ->setAllowedTypes('grid_config', ['array']);
 
         $data = $context->getOr('grid_config');
 

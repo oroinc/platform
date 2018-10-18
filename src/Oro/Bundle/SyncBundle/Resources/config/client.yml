@@ -1,0 +1,47 @@
+services:
+    oro_sync.websocket_client:
+        alias: oro_sync.websocket_client.basic
+
+    oro_sync.websocket_client.basic:
+        class: 'Oro\Bundle\SyncBundle\Client\WebsocketClient'
+        public: false
+        arguments:
+            - '@oro_sync.client.wamp.factory'
+            - '@oro_sync.client.wamp.factory.client_attributes'
+            - '@oro_sync.authentication.ticket_provider'
+
+    oro_sync.client.logger_aware_decorator:
+        class: 'Oro\Bundle\SyncBundle\Client\LoggerAwareWebsocketClientDecorator'
+        decorates: oro_sync.websocket_client
+        arguments:
+            - '@oro_sync.client.logger_aware_decorator.inner'
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: oro_websocket }
+
+    oro_sync.client.manipulator:
+        class: 'Oro\Bundle\SyncBundle\Client\ClientManipulator'
+        decorates: gos_web_socket.websocket.client_manipulator
+        arguments:
+            - '@oro_sync.client.manipulator.inner'
+            - '@gos_web_socket.client_storage'
+            - '@oro_user.security.provider'
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: oro_websocket }
+
+    oro_sync.client.wamp.factory:
+        class: 'Oro\Bundle\SyncBundle\Client\Wamp\Factory\WampClientFactory'
+        public: false
+
+    oro_sync.client.wamp.factory.client_attributes:
+        class: Oro\Bundle\SyncBundle\Client\Wamp\Factory\ClientAttributes
+        public: false
+        arguments:
+            - '%websocket_backend_host%'
+            - '%websocket_backend_port%'
+            - '%websocket_backend_path%'
+            - '%websocket_backend_transport%'
+            - '%websocket_backend_ssl_context_options%'

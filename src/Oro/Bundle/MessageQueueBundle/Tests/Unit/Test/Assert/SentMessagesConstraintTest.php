@@ -4,7 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Test\Assert;
 
 use Oro\Bundle\MessageQueueBundle\Test\Assert\SentMessagesConstraint;
 
-class SentMessagesConstraintTest extends \PHPUnit_Framework_TestCase
+class SentMessagesConstraintTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldBeEvaluatedToFalseIfValueIsNotEqualToExpectedMessages()
     {
@@ -57,14 +57,13 @@ Failed asserting that exactly all messages were sent.
 +        'message' => 'test message 1'
      )
 +    1 => Array (...)
- )
 
 TEXT;
 
         $constraint = new SentMessagesConstraint($expectedMessages);
         try {
             $constraint->evaluate($allMessages, 'additional description');
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             self::assertEquals(
                 $expectedExceptionMessage,
                 $e->getMessage() . $e->getComparisonFailure()->getDiff()

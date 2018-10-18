@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 /**
- * A base class for filters that can be used independently from other filters
- * and can have predefined default value.
+ * The base class for filters that can be used independently of other filters
+ * and have a predefined default value.
  * Also this class can be used for some custom filters.
  */
 class StandaloneFilterWithDefaultValue extends StandaloneFilter
@@ -49,9 +49,11 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
      */
     public function getDefaultValue()
     {
-        return is_callable($this->defaultValue)
-            ? call_user_func($this->defaultValue)
-            : $this->defaultValue;
+        if (\is_callable($this->defaultValue)) {
+            return \call_user_func($this->defaultValue);
+        }
+
+        return $this->defaultValue;
     }
 
     /**
@@ -71,15 +73,12 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
      */
     public function getDefaultValueString()
     {
+        $value = $this->getDefaultValue();
         if (null !== $this->defaultValueToStringConverter) {
-            return call_user_func($this->defaultValueToStringConverter, $this->getDefaultValue());
+            return \call_user_func($this->defaultValueToStringConverter, $value);
         }
 
-        $value = $this->getDefaultValue();
-
-        return null !== $value
-            ? $value
-            : (string)$value;
+        return $value ?? (string)$value;
     }
 
     /**

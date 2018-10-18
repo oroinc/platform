@@ -1,12 +1,10 @@
-define([
-    'oroui/js/mediator',
-    'oroui/js/app/controllers/base/controller'
-], function(mediator, BaseController) {
+define(function(require) {
     'use strict';
 
-    BaseController.loadBeforeAction([
-        'oroui/js/app/plugins/plugin-resizable-area'
-    ], function(resizableArea) {
-        mediator.on('layoutInit', resizableArea.setPreviousState, resizableArea);
+    var $ = require('jquery');
+    var ResizableArea = require('oroui/js/app/plugins/plugin-resizable-area');
+
+    $(document).on('initLayout', function(e) {
+        ResizableArea.setPreviousState($(e.target));
     });
 });

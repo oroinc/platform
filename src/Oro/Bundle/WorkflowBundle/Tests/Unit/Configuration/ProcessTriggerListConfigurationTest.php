@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerConfiguration;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerListConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
-class ProcessTriggerListConfigurationTest extends \PHPUnit_Framework_TestCase
+class ProcessTriggerListConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ProcessTriggerListConfiguration

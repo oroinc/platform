@@ -8,6 +8,8 @@
 "Back": "Back"
 "Delete Confirmation": "Delete Confirmation"
 "Edit": "Edit"
+"Expand": "Expand"
+"Collapse": "Collapse"
 "Loading...": "Loading..."
 "Saving...": "Saving..."
 "Deleting...": "Deleting..."
@@ -98,6 +100,7 @@ oro:
             move_node_error: "You can not move node {{ nodeText }} here."
             no_node_selected_error: "You didn't select any node"
             actions:
+                label: Tree actions
                 expand: 'Expand all'
                 collapse: 'Collapse all'
                 move: 'Move To'
@@ -122,6 +125,22 @@ oro:
                 copied: Copied to clipboard
                 copy_not_successful: Copy command was not successful
                 copy_not_supported: Your browser does not support copy command. Please press Ctrl/Cmd+C to copy
+        widget_picker:
+            add: Add
+            new: New
+            added: Added
+            filter:
+                search_no_found: No result was found
+                search_placeholder: Quick Search
+        zoom:
+            in: Zoom in
+            out: Zoom out
+            auto: Zoom auto
+            steps: Zoom steps
+
+        search: "Search"
+        reset: "Reset"
+        close_menu: "Close menu"
 
 articles: "a|an|the|some|every|any|no"
 abbreviate_ignore_list: "a|an|the|of|at|per|in|on"

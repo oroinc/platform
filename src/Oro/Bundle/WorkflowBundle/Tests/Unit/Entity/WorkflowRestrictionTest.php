@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class WorkflowRestrictionTest extends \PHPUnit_Framework_TestCase
+class WorkflowRestrictionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider propertiesDataProvider

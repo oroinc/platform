@@ -10,7 +10,7 @@ system_configuration:
     fields:
         oro_currency.default_currency:
             data_type: string
-            type: oro_currency
+            type: Oro\Bundle\CurrencyBundle\Form\Type\CurrencyType
             priority: 30
             options:
                 label: oro.currency.system_configuration.fields.default_currency.label
@@ -23,7 +23,7 @@ system_configuration:
 
         oro_currency.currency_display:
             data_type: string
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             priority: 10
             options:
@@ -33,8 +33,8 @@ system_configuration:
                 constraints:
                     - NotBlank: ~
                 choices:
-                    iso_code: oro.currency.system_configuration.fields.currency_display.choices.iso_code
-                    symbol: oro.currency.system_configuration.fields.currency_display.choices.symbol
+                    oro.currency.system_configuration.fields.currency_display.choices.iso_code: iso_code
+                    oro.currency.system_configuration.fields.currency_display.choices.symbol: symbol
     tree:
         system_configuration:
             platform:

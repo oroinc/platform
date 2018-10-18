@@ -6,7 +6,7 @@ use Oro\Bundle\IntegrationBundle\Datagrid\ActionConfiguration;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
-class ActionConfigurationTest extends \PHPUnit_Framework_TestCase
+class ActionConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ActionConfiguration
@@ -14,7 +14,7 @@ class ActionConfigurationTest extends \PHPUnit_Framework_TestCase
     private $actionConfiguration;
 
     /**
-     * @var TypesRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     private $typesRegistryMock;
 

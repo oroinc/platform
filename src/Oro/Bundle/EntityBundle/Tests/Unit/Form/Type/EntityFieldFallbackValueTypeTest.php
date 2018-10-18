@@ -9,12 +9,14 @@ use Oro\Bundle\EntityBundle\Form\Type\EntityFieldFallbackValueType;
 use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\FallbackParentStub;
 use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\FallbackParentStubType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
 {
-    /** @var EntityFallbackResolver|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityFallbackResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $fallbackResolver;
 
     public function testOptionsCanBeOverridden()
@@ -31,15 +33,15 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         $parentObject = new FallbackParentStub();
         $parentObject->valueWithFallback = new EntityFieldFallbackValue();
         $this->fallbackResolver->expects($this->any())->method('getFallbackConfig')->willReturn([]);
-        $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $options);
+        $form = $this->factory->create(FallbackParentStubType::class, $parentObject, $options);
         $fallbackFormType = $this->getChildForm($form);
-        $this->assertEquals(
-            'integer',
-            $fallbackFormType->get('scalarValue')->getConfig()->getType()->getName()
+        $this->assertInstanceOf(
+            IntegerType::class,
+            $fallbackFormType->get('scalarValue')->getConfig()->getType()->getInnerType()
         );
-        $this->assertEquals(
-            'integer',
-            $fallbackFormType->get('fallback')->getConfig()->getType()->getName()
+        $this->assertInstanceOf(
+            IntegerType::class,
+            $fallbackFormType->get('fallback')->getConfig()->getType()->getInnerType()
         );
         $this->assertEquals(
             $options['fallback']['value_options']['scale'],
@@ -71,10 +73,10 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
             ->method('getSystemConfigFormDescription')->willReturn(['type' => IntegerType::class]);
         $this->fallbackResolver->expects($this->any())
             ->method('getFallbackConfig')->willReturn([]);
-        $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $this->getDefaultOptions());
-        $this->assertEquals(
-            'integer',
-            $this->getChildForm($form)->get('scalarValue')->getConfig()->getType()->getName()
+        $form = $this->factory->create(FallbackParentStubType::class, $parentObject, $this->getDefaultOptions());
+        $this->assertInstanceOf(
+            IntegerType::class,
+            $this->getChildForm($form)->get('scalarValue')->getConfig()->getType()->getInnerType()
         );
     }
 
@@ -86,10 +88,11 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         $this->fallbackResolver->expects($this->any())->method('getType')->willReturn('boolean');
         $this->fallbackResolver->expects($this->any())
             ->method('getFallbackConfig')->willReturn([]);
-        $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $this->getDefaultOptions());
-        $this->assertEquals(
-            'choice',
-            $this->getChildForm($form)->get('scalarValue')->getConfig()->getType()->getName()
+        $form = $this->factory->create(FallbackParentStubType::class, $parentObject, $this->getDefaultOptions());
+
+        $this->assertInstanceOf(
+            ChoiceType::class,
+            $this->getChildForm($form)->get('scalarValue')->getConfig()->getType()->getInnerType()
         );
     }
 
@@ -103,10 +106,10 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
             ->will($this->throwException(new FallbackFieldConfigurationMissingException()));
         $this->fallbackResolver->expects($this->any())
             ->method('getFallbackConfig')->willReturn([]);
-        $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $this->getDefaultOptions());
-        $this->assertEquals(
-            'choice',
-            $this->getChildForm($form)->get('scalarValue')->getConfig()->getType()->getName()
+        $form = $this->factory->create(FallbackParentStubType::class, $parentObject, $this->getDefaultOptions());
+        $this->assertInstanceOf(
+            ChoiceType::class,
+            $this->getChildForm($form)->get('scalarValue')->getConfig()->getType()->getInnerType()
         );
     }
 
@@ -118,10 +121,10 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         $this->fallbackResolver->expects($this->any())->method('getType')->willReturn('string');
         $this->fallbackResolver->expects($this->any())
             ->method('getFallbackConfig')->willReturn([]);
-        $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $this->getDefaultOptions());
-        $this->assertEquals(
-            'text',
-            $this->getChildForm($form)->get('scalarValue')->getConfig()->getType()->getName()
+        $form = $this->factory->create(FallbackParentStubType::class, $parentObject, $this->getDefaultOptions());
+        $this->assertInstanceOf(
+            TextType::class,
+            $this->getChildForm($form)->get('scalarValue')->getConfig()->getType()->getInnerType()
         );
     }
 
@@ -131,9 +134,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         $parentObject->valueWithFallback = new EntityFieldFallbackValue();
         $systemConfig = [
             'options' => [
-                'choices' => ['test1' => 'test1', 'test2' => 'test2'],
-                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
-                'choices_as_values' => true,
+                'choices' => ['test1' => 'test1', 'test2' => 'test2']
             ],
         ];
         $this->fallbackResolver->expects($this->any())
@@ -141,7 +142,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
             ->willReturn($systemConfig);
         $this->fallbackResolver->expects($this->any())
             ->method('getFallbackConfig')->willReturn([]);
-        $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $this->getDefaultOptions());
+        $form = $this->factory->create(FallbackParentStubType::class, $parentObject, $this->getDefaultOptions());
         $formOptions = $this->getChildForm($form)->get('scalarValue')->getConfig()->getOptions();
         $this->assertEquals(
             $systemConfig['options']['choices'],
@@ -170,8 +171,8 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
                     }
                 )
             );
-        $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $this->getDefaultOptions());
-        $this->assertArrayHasKey(
+        $form = $this->factory->create(FallbackParentStubType::class, $parentObject, $this->getDefaultOptions());
+        $this->assertContains(
             'testFallback2',
             $this->getChildForm($form)->get('fallback')->getConfig()->getOption('choices')
         );
@@ -189,7 +190,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
 
         $options = $this->getDefaultOptions();
         $options['fallback']['value_options']['choices'] = ['testValue' => 'testValue'];
-        $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $options);
+        $form = $this->factory->create(FallbackParentStubType::class, $parentObject, $options);
 
         $requestData = [
             'valueWithFallback' => [
@@ -219,7 +220,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         $fallbacks = ['testFallback1' => [], 'testFallback2' => []];
         $this->fallbackResolver->expects($this->any())->method('isFallbackSupported')->willReturn(true);
         $this->fallbackResolver->expects($this->any())->method('getFallbackConfig')->willReturn($fallbacks);
-        $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $this->getDefaultOptions());
+        $form = $this->factory->create(FallbackParentStubType::class, $parentObject, $this->getDefaultOptions());
         $requestData = [
             'valueWithFallback' => [
                 'fallback' => 'testFallback2',
@@ -264,7 +265,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    EntityFieldFallbackValueType::NAME => new EntityFieldFallbackValueType($this->fallbackResolver),
+                    EntityFieldFallbackValueType::class => new EntityFieldFallbackValueType($this->fallbackResolver),
                 ],
                 []
             ),

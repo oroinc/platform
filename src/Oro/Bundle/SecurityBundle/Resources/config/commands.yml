@@ -1,0 +1,12 @@
+services:
+    Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand:
+        public: false
+        class: Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand:
+        public: false
+        class: Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand
+        tags:
+            - { name: console.command }

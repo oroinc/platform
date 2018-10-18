@@ -4,7 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model\WebSocket;
 
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 
-class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
+class MessageParamsProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MessageParamsProvider
@@ -12,22 +12,22 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
     protected $messageParamsProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $dateTimeFormatter;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $urlProvider;
 

@@ -1,11 +1,8 @@
-OroEntityPaginationBundle
-=========================
+# OroEntityPaginationBundle
 
-This bundle provides ability to navigate over grid entities from an entity view and entity edit pages.
+OroEntityPaginationBundle enables pagination UI for a collection of entities when these entities are part of a data set of a DataGrid.
 
-
-How to enable pagination
-------------------------
+## How to enable pagination
 
 To enable entity pagination you have to add option ``entity_pagination`` to a datagrid options. If this option
 is enabled then session collects identifiers of entities at the first visit view or edit page of any entity from
@@ -62,9 +59,7 @@ class UserController extends Controller
 }
 ```
 
-
-System Configuration
---------------------
+## System Configuration
 
 Entity pagination has two system configuration options to handle pagination process. These options are accessible
 in section "System configuration" > "General setup" > "Display settings" > "Data Grid settings".
@@ -76,8 +71,7 @@ of entities in grid for entity pagination (i.e. if number of entities in grid mo
 will not be available)
 
 
-Backend processing
-------------------
+## Backend processing
 
 When user comes from grid with enabled entity pagination to view or edit page, grid parameters (filters, sorters etc.)
 transmitted as url parameters in the browser address bar. Then entity pagination storage data collector send a query to

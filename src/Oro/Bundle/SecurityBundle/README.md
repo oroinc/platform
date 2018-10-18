@@ -1,19 +1,10 @@
-OroSecurityBundle
-=================
+# OroSecurityBundle
 
-The `OroSecurityBundle` provides flexible security model which allows to protect data integrity and privacy. The goals of this bundle are as follows:
+OroSecurityBundle extends Symfony security capabilities to enable a role-based ACL security system in the Oro applications.
 
- - Provide users with the access only to the appropriate levels of information that is required to do their jobs.
- - Categorize users by role and restrict access based on those roles.
- - Support data sharing so that users can be granted access to records that they do not own for a specified collaborative effort.
- - Prevent a user's access to records the user does not own or share.
+The bundle enables developers to set up access restrictions for entities and non-entity related actions using the DOC-block annotations and the YAML configuration files. It also provides UI for application administrators to configure the entity-specific permissions for particular user roles based on the entity ownership.
 
-The Oro security model is based on the Symfony standard security model, but adds some significant modifications to allow protect data on different levels.
-
-The next sections describes Oro ACL (Access Control Lists) security.
-
-ACL
----
+## ACL
 
 At first it is important to say that all benefits of Symfony ACL based security is supported by Oro as well. It means that access can be granted/denied on the following scopes:
 
@@ -51,8 +42,8 @@ And these permissions are supported for fields:
  - **VIEW**: Controls whether a user is allowed to view a field.
  - **EDIT**: Controls whether a user is allowed to modify a field.
 
-Features
---------
+## Features
+
 You can find additional information about the bundle's features in their dedicated sections:
 - [Implementation](./Resources/doc/implementation.md)
 - [UI](./Resources/doc/ui.md)
@@ -61,14 +52,13 @@ You can find additional information about the bundle's features in their dedicat
 - [Field ACL](./Resources/doc/field-acl.md)
 - [Custom listeners](./Resources/doc/custom-listeners.md)
 - [Examples](./Resources/doc/examples.md)
+- [Access rules](./Resources/doc/access-rules.md)
 
-Permissions
------------
+## Permissions
 
 The `OroSecurityBundle` provides possibility to use custom permissions for entities.
 See [Permissions](./Resources/doc/permissions.md) for details.
 
-Configurable Permissions
------------
+## Configurable Permissions
 
 See [Configurable Permissions](./Resources/doc/configurable-permissions.md) for details.

@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class FlashBagNotificationSenderTest extends \PHPUnit_Framework_TestCase
+class FlashBagNotificationSenderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FlashBagNotificationSender */
     private $sender;
@@ -19,7 +19,7 @@ class FlashBagNotificationSenderTest extends \PHPUnit_Framework_TestCase
     /** @var FlashBag */
     private $flashBag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     protected function setUp()

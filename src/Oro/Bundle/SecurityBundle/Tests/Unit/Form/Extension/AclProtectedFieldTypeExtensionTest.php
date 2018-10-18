@@ -7,11 +7,13 @@ use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -19,7 +21,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $fieldAclHelper;
 
     /** @var TestLogger */
@@ -60,8 +62,8 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $this->extension->buildForm($builder, $options);
         $listeners = $dispatcher->getListeners();
         $this->assertCount(2, $listeners);
-        $this->assertTrue(array_key_exists('form.pre_bind', $listeners));
-        $this->assertTrue(array_key_exists('form.post_bind', $listeners));
+        $this->assertTrue(array_key_exists(FormEvents::PRE_SUBMIT, $listeners));
+        $this->assertTrue(array_key_exists(FormEvents::POST_SUBMIT, $listeners));
     }
 
     public function testBuildFormWithoutDataClassInOptions()
@@ -152,15 +154,15 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         );
         $this->assertTrue($view->children['city']->isRendered());
         $this->assertFalse($view->children['street']->isRendered());
-        $this->assertTrue($view->children['street']->vars['read_only']);
+        $this->assertTrue($view->children['street']->vars['attr']['readonly']);
         $this->assertFalse($view->children['country']->isRendered());
-        $this->assertTrue($view->children['country']->vars['read_only']);
+        $this->assertTrue($view->children['country']->vars['attr']['readonly']);
     }
 
     public function testPreSubmitOnEmptyData()
     {
         $data = [];
-        $form = $this->factory->create('form', new CmsAddress(), []);
+        $form = $this->factory->create(FormType::class, new CmsAddress(), []);
         $event = new FormEvent($form, $data);
         $this->extension->preSubmit($event);
         $this->assertCount(0, $event->getData());
@@ -175,7 +177,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $entity->street = 'Main street';
         $entity->zip = 78945;
         /** @var Form $form */
-        $form = $this->factory->create('form', $entity, $options);
+        $form = $this->factory->create(FormType::class, $entity, $options);
         $form->add('city');
         $form->add('street');
         $form->add('country');
@@ -250,7 +252,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $options = $this->prepareCorrectOptions(CmsAddress::class, $showRestricted);
         $view = new FormView();
         $view->children = ['city' => new FormView(), 'street' => new FormView(), 'country' => new FormView()];
-        $form = $this->factory->create('form', new CmsAddress(), $options);
+        $form = $this->factory->create(FormType::class, new CmsAddress(), $options);
         $form->add('city');
         $form->add('street');
         $form->add('country');

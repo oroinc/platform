@@ -4,7 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\Node;
 
 use Oro\Bundle\LayoutBundle\Twig\Node\BlockThemeNode;
 
-class BlockThemeNodeTest extends \PHPUnit_Framework_TestCase
+class BlockThemeNodeTest extends \PHPUnit\Framework\TestCase
 {
     const SET_THEME_CALL = '$this->env->getExtension(\'layout\')->renderer->setTheme';
 

@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 class ValidateRequestTypeAndVersionTest extends GetListProcessorTestCase
 {
     /** @var ValidateRequestTypeAndVersion */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -28,7 +28,7 @@ class ValidateRequestTypeAndVersionTest extends GetListProcessorTestCase
         $this->context->getRequestType()->clear();
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError(
                     'request type constraint',
@@ -43,7 +43,7 @@ class ValidateRequestTypeAndVersionTest extends GetListProcessorTestCase
     {
         $this->context->setVersion(null);
         $this->processor->process($this->context);
-        $this->assertEquals('latest', $this->context->getVersion());
+        self::assertEquals('latest', $this->context->getVersion());
     }
 
     public function testProcessWhenVersionIsSet()
@@ -51,13 +51,13 @@ class ValidateRequestTypeAndVersionTest extends GetListProcessorTestCase
         $version = '2.1';
         $this->context->setVersion($version);
         $this->processor->process($this->context);
-        $this->assertSame($version, $this->context->getVersion());
+        self::assertSame($version, $this->context->getVersion());
     }
 
     public function testProcessWhenVersionHasMeaninglessPrefix()
     {
         $this->context->setVersion('v1.2');
         $this->processor->process($this->context);
-        $this->assertEquals('1.2', $this->context->getVersion());
+        self::assertEquals('1.2', $this->context->getVersion());
     }
 }

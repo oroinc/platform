@@ -8,13 +8,13 @@ use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceCollection;
 
-class AddExcludedActionsForNotAccessibleResourcesTest extends \PHPUnit_Framework_TestCase
+class AddExcludedActionsForNotAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $actionProcessorBag;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
+    private $actionProcessorBag;
 
     /** @var AddExcludedActionsForNotAccessibleResources */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -47,6 +47,6 @@ class AddExcludedActionsForNotAccessibleResourcesTest extends \PHPUnit_Framework
         $this->processor->process($context);
 
         self::assertSame([], $resource1->getExcludedActions());
-        self::assertSame($allActions, $resource2->getExcludedActions());
+        self::assertSame(['action2'], $resource2->getExcludedActions());
     }
 }

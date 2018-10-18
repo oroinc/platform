@@ -9,7 +9,7 @@ use Oro\Bundle\CronBundle\Tests\Unit\Stub\ScheduleIntervalStub;
 /**
  * {@inheritDoc}
  */
-class ScheduleIntervalCheckerTest extends \PHPUnit_Framework_TestCase
+class ScheduleIntervalCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ScheduleIntervalChecker

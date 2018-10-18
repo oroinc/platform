@@ -6,6 +6,22 @@ use Doctrine\Common\Collections\Criteria;
 
 /**
  * A filter that can be used to filter data by a value of "primary" field.
+ * For example this filter can be used to filter data by a primary email,
+ * which value is computed based on a collection of emails where each element of this collection
+ * has a "primary" boolean property indicates whether an email is a primary one or not.
+ * In this case, this filter will work only with emails marked as "primary".
+ * Example of usage:
+ * <code>
+ *  filters:
+ *      fields:
+ *          primaryEmail:
+ *              data_type: string
+ *              property_path: emails
+ *              type: primaryField
+ *              options:
+ *                  data_field: email
+ * </code>
+ * @see \Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ComputePrimaryField
  */
 class PrimaryFieldFilter extends ComparisonFilter
 {

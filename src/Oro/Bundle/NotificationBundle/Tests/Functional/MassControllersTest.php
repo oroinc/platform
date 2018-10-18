@@ -14,7 +14,7 @@ class MassControllersTest extends WebTestCase
         );
         $this->client->useHashNavigation(true);
         $this->loadFixtures(
-            ['Oro\Bundle\NotificationBundle\Tests\Functional\Fixture\LoadMassNotificationFixtures']
+            ['Oro\Bundle\NotificationBundle\Tests\Functional\DataFixtures\LoadMassNotificationFixtures']
         );
     }
 

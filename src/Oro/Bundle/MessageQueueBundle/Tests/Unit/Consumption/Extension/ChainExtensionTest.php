@@ -5,12 +5,12 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtensionAwareInterface;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionInterface;
-use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
+use Oro\Component\MessageQueue\Log\ConsumerState;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class ChainExtensionTest extends \PHPUnit_Framework_TestCase
+class ChainExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 
@@ -253,7 +253,7 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Context
+     * @return \PHPUnit\Framework\MockObject\MockObject|Context
      */
     protected function createContext()
     {
@@ -261,7 +261,7 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ExtensionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ExtensionInterface
      */
     protected function createExtension()
     {
@@ -269,7 +269,7 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConsumerState
+     * @return \PHPUnit\Framework\MockObject\MockObject|ConsumerState
      */
     protected function createConsumerState()
     {

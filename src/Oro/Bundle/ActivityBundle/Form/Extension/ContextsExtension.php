@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Form\Extension;
 
+use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -73,7 +74,6 @@ class ContextsExtension extends AbstractTypeExtension
             'label'          => 'oro.activity.contexts.label',
             'tooltip'        => 'oro.activity.contexts.tooltip',
             'required'       => false,
-            'read_only'      => false,
             'mapped'         => false,
             'error_bubbling' => false,
             'configs'   => [
@@ -87,7 +87,7 @@ class ContextsExtension extends AbstractTypeExtension
 
         $builder->add(
             'contexts',
-            'oro_activity_contexts_select',
+            ContextsSelectType::class,
             array_merge($defaultOptions, $options['contexts_options'])
         );
 

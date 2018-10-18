@@ -1,23 +1,32 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DateTransformer;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NullValueTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 
-class NullValueTransformerTest extends \PHPUnit_Framework_TestCase
+class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $innerTransformer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
+    private $innerTransformer;
 
     /** @var NullValueTransformer */
-    protected $nullValueTransformer;
+    private $nullValueTransformer;
 
     protected function setUp()
     {
         $this->innerTransformer = $this->createMock(DataTransformerInterface::class);
 
         $this->nullValueTransformer = new NullValueTransformer($this->innerTransformer);
+    }
+
+    public function testInnerTransformerGetterAndSetter()
+    {
+        self::assertSame($this->innerTransformer, $this->nullValueTransformer->getInnerTransformer());
+
+        $anotherInnerTransformer = $this->createMock(DataTransformerInterface::class);
+        $this->nullValueTransformer->setInnerTransformer($anotherInnerTransformer);
+        self::assertSame($anotherInnerTransformer, $this->nullValueTransformer->getInnerTransformer());
     }
 
     public function testTransformForNull()

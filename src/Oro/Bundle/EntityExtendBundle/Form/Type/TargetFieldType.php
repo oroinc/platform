@@ -5,15 +5,14 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TargetFieldType extends AbstractType
 {
     /** @var ConfigManager */
     protected $configManager;
-
-    /** @var string|null */
-    protected $entityClass;
 
     /**
      * @param ConfigManager $configManager
@@ -24,42 +23,42 @@ class TargetFieldType extends AbstractType
     }
 
     /**
-     * @param string $entityClass
-     */
-    public function setEntityClass($entityClass)
-    {
-        $this->entityClass = $entityClass;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setDefined('entityClass');
+        $resolver->setAllowedTypes('entityClass', ['string', 'null']);
+
         $resolver->setDefaults(
             [
+                'entityClass'     => null,
                 'attr'            => ['class' => 'extend-rel-target-field'],
                 'label'           => 'oro.entity_extend.form.target_field',
-                'empty_value'     => 'oro.entity.form.choose_entity_field',
-                'choices'         => $this->getFieldChoiceList(),
+                'placeholder'     => 'oro.entity.form.choose_entity_field',
                 'auto_initialize' => false
             ]
         );
+
+        $resolver->setNormalizer('choices', function (Options $options) {
+            return $this->getFieldChoiceList($options['entityClass']);
+        });
     }
 
     /**
+     * @param string|null $entityClass
      * @return array
      */
-    protected function getFieldChoiceList()
+    protected function getFieldChoiceList($entityClass)
     {
         $choices = [];
 
-        if (!$this->entityClass) {
+        if (!$entityClass) {
             return $choices;
         }
 
         $entityConfigProvider = $this->configManager->getProvider('entity');
-        $fieldConfigs         = $this->configManager->getProvider('extend')->getConfigs($this->entityClass);
+        $fieldConfigs         = $this->configManager->getProvider('extend')->getConfigs($entityClass);
         foreach ($fieldConfigs as $fieldConfig) {
             /** @var FieldConfigId $fieldId */
             $fieldId = $fieldConfig->getId();
@@ -77,8 +76,9 @@ class TargetFieldType extends AbstractType
             $fieldLabel = $entityConfigProvider
                 ->getConfig($fieldId->getClassName(), $fieldId->getFieldName())
                 ->get('label');
+            $fieldName = $fieldId->getFieldName();
 
-            $choices[$fieldId->getFieldName()] = $fieldLabel ?: $fieldId->getFieldName();
+            $choices[$fieldLabel ?: $fieldName] = $fieldName;
         }
 
         return $choices;
@@ -89,7 +89,7 @@ class TargetFieldType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**

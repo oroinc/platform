@@ -10,21 +10,20 @@ Retrieve a specific file record.
 
 ### get_list
 
-Retrieve a collection of file records.
+Retrieve a set of file records.
 
 {@inheritdoc}
 
 ### create
 
 Create a new file record.
+
 The created record is returned in the response.
 
 {@inheritdoc}
 
 {@request:json_api}
 Example:
-
-`</api/files>`
 
 ```JSON
 {  
@@ -58,8 +57,6 @@ Edit a specific file record.
 {@request:json_api}
 Example:
 
-`</api/files/2>`
-
 ```JSON
 {  
    "data":{  
@@ -92,8 +89,7 @@ Delete a specific file record.
 
 ### delete_list
 
-Delete a collection of file records.
-The list of records that will be deleted, could be limited by filters.
+Delete a set of file records.
 
 {@inheritdoc}
 
@@ -175,8 +171,6 @@ Replace the owner of a specific file record.
 
 {@request:json_api}
 Example:
-
-`</api/files/1/relationships/owner>`
 
 ```JSON
 {

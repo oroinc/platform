@@ -12,7 +12,8 @@ define(function(require) {
     config = _.extend({
         icon: 'ellipsis-h',
         wrapperClassName: 'toolbar-mass-actions',
-        label: __('oro.datagrid.mass_action.title')
+        label: __('oro.datagrid.mass_action.title'),
+        attributes: {'data-placement': 'bottom-end'}
     }, config);
 
     ToolbarMassActionPlugin = BasePlugin.extend({

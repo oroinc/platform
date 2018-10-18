@@ -1,5 +1,5 @@
 title:     "Recent emails"
-iconClass: "fa-envelope"
+iconClass: "mail-icon"
 dialogIcon: "bundles/oroemail/sidebar_widgets/recent_emails/img/recent_emails.png"
 module:    "oroemail/sidebar_widgets/recent_emails/js/widget"
 placement: "both"

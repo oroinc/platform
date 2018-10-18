@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\DataTransformer;
 use Oro\Bundle\EntityBundle\Form\DataTransformer\EntityReferenceToStringTransformer;
 use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\TestEntity;
 
-class EntityReferenceToStringTransformerTest extends \PHPUnit_Framework_TestCase
+class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityReferenceToStringTransformer */
     protected $transformer;

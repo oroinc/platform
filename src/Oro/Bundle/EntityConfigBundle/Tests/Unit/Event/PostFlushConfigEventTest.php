@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Event;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 
-class PostFlushConfigEventTest extends \PHPUnit_Framework_TestCase
+class PostFlushConfigEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

@@ -5,45 +5,81 @@ namespace Oro\Bundle\ApiBundle\Util;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\Join;
 
+/**
+ * Performs the following normalizations of the Criteria object:
+ * * sets missing join aliases
+ * * adds required joins
+ * * replaces LEFT JOIN with INNER JOIN where it is possible
+ */
 class CriteriaNormalizer
 {
-    const JOIN_ALIAS_TEMPLATE = 'alias%d';
+    private const JOIN_ALIAS_TEMPLATE = 'alias%d';
+
+    private const FIELD_OPTION         = 'field';
+    private const PARENT_PATH_OPTION   = 'parentPath';
+    private const NESTING_LEVEL_OPTION = 'nestingLevel';
+
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
+    /** @var RequireJoinsFieldVisitorFactory */
+    private $requireJoinsFieldVisitorFactory;
+
+    /** @var OptimizeJoinsFieldVisitorFactory */
+    private $optimizeJoinsFieldVisitorFactory;
+
+    /**
+     * @param DoctrineHelper                   $doctrineHelper
+     * @param RequireJoinsFieldVisitorFactory  $requireJoinsFieldVisitorFactory
+     * @param OptimizeJoinsFieldVisitorFactory $optimizeJoinsFieldVisitorFactory
+     */
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        RequireJoinsFieldVisitorFactory $requireJoinsFieldVisitorFactory,
+        OptimizeJoinsFieldVisitorFactory $optimizeJoinsFieldVisitorFactory
+    ) {
+        $this->doctrineHelper = $doctrineHelper;
+        $this->requireJoinsFieldVisitorFactory = $requireJoinsFieldVisitorFactory;
+        $this->optimizeJoinsFieldVisitorFactory = $optimizeJoinsFieldVisitorFactory;
+    }
 
     /**
      * @param Criteria $criteria
+     * @param string   $rootEntityClass
      */
-    public function normalizeCriteria(Criteria $criteria)
+    public function normalizeCriteria(Criteria $criteria, string $rootEntityClass): void
     {
         $this->ensureJoinAliasesSet($criteria);
-        $this->completeJoins($criteria);
+        $this->completeJoins($criteria, $rootEntityClass);
         $this->optimizeJoins($criteria);
     }
 
     /**
-     * Sets missing join aliases
+     * Sets missing join aliases.
      *
      * @param Criteria $criteria
      */
-    protected function ensureJoinAliasesSet(Criteria $criteria)
+    private function ensureJoinAliasesSet(Criteria $criteria): void
     {
         $counter = 0;
         $joins = $criteria->getJoins();
         foreach ($joins as $join) {
             $counter++;
             if (!$join->getAlias()) {
-                $join->setAlias(sprintf(self::JOIN_ALIAS_TEMPLATE, $counter));
+                $join->setAlias(\sprintf(self::JOIN_ALIAS_TEMPLATE, $counter));
             }
         }
     }
 
     /**
-     * Makes sure that this criteria object contains all required joins and aliases are set for all joins.
+     * Makes sure that this criteria object contains all required joins.
      *
      * @param Criteria $criteria
+     * @param string   $rootEntityClass
      */
-    protected function completeJoins(Criteria $criteria)
+    private function completeJoins(Criteria $criteria, string $rootEntityClass): void
     {
-        $pathMap = $this->getJoinPathMap($criteria);
+        $pathMap = $this->getJoinPathMap($criteria, $rootEntityClass);
         if (!empty($pathMap)) {
             $aliases = [];
             $joins = $criteria->getJoins();
@@ -54,20 +90,20 @@ class CriteriaNormalizer
             $this->sortJoinPathMap($pathMap);
             foreach ($pathMap as $path => $item) {
                 if (!$criteria->hasJoin($path)) {
-                    $parentPath = $item['parentPath'];
+                    $parentPath = $item[self::PARENT_PATH_OPTION];
                     $parentAlias = $parentPath
                         ? $criteria->getJoin($parentPath)->getAlias()
                         : Criteria::ROOT_ALIAS_PLACEHOLDER;
 
-                    $alias = $item['field'];
+                    $alias = $item[self::FIELD_OPTION];
                     $count = 0;
-                    while (in_array($alias, $aliases, true)) {
-                        $alias = sprintf('%s%d', $item['field'], ++$count);
+                    while (\in_array($alias, $aliases, true)) {
+                        $alias = \sprintf('%s%d', $item[self::FIELD_OPTION], ++$count);
                     }
                     $aliases[] = $alias;
 
                     $criteria
-                        ->addLeftJoin($path, $parentAlias . '.' . $item['field'])
+                        ->addLeftJoin($path, $parentAlias . '.' . $item[self::FIELD_OPTION])
                         ->setAlias($alias);
                 }
             }
@@ -75,22 +111,26 @@ class CriteriaNormalizer
     }
 
     /**
-     * Replaces LEFT JOIN with INNER JOIN where it is possible
+     * Replaces LEFT JOIN with INNER JOIN where it is possible.
      *
      * @param Criteria $criteria
      */
-    protected function optimizeJoins(Criteria $criteria)
+    private function optimizeJoins(Criteria $criteria): void
     {
-        $fields = $this->getWhereFields($criteria);
+        $fields = $this->getFieldsToOptimizeJoins($criteria);
         foreach ($fields as $field) {
-            $lastDelimiter = strrpos($field, '.');
+            $join = $criteria->getJoin($field);
+            if (null !== $join && Join::LEFT_JOIN === $join->getJoinType()) {
+                $join->setJoinType(Join::INNER_JOIN);
+            }
+            $lastDelimiter = \strrpos($field, '.');
             while (false !== $lastDelimiter) {
-                $field = substr($field, 0, $lastDelimiter);
+                $field = \substr($field, 0, $lastDelimiter);
                 $lastDelimiter = false;
                 $join = $criteria->getJoin($field);
                 if (null !== $join && Join::LEFT_JOIN === $join->getJoinType()) {
                     $join->setJoinType(Join::INNER_JOIN);
-                    $lastDelimiter = strrpos($field, '.');
+                    $lastDelimiter = \strrpos($field, '.');
                 }
             }
         }
@@ -98,6 +138,7 @@ class CriteriaNormalizer
 
     /**
      * @param Criteria $criteria
+     * @param string   $rootEntityClass
      *
      * @return array
      *  [
@@ -109,25 +150,34 @@ class CriteriaNormalizer
      *      ...
      *  ]
      */
-    protected function getJoinPathMap(Criteria $criteria)
+    private function getJoinPathMap(Criteria $criteria, string $rootEntityClass): array
     {
         $pathMap = [];
 
-        $joinPaths = array_keys($criteria->getJoins());
-        foreach ($joinPaths as $path) {
+        $joins = $criteria->getJoins();
+        foreach ($joins as $path => $join) {
             $pathMap[$path] = $this->buildJoinPathMapValue($path);
         }
 
-        $rootPath = substr(Criteria::ROOT_ALIAS_PLACEHOLDER, 1, -1);
+        $rootMetadata = $this->doctrineHelper->getEntityMetadataForClass($rootEntityClass);
+        $rootPath = \substr(Criteria::ROOT_ALIAS_PLACEHOLDER, 1, -1);
         $fields = $this->getFields($criteria);
         foreach ($fields as $field) {
-            while ($field) {
-                $path = $this->getPath($field, $rootPath);
-                $field = null;
-                if ($path && Criteria::ROOT_ALIAS_PLACEHOLDER !== $path && !isset($pathMap[$path])) {
-                    $pathMap[$path] = $this->buildJoinPathMapValue($path);
-                    $field = $path;
+            $path = $this->getPath($field, $rootPath);
+            if (!isset($pathMap[$field])) {
+                if ($path) {
+                    if (null !== $this->doctrineHelper->findEntityMetadataByPath($rootEntityClass, $field)) {
+                        $pathMap[$field] = $this->buildJoinPathMapValue($field);
+                    }
+                } elseif ($rootMetadata->hasAssociation($field)) {
+                    $pathMap[$field] = $this->buildJoinPathMapValue($field);
                 }
+            }
+            while ($path) {
+                if (Criteria::ROOT_ALIAS_PLACEHOLDER !== $path && !isset($pathMap[$path])) {
+                    $pathMap[$path] = $this->buildJoinPathMapValue($path);
+                }
+                $path = $this->getPath($path, $rootPath);
             }
         }
 
@@ -140,28 +190,28 @@ class CriteriaNormalizer
      *
      * @return string|null
      */
-    protected function getPath($field, $rootPath)
+    private function getPath(string $field, string $rootPath): ?string
     {
         $path = null;
-        if (0 === strpos($field, '{')) {
-            if ('}' === substr($field, -1)) {
-                $path = substr($field, 1, -2);
+        if (0 === \strpos($field, '{')) {
+            if ('}' === \substr($field, -1)) {
+                $path = \substr($field, 1, -2);
                 if ($rootPath === $path) {
                     $path = null;
                 }
             } else {
-                $lastDelimiter = strrpos($field, '.');
-                if (false !== $lastDelimiter && '}' === substr($field, $lastDelimiter - 1, 1)) {
-                    $path = substr($field, 1, $lastDelimiter - 2);
+                $lastDelimiter = \strrpos($field, '.');
+                if (false !== $lastDelimiter && '}' === $field[$lastDelimiter - 1]) {
+                    $path = \substr($field, 1, $lastDelimiter - 2);
                     if ($rootPath === $path) {
                         $path = null;
                     }
                 }
             }
         } else {
-            $lastDelimiter = strrpos($field, '.');
+            $lastDelimiter = \strrpos($field, '.');
             if (false !== $lastDelimiter) {
-                $path = substr($field, 0, $lastDelimiter);
+                $path = \substr($field, 0, $lastDelimiter);
             }
         }
 
@@ -173,24 +223,24 @@ class CriteriaNormalizer
      *
      * @return array
      */
-    protected function buildJoinPathMapValue($path)
+    private function buildJoinPathMapValue(string $path): array
     {
-        $lastDelimiter = strrpos($path, '.');
+        $lastDelimiter = \strrpos($path, '.');
         if (false === $lastDelimiter) {
             return [
-                'field'        => $path,
-                'parentPath'   => null,
-                'nestingLevel' => 0
+                self::FIELD_OPTION         => $path,
+                self::PARENT_PATH_OPTION   => null,
+                self::NESTING_LEVEL_OPTION => 0
 
             ];
         }
 
-        $parentPath = substr($path, 0, $lastDelimiter);
+        $parentPath = \substr($path, 0, $lastDelimiter);
 
         return [
-            'field'        => substr($path, $lastDelimiter + 1),
-            'parentPath'   => $parentPath,
-            'nestingLevel' => count(explode('.', $parentPath))
+            self::FIELD_OPTION         => \substr($path, $lastDelimiter + 1),
+            self::PARENT_PATH_OPTION   => $parentPath,
+            self::NESTING_LEVEL_OPTION => \substr_count($parentPath, '.') + 1
         ];
     }
 
@@ -199,31 +249,19 @@ class CriteriaNormalizer
      *
      * @return string[]
      */
-    protected function getWhereFields(Criteria $criteria)
+    private function getFields(Criteria $criteria): array
     {
+        $fields = [];
         $whereExpr = $criteria->getWhereExpression();
-        if (!$whereExpr) {
-            return [];
+        if (null !== $whereExpr) {
+            $visitor = $this->requireJoinsFieldVisitorFactory->createExpressionVisitor();
+            $visitor->dispatch($whereExpr);
+            $fields = $visitor->getFields();
         }
-
-        $visitor = new FieldVisitor();
-        $visitor->dispatch($whereExpr);
-
-        return $visitor->getFields();
-    }
-
-    /**
-     * @param Criteria $criteria
-     *
-     * @return string[]
-     */
-    protected function getFields(Criteria $criteria)
-    {
-        $fields = $this->getWhereFields($criteria);
 
         $orderBy = $criteria->getOrderings();
         foreach ($orderBy as $field => $direction) {
-            if (!in_array($field, $fields, true)) {
+            if (!\in_array($field, $fields, true)) {
                 $fields[] = $field;
             }
         }
@@ -232,20 +270,36 @@ class CriteriaNormalizer
     }
 
     /**
+     * @param Criteria $criteria
+     *
+     * @return string[]
+     */
+    private function getFieldsToOptimizeJoins(Criteria $criteria): array
+    {
+        $whereExpr = $criteria->getWhereExpression();
+        if (null === $whereExpr) {
+            return [];
+        }
+
+        $visitor = $this->optimizeJoinsFieldVisitorFactory->createExpressionVisitor();
+        $visitor->dispatch($whereExpr);
+
+        return $visitor->getFields();
+    }
+
+    /**
      * @param array $pathMap
      */
-    protected function sortJoinPathMap(array &$pathMap)
+    private function sortJoinPathMap(array &$pathMap): void
     {
-        uasort(
+        \uasort(
             $pathMap,
             function (array $a, array $b) {
-                if ($a['nestingLevel'] === $b['nestingLevel']) {
+                if ($a[self::NESTING_LEVEL_OPTION] === $b[self::NESTING_LEVEL_OPTION]) {
                     return 0;
-                } elseif ($a['nestingLevel'] < $b['nestingLevel']) {
-                    return -1;
-                } else {
-                    return 1;
                 }
+
+                return $a[self::NESTING_LEVEL_OPTION] < $b[self::NESTING_LEVEL_OPTION] ? -1 : 1;
             }
         );
     }

@@ -4,12 +4,16 @@ namespace Oro\Bundle\LocaleBundle\Form\Type;
 
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Choose fallback type between default and parent values.
+ */
 class FallbackPropertyType extends AbstractType
 {
     const NAME = 'oro_locale_fallback_property';
@@ -48,7 +52,7 @@ class FallbackPropertyType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**
@@ -59,7 +63,7 @@ class FallbackPropertyType extends AbstractType
         $resolver->setDefaults(
             [
                 'required'           => false,
-                'empty_value'        => false,
+                'placeholder'        => false,
                 'enabled_fallbacks'  => [],
                 'existing_fallbacks' => [
                     FallbackType::SYSTEM        => 'oro.locale.fallback.type.default',
@@ -95,21 +99,7 @@ class FallbackPropertyType extends AbstractType
                     );
                 }
 
-                return $choices;
-            }
-        );
-
-        $resolver->setNormalizer(
-            'choice_label',
-            function (Options $options) {
-                $choices = $options->offsetGet('choices');
-
-                if ($choices) {
-                    return function ($choice, $key) use ($choices) {
-                        return $key;
-                    };
-                }
-                return;
+                return array_flip($choices);
             }
         );
     }
@@ -121,11 +111,9 @@ class FallbackPropertyType extends AbstractType
     {
         if ($options['localization']) {
             $view->vars['attr']['data-localization'] = $options['localization'];
-            $view->vars['attr']['test-localization'] = $options['localization'];
         }
         if ($options['parent_localization']) {
             $view->vars['attr']['data-parent-localization'] = $options['parent_localization'];
-            $view->vars['attr']['test-parent-localization'] = $options['parent_localization'];
         }
     }
 }

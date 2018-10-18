@@ -7,7 +7,7 @@ use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
 
-class OroPlatformExtensionTest extends \PHPUnit_Framework_TestCase
+class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad()
     {

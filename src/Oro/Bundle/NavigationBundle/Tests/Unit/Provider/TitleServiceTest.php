@@ -11,25 +11,25 @@ use Oro\Component\DependencyInjection\ServiceLink;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class TitleServiceTest extends \PHPUnit_Framework_TestCase
+class TitleServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var TitleReaderRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var TitleReaderRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     private $titleReaderRegistry;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $titleTranslator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $breadcrumbManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $userConfigManager;
 

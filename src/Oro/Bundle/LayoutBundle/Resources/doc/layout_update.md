@@ -4,11 +4,11 @@
 
 A **layout update** is a set of actions that should be performed with the **[layout](what_is_layout.md)** in order to
 customize the page look depending on our needs. The **layout update** may be performed manually
-(via the [LayoutBuilder](../../../../Component/Layout/LayoutBuilder.php)), or collected by the *Oro Platform* loaders automatically.
+(via the [LayoutBuilder](../../../../Component/Layout/LayoutBuilder.php)), or collected by the *OroPlatform* loaders automatically.
 
 ## Loaders
 
-A loader is responsible for reading, preparing and caching the content of the update file. Out of the box, *Oro Platform* supports *PHP* and *YAML* loaders that load layout updates matched by the file extension. Each of these loaders generates *PHP* classes in the cache directory (`app/cache/{env}/layouts`). For the production mode, validation and generation of cache files is performed by the *optional cache warmer* and could be enforced by running the `app/console cache:warmup --env=prod` shell command.
+A loader is responsible for reading, preparing and caching the content of the update file. Out of the box, *OroPlatform* supports *PHP* and *YAML* loaders that load layout updates matched by the file extension. Each of these loaders generates *PHP* classes in the cache directory (`var/cache/{env}/layouts`). For the production mode, validation and generation of cache files is performed by the *optional cache warmer* and could be enforced by running the `bin/console cache:warmup --env=prod` shell command.
 
 ## Yaml Syntax
 

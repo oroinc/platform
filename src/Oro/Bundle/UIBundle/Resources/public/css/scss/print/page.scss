@@ -1,0 +1,41 @@
+/* @theme: admin.oro; */
+
+a,
+a:visited {
+    text-decoration: underline !important;
+}
+
+a[href]:after {
+    content: "";
+}
+
+a[class~="icons-holder-text"],
+a[class~="icons-holder-text"]:visited,
+a[class~="accordion-toggle"],
+a[class~="accordion-toggle"]:visited {
+    text-decoration: none !important;
+}
+
+.actions-container,
+.widget-actions-container {
+    white-space: nowrap;
+}
+
+.filter-box {
+    padding-left: 20px;
+
+    .filter-list {
+        display: none;
+    }
+
+    .filter-item {
+        a,
+        a:visited {
+            text-decoration: none !important;
+        }
+    }
+}
+
+.scrollable-container {
+    height: auto !important;
+}

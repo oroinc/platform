@@ -6,12 +6,12 @@ use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
+class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SystemAwareResolver */
     protected $resolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     /**

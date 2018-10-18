@@ -10,25 +10,21 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
+    private $metadataProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var LoadParentResourceMetadata */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->metadataProvider = $this->getMockBuilder(MetadataProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->metadataProvider = $this->createMock(MetadataProvider::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->processor = new LoadParentResourceMetadata(
             $this->metadataProvider,
@@ -48,7 +44,7 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
         $this->context->setResult($metadata);
         $this->processor->process($this->context);
 
-        $this->assertSame($metadata, $this->context->getResult());
+        self::assertSame($metadata, $this->context->getResult());
     }
 
     public function testProcessWhenResourceIsNotBasedOnAnotherResource()
@@ -65,7 +61,7 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->hasResult());
+        self::assertFalse($this->context->hasResult());
     }
 
     public function testProcessWhenResourceIsBasedOnAnotherResource()
@@ -84,7 +80,7 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
 
         $expectedMetadata = new EntityMetadata();
         $expectedMetadata->setClassName($entityClass);
-        $expectedMetadata->setHasIdentifierGenerator(false);
+        $expectedMetadata->setHasIdentifierGenerator(true);
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
@@ -106,8 +102,8 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        $this->assertEquals($parentEntityClass, $config->getParentResourceClass());
-        $this->assertEquals($expectedMetadata, $this->context->getResult());
+        self::assertEquals($parentEntityClass, $config->getParentResourceClass());
+        self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
     // @codingStandardsIgnoreStart

@@ -15,13 +15,13 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class MassActionHelperTest extends \PHPUnit_Framework_TestCase
+class MassActionHelperTest extends \PHPUnit\Framework\TestCase
 {
     const MASS_ACTION_NAME = 'massActionName';
     const HANDLER_SERVICE_ID = 'handlerServiceId';
 
     /**
-     * @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $container;
 
@@ -105,10 +105,10 @@ class MassActionHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMassActionByNameWhenNoMassActionExtension()
     {
-        /** @var DatagridInterface|\PHPUnit_Framework_MockObject_MockObject $dataGrid */
+        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $dataGrid */
         $dataGrid = $this->createMock(DatagridInterface::class);
 
-        /** @var ExtensionVisitorInterface|\PHPUnit_Framework_MockObject_MockObject $extension */
+        /** @var ExtensionVisitorInterface|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(ExtensionVisitorInterface::class);
 
         $this->setDatagridExtensions($dataGrid, [$extension]);
@@ -121,10 +121,10 @@ class MassActionHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMassActionByNameWhenNoMassAction()
     {
-        /** @var DatagridInterface|\PHPUnit_Framework_MockObject_MockObject $dataGrid */
+        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $dataGrid */
         $dataGrid = $this->createMock(DatagridInterface::class);
 
-        /** @var MassActionExtension|\PHPUnit_Framework_MockObject_MockObject $extension */
+        /** @var MassActionExtension|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(MassActionExtension::class);
         $extension
             ->expects($this->once())
@@ -142,13 +142,13 @@ class MassActionHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMassActionByName()
     {
-        /** @var DatagridInterface|\PHPUnit_Framework_MockObject_MockObject $dataGrid */
+        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $dataGrid */
         $dataGrid = $this->createMock(DatagridInterface::class);
 
         /** @var MassActionInterface $massAction */
         $massAction = $this->createMock(MassActionInterface::class);
 
-        /** @var MassActionExtension|\PHPUnit_Framework_MockObject_MockObject $extension */
+        /** @var MassActionExtension|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(MassActionExtension::class);
         $extension
             ->expects($this->once())
@@ -163,7 +163,7 @@ class MassActionHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testIsRequestMethodAllowed()
     {
-        /** @var MassActionInterface|\PHPUnit_Framework_MockObject_MockObject $massAction */
+        /** @var MassActionInterface|\PHPUnit\Framework\MockObject\MockObject $massAction */
         $massAction = $this->createMock(MassActionInterface::class);
         $massAction
             ->expects($this->any())
@@ -193,7 +193,7 @@ class MassActionHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getExtensions')
             ->willReturn($extensions);
 
-        /** @var Acceptor|\PHPUnit_Framework_MockObject_MockObject $datagrid */
+        /** @var Acceptor|\PHPUnit\Framework\MockObject\MockObject $datagrid */
         $datagrid
             ->expects($this->once())
             ->method('getAcceptor')
@@ -202,11 +202,11 @@ class MassActionHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param ActionConfiguration $actionConfiguration
-     * @return MassActionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return MassActionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function creatMassAction(ActionConfiguration $actionConfiguration)
     {
-        /** @var MassActionInterface|\PHPUnit_Framework_MockObject_MockObject $massAction **/
+        /** @var MassActionInterface|\PHPUnit\Framework\MockObject\MockObject $massAction **/
         $massAction = $this->createMock(MassActionInterface::class);
 
         $massAction

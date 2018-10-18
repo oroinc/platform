@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\CommentBundle\Form\Type;
 
+use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -34,7 +36,7 @@ class CommentTypeApi extends AbstractType
         $builder
             ->add(
                 'message',
-                'oro_resizeable_rich_text',
+                OroResizeableRichTextType::class,
                 [
                     'required' => true,
                     'label'    => 'oro.comment.message.label',
@@ -47,7 +49,7 @@ class CommentTypeApi extends AbstractType
             )
             ->add(
                 'attachment',
-                'oro_image',
+                ImageType::class,
                 [
                     'label' => 'oro.comment.attachment.label',
                     'required' => false
@@ -72,10 +74,15 @@ class CommentTypeApi extends AbstractType
         );
     }
 
+    public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return self::FORM_NAME;
     }

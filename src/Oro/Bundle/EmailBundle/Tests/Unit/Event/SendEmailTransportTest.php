@@ -5,14 +5,14 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Event;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 
-class SendEmailTransportTest extends \PHPUnit_Framework_TestCase
+class SendEmailTransportTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstruct()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|EmailOrigin $emailOrigin */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|EmailOrigin $emailOrigin */
         $emailOrigin = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailOrigin')
             ->disableOriginalConstructor()->getMock();
-        /** @var \PHPUnit_Framework_MockObject_MockObject|\Swift_Transport_EsmtpTransport $transport */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|\Swift_Transport_EsmtpTransport $transport */
         $transport = $this->getMockBuilder('\Swift_Transport_EsmtpTransport')
             ->disableOriginalConstructor()->getMock();
         

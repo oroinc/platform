@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
+class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -32,22 +32,22 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
     const CLASS_NAME = 'class_name';
 
     /**
-     * @var ConfigHelperHandler|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigHelperHandler|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configHelperHandler;
 
     /**
-     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configManager;
 
     /**
-     * @var ConfigHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configHelper;
 
     /**
-     * @var FieldSessionStorage|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldSessionStorage|\PHPUnit\Framework\MockObject\MockObject
      */
     private $sessionStorage;
 
@@ -83,7 +83,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Request|\PHPUnit_Framework_MockObject_MockObject
+     * @return Request|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createRequest()
     {
@@ -127,10 +127,10 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param FormInterface|\PHPUnit_Framework_MockObject_MockObject $form
+     * @param FormInterface|\PHPUnit\Framework\MockObject\MockObject $form
      * @param EntityConfigModel $entityConfigModel
      * @param FieldConfigModel $fieldConfigModel
-     * @param Request|\PHPUnit_Framework_MockObject_MockObject $request
+     * @param Request|\PHPUnit\Framework\MockObject\MockObject $request
      */
     private function assertArrayResponseReturned(
         FormInterface $form,
@@ -362,8 +362,8 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param Request|\PHPUnit_Framework_MockObject_MockObject $request
-     * @param FormInterface|\PHPUnit_Framework_MockObject_MockObject $form
+     * @param Request|\PHPUnit\Framework\MockObject\MockObject $request
+     * @param FormInterface|\PHPUnit\Framework\MockObject\MockObject $form
      * @param EntityConfigModel $entityConfigModel
      * @param FieldConfigModel $newFieldModel
      */
@@ -429,8 +429,8 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param FieldConfigModel $newFieldModel
-     * @param ConfigInterface|\PHPUnit_Framework_MockObject_MockObject $extendEntityConfig
-     * @return RedirectResponse|\PHPUnit_Framework_MockObject_MockObject
+     * @param ConfigInterface|\PHPUnit\Framework\MockObject\MockObject $extendEntityConfig
+     * @return RedirectResponse|\PHPUnit\Framework\MockObject\MockObject
      */
     private function expectsConfigSavingAndRedirect(
         FieldConfigModel $newFieldModel,
@@ -487,6 +487,11 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('createSecondStepFieldForm')
             ->with($newFieldModel)
             ->willReturn($form);
+
+        $this->configHelperHandler
+            ->expects($this->once())
+            ->method('showClearCacheMessage')
+            ->willReturn($this->configHelperHandler);
 
         $redirectResponse = $this->expectsConfigSavingAndRedirect($newFieldModel, $extendEntityConfig);
 

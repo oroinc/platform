@@ -1,0 +1,8 @@
+/* @theme: blank; */
+
+// Helper for reset default styles of lists
+@mixin list-normalize() {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}

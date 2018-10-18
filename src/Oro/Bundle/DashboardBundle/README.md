@@ -1,20 +1,16 @@
-OroDashboardBundle
-==================
+# OroDashboardBundle
+
+OroDashboardBundle introduces different widget types and manages the configuration of user dashboards and dashboard widgets.
  
-This bundle allows you to manage dashboards for your application created using ORO Platform.
-Dashboard is an entity with user owner. Dashboard view page contains a set of blocks (widgets) with important or useful
-information for your users. User with permissions can add any available widget to dashboard.
- 
-Developer also can configure what widgets are available using configuration files.
- 
-Dashboard configuration
------------------------
+## Dashboard configuration
+
 ```yaml
 dashboards:
     # Configuration of widgets
     widgets:                                                 # widget declaration section
         quick_launchpad:                                     # widget name
-            icon:       icon.png                             # widget icon shown on widget add dialog
+            icon_class: fa-rocket                            # name of FontAwesome class for an icon shown on widget add dialog
+            icon:       icon.png                             # widget icon shown on widget add dialog, in case the iconClass is not defined
             description: Text                                # description of widget
             acl:        acl_resource                         # acl resource of dashboard
             route:      oro_dashboard_itemized_widget        # widget route
@@ -28,11 +24,10 @@ dashboards:
 ```
 To view all configuration options you can launch `config:dump-reference` command:
 ```bash
-php app/console config:dump-reference OroDashboardBundle
+php bin/console config:dump-reference OroDashboardBundle
 ```
 
-How to add new dashboard
-------------------------
+## How to add new dashboard
 
 To add new dashboard you need to create new data migration:
 
@@ -98,10 +93,9 @@ class LoadDashboardData extends AbstractDashboardFixture implements DependentFix
 
 ```
  
-How to make a dashboard a first page of your application
---------------------------------------------------------
+## How to make a dashboard a first page of your application
  
-Make the following changes in `app/config/routing.yml`:
+Make the following changes in `config/routing.yml`:
 ```yaml
 oro_default:
     pattern:  /
@@ -109,8 +103,7 @@ oro_default:
         _controller: OroDashboardBundle:Dashboard:view
 ```
  
-How to add new widget
----------------------
+## How to add new widget
  
 In this example lets create a grid widget. First you need to create a grid. Use `datagrids.yml` of your bundle to do this. For example lets create `dashboard-recent-calls-grid` grid:
 ```yaml
@@ -169,6 +162,7 @@ datagrids:
 ```
  
 Next you need to create a TWIG template renders your grid. This template should be located `Resources/views/Dashboard` directory in of your bundle. For example lets create `recentCalls.html.twig`:
+
 ```twig
 {% extends 'OroDashboardBundle:Dashboard:widget.html.twig' %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
@@ -192,6 +186,7 @@ Next you need to create a TWIG template renders your grid. This template should 
 ```
  
 After that you need to register your widget and add it on the appropriate dashboard. Use `dashboards.yml` of your bundle to do this. For example:
+
 ```yaml
 dashboards:
     widgets:
@@ -205,8 +200,7 @@ dashboards:
 Also there are some additional TWIG templates for mostly used widgets, for example `tabbed`, `itemized` (a widget contains some items, for example links), `chart` and others.
 You can find them in `OroDashboardBundle/Resources/views/Dashboard` directory.
 
-Widget configuration
----------------------
+## Widget configuration
 
 Each widget can have own configuration. Configuration values stores for each widget instance on dashboard.
 
@@ -235,8 +229,7 @@ dashboards:
                label: acme.globalConfigParameter.label
 ```
 
-Grid widget configuration
--------------------------
+## Grid widget configuration
 
 There is special route "oro_dashboard_grid" for rendering grids allowing to set grid specific options.
 

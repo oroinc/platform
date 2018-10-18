@@ -8,9 +8,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 class ValidateEntityExistsTest extends GetProcessorTestCase
 {
     /** @var ValidateEntityExists */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

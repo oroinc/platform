@@ -5,24 +5,24 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
-class EntityDefinitionConfigExtraTest extends \PHPUnit_Framework_TestCase
+class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetName()
     {
         $extra = new EntityDefinitionConfigExtra();
-        $this->assertEquals(EntityDefinitionConfigExtra::NAME, $extra->getName());
+        self::assertEquals(EntityDefinitionConfigExtra::NAME, $extra->getName());
     }
 
     public function testIsPropagable()
     {
         $extra = new EntityDefinitionConfigExtra();
-        $this->assertTrue($extra->isPropagable());
+        self::assertTrue($extra->isPropagable());
     }
 
     public function testCacheKeyPartNoParameters()
     {
         $extra = new EntityDefinitionConfigExtra();
-        $this->assertEquals(
+        self::assertEquals(
             'definition',
             $extra->getCacheKeyPart()
         );
@@ -31,7 +31,7 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit_Framework_TestCase
     public function testCacheKeyPartForSingleItemResource()
     {
         $extra = new EntityDefinitionConfigExtra('action');
-        $this->assertEquals(
+        self::assertEquals(
             'definition:action',
             $extra->getCacheKeyPart()
         );
@@ -40,7 +40,7 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit_Framework_TestCase
     public function testCacheKeyPartForCollectionResource()
     {
         $extra = new EntityDefinitionConfigExtra('action', true);
-        $this->assertEquals(
+        self::assertEquals(
             'definition:action:collection',
             $extra->getCacheKeyPart()
         );
@@ -49,7 +49,7 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit_Framework_TestCase
     public function testCacheKeyPartForSingleItemSubresource()
     {
         $extra = new EntityDefinitionConfigExtra('action', false, 'Test\ParentClass', 'association');
-        $this->assertEquals(
+        self::assertEquals(
             'definition:action:Test\ParentClass:association',
             $extra->getCacheKeyPart()
         );
@@ -58,7 +58,7 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit_Framework_TestCase
     public function testCacheKeyPartForCollectionSubresource()
     {
         $extra = new EntityDefinitionConfigExtra('action', true, 'Test\ParentClass', 'association');
-        $this->assertEquals(
+        self::assertEquals(
             'definition:action:collection:Test\ParentClass:association',
             $extra->getCacheKeyPart()
         );
@@ -69,10 +69,10 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit_Framework_TestCase
         $extra = new EntityDefinitionConfigExtra();
         $context = new ConfigContext();
         $extra->configureContext($context);
-        $this->assertNull($context->getTargetAction());
-        $this->assertFalse($context->isCollection());
-        $this->assertNull($context->getParentClassName());
-        $this->assertNull($context->getAssociationName());
+        self::assertNull($context->getTargetAction());
+        self::assertFalse($context->isCollection());
+        self::assertNull($context->getParentClassName());
+        self::assertNull($context->getAssociationName());
     }
 
     public function testConfigureContextForSingleItemResource()
@@ -80,10 +80,10 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit_Framework_TestCase
         $extra = new EntityDefinitionConfigExtra('action');
         $context = new ConfigContext();
         $extra->configureContext($context);
-        $this->assertEquals('action', $context->getTargetAction());
-        $this->assertFalse($context->isCollection());
-        $this->assertNull($context->getParentClassName());
-        $this->assertNull($context->getAssociationName());
+        self::assertEquals('action', $context->getTargetAction());
+        self::assertFalse($context->isCollection());
+        self::assertNull($context->getParentClassName());
+        self::assertNull($context->getAssociationName());
     }
 
     public function testConfigureContextForCollectionResource()
@@ -91,10 +91,10 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit_Framework_TestCase
         $extra = new EntityDefinitionConfigExtra('action', true);
         $context = new ConfigContext();
         $extra->configureContext($context);
-        $this->assertEquals('action', $context->getTargetAction());
-        $this->assertTrue($context->isCollection());
-        $this->assertNull($context->getParentClassName());
-        $this->assertNull($context->getAssociationName());
+        self::assertEquals('action', $context->getTargetAction());
+        self::assertTrue($context->isCollection());
+        self::assertNull($context->getParentClassName());
+        self::assertNull($context->getAssociationName());
     }
 
     public function testConfigureContextForSingleItemSubresource()
@@ -102,10 +102,10 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit_Framework_TestCase
         $extra = new EntityDefinitionConfigExtra('action', false, 'Test\ParentClass', 'association');
         $context = new ConfigContext();
         $extra->configureContext($context);
-        $this->assertEquals('action', $context->getTargetAction());
-        $this->assertFalse($context->isCollection());
-        $this->assertEquals('Test\ParentClass', $context->getParentClassName());
-        $this->assertEquals('association', $context->getAssociationName());
+        self::assertEquals('action', $context->getTargetAction());
+        self::assertFalse($context->isCollection());
+        self::assertEquals('Test\ParentClass', $context->getParentClassName());
+        self::assertEquals('association', $context->getAssociationName());
     }
 
     public function testConfigureContextForCollectionSubresource()
@@ -113,9 +113,9 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit_Framework_TestCase
         $extra = new EntityDefinitionConfigExtra('action', true, 'Test\ParentClass', 'association');
         $context = new ConfigContext();
         $extra->configureContext($context);
-        $this->assertEquals('action', $context->getTargetAction());
-        $this->assertTrue($context->isCollection());
-        $this->assertEquals('Test\ParentClass', $context->getParentClassName());
-        $this->assertEquals('association', $context->getAssociationName());
+        self::assertEquals('action', $context->getTargetAction());
+        self::assertTrue($context->isCollection());
+        self::assertEquals('Test\ParentClass', $context->getParentClassName());
+        self::assertEquals('association', $context->getAssociationName());
     }
 }

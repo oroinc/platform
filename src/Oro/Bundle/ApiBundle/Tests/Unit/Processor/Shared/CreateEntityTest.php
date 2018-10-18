@@ -2,35 +2,31 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\CreateEntity;
-use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
-use Symfony\Component\HttpFoundation\Response;
 
 class CreateEntityTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityLoader */
-    protected $entityLoader;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityLoader */
+    private $entityLoader;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityInstantiator */
-    protected $entityInstantiator;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityInstantiator */
+    private $entityInstantiator;
 
     /** @var CreateEntity */
-    protected $processor;
+    private $processor;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -49,6 +45,7 @@ class CreateEntityTest extends FormProcessorTestCase
     {
         $entityClass = Entity\Product::class;
         $entity = new $entityClass();
+        $config = new EntityDefinitionConfig();
 
         $this->entityInstantiator->expects(self::once())
             ->method('instantiate')
@@ -56,6 +53,7 @@ class CreateEntityTest extends FormProcessorTestCase
             ->willReturn($entity);
 
         $this->context->setClassName($entityClass);
+        $this->context->setConfig($config);
         $this->processor->process($this->context);
 
         self::assertSame($entity, $this->context->getResult());
@@ -65,8 +63,9 @@ class CreateEntityTest extends FormProcessorTestCase
     {
         $entityClass = Entity\Product::class;
         $entity = new $entityClass();
+        $config = new EntityDefinitionConfig();
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
             ->with($entityClass)
             ->willReturn(false);
@@ -77,6 +76,7 @@ class CreateEntityTest extends FormProcessorTestCase
 
         $this->context->setClassName($entityClass);
         $this->context->setId(123);
+        $this->context->setConfig($config);
         $this->processor->process($this->context);
 
         self::assertSame($entity, $this->context->getResult());
@@ -86,10 +86,11 @@ class CreateEntityTest extends FormProcessorTestCase
     {
         $entityClass = Entity\Product::class;
         $entity = new $entityClass();
+        $config = new EntityDefinitionConfig();
         $metadata = new EntityMetadata();
         $metadata->setHasIdentifierGenerator(true);
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
             ->with($entityClass)
             ->willReturn(true);
@@ -100,6 +101,7 @@ class CreateEntityTest extends FormProcessorTestCase
 
         $this->context->setClassName($entityClass);
         $this->context->setId(123);
+        $this->context->setConfig($config);
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
@@ -111,10 +113,11 @@ class CreateEntityTest extends FormProcessorTestCase
         $entityClass = Entity\Product::class;
         $entityId = 123;
         $entity = new $entityClass();
+        $config = new EntityDefinitionConfig();
         $metadata = new EntityMetadata();
         $metadata->setHasIdentifierGenerator(false);
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
             ->with($entityClass)
             ->willReturn(true);
@@ -129,6 +132,7 @@ class CreateEntityTest extends FormProcessorTestCase
 
         $this->context->setClassName($entityClass);
         $this->context->setId($entityId);
+        $this->context->setConfig($config);
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
@@ -139,10 +143,11 @@ class CreateEntityTest extends FormProcessorTestCase
     {
         $entityClass = Entity\Product::class;
         $entityId = 123;
+        $config = new EntityDefinitionConfig();
         $metadata = new EntityMetadata();
         $metadata->setHasIdentifierGenerator(false);
 
-        $this->doctrineHelper->expects(self::once())
+        $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
             ->with($entityClass)
             ->willReturn(true);
@@ -155,15 +160,13 @@ class CreateEntityTest extends FormProcessorTestCase
 
         $this->context->setClassName($entityClass);
         $this->context->setId($entityId);
+        $this->context->setConfig($config);
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getResult());
         self::assertEquals(
-            [
-                Error::createValidationError(Constraint::CONFLICT, 'The entity already exists')
-                    ->setStatusCode(Response::HTTP_CONFLICT)
-            ],
+            [Error::createConflictValidationError('The entity already exists')],
             $this->context->getErrors()
         );
     }
@@ -172,12 +175,44 @@ class CreateEntityTest extends FormProcessorTestCase
     {
         $entityClass = Entity\Product::class;
         $entity = new $entityClass();
+        $config = new EntityDefinitionConfig();
 
         $this->entityInstantiator->expects(self::never())
             ->method('instantiate');
 
         $this->context->setClassName($entityClass);
+        $this->context->setConfig($config);
         $this->context->setResult($entity);
+        $this->processor->process($this->context);
+
+        self::assertSame($entity, $this->context->getResult());
+    }
+
+    public function testProcessForApiResourceBasedOnManageableEntity()
+    {
+        $entityClass = Entity\UserProfile::class;
+        $parentResourceClass = Entity\User::class;
+        $entity = new $parentResourceClass();
+        $config = new EntityDefinitionConfig();
+        $config->setParentResourceClass($parentResourceClass);
+        $metadata = new EntityMetadata();
+        $metadata->setHasIdentifierGenerator(true);
+
+        $this->doctrineHelper->expects(self::any())
+            ->method('isManageableEntityClass')
+            ->willReturnMap([
+                [$entityClass, false],
+                [$parentResourceClass, true]
+            ]);
+        $this->entityInstantiator->expects(self::once())
+            ->method('instantiate')
+            ->with($parentResourceClass)
+            ->willReturn($entity);
+
+        $this->context->setClassName($entityClass);
+        $this->context->setId(123);
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
         self::assertSame($entity, $this->context->getResult());

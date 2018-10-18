@@ -4,9 +4,10 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
 use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -77,9 +78,9 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
             ->register($apiContextListenerId, SecurityFirewallContextListener::class)
             ->setArguments([new Reference($listenerId), $sessionName, new Reference('security.token_storage')]);
         $contextListeners = [];
-        /** @var Reference[] $listeners */
+        /** @var IteratorArgument $listeners */
         $listeners = $contextDef->getArgument(0);
-        foreach ($listeners as $listener) {
+        foreach ($listeners->getValues() as $listener) {
             // the context listener should be before the access listener
             if ('security.access_listener' === (string)$listener) {
                 $contextListeners[] = new Reference($apiContextListenerId);
@@ -108,8 +109,9 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
         }
 
         $listenerId = 'oro_security.context_listener.' . $contextKey;
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.context_listener'));
-        $listener->replaceArgument(2, $contextKey);
+        $container
+            ->setDefinition($listenerId, new ChildDefinition('security.context_listener'))
+            ->replaceArgument(2, $contextKey);
 
         $this->contextListeners[$contextKey] = $listenerId;
 

@@ -8,7 +8,10 @@ use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate as CacheWarmer;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
-class CacheWarmerAggregate implements CacheWarmerInterface
+/**
+ * @TODO CacheWarmerAggregate extends CacheWarmer only for compatibility with CacheWarmupCommand in Symfony 3.4
+ */
+class CacheWarmerAggregate extends CacheWarmer implements CacheWarmerInterface
 {
     /** @var ServiceLink */
     private $cacheWarmerLink;
@@ -17,7 +20,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     private $extendCacheWarmerLink;
 
     /** @var bool */
-    private $optionalsEnabled = false;
+    protected $optionalsEnabled = false;
 
     /**
      * @param ServiceLink               $cacheWarmerLink
@@ -70,5 +73,20 @@ class CacheWarmerAggregate implements CacheWarmerInterface
             $cacheWarmer->enableOptionalWarmers();
         }
         $cacheWarmer->warmUp($cacheDir);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setWarmers(array $warmers)
+    {
+        throw new \LogicException(sprintf("%s not support method setWarmers", self::class));
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function add(CacheWarmerInterface $warmer)
+    {
+        throw new \LogicException(sprintf("%s not support method add", self::class));
     }
 }

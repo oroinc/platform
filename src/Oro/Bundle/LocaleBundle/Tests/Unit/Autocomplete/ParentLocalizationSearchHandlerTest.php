@@ -14,16 +14,16 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class ParentLocalizationSearchHandlerTest extends \PHPUnit_Framework_TestCase
+class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     const TEST_ENTITY_CLASS = 'stdClass';
 
-    /** @var Indexer|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
     protected $indexer;
 
-    /** @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityRepository;
 
     /** @var ParentLocalizationSearchHandler */
@@ -192,7 +192,7 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit_Framework_TestCase
      * @param array $resultData
      * @param array $expectedIds
      * @param bool $byId
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function assertSearchCall(
         $search,
@@ -232,7 +232,7 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @return ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getManagerRegistryMock()
     {
@@ -257,7 +257,7 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ClassMetadata|\PHPUnit_Framework_MockObject_MockObject
+     * @return ClassMetadata|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMetadataFactoryMock()
     {

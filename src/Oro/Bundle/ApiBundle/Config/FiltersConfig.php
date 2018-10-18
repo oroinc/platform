@@ -3,28 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Oro\Component\EntitySerializer\EntityConfig;
 
 /**
- * Represents a configuration of all filters for an entity.
+ * Represents the configuration of all fields that can be used to filter data.
  */
 class FiltersConfig implements EntityConfigInterface
 {
-    use Traits\ConfigTrait;
-    use Traits\FindFieldTrait;
-    use Traits\ExclusionPolicyTrait;
-
-    /** a list of filters */
-    const FIELDS = EntityConfig::FIELDS;
-
-    /** a type of the exclusion strategy that should be used for the filters */
-    const EXCLUSION_POLICY = EntityConfig::EXCLUSION_POLICY;
-
-    /** exclude all fields are not configured explicitly */
-    const EXCLUSION_POLICY_ALL = EntityConfig::EXCLUSION_POLICY_ALL;
-
-    /** exclude only fields are marked as excluded */
-    const EXCLUSION_POLICY_NONE = EntityConfig::EXCLUSION_POLICY_NONE;
+    /** @var string|null */
+    protected $exclusionPolicy;
 
     /** @var array */
     protected $items = [];
@@ -39,11 +25,13 @@ class FiltersConfig implements EntityConfigInterface
      */
     public function toArray()
     {
-        $result = $this->convertItemsToArray();
-        $this->removeItemWithDefaultValue($result, self::EXCLUSION_POLICY, self::EXCLUSION_POLICY_NONE);
+        $result = ConfigUtil::convertItemsToArray($this->items);
+        if (null !== $this->exclusionPolicy && ConfigUtil::EXCLUSION_POLICY_NONE !== $this->exclusionPolicy) {
+            $result[ConfigUtil::EXCLUSION_POLICY] = $this->exclusionPolicy;
+        }
         $fields = ConfigUtil::convertObjectsToArray($this->fields, true);
-        if (!empty($fields)) {
-            $result[self::FIELDS] = $fields;
+        if ($fields) {
+            $result[ConfigUtil::FIELDS] = $fields;
         }
 
         return $result;
@@ -57,7 +45,8 @@ class FiltersConfig implements EntityConfigInterface
     public function isEmpty()
     {
         return
-            empty($this->items)
+            null === $this->exclusionPolicy
+            && empty($this->items)
             && empty($this->fields);
     }
 
@@ -71,7 +60,7 @@ class FiltersConfig implements EntityConfigInterface
     }
 
     /**
-     * Checks whether the configuration of at least one field exists.
+     * Indicates whether the configuration of at least one filter exists.
      *
      * @return bool
      */
@@ -81,7 +70,7 @@ class FiltersConfig implements EntityConfigInterface
     }
 
     /**
-     * Gets the configuration for all fields.
+     * Gets the configuration for all filters.
      *
      * @return FilterFieldConfig[] [field name => config, ...]
      */
@@ -91,7 +80,7 @@ class FiltersConfig implements EntityConfigInterface
     }
 
     /**
-     * Checks whether the configuration of the filter exists.
+     * Indicates whether the configuration of the filter exists.
      *
      * @param string $fieldName
      *
@@ -129,7 +118,7 @@ class FiltersConfig implements EntityConfigInterface
      */
     public function findField($fieldName, $findByPropertyPath = false)
     {
-        return $this->doFindField($fieldName, $findByPropertyPath);
+        return FindFieldUtil::doFindField($this->fields, $fieldName, $findByPropertyPath);
     }
 
     /**
@@ -141,7 +130,7 @@ class FiltersConfig implements EntityConfigInterface
      */
     public function findFieldNameByPropertyPath($propertyPath)
     {
-        return $this->doFindFieldNameByPropertyPath($propertyPath);
+        return FindFieldUtil::doFindFieldNameByPropertyPath($this->fields, $propertyPath);
     }
 
     /**
@@ -188,5 +177,114 @@ class FiltersConfig implements EntityConfigInterface
     public function removeField($fieldName)
     {
         unset($this->fields[$fieldName]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function has($key)
+    {
+        return \array_key_exists($key, $this->items);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get($key, $defaultValue = null)
+    {
+        if (!\array_key_exists($key, $this->items)) {
+            return $defaultValue;
+        }
+
+        return $this->items[$key];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function set($key, $value)
+    {
+        if (null !== $value) {
+            $this->items[$key] = $value;
+        } else {
+            unset($this->items[$key]);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($key)
+    {
+        unset($this->items[$key]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function keys()
+    {
+        return \array_keys($this->items);
+    }
+
+    /**
+     * Indicates whether the exclusion policy is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasExclusionPolicy()
+    {
+        return null !== $this->exclusionPolicy;
+    }
+
+    /**
+     * Gets the exclusion strategy that should be used for the entity.
+     *
+     * @return string An exclusion strategy, e.g. "none" or "all"
+     */
+    public function getExclusionPolicy()
+    {
+        if (null === $this->exclusionPolicy) {
+            return ConfigUtil::EXCLUSION_POLICY_NONE;
+        }
+
+        return $this->exclusionPolicy;
+    }
+
+    /**
+     * Sets the exclusion strategy that should be used for the entity.
+     *
+     * @param string|null $exclusionPolicy An exclusion strategy, e.g. "none" or "all",
+     *                                     or NULL to remove this option
+     */
+    public function setExclusionPolicy($exclusionPolicy)
+    {
+        $this->exclusionPolicy = $exclusionPolicy;
+    }
+
+    /**
+     * Indicates whether all fields are not configured explicitly should be excluded.
+     *
+     * @return bool
+     */
+    public function isExcludeAll()
+    {
+        return ConfigUtil::EXCLUSION_POLICY_ALL === $this->exclusionPolicy;
+    }
+
+    /**
+     * Sets the exclusion strategy to exclude all fields are not configured explicitly.
+     */
+    public function setExcludeAll()
+    {
+        $this->exclusionPolicy = ConfigUtil::EXCLUSION_POLICY_ALL;
+    }
+
+    /**
+     * Sets the exclusion strategy to exclude only fields are marked as excluded.
+     */
+    public function setExcludeNone()
+    {
+        $this->exclusionPolicy = ConfigUtil::EXCLUSION_POLICY_NONE;
     }
 }

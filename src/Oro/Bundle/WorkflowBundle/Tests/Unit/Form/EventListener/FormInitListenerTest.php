@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\EventListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 use Symfony\Component\Form\FormEvents;
 
-class FormInitListenerTest extends \PHPUnit_Framework_TestCase
+class FormInitListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FormInitListener

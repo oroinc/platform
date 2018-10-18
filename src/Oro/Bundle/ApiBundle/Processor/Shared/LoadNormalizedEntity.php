@@ -18,7 +18,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class LoadNormalizedEntity implements ProcessorInterface
 {
-    const NORMALIZED_ENTITY_LOADED_PARAM = 'normalized_entity_loaded';
+    public const OPERATION_NAME = 'normalized_entity_loaded';
 
     /** @var ActionProcessorBagInterface */
     protected $processorBag;
@@ -43,25 +43,27 @@ class LoadNormalizedEntity implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        if (true === $context->get(self::NORMALIZED_ENTITY_LOADED_PARAM)) {
-            return;
-        }
-
         /** @var SingleItemContext $context */
 
-        $entityId = $context->getId();
-        if (null === $entityId) {
-            // undefined entity
+        if ($context->isProcessed(self::OPERATION_NAME)) {
+            // the normalized entity was already loaded
             return;
         }
 
-        $getProcessor = $this->processorBag->getProcessor(ApiActions::GET);
-        $getContext = $this->createGetContext($context, $getProcessor);
-
-        $getProcessor->process($getContext);
-        $this->processGetResult($getContext, $context);
-
-        $context->set(self::NORMALIZED_ENTITY_LOADED_PARAM, true);
+        $entityId = $context->getId();
+        if (null !== $entityId) {
+            $getProcessor = $this->processorBag->getProcessor(ApiActions::GET);
+            $getContext = $this->createGetContext($context, $getProcessor);
+            $getProcessor->process($getContext);
+            $this->processGetResult($getContext, $context);
+            $context->setProcessed(self::OPERATION_NAME);
+        } elseif (!$context->hasIdentifierFields()) {
+            // remove the result if it was not normalized yet
+            if ($context->hasResult() && \is_object($context->getResult())) {
+                $context->removeResult();
+            }
+            $context->setProcessed(self::OPERATION_NAME);
+        }
     }
 
     /**

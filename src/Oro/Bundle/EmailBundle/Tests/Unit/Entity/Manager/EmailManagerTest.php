@@ -9,27 +9,27 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class EmailManagerTest extends \PHPUnit_Framework_TestCase
+class EmailManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailManager */
     protected $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $emailThreadManager;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $emailThreadProvider;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $queryBuilder;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $mailboxManager;
 
     protected function setUp()
@@ -55,6 +55,9 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
         $this->mailboxManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->mailboxManager->expects($this->any())
+            ->method('findAvailableMailboxIds')
+            ->willReturn([]);
 
         $this->manager = new EmailManager(
             $this->em,

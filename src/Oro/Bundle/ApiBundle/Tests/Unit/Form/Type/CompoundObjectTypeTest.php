@@ -11,9 +11,13 @@ use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameContainerType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class CompoundObjectTypeTest extends TypeTestCase
 {
@@ -24,7 +28,7 @@ class CompoundObjectTypeTest extends TypeTestCase
     {
         return [
             new PreloadedExtension(
-                ['test_name_container' => new NameContainerType()],
+                [new CompoundObjectType($this->getFormHelper())],
                 []
             )
         ];
@@ -35,7 +39,11 @@ class CompoundObjectTypeTest extends TypeTestCase
      */
     protected function getFormHelper()
     {
-        return new FormHelper($this->factory, $this->createMock(ContainerInterface::class));
+        return new FormHelper(
+            $this->createMock(FormFactoryInterface::class),
+            $this->createMock(PropertyAccessorInterface::class),
+            $this->createMock(ContainerInterface::class)
+        );
     }
 
     public function testBuildFormForField()
@@ -48,17 +56,17 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             $data,
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['name' => 'testName']);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals('testName', $data->getName());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals('testName', $data->getName());
     }
 
     public function testBuildFormForRenamedField()
@@ -72,17 +80,17 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             $data,
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['renamedName' => 'testName']);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals('testName', $data->getName());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals('testName', $data->getName());
     }
 
     public function testBuildFormForFieldWithFormType()
@@ -91,21 +99,21 @@ class CompoundObjectTypeTest extends TypeTestCase
         $metadata->addField(new FieldMetadata('id'));
 
         $config = new EntityDefinitionConfig();
-        $config->addField('id')->setFormType('integer');
+        $config->addField('id')->setFormType(IntegerType::class);
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             $data,
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['id' => '123']);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertSame(123, $data->getId());
+        self::assertTrue($form->isSynchronized());
+        self::assertSame(123, $data->getId());
     }
 
     public function testBuildFormForFieldWithFormOptions()
@@ -118,17 +126,17 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             $data,
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['renamedName' => 'testName']);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals('testName', $data->getName());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals('testName', $data->getName());
     }
 
     public function testBuildFormForIgnoredField()
@@ -142,17 +150,17 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             $data,
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['name' => 'testName']);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertNull($data->getName());
+        self::assertTrue($form->isSynchronized());
+        self::assertNull($data->getName());
     }
 
     public function testBuildFormForFieldIgnoredOnlyForGetActions()
@@ -166,17 +174,17 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             $data,
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['name' => 'testName']);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals('testName', $data->getName());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals('testName', $data->getName());
     }
 
     public function testBuildFormForAssociation()
@@ -189,17 +197,17 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             $data,
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['owner' => ['name' => 'testName']]);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertNull($data->getOwner());
+        self::assertTrue($form->isSynchronized());
+        self::assertNull($data->getOwner());
     }
 
     public function testBuildFormForAssociationAsField()
@@ -209,23 +217,23 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $config = new EntityDefinitionConfig();
         $field = $config->addField('owner');
-        $field->setFormType('test_name_container');
+        $field->setFormType(NameContainerType::class);
         $field->setFormOptions(['data_class' => Entity\User::class]);
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             $data,
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['owner' => ['name' => 'testName']]);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertNotNull($data->getOwner());
-        $this->assertSame('testName', $data->getOwner()->getName());
+        self::assertTrue($form->isSynchronized());
+        self::assertNotNull($data->getOwner());
+        self::assertSame('testName', $data->getOwner()->getName());
     }
 
     public function testCreateNestedObject()
@@ -240,24 +248,23 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\Product();
         $formBuilder = $this->factory->createBuilder(
-            'form',
+            FormType::class,
             $data,
             ['data_class' => Entity\Product::class]
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
         $form->submit(['price' => ['value' => 'testPriceValue']]);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertSame('testPriceValue', $data->getPrice()->getValue());
+        self::assertTrue($form->isSynchronized());
+        self::assertSame('testPriceValue', $data->getPrice()->getValue());
     }
 
     public function testCreateNestedObjectWhenValueIsNotSubmitted()
@@ -272,24 +279,23 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\Product();
         $formBuilder = $this->factory->createBuilder(
-            'form',
+            FormType::class,
             $data,
             ['data_class' => Entity\Product::class]
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
         $form->submit([]);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertNull($data->getPrice()->getValue());
+        self::assertTrue($form->isSynchronized());
+        self::assertNull($data->getPrice()->getValue());
     }
 
     public function testCreateNestedObjectWhenSubmittedValueIsNull()
@@ -304,24 +310,23 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\Product();
         $formBuilder = $this->factory->createBuilder(
-            'form',
+            FormType::class,
             $data,
             ['data_class' => Entity\Product::class]
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
         $form->submit(['price' => null]);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertNull($data->getPrice()->getValue());
+        self::assertTrue($form->isSynchronized());
+        self::assertNull($data->getPrice()->getValue());
     }
 
     public function testCreateNestedObjectWhenSubmittedValueIsEmptyArray()
@@ -336,24 +341,23 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\Product();
         $formBuilder = $this->factory->createBuilder(
-            'form',
+            FormType::class,
             $data,
             ['data_class' => Entity\Product::class]
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
         $form->submit(['price' => []]);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertNull($data->getPrice()->getValue());
+        self::assertTrue($form->isSynchronized());
+        self::assertNull($data->getPrice()->getValue());
     }
 
     public function testUpdateNestedObject()
@@ -369,25 +373,24 @@ class CompoundObjectTypeTest extends TypeTestCase
         $data = new Entity\Product();
         $data->setPrice(new Entity\ProductPrice('oldPriceValue', 'oldPriceCurrency'));
         $formBuilder = $this->factory->createBuilder(
-            'form',
+            FormType::class,
             $data,
             ['data_class' => Entity\Product::class]
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
         $form->submit(['price' => ['value' => 'newPriceValue']], false);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertSame('newPriceValue', $data->getPrice()->getValue());
-        $this->assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
+        self::assertTrue($form->isSynchronized());
+        self::assertSame('newPriceValue', $data->getPrice()->getValue());
+        self::assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
     }
 
     public function testUpdateNestedObjectWhenValueIsNotSubmitted()
@@ -403,25 +406,24 @@ class CompoundObjectTypeTest extends TypeTestCase
         $data = new Entity\Product();
         $data->setPrice(new Entity\ProductPrice('oldPriceValue', 'oldPriceCurrency'));
         $formBuilder = $this->factory->createBuilder(
-            'form',
+            FormType::class,
             $data,
             ['data_class' => Entity\Product::class]
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
         $form->submit([], false);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertSame('oldPriceValue', $data->getPrice()->getValue());
-        $this->assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
+        self::assertTrue($form->isSynchronized());
+        self::assertSame('oldPriceValue', $data->getPrice()->getValue());
+        self::assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
     }
 
     public function testUpdateNestedObjectWhenSubmittedValueIsNull()
@@ -437,25 +439,24 @@ class CompoundObjectTypeTest extends TypeTestCase
         $data = new Entity\Product();
         $data->setPrice(new Entity\ProductPrice('oldPriceValue', 'oldPriceCurrency'));
         $formBuilder = $this->factory->createBuilder(
-            'form',
+            FormType::class,
             $data,
             ['data_class' => Entity\Product::class]
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
         $form->submit(['price' => null], false);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertNull($data->getPrice()->getValue());
-        $this->assertNull($data->getPrice()->getCurrency());
+        self::assertTrue($form->isSynchronized());
+        self::assertNull($data->getPrice()->getValue());
+        self::assertNull($data->getPrice()->getCurrency());
     }
 
     public function testUpdateNestedObjectWhenSubmittedValueIsEmptyArray()
@@ -471,24 +472,23 @@ class CompoundObjectTypeTest extends TypeTestCase
         $data = new Entity\Product();
         $data->setPrice(new Entity\ProductPrice('oldPriceValue', 'oldPriceCurrency'));
         $formBuilder = $this->factory->createBuilder(
-            'form',
+            FormType::class,
             $data,
             ['data_class' => Entity\Product::class]
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType($this->getFormHelper()),
+            CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
         $form->submit(['price' => []], false);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertSame('oldPriceValue', $data->getPrice()->getValue());
-        $this->assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
+        self::assertTrue($form->isSynchronized());
+        self::assertSame('oldPriceValue', $data->getPrice()->getValue());
+        self::assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
     }
 }

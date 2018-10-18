@@ -87,7 +87,6 @@ define(function(require) {
                 minWidth: requiredWidth,
                 maxWidth: requiredWidth
             });
-            widget.find('input[type="search"]').width(requiredWidth - 30);
         },
 
         /**

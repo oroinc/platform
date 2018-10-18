@@ -49,13 +49,6 @@ class DumpConfigCommand extends AbstractDebugCommand
                 InputArgument::OPTIONAL,
                 'The entity class name or alias'
             )
-            // @todo: API version is not supported for now
-            //->addArgument(
-            //    'version',
-            //    InputArgument::OPTIONAL,
-            //    'API version',
-            //    Version::LATEST
-            //)
             ->addOption(
                 'section',
                 null,
@@ -98,8 +91,7 @@ class DumpConfigCommand extends AbstractDebugCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $requestType = $this->getRequestType($input);
-        // @todo: API version is not supported for now
-        //$version = $input->getArgument('version');
+        // API version is not supported for now
         $version = Version::normalizeVersion(null);
         $extras = $this->getConfigExtras($input);
 
@@ -332,7 +324,7 @@ class DumpConfigCommand extends AbstractDebugCommand
                 $val = $this->convertConfigValueToHumanReadableRepresentation($val);
             }
         );
-        $output->write(Yaml::dump($config, 100, 4, true, true));
+        $output->write(Yaml::dump($config, 100, 4, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE | Yaml::DUMP_OBJECT));
     }
 
     /**
@@ -346,13 +338,13 @@ class DumpConfigCommand extends AbstractDebugCommand
         $entityClass = reset($keys);
         $config = $config[$entityClass];
         $documentationResource = [];
-        if (array_key_exists(EntityDefinitionConfig::DOCUMENTATION_RESOURCE, $config)) {
-            $documentationResource = $config[EntityDefinitionConfig::DOCUMENTATION_RESOURCE];
+        if (array_key_exists(ConfigUtil::DOCUMENTATION_RESOURCE, $config)) {
+            $documentationResource = $config[ConfigUtil::DOCUMENTATION_RESOURCE];
         }
 
         return [
             $entityClass => [
-                EntityDefinitionConfig::DOCUMENTATION_RESOURCE => $documentationResource
+                ConfigUtil::DOCUMENTATION_RESOURCE => $documentationResource
             ]
         ];
     }

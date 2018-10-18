@@ -6,6 +6,9 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
+/**
+ * Entity attribute type for enum field type
+ */
 class EnumAttributeType implements AttributeTypeInterface
 {
     /**
@@ -56,18 +59,22 @@ class EnumAttributeType implements AttributeTypeInterface
     }
 
     /**
+     * Enum is uses array representation as in general it may combine multiple values
+     *
      * {@inheritdoc}
      */
     public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         if ($originalValue === null) {
-            return null;
+            return [];
         }
 
+        /** @var AbstractEnumValue $originalValue */
         $this->ensureSupportedType($originalValue);
 
-        /** @var AbstractEnumValue $originalValue */
-        return $originalValue->getId();
+        $key = sprintf('%s_%s', $attribute->getFieldName(), $originalValue->getId());
+
+        return [$key => 1];
     }
 
     /**

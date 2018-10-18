@@ -88,15 +88,6 @@ class KernelProxy implements KernelInterface
 
     /**
      * {@inheritdoc}
-     * TODO: remove deprecated method in scope of BAP-15564
-     */
-    public function isClassInActiveBundle($class)
-    {
-        return $this->kernel->isClassInActiveBundle($class);
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function getBundle($name, $first = true)
     {

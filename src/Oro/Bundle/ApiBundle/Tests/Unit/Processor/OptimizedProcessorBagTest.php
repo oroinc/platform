@@ -11,31 +11,31 @@ use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
 use Oro\Component\ChainProcessor\ProcessorIteratorFactoryInterface;
 
-class OptimizedProcessorBagTest extends \PHPUnit_Framework_TestCase
+class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessorFactoryInterface */
-    protected $processorFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorFactoryInterface */
+    private $processorFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessorApplicableCheckerFactoryInterface */
-    protected $applicableCheckerFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorApplicableCheckerFactoryInterface */
+    private $applicableCheckerFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessorIteratorFactoryInterface */
-    protected $processorIteratorFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorIteratorFactoryInterface */
+    private $processorIteratorFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessorApplicableCheckerFactoryInterface */
-    protected $ungroupedApplicableCheckerFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorApplicableCheckerFactoryInterface */
+    private $ungroupedApplicableCheckerFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessorIteratorFactoryInterface */
-    protected $ungroupedProcessorIteratorFactory;
-
-    /** @var ChainApplicableChecker */
-    protected $applicableChecker;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorIteratorFactoryInterface */
+    private $ungroupedProcessorIteratorFactory;
 
     /** @var ChainApplicableChecker */
-    protected $ungroupedApplicableChecker;
+    private $applicableChecker;
+
+    /** @var ChainApplicableChecker */
+    private $ungroupedApplicableChecker;
 
     /** @var OptimizedProcessorBag */
-    protected $processorBag;
+    private $processorBag;
 
     protected function setUp()
     {

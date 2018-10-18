@@ -5,9 +5,9 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\DoctrineTypeMappingProviderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class DoctrineTypeMappingProviderPassTest extends \PHPUnit_Framework_TestCase
+class DoctrineTypeMappingProviderPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $builder;
 
     /**
@@ -20,7 +20,7 @@ class DoctrineTypeMappingProviderPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        /* @var $compilerPass DoctrineTypeMappingProviderPass|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $compilerPass DoctrineTypeMappingProviderPass|\PHPUnit\Framework\MockObject\MockObject */
         $compilerPass = $this->getMockBuilder(DoctrineTypeMappingProviderPass::class)
             ->setMethods(['registerTaggedServices'])
             ->getMock();

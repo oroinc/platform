@@ -12,9 +12,7 @@ class DateTimePicker extends Element
      */
     public function setValue($dateTime)
     {
-        if (!$this->isOpened()) {
-            $this->getDatePicker()->click();
-        }
+        $this->open();
         $this->getYearPicker()->selectOption($dateTime->format('Y'));
         $this->getMonthPicker()->selectOption($dateTime->format('M'));
         $this->getCalendarDate($dateTime->format('j'))->click();
@@ -22,6 +20,41 @@ class DateTimePicker extends Element
         if ($this->getElements('TimePicker')) {
             $this->getTimePicker()->setValue($dateTime);
         }
+    }
+
+    protected function open()
+    {
+        if (!$this->isOpened()) {
+            $this->getDatePicker()->click();
+        }
+    }
+
+    protected function close()
+    {
+        if ($this->isOpened()) {
+            $this->getDatePicker()->click();
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getHeader()
+    {
+        $this->open();
+
+        $container = $this->findVisible('css', 'table.ui-datepicker-calendar');
+
+        $header = array_map(
+            function (NodeElement $element) {
+                return $element->getText();
+            },
+            $container->findAll('css', 'thead th > span')
+        );
+
+        $this->close();
+
+        return $header;
     }
 
     /**

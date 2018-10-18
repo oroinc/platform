@@ -10,9 +10,9 @@ use Oro\Component\MessageQueue\Transport\QueueInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
-class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
+class CreateQueueExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DriverInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DriverInterface */
     private $driver;
 
     /** @var CreateQueueExtension */

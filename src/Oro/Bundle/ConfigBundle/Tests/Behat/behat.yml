@@ -16,11 +16,20 @@ oro_behat_extension:
     ColorsConfigBlock:
       class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\ColorsConfigBlock
 
+    Configuration Quick Search:
+      selector: '.system-configuration-container input[data-name="search"]'
+
     Recent Emails:
       selector: '.email-notification-menu'
 
     WYSIWYG editor:
       selector: '[data-bound-view="oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view"] iframe'
+
+    WYSIWYG Source code button:
+      selector: 'div.mce-container-body div[aria-label="Source code"] button'
+
+    WYSIWYG textarea:
+      selector: 'textarea.mce-textbox'
 
     Entity pagination:
       selector: '#entity-pagination'
@@ -62,7 +71,7 @@ oro_behat_extension:
       selector: '.tooltip-icon.highlight-element'
 
     Tooltip Container:
-      selector: '.popover-content'
+      selector: '.popover-body'
 
     Shopping List Config:
       selector: 'form[name="shopping_list"]'
@@ -76,6 +85,7 @@ oro_behat_extension:
         - OroDataGridBundle::GridContext
         - OroFormBundle::FormContext
         - OroNavigationBundle::FeatureContext
+        - OroNavigationBundle::PinbarContext
         - OroActivityListBundle::ActivityContext
       paths:
         - '@OroConfigBundle/Tests/Behat/Features'

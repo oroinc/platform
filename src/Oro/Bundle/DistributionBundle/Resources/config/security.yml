@@ -1,6 +1,6 @@
 services:
     oro_distribution.listener.access_denied:
-        class: %oro_distribution.security.access_denied_listener.class%
+        class: '%oro_distribution.security.access_denied_listener.class%'
         arguments: ["@session", "@router", "@security.token_storage"]
         tags:
            - { name: kernel.event_listener, event: kernel.exception, method: onAccessDeniedException }
@@ -38,7 +38,7 @@ security:
                 always_use_default_target_path: true
                 csrf_token_generator:           security.csrf.token_manager
             remember_me:
-                secret:                     %secret%
+                secret:                     '%secret%'
                 name:                       BAPRM_DIST
                 lifetime:                   1209600   # stay logged for two weeks
                 httponly:                   true

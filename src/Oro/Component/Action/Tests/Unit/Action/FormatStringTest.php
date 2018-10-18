@@ -9,7 +9,7 @@ use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class FormatStringTest extends \PHPUnit_Framework_TestCase
+class FormatStringTest extends \PHPUnit\Framework\TestCase
 {
     const ATTRIBUTE_PATH = 'attribute';
     const ARGUMENTS_PATH = 'arguments';

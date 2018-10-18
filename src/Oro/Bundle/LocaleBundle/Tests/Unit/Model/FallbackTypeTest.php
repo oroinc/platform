@@ -4,7 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Model;
 
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
-class FallbackTypeTest extends \PHPUnit_Framework_TestCase
+class FallbackTypeTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructAndGetType()
     {

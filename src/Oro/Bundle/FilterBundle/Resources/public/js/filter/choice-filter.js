@@ -49,7 +49,6 @@ define(function(require) {
         events: {
             'keyup input': '_onReadCriteriaInputKey',
             'keydown [type="text"]': '_preventEnterProcessing',
-            'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
             'click .choice-value': '_onClickChoiceValue'
@@ -174,11 +173,6 @@ define(function(require) {
             if (!valueFrame.length) {
                 return;
             }
-            // update left and right margins of value field frame
-            var leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
-            var rightWidth = this.$('.filter-update').outerWidth();
-            valueFrame.css('margin-left', leftWidth);
-            valueFrame.css('padding-right', rightWidth);
             // update class of criteria dropdown
             type = this.$(this.criteriaValueSelectors.type).val();
             isEmptyType = this.isEmptyType(type);

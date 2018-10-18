@@ -54,7 +54,7 @@ class WorkflowTransitionSelectType extends AbstractType
 
                 $choices = [];
                 foreach ($transitions as $transition) {
-                    $choices[$transition->getName()] = $transition->getLabel();
+                    $choices[$transition->getLabel()] = $transition->getName();
                 }
 
                 return $choices;
@@ -97,6 +97,6 @@ class WorkflowTransitionSelectType extends AbstractType
      */
     public function getParent()
     {
-        return OroChoiceType::NAME;
+        return OroChoiceType::class;
     }
 }

@@ -17,7 +17,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Excludes fields according to requested fieldset.
- * For example, in JSON.API the "fields[TYPE]" parameter can be used to request only specific fields.
+ * For example, in JSON.API the "fields[TYPE]" filter can be used to request only specific fields.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class FilterFieldsByExtra implements ProcessorInterface
 {
@@ -52,19 +53,26 @@ class FilterFieldsByExtra implements ProcessorInterface
             return;
         }
 
+        $normalizedFieldFilters = $context->get(FilterFieldsConfigExtra::NAME);
+        if (null === $normalizedFieldFilters) {
+            $normalizedFieldFilters = [];
+        } else {
+            $normalizedFieldFilters = $this->normalizeFieldFilters(
+                $normalizedFieldFilters,
+                $context->getRequestType()
+            );
+        }
+
         $entityClass = $context->getClassName();
         if (!$definition->isFieldsetEnabled()) {
             if (is_a($entityClass, EntityIdentifier::class, true)) {
                 return;
             }
 
-            throw new NotSupportedConfigOperationException($entityClass, FilterFieldsConfigExtra::NAME);
+            if (!$this->isSupported($context, $normalizedFieldFilters)) {
+                throw new NotSupportedConfigOperationException($entityClass, FilterFieldsConfigExtra::NAME);
+            }
         }
-
-        $normalizedFieldFilters = $this->normalizeFieldFilters(
-            $context->get(FilterFieldsConfigExtra::NAME),
-            $context->getRequestType()
-        );
 
         if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
             $this->filterEntityFields($definition, $entityClass, $normalizedFieldFilters);
@@ -73,6 +81,28 @@ class FilterFieldsByExtra implements ProcessorInterface
         }
     }
 
+    /**
+     * @param ConfigContext $context
+     * @param array         $normalizedFieldFilters
+     *
+     * @return bool
+     */
+    protected function isSupported(ConfigContext $context, array $normalizedFieldFilters): bool
+    {
+        $result = false;
+        if (!empty($normalizedFieldFilters) && $context->getParentClassName() && $context->getAssociationName()) {
+            $parentClass = $context->getParentClassName();
+            if (isset($normalizedFieldFilters[$parentClass])
+                && \count($normalizedFieldFilters) === 1
+                && \count($normalizedFieldFilters[$parentClass]) === 1
+                && $normalizedFieldFilters[$parentClass][0] === $context->getAssociationName()
+            ) {
+                $result = true;
+            }
+        }
+
+        return $result;
+    }
     /**
      * @param array       $fieldFilters
      * @param RequestType $requestType

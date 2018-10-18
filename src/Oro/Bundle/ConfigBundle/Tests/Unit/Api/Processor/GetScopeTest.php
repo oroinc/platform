@@ -13,7 +13,7 @@ use Oro\Bundle\ConfigBundle\Api\Processor\GetScope;
 
 class GetScopeTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configRepository;
 
     /** @var GetScope */

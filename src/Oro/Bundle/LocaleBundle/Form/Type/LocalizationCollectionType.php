@@ -12,6 +12,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Manage collection of localized field values.
+ */
 class LocalizationCollectionType extends AbstractType
 {
     const NAME = 'oro_locale_localization_collection';
@@ -73,11 +76,12 @@ class LocalizationCollectionType extends AbstractType
         ]);
 
         $resolver->setDefaults([
-            'entry_options'               => [],
-            'fallback_type'         => FallbackPropertyType::NAME,
+            'entry_options'         => [],
+            'fallback_type'         => FallbackPropertyType::class,
             'enabled_fallbacks'     => [],
-            'value_type'            => FallbackValueType::NAME,
-            'group_fallback_fields' => null
+            'value_type'            => FallbackValueType::class,
+            'group_fallback_fields' => null,
+            'exclude_parent_localization' => false
         ]);
     }
 
@@ -89,8 +93,9 @@ class LocalizationCollectionType extends AbstractType
         foreach ($this->getLocalizations() as $localization) {
             // calculate enabled fallbacks for the specific localization
             $enabledFallbacks = $options['enabled_fallbacks'];
+            $excludeParentLocalization = $options['exclude_parent_localization'];
             $parent = null;
-            if ($localization->getParentLocalization()) {
+            if (!$excludeParentLocalization && $localization->getParentLocalization()) {
                 $enabledFallbacks = array_merge($enabledFallbacks, [FallbackType::PARENT_LOCALIZATION]);
                 $parent = $localization->getParentLocalization()->getName();
             }
@@ -106,7 +111,8 @@ class LocalizationCollectionType extends AbstractType
                     'fallback_type_localization' => $localization->getName(),
                     'fallback_type_parent_localization' => $parent,
                     'enabled_fallbacks' => $enabledFallbacks,
-                    'group_fallback_fields' => $options['group_fallback_fields']
+                    'group_fallback_fields' => $options['group_fallback_fields'],
+                    'exclude_parent_localization' => $excludeParentLocalization
                 ]
             );
         }

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 
+use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AndCompositeExpression;
 
-class AndCompositeExpressionTest extends \PHPUnit_Framework_TestCase
+class AndCompositeExpressionTest extends \PHPUnit\Framework\TestCase
 {
     public function testWalkCompositeExpression()
     {
@@ -17,10 +18,7 @@ class AndCompositeExpressionTest extends \PHPUnit_Framework_TestCase
 
         $result = $expression->walkCompositeExpression($expressionList);
 
-        $this->assertInstanceOf('Doctrine\ORM\Query\Expr\Andx', $result);
-        $this->assertEquals(
-            $expressionList,
-            $result->getParts()
-        );
+        self::assertInstanceOf(Andx::class, $result);
+        self::assertEquals($expressionList, $result->getParts());
     }
 }

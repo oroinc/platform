@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 use Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider;
 use Oro\Component\Action\Model\DoctrineTypeMappingExtensionInterface;
 
-class DoctrineTypeMappingProviderTest extends \PHPUnit_Framework_TestCase
+class DoctrineTypeMappingProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DoctrineTypeMappingProvider */
     private $provider;
@@ -81,7 +81,7 @@ class DoctrineTypeMappingProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $types
      *
-     * @return DoctrineTypeMappingExtensionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return DoctrineTypeMappingExtensionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createExtension(array $types = [])
     {

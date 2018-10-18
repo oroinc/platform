@@ -9,6 +9,9 @@ use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 
+/**
+ * Trigger expression validator.
+ */
 class TransitionEventTriggerExpressionVerifier implements TransitionEventTriggerVerifierInterface
 {
     /**
@@ -70,7 +73,7 @@ class TransitionEventTriggerExpressionVerifier implements TransitionEventTrigger
         $varsAndTypes = [];
 
         foreach ($context as $var => $val) {
-            $varsAndTypes[] = sprintf('%s [%s]', $var, get_class($val));
+            $varsAndTypes[] = sprintf('%s [%s]', $var, $val ? get_class($val) : null);
         }
 
         return $varsAndTypes;

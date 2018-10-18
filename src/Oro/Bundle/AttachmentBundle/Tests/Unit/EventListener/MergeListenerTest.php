@@ -11,7 +11,7 @@ use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
-class MergeListenerTest extends \PHPUnit_Framework_TestCase
+class MergeListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var string $fieldPrefix */
     private $fieldPrefix;

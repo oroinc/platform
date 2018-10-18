@@ -9,19 +9,17 @@ use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class EmptyDataExtensionTest extends \PHPUnit_Framework_TestCase
+class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityInstantiator;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityInstantiator */
+    private $entityInstantiator;
 
     /** @var EmptyDataExtension */
-    protected $emptyDataExtension;
+    private $emptyDataExtension;
 
     protected function setUp()
     {
-        $this->entityInstantiator = $this->getMockBuilder(EntityInstantiator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityInstantiator = $this->createMock(EntityInstantiator::class);
 
         $this->emptyDataExtension = new EmptyDataExtension($this->entityInstantiator);
     }
@@ -59,7 +57,7 @@ class EmptyDataExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [null, null],
-            ['', ''],
+            ['', '']
         ];
     }
 

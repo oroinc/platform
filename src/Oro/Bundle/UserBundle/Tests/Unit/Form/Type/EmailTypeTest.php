@@ -13,8 +13,7 @@ class EmailTypeTest extends FormIntegrationTestCase
             'email' => 'test@example.com',
         );
 
-        $type = new EmailType();
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(EmailType::class);
 
         $email = new Email();
         $email->setEmail($formData['email']);

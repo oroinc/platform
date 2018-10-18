@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Form\Handler;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Symfony\Component\Form\FormInterface;
@@ -10,6 +11,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class SegmentHandler
 {
+    use RequestHandlerTrait;
+
     /**
      * @var FormInterface
      */
@@ -60,7 +63,7 @@ class SegmentHandler
 
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
-            $this->form->submit($request);
+            $this->submitPostPutRequest($this->form, $request);
 
             if ($this->form->isValid()) {
                 $this->onSuccess($entity);

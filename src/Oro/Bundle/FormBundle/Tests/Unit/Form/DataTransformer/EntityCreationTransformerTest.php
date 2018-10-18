@@ -7,14 +7,14 @@ use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreationTransformer;
 use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\TestCreationEntity;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 
-class EntityCreationTransformerTest extends \PHPUnit_Framework_TestCase
+class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_ENTITY_CLASS = 'Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\TestCreationEntity';
 
     /** @var EntityCreationTransformer */
     protected $transformer;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
     protected function setUp()
@@ -39,7 +39,7 @@ class EntityCreationTransformerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testReverseTransformDataProvider
+     * @dataProvider reverseTransformDataProvider
      *
      * @param            $value
      * @param            $expected
@@ -74,7 +74,7 @@ class EntityCreationTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $entity);
     }
 
-    public function testReverseTransformDataProvider()
+    public function reverseTransformDataProvider()
     {
         return [
             'no value 1' => [null, null],

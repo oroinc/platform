@@ -5,7 +5,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Config;
 use Oro\Bundle\FormBundle\Config\BlockConfig;
 use Oro\Bundle\FormBundle\Config\SubBlockConfig;
 
-class BlockConfigTest extends \PHPUnit_Framework_TestCase
+class BlockConfigTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  BlockConfig */
     private $blockConfig;
@@ -196,7 +196,7 @@ class BlockConfigTest extends \PHPUnit_Framework_TestCase
     public function testException()
     {
         /** test getSubBlock Exception */
-        $this->expectException('\PHPUnit_Framework_Error_Notice');
+        $this->expectException(\PHPUnit\Framework\Error\Notice::class);
         $this->expectExceptionMessage('Undefined index: testSubBlock');
         $this->blockConfig->getSubBlock('testSubBlock');
     }

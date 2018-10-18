@@ -1,0 +1,117 @@
+/* @theme: admin.oro; */
+
+.oro-item-collection {
+    &input[type="email"],
+    &input[type="text"] {
+        width: $form-item-collection-field-width;
+    }
+
+    .input-append,
+    .input-prepend {
+        input[type="email"],
+        input[type="text"] {
+            width: $form-item-collection-field-append-width;
+        }
+    }
+
+    .input-append-sortable,
+    .input-prepend-sortable {
+        input[type="email"],
+        input[type="text"] {
+            width: $form-item-collection-field-append-sortable-width;
+        }
+    }
+
+    .collection-element-other {
+        margin-bottom: $form-item-collection-element-offset-bottom;
+
+        input[type='email'],
+        input[type='text'],
+        textarea {
+            width: $form-item-collection-element-width;
+        }
+
+        select,
+        .selector {
+            width: $form-item-collection-selector-width;
+            margin-left: $form-item-collection-selector-offset-left;
+        }
+
+        .select2-container {
+            width: $form-item-collection-select2-width;
+        }
+    }
+}
+
+.oro-item-collection.not-removable {
+    input[type="email"],
+    input[type="text"] {
+        width: $form-item-collection-removable-field-width;
+    }
+
+    .input-append,
+    .input-prepend {
+        input[type="email"],
+        input[type="text"] {
+            width: $form-item-collection-removable-append-field-width;
+        }
+    }
+
+    .input-append-sortable,
+    .input-prepend-sortable {
+        input[type="email"],
+        input[type="text"] {
+            width: $form-item-collection-removable-append-sortable-field-width;
+        }
+    }
+}
+
+input[type="text"].hasDatepicker {
+    min-width: $form-item-collection-datepicker-field-min-width;
+}
+
+.form-horizontal {
+    .controls {
+        padding-top: 7px;
+
+        .controls {
+            padding-top: 0;
+        }
+
+        >,
+        .oro-clearfix,
+        .fallback-container {
+            input:not([type=checkbox]):not([type=radio]),
+            textarea,
+            .selector,
+            .select2-container,
+            .input-append {
+                margin-top: -7px; //  input padding + border
+
+                + .fallback-status,
+                + .btn:not(.add-on),
+                > .btn:not(.add-on) {
+                    margin-top: -7px;
+                }
+
+            }
+
+            .selector,
+            .select2-container,
+            .input-append,
+            td {
+                input:not([type=checkbox]):not([type=radio]),
+                textarea,
+                .selector,
+                .select2-container {
+                    margin-top: 0;
+                }
+            }
+        }
+
+        .jstree-wrapper {
+            padding-top: 0;
+            min-width: $field-width;
+        }
+    }
+}

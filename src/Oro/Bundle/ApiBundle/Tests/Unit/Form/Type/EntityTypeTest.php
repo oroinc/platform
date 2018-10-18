@@ -10,19 +10,26 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 
 class EntityTypeTest extends OrmRelatedTestCase
 {
     /** @var FormFactoryInterface */
-    protected $factory;
+    private $factory;
 
     protected function setUp()
     {
         parent::setUp();
-
-        $this->factory = Forms::createFormFactoryBuilder()->getFormFactory();
+        $this->factory = Forms::createFormFactoryBuilder()
+            ->addExtensions([
+                new PreloadedExtension(
+                    [new EntityType($this->doctrineHelper, new EntityLoader($this->doctrine))],
+                    []
+                )
+            ])
+            ->getFormFactory();
     }
 
     /**
@@ -35,13 +42,13 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
+            EntityType::class,
             null,
             ['metadata' => $associationMetadata]
         );
         $form->submit($value);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals($expected, $form->getData());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals($expected, $form->getData());
     }
 
     public function validSingleEmptyValuesDataProvider()
@@ -49,7 +56,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         return [
             [null, null],
             ['', null],
-            [[], null],
+            [[], null]
         ];
     }
 
@@ -63,13 +70,13 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
+            EntityType::class,
             null,
             ['metadata' => $associationMetadata]
         );
         $form->submit($value);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals($expected, $form->getData());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals($expected, $form->getData());
     }
 
     public function validMultipleEmptyValuesDataProvider()
@@ -77,7 +84,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         return [
             [null, new ArrayCollection()],
             ['', new ArrayCollection()],
-            [[], new ArrayCollection()],
+            [[], new ArrayCollection()]
         ];
     }
 
@@ -106,12 +113,12 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
+            EntityType::class,
             null,
             ['metadata' => $associationMetadata]
         );
         $form->submit($value);
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testMultipleWithValidValue()
@@ -139,12 +146,12 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
+            EntityType::class,
             null,
             ['metadata' => $associationMetadata]
         );
         $form->submit([$value]);
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSingleWithInvalidValue()
@@ -154,12 +161,12 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
+            EntityType::class,
             null,
             ['metadata' => $associationMetadata]
         );
         $form->submit('test');
-        $this->assertFalse($form->isSynchronized());
+        self::assertFalse($form->isSynchronized());
     }
 
     public function testMultipleWithInvalidValue()
@@ -169,12 +176,12 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
+            EntityType::class,
             null,
             ['metadata' => $associationMetadata]
         );
         $form->submit('test');
-        $this->assertFalse($form->isSynchronized());
+        self::assertFalse($form->isSynchronized());
     }
 
     public function testSingleWithNotAcceptableValue()
@@ -186,12 +193,12 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
+            EntityType::class,
             null,
             ['metadata' => $associationMetadata]
         );
         $form->submit($value);
-        $this->assertFalse($form->isSynchronized());
+        self::assertFalse($form->isSynchronized());
     }
 
     public function testMultipleWithNotAcceptableValue()
@@ -203,12 +210,12 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
+            EntityType::class,
             null,
             ['metadata' => $associationMetadata]
         );
         $form->submit([$value]);
-        $this->assertFalse($form->isSynchronized());
+        self::assertFalse($form->isSynchronized());
     }
 
     public function testSingleWithValidValueFromIncludedEntities()
@@ -226,12 +233,12 @@ class EntityTypeTest extends OrmRelatedTestCase
         $includedEntities->add($entity, $value['class'], $value['id'], new IncludedEntityData('/included/0', 0));
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
+            EntityType::class,
             null,
             ['metadata' => $associationMetadata, 'included_entities' => $includedEntities]
         );
         $form->submit($value);
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testMultipleWithValidValueFromIncludedEntities()
@@ -249,17 +256,11 @@ class EntityTypeTest extends OrmRelatedTestCase
         $includedEntities->add($entity, $value['class'], $value['id'], new IncludedEntityData('/included/0', 0));
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
+            EntityType::class,
             null,
             ['metadata' => $associationMetadata, 'included_entities' => $includedEntities]
         );
         $form->submit([$value]);
-        $this->assertTrue($form->isSynchronized());
-    }
-
-    public function testGetName()
-    {
-        $type = new EntityType($this->doctrine, new EntityLoader($this->doctrine));
-        $this->assertEquals('oro_api_entity', $type->getName());
+        self::assertTrue($form->isSynchronized());
     }
 }

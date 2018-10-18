@@ -6,6 +6,9 @@ use Knp\Menu\Factory\ExtensionInterface;
 use Knp\Menu\ItemInterface;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Adds uri, extras/routes and extras/routesParameters for allowed menu items.
+ */
 class RoutingAwareMenuFactoryExtension implements ExtensionInterface
 {
     /** @var RouterInterface */
@@ -31,12 +34,16 @@ class RoutingAwareMenuFactoryExtension implements ExtensionInterface
      */
     public function buildOptions(array $options = [])
     {
-        if (!empty($options['route']) && $this->getOptionValue($options, ['extras', 'isAllowed'], true)) {
-            $params = $this->getOptionValue($options, ['routeParameters'], []);
+        if (!empty($options['route']) && $this->getExtraOption($options, 'isAllowed', true)) {
+            $params = $this->getOption($options, 'routeParameters', []);
+            $referenceType = !empty($options['routeAbsolute'])
+                ? RouterInterface::ABSOLUTE_URL
+                : RouterInterface::ABSOLUTE_PATH;
 
-            $newOptions['uri'] = $this->router->generate($options['route'], $params, !empty($options['routeAbsolute']));
-            $newOptions['extras']['routes'] = [$options['route']];
-            $newOptions['extras']['routesParameters'] = [$options['route'] => $params];
+            $route = $options['route'];
+            $newOptions['uri'] = $this->router->generate($route, $params, $referenceType);
+            $newOptions['extras']['routes'] = [$route];
+            $newOptions['extras']['routesParameters'] = [$route => $params];
 
             $options = array_merge_recursive($newOptions, $options);
         }
@@ -45,19 +52,37 @@ class RoutingAwareMenuFactoryExtension implements ExtensionInterface
     }
 
     /**
-     * @param array $options
-     * @param array $keys
-     * @param mixed $default
+     * @param array  $options
+     * @param string $key
+     * @param mixed  $default
      *
      * @return mixed
      */
-    private function getOptionValue(array $options, array $keys, $default = null)
+    private function getOption(array $options, $key, $default = null)
     {
-        $key = array_shift($keys);
-        if (!array_key_exists($key, $options)) {
-            return $default;
+        if (array_key_exists($key, $options)) {
+            return $options[$key];
         }
 
-        return $keys ? $this->getOptionValue($options[$key], $keys, $default) : $options[$key];
+        return $default;
+    }
+
+    /**
+     * @param array  $options
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    private function getExtraOption(array $options, $key, $default = null)
+    {
+        if (array_key_exists('extras', $options)) {
+            $extras = $options['extras'];
+            if (array_key_exists($key, $extras)) {
+                return $extras[$key];
+            }
+        }
+
+        return $default;
     }
 }

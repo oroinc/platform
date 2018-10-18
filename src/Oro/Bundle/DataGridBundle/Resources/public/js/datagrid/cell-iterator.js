@@ -18,7 +18,7 @@ define(function(require) {
             this.columns = grid.columns;
             this.rows = grid.collection;
 
-            constructor.__super__.constructor.apply(this, arguments);
+            CellIterator.__super__.constructor.apply(this, arguments);
         },
 
         toResolvedPromise: function(result) {

@@ -1,4 +1,4 @@
-// @theme: default;
+/* @theme: default; */
 
 .catalog-switcher {
     .btn {
@@ -8,8 +8,10 @@
             color: $catalog-switcher-btn-color;
         }
 
-        &.active {
-            background: $catalog-switcher-btn-background-active;
+        &.active,
+        &:not(:disabled):not(.disabled):active,
+        &:not(:disabled):not(.disabled).active {
+            background-color: $catalog-switcher-btn-background-active;
             color: $catalog-switcher-btn-color-active;
         }
     }

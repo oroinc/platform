@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Extend;
 
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
-class FieldTypeHelperTest extends \PHPUnit_Framework_TestCase
+class FieldTypeHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FieldTypeHelper

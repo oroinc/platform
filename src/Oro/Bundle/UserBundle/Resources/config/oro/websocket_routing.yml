@@ -1,0 +1,4 @@
+oro_user.outdated_user_page:
+    channel: 'oro/outdated_user_page'
+    handler:
+        callback: 'oro_user.outdated_user_page'

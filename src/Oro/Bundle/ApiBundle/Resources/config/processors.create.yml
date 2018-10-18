@@ -37,12 +37,12 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -40 }
 
-    oro_api.create.rest.normalize_entity_id:
+    oro_api.create.normalize_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Create\NormalizeEntityId
         arguments:
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
         tags:
-            - { name: oro.api.processor, action: create, group: normalize_input, requestType: rest, priority: -110 }
+            - { name: oro.api.processor, action: create, group: normalize_input, priority: -110 }
 
     #
     # security_check
@@ -86,20 +86,6 @@ services:
     # transform_data
     #
 
-    oro_api.create.build_form_builder:
-        class: Oro\Bundle\ApiBundle\Processor\Create\BuildFormBuilder
-        arguments:
-            - '@oro_api.form_helper'
-        tags:
-            - { name: oro.api.processor, action: create, group: transform_data, priority: 100 }
-
-    oro_api.create.submit_form:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\SubmitForm
-        arguments:
-            - true # set missing fields to NULL
-        tags:
-            - { name: oro.api.processor, action: create, group: transform_data, priority: -50 }
-
     #
     # save_data
     #
@@ -130,9 +116,10 @@ services:
     oro_api.create.rest.set_location_header:
         class: Oro\Bundle\ApiBundle\Processor\Create\Rest\SetLocationHeader
         arguments:
+            - '@oro_api.rest.routes'
             - '@router'
             - '@oro_api.value_normalizer'
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
         tags:
             - { name: oro.api.processor, action: create, group: finalize, requestType: rest, priority: -10 }
 

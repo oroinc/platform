@@ -89,6 +89,28 @@ define([
                 }
             }
             return $el;
+        },
+
+        render: function() {
+            BaseView.__super__.render.call(this);
+            this.initControls();
+            return this;
+        }
+    }, {
+        /**
+         * Resolves element declared in view's options
+         *
+         * @param {string|jQuery} el value of view's element declaration in options
+         * @return {jQuery}
+         */
+        resolveElOption: function(el) {
+            var $el;
+            if (typeof el === 'string' && el.substr(0, 7) === 'region:') {
+                $el = BaseView.prototype._findRegionElem(el.substr(7));
+            } else {
+                $el = $(el);
+            }
+            return $el;
         }
     });
 

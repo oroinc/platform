@@ -9,6 +9,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumName;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -70,7 +71,7 @@ class EnumNameType extends AbstractType
                         }
                     }
                 };
-                $constraints[] = new Assert\Callback([$callback]);
+                $constraints[] = new Assert\Callback(['callback' => $callback]);
                 $constraints[] = new UniqueEnumName(
                     [
                         'entityClassName' => $fieldConfigId->getClassName(),
@@ -85,16 +86,21 @@ class EnumNameType extends AbstractType
             return $constraints;
         };
 
-        $resolver->setNormalizers(
-            [
-                'constraints'       => $constraintsNormalizer,
-                'disabled'          => function (Options $options, $value) {
-                    return $this->isReadOnly($options) ? true : $value;
-                },
-                'validation_groups' => function (Options $options, $value) {
-                    return $options['disabled'] ? false : $value;
-                }
-            ]
+        $resolver->setNormalizer(
+            'constraints',
+            $constraintsNormalizer
+        )
+        ->setNormalizer(
+            'disabled',
+            function (Options $options, $value) {
+                return $this->isReadOnly($options) ? true : $value;
+            }
+        )
+        ->setNormalizer(
+            'validation_groups',
+            function (Options $options, $value) {
+                return $options['disabled'] ? false : $value;
+            }
         );
     }
 
@@ -119,7 +125,7 @@ class EnumNameType extends AbstractType
      */
     public function getParent()
     {
-        return 'text';
+        return TextType::class;
     }
 
     /**

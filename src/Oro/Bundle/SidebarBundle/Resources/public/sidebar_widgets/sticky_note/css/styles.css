@@ -1,7 +1,3 @@
-.sidebar-widget-sticky-note .sidebar-widget-content {
-    margin: 8px;
-    border: 1px solid #dbdbdb;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    padding: 8px;
+.sidebar-widget.sidebar-widget-sticky-note .sidebar-widget__content {
+    padding: 10px 16px;
 }

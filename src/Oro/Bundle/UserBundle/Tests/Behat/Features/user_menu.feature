@@ -24,7 +24,7 @@ Feature: User menu
       | Subject | Test mail for me              |
       | To      | John                          |
       | Body    | This is very simple test mail |
-    And press "Send"
+    And click "Send"
     Then I should see "The email was sent" flash message
     And number of records should be 1
 

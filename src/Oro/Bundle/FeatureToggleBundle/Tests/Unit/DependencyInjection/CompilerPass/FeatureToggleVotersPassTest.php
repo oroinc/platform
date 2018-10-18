@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class FeatureToggleVotersPassTest extends \PHPUnit_Framework_TestCase
+class FeatureToggleVotersPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FeatureToggleVotersPass
@@ -21,7 +21,7 @@ class FeatureToggleVotersPassTest extends \PHPUnit_Framework_TestCase
 
     public function testSkipProcess()
     {
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container **/
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container **/
         $container = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -50,7 +50,7 @@ class FeatureToggleVotersPassTest extends \PHPUnit_Framework_TestCase
             new Reference('first_voter')
         ];
 
-        /** @var Definition|\PHPUnit_Framework_MockObject_MockObject $featureChecker */
+        /** @var Definition|\PHPUnit\Framework\MockObject\MockObject $featureChecker */
         $featureCheckerDefinition = $this->getMockBuilder(Definition::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -59,7 +59,7 @@ class FeatureToggleVotersPassTest extends \PHPUnit_Framework_TestCase
             ->method('addMethodCall')
             ->with('setVoters', [$expected]);
 
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container **/
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container **/
         $container = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();

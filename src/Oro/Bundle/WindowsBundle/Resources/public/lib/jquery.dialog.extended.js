@@ -92,6 +92,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             // remove custom handler
             $(document).unbind('keydown.dialog', this._onBackspacePress);
             $(window).unbind('resize.dialog', this._windowResizeHandler);
+
+            // @TODO: Remove this fix when Apple fix caret placement bug
+            this.iOScaretFixer(false);
         },
 
         _makeDraggable: function() {
@@ -288,7 +291,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                 this.options.minimizeTo.addClass('ui-dialog-minimize-container');
                 this.options.minimizeTo
                 .css({
-                    position: 'fixed',
+                    position: _.isMobile() ? 'relative' : 'fixed',
                     bottom: 1,
                     left: this._limitTo().offset().left,
                     zIndex: 9999
@@ -321,7 +324,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                         of: this._limitTo()
                     }
                 });
-                this.widget().css('position', 'fixed'); // remove scroll when maximized
+                this.widget().css('position', _.isMobile() ? 'relative' : 'fixed'); // remove scroll when maximized
                 if ($.isFunction(onResizeCallback)) {
                     onResizeCallback();
                 }
@@ -541,7 +544,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                 widgetCSS = {
                     'min-height': widget.style.minHeight,
                     'border': widget.style.border,
-                    'position': 'fixed',
+                    'position': _.isMobile() ? 'relative' : 'fixed',
                     'left': this._getVisibleLeft(original.position.left, original.size.width),
                     'top': this._getVisibleTop(original.position.top, original.size.height)
                 };
@@ -572,7 +575,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
 
             // Calculate position to be visible after maximize
             this.widget().css({
-                position: 'fixed',
+                position: _.isMobile() ? 'relative' : 'fixed',
                 left: this._getVisibleLeft(original.position.left, original.size.width),
                 top: this._getVisibleTop(original.position.top, original.size.height)
             });

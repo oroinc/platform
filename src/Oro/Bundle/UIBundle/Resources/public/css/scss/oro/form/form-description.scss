@@ -1,0 +1,34 @@
+/* @theme: admin.oro; */
+
+.form-description {
+    margin-bottom: $form-description-offset-bottom;
+
+    &--signin-help {
+        margin-bottom: $form-description-signin-help-offset-bottom;
+    }
+
+    &__logo {
+        margin-bottom: $form-description-logo-offset-bottom;
+    }
+
+    &__logo-img {
+        display: $form-description-logo-img-display;
+        margin: $form-description-logo-img-offset;
+        max-height: $form-description-logo-img-max-height;
+    }
+
+    &__main {
+        font-size: $form-description-main-font-size;
+        font-weight: $form-description-main-font-weight;
+        line-height: $form-description-main-line-height;
+        text-align: $form-description-main-text-align;
+        color: $form-description-main-color;
+        margin-bottom: $form-description-main-offset-bottom;
+    }
+
+    &__text {
+        font-size: $form-description-text-font-size;
+        text-align: $form-description-text-align;
+        color: $form-description-color;
+    }
+}

@@ -5,10 +5,12 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSelectType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,13 +20,13 @@ class IntegrationSelectTypeTest extends OrmTestCase
     /** @var  IntegrationSelectType */
     protected $type;
 
-    /** @var TypesRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $assetHelper;
 
     protected function setUp()
@@ -37,7 +39,12 @@ class IntegrationSelectTypeTest extends OrmTestCase
         $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()->getMock();
 
-        $this->type = new IntegrationSelectType($this->em, $this->registry, $this->assetHelper, $aclHelper);
+        $this->type = new IntegrationSelectType(
+            $this->em,
+            $this->registry,
+            $this->assetHelper,
+            $aclHelper
+        );
     }
 
     public function tearDown()
@@ -52,7 +59,7 @@ class IntegrationSelectTypeTest extends OrmTestCase
 
     public function testParent()
     {
-        $this->assertSame('oro_select2_choice', $this->type->getParent());
+        $this->assertSame(Select2ChoiceType::class, $this->type->getParent());
     }
 
     public function testFinishView()
@@ -125,6 +132,6 @@ class IntegrationSelectTypeTest extends OrmTestCase
                 'allowed_types' => ['testType']
             ]
         );
-        $this->assertInstanceOf('Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList', $resolved['choice_list']);
+        $this->assertInstanceOf(ChoiceLoaderInterface::class, $resolved['choice_loader']);
     }
 }

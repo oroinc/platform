@@ -1,8 +1,15 @@
+nelmio_api_doc_index:
+    path: '%oro_api.rest.prefix%doc/{view}'
+    methods: [GET]
+    defaults:
+        _controller: NelmioApiDocBundle:ApiDoc:index
+        view: rest_json_api
+
 # * GET method: returns an entity of the given type by its identifier
 # * DELETE method: deletes an entity of the given type by its identifier
 # * PATCH method: updates the specified fields of the given entity
 oro_rest_api_item:
-    path: /api/{entity}/{id}
+    path: '%oro_api.rest.prefix%{entity}/{id}'
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
@@ -15,7 +22,7 @@ oro_rest_api_item:
 # * DELETE method: deletes a list of entities of the given type by the given filters
 # * POST method: creates an entity of the given type
 oro_rest_api_list:
-    path: /api/{entity}
+    path: '%oro_api.rest.prefix%{entity}'
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
@@ -27,8 +34,20 @@ oro_rest_api_list:
 # * GET method: returns an entity (for to-one association)
 #   or a list of entities (for to-many association)
 #   connected to the given entity by the given association
+# * PATCH method: updates an entity (or entities, it depends on the association type) connected
+#   to the given entity by the given association.
+#   This type of the request is non-standard and do not have default implementation,
+#   additional processors should be added for each association requires it.
+# * POST method: adds an entity (or entities, it depends on the association type) connected
+#   to the given entity by the given association.
+#   This type of the request is non-standard and do not have default implementation,
+#   additional processors should be added for each association requires it.
+# * DELETE method: deletes an entity (or entities, it depends on the association type) connected
+#   to the given entity by the given association.
+#   This type of the request is non-standard and do not have default implementation,
+#   additional processors should be added for each association requires it.
 oro_rest_api_subresource:
-    path: /api/{entity}/{id}/{association}
+    path: '%oro_api.rest.prefix%{entity}/{id}/{association}'
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
@@ -46,7 +65,7 @@ oro_rest_api_subresource:
 # * POST method: adds the specified entities to the relationship represented by the given to-many association
 # * DELETE method: deletes the specified entities from the relationship represented by the given to-many association
 oro_rest_api_relationship:
-    path: /api/{entity}/{id}/relationships/{association}
+    path: '%oro_api.rest.prefix%{entity}/{id}/relationships/{association}'
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
@@ -54,103 +73,3 @@ oro_rest_api_relationship:
     options:
         group: rest_api
         priority: -10
-
-
-#
-# deprecated routes with "_format" placeholder
-# they are added to prevent BC break
-# and they must be registered at the end to avoid collisions with main API routes
-#
-
-oro_rest_api_get_deprecated:
-    path: /api/{entity}/{id}.{_format}
-    methods: [GET]
-    requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/\.]+)
-        _format: json
-    defaults:
-        _controller: OroApiBundle:RestApi:item
-        _format: json
-        _action: get
-    options:
-        group: rest_api_deprecated
-        priority: -15
-
-oro_rest_api_cget_deprecated:
-    path: /api/{entity}.{_format}
-    methods: [GET]
-    requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/\.]+)
-        _format: json
-    defaults:
-        _controller: OroApiBundle:RestApi:list
-        _format: json
-        _action: get_list
-    options:
-        group: rest_api_deprecated
-        priority: -15
-
-oro_rest_api_delete_deprecated:
-    path: /api/{entity}/{id}.{_format}
-    methods: [DELETE]
-    requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApi:item
-        _format: json
-        _action: delete
-    options:
-        group: rest_api_deprecated
-        priority: -15
-
-oro_rest_api_cdelete_deprecated:
-    path: /api/{entity}.{_format}
-    methods: [DELETE]
-    requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApi:list
-        _format: json
-        _action: delete_list
-    options:
-        group: rest_api_deprecated
-        priority: -15
-
-oro_rest_api_post_deprecated:
-    path: /api/{entity}.{_format}
-    methods: [POST]
-    requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApi:list
-        _format: json
-        _action: create
-    options:
-        group: rest_api_deprecated
-        priority: -15
-
-oro_rest_api_patch_deprecated:
-    path: /api/{entity}/{id}.{_format}
-    methods: [PATCH]
-    requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApi:item
-        _format: json
-        _action: update
-    options:
-        group: rest_api_deprecated
-        priority: -15
-
-oro_rest_api_get_subresource_deprecated:
-    path: /api/{entity}/{id}/{association}.{_format}
-    methods: [GET]
-    requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApi:subresource
-        _format: json
-        _action: get_subresource
-    options:
-        group: rest_api_deprecated
-        priority: -15

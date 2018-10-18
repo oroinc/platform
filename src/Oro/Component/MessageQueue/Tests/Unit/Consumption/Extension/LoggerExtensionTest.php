@@ -9,7 +9,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Psr\Log\LoggerInterface;
 
-class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
+class LoggerExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 

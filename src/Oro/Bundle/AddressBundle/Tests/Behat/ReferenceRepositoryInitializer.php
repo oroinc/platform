@@ -3,48 +3,48 @@
 namespace Oro\Bundle\AddressBundle\Tests\Behat;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\ORM\EntityRepository;
 use Nelmio\Alice\Instances\Collection as AliceCollection;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
-use Oro\Bundle\AddressBundle\Entity\Repository\AddressTypeRepository;
-use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\ReferenceRepositoryInitializerInterface;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 
 class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerInterface
 {
+    /** @var array */
+    private $data = [
+        Country::class => [
+            'germany' => ['iso2Code' => 'DE'],
+            'united_states' => ['iso2Code' => 'US'],
+        ],
+        Region::class => [
+            'berlin' => ['combinedCode' => 'DE-BE'],
+            'florida' => ['combinedCode' => 'US-FL'],
+        ],
+        AddressType::class => [
+            'billingType' => ['name' => 'billing'],
+            'shippingType' => ['name' => 'shipping'],
+        ],
+        TranslationKey::class => [
+            'translation_key_oro_country_DE' => ['key' => 'country.DE', 'domain' => 'entities'],
+            'translation_key_oro_region_DE-BE' => ['key' => 'region.DE-BE', 'domain' => 'entities'],
+            'translation_key_oro_country_US' => ['key' => 'country.US', 'domain' => 'entities'],
+            'translation_key_oro_region_US-FL' => ['key' => 'region.US-FL', 'domain' => 'entities'],
+        ],
+    ];
+
     /**
      * {@inheritdoc}
      */
     public function init(Registry $doctrine, AliceCollection $referenceRepository)
     {
-        /** @var EntityRepository $repository */
-        $repository = $doctrine->getManager()->getRepository('OroAddressBundle:Country');
-        /** @var Country $germany */
-        $germany = $repository->findOneBy(['name' => 'Germany']);
-        $referenceRepository->set('germany', $germany);
-        /** @var Country $us */
-        $us = $repository->findOneBy(['name' => 'United States']);
-        $referenceRepository->set('united_states', $us);
+        foreach ($this->data as $className => $entities) {
+            $repository = $doctrine->getManager()->getRepository($className);
 
-        /** @var RegionRepository $repository */
-        $repository = $doctrine->getManager()->getRepository('OroAddressBundle:Region');
-        /** @var Region $berlin */
-        $berlin = $repository->findOneBy(['name' => 'Berlin']);
-        $referenceRepository->set('berlin', $berlin);
-
-        /** @var Region $florida */
-        $florida = $repository->findOneBy(['name' => 'Florida']);
-        $referenceRepository->set('florida', $florida);
-
-        /** @var AddressTypeRepository $repository */
-        $repository = $doctrine->getManager()->getRepository('OroAddressBundle:AddressType');
-        /** @var AddressType $billingType*/
-        $billingType = $repository->findOneBy(['name' => 'billing']);
-        $referenceRepository->set('billingType', $billingType);
-        /** @var AddressType $shippingType*/
-        $shippingType = $repository->findOneBy(['name' => 'shipping']);
-        $referenceRepository->set('shippingType', $shippingType);
+            foreach ($entities as $referenceName => $criteria) {
+                $referenceRepository->set($referenceName, $repository->findOneBy($criteria));
+            }
+        }
     }
 }

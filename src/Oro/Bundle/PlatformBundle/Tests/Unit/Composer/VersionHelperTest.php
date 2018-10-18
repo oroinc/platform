@@ -5,12 +5,12 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Composer;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 use Oro\Bundle\PlatformBundle\OroPlatformBundle;
 
-class VersionHelperTest extends \PHPUnit_Framework_TestCase
+class VersionHelperTest extends \PHPUnit\Framework\TestCase
 {
     const VERSION = '1.0';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $factory;
 
@@ -20,7 +20,7 @@ class VersionHelperTest extends \PHPUnit_Framework_TestCase
     protected $helper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $repo;
 

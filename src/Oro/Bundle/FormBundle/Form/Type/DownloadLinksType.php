@@ -29,9 +29,9 @@ class DownloadLinksType extends AbstractType
     {
         $resolver
             ->setRequired(['source'])
-            ->setOptional(['class'])
+            ->setDefined(['class'])
             ->setDefaults(['class' => ''])
-            ->setAllowedTypes(['source' => 'array']);
+            ->setAllowedTypes('source', 'array');
     }
 
     /**

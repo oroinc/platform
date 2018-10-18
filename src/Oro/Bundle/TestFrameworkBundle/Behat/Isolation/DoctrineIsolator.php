@@ -16,6 +16,11 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Disables all optional listeners (except list of required listeners) before loading data fixtures and enables them
+ * again after loading data completed. It will increase performance of data fixtures, because many listeners don't
+ * required during data loading (like data audit listener).
+ */
 class DoctrineIsolator implements IsolatorInterface
 {
     /**
@@ -39,6 +44,11 @@ class DoctrineIsolator implements IsolatorInterface
     protected $aliceLoader;
 
     /**
+     * @var array
+     */
+    protected $requiredListeners = [];
+
+    /**
      * @param KernelInterface $kernel
      * @param FixtureLoader $fixtureLoader
      * @param OroAliceLoader $aliceLoader
@@ -59,6 +69,14 @@ class DoctrineIsolator implements IsolatorInterface
     public function addInitializer(ReferenceRepositoryInitializerInterface $initializer)
     {
         $this->initializers[] = $initializer;
+    }
+
+    /**
+     * @param array $requiredListeners
+     */
+    public function setRequiredListeners(array $requiredListeners)
+    {
+        $this->requiredListeners = $requiredListeners;
     }
 
     public function initReferences()
@@ -89,10 +107,28 @@ class DoctrineIsolator implements IsolatorInterface
     /** {@inheritdoc} */
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
+        $manager = $this->kernel->getContainer()->get('oro_platform.optional_listeners.manager');
+        $listenersToDisable = array_filter($manager->getListeners(), function ($listener) {
+            return !in_array($listener, $this->requiredListeners, true);
+        });
+
+        if ($listenersToDisable) {
+            $event->writeln('<info>Disabling optional listeners:</info>');
+            foreach ($listenersToDisable as $listener) {
+                $manager->disableListener($listener);
+                $event->writeln(sprintf('<comment>  => %s</comment>', $listener));
+            }
+        }
+
         $event->writeln('<info>Load fixtures</info>');
 
         $this->initReferences();
         $this->loadFixtures($event);
+
+        if ($listenersToDisable) {
+            $event->writeln('<info>Enabling optional listeners</info>');
+            $manager->enableListeners($listenersToDisable);
+        }
     }
 
     /** {@inheritdoc} */

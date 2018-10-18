@@ -12,10 +12,10 @@ class BooleanTypeTest extends TypeTestCase
      */
     public function testWithValidValue($value, $expected)
     {
-        $form = $this->factory->create(new BooleanType());
+        $form = $this->factory->create(BooleanType::class);
         $form->submit($value);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertSame($expected, $form->getData());
+        self::assertTrue($form->isSynchronized());
+        self::assertSame($expected, $form->getData());
     }
 
     public function validValuesDataProvider()
@@ -32,7 +32,7 @@ class BooleanTypeTest extends TypeTestCase
             [false, null], // Symfony Form treats false as NULL due to checkboxes
             [0, false],
             ['', null],
-            [null, null],
+            [null, null]
         ];
     }
 
@@ -41,21 +41,15 @@ class BooleanTypeTest extends TypeTestCase
      */
     public function testWithInvalidValue($value)
     {
-        $form = $this->factory->create(new BooleanType());
+        $form = $this->factory->create(BooleanType::class);
         $form->submit($value);
-        $this->assertFalse($form->isSynchronized());
+        self::assertFalse($form->isSynchronized());
     }
 
     public function invalidValuesDataProvider()
     {
         return [
-            ['test'],
+            ['test']
         ];
-    }
-
-    public function testGetName()
-    {
-        $type = new BooleanType();
-        $this->assertEquals('oro_api_boolean', $type->getName());
     }
 }

@@ -1,11 +1,4 @@
 config:
-    shim:
-        'jquery.validate':
-            deps:
-                - 'jquery'
-        'jquery.validate-additional-methods':
-            deps:
-                - 'jquery.validate'
     map:
         '*':
             'jquery.validate': 'oroform/js/extend/validate'

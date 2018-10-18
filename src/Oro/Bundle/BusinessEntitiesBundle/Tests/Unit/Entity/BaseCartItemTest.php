@@ -4,7 +4,7 @@ namespace Oro\Bundle\BusinessEntitiesBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\BusinessEntitiesBundle\Entity\BaseCartItem;
 
-class BaseCartItemTest extends \PHPUnit_Framework_TestCase
+class BaseCartItemTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_STRING = 'testString';
     const TEST_ID     = 123;

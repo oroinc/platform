@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType as SymfonyTextType;
+
 /**
  * This form type is just a wrapper around standard 'text' form type, but
  * this form type can handle 'require_schema_update' option that
@@ -37,6 +39,6 @@ class TextType extends AbstractConfigType
      */
     public function getParent()
     {
-        return 'text';
+        return SymfonyTextType::class;
     }
 }

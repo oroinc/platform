@@ -11,14 +11,14 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class NormalizeEntityClassTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
     private $resourcesProvider;
 
     /** @var NormalizeEntityClass */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -52,7 +52,7 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
     {
         $this->context->setClassName('Test\Class');
 
-        $this->valueNormalizer->expects($this->never())
+        $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
 
         $this->processor->process($this->context);

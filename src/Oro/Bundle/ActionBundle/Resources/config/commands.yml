@@ -1,0 +1,24 @@
+services:
+    Oro\Bundle\ActionBundle\Command\DebugActionCommand:
+        public: false
+        class: Oro\Bundle\ActionBundle\Command\DebugActionCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\ActionBundle\Command\DebugConditionCommand:
+        public: false
+        class: Oro\Bundle\ActionBundle\Command\DebugConditionCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\ActionBundle\Command\DebugOperationCommand:
+        public: false
+        class: Oro\Bundle\ActionBundle\Command\DebugOperationCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\ActionBundle\Command\ValidateActionConfigurationCommand:
+        public: false
+        class: Oro\Bundle\ActionBundle\Command\ValidateActionConfigurationCommand
+        tags:
+            - { name: console.command }

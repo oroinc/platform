@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\WorkflowBundle\Datagrid\Translation\WorkflowColumnListener;
 
-class WorkflowColumnListenerTest extends \PHPUnit_Framework_TestCase
+class WorkflowColumnListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowColumnListener */
     protected $listener;

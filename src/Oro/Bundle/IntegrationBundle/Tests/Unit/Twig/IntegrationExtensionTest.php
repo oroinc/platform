@@ -6,7 +6,7 @@ use Oro\Bundle\IntegrationBundle\Event\LoadIntegrationThemesEvent;
 use Oro\Bundle\IntegrationBundle\Twig\IntegrationExtension;
 use Symfony\Component\Form\FormView;
 
-class IntegrationExtensionTest extends \PHPUnit_Framework_TestCase
+class IntegrationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     protected $dispatcher;
     protected $integrationExtension;

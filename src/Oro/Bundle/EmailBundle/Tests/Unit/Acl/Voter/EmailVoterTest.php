@@ -10,15 +10,15 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class EmailVoterTest extends \PHPUnit_Framework_TestCase
+class EmailVoterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailVoter */
     protected $emailVoter;
 
-    /** @var Container|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Container|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
-    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
     protected function setUp()

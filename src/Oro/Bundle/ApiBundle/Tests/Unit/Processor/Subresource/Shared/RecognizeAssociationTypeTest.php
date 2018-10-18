@@ -4,25 +4,25 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\RecognizeAssociationType;
+use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $subresourcesProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|SubresourcesProvider */
+    private $subresourcesProvider;
 
     /** @var RecognizeAssociationType */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
-        $this->subresourcesProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\SubresourcesProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->subresourcesProvider = $this->createMock(SubresourcesProvider::class);
 
         $this->processor = new RecognizeAssociationType(
             $this->subresourcesProvider
@@ -31,7 +31,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
 
     public function testProcessWhenEntityClassNameIsAlreadySet()
     {
-        $this->subresourcesProvider->expects($this->never())
+        $this->subresourcesProvider->expects(self::never())
             ->method('getSubresources');
 
         $this->context->setClassName('Test\Class');
@@ -42,11 +42,37 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
     {
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError(
                     'relationship constraint',
                     'The association name must be set in the context.'
+                )
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessForUnknownParentEntity()
+    {
+        $parentEntityClass = 'Test\ParentClass';
+        $associationName = 'testAssociation';
+
+        $this->subresourcesProvider->expects(self::once())
+            ->method('getSubresources')
+            ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(null);
+
+        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setAssociationName($associationName);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [
+                Error::createValidationError(
+                    'relationship constraint',
+                    'Unsupported subresource.',
+                    Response::HTTP_NOT_FOUND
                 )
             ],
             $this->context->getErrors()
@@ -60,7 +86,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
 
         $entitySubresources = new ApiResourceSubresources($parentEntityClass);
 
-        $this->subresourcesProvider->expects($this->once())
+        $this->subresourcesProvider->expects(self::once())
             ->method('getSubresources')
             ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn($entitySubresources);
@@ -69,15 +95,41 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $this->context->setAssociationName($associationName);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError(
                     'relationship constraint',
-                    'The target entity type cannot be recognized.'
+                    'Unsupported subresource.',
+                    Response::HTTP_NOT_FOUND
                 )
             ],
             $this->context->getErrors()
         );
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException
+     */
+    public function testProcessForExcludedAssociation()
+    {
+        $parentEntityClass = 'Test\ParentClass';
+        $associationName = 'testAssociation';
+
+        $entitySubresources = new ApiResourceSubresources($parentEntityClass);
+        $associationSubresource = new ApiSubresource();
+        $associationSubresource->setIsCollection(true);
+        $associationSubresource->setTargetClassName('Test\Class');
+        $associationSubresource->setExcludedActions([$this->context->getAction()]);
+        $entitySubresources->addSubresource($associationName, $associationSubresource);
+
+        $this->subresourcesProvider->expects(self::once())
+            ->method('getSubresources')
+            ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn($entitySubresources);
+
+        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setAssociationName($associationName);
+        $this->processor->process($this->context);
     }
 
     public function testProcessForKnownAssociation()
@@ -91,7 +143,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $associationSubresource->setTargetClassName('Test\Class');
         $entitySubresources->addSubresource($associationName, $associationSubresource);
 
-        $this->subresourcesProvider->expects($this->once())
+        $this->subresourcesProvider->expects(self::once())
             ->method('getSubresources')
             ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn($entitySubresources);
@@ -100,11 +152,11 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $this->context->setAssociationName($associationName);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             $associationSubresource->getTargetClassName(),
             $this->context->getClassName()
         );
-        $this->assertEquals(
+        self::assertEquals(
             $associationSubresource->isCollection(),
             $this->context->isCollection()
         );
@@ -118,7 +170,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $entitySubresources = new ApiResourceSubresources($parentEntityClass);
         $entitySubresources->addSubresource('testAssociation');
 
-        $this->subresourcesProvider->expects($this->once())
+        $this->subresourcesProvider->expects(self::once())
             ->method('getSubresources')
             ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn($entitySubresources);
@@ -127,7 +179,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $this->context->setAssociationName($associationName);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError(
                     'relationship constraint',

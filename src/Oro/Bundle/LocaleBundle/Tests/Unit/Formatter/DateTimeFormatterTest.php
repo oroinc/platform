@@ -4,10 +4,10 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
-class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
+class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $localeSettings;
 
@@ -508,6 +508,43 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
                 'fr_FR'
             ),
         );
+    }
+
+    /**
+     * @dataProvider getDateTimeNotModifiedDataProvider
+     */
+    public function testGetDateTimeReturnsNotModified($date)
+    {
+        $this->assertSame($date, $this->formatter->getDateTime($date));
+    }
+
+    /**
+     * @return array
+     */
+    public function getDateTimeNotModifiedDataProvider()
+    {
+        return [
+            'DateTime' => [
+                'date' => new \DateTime,
+            ],
+            'DateTimeImmutable' => [
+                'date' => new \DateTimeImmutable(),
+            ],
+        ];
+    }
+
+    public function testGetDateTimeFromString()
+    {
+        $actual = $this->formatter->getDateTime('10 September 2000');
+        $this->assertInstanceOf(\DateTime::class, $actual);
+        $this->assertEquals('UTC', $actual->getTimezone()->getName());
+    }
+
+    public function testGetDateTimeFromInteger()
+    {
+        $actual = $this->formatter->getDateTime(1523028070);
+        $this->assertInstanceOf(\DateTime::class, $actual);
+        $this->assertEquals('UTC', $actual->getTimezone()->getName());
     }
 
     /**

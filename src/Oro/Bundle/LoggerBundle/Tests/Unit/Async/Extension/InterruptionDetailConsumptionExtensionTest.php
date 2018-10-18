@@ -3,20 +3,20 @@
 namespace Oro\Bundle\LoggerBundle\Bundle\Tests\Unit\Async\Extension;
 
 use Oro\Bundle\LoggerBundle\Async\Extension\InterruptionDetailConsumptionExtension;
-use Oro\Bundle\MessageQueueBundle\Log\MessageProcessorClassProvider;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Log\MessageProcessorClassProvider;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class InterruptionDetailConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
+class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     protected $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MessageProcessorClassProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MessageProcessorClassProvider */
     protected $messageProcessorClassProvider;
 
     /** @var InterruptionDetailConsumptionExtension */

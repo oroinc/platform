@@ -6,17 +6,17 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\Tests\Unit\TestArrayObject;
 
-class ConfigUtilTest extends \PHPUnit_Framework_TestCase
+class ConfigUtilTest extends \PHPUnit\Framework\TestCase
 {
     public function testConvertObjectsToArrayDoNotTreatEmptyAsNull()
     {
         $objects = [
             'obj1' => new TestArrayObject([]),
-            'obj2' => new TestArrayObject(['key' => 'val']),
+            'obj2' => new TestArrayObject(['key' => 'val'])
         ];
 
         $expected = [
-            'obj2' => ['key' => 'val'],
+            'obj2' => ['key' => 'val']
         ];
 
         self::assertEquals($expected, ConfigUtil::convertObjectsToArray($objects));
@@ -26,12 +26,12 @@ class ConfigUtilTest extends \PHPUnit_Framework_TestCase
     {
         $objects = [
             'obj1' => new TestArrayObject([]),
-            'obj2' => new TestArrayObject(['key' => 'val']),
+            'obj2' => new TestArrayObject(['key' => 'val'])
         ];
 
         $expected = [
             'obj1' => null,
-            'obj2' => ['key' => 'val'],
+            'obj2' => ['key' => 'val']
         ];
 
         self::assertEquals($expected, ConfigUtil::convertObjectsToArray($objects, true));
@@ -60,7 +60,7 @@ class ConfigUtilTest extends \PHPUnit_Framework_TestCase
     public function testGetPropertyPathOfMetaPropertyWhenFoundItemIsFieldNotMetaProperty()
     {
         $config = new EntityDefinitionConfig();
-        $field = $config->addField('__field1__');
+        $config->addField('__field1__');
 
         self::assertNull(ConfigUtil::getPropertyPathOfMetaProperty('field1', $config));
     }
@@ -68,7 +68,7 @@ class ConfigUtilTest extends \PHPUnit_Framework_TestCase
     public function testGetPropertyPathOfMetaPropertyForExistingMetaProperty()
     {
         $config = new EntityDefinitionConfig();
-        $field = $config->addField('__field1__')->setMetaProperty(true);
+        $config->addField('__field1__')->setMetaProperty(true);
 
         self::assertEquals('__field1__', ConfigUtil::getPropertyPathOfMetaProperty('field1', $config));
     }

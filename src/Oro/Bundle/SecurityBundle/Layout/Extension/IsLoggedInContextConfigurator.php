@@ -28,9 +28,7 @@ class IsLoggedInContextConfigurator implements ContextConfiguratorInterface
     {
         $context->getResolver()
             ->setRequired([self::OPTION_NAME])
-            ->setAllowedTypes([
-                self::OPTION_NAME => ['bool']
-            ]);
+            ->setAllowedTypes(self::OPTION_NAME, ['bool']);
 
         $context->set(self::OPTION_NAME, $this->tokenAccessor->hasUser());
     }

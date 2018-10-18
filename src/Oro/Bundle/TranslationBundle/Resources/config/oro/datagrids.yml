@@ -76,8 +76,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                true: oro.translation.language.status.enabled
-                                false: oro.translation.language.status.disabled
+                                oro.translation.language.status.enabled: 1
+                                oro.translation.language.status.disabled: 0
                 createdAt:
                     type:      datetime
                     data_name: language.createdAt
@@ -191,7 +191,7 @@ datagrids:
                 domain:
                     data_name: domain
             default:
-                language: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                language: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
         filters:
             columns:
                 language:

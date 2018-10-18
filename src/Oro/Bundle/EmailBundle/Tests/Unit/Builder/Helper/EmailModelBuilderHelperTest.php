@@ -16,7 +16,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Templating\EngineInterface;
 
-class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
+class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailModelBuilderHelper
@@ -24,42 +24,42 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
     protected $helper;
 
     /**
-     * @var EntityRoutingHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityRoutingHelper;
 
     /**
-     * @var EmailAddressHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailAddressHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $emailAddressHelper;
 
     /**
-     * @var EntityNameResolver|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityNameResolver;
 
     /**
-     * @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $tokenAccessor;
 
     /**
-     * @var EmailAddressManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailAddressManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $emailAddressManager;
 
     /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityManager;
 
     /**
-     * @var EmailCacheManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailCacheManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $emailCacheManager;
 
     /**
-     * @var EngineInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EngineInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $templating;
 

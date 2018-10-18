@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityIdExists;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
@@ -9,7 +10,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 class ValidateEntityIdExistsTest extends GetProcessorTestCase
 {
     /** @var ValidateEntityIdExists */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -22,13 +23,19 @@ class ValidateEntityIdExistsTest extends GetProcessorTestCase
     {
         $this->context->setId(123);
         $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function testProcessWhenNoId()
     {
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError(
                     'entity identifier constraint',
@@ -37,5 +44,15 @@ class ValidateEntityIdExistsTest extends GetProcessorTestCase
             ],
             $this->context->getErrors()
         );
+    }
+
+    public function testProcessWhenNoIdAndEntityDoesNotHaveIdentifierFields()
+    {
+        $metadata = new EntityMetadata();
+
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
     }
 }

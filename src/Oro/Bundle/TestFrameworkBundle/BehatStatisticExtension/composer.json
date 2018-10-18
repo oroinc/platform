@@ -5,14 +5,14 @@
         "php": "7.1.*",
         "behat/behat": "^3.2",
         "doctrine/dbal": "2.5.5",
-        "symfony/config": "^3.3"
+        "symfony/config": "3.4.*"
     },
     "require-dev": {
         "ext-pdo_sqlite": "*",
-        "phpunit/phpunit": "5.7.*",
-        "symfony/process": "^3.3",
-        "symfony/yaml": "^3.3",
-        "symfony/console": "2.8.*"
+        "phpunit/phpunit": "6.5.*",
+        "symfony/process": "3.4.*",
+        "symfony/yaml": "3.4.*",
+        "symfony/console": "3.4.*"
     },
     "license": "MIT",
     "authors": [

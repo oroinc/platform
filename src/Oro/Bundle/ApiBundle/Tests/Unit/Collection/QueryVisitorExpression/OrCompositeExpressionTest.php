@@ -3,9 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 
 use Doctrine\ORM\Query\Expr\Comparison;
+use Doctrine\ORM\Query\Expr\Orx;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\OrCompositeExpression;
 
-class OrCompositeExpressionTest extends \PHPUnit_Framework_TestCase
+class OrCompositeExpressionTest extends \PHPUnit\Framework\TestCase
 {
     public function testWalkCompositeExpression()
     {
@@ -17,10 +18,7 @@ class OrCompositeExpressionTest extends \PHPUnit_Framework_TestCase
 
         $result = $expression->walkCompositeExpression($expressionList);
 
-        $this->assertInstanceOf('Doctrine\ORM\Query\Expr\Orx', $result);
-        $this->assertEquals(
-            $expressionList,
-            $result->getParts()
-        );
+        self::assertInstanceOf(Orx::class, $result);
+        self::assertEquals($expressionList, $result->getParts());
     }
 }

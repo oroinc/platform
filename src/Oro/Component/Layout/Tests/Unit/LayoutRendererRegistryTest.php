@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\LayoutRendererRegistry;
 
-class LayoutRendererRegistryTest extends \PHPUnit_Framework_TestCase
+class LayoutRendererRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutRendererRegistry */
     protected $registry;

@@ -8,7 +8,7 @@ use Oro\Bundle\ReportBundle\Validator\Constraints\ReportDateGroupingConstraint;
 use Oro\Bundle\ReportBundle\Validator\ReportDateGroupingValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class ReportDateGroupingValidatorTest extends \PHPUnit_Framework_TestCase
+class ReportDateGroupingValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ReportDateGroupingValidator
@@ -16,12 +16,12 @@ class ReportDateGroupingValidatorTest extends \PHPUnit_Framework_TestCase
     protected $reportDateGroupingValidator;
 
     /**
-     * @var ReportDateGroupingConstraint|\PHPUnit_Framework_MockObject_MockObject $constraint
+     * @var ReportDateGroupingConstraint|\PHPUnit\Framework\MockObject\MockObject $constraint
      */
     protected $constraint;
 
     /**
-     * @var ExecutionContextInterface|\PHPUnit_Framework_MockObject_MockObject $constraint
+     * @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject $constraint
      */
     protected $context;
 

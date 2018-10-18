@@ -1,19 +1,15 @@
-Oro Routing Component
-=====================
+# Oro Routing Component
 
 `Oro Routing Component` provides additional flexibility for the [Symfony Routing Component](http://symfony.com/doc/current/components/routing/introduction.html).
 
-Supported Features
-------------------
+## Supported Features
 
 - Provides implementation of a routing loader for collecting routing definition from all bundles.
 - Allows to change a priority of a route through `priority` option.
 - Provides a way to easily create own resolvers for routes based on route options.
 - Allows to hide a route using `hidden` option.
 
-
-Configuration
--------------
+## Configuration
 
 It is supposed that your application is built around [Symfony Framework](http://symfony.com/), but this component can be used without it as well.
 
@@ -113,7 +109,7 @@ class AcmeAppBundle extends Bundle
 }
 ```
 
-The last thing you need to do is to register a root routing resource for your application in `app/config/routing.yml`:
+The last thing you need to do is to register a root routing resource for your application in `config/routing.yml`:
 
 ``` yaml
 acme_auto_routing:
@@ -124,8 +120,7 @@ acme_auto_routing:
 The configuration of the `Oro Routing Component` is finished.
 
 
-Change a route priority
------------------------
+## Change a route priority
 
 In Symfony if several routes match the same URL the earlier route always win. The routes order registered by the cumulative loader depends on the order of bundles. But sometimes you may need to change this order.
 
@@ -142,8 +137,7 @@ acme_product:
 
 Please note the bigger the priority number is, the sooner the route will be checked.
 
-Create own route options resolver
----------------------------------
+## Create own route options resolver
 
 At the first implement your resolver. It must implement [RouteOptionsResolverInterface](./Resolver/RouteOptionsResolverInterface.php). For example:
 
@@ -181,8 +175,7 @@ services:
 
 ```
 
-Hide routes
------------
+## Hide routes
 
 Sometime you need to hide some route from Symfony URL Matcher, but keep it available in Symfony URL Generator. For example if you have same common route for some kind of entities and you use a route options resolver to create routes for concrete entities based on the common route.
 

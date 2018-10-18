@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 
-use Doctrine\ORM\Query\AST\PathExpression;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
@@ -18,7 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
+class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
 {
     const BUSINESS_UNIT = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit';
     const ORGANIZATION  = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization';
@@ -31,13 +30,13 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var OwnershipMetadataProviderStub */
     private $metadataProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $aclVoter;
 
     /** @var OwnerTree */
@@ -230,7 +229,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getOrganizationContext')
             ->will($this->returnValue($organization));
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface $aclGroupProvider */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface $aclGroupProvider */
         $aclGroupProvider = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
         $aclGroupProvider->expects($this->any())->method('getGroup')->willReturn($expectedGroup);
 
@@ -317,7 +316,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     null,
                     null,
-                    AccessLevel::GLOBAL_LEVEL,
                     'organization',
                     'org4',
                     true
@@ -330,7 +328,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 AccessLevel::GLOBAL_LEVEL,
                 'BUSINESS_UNIT',
                 self::TEST_ENTITY,
-                array(null, null, AccessLevel::GLOBAL_LEVEL, 'organization', 'org4', true)
+                array(null, null, 'organization', 'org4', true)
             ),
             'for the TEST entity with GLOBAL ACL, userId, grant and USER ownerType' => array(
                 'user4',
@@ -339,7 +337,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 AccessLevel::GLOBAL_LEVEL,
                 'USER',
                 self::TEST_ENTITY,
-                array(null, null, AccessLevel::GLOBAL_LEVEL, 'organization', 'org4', true)
+                array(null, null, 'organization', 'org4', true)
             ),
             'for the ORGANIZATION entity without ownerType; with GLOBAL ACL, userId, grant' => array(
                 'user4',
@@ -351,7 +349,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'id',
                     array('org4'),
-                    PathExpression::TYPE_STATE_FIELD,
                     null,
                     null,
                     false
@@ -373,7 +370,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'owner',
                     array('bu4', 'bu41', 'bu411'),
-                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                     'organization',
                     'org4',
                     false
@@ -389,7 +385,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'owner',
                     array('user4', 'user411'),
-                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                     'organization',
                     'org4',
                     false
@@ -405,7 +400,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'id',
                     array('bu4', 'bu41', 'bu411'),
-                    PathExpression::TYPE_STATE_FIELD,
                     null,
                     null,
                     false
@@ -427,7 +421,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'owner',
                     array('bu4'),
-                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                     'organization',
                     'org4',
                     false
@@ -443,7 +436,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'owner',
                     array('user4'),
-                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                     'organization',
                     'org4',
                     false
@@ -459,7 +451,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'id',
                     array('bu4'),
-                    PathExpression::TYPE_STATE_FIELD,
                     null,
                     null,
                     false
@@ -484,7 +475,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'owner',
                     'user4',
-                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                     'organization',
                     'org4',
                     false
@@ -500,7 +490,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'id',
                     'user4',
-                    PathExpression::TYPE_STATE_FIELD,
                     null,
                     null,
                     false
@@ -513,7 +502,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 'user1', '', true, AccessLevel::LOCAL_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, array(
                     'owner',
                     array('bu1', 'bu2'),
-                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                     null,
                     null,
                     false
@@ -523,7 +511,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 'user1', 'org1', true, AccessLevel::LOCAL_LEVEL, 'BUSINESS_UNIT', self::BUSINESS_UNIT, array(
                     'id',
                     array('bu1'),
-                    PathExpression::TYPE_STATE_FIELD,
                     null,
                     null,
                     false
@@ -533,7 +520,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 'user1', '', true, AccessLevel::LOCAL_LEVEL, 'BUSINESS_UNIT', self::USER, array(
                     'owner',
                     array('bu1', 'bu2'),
-                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                     null,
                     null,
                     false
@@ -543,7 +529,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 'user1', 'org2', true, AccessLevel::DEEP_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, array(
                     'owner',
                     array('bu2'),
-                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                     'organization',
                     'org2',
                     false
@@ -562,7 +547,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 null,
                 null,
                 self::TEST_ENTITY,
-                [null, null, PathExpression::TYPE_STATE_FIELD, null, null, false]
+                [null, null, null, null, false]
             ),
         );
     }

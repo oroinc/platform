@@ -73,7 +73,7 @@ class OperationAssembler extends AbstractAssembler
             ->setEnabled($this->getOption($options, 'enabled', true))
             ->setPageReload($this->getOption($options, 'page_reload', true))
             ->setOrder($this->getOption($options, 'order', 0))
-            ->setFormType($this->getOption($options, 'form_type', OperationType::NAME))
+            ->setFormType($this->getOption($options, 'form_type', OperationType::class))
             ->setButtonOptions($this->getOption($options, 'button_options', []))
             ->setFrontendOptions($this->getOption($options, 'frontend_options', []))
             ->setDatagridOptions($this->getOption($options, 'datagrid_options', []))

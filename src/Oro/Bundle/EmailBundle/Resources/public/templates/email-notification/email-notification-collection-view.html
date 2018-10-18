@@ -4,19 +4,19 @@
     default: %>reply-all-action<% ; break;
 }%>">
 <% if (length > 0) { %>
-    <div class="header row-fluid">
-        <a class="my-emails pull-left" href="<%=userEmailsUrl %>">
+    <div class="short-emails-list__header">
+        <a class="my-emails" href="<%=userEmailsUrl %>">
             <%=_.__('oro.email.notification.user_emails.label') %>
         </a>
         <% if (countNewEmail) { %>
             <% if (hasMarkVisibleButton) { %>
-            <button class="mark-visible-as-read pull-right btn btn-primary">
+            <button class="mark-visible-as-read btn btn-link">
                 <i class="fa-check-square-o"></i>
                 <%=_.__('oro.email.recent_emails_widget.mark_visible_read.label') %>
             </button>
             <% } %>
             <% if (hasMarkAllButton) { %>
-            <button class="mark-as-read pull-right btn btn-primary">
+            <button class="mark-as-read btn btn-link">
                 <i class="fa-check-square-o"></i>
                 <%=_.__('oro.email.notification.mark_read.label') %>
             </button>

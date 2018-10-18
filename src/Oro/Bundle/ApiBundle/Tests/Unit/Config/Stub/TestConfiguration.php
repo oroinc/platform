@@ -11,7 +11,7 @@ class TestConfiguration implements ConfigurationSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function configure(NodeBuilder $node)
+    public function configure(NodeBuilder $node): void
     {
         $node->end()->useAttributeAsKey('name')->prototype('variable');
     }
@@ -19,7 +19,7 @@ class TestConfiguration implements ConfigurationSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function isApplicable($section)
+    public function isApplicable(string $section): bool
     {
         return true;
     }
@@ -27,7 +27,7 @@ class TestConfiguration implements ConfigurationSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function setSettings(ConfigurationSettingsInterface $settings)
+    public function setSettings(ConfigurationSettingsInterface $settings): void
     {
     }
 }

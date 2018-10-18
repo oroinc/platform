@@ -4,7 +4,7 @@ namespace Oro\Component\ConfigExpression\Tests\Unit;
 
 use Oro\Component\ConfigExpression\ConfigExpressions;
 
-class ConfigExpressionsTest extends \PHPUnit_Framework_TestCase
+class ConfigExpressionsTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigExpressions */
     protected $language;

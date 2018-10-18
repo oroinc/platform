@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Form\Type;
 
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NameFormatType extends AbstractType
@@ -38,7 +39,7 @@ class NameFormatType extends AbstractType
      */
     public function getParent()
     {
-        return 'text';
+        return TextType::class;
     }
 
     /**

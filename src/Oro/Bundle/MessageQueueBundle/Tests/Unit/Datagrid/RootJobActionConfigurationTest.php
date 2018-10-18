@@ -5,7 +5,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\MessageQueueBundle\Datagrid\RootJobActionConfiguration;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 
-class RootJobActionConfigurationTest extends \PHPUnit_Framework_TestCase
+class RootJobActionConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {

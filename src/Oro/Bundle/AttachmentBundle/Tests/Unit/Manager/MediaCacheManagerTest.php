@@ -9,7 +9,7 @@ use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\AttachmentBundle\Manager\MediaCacheManager;
 use Prophecy\Argument;
 
-class MediaCacheManagerTest extends \PHPUnit_Framework_TestCase
+class MediaCacheManagerTest extends \PHPUnit\Framework\TestCase
 {
     const PREFIX = 'media/cache';
     const FILESYSTEM_NAME = 'mediacache';

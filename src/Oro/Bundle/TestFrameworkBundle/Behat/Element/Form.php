@@ -8,10 +8,10 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Doctrine\Common\Inflector\Inflector;
 
 /**
- * Class Form
+ * Form element implementation
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyMethods)
- * @package Oro\Bundle\TestFrameworkBundle\Behat\Element
  */
 class Form extends Element
 {
@@ -49,13 +49,51 @@ class Form extends Element
         }
     }
 
+    /**
+     * @param string $label
+     * @param string $value
+     * @throws ElementNotFoundException
+     */
+    public function typeInField($label, $value)
+    {
+        $field = null;
+        if (isset($this->options['mapping'][$label])) {
+            $field = $this->findField($this->options['mapping'][$label]);
+        }
+
+        if (null === $field) {
+            $field = $this->getPage()->find('named', ['field', $label]);
+        }
+
+        if (null === $field && $this->elementFactory->hasElement($label)) {
+            // try to find field among defined elements
+            $field = $this->elementFactory->createElement($label);
+        }
+
+        if (null === $field) {
+            throw new ElementNotFoundException(
+                $this->getDriver(),
+                'form field',
+                'id|name|label|value|placeholder',
+                $label
+            );
+        }
+
+        self::assertTrue($field->isVisible(), "Field with '$label' was found, but it not visible");
+
+        $this->getDriver()->typeIntoInput($field->getXpath(), $value);
+    }
+
+    /**
+     * @param TableNode $table
+     */
     public function assertFields(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
             list($label, $value) = $row;
             $locator = isset($this->options['mapping'][$label]) ? $this->options['mapping'][$label] : $label;
             $field = $this->findField($locator);
-            self::assertNotNull($field, sprintf("Field `%s` not found", $label));
+            self::assertNotNull($field, sprintf('Field `%s` not found', $label));
 
             $field = $this->wrapField($label, $field);
 
@@ -138,7 +176,6 @@ class Form extends Element
 
     /**
      * {@inheritdoc}
-     * @todo Move behat elements to Driver layer. BAP-11887.
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -150,30 +187,33 @@ class Form extends Element
         $field = $this->find($selector['type'], $selector['locator']);
 
         if ($field) {
-            if ($field->hasAttribute('type') && 'file' === $field->getAttribute('type')) {
+            $type = $field->getAttribute('type');
+            $classes = preg_split('/\s+/', (string)$field->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY);
+
+            if ('file' === $type) {
                 return $this->elementFactory->wrapElement('FileField', $field);
             }
 
-            if ($field->hasAttribute('type') && 'datetime' === $field->getAttribute('type')) {
+            if ('datetime' === $type) {
                 return $this->elementFactory->wrapElement('DateTimePicker', $field->getParent()->getParent());
             }
 
-            if ($field->hasClass('custom-checkbox__input')) {
+            if (in_array('custom-checkbox__input', $classes, true)) {
                 return $this->elementFactory->wrapElement(
                     'PrettyCheckbox',
                     $field->getParent()->find('css', '.custom-checkbox__icon')
                 );
             }
 
-            if ($field->hasAttribute('type') && 'checkbox' === $field->getAttribute('type')) {
+            if ('checkbox' === $type) {
                 return $this->elementFactory->wrapElement('Checkbox', $field);
             }
 
-            if ($field->hasClass('select2-offscreen')) {
+            if (in_array('select2-offscreen', $classes, true)) {
                 return $this->elementFactory->wrapElement('Select2Entity', $field);
             }
 
-            if ($field->hasClass('select2-input')) {
+            if (in_array('select2-input', $classes, true)) {
                 return $this->elementFactory->wrapElement('Select2Entities', $field);
             }
 
@@ -203,25 +243,30 @@ class Form extends Element
     {
         if ($label = $this->findLabel($locator)) {
             $sndParent = $label->getParent()->getParent();
+            $classes = preg_split('/\s+/', (string)$sndParent->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY);
 
-            if ($sndParent->hasClass('control-group-collection')) {
+            if (in_array('control-group-collection', $classes, true)) {
                 $elementName = Inflector::singularize(trim($label->getText())).'Collection';
                 $elementName = $this->elementFactory->hasElement($elementName) ? $elementName : 'CollectionField';
 
                 return $this->elementFactory->wrapElement($elementName, $sndParent);
-            } elseif ($sndParent->hasClass('control-group-oro_file')) {
+            } elseif (in_array('control-group-oro_file', $classes, true)) {
                 $input = $sndParent->find('css', 'input[type="file"]');
 
                 return $this->elementFactory->wrapElement('FileField', $input);
             } elseif ($select = $sndParent->find('css', 'select')) {
                 return $select;
-            } elseif ($sndParent->hasClass('control-group-checkbox')) {
+            } elseif (in_array('control-group-checkbox', $classes, true)) {
                 return $sndParent->find('css', 'input[type=checkbox]');
-            } elseif ($sndParent->hasClass('control-group-choice')) {
+            } elseif (in_array('control-group-choice', $classes, true)) {
                 return $this->elementFactory->wrapElement('GroupChoiceField', $sndParent->find('css', '.controls'));
-            } elseif ($field = $sndParent->find('css', '#'.$label->getAttribute('for'))) {
+            } elseif ($label->getAttribute('for')
+                && $field = $sndParent->find('css', '#'.$label->getAttribute('for'))
+            ) {
                 return $field;
-            } elseif ($field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))) {
+            } elseif ($label->getAttribute('for')
+                && $field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))
+            ) {
                 return $field;
             } else {
                 self::fail(sprintf('Find label "%s", but can\'t determine field type', $locator));
@@ -248,7 +293,15 @@ class Form extends Element
         $value = trim($value);
 
         if (0 === strpos($value, '[')) {
-            return array_map('trim', explode(',', trim($value, '[]')));
+            return self::normalizeValue(
+                array_map(
+                    'trim',
+                    explode(
+                        ',',
+                        trim($value, '[]')
+                    )
+                )
+            );
         }
 
         if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($value))) {
@@ -257,7 +310,7 @@ class Form extends Element
 
         $value = self::checkAdditionalFunctions($value);
 
-        if (in_array($value, ['true', 'false', 'yes', 'no', 'on', 'off'])) {
+        if (in_array($value, ['true', 'false'])) {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         }
 
@@ -290,6 +343,10 @@ class Form extends Element
         return $value;
     }
 
+    /**
+     * @param string $locator
+     * @return NodeElement|null
+     */
     protected function findFieldSetLabel($locator)
     {
         $labelSelector = sprintf("h5.user-fieldset:contains('%s')", $locator);
@@ -378,8 +435,6 @@ class Form extends Element
                 '/following-sibling::span[@class="validation-failed"]'
             )
         ), $errorSpans);
-
-        self::assertNotEmpty($errorSpans, "Field $fieldName has no validation errors");
 
         return array_map(function (NodeElement $error) {
             return $error->getText();

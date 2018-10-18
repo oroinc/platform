@@ -10,6 +10,8 @@ use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -58,7 +60,7 @@ class ConfigType extends AbstractType
              */
             $builder->add(
                 'fieldName',
-                'text',
+                TextType::class,
                 array(
                     'label'     => 'oro.entity_config.form.name.label',
                     'block'     => 'general',
@@ -68,13 +70,13 @@ class ConfigType extends AbstractType
             );
             $builder->add(
                 'type',
-                'choice',
+                ChoiceType::class,
                 array(
                     'label'       => 'oro.entity_config.form.type.label',
                     'choices'     => [],
                     'block'       => 'general',
                     'disabled'    => true,
-                    'empty_value' => 'oro.entity_extend.form.data_type.' . $fieldType
+                    'placeholder' => 'oro.entity_extend.form.data_type.' . $fieldType
                 )
             );
         } else {
@@ -90,13 +92,12 @@ class ConfigType extends AbstractType
 
                 $builder->add(
                     $provider->getScope(),
-                    new ConfigScopeType(
-                        $provider->getPropertyConfig()->getFormItems($configType, $fieldType),
-                        $config,
-                        $this->configManager,
-                        $configModel
-                    ),
+                    ConfigScopeType::class,
                     array(
+                        'items' => $provider->getPropertyConfig()->getFormItems($configType, $fieldType),
+                        'config' => $config,
+                        'config_model' => $configModel,
+                        'config_manager' => $this->configManager,
                         'block_config' => $this->getFormBlockConfig($provider, $configType)
                     )
                 );
@@ -122,11 +123,7 @@ class ConfigType extends AbstractType
     {
         $resolver->setRequired(array('config_model'));
 
-        $resolver->setAllowedTypes(
-            array(
-                'config_model' => 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel'
-            )
-        );
+        $resolver->setAllowedTypes('config_model', 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel');
     }
 
     /**

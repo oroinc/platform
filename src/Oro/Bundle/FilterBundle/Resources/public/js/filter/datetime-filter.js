@@ -66,8 +66,8 @@ define(function(require) {
         },
 
         _getPickerConstructor: function() {
-            return tools.isMobile() || !this.dateWidgetOptions.showDatevariables ? DateTimePickerView :
-                VariableDateTimePickerView;
+            return tools.isMobile() || !this.dateWidgetOptions.showDatevariables
+                ? DateTimePickerView : VariableDateTimePickerView;
         },
 
         _renderCriteria: function() {

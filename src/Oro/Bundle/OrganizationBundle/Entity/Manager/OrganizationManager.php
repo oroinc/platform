@@ -2,48 +2,60 @@
 
 namespace Oro\Bundle\OrganizationBundle\Entity\Manager;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\NoResultException;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Provides a set of methods to simplify manage of the Organization entity.
+ */
 class OrganizationManager
 {
-    /** @var EntityManager */
-    protected $em;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
     /**
-     * @param EntityManager $em
+     * @param ManagerRegistry $doctrine
      */
-    public function __construct(EntityManager $em)
+    public function __construct(ManagerRegistry $doctrine)
     {
-        $this->em = $em;
+        $this->doctrine = $doctrine;
     }
 
     /**
+     * Gets organization by its identifier.
+     *
      * @param int $id
+     *
      * @return Organization
+     *
+     * @throws NoResultException if the organization was not found
      */
     public function getOrganizationById($id)
     {
-        return $this->em->getRepository('OroOrganizationBundle:Organization')->getOrganizationById($id);
+        $organization = $this->getRepository()->find($id);
+        if (!$organization) {
+            throw new NoResultException();
+        }
+
+        return $organization;
     }
 
     /**
+     * Gets organization by its name.
+     *
      * @param string $name
+     *
      * @return Organization
+     *
+     * @throws NoResultException if the organization was not found
      */
     public function getOrganizationByName($name)
     {
-        return $this->getOrganizationRepo()->getOrganizationByName($name);
-    }
-
-    /**
-     * @return OrganizationRepository
-     */
-    public function getOrganizationRepo()
-    {
-        return $this->em->getRepository('OroOrganizationBundle:Organization');
+        return $this->getRepository()->getOrganizationByName($name);
     }
 
     /**
@@ -52,9 +64,10 @@ class OrganizationManager
      */
     public function updateOrganization(Organization $organization, $flush = true)
     {
-        $this->em->persist($organization);
+        $storageManager = $this->getStorageManager();
+        $storageManager->persist($organization);
         if ($flush) {
-            $this->em->flush();
+            $storageManager->flush();
         }
     }
 
@@ -62,10 +75,26 @@ class OrganizationManager
      * @param User   $user
      * @param string $name
      *
-     * @return null|Organization
+     * @return Organization|null
      */
     public function getEnabledUserOrganizationByName(User $user, $name)
     {
-        return $this->getOrganizationRepo()->getEnabledByUserAndName($user, $name, true, true);
+        return $this->getRepository()->getEnabledByUserAndName($user, $name, true, true);
+    }
+
+    /**
+     * @return EntityManager
+     */
+    public function getStorageManager()
+    {
+        return $this->doctrine->getManagerForClass(Organization::class);
+    }
+
+    /**
+     * @return OrganizationRepository
+     */
+    public function getRepository()
+    {
+        return $this->getStorageManager()->getRepository(Organization::class);
     }
 }

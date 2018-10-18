@@ -65,7 +65,7 @@ class SegmentFilterBuilderType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return self::NAME;
     }
@@ -218,10 +218,11 @@ class SegmentFilterBuilderType extends AbstractType
                     ->getEntityReference(SegmentTypeEntity::class, $segmentTypeName);
                 $segment->setType($segmentType);
 
-                /** @var User $user */
                 $user = $this->tokenStorage->getToken()->getUser();
-                $segment->setOwner($user->getOwner());
-                $segment->setOrganization($user->getOrganization());
+                if ($user instanceof User) {
+                    $segment->setOwner($user->getOwner());
+                    $segment->setOrganization($user->getOrganization());
+                }
             }
 
             $this->setSegmentName($segment, $config, $form);
