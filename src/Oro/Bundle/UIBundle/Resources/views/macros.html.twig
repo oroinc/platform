@@ -1122,6 +1122,21 @@
     {% endspaceless %}
 {%- endmacro -%}
 
+{% macro renderUrlWithActions(url, text, class, title, entity) %}
+    {%- set actions %}
+        {%- placeholder url_actions with {data: url, entity: entity} -%}
+    {% endset -%}
+    {% set actions = actions|trim %}
+    <span class="inline-actions-element truncate{% if actions is empty %} inline-actions-element_no-actions{% endif %}">
+        <span class="inline-actions-element_wrapper">
+            {{ _self.renderUrl(url, text, class, title) }}
+        </span>
+        {% if actions is not empty -%}
+            <span class="inline-actions-element_actions url-actions">{{ actions|raw }}</span>
+        {%- endif %}
+    </span>
+{%- endmacro %}
+
 {%- macro renderPhone(phone, title) -%}
     {% if title is empty %}
         {% set title = phone %}
