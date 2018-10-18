@@ -1,12 +1,12 @@
-define([
-    'underscore',
-    'jquery',
-    'backgrid',
-    'oroui/js/tools/text-util'
-], function(_, $, Backgrid, textUtil) {
+define(function(require) {
     'use strict';
 
     var HeaderCell;
+    var _ = require('underscore');
+    var Backgrid = require('backgrid');
+    var textUtil = require('oroui/js/tools/text-util');
+    var template = require('tpl!orodatagrid/templates/datagrid/header-cell.html');
+    var popoverTemplate = require('tpl!orodatagrid/templates/datagrid/header-cell-popover.html');
 
     /**
      * Datagrid header cell
@@ -18,18 +18,10 @@ define([
     HeaderCell = Backgrid.HeaderCell.extend({
 
         /** @property */
-        template: _.template(
-            '<% if (sortable) { %>' +
-                '<a class="grid-header-cell__link" href="#" role="button">' +
-                    '<span class="grid-header-cell__label"><%- label %></span>' +
-                    '<span class="caret" aria-hidden="true"></span>' +
-                '</a>' +
-            '<% } else { %>' +
-                '<span class="grid-header-cell__label-container">' +
-                    '<span class="grid-header-cell__label"><%- label %></span>' +
-                '</span>' +
-            '<% } %>'
-        ),
+        template: template,
+
+        /** @property */
+        popoverTemplate: popoverTemplate,
 
         /** @property {Boolean} */
         allowNoSorting: true,
@@ -189,6 +181,11 @@ define([
             }
         },
 
+        /**
+         * Mouse Enter on column name to show popover
+         *
+         * @param {Event} e
+         */
         onMouseEnter: function(e) {
             var $label = this.$('.grid-header-cell__label');
 
@@ -204,18 +201,14 @@ define([
             }
 
             this.popoverAdded = true;
-
             $label.popover({
                 content: this.column.get('label'),
                 trigger: 'manual',
                 placement: 'bottom',
                 animation: false,
                 container: 'body',
-                template: '<div class="popover" role="tooltip">' +
-                              '<div class="arrow"></div>' +
-                              '<h3 class="popover-header"></h3>' +
-                              '<div class="popover-body popover-no-close-button"></div>' +
-                          '</div>'
+                offset: this.calcPopoverOffset(),
+                template: this.popoverTemplate()
             });
 
             this.hintTimeout = setTimeout(function addHeaderCellHint() {
@@ -223,12 +216,35 @@ define([
             }, 300);
         },
 
+        /**
+         * Mouse Leave from column name to hide popover
+         *
+         * @param {Event} e
+         */
         onMouseLeave: function(e) {
             clearTimeout(this.hintTimeout);
             var $label = this.$('.grid-header-cell__label');
             $label.popover('hide');
             $label.popover('dispose');
             this.popoverAdded = false;
+        },
+
+        /**
+         * Calculation offset of column label for popover
+         *
+         * @return {String}
+         */
+        calcPopoverOffset: function() {
+            var x = 0;
+            var y = 0;
+            var $label = this.$('.grid-header-cell__label');
+
+            var elBottom = this.$el[0].getBoundingClientRect().bottom;
+            var labelBottom = $label[0].getBoundingClientRect().bottom;
+
+            y = elBottom - labelBottom;
+
+            return [x, y].join(', ');
         }
     });
 
