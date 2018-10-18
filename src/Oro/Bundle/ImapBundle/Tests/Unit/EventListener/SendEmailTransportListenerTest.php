@@ -6,6 +6,7 @@ use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\EventListener\SendEmailTransportListener;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -114,11 +115,11 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param $password
-     * @return \Oro\Bundle\SecurityBundle\Encoder\Mcrypt|\PHPUnit\Framework\MockObject\MockObject
+     * @return SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getEncoderMock($password)
     {
-        $encoder = $this->createMock('Oro\Bundle\SecurityBundle\Encoder\Mcrypt');
+        $encoder = $this->createMock(SymmetricCrypterInterface::class);
         $encoder->expects($this->once())
             ->method('decryptData')
             ->willReturn($password);

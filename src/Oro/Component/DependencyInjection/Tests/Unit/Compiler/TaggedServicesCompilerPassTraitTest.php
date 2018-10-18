@@ -36,7 +36,7 @@ class TaggedServicesCompilerPassTraitTest extends \PHPUnit\Framework\TestCase
     {
         $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
         $container->expects($this->once())->method('hasDefinition')->willReturn(true);
-        $container->expects($this->once())->method('findTaggedServiceIds')->with('tag1')->willReturn(null);
+        $container->expects($this->once())->method('findTaggedServiceIds')->with('tag1')->willReturn([]);
         $container->expects($this->never())->method('getDefinition');
 
         $this->trait->registerTaggedServices($container, 'service1', 'tag1', 'addExtension');

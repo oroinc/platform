@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Encoder;
 
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
 
-class McryptTest extends \PHPUnit\Framework\TestCase
+class DefaultCrypterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test two way encoding/decoding
@@ -16,7 +16,7 @@ class McryptTest extends \PHPUnit\Framework\TestCase
     {
         $someData = 'someValue';
 
-        $encryptor = new Mcrypt($key);
+        $encryptor = new DefaultCrypter($key);
 
         $encrypted = $encryptor->encryptData($someData);
         $this->assertInternalType('string', $encrypted);
@@ -33,15 +33,18 @@ class McryptTest extends \PHPUnit\Framework\TestCase
     {
         $someData = 'someValue';
 
-        $encryptor = new Mcrypt($key);
+        $encryptor = new DefaultCrypter($key);
         $encrypted = $encryptor->encryptData($someData);
         $this->assertNotEquals($someData, $encrypted);
 
-        $newInstance = new Mcrypt($key);
+        $newInstance = new DefaultCrypter($key);
         $this->assertEquals($someData, $newInstance->decryptData($encrypted));
         $this->assertNotEquals($encrypted, $newInstance->encryptData($someData));
     }
 
+    /**
+     * @return array
+     */
     public function keyDataProvider()
     {
         return array(

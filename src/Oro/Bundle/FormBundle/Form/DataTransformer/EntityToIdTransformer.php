@@ -144,11 +144,11 @@ class EntityToIdTransformer implements DataTransformerInterface
             }
         }
 
-        if (count($result) !== 1) {
+        if (null === $result || count($result) !== 1) {
             throw new TransformationFailedException(sprintf('The value "%s" does not exist or not unique.', $id));
         }
 
-        return $result ? reset($result) : null;
+        return reset($result);
     }
 
     protected function createPropertyAccessor()

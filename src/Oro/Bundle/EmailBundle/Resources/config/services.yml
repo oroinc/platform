@@ -622,7 +622,7 @@ services:
             - '@oro_email.email.entity.builder='
             - '@oro_email.email.activity.manager'
             - '@event_dispatcher'
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_email.tools.email_origin_helper'
 
     oro_email.workflow.action.send_email:
@@ -1227,7 +1227,7 @@ services:
         arguments:
             - '@oro_config.manager'
             - '@oro_config.scope.global'
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
 
     oro_email.mailer.checker.smtp_settings:
         class: Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker

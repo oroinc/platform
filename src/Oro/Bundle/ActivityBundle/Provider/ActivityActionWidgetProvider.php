@@ -7,6 +7,9 @@ use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
 
+/**
+ * Provider for activity action widget.
+ */
 class ActivityActionWidgetProvider implements WidgetProviderInterface
 {
     /** @var ActivityManager */
@@ -32,7 +35,7 @@ class ActivityActionWidgetProvider implements WidgetProviderInterface
      */
     public function supports($object)
     {
-        return $this->activityManager->hasActivityAssociations(ClassUtils::getClass($object));
+        return is_object($object) && $this->activityManager->hasActivityAssociations(ClassUtils::getClass($object));
     }
 
     /**
