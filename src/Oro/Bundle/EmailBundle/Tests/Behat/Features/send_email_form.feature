@@ -50,25 +50,40 @@ Feature: Send email form
       | CONTACT       | SUBJECT                                  |
       | Charlie Sheen | Test Template Subject Test Template Body |
 
-  Scenario: Create email template with error
+  Scenario: Create email template with error with no entity
     Given I go to System/ Emails/ Templates
     When I click "Create Email Template"
     And fill form with:
-      | Template Name | test_error_template                   |
+      | Template Name | test_error_template_no_entity         |
       | Type          | Html                                  |
+      | Subject       | Test Template Subject                 |
+      | Content       | Test {{ test.nonExisting }} Body      |
+    And I save and close form
+    Then I should see "Template saved" flash message
+
+  Scenario: Create email template with error with entity
+    Given I go to System/ Emails/ Templates
+    When I click "Create Email Template"
+    And fill form with:
+      | Template Name | test_error_template_entity            |
+      | Type          | Html                                  |
+      | Entity Name   | User                                  |
       | Subject       | Test Template Subject                 |
       | Content       | Test {{ entity.nonExisting }} Body    |
     And I save and close form
     Then I should see "Template saved" flash message
 
-  Scenario: Check if email template can be used
+  Scenario: Check if email templates can be used
     Given I click My Emails in user menu
     And I follow "Compose"
     And fill "Email Form" with:
       | Body           | This is test mail with template error |
       | To             | Charlie Sheen                         |
       | Subject        | Behat test                            |
-    When I select "test_error_template" from "Apply template"
+    When I select "test_error_template_entity" from "Apply template"
+    And I click "Yes, Proceed"
+    And I should see that "Body" contains "Test N/A Body"
+    When I select "test_error_template_no_entity" from "Apply template"
     And I click "Yes, Proceed"
     Then I should see "This email template can't be used"
     And click "Send"
