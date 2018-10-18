@@ -264,7 +264,7 @@ define(function(require) {
             if (levelLimit > 0 && treeNode && treeNode.__isEntity) {
                 _.each(treeNode, function(node) {
                     var isEntity = node.__isEntity;
-                    if (isEntity && (omitRelationFields || !node.__hasScalarFieldsInSubtree(levelLimit))) {
+                    if (isEntity && (omitRelationFields || !node.__hasScalarFieldsInSubtree(levelLimit - 1))) {
                         return;
                     }
                     var item = _.extend(_.pick(node.__field, 'label', 'type', 'name'), {

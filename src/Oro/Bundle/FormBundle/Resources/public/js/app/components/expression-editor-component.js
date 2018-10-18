@@ -9,6 +9,13 @@ define(function(require) {
 
     ExpressionEditorComponent = BaseComponent.extend({
         /**
+         * @inheritDoc
+         */
+        constructor: function ExpressionEditorComponent(options) {
+            ExpressionEditorComponent.__super__.constructor.call(this, options);
+        },
+
+        /**
          * @param {Object} options
          * @param {Object} options.dataProviderConfig
          */

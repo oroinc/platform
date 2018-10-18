@@ -114,8 +114,8 @@ define(function(require) {
             ) {
                 var operator = this.binaryOperators[token.value];
                 this.stream.next();
-                var precedence1 = this.OPERATOR_LEFT === operator.associativity ?
-                    operator.precedence + 1 : operator.precedence;
+                var precedence1 = this.OPERATOR_LEFT === operator.associativity
+                    ? operator.precedence + 1 : operator.precedence;
                 var expr1 = this.parseExpression(precedence1);
                 expr = new BinaryNode(token.value, expr, expr1);
 
