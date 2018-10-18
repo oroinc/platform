@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
+use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -17,6 +17,9 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * A base class for pre import message processors.
+ */
 abstract class PreImportMessageProcessorAbstract implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -55,9 +58,9 @@ abstract class PreImportMessageProcessorAbstract implements MessageProcessorInte
     protected $writerChain;
 
     /**
-     * @var ConfigManager
+     * @var NotificationSettings
      */
-    protected $configManager;
+    protected $notificationSettings;
 
     /**
      * @var integer
@@ -72,6 +75,7 @@ abstract class PreImportMessageProcessorAbstract implements MessageProcessorInte
      * @param FileManager $fileManager
      * @param AbstractImportHandler $importHandler
      * @param WriterChain $writerChain
+     * @param NotificationSettings $notificationSettings
      * @param integer $batchSize
      */
     public function __construct(
@@ -82,6 +86,7 @@ abstract class PreImportMessageProcessorAbstract implements MessageProcessorInte
         FileManager $fileManager,
         AbstractImportHandler $importHandler,
         WriterChain $writerChain,
+        NotificationSettings $notificationSettings,
         $batchSize
     ) {
         $this->jobRunner = $jobRunner;
@@ -91,15 +96,8 @@ abstract class PreImportMessageProcessorAbstract implements MessageProcessorInte
         $this->fileManager = $fileManager;
         $this->importHandler = $importHandler;
         $this->writerChain = $writerChain;
+        $this->notificationSettings = $notificationSettings;
         $this->batchSize = $batchSize;
-    }
-
-    /**
-     * @param ConfigManager $configManager
-     */
-    public function setConfigManager(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
     }
 
     /**

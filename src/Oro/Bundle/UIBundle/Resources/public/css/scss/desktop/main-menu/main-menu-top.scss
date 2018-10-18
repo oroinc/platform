@@ -8,8 +8,8 @@
     .main-menu {
         display: flex;
         align-items: center;
-        float: left;
-        padding-left: 5px;
+        float: #{$start};
+        padding-#{$start}: 5px;
 
         @include clearfix();
     }
@@ -21,8 +21,13 @@
 
         background-color: $menu-dropdown-background-color;
         border: 0;
-        border-radius: 0 2px 2px 2px;
+        border-radius: corner-values(0 2px 2px 2px);
         box-shadow: $menu-dropdown-box-shadow;
+
+        &:before,
+        &:after {
+            content: none;
+        }
     }
 
     .title {
@@ -59,7 +64,7 @@
     .dropdown {
         > .dropdown-menu {
             top: 0;
-            left: 100%;
+            #{$start}: 100%;
 
             display: block;
 
@@ -67,7 +72,7 @@
         }
 
         &-level-1 {
-            float: left;
+            float: #{$start};
 
             &.active {
                 background-color: $menu-dropdown-background-color-active;
@@ -98,7 +103,7 @@
                             bottom: 0;
                             right: 0;
                             left: 0;
-                            z-index: $zindexDropdown + 2;
+                            z-index: $zindex-dropdown + 2;
 
                             height: 6px;
 
@@ -112,7 +117,7 @@
                 }
 
                 .dropdown-menu-wrapper {
-                    z-index: $zindexDropdown + 1;
+                    z-index: $zindex-dropdown + 1;
 
 
                     &__placeholder {
@@ -164,14 +169,14 @@
         > .dropdown-menu {
             position: relative;
             top: 0;
-            left: 0;
+            #{$start}: 0;
 
             display: block;
         }
 
         &__child {
             position: absolute;
-            left: 100%;
+            #{$start}: 100%;
 
             visibility: hidden;
         }
@@ -221,38 +226,38 @@
     }
 
     .align-menu {
-        &-left {
+        &-start {
             > .dropdown-menu-wrapper__placeholder {
-                right: 0;
+                #{$end}: 0;
             }
 
             > .dropdown-menu-wrapper__child,
             > .dropdown-menu {
-                right: 100%;
-                left: auto;
+                #{$end}: 100%;
+                #{$start}: auto;
 
-                margin-right: -22px;
+                margin-#{$end}: -22px;
             }
         }
 
-        &-right {
+        &-end {
             > .dropdown-menu-wrapper__placeholder {
-                left: 0;
+                #{$start}: 0;
             }
 
             > .dropdown-menu-wrapper__child,
             > .dropdown-menu {
-                left: 100%;
+                #{$start}: 100%;
 
-                margin-left: -22px;
+                margin-#{$start}: -22px;
             }
         }
     }
 
     .menu-level-1 {
         .align-menu {
-            &-left,
-            &-right {
+            &-start,
+            &-end {
                 .unclickable {
                     position: relative;
 
@@ -268,30 +273,32 @@
                         color: $menu-item-text-color;
 
                         content: none;
+
+                        @include reset-caret();
                     }
                 }
             }
 
-            &-left {
+            &-start {
                 > .unclickable {
-                    @include fa-icon($menu-icon-left, before, true) {
-                        left: 16px;
+                    @include fa-icon($menu-top-icon-start, before, true) {
+                        #{$start}: 16px;
                     }
 
                     .title:not(.title-level-1) {
-                        padding-left: 26px;
+                        padding-#{$start}: 26px;
                     }
                 }
             }
 
-            &-right {
+            &-end {
                 > .unclickable {
-                    @include fa-icon($menu-icon-right, after, true) {
-                        right: 16px;
+                    @include fa-icon($menu-top-icon-end, after, true) {
+                        #{$end}: 16px;
                     }
 
                     .title:not(.title-level-1) {
-                        padding-right: 26px;
+                        padding-#{$end}: 26px;
                     }
                 }
             }
@@ -299,22 +306,22 @@
     }
 
     .align-single-item {
-        &-left {
+        &-start {
             > .dropdown-menu-wrapper__placeholder,
             > .dropdown-menu-wrapper__child,
             > .dropdown-menu {
                 .dropdown-menu-single-item .title {
-                    padding-left: 26px;
+                    padding-#{$start}: 26px;
                 }
             }
         }
 
-        &-right {
+        &-end {
             > .dropdown-menu-wrapper__placeholder,
             > .dropdown-menu-wrapper__child,
             > .dropdown-menu {
                 .dropdown-menu-single-item .title {
-                    padding-right: 26px;
+                    padding-#{$end}: 26px;
                 }
             }
         }

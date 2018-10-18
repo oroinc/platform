@@ -26,7 +26,7 @@ class MandatoryFieldProviderCompilerPass implements CompilerPassInterface
             foreach ($attributes as $tagAttributes) {
                 $providers[] = [
                     $id,
-                    DependencyInjectionUtil::getAttribute($tagAttributes, 'requestType', null)
+                    DependencyInjectionUtil::getRequestType($tagAttributes)
                 ];
             }
         }

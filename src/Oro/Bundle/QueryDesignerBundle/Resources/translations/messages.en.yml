@@ -34,8 +34,8 @@ oro:
             sorting_desc:       Desc
             condition:          Condition
         condition_builder:
+            drag_n_drop_hint: "Drag and drop from the left to start working"
             criteria:
-                drag_hint: drag to select
                 field_condition:   Field Condition
                 aggregated_field_condition:   Aggregation column
                 conditions_group:  Conditions Group

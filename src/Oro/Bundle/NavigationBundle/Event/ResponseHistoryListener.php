@@ -13,17 +13,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * Adds current page to the navigation history.
+ */
 class ResponseHistoryListener
 {
-    /** @var array */
-    public static $excludedActions = [
-        'Oro\Bundle\FrontendBundle\Controller\FrontendController::exceptionAction',
-    ];
-
     /** @var string */
     protected $historyItemFQCN;
 
@@ -45,6 +42,9 @@ class ResponseHistoryListener
     /** @var TitleServiceInterface */
     protected $titleService;
 
+    /** @var array [route name => true, ...] */
+    private $excludedRoutes = [];
+
     /**
      * @param ItemFactory           $navigationItemFactory
      * @param TokenStorageInterface $tokenStorage
@@ -61,6 +61,16 @@ class ResponseHistoryListener
         $this->tokenStorage = $tokenStorage;
         $this->registry = $registry;
         $this->titleService = $titleService;
+    }
+
+    /**
+     * Adds a route to the list of routes that should not be added to the navigation history.
+     *
+     * @param string $routeName
+     */
+    public function addExcludedRoute($routeName)
+    {
+        $this->excludedRoutes[$routeName] = true;
     }
 
     /**
@@ -107,7 +117,7 @@ class ResponseHistoryListener
         $historyItem = $em->getRepository($this->historyItemFQCN)->findOneBy($postArray);
 
         if (!$historyItem) {
-            $routeParameters = $request->get('_route_params');
+            $routeParameters = $request->attributes->get('_route_params');
             unset($routeParameters['id']);
 
             $entityId = filter_var($request->get('id'), FILTER_VALIDATE_INT);
@@ -117,7 +127,7 @@ class ResponseHistoryListener
                 $entityId = null;
             }
 
-            $postArray['route']           = $request->get('_route');
+            $postArray['route']           = $request->attributes->get('_route');
             $postArray['routeParameters'] = $routeParameters;
             $postArray['entityId']        = $entityId;
 
@@ -154,18 +164,17 @@ class ResponseHistoryListener
      */
     private function shouldSaveHistory(FilterResponseEvent $event)
     {
-        if (HttpKernel::MASTER_REQUEST != $event->getRequestType()) {
+        if (!$event->isMasterRequest()) {
             // Do not do anything
             return false;
         }
 
-        //exclude exceptions, history should not save exception pages
-        $attributes = $event->getRequest()->attributes;
-        if (isset($attributes) && in_array($attributes->get('_controller'), self::$excludedActions)) {
-            return false;
-        }
+        $route = $event->getRequest()->attributes->get('_route');
 
-        return true;
+        return
+            $route
+            && $route[0] !== '_'
+            && !isset($this->excludedRoutes[$route]);
     }
 
     /**
@@ -186,11 +195,6 @@ class ResponseHistoryListener
             && $request->getMethod() === 'GET'
             && (!$request->isXmlHttpRequest()
                 || $request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER));
-
-        if ($result) {
-            $route  = $request->get('_route');
-            $result = $route[0] !== '_' && $route !== 'oro_default';
-        }
 
         if ($result && $response->headers->has('Content-Disposition')) {
             $contentDisposition = $response->headers->get('Content-Disposition');

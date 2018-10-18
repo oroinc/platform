@@ -9,6 +9,10 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Sets a "primary" flag in a collection based on a value of "primary" field.
+ * For example this processor can be used to set a "primary" boolean property
+ * for elements of a emails collection based on a primary email property of an entity
+ * contains this collection.
+ * @see \Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ComputePrimaryField
  */
 class MapPrimaryField extends AbstractProcessor
 {

@@ -115,34 +115,30 @@ class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 
         $enumFieldConfig = new Config(new FieldConfigId('extend', $className, 'enumField', 'enum'));
         $enumFieldConfig->set('target_field', 'targetField');
-        $multiEnumFieldConfig = new Config(new FieldConfigId('extend', $className, 'multiEnumField', 'multiEnum'));
+        $multiEnumFieldConfigId = new FieldConfigId('extend', $className, 'multiEnumField', 'multiEnum');
 
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($className)
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
         $this->extendConfigProvider->expects($this->exactly(3))
             ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$className, 'enumField', true],
-                        [$className, 'multiEnumField', true],
-                        [$className, 'nonConfigurableField', false],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$className, 'enumField', true],
+                [$className, 'multiEnumField', true],
+                [$className, 'nonConfigurableField', false]
+            ]);
         $this->extendConfigProvider->expects($this->exactly(2))
+            ->method('getId')
+            ->willReturnMap([
+                [$className, 'enumField', null, $enumFieldConfig->getId()],
+                [$className, 'multiEnumField', null, $multiEnumFieldConfigId]
+            ]);
+        $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$className, 'enumField', $enumFieldConfig],
-                        [$className, 'multiEnumField', $multiEnumFieldConfig],
-                    ]
-                )
-            );
+            ->with($className, 'enumField')
+            ->willReturn($enumFieldConfig);
     }
 
     /**

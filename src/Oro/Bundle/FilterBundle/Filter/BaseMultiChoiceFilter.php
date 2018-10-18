@@ -6,6 +6,9 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * Base class for filter that supports multi choices.
+ */
 abstract class BaseMultiChoiceFilter extends AbstractFilter
 {
     /**
@@ -41,7 +44,7 @@ abstract class BaseMultiChoiceFilter extends AbstractFilter
     /**
      * Return a value depending on comparison type
      *
-     * @param string $value
+     * @param array $value
      *
      * @return mixed
      */
@@ -64,6 +67,7 @@ abstract class BaseMultiChoiceFilter extends AbstractFilter
             return false;
         }
 
+        $data['value'] = (array) $data['value'];
         if (count($data['value']) === 1) {
             switch ($type) {
                 case DictionaryFilterType::TYPE_NOT_IN:

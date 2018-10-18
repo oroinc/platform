@@ -1,0 +1,9 @@
+/* @theme: admin.oro; */
+
+@media only screen and (max-width: $small-devices-media-breakpoint) {
+    .actions-panel {
+        > div .action {
+            display: none;
+        }
+    }
+}

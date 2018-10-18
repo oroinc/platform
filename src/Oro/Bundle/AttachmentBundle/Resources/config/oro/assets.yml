@@ -1,4 +1,4 @@
 assets:
     css:
         'oroattachment':
-            - 'bundles/oroattachment/css/attachment.scss'
+            - 'bundles/oroattachment/css/scss/main.scss'

@@ -17,6 +17,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 {
@@ -31,9 +32,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigManager');
         $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
 
         $this->builder = new RelationMetadataBuilder(
@@ -44,8 +43,11 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportsDataProvider
+     *
+     * @param Config $extendConfig
+     * @param bool $expected
      */
-    public function testSupports($extendConfig, $expected)
+    public function testSupports(Config $extendConfig, $expected)
     {
         $this->assertEquals(
             $expected,
@@ -53,6 +55,9 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function supportsDataProvider()
     {
         return [
@@ -69,6 +74,8 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider statesToSkipDataProvider
+     *
+     * @param string $state
      */
     public function testShouldSkipBuildForSpecifiedStateOfTargetEntity($state)
     {
@@ -114,6 +121,9 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($metadataBuilder->getClassMetadata()->hasAssociation($fieldName));
     }
 
+    /**
+     * @return array
+     */
     public function statesToSkipDataProvider()
     {
         return [
@@ -245,6 +255,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                         'target_entity'   => $targetEntityClass,
                         'target_field_id' => null,
                         'cascade'         => ['persist'],
+                        'fetch'           => 'extra_lazy',
                         'on_delete'       => 'CASCADE',
                         'nullable'        => false
                     ]
@@ -289,7 +300,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'targetToSourceKeyColumns' => [
                     'id' => $fieldName . '_id'
                 ],
-                'fetch'                    => ClassMetadataInfo::FETCH_LAZY,
+                'fetch'                    => ClassMetadataInfo::FETCH_EXTRA_LAZY,
                 'isCascadeRemove'          => false,
                 'isCascadePersist'         => true,
                 'isCascadeRefresh'         => false,
@@ -624,7 +635,8 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                         'owner'           => false,
                         'target_entity'   => $targetEntityClass,
                         'target_field_id' => $targetFieldId,
-                        'cascade'         => ['persist']
+                        'cascade'         => ['persist'],
+                        'fetch'           => 'extra_lazy',
                     ]
                 ],
                 'schema'   => [
@@ -648,7 +660,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'mappedBy'         => $targetFieldName,
                 'inversedBy'       => null,
                 'cascade'          => ['persist', 'detach'],
-                'fetch'            => ClassMetadataInfo::FETCH_LAZY,
+                'fetch'            => ClassMetadataInfo::FETCH_EXTRA_LAZY,
                 'isCascadeRemove'  => false,
                 'isCascadePersist' => true,
                 'isCascadeRefresh' => false,
@@ -1036,7 +1048,8 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                         'owner'           => true,
                         'target_entity'   => $targetEntityClass,
                         'target_field_id' => $targetFieldId,
-                        'cascade'         => ['persist']
+                        'cascade'         => ['persist'],
+                        'fetch'           => 'extra_lazy',
                     ]
                 ],
                 'schema'   => [
@@ -1094,7 +1107,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'relationToTargetKeyColumns' => [
                     'testclass2_id' => 'id'
                 ],
-                'fetch'                      => ClassMetadataInfo::FETCH_LAZY,
+                'fetch'                      => ClassMetadataInfo::FETCH_EXTRA_LAZY,
                 'isOnDeleteCascade'          => true,
                 'isCascadeRemove'            => false,
                 'isCascadePersist'           => true,
@@ -1395,7 +1408,8 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                         'owner'           => false,
                         'target_entity'   => $targetEntityClass,
                         'target_field_id' => $targetFieldId,
-                        'cascade'         => ['persist']
+                        'cascade'         => ['persist'],
+                        'fetch'           => 'extra_lazy',
                     ]
                 ],
                 'schema'   => [
@@ -1420,7 +1434,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'inversedBy'       => null,
                 'cascade'          => ['persist'],
                 'joinTable'        => [],
-                'fetch'            => ClassMetadataInfo::FETCH_LAZY,
+                'fetch'            => ClassMetadataInfo::FETCH_EXTRA_LAZY,
                 'isCascadeRemove'  => false,
                 'isCascadePersist' => true,
                 'isCascadeRefresh' => false,
@@ -1564,7 +1578,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
      *
      * @return Config
      */
-    protected function getEntityConfig($className, $values = [])
+    protected function getEntityConfig($className, array $values = [])
     {
         $configId = new EntityConfigId('extend', $className);
         $config   = new Config($configId);

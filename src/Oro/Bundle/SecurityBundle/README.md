@@ -52,6 +52,7 @@ You can find additional information about the bundle's features in their dedicat
 - [Field ACL](./Resources/doc/field-acl.md)
 - [Custom listeners](./Resources/doc/custom-listeners.md)
 - [Examples](./Resources/doc/examples.md)
+- [Access rules](./Resources/doc/access-rules.md)
 
 ## Permissions
 

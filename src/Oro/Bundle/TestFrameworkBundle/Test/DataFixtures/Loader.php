@@ -224,7 +224,7 @@ class Loader
      *
      * @return array
      */
-    private function getUnsequencedFixtures(array $sequences, $dependencies = null)
+    protected function getUnsequencedFixtures(array $sequences, $dependencies = null)
     {
         $unsequencedFixtures = [];
         if (null === $dependencies) {

@@ -35,10 +35,10 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ImportStrategyHelper */
     protected $strategyHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FieldNameValidationHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldNameValidationHelper */
     protected $validationHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContextInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContextInterface */
     protected $context;
 
     /**

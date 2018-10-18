@@ -1,0 +1,27 @@
+/* @theme: admin.oro; */
+
+$dropdown-menu-background: #fff !default;
+$dropdown-menu-min-width: 140px !default;
+$dropdown-menu-offset: 2px 0 0 !default;
+$dropdown-menu-inner-offset: 5px 0 !default;
+$dropdown-menu-border: none !default;
+$dropdown-menu-border-radius: 2px !default;
+$dropdown-menu-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
+$dropdown-menu-divider-color: $primary-860 !default;
+
+$dropdown-item-background: none !default;
+$dropdown-item-width: 100% !default;
+$dropdown-item-border: none !default;
+$dropdown-item-display: block !default;
+$dropdown-item-color: $primary-200 !default;
+$dropdown-item-text-align: left !default;
+$dropdown-item-inner-offset: 4px 16px !default;
+$dropdown-item-outline: none !default;
+
+$dropdown-item-hover-background: $primary-900 !default;
+$dropdown-item-hover-color: $primary-200 !default;
+
+$dropdown-item-active-background: $primary-900 !default;
+$dropdown-item-active-color: $primary-200 !default;
+
+$dropdown-toggle-box-shadow: none !default;

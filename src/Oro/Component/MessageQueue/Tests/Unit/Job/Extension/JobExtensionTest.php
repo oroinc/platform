@@ -57,4 +57,17 @@ class JobExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNull($consumerState->getJob());
     }
+
+    public function testOnCancel()
+    {
+        $job = new Job();
+
+        $consumerState = new ConsumerState();
+        $consumerState->setJob(new Job());
+
+        $extension = new JobExtension($consumerState);
+        $extension->onCancel($job);
+
+        $this->assertNull($consumerState->getJob());
+    }
 }

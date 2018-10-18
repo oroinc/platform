@@ -8,7 +8,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 interface EntityConfigInterface extends ConfigBagInterface
 {
     /**
-     * Checks whether the configuration of at least one field exists.
+     * Indicates whether the configuration of at least one field exists.
      *
      * @return bool
      */
@@ -22,7 +22,7 @@ interface EntityConfigInterface extends ConfigBagInterface
     public function getFields();
 
     /**
-     * Checks whether the field configuration exists.
+     * Indicates whether the field configuration exists.
      *
      * @param string $fieldName
      *

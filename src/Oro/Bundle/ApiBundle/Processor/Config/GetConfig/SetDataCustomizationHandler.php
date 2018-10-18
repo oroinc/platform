@@ -7,13 +7,14 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\AssociationHandler;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\EntityHandler;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Registers a post loading handler for the entity and all assiciated entities.
+ * Registers a post loading handler for the entity and all associated entities.
  * It allows to customize loaded data by registering own processors for the "customize_loaded_data" action.
  */
 class SetDataCustomizationHandler implements ProcessorInterface
@@ -81,7 +82,7 @@ class SetDataCustomizationHandler implements ProcessorInterface
     ): void {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            if ($field->hasTargetEntity() && $field->getTargetClass()) {
+            if ($this->isCustomizableAssociation($field)) {
                 $this->setAssociationCustomizationHandler(
                     $context,
                     $field,
@@ -90,6 +91,19 @@ class SetDataCustomizationHandler implements ProcessorInterface
                 );
             }
         }
+    }
+
+    /**
+     * @param EntityDefinitionFieldConfig $field
+     *
+     * @return bool
+     */
+    private function isCustomizableAssociation(EntityDefinitionFieldConfig $field): bool
+    {
+        return
+            $field->hasTargetEntity()
+            && $field->getTargetClass()
+            && !DataType::isAssociationAsField($field->getDataType());
     }
 
     /**

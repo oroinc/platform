@@ -29,7 +29,6 @@ parameters:
     oro_email.manager.email_activity_search.api.class: Oro\Bundle\EmailBundle\Entity\Manager\EmailActivitySearchApiEntityManager
     oro_email.manager.email_activity_suggestion.api.class: Oro\Bundle\EmailBundle\Entity\Manager\EmailActivitySuggestionApiEntityManager
     oro_email.entity.cache.warmer.class:          Oro\Bundle\EmailBundle\Cache\EntityCacheWarmer
-    oro_email.entity.cache.clearer.class:         Oro\Bundle\EmailBundle\Cache\EntityCacheClearer
     oro_email.direct_mailer.class:                Oro\Bundle\EmailBundle\Mailer\DirectMailer
     oro_email.mailer.processor.class:             Oro\Bundle\EmailBundle\Mailer\Processor
     oro_email.email.activity.manager.class:       Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager
@@ -155,13 +154,6 @@ services:
         tags:
             - { name: kernel.cache_warmer, priority: 30 }
             - { name: oro_entity_extend.warmer }
-
-    oro_email.entity.cache.clearer:
-        class: '%oro_email.entity.cache.clearer.class%'
-        deprecated: ~
-        arguments:
-            - '%oro_email.entity.cache_dir%'
-            - '%oro_email.entity.proxy_name_template%'
 
     oro_email.email.cache.manager:
         class: '%oro_email.email.cache.manager.class%'
@@ -630,7 +622,7 @@ services:
             - '@oro_email.email.entity.builder='
             - '@oro_email.email.activity.manager'
             - '@event_dispatcher'
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_email.tools.email_origin_helper'
 
     oro_email.workflow.action.send_email:
@@ -657,6 +649,7 @@ services:
             - '@validator'
         calls:
             - [setLogger, ['@logger']]
+            - [setPreferredLanguageProvider, ['@oro_locale.provider.chain_preferred_language_provider']]
         tags:
             - { name: oro_action.action, alias: send_email_template }
 
@@ -675,6 +668,7 @@ services:
             - '@doctrine'
             - '@oro_email.email.owner.provider.storage'
             - '@oro_email.email_grid_mailbox_name_helper'
+            - '@oro_email.email.address.manager'
 
     oro_email.email_grid_mailbox_name_helper:
         class: Oro\Bundle\EmailBundle\Datagrid\MailboxNameHelper
@@ -988,6 +982,12 @@ services:
         calls:
             - [setLogger, ['@logger']]
 
+    oro_email.internal_email.flag_manager_loader:
+        public: false
+        class: Oro\Bundle\EmailBundle\Provider\InternalEmailFlagManagerLoader
+        tags:
+            - { name: oro_email.email_flag_manager_loader }
+
     oro_email.manager.notification:
         class: '%oro_email.manager.notification.class%'
         arguments:
@@ -1227,7 +1227,7 @@ services:
         arguments:
             - '@oro_config.manager'
             - '@oro_config.scope.global'
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
 
     oro_email.mailer.checker.smtp_settings:
         class: Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker
@@ -1287,3 +1287,25 @@ services:
             - [setClassName, ['%oro_email.emailtemplate.entity.class%']]
         tags:
             - { name: security.voter }
+
+    oro_email.manager.template_email:
+        class: Oro\Bundle\EmailBundle\Manager\TemplateEmailManager
+        arguments:
+            - '@oro_email.direct_mailer'
+            - '@oro_locale.provider.chain_preferred_language_provider'
+            - '@oro_email.mailer.processor'
+            - '@oro_email.provider.email_template_content_provider'
+
+    oro_email.async.template_email_message_sender:
+        class: 'Oro\Bundle\EmailBundle\Async\TemplateEmailMessageSender'
+        public: false
+        arguments:
+            - '@oro_email.manager.template_email'
+            - '@oro_entity.doctrine_helper'
+
+    oro_email.provider.email_template_content_provider:
+        class: 'Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider'
+        public: false
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_email.email_renderer'

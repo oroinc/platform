@@ -16,7 +16,7 @@ Feature: Localization Crud
       | Parent localization | N/A     |
 
   Scenario: Verify HTML tags
-    Given I press "Create Localization"
+    Given I click "Create Localization"
     And I click "Fallback Status"
     When I fill "Localization Create Form" with:
       | Name                | Test <script>alert(1)</script>        |
@@ -39,7 +39,7 @@ Feature: Localization Crud
       | Title | TestDefault alert(1) |
 
   Scenario: Check required fields
-    Given I press "Create Localization"
+    Given I click "Create Localization"
     When I save form
     Then I should see validation errors:
       | Name | This value should not be blank. |

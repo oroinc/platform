@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -44,19 +45,13 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             $this->getUrl($route, array_merge($routeParameters, ['entity' => $entityType]))
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'resource not accessible exception',
-                        'detail' => 'The resource is not accessible.'
-                    ]
-                ]
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -95,14 +90,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             $this->getUrl($route, array_merge($routeParameters, ['entity' => $entityType]))
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         if ('HEAD' === $method) {
             // the HEAD response should not have the content
             self::assertEmpty($response->getContent());
         } else {
             $this->assertResponseContains(
-                ['errors' => [['status' => '404', 'title' => 'entity type constraint']]],
+                ['errors' => [['status' => (string)Response::HTTP_NOT_FOUND, 'title' => 'entity type constraint']]],
                 $response
             );
         }
@@ -156,19 +151,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'resource not accessible exception',
-                        'detail' => 'The resource is not accessible.'
-                    ]
-                ]
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -187,7 +177,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'POST, DELETE');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -206,19 +196,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'resource not accessible exception',
-                        'detail' => 'The resource is not accessible.'
-                    ]
-                ]
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -237,7 +222,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, DELETE');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -256,19 +241,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'resource not accessible exception',
-                        'detail' => 'The resource is not accessible.'
-                    ]
-                ]
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -287,7 +267,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, DELETE');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -306,19 +286,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'resource not accessible exception',
-                        'detail' => 'The resource is not accessible.'
-                    ]
-                ]
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -337,7 +312,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, PATCH');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -356,19 +331,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'resource not accessible exception',
-                        'detail' => 'The resource is not accessible.'
-                    ]
-                ]
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -387,7 +357,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, POST');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, POST');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -406,19 +376,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'resource not accessible exception',
-                        'detail' => 'The resource is not accessible.'
-                    ]
-                ]
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -437,7 +402,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
+
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -456,19 +422,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -487,19 +448,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'resource not accessible exception',
-                        'detail' => 'The resource is not accessible.'
-                    ]
-                ]
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -518,7 +474,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'PATCH');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, PATCH');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -537,7 +493,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'PATCH');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, PATCH');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -556,19 +512,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -587,19 +538,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'resource not accessible exception',
-                        'detail' => 'The resource is not accessible.'
-                    ]
-                ]
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -618,7 +564,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -637,7 +583,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -656,19 +602,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -687,19 +628,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'resource not accessible exception',
-                        'detail' => 'The resource is not accessible.'
-                    ]
-                ]
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -718,7 +654,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, DELETE');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -737,7 +673,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, DELETE');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -756,19 +692,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -787,19 +718,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'resource not accessible exception',
-                        'detail' => 'The resource is not accessible.'
-                    ]
-                ]
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -818,7 +744,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, POST');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, POST');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -837,7 +763,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, POST');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, POST');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -856,19 +782,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -887,19 +808,14 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'resource not accessible exception',
-                        'detail' => 'The resource is not accessible.'
-                    ]
-                ]
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -925,7 +841,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -949,7 +865,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -962,7 +878,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, PATCH');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -975,7 +891,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, PATCH');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -989,22 +905,18 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
                 self::processTemplateData(['entity' => $entityType, 'id' => '@test_department->id'])
             )
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, DELETE');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
     public function testOptionsMethodForSingleItemPrimaryResourceRoute()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->request(
-            'OPTIONS',
-            $this->getUrl(
-                $this->getItemRouteName(),
-                self::processTemplateData(['entity' => $entityType, 'id' => '@test_department->id'])
-            )
+        $response = $this->options(
+            $this->getItemRouteName(),
+            ['entity' => $entityType, 'id' => '@test_department->id']
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, DELETE');
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH, DELETE');
     }
 
     public function testHeadMethodForSingleItemPrimaryResourceRoute()
@@ -1017,7 +929,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
                 self::processTemplateData(['entity' => $entityType, 'id' => '@test_department->id'])
             )
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, DELETE');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -1028,19 +940,15 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             'PATCH',
             $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, POST, DELETE');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
     public function testOptionsMethodForListPrimaryResourceRoute()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->request(
-            'OPTIONS',
-            $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
-        );
-        self::assertMethodNotAllowedResponse($response, 'GET, POST, DELETE');
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        $response = $this->options($this->getListRouteName(), ['entity' => $entityType]);
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET, POST, DELETE');
     }
 
     public function testHeadMethodForListPrimaryResourceRoute()
@@ -1050,26 +958,18 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             'HEAD',
             $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, POST, DELETE');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
     public function testOptionsMethodForRelationshipRoute()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->request(
-            'OPTIONS',
-            $this->getUrl(
-                $this->getRelationshipRouteName(),
-                self::processTemplateData([
-                    'entity'      => $entityType,
-                    'id'          => '@test_department->id',
-                    'association' => 'staff'
-                ])
-            )
+        $response = $this->options(
+            $this->getRelationshipRouteName(),
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff']
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, POST, DELETE');
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH, POST, DELETE');
     }
 
     public function testHeadMethodForRelationshipRoute()
@@ -1086,7 +986,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
                 ])
             )
         );
-        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, POST, DELETE');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -1099,7 +999,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -1112,7 +1012,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -1125,26 +1025,18 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'GET');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
     public function testOptionsMethodForSubresourceRoute()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->request(
-            'OPTIONS',
-            $this->getUrl(
-                $this->getSubresourceRouteName(),
-                self::processTemplateData([
-                    'entity'      => $entityType,
-                    'id'          => '@test_department->id',
-                    'association' => 'staff'
-                ])
-            )
+        $response = $this->options(
+            $this->getSubresourceRouteName(),
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff']
         );
-        self::assertMethodNotAllowedResponse($response, 'GET');
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET');
     }
 
     public function testHeadMethodForSubresourceRoute()
@@ -1161,11 +1053,11 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
                 ])
             )
         );
-        self::assertMethodNotAllowedResponse($response, 'GET');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
-    public function testGetSubresourceWithUnacessibleTarget()
+    public function testGetSubresourceWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->getSubresource(
@@ -1175,23 +1067,17 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
-    public function testPostSubresourceWithUnacessibleTarget()
+    public function testPostSubresourceWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->postSubresource(
@@ -1201,23 +1087,17 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
-    public function testPatchSubresourceWithUnacessibleTarget()
+    public function testPatchSubresourceWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->patchSubresource(
@@ -1227,23 +1107,17 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
-    public function testDeleteSubresourceWithUnacessibleTarget()
+    public function testDeleteSubresourceWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->deleteSubresource(
@@ -1253,23 +1127,17 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
-    public function testGetRelationshipWithUnacessibleTarget()
+    public function testGetRelationshipWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->getRelationship(
@@ -1279,23 +1147,17 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
-    public function testPostRelationshipWithUnacessibleTarget()
+    public function testPostRelationshipWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->postRelationship(
@@ -1305,23 +1167,17 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
-    public function testPatchRelationshipWithUnacessibleTarget()
+    public function testPatchRelationshipWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->patchRelationship(
@@ -1331,23 +1187,17 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
-    public function testDeleteRelationshipWithUnacessibleTarget()
+    public function testDeleteRelationshipWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->deleteRelationship(
@@ -1357,54 +1207,37 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
-    public function testOptionsRelationshipWithUnacessibleTarget()
+    public function testOptionsRelationshipWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
-        $response = $this->request(
-            'OPTIONS',
-            $this->getUrl(
-                $this->getSubresourceRouteName(),
-                self::processTemplateData([
-                    'entity'      => $entityType,
-                    'id'          => '@test_product->id',
-                    'association' => 'unaccessible-target'
-                ])
-            )
+        $response = $this->options(
+            $this->getSubresourceRouteName(),
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unaccessible-target'],
+            [],
+            false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
-    public function testHeadRelationshipWithUnacessibleTarget()
+    public function testHeadRelationshipWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->request(
@@ -1419,7 +1252,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             )
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         self::assertEmpty($response->getContent());
     }

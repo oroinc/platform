@@ -21,6 +21,7 @@ use Symfony\Component\Debug\BufferingLogger;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -151,6 +152,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccurs($withLogger)
@@ -207,6 +209,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursAndSoftErrorsHandlingEnabled($withLogger)
@@ -264,6 +267,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccurs($withLogger)
@@ -322,6 +326,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursInLastProcessor($withLogger)
@@ -378,6 +383,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursAndSoftErrorsHandlingEnabled($withLogger)
@@ -437,6 +443,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabled($withLogger)
@@ -494,6 +501,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursAndNormalizeResultGroupIsDisabled($withLogger)
@@ -551,6 +559,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursAndNormalizeResultGroupIsDisabledAndSoftErrorsHandlingEnabled($withLogger)
@@ -609,6 +618,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursAndNormalizeResultGroupIsDisabled($withLogger)
@@ -683,6 +693,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursAndNormalizeResultGroupIsDisabledAndSoftErrorsHandlingEnabled($withLogger)
@@ -743,6 +754,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursInNormalizeResultGroup($withLogger)
@@ -796,6 +808,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled($withLogger)
@@ -850,6 +863,209 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
+     * @dataProvider loggerProvider
+     */
+    public function testWhenAuthenticationExceptionOccursInNormalizeResultGroup($withLogger)
+    {
+        $logger = null;
+        if ($withLogger) {
+            $logger = $this->setLogger();
+        }
+
+        $context = $this->getContext();
+
+        $authenticationException = new AuthenticationException('Access Denied');
+
+        $processor1 = $this->addProcessor('processor1', 'group1');
+        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+
+        $processor1->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context));
+        $processor10->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context))
+            ->willThrowException($authenticationException);
+        $processor11->expects(self::never())
+            ->method('process');
+
+        try {
+            $this->processor->process($context);
+            self::fail(sprintf('The %s expected', get_class($authenticationException)));
+        } catch (AuthenticationException $e) {
+            self::assertEquals($authenticationException->getMessage(), $e->getMessage());
+            if (null !== $logger) {
+                self::assertEquals([], $logger->cleanLogs());
+            }
+        }
+    }
+
+    /**
+     * @param bool $withLogger
+     * @dataProvider loggerProvider
+     */
+    public function testWhenExceptionAndThenAuthenticationExceptionOccursInNormalizeResultGroup($withLogger)
+    {
+        $logger = null;
+        if ($withLogger) {
+            $logger = $this->setLogger();
+        }
+
+        $context = $this->getContext();
+
+        $exception = new \Exception('test exception');
+        $authenticationException = new AuthenticationException('Access Denied');
+
+        $processor1 = $this->addProcessor('processor1', 'group1');
+        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+
+        $processor1->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context))
+            ->willThrowException($exception);
+        $processor10->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context))
+            ->willThrowException($authenticationException);
+        $processor11->expects(self::never())
+            ->method('process');
+
+        try {
+            $this->processor->process($context);
+            self::fail(sprintf('The %s expected', get_class($authenticationException)));
+        } catch (AuthenticationException $e) {
+            self::assertEquals($authenticationException->getMessage(), $e->getMessage());
+            if (null !== $logger) {
+                $logs = $logger->cleanLogs();
+                self::assertCount(1, $logs);
+                // remove log message context because here by some reasons PHPUnit hangs out
+                // comparing two exception objects if them are not equal
+                $loggedException = $logs[0][2]['exception'];
+                unset($logs[0][2]);
+                self::assertEquals(
+                    [
+                        ['error', 'The execution of "processor1" processor is failed.']
+                    ],
+                    $logs
+                );
+                self::assertInstanceOf(get_class($exception), $loggedException);
+                self::assertEquals($exception->getMessage(), $loggedException->getMessage());
+            }
+        }
+    }
+
+    /**
+     * @param bool $withLogger
+     * @dataProvider loggerProvider
+     */
+    public function testWhenAuthenticationExceptionOccursInNormalizeResultGroupAndSoftErr($withLogger)
+    {
+        $logger = null;
+        if ($withLogger) {
+            $logger = $this->setLogger();
+        }
+
+        $context = $this->getContext();
+        $context->setSoftErrorsHandling(true);
+
+        $authenticationException = new AuthenticationException('Access Denied');
+
+        $processor1 = $this->addProcessor('processor1', 'group1');
+        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+
+        $processor1->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context));
+        $processor10->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context))
+            ->willThrowException($authenticationException);
+        $processor11->expects(self::never())
+            ->method('process');
+
+        try {
+            $this->processor->process($context);
+        } catch (AuthenticationException $e) {
+            self::assertEquals($authenticationException->getMessage(), $e->getMessage());
+            if (null !== $logger) {
+                self::assertEquals([], $logger->cleanLogs());
+            }
+        }
+
+        $errors = $context->getErrors();
+        self::assertCount(1, $errors);
+        $errorException = $errors[0]->getInnerException();
+        self::assertInstanceOf(get_class($authenticationException), $errorException);
+        self::assertEquals($authenticationException->getMessage(), $errorException->getMessage());
+    }
+
+    /**
+     * @param bool $withLogger
+     * @dataProvider loggerProvider
+     */
+    public function testWhenExceptionAndThenAuthenticationExceptionOccursInNormalizeResultGroupAndSoftErr($withLogger)
+    {
+        $logger = null;
+        if ($withLogger) {
+            $logger = $this->setLogger();
+        }
+
+        $context = $this->getContext();
+        $context->setSoftErrorsHandling(true);
+
+        $exception = new \Exception('test exception');
+        $authenticationException = new AuthenticationException('Access Denied');
+
+        $processor1 = $this->addProcessor('processor1', 'group1');
+        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+
+        $processor1->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context))
+            ->willThrowException($exception);
+        $processor10->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context))
+            ->willThrowException($authenticationException);
+        $processor11->expects(self::never())
+            ->method('process');
+
+        try {
+            $this->processor->process($context);
+        } catch (AuthenticationException $e) {
+            self::assertEquals($authenticationException->getMessage(), $e->getMessage());
+            if (null !== $logger) {
+                $logs = $logger->cleanLogs();
+                self::assertCount(1, $logs);
+                // remove log message context because here by some reasons PHPUnit hangs out
+                // comparing two exception objects if them are not equal
+                $loggedException = $logs[0][2]['exception'];
+                unset($logs[0][2]);
+                self::assertEquals(
+                    [
+                        ['info', 'An exception occurred in "processor1" processor.']
+                    ],
+                    $logs
+                );
+                self::assertInstanceOf(get_class($exception), $loggedException);
+                self::assertEquals($exception->getMessage(), $loggedException->getMessage());
+            }
+        }
+
+        $errors = $context->getErrors();
+        self::assertCount(1, $errors);
+        $errorException = $errors[0]->getInnerException();
+        self::assertInstanceOf(get_class($exception), $errorException);
+        self::assertEquals($exception->getMessage(), $errorException->getMessage());
+    }
+
+    /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursInNormalizeResultGroup($withLogger)
@@ -892,6 +1108,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled($withLogger)
@@ -935,6 +1152,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenInternalPhpErrorOccurs($withLogger)
@@ -994,6 +1212,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Exception $exception
+     *
      * @dataProvider safeExceptionProvider
      */
     public function testWhenSafeExceptionOccurs(\Exception $exception)
@@ -1057,6 +1276,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param HttpException $exception
+     *
      * @dataProvider httpInternalServerErrorExceptionProvider
      */
     public function testWhenHttpInternalServerErrorExceptionOccurs(HttpException $exception)
@@ -1118,6 +1338,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @param Error $error
      * @param array $loggedError
+     *
      * @dataProvider errorForLogConversionProvider
      */
     public function testErrorForLogConversion(Error $error, array $loggedError)

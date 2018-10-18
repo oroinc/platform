@@ -19,7 +19,6 @@ parameters:
     oro_attachment.datagrid.action.dialog.class:                 Oro\Bundle\AttachmentBundle\DataGrid\Action\DialogAction
 
     oro_attachment.provider.attachment.class:                    Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
-    oro_attachment.config.class:                                 Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig
 
     oro_attachment.formatter.image_encoded.class:                Oro\Bundle\AttachmentBundle\Formatter\ImageEncodedFormatter
     oro_attachment.formatter.image_link.class:                   Oro\Bundle\AttachmentBundle\Formatter\ImageLinkFormatter
@@ -48,7 +47,12 @@ services:
         class: Oro\Bundle\AttachmentBundle\Manager\FileManager
         arguments:
           - '@knp_gaufrette.filesystem_map'
+          - '@oro_attachment.protocol_validator'
         lazy: true
+
+    oro_attachment.protocol_validator:
+        class: Oro\Bundle\AttachmentBundle\Validator\ProtocolValidator
+        public: false
 
     oro_attachment.liip_imagine.binary.factory.guess_mime_type:
         class: 'Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\GuessMimeType\GuessMimeTypeByFileContextFactory'
@@ -152,6 +156,7 @@ services:
             - [setAttachmentManager, ['@oro_attachment.manager']]
             - [setFileManager, ['@oro_attachment.file_manager']]
             - [setValidator, ['@oro_attachment.validator.file_config_validator']]
+            - [setLogger, ['@logger']]
         tags:
             - { name: oro_importexport.normalizer}
 
@@ -203,11 +208,6 @@ services:
         public: false
         tags:
             - { name: oro_entity.exclusion_provider.api }
-
-    oro_attachment.config:
-        class: '%oro_attachment.config.class%'
-        arguments:
-            - '@oro_attachment.association_helper'
 
     oro_attachment.formatter.image_encoded:
         class: '%oro_attachment.formatter.image_encoded.class%'

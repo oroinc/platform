@@ -50,7 +50,9 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onClick: function(e) {
-            this._getButtonManager($(e.currentTarget)).execute(e);
+            var $target = $(e.currentTarget);
+            $target.trigger('tohide.bs.dropdown');
+            this._getButtonManager($target).execute(e);
 
             return false;
         },

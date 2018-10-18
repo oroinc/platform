@@ -14,12 +14,12 @@ class LoadEnumsData extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
-        for ($i = 1; $i <= 2; $i++) {
+        for ($i = 1; $i <= 4; $i++) {
             $enum = new TestEnum1(sprintf('item%d', $i), sprintf('Item %d', $i), $i - 1, !(bool)$i);
             $this->addReference(sprintf('enum1_%d', $i), $enum);
             $manager->persist($enum);
         }
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 4; $i++) {
             $enum = new TestEnum2(sprintf('item%d', $i), sprintf('Item %d', $i), $i - 1, !(bool)$i);
             $this->addReference(sprintf('enum2_%d', $i), $enum);
             $manager->persist($enum);

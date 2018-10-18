@@ -290,7 +290,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                             $triggeredAce = $ace;
                             $triggeredMask = $requiredMask;
                         }
-                    } elseif (null !== $isAceApplicable) {
+                    } elseif (null !== $isAceApplicable && null === $triggeredAce) {
                         $permissionGroupMask = $this->getPermissionGroupMask($requiredMask, $extension);
                         if (null !== $permissionGroupMask && 0 === ($permissionGroupMask & $ace->getMask())) {
                             $triggeredAce = $ace;

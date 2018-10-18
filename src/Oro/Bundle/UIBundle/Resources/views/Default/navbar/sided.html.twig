@@ -19,7 +19,7 @@
             {{ UI.app_logo(organization_name) }}
         </header>
 
-        <div class="scroller" id="main-menu"
+        <nav class="scroller" id="main-menu"
                 {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/main-menu-view'}) }}>
             <button class="main-menu-sided__scroll invisible"
                     data-role="scroll-trigger"
@@ -34,7 +34,7 @@
                     aria-label="{{ 'oro.ui.navbar.scroll_down_label'|trans }}"
             >
             </button>
-        </div>
+        </nav>
 
         <button id="main-menu-toggler" class="main-menu-toggler" aria-label="{{ 'oro.ui.navbar.toggler_label'|trans }}"></button>
     </div>

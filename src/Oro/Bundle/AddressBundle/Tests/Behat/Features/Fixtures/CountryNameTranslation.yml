@@ -1,0 +1,21 @@
+Oro\Bundle\TranslationBundle\Entity\Translation:
+    translation_Angola_zulu:
+        translationKey: '@translation_key_oro_country_DE'
+        value: 'GermanyZulu'
+        language: '@zulu_lang'
+        scope: 1
+    translation_Angola_Bengo_zulu:
+        translationKey: '@translation_key_oro_region_DE-BE'
+        value: 'BerlinZulu'
+        language: '@zulu_lang'
+        scope: 1
+    translation_Belgium_zulu:
+        translationKey: '@translation_key_oro_country_US'
+        value: 'United StatesZulu'
+        language: '@zulu_lang'
+        scope: 1
+    translation_Belgium_Namur_zulu:
+        translationKey: '@translation_key_oro_region_US-FL'
+        value: 'FloridaZulu'
+        language: '@zulu_lang'
+        scope: 1

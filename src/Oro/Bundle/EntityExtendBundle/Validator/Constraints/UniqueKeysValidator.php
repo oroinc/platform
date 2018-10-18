@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
-use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+/**
+ * Validates multidimensional array, or objects collection $value
+ * Check if there are no duplicates among collection item['name'] and item['key'] values
+ */
 class UniqueKeysValidator extends ConstraintValidator
 {
     /**
@@ -14,7 +17,7 @@ class UniqueKeysValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         /** @var UniqueKeys $constraint */
-        $names = ArrayUtil::arrayColumn($value, 'name');
+        $names = \array_column($value, 'name');
         if ($names && $names != array_unique($names)) {
             $this->context->addViolation(
                 $constraint->message
@@ -23,7 +26,7 @@ class UniqueKeysValidator extends ConstraintValidator
             return;
         }
 
-        $keys = ArrayUtil::arrayColumn($value, 'key');
+        $keys = \array_column($value, 'key');
         if ($keys && $keys != array_unique($keys, SORT_REGULAR)) {
             $this->context->addViolation(
                 $constraint->message

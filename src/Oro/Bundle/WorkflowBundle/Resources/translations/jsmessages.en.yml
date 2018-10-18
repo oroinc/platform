@@ -17,6 +17,11 @@ oro:
             cannot:
                 set:
                     step: 'Cannot set end step to <i>(Start)</i> step. Please select another one'
+        flowchart:
+            step:
+                actions_label: Step actions
+            transition:
+                actions_label: Transition actions
 
 "Gray button": "Gray button"
 "Navy blue button": "Navy blue button"

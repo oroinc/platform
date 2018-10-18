@@ -9,12 +9,17 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * The base class for different kind of "datetime", "date" and "time" filters.
+ * IMPORTANT: take into account that "between" and "not between" expressions are different
+ * from such expressions in filters for numberic fields. The difference is that
+ * for date and datetime fields these expressions are not include the end value.
+ * This is done to prevent loss of data related to ending minutes, seconds, milliseconds, etc.
+ * For example to corrent filtering of all records created on May 1, 2018, the following expression
+ * should be used: "createdAt >= 2018-05-01 00:00:00 AND createdAt < 2018-05-02 00:00:00".
+ * The expression like "createdAt >= 2018-05-01 00:00:00 AND createdAt <= 2018-05-01 23:59:59"
+ * is incorrect and leads to loss of data created at the last second of the day.
  */
 abstract class AbstractDateFilter extends AbstractFilter
 {
-    /** DateTime object as string format */
-    const DATETIME_FORMAT = 'Y-m-d';
-
     /** @var DateFilterUtility */
     protected $dateFilterUtility;
 
@@ -81,6 +86,8 @@ abstract class AbstractDateFilter extends AbstractFilter
      */
     protected function parseData($data)
     {
+        $this->validateFieldName();
+
         return $this->dateFilterUtility->parseData($this->get(FilterUtility::DATA_NAME_KEY), $data, $this->name);
     }
 
@@ -126,7 +133,7 @@ abstract class AbstractDateFilter extends AbstractFilter
         }
 
         if (null !== $dateEndValue) {
-            $exprs[] = $ds->expr()->lte($fieldName, $endDateParameterName, true);
+            $exprs[] = $ds->expr()->lt($fieldName, $endDateParameterName, true);
         }
 
         return call_user_func_array([$ds->expr(), $conditionType], $exprs);
@@ -183,13 +190,13 @@ abstract class AbstractDateFilter extends AbstractFilter
                 if (null !== $dateEndValue) {
                     $expr = $ds->expr()->orX(
                         $ds->expr()->lt($fieldName, $startDateParameterName, true),
-                        $ds->expr()->gt($fieldName, $endDateParameterName, true)
+                        $ds->expr()->gte($fieldName, $endDateParameterName, true)
                     );
                 } else {
                     $expr = $ds->expr()->lt($fieldName, $startDateParameterName, true);
                 }
             } else {
-                $expr = $ds->expr()->gt($fieldName, $endDateParameterName, true);
+                $expr = $ds->expr()->gte($fieldName, $endDateParameterName, true);
             }
 
             return $expr;
@@ -245,8 +252,6 @@ abstract class AbstractDateFilter extends AbstractFilter
         $endDateParameterName,
         $fieldName
     ) {
-        QueryBuilderUtil::checkField($fieldName);
-
         switch ($type) {
             case DateRangeFilterType::TYPE_MORE_THAN:
                 return $this->buildFilterLessMore(
@@ -318,5 +323,13 @@ abstract class AbstractDateFilter extends AbstractFilter
         );
 
         return $metadata;
+    }
+
+    /**
+     * Validates the filter field name.
+     */
+    protected function validateFieldName()
+    {
+        QueryBuilderUtil::checkField($this->get(FilterUtility::DATA_NAME_KEY));
     }
 }

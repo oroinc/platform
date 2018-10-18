@@ -18,8 +18,11 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
+/**
+ * This class provides ability to synchronize email with IMAP
+ */
 class ImapEmailSynchronizer extends AbstractEmailSynchronizer
 {
     protected static $messageQueueTopic = Topics::SYNC_EMAILS;
@@ -30,7 +33,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     /** @var ImapConnectorFactory */
     protected $connectorFactory;
 
-    /** @var Mcrypt */
+    /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
     /** @var ImapEmailGoogleOauth2Manager */
@@ -44,7 +47,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
      * @param KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory
      * @param ImapEmailSynchronizationProcessorFactory $syncProcessorFactory
      * @param ImapConnectorFactory $connectorFactory
-     * @param Mcrypt $encryptor
+     * @param SymmetricCrypterInterface $encryptor
      * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
      */
     public function __construct(
@@ -52,7 +55,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory,
         ImapEmailSynchronizationProcessorFactory $syncProcessorFactory,
         ImapConnectorFactory $connectorFactory,
-        Mcrypt $encryptor,
+        SymmetricCrypterInterface $encryptor,
         ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
     ) {
         parent::__construct($doctrine, $knownEmailAddressCheckerFactory);

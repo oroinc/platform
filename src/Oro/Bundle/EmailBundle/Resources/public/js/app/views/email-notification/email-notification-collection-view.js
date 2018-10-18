@@ -87,7 +87,7 @@ define(function(require) {
 
         updateViewMode: function() {
             if (!this.isActiveTypeDropDown('notification')) {
-                var $iconEnvelope = this.$el.find('.oro-dropdown-toggle .fa-envelope');
+                var $iconEnvelope = this.$el.find('.dropdown-toggle .fa-envelope');
                 if (this.collection.models.length === 0) {
                     this.setModeDropDownMenu('empty');
                     $iconEnvelope.removeClass('highlight');
@@ -184,15 +184,15 @@ define(function(require) {
         },
 
         isOpen: function() {
-            this.$el.hasClass('open');
+            this.$el.hasClass('show');
         },
 
         close: function() {
-            this.$el.removeClass('open');
+            this.$el.removeClass('show');
         },
 
         open: function() {
-            this.$el.addClass('open');
+            this.$el.addClass('show');
         },
 
         onCollectionRequest: function() {

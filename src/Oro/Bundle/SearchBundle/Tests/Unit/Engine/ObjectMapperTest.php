@@ -425,6 +425,8 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
             ->willReturn([
                 'text.sku' => 'sku',
                 'text.defaultName' => 'defaultName',
+                'integer.integerField' => 'integerValue',
+                'decimal.decimalField' => 'decimalValue',
                 'notExistingField' => 'notExistingField'
             ]);
 
@@ -434,15 +436,19 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                 'recordId' => 29
             ],
             'sku' => '2GH80',
-            'defaultName' => 'Example Headlamp'
+            'defaultName' => 'Example Headlamp',
+            'integerField' => '42',
+            'decimalField' => '12.34',
         ];
 
         $result = $this->mapper->mapSelectedData($query, $item);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'sku' => '2GH80',
                 'defaultName' => 'Example Headlamp',
+                'integerValue' => 42,
+                'decimalValue' => 12.34,
                 'notExistingField' => ''
             ],
             $result

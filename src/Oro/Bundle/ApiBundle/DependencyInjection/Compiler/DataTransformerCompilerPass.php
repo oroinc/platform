@@ -27,7 +27,7 @@ class DataTransformerCompilerPass implements CompilerPassInterface
                 $transformers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     new Reference($id),
                     $tagAttributes['dataType'],
-                    DependencyInjectionUtil::getAttribute($tagAttributes, 'requestType', null)
+                    DependencyInjectionUtil::getRequestType($tagAttributes)
                 ];
             }
         }

@@ -30,6 +30,7 @@
     {% set action %}
         {% if is_granted('oro_email_email_create') %}
             <a href="#" title="{{ 'oro.email.reply'|trans }}"
+               class="dropdown-item"
                data-url="<%= routing.generate('oro_email_email_reply', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
                {{ UI.renderWidgetDataAttributes({
                 'type': 'dialog',
@@ -46,7 +47,7 @@
                         'width': 1000
                     }
                 }
-            }) }}><i class="fa-reply hide-text">{{ 'oro.email.reply'|trans|raw }}</i>
+            }) }}><span class="fa-reply hide-text" aria-hidden="true">{{ 'oro.email.reply'|trans|raw }}</span>
                 {{ 'oro.email.reply'|trans|raw }}
             </a>
         {% endif %}
@@ -56,6 +57,7 @@
     {% set action %}
         {% if is_granted('oro_email_email_create') %}
             <a href="#" title="{{ 'oro.email.forward'|trans }}"
+               class="dropdown-item"
                data-url="<%= routing.generate('oro_email_email_forward', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
                {{ UI.renderWidgetDataAttributes({
                 'type': 'dialog',
@@ -72,7 +74,7 @@
                         'width': 1000
                     }
                 }
-            }) }}><i class="fa-mail-forward hide-text">{{ 'oro.email.forward'|trans|raw }}</i>
+            }) }}><span class="fa-mail-forward hide-text" aria-hidden="true">{{ 'oro.email.forward'|trans|raw }}</span>
                 {{ 'oro.email.forward'|trans|raw }}
             </a>
         {% endif %}

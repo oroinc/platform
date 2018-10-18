@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
-use Doctrine\ORM\Query\AST\PathExpression;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
@@ -311,7 +310,6 @@ class OwnershipConditionDataBuilder extends AbstractOwnershipConditionDataBuilde
             return [
                 $this->getColumnName($metadata, $columnName),
                 $idOrIds,
-                $columnName == null ? PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION : PathExpression::TYPE_STATE_FIELD,
                 $organizationField,
                 $organizationValue,
                 $ignoreOwner
@@ -320,7 +318,6 @@ class OwnershipConditionDataBuilder extends AbstractOwnershipConditionDataBuilde
             return [
                 null,
                 null,
-                PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                 $organizationField,
                 $organizationValue,
                 $ignoreOwner
@@ -340,7 +337,6 @@ class OwnershipConditionDataBuilder extends AbstractOwnershipConditionDataBuilde
         return [
             null,
             null,
-            PathExpression::TYPE_STATE_FIELD,
             null,
             null,
             false

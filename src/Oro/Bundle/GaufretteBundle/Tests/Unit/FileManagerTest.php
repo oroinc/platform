@@ -175,6 +175,63 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($file, $this->fileManager->getFile($fileName, false));
     }
 
+    /**
+     * @expectedException \Gaufrette\Exception\FileNotFound
+     * @expectedExceptionMessage  The file "testFile.txt" was not found.
+     */
+    public function testGetStreamWhenFileDoesNotExist()
+    {
+        $fileName = 'testFile.txt';
+
+        $this->filesystem->expects($this->once())
+            ->method('has')
+            ->with($fileName)
+            ->willReturn(false);
+        $this->filesystem->expects($this->never())
+            ->method('createStream');
+
+        $this->fileManager->getStream($fileName);
+    }
+
+    public function testGetStreamWhenFileDoesNotExistAndRequestedIgnoreException()
+    {
+        $fileName = 'testFile.txt';
+
+        $this->filesystem->expects($this->once())
+            ->method('has')
+            ->with($fileName)
+            ->willReturn(false);
+        $this->filesystem->expects($this->never())
+            ->method('createStream');
+
+        $this->assertNull($this->fileManager->getStream($fileName, false));
+    }
+
+    public function testGetStreamWhenFileExistsAndRequestedIgnoreException()
+    {
+        $fileName = 'testFile.txt';
+
+        $file = tmpfile();
+        fwrite($file, 'file content ...');
+        fseek($file, 0);
+
+        $this->filesystem->expects($this->once())
+            ->method('has')
+            ->with($fileName)
+            ->willReturn(true);
+        $this->filesystem->expects($this->once())
+            ->method('createStream')
+            ->with($fileName)
+            ->willReturn($file);
+
+        $stream = $this->fileManager->getStream($fileName, false);
+
+        $this->assertInternalType('resource', $stream);
+        $this->assertSame($file, $stream);
+
+        fclose($file);
+    }
+
     public function testGetFileContentByFileName()
     {
         $fileName = 'testFile.txt';
@@ -325,11 +382,78 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->with($fileName)
             ->willReturn($resultStream);
 
-        $this->fileManager->writeStreamToStorage($srcStream, $fileName);
+        $result = $this->fileManager->writeStreamToStorage($srcStream, $fileName);
 
-        $resultStream->open(new StreamMode('rb+'));
+        $resultStream->open(new StreamMode('rb'));
         $resultStream->seek(0);
         $this->assertStringEqualsFile($localFilePath, $resultStream->read(100));
+        $this->assertTrue($result);
+        // double check if input stream is closed
+        $this->assertFalse($srcStream->cast(1));
+    }
+
+    public function testWriteStreamToStorageWithEmptyStreamAndAvoidWriteEmptyStream()
+    {
+        $localFilePath = __DIR__ . '/Fixtures/emptyFile.txt';
+        $fileName = 'test2.txt';
+
+        $srcStream = new LocalStream($localFilePath);
+
+        $this->filesystem->expects($this->never())
+            ->method('createStream')
+            ->with($fileName);
+
+        $result = $this->fileManager->writeStreamToStorage($srcStream, $fileName, true);
+
+        $this->assertFalse($result);
+        // double check if input stream is closed
+        $this->assertFalse($srcStream->cast(1));
+    }
+
+    public function testWriteStreamToStorageWithEmptyStream()
+    {
+        $localFilePath = __DIR__ . '/Fixtures/emptyFile.txt';
+        $fileName = 'test2.txt';
+
+        $srcStream = new LocalStream($localFilePath);
+        $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
+
+        $this->filesystem->expects($this->once())
+            ->method('createStream')
+            ->with($fileName)
+            ->willReturn($resultStream);
+
+        $result = $this->fileManager->writeStreamToStorage($srcStream, $fileName);
+
+        $resultStream->open(new StreamMode('rb'));
+        $resultStream->seek(0);
+        $this->assertEmpty($resultStream->read(100));
+        $this->assertTrue($result);
+        // double check if input stream is closed
+        $this->assertFalse($srcStream->cast(1));
+    }
+
+    public function testWriteStreamToStorageAndAvoidWriteEmptyStream()
+    {
+        $localFilePath = __DIR__ . '/Fixtures/test.txt';
+        $fileName = 'test2.txt';
+
+        $srcStream = new LocalStream($localFilePath);
+        $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
+
+        $this->filesystem->expects($this->once())
+            ->method('createStream')
+            ->with($fileName)
+            ->willReturn($resultStream);
+
+        $result = $this->fileManager->writeStreamToStorage($srcStream, $fileName, true);
+
+        $resultStream->open(new StreamMode('rb'));
+        $resultStream->seek(0);
+        $this->assertStringEqualsFile($localFilePath, $resultStream->read(100));
+        $this->assertTrue($result);
+        // double check if input stream is closed
+        $this->assertFalse($srcStream->cast(1));
     }
 
     public function testWriteToTemporaryFile()

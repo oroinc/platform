@@ -1,121 +1,64 @@
+/* @theme: admin.oro; */
+
 .activity-list-widget {
-    .activity-list {
-        .info {
-            margin-bottom: $contentPadding;
-        }
-    }
-
     .grid-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: $activity-mobile-toolbar-offset;
+    }
+
+    .filter-box {
         padding: 0;
-        margin-bottom: $contentPadding;
+        width: 100%;
+        flex-grow: 1;
+    }
 
-        .filter-container {
-            padding: 0;
-            margin-bottom: $contentPadding;
+    .filter-item {
+        margin-bottom: $activity-mobile-toolbar-item-offset;
+    }
+
+    .pagination {
+        margin: 0;
+    }
+
+    .actions-panel {
+        width: auto;
+    }
+
+    .accordion-heading {
+        flex-wrap: wrap;
+
+        .details {
+            margin: $activity-mobile-details-offset;
         }
 
-        .actions-panel {
-            margin-left: 0;
-
-            a.action.btn {
-                display: inline-block;
-            }
-        }
-
-        .pagination {
-            text-align: center;
-            margin: 0;
+        .extra-info {
+            order: 1;
+            width: 100%;
         }
     }
 
-    .comments-view-footer {
-        margin-bottom: 0;
+    .accordion-toggle {
+        background: transparent;
     }
 
-    .accordion-heading > .created-at {
-        margin: 7px 0 0 0;
+    .accordion-icon {
+        padding-#{$start}: 0;
     }
 
-    .accordion-body .message .comment {
-        padding-right: 0;
+    .comment {
+        .user {
+            display: block;
+        }
     }
 }
 
-@media screen and (max-width: 650px) {
+@media only screen and (max-width: $small-devices-media-breakpoint) {
     .activity-list-widget {
-        .grid-toolbar {
-            .btn-group {
-                margin: 0 10px 10px 0;
-            }
-
-            .pagination {
-                width: calc(100% - 40px);
-                overflow: hidden;
-                text-overflow: ellipsis;
-                text-align: left;
-            }
-        }
-
-        .accordion > .items {
-            .extra-info {
-                width: 100%;
-            }
-
-            .message-item {
-                margin-right: 4px;
-            }
-
+        .accordion-heading {
             .details {
-                min-width: 0;
-                max-width: calc(100% - 80px);
-                margin-right: 0;
-            }
-
-            .actions {
-                margin-left: 0;
-                margin-right: -10px;
-            }
-        }
-
-        .accordion-body {
-            .widget-content > .responsive-block {
-                min-width: 100%;
-            }
-
-            .message .comment {
-                padding: 0;
-            }
-        }
-    }
-}
-
-@media screen and (min-width: 400px) {
-    .activity-list-widget .filter-box {
-        width: calc(100% - 34px);
-
-        + .pull-right {
-            margin-left: -2px;
-        }
-
-        > .filter-container {
-            margin-bottom: 6px;
-
-            > .filter-item {
-                width: calc(50% - 16px);
-                margin: 0 12px 10px 0;
-
-                &:last-child {
-                    margin-bottom: 10px;
-                }
-
-                .filter-criteria-selector {
-                    height: 32px;
-                    line-height: 29px;
-
-                    .caret {
-                        margin-top: 13px;
-                    }
-                }
+                max-width: $activity-mobile-details-small-width;
+                min-width: $activity-mobile-details-small-width;
             }
         }
     }

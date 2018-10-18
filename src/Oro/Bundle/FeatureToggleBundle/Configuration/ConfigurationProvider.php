@@ -7,6 +7,9 @@ use Oro\Bundle\FeatureToggleBundle\Exception\CircularReferenceException;
 use Oro\Component\Config\Merger\ConfigurationMerger;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
+/**
+ * Provides an entry point for configuration of features.
+ */
 class ConfigurationProvider
 {
     const INTERNAL = '__internal__';
@@ -56,7 +59,6 @@ class ConfigurationProvider
 
     public function warmUpCache()
     {
-        $this->clearCache();
         $this->cache->save(FeatureToggleConfiguration::ROOT, $this->resolveConfiguration());
     }
 
@@ -108,13 +110,13 @@ class ConfigurationProvider
      */
     protected function getConfiguration($ignoreCache = false)
     {
-        if (!$ignoreCache && $this->cache->contains(FeatureToggleConfiguration::ROOT)) {
-            $configuration = $this->cache->fetch(FeatureToggleConfiguration::ROOT);
-        } else {
+        if ($ignoreCache) {
             $configuration = $this->resolveConfiguration();
-
-            if (!$ignoreCache) {
-                $this->warmUpCache();
+        } else {
+            $configuration = $this->cache->fetch(FeatureToggleConfiguration::ROOT);
+            if (false === $configuration) {
+                $configuration = $this->resolveConfiguration();
+                $this->cache->save(FeatureToggleConfiguration::ROOT, $configuration);
             }
         }
 

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
@@ -10,7 +12,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Add ACL restrictions to the Criteria object.
+ * Add ACL restrictions to ORM query.
  */
 class ProtectQueryByAcl implements ProcessorInterface
 {
@@ -51,14 +53,9 @@ class ProtectQueryByAcl implements ProcessorInterface
     {
         /** @var Context $context */
 
-        if ($context->hasQuery()) {
-            // a query is already built
-            return;
-        }
-
-        $criteria = $context->getCriteria();
-        if (null === $criteria) {
-            // the criteria object does not exist
+        $query = $context->getQuery();
+        if (!($query instanceof QueryBuilder || $query instanceof Query)) {
+            // ACL helper supports only QueryBuilder or Query
             return;
         }
 
@@ -80,9 +77,7 @@ class ProtectQueryByAcl implements ProcessorInterface
             $permission = $this->permission;
         }
 
-        if ($permission) {
-            $this->aclHelper->applyAclToCriteria($entityClass, $criteria, $permission);
-        }
+        $context->setQuery($this->aclHelper->apply($query, $permission));
     }
 
     /**

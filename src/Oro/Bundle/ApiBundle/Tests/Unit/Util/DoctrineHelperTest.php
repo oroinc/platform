@@ -128,14 +128,12 @@ class DoctrineHelperTest extends OrmRelatedTestCase
 
     public function testGetIndexedAssociations()
     {
-        // category = ManyToOne
-        // groups = ManyToMany (should be ignored)
-        // products = OneToMany (should be ignored)
-        // owner = ManyToOne
         self::assertEquals(
             [
-                'category' => 'string',
-                'owner'    => 'integer'
+                'category' => 'string', // many-to-one
+                'owner'    => 'integer', // many-to-one
+                'groups'   => 'integer', // many-to-many
+                'products' => 'integer', // one-to-many
             ],
             $this->doctrineHelper->getIndexedAssociations($this->getClassMetadata(Entity\User::class))
         );

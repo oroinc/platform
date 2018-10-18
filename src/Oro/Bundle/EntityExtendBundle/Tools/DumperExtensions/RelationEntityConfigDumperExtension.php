@@ -11,6 +11,9 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Handles saving relation configuration of entities.
+ */
 class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
     /** @var ConfigManager */
@@ -54,7 +57,7 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
                     continue;
                 }
 
-                // @todo: we need to find a way to use this extension to process OWNER_SYSTEM relations as well
+                // we need to find a way to use this extension to process OWNER_SYSTEM relations as well
                 // currently we have several problems here:
                 // - collision with associations
                 // - no support unidirectional relations
@@ -284,6 +287,9 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
     {
         if ($fieldConfig->has('cascade')) {
             $relation['cascade'] = $fieldConfig->get('cascade');
+        }
+        if ($fieldConfig->has('fetch')) {
+            $relation['fetch'] = $fieldConfig->get('fetch');
         }
         if ($fieldConfig->has('on_delete')) {
             $relation['on_delete'] = $fieldConfig->get('on_delete');

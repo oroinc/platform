@@ -13,14 +13,17 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactory;
 use Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadTestEntitiesData;
 use Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadUserData;
-use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class IterableResultFactoryTest extends WebTestCase
 {
+    use RolePermissionExtension;
+
     const GRID_NAME = 'test-entity-grid';
 
     protected function setUp()
@@ -199,26 +202,13 @@ class IterableResultFactoryTest extends WebTestCase
 
         /** @var User $user */
         $simpleUser = $this->getReference(LoadUserData::SIMPLE_USER);
-        $role = $entityManager->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_USER']);
         $organization = $entityManager->getRepository('OroOrganizationBundle:Organization')
             ->find(self::AUTH_ORGANIZATION);
 
         $token = new UsernamePasswordOrganizationToken($simpleUser, $simpleUser->getUsername(), 'main', $organization);
         $this->client->getContainer()->get('security.token_storage')->setToken($token);
 
-        $aclManager = $this->getAclManager();
-
-        $oid = $aclManager->getOid('entity:' . TestEntity::class);
-        $maskBuilder = $aclManager->getMaskBuilder($oid);
-        $maskBuilder->add($maskBuilder->getMask('MASK_VIEW_BASIC'));
-
-        $aclManager->setPermission(
-            $aclManager->getSid($role),
-            $oid,
-            $maskBuilder->get()
-        );
-
-        $aclManager->flush();
+        $this->updateRolePermission('ROLE_USER', TestEntity::class, AccessLevel::BASIC_LEVEL);
     }
 
     /**
@@ -235,13 +225,5 @@ class IterableResultFactoryTest extends WebTestCase
     private function getDatagridManager()
     {
         return $this->client->getContainer()->get('oro_datagrid.datagrid.manager');
-    }
-
-    /**
-     * @return AclManager
-     */
-    private function getAclManager()
-    {
-        return $this->client->getContainer()->get('oro_security.acl.manager');
     }
 }

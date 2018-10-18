@@ -1,0 +1,8 @@
+/* @theme: admin.oro; */
+
+.grid-without-header {
+    .grid-header,
+    .grid-footer {
+        display: none;
+    }
+}

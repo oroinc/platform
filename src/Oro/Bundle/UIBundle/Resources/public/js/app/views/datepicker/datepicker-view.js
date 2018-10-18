@@ -44,6 +44,11 @@ define(function(require) {
         _preventFrontendUpdate: false,
 
         /**
+         * ClassName for empty field
+         */
+        emptyClassName: 'input--empty',
+
+        /**
          * @inheritDoc
          */
         constructor: function DatePickerView() {
@@ -132,6 +137,8 @@ define(function(require) {
             this.$frontDateField.attr(options.dateInputAttrs);
             this.$frontDateField.attr('data-fake-front-field', '');
             this.$frontDateField.on('keyup change', _.bind(this.updateOrigin, this));
+            this.$frontDateField.on('keypress keyup change focus blur', _.bind(this.checkEmpty, this));
+            this.checkEmpty();
             this.$el.after(this.$frontDateField);
             this.$el.attr('data-format', 'backend');
         },
@@ -188,6 +195,15 @@ define(function(require) {
                     .element(this.$frontDateField);
             }
             this.$frontDateField.trigger('change');
+        },
+
+        /**
+         * Update empty state
+         */
+        checkEmpty: function() {
+            if (this.nativeMode && this.$frontDateField) {
+                this.$frontDateField.toggleClass(this.emptyClassName, !this.$frontDateField.val().length);
+            }
         },
 
         /**

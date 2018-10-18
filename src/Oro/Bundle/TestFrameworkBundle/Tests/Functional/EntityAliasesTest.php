@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Provider\TestEntityAliasResolver;
+use Oro\Bundle\EntityBundle\Provider\EntityAliasLoader;
+use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EntityAliasesTest extends WebTestCase
@@ -12,13 +13,10 @@ class EntityAliasesTest extends WebTestCase
         $this->initClient();
     }
 
-    public function testAliasErrors()
+    public function testShouldLoadAllEntityAliasesWithoutErrors()
     {
-        /** @var TestEntityAliasResolver $entityAliasResolver */
-        $entityAliasResolver = self::getContainer()->get('oro_test.entity_alias_resolver');
-        $entityAliasResolver->clearCache();
-        $entityAliasResolver->getAll();
-
-        self::assertEmpty($entityAliasResolver->popLogs());
+        /** @var EntityAliasLoader $entityAliasLoader */
+        $entityAliasLoader = self::getContainer()->get('oro_test.entity_alias_loader');
+        $entityAliasLoader->load(new EntityAliasStorage());
     }
 }

@@ -6,15 +6,9 @@ services:
         class: 'Oro\Bundle\SyncBundle\Client\WebsocketClient'
         public: false
         arguments:
-            - '@oro_sync.client.factory.gos'
+            - '@oro_sync.client.wamp.factory'
+            - '@oro_sync.client.wamp.factory.client_attributes'
             - '@oro_sync.authentication.ticket_provider'
-            - '%websocket_backend_host%'
-            - '%websocket_backend_port%'
-            - '%websocket_backend_path%'
-
-    oro_sync.client.factory.gos:
-        class: 'Oro\Bundle\SyncBundle\Client\Factory\GosClientFactory'
-        public: false
 
     oro_sync.client.logger_aware_decorator:
         class: 'Oro\Bundle\SyncBundle\Client\LoggerAwareWebsocketClientDecorator'
@@ -37,3 +31,17 @@ services:
             - [ setLogger, [ '@logger' ] ]
         tags:
             - { name: monolog.logger, channel: oro_websocket }
+
+    oro_sync.client.wamp.factory:
+        class: 'Oro\Bundle\SyncBundle\Client\Wamp\Factory\WampClientFactory'
+        public: false
+
+    oro_sync.client.wamp.factory.client_attributes:
+        class: Oro\Bundle\SyncBundle\Client\Wamp\Factory\ClientAttributes
+        public: false
+        arguments:
+            - '%websocket_backend_host%'
+            - '%websocket_backend_port%'
+            - '%websocket_backend_path%'
+            - '%websocket_backend_transport%'
+            - '%websocket_backend_ssl_context_options%'

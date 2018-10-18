@@ -23,7 +23,7 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
 
         $fileCacheDef = new Definition(
             MemoryCacheChain::class,
-            [[$this->getFilesystemCache('%kernel.cache_dir%/oro')]]
+            [$this->getFilesystemCache('%kernel.cache_dir%/oro')]
         );
         $fileCacheDef->setAbstract(true);
         $this->assertEquals(
@@ -33,7 +33,7 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
 
         $dataCacheDef = new Definition(
             MemoryCacheChain::class,
-            [[$this->getFilesystemCache('%kernel.cache_dir%/oro_data')]]
+            [$this->getFilesystemCache('%kernel.cache_dir%/oro_data')]
         );
         $dataCacheDef->setAbstract(true);
         $this->assertEquals(
@@ -55,17 +55,11 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $compiler->process($container);
 
         $this->assertEquals(
-            (new Definition(
-                MemoryCacheChain::class,
-                [[$fileCacheDef]]
-            ))->setAbstract(true),
+            (new Definition(MemoryCacheChain::class, [$fileCacheDef]))->setAbstract(true),
             $container->getDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE)
         );
         $this->assertEquals(
-            (new Definition(
-                MemoryCacheChain::class,
-                [[$dataCacheDef]]
-            ))->setAbstract(true),
+            (new Definition(MemoryCacheChain::class, [$dataCacheDef]))->setAbstract(true),
             $container->getDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE)
         );
     }

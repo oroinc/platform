@@ -7,6 +7,7 @@ oro_behat_extension:
         mapping:
           Username: '_username'
           Password: '_password'
+          Remember me on this computer: '_remember_me'
 
     User Form:
       selector: 'form[name="oro_user_user_form"]'
@@ -20,17 +21,17 @@ oro_behat_extension:
           Last Name: 'oro_user_user_form[lastName]'
           Primary Email: 'oro_user_user_form[email]'
           First Role:
-            locator: '//label[text()[contains(.,"First Role")]]/../input'
+            locator: '//label[contains(.,"First Role")]/../span/input'
             type: xpath
           Second Role:
-            locator: '//label[text()[contains(.,"Second Role")]]/../input'
+            locator: '//label[contains(.,"Second Role")]/../span/input'
             type: xpath
           OroCRM Organization:
             locator: '(//div[contains(@class,"organization-structure")]//input[@type="checkbox"][@data-name="organization"])[1]'
             type: xpath
 
     UserMenu:
-      selector: {type: 'xpath', locator: '//li[@id="user-menu"]'}
+      selector: {type: 'xpath', locator: '//*[@id="user-menu"]'}
       class: Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu
 
     SidebarMenu:
@@ -59,6 +60,9 @@ oro_behat_extension:
 
     Edit Button:
       selector: 'a[title="Edit profile"]'
+
+    Username or Email:
+      selector: '.oro-forgot-password input[name="username"]'
 
   pages:
     Login:
@@ -107,7 +111,6 @@ oro_behat_extension:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
         - OroUserBundle::FeatureContext
-        - OroDataGridBundle::GridContext
         - OroFormBundle::FormContext
         - OroConfigBundle::FeatureContext
         - OroSecurityBundle::ACLContext
@@ -115,5 +118,6 @@ oro_behat_extension:
         - OroLocaleBundle::LocalizationContext
         - OroActivityListBundle::ActivityContext
         - OroDataGridBundle::GridContext
+        - OroEmailBundle::EmailContext
       paths:
         - '@OroUserBundle/Tests/Behat/Features'

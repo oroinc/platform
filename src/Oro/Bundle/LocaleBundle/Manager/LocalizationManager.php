@@ -9,6 +9,9 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 
+/**
+ * Provides localization entities by passed ids.
+ */
 class LocalizationManager
 {
     const CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
@@ -60,7 +63,6 @@ class LocalizationManager
         $cache = $useCache ? $this->cacheProvider->fetch(static::getCacheKey($id)) : false;
 
         if ($cache !== false && array_key_exists($id, $cache)) {
-            // todo should be removed in scope of https://magecore.atlassian.net/browse/BB-9641
             // make doctrine know about entity from cache
             $this->doctrineHelper
                 ->getEntityManager(Localization::class)
@@ -71,7 +73,7 @@ class LocalizationManager
         }
 
         /** @var Localization $cache */
-        $cache = $this->getRepository()->findOneBy(['id' => $id]);
+        $cache = $this->getRepository()->find($id);
 
         if ($cache === null) {
             return null;

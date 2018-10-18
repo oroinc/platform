@@ -13,10 +13,10 @@ services:
 
     oro_datagrid.importexport.data_converter:
         class: '%oro_datagrid.importexport.data_converter.class%'
+        lazy: true
         arguments:
-            - '@oro_datagrid.datagrid.manager.link'
+            - '@oro_datagrid.importexport.datagrid_columns_from_context_provider'
             - '@translator'
-            - '@oro_datagrid.columns.helper'
             - '@oro_importexport.formatter.formatter_provider'
 
     oro_datagrid.importexport.export_reader:
@@ -35,3 +35,10 @@ services:
         arguments:
             - '@oro_datagrid.datagrid.manager.link'
             - '@event_dispatcher'
+
+    oro_datagrid.importexport.datagrid_columns_from_context_provider:
+        class: 'Oro\Bundle\DataGridBundle\ImportExport\DatagridColumnsFromContextProvider'
+        lazy: true
+        arguments:
+        - '@oro_datagrid.datagrid.manager'
+        - '@oro_datagrid.provider.state.columns'

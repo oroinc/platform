@@ -10,13 +10,10 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Event\AfterRemoveFieldEvent;
-use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -61,11 +58,6 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $eventDispatcher;
-
     protected function setUp()
     {
         $this->configManager = $this->createMock(ConfigManager::class);
@@ -73,7 +65,6 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->configHelper = $this->createMock(ConfigHelper::class);
         $this->session = $this->createMock(Session::class);
         $this->fieldConfigModel = $this->createMock(FieldConfigModel::class);
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->registry = $this->createMock(ManagerRegistry::class);
 
         $this->handler = new RemoveRestoreConfigFieldHandler(
@@ -81,7 +72,6 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
             $this->validationHelper,
             $this->configHelper,
             $this->session,
-            $this->eventDispatcher,
             $this->registry
         );
     }
@@ -146,10 +136,6 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('getFlashBag')
             ->willReturn($flashBag);
-
-        $this->eventDispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(Events::AFTER_REMOVE_FIELD, new AfterRemoveFieldEvent($this->fieldConfigModel));
 
         $expectedContent = [
             'message' => self::SAMPLE_SUCCESS_MESSAGE,

@@ -1,9 +1,5 @@
 assets:
     css:
       'orodatagrid':
-          - 'bundles/bowerassets/backgrid/lib/backgrid.css'
-          - 'bundles/bowerassets/backgrid-paginator/backgrid-paginator.css'
           - 'bundles/orodatagrid/css/scss/main.scss'
-          - 'bundles/orodatagrid/css/scss/inline-editing-help.scss'
-          - 'bundles/orodatagrid/css/scss/board/board.scss'
-          - 'bundles/orodatagrid/css/scss/board/card.scss'
+          # - 'bundles/orodatagrid/css/scss/inline-editing-help.scss' component temporary not in use

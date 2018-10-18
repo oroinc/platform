@@ -14,7 +14,7 @@ interface QueryModifierInterface
      * Makes modification of the given query builder.
      *
      * @param QueryBuilder $qb             The query builder to modify
-     * @param bool         $skipRootEntity Whether the root entiry should be protected or not
+     * @param bool         $skipRootEntity Whether the root entity should be protected or not
      */
     public function modify(QueryBuilder $qb, bool $skipRootEntity): void;
 }

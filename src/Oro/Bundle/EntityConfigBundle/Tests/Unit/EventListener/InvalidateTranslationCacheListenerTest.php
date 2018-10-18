@@ -13,7 +13,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var RegistryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var RegistryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $registry;
 
@@ -41,7 +41,7 @@ class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($configuration);
 
-        /** @var Cache|\PHPUnit_Framework_MockObject_MockObject $cacheProvider */
+        /** @var Cache|\PHPUnit\Framework\MockObject\MockObject $cacheProvider */
         $cacheProvider = $this->getMockBuilder(Cache::class)
             ->setMethods([
                 'fetch',
@@ -72,7 +72,7 @@ class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($configuration);
 
-        /** @var Cache|\PHPUnit_Framework_MockObject_MockObject $cacheProvider */
+        /** @var Cache|\PHPUnit\Framework\MockObject\MockObject $cacheProvider */
         $cacheProvider = $this->createMock(CacheProvider::class);
         $configuration->setQueryCacheImpl($cacheProvider);
         $cacheProvider->expects($this->once())

@@ -1,6 +1,7 @@
+/* @theme: admin.oro; */
+
 .select2-container.select2-tree-autocomplete {
     &.select2-container-multi {
-        border: none;
         background: #fff;
 
         &.hide-all-tree-related-ui {
@@ -19,18 +20,12 @@
                 order: -1;
 
                 .select2-input {
-                    background-color: #fff;
-                    border: 1px solid #ccc;
-                    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-                    height: 20px;
                     padding: 4px 6px;
-                    margin-bottom: 10px;
                     font-size: 14px;
                     line-height: 20px;
                     color: #555;
-                    border-radius: 4px;
                     vertical-align: middle;
-                    min-width: calc(100% - 14px);
+                    min-width: 100%;
                 }
             }
 
@@ -72,18 +67,6 @@
             .select2-search-choice-close {
                 top: 6px;
             }
-        }
-
-        &.select2-dropdown-open:not(.select2-drop-above) .select2-choices .select2-search-field .select2-input {
-            border-color: #aaa;
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
-        }
-
-        &.select2-dropdown-open.select2-drop-above .select2-choices .select2-search-field .select2-input {
-            border-color: #aaa;
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
         }
     }
 
