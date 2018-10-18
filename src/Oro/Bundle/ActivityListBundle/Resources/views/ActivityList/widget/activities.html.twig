@@ -14,42 +14,39 @@
 
         {% block widget_actions %}
         <div class="grid-toolbar">
-            <div class="filter-box oro-clearfix-width">
+            <div class="filter-box">
                 <div class="filter-container"></div>
             </div>
-            <div class="pull-right">
-                <div class="actions-panel pull-right">
-                    {{ UI.clientLink({
-                        'aCss': 'action btn',
-                        'iCss': 'fa-refresh',
-                        'label': ' ' ~ ('Refresh'|trans),
-                        'dataAttributes': {'action-name': 'refresh', 'section': 'top'}
-                    }) }}
-                </div>
+            <div class="pagination" role="navigation">
+                {% set direction = oro_config_value('oro_activity_list.sorting_direction') == 'DESC' %}
+                {% set prevButtonText = direction ? 'oro.activitylist.pagination.newer'|trans : 'oro.activitylist.pagination.older'|trans %}
+                {% set nextButtonText = direction ? 'oro.activitylist.pagination.older'|trans : 'oro.activitylist.pagination.newer'|trans %}
+
+                <button data-section="top"
+                        data-action-name="goto_previous"
+                        class="btn pagination-previous"
+                        title="{{ prevButtonText }}"
+                        {% if pager.current == 1 %}disabled={% endif %}
+                >
+                    <span class="fa-chevron-left" aria-hidden="true"></span>
+                    {{ prevButtonText }}
+                </button>
+                <button data-section="top"
+                        data-action-name="goto_next"
+                        class="btn icon-end pagination-next"
+                        title="{{ nextButtonText }}"
+                >
+                    {{ nextButtonText }}
+                    <span class="fa-chevron-right" aria-hidden="true"></span>
+                </button>
             </div>
-            <div class="pagination">
-                <ul class="icons-holder">
-                    <li class="pagination-previous {% if pager.current == 1 %} disabled {% endif %}">
-                        <a href="#" data-section="top" data-action-name="goto_previous">
-                            <i class="fa-chevron-left hide-text"></i>
-                            {% if oro_config_value('oro_activity_list.sorting_direction') == 'DESC' %}
-                                {{ 'oro.activitylist.pagination.newer'|trans }}
-                            {% else %}
-                                {{ 'oro.activitylist.pagination.older'|trans }}
-                            {% endif %}
-                        </a>
-                    </li>
-                    <li class="pagination-next">
-                        <a href="#" data-section="top" data-action-name="goto_next">
-                            {% if oro_config_value('oro_activity_list.sorting_direction') == 'DESC' %}
-                                {{ 'oro.activitylist.pagination.older'|trans }}
-                            {% else %}
-                                {{ 'oro.activitylist.pagination.newer'|trans }}
-                            {% endif %}
-                            <i class="fa-chevron-right hide-text"></i>
-                        </a>
-                    </li>
-                </ul>
+            <div class="actions-panel">
+                {{ UI.clientLink({
+                    'aCss': 'action btn btn-icon',
+                    'iCss': 'fa-refresh',
+                    'label': ' ' ~ ('Refresh'|trans),
+                    'dataAttributes': {'action-name': 'refresh', 'section': 'top'}
+                }) }}
             </div>
         </div>
         {% endblock %}

@@ -7,7 +7,7 @@ use Doctrine\ORM\Configuration;
 /**
  * The goal of this class id to allow to use any custom ORM configuration attribute
  * without extending the Configuration class each time when a new custom attribute is required.
- * This should improve horizontal extendability of ORO Platform.
+ * This should improve horizontal extendability of OroPlatform.
  */
 class OrmConfiguration extends Configuration
 {

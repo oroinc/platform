@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Oro\Bundle\EntityBundle\Exception\RuntimeException;
+use Oro\Bundle\EntityBundle\Exception\DuplicateEntityAliasException;
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 
+/**
+ * The storage for entity aliases.
+ */
 class EntityAliasStorage implements \Serializable
 {
-    /** @var bool */
-    private $debug = false;
-
     /** @var EntityAlias[] */
     private $aliases = [];
 
@@ -20,31 +21,24 @@ class EntityAliasStorage implements \Serializable
     private $pluralAliasToClass = [];
 
     /**
-     * @param bool $debug
-     */
-    public function setDebug($debug)
-    {
-        $this->debug = $debug;
-    }
-
-    /**
      * Adds an alias for the given entity.
      *
      * @param string      $entityClass
      * @param EntityAlias $entityAlias
      *
-     * @throws \InvalidArgumentException if the given entity alias has invalid "alias" or "pluralAlias"
-     * @throws RuntimeException if duplicate alias is found. This exception is thrown in debug mode only
+     * @throws InvalidEntityAliasException if the given entity alias has invalid alias or plural alias
+     * @throws DuplicateEntityAliasException if duplicated entity alias is detected
      */
     public function addEntityAlias($entityClass, EntityAlias $entityAlias)
     {
+        $this->validateAliasNotBlank($entityClass, $entityAlias->getAlias(), false);
+        $this->validateAliasNotBlank($entityClass, $entityAlias->getPluralAlias(), true);
         $this->validateAlias($entityClass, $entityAlias->getAlias(), false);
         $this->validateAlias($entityClass, $entityAlias->getPluralAlias(), true);
-        if ($this->validateDuplicates($entityClass, $entityAlias)) {
-            $this->aliases[$entityClass] = $entityAlias;
-            $this->aliasToClass[$entityAlias->getAlias()] = $entityClass;
-            $this->pluralAliasToClass[$entityAlias->getPluralAlias()] = $entityClass;
-        }
+        $this->validateDuplicates($entityClass, $entityAlias);
+        $this->aliases[$entityClass] = $entityAlias;
+        $this->aliasToClass[$entityAlias->getAlias()] = $entityClass;
+        $this->pluralAliasToClass[$entityAlias->getPluralAlias()] = $entityClass;
     }
 
     /**
@@ -76,9 +70,7 @@ class EntityAliasStorage implements \Serializable
      */
     public function getEntityAlias($entityClass)
     {
-        return isset($this->aliases[$entityClass])
-            ? $this->aliases[$entityClass]
-            : null;
+        return $this->aliases[$entityClass] ?? null;
     }
 
     /**
@@ -90,9 +82,7 @@ class EntityAliasStorage implements \Serializable
      */
     public function getClassByAlias($alias)
     {
-        return isset($this->aliasToClass[$alias])
-            ? $this->aliasToClass[$alias]
-            : null;
+        return $this->aliasToClass[$alias] ?? null;
     }
 
     /**
@@ -104,9 +94,7 @@ class EntityAliasStorage implements \Serializable
      */
     public function getClassByPluralAlias($pluralAlias)
     {
-        return isset($this->pluralAliasToClass[$pluralAlias])
-            ? $this->pluralAliasToClass[$pluralAlias]
-            : null;
+        return $this->pluralAliasToClass[$pluralAlias] ?? null;
     }
 
     /**
@@ -148,44 +136,53 @@ class EntityAliasStorage implements \Serializable
     protected function getDuplicateAliasHelpMessage()
     {
         return
-            'To solve this problem '
-            . 'you can use "entity_aliases" or "entity_alias_exclusions" section in the '
-            . '"Resources/config/oro/entity.yml" of your bundle '
+            'To solve this problem you can '
+            . 'use "entity_aliases" or "entity_alias_exclusions" section in "Resources/config/oro/entity.yml" '
             . 'or create a service to provide aliases for conflicting classes '
-            . 'and register it with the "oro_entity.alias_provider" tag in DI container.';
+            . 'and register it with "oro_entity.alias_provider" tag in DI container.';
+    }
+
+    /**
+     * Validates that the given value is not empty string and not NULL.
+     *
+     * @param string      $entityClass
+     * @param string|null $value
+     * @param bool        $isPluralAlias
+     *
+     * @throws InvalidEntityAliasException if the given value is empty string or NULL
+     */
+    protected function validateAliasNotBlank($entityClass, $value, $isPluralAlias)
+    {
+        if (!$value) {
+            throw new InvalidEntityAliasException(sprintf(
+                '%s for the "%s" entity must not be empty.',
+                $isPluralAlias ? 'The plural alias' : 'The alias',
+                $entityClass
+            ));
+        }
     }
 
     /**
      * Validates that the given value can be used as an entity alias.
      *
-     * @param mixed $entityClass
-     * @param mixed $value
-     * @param bool  $isPluralAlias
+     * @param string      $entityClass
+     * @param string|null $value
+     * @param bool        $isPluralAlias
      *
-     * @throws \InvalidArgumentException if the given value cannot be used as an entity alias
+     * @throws InvalidEntityAliasException if the given value cannot be used as an entity alias
      */
     protected function validateAlias($entityClass, $value, $isPluralAlias)
     {
-        if (empty($value)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    '%s for the "%s" entity must not be empty.',
-                    $isPluralAlias ? 'The plural alias' : 'The alias',
-                    $entityClass
-                )
-            );
-        } elseif (!preg_match('/^[a-z][a-z0-9_]*$/D', $value)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'The string "%s" cannot be used as %s for the "%s" entity '
-                    . 'because it contains illegal characters. '
-                    . 'The valid alias should start with a letter and only contain '
-                    . 'lower case letters, numbers and underscores ("_").',
-                    $value,
-                    $isPluralAlias ? 'the plural alias' : 'the alias',
-                    $entityClass
-                )
-            );
+        if (!preg_match('/^[a-z][a-z0-9_]*$/D', $value)) {
+            throw new InvalidEntityAliasException(sprintf(
+                'The string "%s" cannot be used as %s for the "%s" entity '
+                . 'because it contains illegal characters. '
+                . 'The valid alias should start with a letter and only contain '
+                . 'lower case letters, numbers and underscores ("_").',
+                $value,
+                $isPluralAlias ? 'the plural alias' : 'the alias',
+                $entityClass
+            ));
         }
     }
 
@@ -193,78 +190,49 @@ class EntityAliasStorage implements \Serializable
      * @param string      $entityClass
      * @param EntityAlias $entityAlias
      *
-     * @return bool TRUE if no duplicates detected; otherwise FALSE in not debugging environment
-     *              or RuntimeException in debugging environment
-     *
-     * @throws RuntimeException if duplicate alias is found
+     * @throws DuplicateEntityAliasException if duplicated entity alias is detected
      */
     protected function validateDuplicates($entityClass, EntityAlias $entityAlias)
     {
         if (isset($this->aliasToClass[$entityAlias->getAlias()])) {
-            if ($this->debug) {
-                throw new RuntimeException(
-                    sprintf(
-                        'The alias "%s" cannot be used for the entity "%s" '
-                        . 'because it is already used for the entity "%s". '
-                        . $this->getDuplicateAliasHelpMessage(),
-                        $entityAlias->getAlias(),
-                        $entityClass,
-                        $this->aliasToClass[$entityAlias->getAlias()]
-                    )
-                );
-            }
-
-            return false;
+            throw new DuplicateEntityAliasException(sprintf(
+                'The alias "%s" cannot be used for the entity "%s" '
+                . 'because it is already used for the entity "%s". '
+                . $this->getDuplicateAliasHelpMessage(),
+                $entityAlias->getAlias(),
+                $entityClass,
+                $this->aliasToClass[$entityAlias->getAlias()]
+            ));
         }
         if (isset($this->pluralAliasToClass[$entityAlias->getPluralAlias()])) {
-            if ($this->debug) {
-                throw new RuntimeException(
-                    sprintf(
-                        'The plural alias "%s" cannot be used for the entity "%s" '
-                        . 'because it is already used for the entity "%s". '
-                        . $this->getDuplicateAliasHelpMessage(),
-                        $entityAlias->getPluralAlias(),
-                        $entityClass,
-                        $this->pluralAliasToClass[$entityAlias->getPluralAlias()]
-                    )
-                );
-            }
-
-            return false;
+            throw new DuplicateEntityAliasException(sprintf(
+                'The plural alias "%s" cannot be used for the entity "%s" '
+                . 'because it is already used for the entity "%s". '
+                . $this->getDuplicateAliasHelpMessage(),
+                $entityAlias->getPluralAlias(),
+                $entityClass,
+                $this->pluralAliasToClass[$entityAlias->getPluralAlias()]
+            ));
         }
         if (isset($this->pluralAliasToClass[$entityAlias->getAlias()])) {
-            if ($this->debug) {
-                throw new RuntimeException(
-                    sprintf(
-                        'The alias "%s" cannot be used for the entity "%s" '
-                        . 'because it is already used as a plural alias for the entity "%s". '
-                        . $this->getDuplicateAliasHelpMessage(),
-                        $entityAlias->getAlias(),
-                        $entityClass,
-                        $this->pluralAliasToClass[$entityAlias->getAlias()]
-                    )
-                );
-            }
-
-            return false;
+            throw new DuplicateEntityAliasException(sprintf(
+                'The alias "%s" cannot be used for the entity "%s" '
+                . 'because it is already used as a plural alias for the entity "%s". '
+                . $this->getDuplicateAliasHelpMessage(),
+                $entityAlias->getAlias(),
+                $entityClass,
+                $this->pluralAliasToClass[$entityAlias->getAlias()]
+            ));
         }
         if (isset($this->aliasToClass[$entityAlias->getPluralAlias()])) {
-            if ($this->debug) {
-                throw new RuntimeException(
-                    sprintf(
-                        'The plural alias "%s" cannot be used for the entity "%s" '
-                        . 'because it is already used as an alias for the entity "%s". '
-                        . $this->getDuplicateAliasHelpMessage(),
-                        $entityAlias->getPluralAlias(),
-                        $entityClass,
-                        $this->aliasToClass[$entityAlias->getPluralAlias()]
-                    )
-                );
-            }
-
-            return false;
+            throw new DuplicateEntityAliasException(sprintf(
+                'The plural alias "%s" cannot be used for the entity "%s" '
+                . 'because it is already used as an alias for the entity "%s". '
+                . $this->getDuplicateAliasHelpMessage(),
+                $entityAlias->getPluralAlias(),
+                $entityClass,
+                $this->aliasToClass[$entityAlias->getPluralAlias()]
+            ));
         }
-
-        return true;
     }
 }

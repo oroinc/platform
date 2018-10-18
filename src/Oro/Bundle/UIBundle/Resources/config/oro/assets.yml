@@ -6,7 +6,7 @@ assets:
             - 'bundles/components/jstree/dist/themes/default/style.min.css'
 
             # Bootstrap port
-            - 'bundles/oroui/css/bootstrap/bootstrap.css'
+            - 'bundles/oroui/css/scss/bootstrap/bootstrap.scss'
 
             # libraries' styles
             - 'bundles/bowerassets/font-awesome/css/font-awesome.css'
@@ -22,10 +22,9 @@ assets:
             # customized libraries' styles
             - 'bundles/oroui/css/jquery-ui.grid.css'
             - 'bundles/oroui/css/jquery-ui.custom.css'
-            - 'bundles/oroui/css/lightgallery/lightgallery.css'
+            - 'bundles/oroui/css/lightgallery/lightgallery.scss'
             - 'bundles/oroui/css/mcustomscrollbar/jquery.mCustomScrollbar-custome.css'
 
             # custom styles
             - 'bundles/oroui/css/scss/main.scss'
             - 'bundles/oroui/css/all.css'
-            - 'bundles/oroui/css/widget-picker/scss/style.scss'

@@ -9,7 +9,8 @@ dashboards:
     # Configuration of widgets
     widgets:                                                 # widget declaration section
         quick_launchpad:                                     # widget name
-            icon:       icon.png                             # widget icon shown on widget add dialog
+            icon_class: fa-rocket                            # name of FontAwesome class for an icon shown on widget add dialog
+            icon:       icon.png                             # widget icon shown on widget add dialog, in case the iconClass is not defined
             description: Text                                # description of widget
             acl:        acl_resource                         # acl resource of dashboard
             route:      oro_dashboard_itemized_widget        # widget route

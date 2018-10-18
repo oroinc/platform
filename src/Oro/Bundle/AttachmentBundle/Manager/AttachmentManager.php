@@ -410,13 +410,15 @@ class AttachmentManager
      */
     public function parseFileKey($key)
     {
-        if (!($decoded = base64_decode(str_replace('_', '/', $key)))
-            || count($result = @unserialize($decoded)) !== 3
-        ) {
-            throw new \InvalidArgumentException(sprintf('Invalid file key: "%s".', $key));
+        $decoded = base64_decode(str_replace('_', '/', $key));
+        if ($decoded) {
+            $result = @unserialize($decoded);
+            if (!empty($result) && count($result) === 3) {
+                return $result;
+            }
         }
 
-        return $result;
+        throw new \InvalidArgumentException(sprintf('Invalid file key: "%s".', $key));
     }
 
     /**

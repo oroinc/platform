@@ -11,7 +11,7 @@ class CommentItem extends Element
      */
     public function clickActionLink($title)
     {
-        $actions = $this->find('css', 'div.comment-actions a.dropdown-toggle');
+        $actions = $this->find('css', 'div.comment-actions .dropdown-toggle');
         self::assertNotNull($actions, 'Comment actions dropdown not found');
 
         // BAP-11448. PhantomJs not handle mouseOver on this element

@@ -1,25 +1,31 @@
 <script type="text/html" id="template-datagrid-toolbar">
-    <div class="grid-toolbar clearfix">
-    {% if isDesktopVersion() %}
-        <div class="sorting pull-left form-horizontal" data-grid-sorting></div>
-        <div class="pull-left grid-toolbar-mass-actions">
-            <div class="mass-actions-panel btn-group icons-holder"></div>
-            <div class="extra-actions-panel" data-grid-extra-actions-panel></div>
+    <div class="grid-toolbar">
+     {% if isDesktopVersion() %}
+        <div class="grid-toolbar__part grid-toolbar__part--start">
+            <div class="sorting" data-grid-sorting></div>
+            <div class="grid-toolbar-mass-actions">
+                <div class="extra-actions-panel" data-grid-extra-actions-panel></div>
+            </div>
         </div>
-        <div class="pull-right grid-toolbar-tools">
-            <div class="actions-panel pull-right form-horizontal" data-grid-actions-panel></div>
-            <div class="page-size pull-right form-horizontal" data-grid-pagesize></div>
+        <div class="grid-toolbar__part grid-toolbar__part--center">
+            <div class="pagination" data-grid-pagination></div>
+            <div data-grid-items-counter></div>
         </div>
-        <div class="pagination pagination-centered" data-grid-pagination></div>
-        <div class="test" data-grid-items-counter></div>
+        <div class="grid-toolbar__part grid-toolbar__part--end">
+            <div class="grid-toolbar-tools">
+                <div class="page-size" data-grid-pagesize></div>
+                <div class="actions-panel" data-grid-actions-panel></div>
+            </div>
+        </div>
     {% else %}
-        <div class="actions-panel pull-right" data-grid-actions-panel></div>
-        <div class="pull-left grid-toolbar-mass-actions">
-            <div class="mass-actions-panel btn-group icons-holder"></div>
+        <div class="grid-toolbar__part grid-toolbar__part--start">
+            <div class="page-size" data-grid-pagesize></div>
+            <div class="actions-panel" data-grid-actions-panel></div>
         </div>
-        <div class="pagination-container">
-            <div class="pagination pull-left" data-grid-pagination></div>
-            <div class="page-size pull-left" data-grid-pagesize></div>
+        <div class="grid-toolbar__part grid-toolbar__part--end">
+            <div class="pagination-container">
+                <div class="pagination" data-grid-pagination></div>
+            </div>
         </div>
     {% endif %}
     </div>

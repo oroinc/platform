@@ -110,8 +110,8 @@ The following variables are available in installer script:
 
 All outputs from installer script will be logged in oro_install.log file or will be shown in console in you use console installer.
 
-## Launching plain PHP script in ORO Platform context
-In some cases you may need to launch PHP scripts in context of ORO Platform. It means that you need an access to Symfony DI container. Examples of such cases may be some installation or maintenance sctipts. To achieve this you can use `oro:platform:run-script` command.
+## Launching plain PHP script in OroPlatform context
+In some cases you may need to launch PHP scripts in context of OroPlatform. It means that you need an access to Symfony DI container. Examples of such cases may be some installation or maintenance sctipts. To achieve this you can use `oro:platform:run-script` command.
 Each script file must be started with `@OroScript` annotation. For example:
 ``` php
 <?php

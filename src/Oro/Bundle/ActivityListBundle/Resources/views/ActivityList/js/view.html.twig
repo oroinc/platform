@@ -1,41 +1,49 @@
 <script type="text/html" id="{{ id|e('html_attr')|raw }}">
+    <% var labelId = _.uniqueId('label-') %>
+    <% var regionId = _.uniqueId('region-') %>
     <div class="accordion-group">
-        <div class="accordion-heading clearfix">
-            <a href="#accordion-item<%= id %>" data-toggle="collapse"
-               class="accordion-icon accordion-toggle<% if (collapsed) { %> collapsed<% } %>"></a>
+        <div class="accordion-heading">
+            <a href="#<%- regionId %>" data-toggle="collapse" aria-expanded="<%- collapsed ? 'false' : 'true' %>"
+               aria-controls="<%- regionId %>"
+               class="btn btn-light accordion-icon accordion-toggle<% if (collapsed) { %> collapsed<% } %>"
+               title="<%- _.__(collapsed ? 'Expand' : 'Collapse')%>"
+               data-collapsed-title="{{ 'Expand'|trans }}"
+               data-expanded-title="{{ 'Collapse'|trans }}"
+               role="button"
+            ></a>
             <div class="icon">
                 {% block activityIcon %}
                 {% endblock %}
             </div>
-            <div class="details">
+            <div id="<%- labelId %>" class="details">
                 {% block activityDetails %}
                 {% endblock %}
+            </div>
+            <div class="extra-info">
+                <div class="message-item message">
+                    <b class="message-subject"><%- _.unescape(subject) %></b>
+                    <% if (!_.isUndefined(description) && !_.isEmpty(description)) { %>
+                    - <%= description %>
+                    <% } %>
+                    {% block activityShortMessage %}
+                    {% endblock %}
+                </div>
+                <div class="comment-count"<% if (!commentCount) { %> style="display:none"<% } %>
+                    title="<%= _.__('oro.activitylist.comment.quantity_label') %>">
+                    <span class="fa-comment" aria-hidden="true"></span><span class="count"><%= commentCount %></span>
+                </div>
+            {% block activityDate %}
+                <div class="created-at">
+                    <span class="date"><%= updatedAt %></span>
+                </div>
+            {% endblock %}
             </div>
             <div class="actions">
                 {% block activityActions %}
                 {% endblock %}
             </div>
-            <div class="extra-info">
-                <div class="message-item message">
-                    {% block activityShortMessage %}
-                        <strong><%- _.unescape(subject) %></strong>
-                        <% if (!_.isUndefined(description) && !_.isEmpty(description)) { %>
-                        - <%= description %>
-                        <% } %>
-                    {% endblock %}
-                </div>
-                <div class="comment-count"<% if (!commentCount) { %> style="display:none"<% } %>
-                    title="<%= _.__('oro.activitylist.comment.quantity_label') %>">
-                    <i class="fa-comment"></i><span class="count"><%= commentCount %></span>
-                </div>
-                <div class="created-at">
-                    {% block activityDate %}
-                        <i class="date"><%= updatedAt %></i>
-                    {% endblock %}
-                </div>
-            </div>
         </div>
-        <div class="accordion-body collapse<% if (!collapsed) { %> in<% } %>" id="accordion-item<%= id %>">
+        <div id="<%- regionId %>" role="region" aria-labelledby="<%- labelId %>" class="accordion-body collapse<% if (!collapsed) { %> show<% } %>">
             <div class="message">
                 {% block activityContent %}
                     {# Do NOT remove. Placeholder for activity view #}

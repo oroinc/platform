@@ -1,0 +1,9 @@
+/* @theme admin.oro; */
+
+$loading-mask-z-index: $zindex-dropdown - 1 !default;
+$loading-mask-background-color: $primary-inverse !default;
+
+$loading-mask-icon-color: $primary-700 !default;
+$loading-mask-icon-size: 32px !default;
+
+$loading-view-height: 200px !default;

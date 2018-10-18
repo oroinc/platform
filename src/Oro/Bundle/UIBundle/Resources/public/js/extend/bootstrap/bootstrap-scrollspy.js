@@ -3,73 +3,125 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    require('bootstrap');
+    var MutationObserver = window.MutationObserver;
 
-    var _superScrollSpy = $.fn.scrollspy;
-
-    var ScrollSpy = function(element, options) {
-        _superScrollSpy.Constructor.apply(this, arguments);
-
-        var self = this;
-        var $element = $(element);
-        var observer;
-
-        if (MutationObserver) {
-            observer = new MutationObserver(_.debounce(function(mutations) {
-                // Destroy scrollspy if element is not exist in the DOM
-                if ($(document).find($element).length) {
-                    $element.scrollspy('refresh');
-                } else {
-                    self.destroy();
-                }
-            }, 50));
-
-            this.observer = observer;
-        }
-
-        if (observer) {
-            // scrollspy refresh on tag body leads to infinite toggling snizzle id
-            var $collection = $element.is('body') ? $element.children() : $element;
-            $collection.each(function() {
-                observer.observe(this, {
-                    attributes: true,
-                    childList: true,
-                    subtree: true,
-                    characterData: true
-                });
-            });
-        }
+    var NAME = 'scrollspy';
+    var DATA_KEY = 'bs.scrollspy';
+    var EVENT_KEY = '.' + DATA_KEY;
+    var DATA_API_KEY = '.data-api';
+    var NAV_LINKS = '.nav > a';
+    var Event = {
+        LOAD_DATA_API: 'load' + EVENT_KEY + DATA_API_KEY
+    };
+    var Selector = {
+        DATA_SPY: '[data-spy="scroll"]'
     };
 
-    ScrollSpy.prototype = _.extend(Object.create(_superScrollSpy.Constructor.prototype), {
+    require('bootstrap-scrollspy');
 
-        constructor: ScrollSpy,
+    var ScrollSpy = $.fn[NAME].Constructor;
+    var JQUERY_NO_CONFLICT = $.fn[NAME].noConflict();
+
+    var OroScrollSpy = function OroScrollSpy(element, options) {
+        ScrollSpy.call(this, element, options);
+
+        this._selector += ', ' + this._config.target + ' ' + NAV_LINKS;
+
+        if (!MutationObserver) {
+            return;
+        }
+
+        var $element = $(element);
+        var $collection = $element.is('body') ? $element.children() : $element;
+
+        this._mutationObserver = new MutationObserver(_.debounce(function(mutations) {
+            // Destroy scrollspy if element is not exist in the DOM
+            if ($(document).find($element).length) {
+                $element.scrollspy('refresh');
+            } else {
+                this.dispose();
+            }
+        }.bind(this), 50));
+
+        $collection.each(function(index, element) {
+            this._mutationObserver.observe(element, {
+                attributes: true,
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
+        }.bind(this));
+    };
+
+    OroScrollSpy.__super__ = ScrollSpy.prototype;
+    OroScrollSpy.prototype = Object.assign(Object.create(ScrollSpy.prototype), {
+        constructor: OroScrollSpy,
 
         /**
          * Method for destroy scrollspy, disable event listener
          * disconnect observer if that exist
          */
-        destroy: function() {
-            this.$scrollElement.off('scroll.scroll-spy.data-api');
-            if (this.observer) {
-                this.observer.disconnect();
+        dispose: function() {
+            if (this._mutationObserver) {
+                this._mutationObserver.disconnect();
+                this._mutationObserver = null;
+            }
+
+            return ScrollSpy.prototype.dispose.apply(this, arguments);
+        }
+    });
+
+    OroScrollSpy._jQueryInterface = function _jQueryInterface(config) {
+        return this.each(function() {
+            var data = $(this).data(DATA_KEY);
+            var _config = typeof config === 'object' && config;
+
+            if (!data) {
+                data = new OroScrollSpy(this, _config);
+                $(this).data(DATA_KEY, data);
+            }
+            if (typeof config === 'string') {
+                if (typeof data[config] === 'undefined') {
+                    throw new TypeError('No method named ' + config);
+                }
+
+                data[config]();
+            }
+        });
+    };
+
+    Object.defineProperties(OroScrollSpy, {
+        VERSION: {
+            configurable: true,
+            get: function get() {
+                return ScrollSpy.VERSION;
+            }
+        },
+        Default: {
+            configurable: true,
+            get: function get() {
+                return ScrollSpy.Default;
             }
         }
     });
 
-    $.fn.scrollspy = $.extend(function(option) {
-        return this.each(function() {
-            var $this = $(this);
-            var data = $this.data('scrollspy');
-            var options = typeof option === 'object' && option;
-            if (!data) {
-                $this.data('scrollspy', (data = new ScrollSpy(this, options)));
-            }
-            if (typeof option === 'string') {
-                data[option]();
-            }
-        });
-    }, _superScrollSpy);
+    $(window).off(Event.LOAD_DATA_API).on(Event.LOAD_DATA_API, function() {
+        var scrollSpys = $.makeArray($(Selector.DATA_SPY));
 
-    $.fn.scrollspy.Constructor = ScrollSpy;
+        for (var i = scrollSpys.length; i--;) {
+            var $spy = $(scrollSpys[i]);
+
+            ScrollSpy._jQueryInterface.call($spy, $spy.data());
+        }
+    });
+
+    $.fn[NAME] = OroScrollSpy._jQueryInterface;
+    $.fn[NAME].Constructor = OroScrollSpy;
+
+    $.fn[NAME].noConflict = function() {
+        $.fn[NAME] = JQUERY_NO_CONFLICT;
+        return OroScrollSpy._jQueryInterface;
+    };
+
+    return OroScrollSpy;
 });

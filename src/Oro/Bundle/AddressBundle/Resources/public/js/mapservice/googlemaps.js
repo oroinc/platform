@@ -147,7 +147,9 @@ define(function(require) {
                     });
 
                     this.mapsLoadExecuted = false;
-                }, this)
+                }, this),
+                errorHandlerMessage: false,
+                error: this.mapLocationUnknown.bind(this)
             });
         },
 

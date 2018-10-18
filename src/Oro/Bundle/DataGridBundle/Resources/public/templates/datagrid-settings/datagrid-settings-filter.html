@@ -1,0 +1,15 @@
+<div class="datagrid-settings-search<% if (search.length === 0) { %> empty<% } %>"
+     data-role="datagrid-settings-search-wrapper">
+    <input type="text" data-role="datagrid-settings-search" value="<%=search %>"
+            placeholder="<%= _.__('oro.datagrid.settings.filter.search_placeholder') %>" />
+    <a href="#" class="clear fa-close" data-role="datagrid-settings-clear-search"
+       title="<%= _.__('oro.datagrid.settings.filter.clear_search_tooltip') %>"></a>
+</div>
+<a href="#" class="datagrid-settings-renderable-tab<% if (!renderable) { %> active<% } %>"
+   data-role="datagrid-settings-show-all">
+    <%= _.__('oro.datagrid.settings.filter.all') %>
+</a>
+<a href="#" class="datagrid-settings-renderable-tab<% if (renderable) { %> active<% } %>"
+   data-role="datagrid-settings-show-selected">
+    <%= _.__('oro.datagrid.settings.filter.selected') %>
+</a>

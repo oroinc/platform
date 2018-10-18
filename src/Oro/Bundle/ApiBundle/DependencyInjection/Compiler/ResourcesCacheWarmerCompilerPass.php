@@ -26,7 +26,7 @@ class ResourcesCacheWarmerCompilerPass implements CompilerPassInterface
             }
         }
         $container->getDefinition(self::RESOURCES_CACHE_WARMER_SERVICE)
-            ->replaceArgument(3, $requestTypes);
+            ->replaceArgument(2, $requestTypes);
     }
 
     /**

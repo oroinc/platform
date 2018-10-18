@@ -5,6 +5,9 @@ namespace Oro\Bundle\UserBundle\Menu;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 
+/**
+ * Allows to add extra items to user menu
+ */
 class UserMenuBuilder implements BuilderInterface
 {
     /**
@@ -12,7 +15,7 @@ class UserMenuBuilder implements BuilderInterface
      */
     public function build(ItemInterface $menu, array $options = array(), $alias = null)
     {
-        $menu->setExtra('type', 'dropdown');
+        $menu->setExtra('type', 'user_menu');
         /* Disabled status menu till active stream will be implemented (BAP-617)
          $menu->addChild(
             'Update status',

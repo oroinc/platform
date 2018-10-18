@@ -1,12 +1,12 @@
 /* @theme: admin.oro; */
 
 // Main menu
-
 $menu-animation: all 200ms linear !default;
 $menu-background-color: $primary-300 !default;
-$menu-font-size: $baseFontSize + 1 !default;
+$menu-font-size: $base-font-size + 1 !default;
 $menu-background-color-active: $extra-200 !default;
 $menu-header-height: 48px !default;
+
 $menu-icon-left: $fa-var-angle-left !default;
 $menu-icon-right: $fa-var-angle-right !default;
 $menu-icon-up: $fa-var-angle-up !default;
@@ -17,10 +17,12 @@ $menu-placeholder-size: 17px !default;
 $menu-top-icon-start: if-ltr($menu-icon-left, $menu-icon-right) !default;
 $menu-top-icon-end: if-ltr($menu-icon-right, $menu-icon-left) !default;
 
+$menu-close-botton-background-color: rgba($primary, .55) !default;
+$menu-close-button-color: $primary-inverse !default;
+
 // Main menu full screen view
 $menu-full-screen-button-color: $primary-750 !default;
 $menu-full-screen-title-color: $primary-200 !default;
-
 
 // Main menu side view
 $menu-side-width: 230px !default;
@@ -34,8 +36,7 @@ $menu-dropdown-background-color-active: $primary-500 !default;
 $menu-dropdown-background-color-light-active: $primary-700 !default;
 
 // Mobile main menu
-$menu-mobile-box-shadow: if-ltr(0 2px 10px 0 rgba(0, 0, 0, 0.19), -2px 0px 10px 0 rgba(0, 0, 0, 0.19)) !default;
-
+$menu-mobile-box-shadow: if-ltr(0 2px 10px 0 rgba(0, 0, 0, .19), -2px 0 10px 0 rgba(0, 0, 0, .19)) !default;
 
 // Main menu items
 $menu-accordion-icon-color: $primary-550 !default;
@@ -48,7 +49,6 @@ $menu-item-offset: 9px 18px 9px 16px !default;
 $menu-item-divider-color: $primary-800 !default;
 
 $menu-minimized-item-first-level-text-color-active: $primary-400 !default;
-
 
 // Main menu toggler
 $menu-toggler-font-size: 16px !default;

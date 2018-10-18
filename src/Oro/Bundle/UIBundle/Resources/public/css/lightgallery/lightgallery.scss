@@ -1,0 +1,47 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/variables";
+@import "oroui/css/scss/mixins";
+
+.lg-backdrop.in {
+    opacity: 0.3;
+}
+.lg-toolbar {
+    background: $primary;
+}
+
+.lg-toolbar .lg-print {
+    font-family: FontAwesome;
+}
+
+.lg-outer {
+    $loader-size: 32px;
+    $loader-width: 6px;
+
+    .lg-item {
+        background: transparent;
+
+        &:after {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+
+            margin-top: -$loader-size / 2;
+            margin-left: -$loader-size / 2;
+
+            content: '';
+
+            display: block;
+
+            @include loader($loader-size, $loader-width, $primary-inverse);
+        }
+
+        &.lg-complete:after {
+            content: none;
+        }
+    }
+}
+
+.mobile-version .lg-print {
+    display: none !important;
+}

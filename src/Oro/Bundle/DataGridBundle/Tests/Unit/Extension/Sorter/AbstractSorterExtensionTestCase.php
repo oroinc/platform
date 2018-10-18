@@ -32,6 +32,15 @@ abstract class AbstractSorterExtensionTestCase extends \PHPUnit\Framework\TestCa
      */
     public function testVisitMetadata(array $sorters, array $columns, array $expectedData): void
     {
+        $this->sortersStateProvider
+            ->expects($this->once())
+            ->method('getState')
+            ->willReturn([]);
+        $this->sortersStateProvider
+            ->expects(self::once())
+            ->method('getDefaultState')
+            ->willReturn([]);
+
         $config = DatagridConfiguration::create([Configuration::SORTERS_KEY => $sorters]);
 
         $data = MetadataObject::create([Configuration::COLUMNS_KEY => $columns]);

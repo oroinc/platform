@@ -2,11 +2,21 @@
 
 {% block content %}
     <div class="tab-container">
-        <ul class="nav nav-tabs">
+        <ul class="nav nav-tabs" role="tablist">
+            {% set tabTabId = 'tab-'|uniqid %}
+            {% set tabContentId = 'tab-content-'|uniqid %}
             {% for tab in tabs %}
-                <li{% if activeTab == tab.name %} class="active"{% endif %}><a
-                    href="javascript:void(0);" class="no-hash tab-button"
-                    data-name="{{ tab.name }}" data-url="{{ tab.url }}">
+                <li class="nav-item">
+                    <a id="{{ (loop.index == 0) ? tabTabId : tabTabId ~ loop.index }}"
+                       href="#{{ tabContentId }}"
+                       role="tab"
+                       class="no-hash tab-button nav-link {% if activeTab == tab.name %} active{% endif %}"
+                       data-name="{{ tab.name }}"
+                       data-url="{{ tab.url }}"
+                       data-toggle="tab"
+                       aria-controls="{{ tabContentId }}"
+                       aria-selected="{% if activeTab == tab.name %}true{% else %}false{% endif %}"
+                    >
                         {{ tab.label }}
                         {% if tab.afterHtml is defined %}
                             {{ tab.afterHtml|raw }}
@@ -15,7 +25,7 @@
                 </li>
             {% endfor %}
         </ul>
-        <div class="tab-content">
+        <div class="tab-content" role="tabpanel" aria-labelledby="{{ tabTabId }}">
             <div class="content">
                 {% block tab_content %}
                     {{ activeTabContent|raw }}

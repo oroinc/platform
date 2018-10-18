@@ -14,7 +14,7 @@ class GridFilterManager extends FrontendGridFilterManager
     {
         $filterCheckbox = $this->find(
             'css',
-            'li label[title="' . $title . '"] input[type=checkbox]'
+            'td.visibility-cell[title="' . $title . '"] input[type="checkbox"]'
         );
 
         self::assertNotNull($filterCheckbox, 'Can not find filter: ' . $title);

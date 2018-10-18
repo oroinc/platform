@@ -20,5 +20,5 @@ interface SelectedFieldsProviderInterface
     public function getSelectedFields(
         DatagridConfiguration $datagridConfiguration,
         ParameterBag $datagridParameters
-    );
+    ): array;
 }

@@ -56,7 +56,7 @@ define([
         /**
          * @property {String}
          */
-        caret: '<span class="caret"></span>',
+        caret: '<span class="caret" aria-hidden="true"></span>',
 
         /**
          * @inheritDoc
@@ -105,7 +105,7 @@ define([
             var parentDiv = $(e.currentTarget).parent().parent().parent();
             var choiceName = $(e.currentTarget).html();
             choiceName += this.caret;
-            parentDiv.find('.dropdown-toggle').html(choiceName);
+            parentDiv.find('[data-toggle="dropdown"]').html(choiceName);
 
             var type = $(e.currentTarget).attr('data-value');
             this._onClickChoiceValueSetType(type);
@@ -179,6 +179,7 @@ define([
                 this._hideCriteria();
             }
 
+            this.$el.inputWidget('seekAndCreate');
             this._handleEmptyFilter();
         },
 

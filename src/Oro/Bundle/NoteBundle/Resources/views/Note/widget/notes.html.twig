@@ -7,6 +7,11 @@
         {% block widget_actions %}
             <div class="widget-actions">
                 {{ UI.clientLink({
+                    'aCss': 'expand-all-button btn-mini',
+                    'label' : 'Expand All'|trans,
+                    'dataAttributes': {'action-name': 'expand_all'}
+                }) }}
+                {{ UI.clientLink({
                     'aCss': 'collapse-all-button btn-mini',
                     'label' : 'Collapse All'|trans,
                     'dataAttributes': {'action-name': 'collapse_all'}
