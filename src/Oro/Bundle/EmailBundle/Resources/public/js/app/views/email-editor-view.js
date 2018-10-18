@@ -11,6 +11,8 @@ define(function(require) {
     var ApplyTemplateConfirmation = require('oroemail/js/app/apply-template-confirmation');
 
     EmailEditorView = BaseView.extend({
+        templatesProvider: null,
+        editorComponentName: null,
         readyPromise: null,
         domCache: null,
 
@@ -27,6 +29,7 @@ define(function(require) {
         initialize: function(options) {
             EmailEditorView.__super__.initialize.apply(this, arguments);
             this.templatesProvider = options.templatesProvider;
+            this.editorComponentName = options.editorComponentName;
             this.setupCache();
         },
 
@@ -147,7 +150,8 @@ define(function(require) {
          * Returns wysiwyg editor view
          */
         getBodyEditorView: function() {
-            return this.pageComponent('wrap_oro_email_email_body').view.pageComponent('oro_email_email_body').view;
+            return this.pageComponent('wrap_' + this.editorComponentName).view
+                .pageComponent(this.editorComponentName).view;
         },
 
         initFields: function() {
