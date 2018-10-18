@@ -40,6 +40,7 @@
 * Change target and name of a layout event. Now `layout` triggers `initLayout` event on DOM element instead `layoutInit` on `mediator`
 #### SecurityBundle
 * `Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper::apply` method logic was changed to support Access rules.
+* `oro_security.encoder.mcrypt` service was changed to `oro_security.encoder.default`.
 
 ## 3.0.0 (2018-07-27)
 [Show detailed list of changes](incompatibilities-3-0.md)

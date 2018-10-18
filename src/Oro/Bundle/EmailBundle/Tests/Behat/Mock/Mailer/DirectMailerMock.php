@@ -22,7 +22,7 @@ class DirectMailerMock extends DirectMailer
                 (string) $emailOrigin->getSmtpPort(),
                 $emailOrigin->getSmtpEncryption(),
                 $emailOrigin->getUser(),
-                $this->container->get('oro_security.encoder.mcrypt')->decryptData($emailOrigin->getPassword())
+                $this->container->get('oro_security.encoder.default')->decryptData($emailOrigin->getPassword())
             );
         } else {
             parent::prepareEmailOriginSmtpTransport($emailOrigin);

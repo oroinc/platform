@@ -4,7 +4,10 @@ namespace Oro\Bundle\SecurityBundle\Encoder;
 
 use ass\XmlSecurity\Key\Aes256Cbc as Cipher;
 
-class Mcrypt implements SymmetricCrypterInterface
+/**
+ * This class provides default crypter to encrypt/decrypt data in the Oro products
+ */
+class DefaultCrypter implements SymmetricCrypterInterface
 {
     /** @var string */
     protected $key;

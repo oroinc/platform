@@ -144,7 +144,7 @@ class WorkflowItemListenerTest extends \PHPUnit\Framework\TestCase
         $this->systemWorkflowManager->expects($this->once())
             ->method('getWorkflowItemsByEntity')
             ->with($entity)
-            ->willReturn($hasWorkflowItems ? [$workflowItem] : null);
+            ->willReturn($hasWorkflowItems ? [$workflowItem] : []);
 
         $entityManager = null;
         if ($hasWorkflowItems) {

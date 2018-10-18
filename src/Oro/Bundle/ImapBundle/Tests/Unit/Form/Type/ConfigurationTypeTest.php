@@ -14,7 +14,8 @@ use Oro\Bundle\ImapBundle\Validator\Constraints\EmailFolders;
 use Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
@@ -27,7 +28,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 {
     const TEST_PASSWORD = 'somePassword';
 
-    /** @var Mcrypt */
+    /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -41,7 +42,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        $this->encryptor = new Mcrypt('someKey');
+        $this->encryptor = new DefaultCrypter('someKey');
 
         $user = $this->createMock(User::class);
 

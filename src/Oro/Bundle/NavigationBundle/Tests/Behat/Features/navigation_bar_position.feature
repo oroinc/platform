@@ -141,6 +141,7 @@ Feature: Navigation bar position
       | System/ Configuration               | "System/ Configuration" |
 
   Scenario: Change navigation bar position from "Left" to "Top"
+    Given I login as administrator
     When I go to System/ Configuration
     And follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And uncheck "Use default" for "Position" field
