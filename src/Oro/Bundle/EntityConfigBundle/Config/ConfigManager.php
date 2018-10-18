@@ -489,9 +489,9 @@ class ConfigManager
      */
     public function flushAllCaches()
     {
-        //$this->cache->flushAllConfigurable();
-        //$this->cache->flushAllConfigs();
-        // @todo temporary solution. 'flush' methods should be used. should be fixed in BAP-9151
+        // 'flushAllConfigurable' and 'flushAllConfigs' methods cannot be used due to them are removed
+        // entries from all caches, not only from entity config related caches
+        // for details, see BAP-9151
         $this->cache->deleteAllConfigurable();
         $this->cache->deleteAllConfigs();
     }
@@ -549,7 +549,6 @@ class ConfigManager
             $this->auditManager->save($logEntry);
         }
 
-        // @todo: Should be removed together with deprecated events
         if ($this->hasListeners(Events::POST_FLUSH_CONFIG)) {
             $this->eventDispatcher->dispatch(
                 Events::POST_FLUSH_CONFIG,
@@ -582,7 +581,6 @@ class ConfigManager
         foreach ($this->persistConfigs as $config) {
             $this->calculateConfigChangeSet($config);
 
-            // @todo: Should be removed together with deprecated events
             if ($this->hasListeners(Events::PRE_PERSIST_CONFIG)) {
                 $this->eventDispatcher->dispatch(
                     Events::PRE_PERSIST_CONFIG,
@@ -782,7 +780,6 @@ class ConfigManager
                     $this->cache->saveEntities($entities, true);
                 }
 
-                // @todo: Should be removed together with deprecated events
                 if ($this->hasListeners(Events::NEW_ENTITY_CONFIG)) {
                     $this->eventDispatcher->dispatch(
                         Events::NEW_ENTITY_CONFIG,
@@ -847,7 +844,6 @@ class ConfigManager
                 $this->cache->saveFields($className, $fields, true);
             }
 
-            // @todo: Should be removed together with deprecated events
             if ($this->hasListeners(Events::NEW_FIELD_CONFIG)) {
                 $this->eventDispatcher->dispatch(
                     Events::NEW_FIELD_CONFIG,
@@ -866,8 +862,6 @@ class ConfigManager
     /**
      * @param string $className
      * @param bool   $force - if TRUE overwrite existing value from annotation
-     *
-     * @TODO: need handling for removed values
      */
     public function updateConfigEntityModel($className, $force = false)
     {
@@ -891,7 +885,6 @@ class ConfigManager
             }
         }
 
-        // @todo: Should be removed together with deprecated events
         if ($this->hasListeners(Events::UPDATE_ENTITY_CONFIG)) {
             $this->eventDispatcher->dispatch(
                 Events::UPDATE_ENTITY_CONFIG,
@@ -908,8 +901,6 @@ class ConfigManager
      * @param string $className
      * @param string $fieldName
      * @param bool   $force - if TRUE overwrite existing value from annotation
-     *
-     * @TODO: need handling for removed values
      */
     public function updateConfigFieldModel($className, $fieldName, $force = false)
     {
@@ -939,7 +930,6 @@ class ConfigManager
             }
         }
 
-        // @todo: Should be removed together with deprecated events
         if ($this->hasListeners(Events::UPDATE_FIELD_CONFIG)) {
             $this->eventDispatcher->dispatch(
                 Events::UPDATE_FIELD_CONFIG,
@@ -965,7 +955,6 @@ class ConfigManager
     {
         $result = $this->modelManager->changeFieldName($className, $fieldName, $newFieldName);
         if ($result) {
-            // @todo: Should be removed together with deprecated events
             if ($this->hasListeners(Events::RENAME_FIELD_OLD)) {
                 $this->eventDispatcher->dispatch(
                     Events::RENAME_FIELD_OLD,

@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
+/**
+ * Provides the list of all events related to entity configuration.
+ */
 final class Events
 {
     /**
