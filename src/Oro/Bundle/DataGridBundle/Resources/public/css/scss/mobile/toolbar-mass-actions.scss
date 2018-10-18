@@ -1,23 +1,25 @@
-.toolbar-mass-actions {
-  display: inline-block;
+/* @theme: admin.oro; */
 
-  a.action.btn.dropdown-toggle {
-    display: inline-block !important;
-    line-height: 30px;
-    margin-right: 0;
-  }
-  .dropdown-menu {
-    left: auto;
-    right: 0;
-    min-width: 60px;
-    > .action {
-      display: block;
-      font-size: $baseFontSize;
-      line-height: $baseLineHeight;
-      font-family: $baseFontFamily;
-      color: $bodyColor;
-      white-space: nowrap;
-      padding: 0 16px 0 8px;
+.toolbar-mass-actions {
+    display: inline-block;
+
+    .dropdown-toggle {
+        display: inline-block;
+        margin-#{$end}: 0;
+
+        line-height: $toolbar-mass-actions-toggle-line-height;
     }
-  }
+
+    .dropdown-menu {
+        .action {
+            display: block;
+            padding: $toolbar-mass-actions-action-offset;
+            margin: 0;
+
+            line-height: $line-height-base;
+            font-family: $font-family-sans-serif;
+
+            color: $body-color;
+        }
+    }
 }

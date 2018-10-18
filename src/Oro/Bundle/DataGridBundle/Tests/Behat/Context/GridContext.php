@@ -558,7 +558,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iPressNextPageButton($gridName = null)
     {
         $grid = $this->getGrid($gridName);
-        $this->getGridPaginator($grid)->clickLink('Next');
+        $this->getGridPaginator($grid)->pressButton('Next');
     }
 
     /**
@@ -1633,6 +1633,9 @@ TEXT;
             $grid->getElement($filtersButton)->open();
         }
 
+        $gridSettingsButton = $grid->getElement($grid->getMappedChildElementName('GridColumnManagerButton'));
+        $gridSettingsButton->click();
+
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
@@ -1640,11 +1643,8 @@ TEXT;
         $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->checkColumnFilter($filter);
 
-        try {
-            $filterManager->close();
-        } catch (\Exception $e) {
-            $filterButton->click();
-        }
+        $gridSettingsClose = $grid->getElement($grid->getMappedChildElementName('GridSettingsManagerClose'));
+        $gridSettingsClose->click();
     }
 
     /**
@@ -1664,6 +1664,9 @@ TEXT;
             $grid->getElement($filtersButton)->open();
         }
 
+        $gridSettingsButton = $grid->getElement($grid->getMappedChildElementName('GridColumnManagerButton'));
+        $gridSettingsButton->click();
+
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
@@ -1671,11 +1674,8 @@ TEXT;
         $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->uncheckColumnFilter($filter);
 
-        try {
-            $filterManager->close();
-        } catch (\Exception $e) {
-            $filterButton->click();
-        }
+        $gridSettingsClose = $grid->getElement($grid->getMappedChildElementName('GridSettingsManagerClose'));
+        $gridSettingsClose->click();
     }
 
     /**
@@ -1849,10 +1849,10 @@ TEXT;
     }
 
     /**
-     * @param string $lnk
+     * @param string $button
      * @param string|null $gridName
      */
-    private function pressPaginationControlButton($lnk, $gridName = null)
+    private function pressPaginationControlButton($button, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
 
@@ -1865,7 +1865,7 @@ TEXT;
         );
 
         $gridPaginator = $this->elementFactory->createElement('GridToolbarPaginator', $gridPaginatorContainer);
-        $gridPaginator->clickLink($lnk);
+        $gridPaginator->pressButton($button);
     }
 
     /**

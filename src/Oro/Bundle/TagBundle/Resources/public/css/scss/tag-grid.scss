@@ -1,0 +1,11 @@
+/* @theme: admin.oro; */
+
+.tag-search-grid {
+    thead {
+        display: none;
+    }
+
+    .table.grid tbody tr:first-child td {
+        border-top: 0 none;
+    }
+}

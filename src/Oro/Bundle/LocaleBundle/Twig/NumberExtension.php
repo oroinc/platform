@@ -5,6 +5,10 @@ namespace Oro\Bundle\LocaleBundle\Twig;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Used to call number formatter to format numbers, currencies, percents etc
+ * according to locale and additional parameters
+ */
 class NumberExtension extends \Twig_Extension
 {
     /** @var ContainerInterface */
@@ -105,12 +109,13 @@ class NumberExtension extends \Twig_Extension
      * @param string|int  $attribute
      * @param string|null $style
      * @param string|null $locale
+     * @param array $attributes
      *
      * @return int
      */
-    public function getAttribute($attribute, $style = null, $locale = null)
+    public function getAttribute($attribute, $style = null, $locale = null, $attributes = [])
     {
-        return $this->getNumberFormatter()->getAttribute($attribute, $style, $locale);
+        return $this->getNumberFormatter()->getAttribute($attribute, $style, $locale, $attributes);
     }
 
     /**

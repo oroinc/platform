@@ -15,6 +15,15 @@ define(function(require) {
         buttonClass: 'btn',
         useButtonGroup: true,
         useCaret: true,
+        /**
+         * Label of dropdown control
+         * @type {string}
+         */
+        label: '',
+
+        optionNames: BaseView.prototype.optionNames.concat([
+            'selectOptions', 'selectedValue', 'buttonClass', 'useButtonGroup', 'useCaret', 'label'
+        ]),
 
         /**
          * @inheritDoc
@@ -24,8 +33,6 @@ define(function(require) {
         },
 
         initialize: function(options) {
-            _.extend(this,
-                _.pick(options, 'selectOptions', 'selectedValue', 'buttonClass', 'useButtonGroup', 'useCaret'));
             if (!_.has(options, 'selectedValue')) {
                 var firstOption = _.first(this.selectOptions);
                 if (_.isString(firstOption)) {
@@ -51,7 +58,7 @@ define(function(require) {
 
         getTemplateData: function() {
             var data = DropdownSelectView.__super__.getTemplateData.call(this);
-            _.defaults(data, _.pick(this, 'buttonClass', 'useButtonGroup', 'useCaret'));
+            _.extend(data, _.pick(this, 'buttonClass', 'useButtonGroup', 'useCaret', 'label'));
             data.options = _.map(this.selectOptions, this._selectOptionIteratee, this);
             var selectedOption = _.findWhere(data.options, {selected: true});
             data.selectedLabel = selectedOption.label;
@@ -96,7 +103,9 @@ define(function(require) {
             });
             var $option = this.$('[data-value="' + escapedValue + '"]');
             this.$('.dropdown-menu li').removeClass('selected');
+            this.$('.dropdown-menu li [data-value]').removeAttr('aria-selected');
             $option.closest('li').addClass('selected');
+            $option.attr('aria-selected', 'true');
             this.$('.current-label').text($option.text());
             this.trigger('change', this.selectedValue);
         },

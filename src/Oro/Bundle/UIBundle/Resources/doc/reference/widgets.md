@@ -252,6 +252,8 @@ General implementation of show logic.
 -   dialogOptions - Extended ui.dialog options
 -   stateEnabled - flag, enables window state saving, enabled by default
 -   incrementalPosition - flag, enables window incremental positioning, enabled by default
+-   mobileLoadingBar: flag, enables loading bar for dialog on mobile devices, enabled by default
+-   desktopLoadingBar: flag, enables loading bar for dialog on desktop, disabled by default
 
 Front-end - Widget Manager
 --------------------------

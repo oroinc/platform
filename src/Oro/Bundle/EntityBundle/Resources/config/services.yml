@@ -254,6 +254,7 @@ services:
 
     oro_entity.entity_alias.cache.warmer:
         class: Oro\Bundle\EntityBundle\Cache\EntityAliasCacheWarmer
+        public: false
         arguments:
             - '@oro_entity.entity_alias_resolver'
         tags:
@@ -261,6 +262,7 @@ services:
 
     oro_entity.additional_metadata.cache.warmer:
         class: Oro\Bundle\EntityBundle\Cache\AdditionalMetadataCacheWarmer
+        public: false
         arguments:
             - '@oro_entity.orm.mapping.additional_metadata_provider'
         tags:
@@ -272,8 +274,6 @@ services:
             - '@oro_entity.entity_alias_loader'
             - '@oro_entity.entity_alias_cache'
             - '@logger'
-            - '%kernel.debug%'
-        lazy: true
 
     oro_entity.entity_alias_cache:
         parent: oro.cache.abstract.without_memory_cache

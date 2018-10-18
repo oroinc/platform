@@ -14,8 +14,8 @@ class SearchResult extends Page
     {
         $this->getMainMenu()->openAndClick('Dashboards/ Dashboard');
         $page = $this->elementFactory->getPage();
-        $page->clickLink('Search');
-        $field = $page->find('css', 'input#search-bar-search');
+        $page->click('Search');
+        $field = $page->find('css', 'input[name=search]');
 
         /** @var OroSelenium2Driver $driver */
         $driver = $page->getSession()->getDriver();

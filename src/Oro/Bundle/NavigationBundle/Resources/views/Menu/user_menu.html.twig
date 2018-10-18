@@ -1,0 +1,5 @@
+{% if isMobileVersion() %}
+    {% include 'OroNavigationBundle:Menu:user_menu_mobile.html.twig' %}
+{% else %}
+    {% include 'OroNavigationBundle:Menu:dropdown.html.twig' %}
+{% endif %}

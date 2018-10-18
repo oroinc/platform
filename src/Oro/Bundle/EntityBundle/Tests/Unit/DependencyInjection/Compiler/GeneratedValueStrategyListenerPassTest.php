@@ -35,7 +35,7 @@ class GeneratedValueStrategyListenerPassTest extends \PHPUnit\Framework\TestCase
 
         $definition->expects($this->once())->method('clearTag')->with($this->isType('string'));
         $definition
-            ->expects($this->exactly(count($parameterValue)))
+            ->expects($this->exactly(count((array) $parameterValue)))
             ->method('addTag')
             ->with(
                 $this->isType('string'),

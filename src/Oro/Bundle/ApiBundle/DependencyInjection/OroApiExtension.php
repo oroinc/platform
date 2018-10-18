@@ -35,6 +35,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     private const ALLOW_ORIGIN_PROCESSOR_SERVICE_ID             = 'oro_api.rest.cors.set_allow_origin';
     private const CORS_HEADERS_PROCESSOR_SERVICE_ID             = 'oro_api.rest.cors.set_allow_and_expose_headers';
     private const CONFIG_CACHE_WARMER_SERVICE_ID                = 'oro_api.config_cache_warmer';
+    private const CACHE_MANAGER_SERVICE_ID                      = 'oro_api.cache_manager';
 
     /**
      * {@inheritdoc}
@@ -209,12 +210,23 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $container->setParameter(self::API_DOC_DEFAULT_VIEW_PARAMETER_NAME, $this->getDefaultView($apiDocViews));
 
         $configFiles = [];
+        $cacheManagerConfigKeys = [];
         foreach ($config['config_files'] as $configKey => $fileConfig) {
             $configFiles[$configKey] = $fileConfig['file_name'];
+            $cacheManagerConfigKeys[$configKey] = $fileConfig['request_type'] ?? [];
         }
+        $cacheManagerApiDocViews = [];
+        foreach ($apiDocViews as $view => $viewConfig) {
+            $cacheManagerApiDocViews[$view] = $viewConfig['request_type'] ?? [];
+        }
+
         $container
             ->getDefinition(self::CONFIG_CACHE_WARMER_SERVICE_ID)
             ->replaceArgument(0, $configFiles);
+        $container
+            ->getDefinition(self::CACHE_MANAGER_SERVICE_ID)
+            ->replaceArgument(0, $cacheManagerConfigKeys)
+            ->replaceArgument(1, $cacheManagerApiDocViews);
     }
 
     /**

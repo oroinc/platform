@@ -5,22 +5,38 @@ namespace Oro\Bundle\UIBundle\Tests\Behat\Context;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
-use Oro\Bundle\UIBundle\Tests\Behat\Element\BreadcrumbContainerElement;
 
 class BreadcrumbContext extends OroFeatureContext implements OroPageObjectAware
 {
     use PageObjectDictionary;
 
     /**
-     * @Given /^(?:|I )follow "([^"]*)" breadcrumb$/
+     * @Given /^(?:|I )follow "([^"]*)" within page title$/
      *
-     * @param string $breadcrumbText
+     * @param string $link
      */
-    public function iFollowBreadcrumb($breadcrumbText)
+    public function iFollowLinkWithinPageTitle($link)
     {
-        /** @var BreadcrumbContainerElement $breadcrumbContainer */
+        $pageTitle = $this->elementFactory->createElement('Page Title');
+        $pageTitle->clickOrPress($link);
+    }
+
+    /**
+     * Checks, that breadcrumbs contain specified text
+     * Example: Given I should see "System/ User Management/ Users" in breadcrumbs
+     * Example: Given I should see "Customers / Accounts" in breadcrumbs
+     *
+     * @Given /^(?:|I )should see "(?P<text>(?:[^"]|\\")*)" in breadcrumbs$/
+     */
+    public function iShouldSeeTextInBreadcrumbs($text)
+    {
         $breadcrumbContainer = $this->elementFactory->createElement('Breadcrumb Container');
-        $breadcrumb = $breadcrumbContainer->getBreadcrumb($breadcrumbText);
-        $breadcrumb->click();
+        $actualText = $breadcrumbContainer->getText();
+        $normalizedText = preg_replace('/\s?\//', '', $text);
+
+        self::assertTrue(
+            strcasecmp($actualText, $normalizedText) === 0,
+            sprintf('Text "%s" does not match to actual breadcrumbs "%s"', $text, $actualText)
+        );
     }
 }

@@ -1,12 +1,16 @@
+/* @theme: admin.oro; */
+
 .enum-value-collection {
-  position: relative;
-  width: 297px;
-  &__clear-default {
-    position: absolute;
-    bottom: 3px;
-    right: 3px;
-    &.disabled {
-      display: none;
+    position: relative;
+    width: 297px;
+
+    &__clear-default {
+        position: absolute;
+        bottom: 3px;
+        right: 3px;
+
+        &.disabled {
+            display: none;
+        }
     }
-  }
 }

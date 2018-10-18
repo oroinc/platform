@@ -1,0 +1,46 @@
+/* @theme: admin.oro; */
+
+$activity-toolbar-offset: 12px !default;
+
+$activity-filter-box-width: 33% !default;
+$activity-filter-item-offset: 8px !default;
+$activity-filter-info-offset: 8px 0 20px !default;
+
+$activity-date-font-size: 12px !default;
+$activity-icon-color: $primary-550 !default;
+
+$activity-no-data-font-size: 13px !default;
+$activity-no-data-font-offset: 4px 0 !default;
+
+$activity-icon-font-size: 16px !default;
+$activity-icon-size: 28px !default;
+
+$activity-heading-min-height: 46px !default;
+$activity-heading-offset: 6px 0!default;
+
+$activity-actions-offset: 8px !default;
+
+$activity-count-offset: 0 20px !default;
+$activity-count-color: $primary-700 !default;
+
+$activity-accordion-icon-offset: side-values(0 8px 0 16px) !default;
+$activity-accordion-icon-color-hover: $primary-400 !default;
+$activity-accordion-icon-expanded: $fa-var-minus-square-o !default;
+$activity-accordion-icon-collapsed: $fa-var-plus-square-o !default;
+
+$activity-details-width: 240px !default;
+$activity-details-offset: side-values(0 30px 0 10px) !default;
+
+$activity-info-width: calc(100% - 400px) !default;
+
+$activity-message-subject-color: $primary !default;
+
+$activity-user-fieldset-offset: side-values(4px 20px 0 0) !default;
+
+$activity-comment-offset: side-values(0 6px 0 0) !default;
+
+$activity-filter-select-color: $primary-400 !default;
+
+$activity-short-message-offset: side-values(0 8px 0 0) !default;
+
+$activity-responsive-block-offset: 16px !default;

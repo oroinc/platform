@@ -1,0 +1,8 @@
+/* @theme: admin.oro; */
+
+.organization-switcher {
+    .dropdown-menu {
+        #{$start}: auto;
+        #{$end}: unset;
+    }
+}

@@ -13,7 +13,7 @@ define(function(require) {
     ActionPermissionsReadonlyRowView = BaseView.extend({
         tagName: 'tr',
 
-        className: 'collapsed',
+        className: 'grid-row collapsed',
 
         autoRender: false,
 
@@ -24,10 +24,6 @@ define(function(require) {
         permissionItemView: PermissionReadOnlyView,
 
         fieldItemView: ReadonlyFieldView,
-
-        events: {
-            'click .collapse-action': 'onFieldsSectionToggle'
-        },
 
         /**
          * @inheritDoc
@@ -78,19 +74,6 @@ define(function(require) {
                 }));
             }
             return this;
-        },
-
-        changeTitle: function(targetElement) {
-            var target = this.$(targetElement);
-            var titleHolder = this.$el.hasClass('collapsed') ? 'data-collapsed-title' : 'data-expanded-title';
-            target.attr('title', target.attr(titleHolder));
-        },
-
-        onFieldsSectionToggle: function(e) {
-            e.preventDefault();
-            this.$el.toggleClass('collapsed');
-            this.changeTitle(e.target);
-            this.$('[data-name=fields-list]').slideToggle(!this.$el.hasClass('collapsed'));
         }
     });
 
