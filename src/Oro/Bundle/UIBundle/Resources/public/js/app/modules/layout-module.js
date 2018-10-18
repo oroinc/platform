@@ -8,7 +8,7 @@ define(function(require) {
      * Init layout's handlers and listeners
      */
     mediator.setHandler('layout:init', layout.init, layout);
-    mediator.setHandler('layout:dispose', layout.unstyleForm, layout);
+    mediator.setHandler('layout:dispose', layout.dispose, layout);
     mediator.setHandler('layout:getPreferredLayout', layout.getPreferredLayout, layout);
     mediator.setHandler('layout:getAvailableHeight', layout.getAvailableHeight, layout);
     mediator.setHandler('layout:enablePageScroll', layout.enablePageScroll, layout);

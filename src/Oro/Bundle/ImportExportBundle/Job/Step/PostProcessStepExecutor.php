@@ -16,6 +16,9 @@ use Oro\Bundle\ImportExportBundle\Job\ContextHelper;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 
+/**
+ * Import export post process step executor
+ */
 class PostProcessStepExecutor extends StepExecutor implements StepExecutionAwareInterface
 {
     const JOB_TYPE_KEY = 'type';
@@ -166,7 +169,7 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
                 continue;
             }
 
-            if (0 === (count($value) % $this->batchSize)) {
+            if (0 === (count((array) $value) % $this->batchSize)) {
                 return true;
             }
         }

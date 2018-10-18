@@ -36,7 +36,7 @@ define(function(require) {
         },
 
         onNewEmail: function($notificationElement) {
-            if ($notificationElement.parent().hasClass('open') === false) {
+            if ($notificationElement.parent().hasClass('show') === false) {
                 $notificationElement.show().delay(5000).fadeOut(1000);
             }
         }

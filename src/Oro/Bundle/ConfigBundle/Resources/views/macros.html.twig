@@ -2,7 +2,7 @@
     Displays title and search form
 #}
 {% macro renderTitleAndButtons(pageTitle, buttons) %}
-    <div class="container-fluid configuration-header clearfix">
+    <div class="container-fluid page-title configuration-header">
     {% if pageTitle is iterable %}
         <div class="customer-info customer-simple pull-left">
         {% for title in pageTitle%}
@@ -21,7 +21,7 @@
             {{ pageTitle }}
         </h1>
     {% endif %}
-        <div class="pull-right">
+        <div class="pull-right navbar-extra-right">
             {% if buttons is defined %}
                 {% for button in buttons %}
                     {{ button }}
@@ -146,9 +146,9 @@
                     <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.id }}"/>
                 </div>
                 {% if content.formErrors is defined and content.formErrors | length %}
-                    <div class="customer-info-actions container-fluid well-small alert-wrap">
-                        <div class="alert alert-error">
-                            <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap">×</button>
+                    <div class="customer-info-actions container-fluid well-small alert-wrap" role="alert">
+                        <div class="alert alert-error alert-dismissible">
+                            <button class="close" type="button" data-dismiss="alert" aria-label="{{ 'Close'|trans }}" data-target=".alert-wrap"><span aria-hidden="true">&times;</span></button>
                             {{ content.formErrors|raw }}
                         </div>
                     </div>

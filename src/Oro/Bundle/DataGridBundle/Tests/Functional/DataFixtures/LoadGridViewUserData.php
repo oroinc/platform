@@ -86,6 +86,6 @@ class LoadGridViewUserData extends AbstractFixture implements DependentFixtureIn
      */
     protected function getUserClassName()
     {
-        return 'OroUserBundle:User';
+        return User::class;
     }
 }

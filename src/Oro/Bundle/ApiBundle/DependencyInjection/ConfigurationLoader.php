@@ -129,7 +129,8 @@ class ConfigurationLoader
         $entityAliasResolverServiceId = $this->configureEntityAliasResolver(
             $configKey,
             $configCacheServiceId,
-            $entityOverrideProviderServiceId
+            $entityOverrideProviderServiceId,
+            [$fileName]
         );
         $exclusionProviderServiceId = $this->configureExclusionProvider(
             $configKey,
@@ -178,7 +179,8 @@ class ConfigurationLoader
         $entityAliasResolverServiceId = $this->configureEntityAliasResolver(
             $configKey,
             $configCacheServiceId,
-            $entityOverrideProviderServiceId
+            $entityOverrideProviderServiceId,
+            $fileNames
         );
         $exclusionProviderServiceId = $this->configureExclusionProvider(
             $configKey,
@@ -254,16 +256,18 @@ class ConfigurationLoader
     }
 
     /**
-     * @param string $configKey
-     * @param string $configCacheServiceId
-     * @param string $entityOverrideProviderServiceId
+     * @param string   $configKey
+     * @param string   $configCacheServiceId
+     * @param string   $entityOverrideProviderServiceId
+     * @param string[] $configFiles
      *
      * @return string entity alias resolver service id
      */
     private function configureEntityAliasResolver(
         string $configKey,
         string $configCacheServiceId,
-        string $entityOverrideProviderServiceId
+        string $entityOverrideProviderServiceId,
+        array $configFiles
     ): string {
         $cacheServiceId = 'oro_api.entity_alias_cache.' . $configKey;
         $this->container
@@ -293,7 +297,7 @@ class ConfigurationLoader
                 new Reference($entityOverrideProviderServiceId),
                 new Reference($cacheServiceId),
                 new Reference('logger'),
-                $this->container->getParameter('kernel.debug')
+                $configFiles
             ])
             ->setPublic(true)
             ->addTag('monolog.logger', ['channel' => 'api']);

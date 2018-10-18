@@ -570,7 +570,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     {
         $executedCount = 0;
         reset($this->actions[$group]);
-        while (list($index, $action) = each($this->actions[$group])) {
+        foreach ($this->actions[$group] as $index => $action) {
             if ($this->isActionReadyToExecute($action[0], $action[2])) {
                 $executedCount += $this->executeAction($index, $action);
                 unset($this->actions[$group][$index]);
@@ -598,7 +598,8 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
             $hasExecuted = false;
             $hasSkipped  = false;
             reset($this->actions[$group]);
-            while (list($index, $action) = each($this->actions[$group])) {
+            while ($index = key($this->actions[$group])) {
+                $action = $this->actions[$group][$index];
                 if ($this->isActionReadyToExecute($action[0], $action[2])) {
                     $executedCount += $this->executeAction($index, $action);
                     unset($this->actions[$group][$index]);
@@ -609,6 +610,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
                         break;
                     }
                 } else {
+                    next($this->actions[$group]);
                     $hasSkipped = true;
                     if ($hasExecuted) {
                         // start execution from the begin
@@ -735,7 +737,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     {
         $executedCount = 0;
         reset($this->links[$key][$id]);
-        while (isset($this->links[$key][$id]) && list($removeIndex) = each($this->links[$key][$id])) {
+        foreach (array_keys($this->links[$key][$id]) as $removeIndex) {
             if ($removeIndex > $index) {
                 break;
             }

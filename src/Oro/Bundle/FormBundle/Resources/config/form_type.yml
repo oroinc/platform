@@ -292,14 +292,14 @@ services:
     oro_form.type.encoded_password:
         class: '%oro_form.type.encoded_password.class%'
         arguments:
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
         tags:
             - { name: form.type, alias: oro_encoded_password }
 
     oro_form.type.encoded_placeholder_password:
         class: 'Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType'
         arguments:
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
         tags:
             - { name: form.type, alias: oro_encoded_placeholder_password }
 

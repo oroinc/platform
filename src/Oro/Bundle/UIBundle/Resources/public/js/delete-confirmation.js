@@ -4,7 +4,6 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var ModalView = require('oroui/js/modal');
-    var template = require('tpl!oroui/templates/delete-confirmation.html');
     var DeleteConfirmationView;
 
     /**
@@ -15,10 +14,6 @@ define(function(require) {
      * @extends oroui.ModalView
      */
     DeleteConfirmationView = ModalView.extend({
-
-        /** @property {String} */
-        template: template,
-
         /** @property {String} */
         className: 'modal oro-modal-danger',
 
@@ -31,7 +26,7 @@ define(function(require) {
         /** @property {String} */
         cancelText: __('Cancel'),
 
-        okButtonClass: 'btn ok btn-danger',
+        okButtonClass: 'btn btn-danger',
 
         /**
          * @inheritDoc

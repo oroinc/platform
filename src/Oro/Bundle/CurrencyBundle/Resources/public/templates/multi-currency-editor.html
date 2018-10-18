@@ -1,4 +1,4 @@
-<div class="inline-editor__fields input-append">
+<div class="inline-editor__fields">
     <!-- span wrapper for input[name=value] fixes flex box layout -->
     <span><input name="value" type="<%= inputType %>" value="<%= value.amount %>"
            class="form-control" placeholder="<%= placeholder %>"
@@ -7,7 +7,11 @@
 </div>
 <div class="inline-editor__actions">
     <button class="inline-editor__action-item" type="submit"
-            title="<%= _.__('oro.form.inlineEditing.action.save') %>"><i class="fa-check-square-o"></i></button>
+            title="<%= _.__('oro.form.inlineEditing.action.save') %>">
+        <span class="fa-check" aria-hidden="true"></span>
+    </button>
     <button class="inline-editor__action-item" data-action="cancel"
-            title="<%= _.__('oro.form.inlineEditing.action.cancel') %>"><i class="fa-ban"></i></button>
+            title="<%= _.__('oro.form.inlineEditing.action.cancel') %>">
+        <span class="fa-ban" aria-hidden="true"></span>
+    </button>
 </div>

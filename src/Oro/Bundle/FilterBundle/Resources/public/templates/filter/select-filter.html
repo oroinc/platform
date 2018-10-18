@@ -1,5 +1,5 @@
 <div class="filter-item oro-drop">
-    <div class="btn filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
+    <div class="btn dropdown-toggle filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
         <% if (showLabel) { %><%- label %><% } %><span class="filter-item-hint"></span>
         <select>
             <% _.each(options, function (option) { %>
@@ -9,6 +9,5 @@
             </option>
             <% }); %>
         </select>
-        <span class="caret"></span>
     </div>
 </div>

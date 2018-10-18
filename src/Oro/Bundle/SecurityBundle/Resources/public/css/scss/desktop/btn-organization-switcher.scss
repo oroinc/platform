@@ -1,0 +1,9 @@
+/* @theme: admin.oro; */
+
+.btn-organization-switcher {
+    color: $btn-organization-switcher-desktop-color;
+    font-size: 17px;
+    cursor: pointer;
+    line-height: inherit;
+    margin-#{$start}: 6px;
+}

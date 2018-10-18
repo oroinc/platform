@@ -1,0 +1,21 @@
+/* @theme: admin.oro; */
+
+$accordion-toggle-background: $primary-900 !default;
+$accordion-toggle-font-size: 14px !default;
+$accordion-toggle-font-weight: bold !default;
+$accordion-toggle-offset: side-values(0 0 8px 0) !default;
+
+$accordion-toggle-before-content: '\f107' !default;
+$accordion-toggle-before-font-family: FontAwesome !default;
+$accordion-toggle-before-font-size: 16px !default;
+$accordion-toggle-before-offset: side-values(0 0 8px 0) !default;
+$accordion-toggle-before-width: 10px !default;
+$accordion-toggle-before-display: inline-block !default;
+
+$accordion-toggle-collapsed-before-content: '\f105' !default;
+$accordion-toggle-collapsed-before-offset: side-values(0 4px 0 0) !default;
+$accordion-toggle-collapsed-before-inner-offset: side-values(0 0 0 4px) !default;
+
+$accordion-group-responsive-section-border-radius: 0 !default;
+$accordion-group-responsive-section-offset-bottom: 0 !default;
+$accordion-group-responsive-section-border: none !default;

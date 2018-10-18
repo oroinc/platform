@@ -129,7 +129,6 @@ define(function(require) {
                 title: __('oro.ui.leave_page_save_data_or_discard_title'),
                 content: __('oro.ui.leave_page_save_data_or_discard'),
                 okText: __('Save'),
-                secondaryText: __('Discard'),
                 className: 'modal modal-primary',
                 cancelText: __('Cancel'),
                 template: require('tpl!oroui/templates/three-buttons-modal.html')

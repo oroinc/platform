@@ -4,6 +4,9 @@ namespace Oro\Bundle\EntityBundle\Cache;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 
+/**
+ * Warmer for logging hydrator classes.
+ */
 class LoggingHydratorWarmer extends CacheWarmer
 {
     /**
@@ -50,6 +53,12 @@ class LoggingHydratorWarmer extends CacheWarmer
             $namespace       = substr($fullClassName, 0, $pos);
             $className       = substr($fullClassName, $pos + 1);
             $parentClassName = $hydrator['class'];
+
+            $countString = 'null === $result ? 0 : count($result)';
+            if ($hydrator['collection'] !== true) {
+                $countString = 'null === $result ? 0 : 1';
+            }
+
             $this->writeCacheFile(
                 $cacheDir . DIRECTORY_SEPARATOR . $className . '.php',
                 <<<PHP
@@ -63,7 +72,7 @@ class $className extends \\$parentClassName
         if (\$logger = \$this->_em->getConfiguration()->getAttribute('OrmProfilingLogger')) {
             \$logger->startHydration('$hydratorName');
             \$result = parent::hydrateAll(\$stmt, \$resultSetMapping, \$hints);
-            \$logger->stopHydration(count(\$result), \$resultSetMapping->getAliasMap());
+            \$logger->stopHydration($countString, \$resultSetMapping->getAliasMap());
             return \$result;
         }
         return parent::hydrateAll(\$stmt, \$resultSetMapping, \$hints);

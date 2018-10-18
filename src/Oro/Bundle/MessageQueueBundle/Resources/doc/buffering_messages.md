@@ -47,8 +47,8 @@ transaction is commited (call `flushBuffer` and then `disableBuffering` methods 
 collected messages from the buffer without sending them when the root transaction is rolled back (call
 `clearBuffer` and then `disableBuffering` methods of the producer).
 
-The watcher service is tagged by `oro.doctrine.connection.transaction_watcher` tag. The Oro Platform handles
-this tag out of the box. But if you use the MessageQueue bundle without the Oro Platform, you need to register the
+The watcher service is tagged by `oro.doctrine.connection.transaction_watcher` tag. OroPlatform handles
+this tag out of the box. But if you use the MessageQueue bundle without OroPlatform, you need to register the
 `Oro\Component\DoctrineUtils\DependencyInjection\AddTransactionWatcherCompilerPass` compiler pass and class loader
 for the transaction watcher aware connection proxy in your application, for example:
 

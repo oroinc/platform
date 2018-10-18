@@ -72,7 +72,7 @@ define(function(require) {
         onWidgetLoad: function(widget) {
             this.resetWidgetFormToActiveTabForm(widget);
 
-            this.$('.nav-tabs a').on('shown .bs.tab', function() {
+            this.$('.nav-tabs a').on('shown.bs.tab', function() {
                 this.resetWidgetFormToActiveTabForm(widget);
                 this.refreshActiveInputWidgets();
             }.bind(this));

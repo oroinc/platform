@@ -60,6 +60,7 @@ oro:
             user_groupes.description: List of system groups
             users_management.label: User Management
             user_create.label: Create User
+            user_menu.label: User menu
             shortcut_new_user.label: Create new User
             shortcut_new_user.description: Create new user instance
             shortcut_list_users.label: Show Users list
