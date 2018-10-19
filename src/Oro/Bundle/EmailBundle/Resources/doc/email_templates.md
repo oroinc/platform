@@ -79,13 +79,9 @@ After these steps, the Twig function "order_line_items" became available for usa
 Please note, that in Emails Templates could be iterated only data sets that contained in plain PHP arrays, not objects or collections. Thereby the custom twig function has to return an array if you need to iterate through this dataset in your Email Templates.
 
 Basic email template structure
-----------------------------------------
+------------------------------
 
-The most important point when creating a template is its structure.
-
-Third-party elements that can not be used in the template according to the rules HTML, should be wrapped in html comment.
-
-**Since the WYSIWYG editor works on the basis of the rules of html, it will automatically modify all blocks inside the twig tags.**
+Beware that HTML email templates are passed to WYSIWYG when being edited. **WYSIWYG automatically tries to modify given HTML according to HTML specification.** Therefore text and tags that violate HTML specification, should be wrapped in HTML comment. For example, no tags or text are allowed between `<table></table>` tags except `thead`, `tbody`, `tfoot`, `th`, `tr`, `td`.
 
 Examples:
 
