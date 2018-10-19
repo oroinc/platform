@@ -8,6 +8,9 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * Assigns|Return active user (current logged in system) action
+ */
 class AssignActiveUser extends AbstractAction
 {
     /** @var TokenStorageInterface */
@@ -39,7 +42,7 @@ class AssignActiveUser extends AbstractAction
             $activeUser = $token->getUser();
         }
 
-        if (!$activeUser) {
+        if (!$activeUser && $this->options['exceptionOnNotFound']) {
             throw new ActionException('Can\'t extract active user');
         }
 
@@ -51,13 +54,20 @@ class AssignActiveUser extends AbstractAction
      */
     public function initialize(array $options)
     {
-        if (count($options) !== 1) {
-            throw new InvalidParameterException('Only one attribute parameter must be defined');
+        if (!in_array(count($options), [1, 2])) {
+            throw new InvalidParameterException('Only one or two attribute parameters must be defined');
         }
 
         if (isset($options[0])) {
             $options['attribute'] = $options[0];
             unset($options[0]);
+        }
+
+        if (isset($options[1])) {
+            $options['exceptionOnNotFound'] = (bool)$options[1];
+        }
+        if (!isset($options['exceptionOnNotFound'])) {
+            $options['exceptionOnNotFound'] = true;
         }
 
         if (!isset($options['attribute'])) {

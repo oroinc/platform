@@ -1,0 +1,70 @@
+{#
+Example:
+
+{% import "oroTranslationBundle::macros.html.twig" as oroTranslations %}
+
+{{ oroTranslations.partialTranslations(editForm.translations, ['title','description']) }}
+{{ oroTranslations.partialTranslations(editForm.translations, ['url']) }}
+#}
+
+{% macro partialTranslations(form, fieldsNames) %}
+    <div class="oro_translations tabbable">
+        <ul class="oro_translationsLocales nav nav-tabs">
+        {% for translationsFields in form %}
+            {% set locale = translationsFields.vars.name %}
+
+            <li class="nav-item{% if app.request.locale == locale %} active{% endif %}">
+                <a href="javascript:void(0)" data-toggle="tab" data-target=".oro_translationsFields-{{ locale }}" class="nav-link">
+                   {{ locale|capitalize }}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+
+        <div class="oro_translationsFields tab-content">
+        {% for translationsFields in form %}
+            {% set locale = translationsFields.vars.name %}
+
+            <div class="oro_translationsFields-{{ locale }} tab-pane {% if app.request.locale == locale %}active{% endif %}">
+            {% for translationsField in translationsFields if translationsField.vars.name in fieldsNames %}
+                {{ form_widget(translationsField) }}
+            {% endfor %}
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro partialTranslationsGedmo(form, fieldsNames) %}
+    <div class="oro_translations tabbable">
+        <ul class="oro_translationsLocales nav nav-tabs">
+        {% for translationsLocales in form %}
+            {% set isDefaultLocale = 'defaultLocale' == translationsLocales.vars.name %}
+
+            {% for translationsFields in translationsLocales %}
+                {% set locale = translationsFields.vars.name %}
+
+                <li class="nav-item{% if app.request.locale == locale %} active{% endif %}">
+                    <a href="javascript:void(0)" data-toggle="tab" data-target=".oro_translationsFields-{{ locale }}" class="nav-link">
+                        {{ locale|capitalize }} {% if isDefaultLocale %}[Default]{% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+        {% endfor %}
+        </ul>
+
+        <div class="oro_translationsFields tab-content">
+        {% for translationsLocales in form %}
+            {% for translationsFields in translationsLocales %}
+                {% set locale = translationsFields.vars.name %}
+
+                <div class="oro_translationsFields-{{ locale }} tab-pane {% if app.request.locale == locale %}active{% endif %}">
+                {% for translationsField in translationsFields if translationsField.vars.name in fieldsNames %}
+                    {{ form_widget(translationsField) }}
+                {% endfor %}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        </div>
+    </div>
+{% endmacro %}

@@ -6,6 +6,10 @@ use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
+ * Provides various kind of functions for working with arrays
+ * example: ArrayUtil::sortBy provides stable sorting alternative to native php functions
+ * see methods documentation for more details
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ArrayUtil
@@ -351,51 +355,6 @@ class ArrayUtil
         array_shift($sortedUniqueInts);
 
         return [$min, $max];
-    }
-
-    /**
-     * Return the values from a single column in the input array
-     *
-     * @link http://php.net/manual/en/function.array-column.php
-     *
-     * @param array $array
-     * @param mixed $columnKey
-     * @param mixed $indexKey
-     *
-     * @return array
-     *
-     * @deprecated since 1.10. Use native array_column instead
-     */
-    public static function arrayColumn(array $array, $columnKey, $indexKey = null)
-    {
-        $result = [];
-
-        if (empty($array)) {
-            return [];
-        }
-
-        if (!isset($columnKey)) {
-            throw new \InvalidArgumentException('Column key is empty');
-        }
-
-        foreach ($array as $item) {
-            if (!isset($item[$columnKey])) {
-                continue;
-            }
-
-            if ($indexKey && !isset($item[$indexKey])) {
-                continue;
-            }
-
-            if ($indexKey) {
-                $index          = $item[$indexKey];
-                $result[$index] = $item[$columnKey];
-            } else {
-                $result[] = $item[$columnKey];
-            }
-        }
-
-        return $result;
     }
 
     /**

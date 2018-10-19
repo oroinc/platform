@@ -5,7 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation\KeySource;
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 
-class TranslationKeySourceTest extends \PHPUnit_Framework_TestCase
+class TranslationKeySourceTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructorDataValidation()
     {

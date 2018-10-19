@@ -13,18 +13,21 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
+class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FormInterface */
+    const FORM_NAME = 'form_name';
+    const FORM_DATA = ['field' => 'data'];
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface */
     protected $form;
 
     /** @var Request */
     protected $request;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
     protected $eventDispatcher;
 
     /** @var IntegrationHandler */
@@ -64,12 +67,14 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessSupportedRequest($method)
     {
+        $this->request->initialize([], [self::FORM_NAME => self::FORM_DATA]);
         $this->request->setMethod($method);
 
+        $this->form->expects($this->any())->method('getName')->willReturn(self::FORM_NAME);
         $this->form->expects($this->once()) ->method('setData')
             ->with($this->entity);
         $this->form->expects($this->once()) ->method('submit')
-            ->with($this->request);
+            ->with(self::FORM_DATA);
 
         $this->assertFalse($this->handler->process($this->entity));
     }
@@ -84,10 +89,12 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessValidData()
     {
+        $this->request->initialize([], [self::FORM_NAME => self::FORM_DATA]);
         $this->request->setMethod('POST');
 
+        $this->form->expects($this->any())->method('getName')->willReturn(self::FORM_NAME);
         $this->form->expects($this->once())->method('setData')->with($this->entity);
-        $this->form->expects($this->once()) ->method('submit') ->with($this->request);
+        $this->form->expects($this->once()) ->method('submit') ->with(self::FORM_DATA);
         $this->form->expects($this->once()) ->method('isValid')
             ->will($this->returnValue(true));
 
@@ -113,8 +120,10 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
         $expectOwnerSetEvent,
         $expectIntegrationUpdateEvent
     ) {
+        $this->request->initialize([], [self::FORM_NAME => self::FORM_DATA]);
         $this->request->setMethod('POST');
 
+        $this->form->expects($this->any())->method('getName')->willReturn(self::FORM_NAME);
         $this->form->expects($this->once())->method('setData')->with($entity)
             ->will(
                 $this->returnCallback(
@@ -123,7 +132,7 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-        $this->form->expects($this->once()) ->method('submit') ->with($this->request);
+        $this->form->expects($this->once()) ->method('submit') ->with(self::FORM_DATA);
         $this->form->expects($this->once()) ->method('isValid')
             ->will($this->returnValue(true));
 

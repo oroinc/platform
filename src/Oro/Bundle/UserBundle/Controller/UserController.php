@@ -9,6 +9,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
+use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -79,17 +80,17 @@ class UserController extends Controller
             throw $this->createAccessDeniedException();
         }
         $userApi = $this->getUserApi($user);
-        $form = $this->createForm('oro_user_apikey_gen', $userApi);
+        $form = $this->createForm(UserApiKeyGenType::class, $userApi);
 
         $request = $this->container->get('request_stack')->getCurrentRequest();
         if ($request->getMethod() === 'POST') {
             $userApi->setApiKey($userApi->generateKey());
             $form->setData($userApi);
-            $form->submit($request);
+            $form->handleRequest($request);
 
             $responseData = ['data' => [], 'status' => 'success'];
             $status = Response::HTTP_OK;
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $this->saveUserApi($user, $userApi);
                 $responseData['data'] = ['apiKey' => $userApi->getApiKey()];
             } else {
@@ -100,6 +101,7 @@ class UserController extends Controller
 
             return new JsonResponse($responseData, $status);
         }
+        $view = $form->createView();
 
         return $this->render(
             'OroUserBundle:User/widget:apiKeyGen.html.twig',

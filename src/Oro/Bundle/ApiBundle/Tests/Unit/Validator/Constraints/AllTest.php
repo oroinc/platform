@@ -5,19 +5,19 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\ApiBundle\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\NotNull;
 
-class AllTest extends \PHPUnit_Framework_TestCase
+class AllTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetTargets()
     {
         $constraint = new All(new NotNull());
-        $this->assertEquals('property', $constraint->getTargets());
+        self::assertEquals('property', $constraint->getTargets());
     }
 
     public function testThatConstraintsPropertyIsSet()
     {
         $childConstraint = new NotNull();
         $constraint = new All($childConstraint);
-        $this->assertEquals([$childConstraint], $constraint->constraints);
+        self::assertEquals([$childConstraint], $constraint->constraints);
     }
 
     /**

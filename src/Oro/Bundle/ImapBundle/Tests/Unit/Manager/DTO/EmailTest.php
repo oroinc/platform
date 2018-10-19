@@ -2,33 +2,215 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 
+use Oro\Bundle\ImapBundle\Mail\Storage\Attachment;
 use Oro\Bundle\ImapBundle\Mail\Storage\Body;
-use Oro\Bundle\ImapBundle\Mail\Storage\Exception\InvalidBodyFormatException;
+use Oro\Bundle\ImapBundle\Mail\Storage\Content;
+use Oro\Bundle\ImapBundle\Mail\Storage\Message;
+use Oro\Bundle\ImapBundle\Mail\Storage\Value;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailAttachment;
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailBody;
 use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
 use Zend\Mail\Header\ContentType;
 
-class EmailTest extends \PHPUnit_Framework_TestCase
+class EmailTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var Message|\PHPUnit\Framework\MockObject\MockObject */
+    private $message;
+
+    /** @var Email */
+    private $email;
+
+    protected function setUp()
+    {
+        $this->message = $this->createMock(Message::class);
+
+        $this->email = new Email($this->message);
+    }
+
     /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @dataProvider getBodyDataProvider
+     *
+     * @param ContentType|null $contentType
+     * @param bool $bodyIsText
+     * @param string $expectedContentType
      */
+    public function testGetBody($contentType, $bodyIsText, $expectedContentType)
+    {
+        $this->assertGetBodyCalled($contentType, $bodyIsText);
+
+        $body = new EmailBody();
+        $body->setContent('testContent')
+            ->setBodyIsText($bodyIsText)
+            ->setOriginalContentType($expectedContentType);
+
+        $this->assertEquals($body, $this->email->getBody());
+
+        //assert data from local cache
+        $this->assertEquals($body, $this->email->getBody());
+    }
+
+    /**
+     * @return array
+     */
+    public function getBodyDataProvider()
+    {
+        return [
+            'text/plain content type' => [
+                'contentType' => ContentType::fromString('Content-Type: text/plain'),
+                'bodyIsText' => true,
+                'expectedContentType' => 'text/plain',
+            ],
+            'text/html content type' => [
+                'contentType' => ContentType::fromString('Content-Type: text/html'),
+                'bodyIsText' => false,
+                'expectedContentType' => 'text/html',
+            ],
+            'empty content type' => [
+                'contentType' => null,
+                'bodyIsText' => true,
+                'expectedContentType' => '',
+            ],
+        ];
+    }
+
+    /**
+     * @param ContentType|null $contentType
+     * @param null $bodyIsText
+     */
+    protected function assertGetBodyCalled($contentType, $bodyIsText)
+    {
+        $srcBodyContent = $this->createMock(Content::class);
+        $srcBodyContent->expects($this->once())
+            ->method('getDecodedContent')
+            ->willReturn('testContent');
+
+        $srcBody = $this->createMock(Body::class);
+        $srcBody->expects($this->once())
+            ->method('getContent')
+            ->with($this->equalTo(!$bodyIsText))
+            ->willReturn($srcBodyContent);
+
+        $this->message->expects($this->once())
+            ->method('getBody')
+            ->willReturn($srcBody);
+
+        $this->message->expects($this->once())
+            ->method('getPriorContentType')
+            ->willReturn($contentType);
+    }
+
+    /**
+     * @dataProvider getAttachmentsDataProvider
+     *
+     * @param array $attachments
+     * @param bool $getBodyCalled
+     * @param ContentType|null $contentType
+     * @param Attachment|null $msgAsAttachment
+     * @param array $expected
+     */
+    public function testGetAttachments(
+        array $attachments,
+        $getBodyCalled,
+        ContentType $contentType = null,
+        Attachment $msgAsAttachment = null,
+        array $expected = []
+    ) {
+        $this->message->expects($this->once())
+            ->method('getAttachments')
+            ->willReturn($attachments);
+
+        if ($getBodyCalled) {
+            $this->assertGetBodyCalled($contentType, true);
+        }
+
+        if ($msgAsAttachment) {
+            $this->message->expects($this->once())
+                ->method('getMessageAsAttachment')
+                ->willReturn($msgAsAttachment);
+        }
+
+        $this->assertEquals($expected, $this->email->getAttachments());
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttachmentsDataProvider()
+    {
+        $attachment = new EmailAttachment();
+        $attachment
+            ->setFileName('fileName')
+            ->setContent('content')
+            ->setContentType('contentType')
+            ->setContentTransferEncoding('contentTransferEncoding');
+
+        return [
+            'with attachments' => [
+                'attachments' => [$this->getAttachmentMock()],
+                'getBodyCalled' => false,
+                'contentType' => null,
+                'messageAsAttachment' => null,
+                'expected' => [$attachment]
+            ],
+            'without attachments, message as attachment' => [
+                'attachments' => [],
+                'getBodyCalled' => true,
+                'contentType' => null,
+                'messageAsAttachment' => $this->getAttachmentMock(),
+                'expected' => [$attachment]
+            ],
+            'without any attachments' => [
+                'attachments' => [],
+                'getBodyCalled' => true,
+                'contentType' => ContentType::fromString('Content-Type: text/plain'),
+                'messageAsAttachment' => null,
+                'expected' => []
+            ],
+        ];
+    }
+
+    /**
+     * @return Attachment|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected function getAttachmentMock()
+    {
+        $srcAttachmentContent = $this->createMock(Content::class);
+        $srcAttachmentContent->expects($this->once())
+            ->method('getContent')
+            ->willReturn('content');
+        $srcAttachmentContent->expects($this->once())
+            ->method('getContentType')
+            ->willReturn('contentType');
+        $srcAttachmentContent->expects($this->once())
+            ->method('getContentTransferEncoding')
+            ->willReturn('contentTransferEncoding');
+
+        $srcAttachmentFileName = $this->createMock(Value::class);
+        $srcAttachmentFileName->expects($this->once())
+            ->method('getValue')
+            ->willReturn('fileName');
+
+        $srcAttachment = $this->createMock(Attachment::class);
+        $srcAttachment->expects($this->once())
+            ->method('getFileName')
+            ->willReturn($srcAttachmentFileName);
+        $srcAttachment->expects($this->once())
+            ->method('getContent')
+            ->willReturn($srcAttachmentContent);
+
+        return $srcAttachment;
+    }
+
     public function testGettersAndSetters()
     {
-        $message = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Message')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $id = new ItemId('testId', 'testChangeKey');
         $sentAt = new \DateTime('now');
         $receivedAt = new \DateTime('now');
         $internalDate = new \DateTime('now');
         $flags = ["\\Test"];
 
-        $obj = new Email($message);
-        $obj
+        $this->email
             ->setId($id)
             ->setSubject('testSubject')
             ->setFrom('testFrom')
@@ -44,94 +226,27 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ->setXMessageId('testXMessageId')
             ->setXThreadId('testXThreadId');
 
-        $this->assertEquals($id, $obj->getId());
-        $this->assertEquals('testSubject', $obj->getSubject());
-        $this->assertEquals('testFrom', $obj->getFrom());
-        $toRecipients = $obj->getToRecipients();
-        $this->assertEquals('testToRecipient', $toRecipients[0]);
-        $ccRecipients = $obj->getCcRecipients();
-        $this->assertEquals('testCcRecipient', $ccRecipients[0]);
-        $bccRecipients = $obj->getBccRecipients();
-        $this->assertEquals('testBccRecipient', $bccRecipients[0]);
-        $this->assertEquals($sentAt, $obj->getSentAt());
-        $this->assertEquals($receivedAt, $obj->getReceivedAt());
-        $this->assertEquals($internalDate, $obj->getInternalDate());
-        $this->assertEquals(1, $obj->getImportance());
-        $this->assertEquals('testMessageId', $obj->getMessageId());
-        $this->assertEquals('testXMessageId', $obj->getXMessageId());
-        $this->assertEquals('testXThreadId', $obj->getXThreadId());
-        $this->assertCount(2, $obj->getMultiMessageId());
-        $this->assertInternalType('array', $obj->getMultiMessageId());
+        $this->assertEquals($id, $this->email->getId());
+        $this->assertEquals('testSubject', $this->email->getSubject());
+        $this->assertEquals('testFrom', $this->email->getFrom());
+        $this->assertEquals('testToRecipient', $this->email->getToRecipients()[0]);
+        $this->assertEquals('testCcRecipient', $this->email->getCcRecipients()[0]);
+        $this->assertEquals('testBccRecipient', $this->email->getBccRecipients()[0]);
+        $this->assertEquals($sentAt, $this->email->getSentAt());
+        $this->assertEquals($receivedAt, $this->email->getReceivedAt());
+        $this->assertEquals($internalDate, $this->email->getInternalDate());
+        $this->assertEquals(1, $this->email->getImportance());
+        $this->assertEquals('testMessageId', $this->email->getMessageId());
+        $this->assertEquals('testXMessageId', $this->email->getXMessageId());
+        $this->assertEquals('testXThreadId', $this->email->getXThreadId());
+        $this->assertCount(2, $this->email->getMultiMessageId());
+        $this->assertInternalType('array', $this->email->getMultiMessageId());
 
-        $contentType = new ContentType();
-        $contentType->setType('text/plain');
-        $message->expects($this->once())
-            ->method('getPriorContentType')
-            ->will($this->returnValue($contentType));
-
-        $srcBodyContent = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Content')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $srcBody = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Body')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $srcBody->expects($this->at(0))
-            ->method('getContent')
-            ->with($this->equalTo(Body::FORMAT_TEXT))
-            ->will($this->returnValue($srcBodyContent));
-        $srcBodyContent->expects($this->once())
-            ->method('getDecodedContent')
-            ->will($this->returnValue('testContent'));
-        $body = new EmailBody();
-        $body->setContent('testContent')->setBodyIsText(true);
-        $message->expects($this->once())
-            ->method('getBody')
-            ->will($this->returnValue($srcBody));
-        $this->assertEquals($body, $obj->getBody());
-        $message->expects($this->exactly(2))
+        $this->message->expects($this->exactly(2))
             ->method('getFlags')
-            ->will($this->returnValue($flags));
-        $this->assertTrue($obj->hasFlag("\\Test"));
-        $this->assertFalse($obj->hasFlag("\\Test2"));
+            ->willReturn($flags);
 
-        $srcAttachmentContent = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Content')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $srcAttachmentFileName = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Value')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $srcAttachment = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Attachment')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $srcAttachment->expects($this->once())
-            ->method('getFileName')
-            ->will($this->returnValue($srcAttachmentFileName));
-        $srcAttachment->expects($this->once())
-            ->method('getContent')
-            ->will($this->returnValue($srcAttachmentContent));
-        $srcAttachmentFileName->expects($this->once())
-            ->method('getValue')
-            ->will($this->returnValue('fileName'));
-        $srcAttachmentContent->expects($this->once())
-            ->method('getContent')
-            ->will($this->returnValue('content'));
-        $srcAttachmentContent->expects($this->once())
-            ->method('getContentType')
-            ->will($this->returnValue('contentType'));
-        $srcAttachmentContent->expects($this->once())
-            ->method('getContentTransferEncoding')
-            ->will($this->returnValue('contentTransferEncoding'));
-        $attachment = new EmailAttachment();
-        $attachment
-            ->setFileName('fileName')
-            ->setContent('content')
-            ->setContentType('contentType')
-            ->setContentTransferEncoding('contentTransferEncoding');
-        $message->expects($this->once())
-            ->method('getAttachments')
-            ->will($this->returnValue(array($srcAttachment)));
-        $attachments = $obj->getAttachments();
-        $this->assertCount(1, $attachments);
-        $this->assertEquals($attachment, $attachments[0]);
+        $this->assertTrue($this->email->hasFlag("\\Test"));
+        $this->assertFalse($this->email->hasFlag("\\Test2"));
     }
 }

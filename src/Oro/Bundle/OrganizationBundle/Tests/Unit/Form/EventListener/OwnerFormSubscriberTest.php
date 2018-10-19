@@ -6,13 +6,14 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class OwnerFormSubscriberTest extends \PHPUnit_Framework_TestCase
+class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 
@@ -147,7 +148,7 @@ class OwnerFormSubscriberTest extends \PHPUnit_Framework_TestCase
         $form->expects($this->once())->method('remove')->with($this->fieldName);
         $form->expects($this->once())->method('add')->with(
             $this->fieldName,
-            'text',
+            TextType::class,
             array(
                 'disabled' => true,
                 'data' => $ownerName,

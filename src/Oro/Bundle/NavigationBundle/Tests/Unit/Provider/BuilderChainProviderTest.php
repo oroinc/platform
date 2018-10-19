@@ -11,20 +11,20 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuItemStub;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
+class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FactoryInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|FactoryInterface
      */
     protected $factory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ArrayLoader
+     * @var \PHPUnit\Framework\MockObject\MockObject|ArrayLoader
      */
     protected $loader;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|MenuManipulator
+     * @var \PHPUnit\Framework\MockObject\MockObject|MenuManipulator
      */
     protected $manipulator;
 
@@ -256,7 +256,7 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|BuilderInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|BuilderInterface
      */
     protected function getMenuBuilderMock()
     {
@@ -320,7 +320,7 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param  string                                   $name
      * @param  null|int                                 $position
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getChildItem($name, $position = null)
     {

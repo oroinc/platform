@@ -6,7 +6,7 @@ use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\LoggerCollectorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class LoggerCollectorPassTest extends \PHPUnit_Framework_TestCase
+class LoggerCollectorPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LoggerCollectorPass
@@ -23,7 +23,7 @@ class LoggerCollectorPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessWhenServiceNotExist()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder $containerBuilder */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder $containerBuilder */
         $containerBuilder = $this->createMock(ContainerBuilder::class);
         $containerBuilder->expects($this->any())
             ->method('hasDefinition')
@@ -36,7 +36,7 @@ class LoggerCollectorPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessWhenServiceExist()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder $containerBuilder */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder $containerBuilder */
         $containerBuilder = $this->createMock(ContainerBuilder::class);
         $containerBuilder->expects($this->any())
             ->method('hasDefinition')

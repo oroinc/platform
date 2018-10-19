@@ -46,7 +46,6 @@ define(function(require) {
         listSelector: '[data-name="list"]',
         loadingSelector: '[data-name="loading"]',
         fallbackSelector: '[data-name="fallback"]',
-        dropdownMenuOptions: null,
 
         /**
          * @type {string}
@@ -70,21 +69,21 @@ define(function(require) {
         template: _.template([
             '<div class="dropdown-menu-collection__fallback" data-name="fallback"><%= fallbackText %></div>',
             '<div class="dropdown-menu-collection__loading" data-name="loading"><%= loadingText %></div>',
-            '<ul class="dropdown-menu-collection__list" data-name="list"></ul>'
+            '<ul class="dropdown-menu-collection__list" data-name="list" role="menu"></ul>'
         ].join('')),
 
         /**
          * @inheritDoc
          */
-        constructor: function DropdownMenuCollectionView() {
-            DropdownMenuCollectionView.__super__.constructor.apply(this, arguments);
+        constructor: function DropdownMenuCollectionView(options) {
+            DropdownMenuCollectionView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['loadingText', 'fallbackText', 'keysMap', 'dropdownMenuOptions']));
+            _.extend(this, _.pick(options, ['loadingText', 'fallbackText', 'keysMap']));
             if (options.keysMap) {
                 var keysMap = options.keysMap;
-                var ItemView = this.itemView = this.itemView.extend({
+                var ItemView = this.itemView = this.itemView.extend({// eslint-disable-line oro/named-constructor
                     getTemplateData: function() {
                         var data = ItemView.__super__.getTemplateData.call(this);
                         data.id = keysMap.id && data[keysMap.id];
@@ -96,21 +95,13 @@ define(function(require) {
             DropdownMenuCollectionView.__super__.initialize.call(this, options);
         },
 
-        render: function() {
-            DropdownMenuCollectionView.__super__.render.call(this);
-            if (this.dropdownMenuOptions) {
-                this.$el.data('options', this.dropdownMenuOptions);
-            }
-            return this;
-        },
-
         getTemplateData: function() {
             var data = DropdownMenuCollectionView.__super__.getTemplateData.call(this);
             _.extend(data, _.pick(this, ['loadingText', 'fallbackText']));
             return data;
         },
 
-        itemView: BaseView.extend({
+        itemView: BaseView.extend({// eslint-disable-line oro/named-constructor
             tagName: 'li',
             template: _.template('<a href="#" data-value="<%= id %>"><%= text %></a>')
         }),

@@ -27,16 +27,12 @@ services:
     oro_api.normalize_value.string:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeString
         tags:
-            - { name: oro.api.processor, action: normalize_value, dataType: string, priority: -10 }
-            - { name: oro.api.processor, action: normalize_value, dataType: guid, priority: -10 }
-            - { name: oro.api.processor, action: normalize_value, dataType: currency, priority: -10 }
+            - { name: oro.api.processor, action: normalize_value, dataType: string|guid|currency, priority: -10 }
 
     oro_api.normalize_value.integer:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeInteger
         tags:
-            - { name: oro.api.processor, action: normalize_value, dataType: integer, priority: -10 }
-            - { name: oro.api.processor, action: normalize_value, dataType: smallint, priority: -10 }
-            - { name: oro.api.processor, action: normalize_value, dataType: duration, priority: -10 }
+            - { name: oro.api.processor, action: normalize_value, dataType: integer|smallint|duration, priority: -10 }
 
     oro_api.normalize_value.bigint:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeBigint
@@ -56,15 +52,12 @@ services:
     oro_api.normalize_value.decimal:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeDecimal
         tags:
-            - { name: oro.api.processor, action: normalize_value, dataType: decimal, priority: -10 }
-            - { name: oro.api.processor, action: normalize_value, dataType: money, priority: -10 }
-            - { name: oro.api.processor, action: normalize_value, dataType: money_value, priority: -10 }
+            - { name: oro.api.processor, action: normalize_value, dataType: decimal|money|money_value, priority: -10 }
 
     oro_api.normalize_value.number:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeNumber
         tags:
-            - { name: oro.api.processor, action: normalize_value, dataType: float, priority: -10 }
-            - { name: oro.api.processor, action: normalize_value, dataType: percent, priority: -10 }
+            - { name: oro.api.processor, action: normalize_value, dataType: float|percent, priority: -10 }
 
     #
     # REST API processors

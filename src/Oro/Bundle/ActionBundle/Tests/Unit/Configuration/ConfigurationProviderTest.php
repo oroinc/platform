@@ -10,7 +10,7 @@ use Oro\Bundle\CacheBundle\Loader\ConfigurationLoader;
 use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     const ROOT_NODE_NAME = 'test_root_node';
     const ROOT_NODE_OPERATION = 'operations';
@@ -19,13 +19,13 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     const BUNDLE2 = 'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2';
     const BUNDLE3 = 'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle3\TestBundle3';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationListConfiguration */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OperationListConfiguration */
     protected $definitionConfiguration;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationConfigurationValidator */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OperationConfigurationValidator */
     protected $definitionConfigurationValidator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheProvider */
     protected $cacheProvider;
 
     protected function setUp()
@@ -39,10 +39,6 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $config = ['test' => 'config'];
 
-        $this->cacheProvider->expects($this->once())
-            ->method('contains')
-            ->with(self::ROOT_NODE_NAME)
-            ->willReturn(true);
         $this->cacheProvider->expects($this->once())
             ->method('fetch')
             ->with(self::ROOT_NODE_NAME)
@@ -146,7 +142,6 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->cacheProvider->expects($this->never())->method('contains');
         $this->cacheProvider->expects($this->never())->method('fetch');
         $this->cacheProvider->expects($this->never())->method('save');
 
@@ -182,7 +177,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetActionConfigurationWithoutCache(array $rawConfig, array $expected)
     {
         $this->cacheProvider->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(self::ROOT_NODE_NAME)
             ->willReturn(false);
 
@@ -285,13 +280,6 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function assertConfigurationCacheBuilt()
     {
-        $this->cacheProvider->expects($this->never())
-            ->method('fetch')
-            ->with(self::ROOT_NODE_NAME);
-        $this->cacheProvider->expects($this->once())
-            ->method('delete')
-            ->with(self::ROOT_NODE_NAME)
-            ->willReturn(true);
         $this->cacheProvider->expects($this->once())
             ->method('save')
             ->with(self::ROOT_NODE_NAME)

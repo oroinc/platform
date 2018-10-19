@@ -1,21 +1,16 @@
-define([
-    'oroui/js/mediator',
-    'oroui/js/app/controllers/base/controller'
-], function(mediator, BaseController) {
+define(function(require) {
     'use strict';
+
+    var mediator = require('oroui/js/mediator');
+    var widgetManager = require('oroui/js/widget-manager');
 
     /**
      * Init Widget Manager's handlers and listeners
      */
-    BaseController.loadBeforeAction([
-        'oroui/js/widget-manager', 'oroui/js/standart-confirmation'
-    ], function(manager) {
-        mediator.setHandler('widgets:getByIdAsync', manager.getWidgetInstance, manager);
-        mediator.setHandler('widgets:getByAliasAsync', manager.getWidgetInstanceByAlias, manager);
-
-        mediator.on('widget_initialize', manager.addWidgetInstance, manager);
-        mediator.on('widget_remove', manager.removeWidget, manager);
-        mediator.on('page:afterChange', manager.resetWidgets, manager);
-    });
+    mediator.setHandler('widgets:getByIdAsync', widgetManager.getWidgetInstance, widgetManager);
+    mediator.setHandler('widgets:getByAliasAsync', widgetManager.getWidgetInstanceByAlias, widgetManager);
+    mediator.on('widget_initialize', widgetManager.addWidgetInstance, widgetManager);
+    mediator.on('widget_remove', widgetManager.removeWidget, widgetManager);
+    mediator.on('page:afterChange', widgetManager.resetWidgets, widgetManager);
 });
 

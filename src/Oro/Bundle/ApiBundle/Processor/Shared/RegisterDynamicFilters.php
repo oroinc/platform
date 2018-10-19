@@ -8,9 +8,11 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\InvalidFilterValueKeyException;
 use Oro\Bundle\ApiBundle\Filter\SelfIdentifiableFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
+use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -20,93 +22,187 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
- * Registers all allowed dynamic filters.
+ * Registers all allowed nested filters and
+ * if the filter group is specified, encloses filters keys
+ * by the "{filter group}[%s]" pattern, e.g. "filter[%s]".
  */
 class RegisterDynamicFilters extends RegisterFilters
 {
+    public const OPERATION_NAME = 'register_dynamic_filters';
+
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var ConfigProvider */
-    protected $configProvider;
+    private $configProvider;
+
+    /** @var string|null */
+    private $filterGroup;
 
     /**
      * @param FilterFactoryInterface $filterFactory
      * @param DoctrineHelper         $doctrineHelper
      * @param ConfigProvider         $configProvider
+     * @param string|null            $filterGroup
      */
     public function __construct(
         FilterFactoryInterface $filterFactory,
         DoctrineHelper $doctrineHelper,
-        ConfigProvider $configProvider
+        ConfigProvider $configProvider,
+        ?string $filterGroup = null
     ) {
         parent::__construct($filterFactory);
         $this->doctrineHelper = $doctrineHelper;
         $this->configProvider = $configProvider;
+        $this->filterGroup = $filterGroup;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(ContextInterface $context)
     {
         /** @var Context $context */
 
+        if ($context->isProcessed(self::OPERATION_NAME)) {
+            // the filters were already registered
+            return;
+        }
+
+        $filterCollection = $context->getFilters();
         $allFilterValues = $context->getFilterValues();
-        $filterValues = $allFilterValues->getGroup('filter');
-        if (!empty($filterValues)) {
-            $filters = $context->getFilters();
-            $knownFilterKeys = [];
+        if ('initialize' === $context->getLastGroup()) {
+            $this->prepareFiltersForDocumentation($filterCollection);
+        } else {
             $renameMap = [];
-            foreach ($filters as $filterKey => $filter) {
+            $knownFilterKeys = [];
+            $filterValues = $this->getFilterValues($allFilterValues);
+            foreach ($filterCollection as $filterKey => $filter) {
                 if ($filter instanceof SelfIdentifiableFilterInterface) {
                     try {
-                        $actualFilterKey = $filter->searchFilterKey($filterValues);
-                        if ($actualFilterKey) {
-                            $knownFilterKeys[$actualFilterKey] = true;
-                            $renameMap[$filterKey] = $actualFilterKey;
+                        $actualFilterKeys = $filter->searchFilterKeys($filterValues);
+                        if (empty($actualFilterKeys)) {
+                            $renameMap[$filterKey] = null;
+                        } else {
+                            foreach ($actualFilterKeys as $actualFilterKey) {
+                                $knownFilterKeys[$actualFilterKey] = true;
+                                $renameMap[$filterKey][] = $actualFilterKey;
+                            }
                         }
                     } catch (InvalidFilterValueKeyException $e) {
-                        $context->addError(
-                            Error::createValidationError(Constraint::FILTER)
-                                ->setInnerException($e)
-                                ->setSource(
-                                    ErrorSource::createByParameter(
-                                        $e->getFilterValue()->getSourceKey() ?: $filterKey
-                                    )
-                                )
-                        );
+                        $actualFilterKey = $filterKey;
+                        if ($this->filterGroup) {
+                            $actualFilterKey = $filterCollection->getGroupedFilterKey($this->filterGroup, $filterKey);
+                        }
+                        $knownFilterKeys[$actualFilterKey] = true;
+                        $renameMap[$filterKey] = null;
+                        $context->addError($this->createInvalidFilterValueKeyError($actualFilterKey, $e));
+                    }
+                } elseif ($this->filterGroup) {
+                    $groupedFilterKey = $filterCollection->getGroupedFilterKey($this->filterGroup, $filterKey);
+                    if ($filter instanceof StandaloneFilterWithDefaultValue
+                        || $allFilterValues->has($groupedFilterKey)
+                    ) {
+                        $knownFilterKeys[$groupedFilterKey] = true;
+                        $renameMap[$filterKey][] = $groupedFilterKey;
+                    } else {
+                        $renameMap[$filterKey] = null;
                     }
                 } elseif ($allFilterValues->has($filterKey)) {
                     $knownFilterKeys[$filterKey] = true;
                 }
             }
-            $this->renameFilters($filters, $renameMap);
-            $this->addDynamicFilters($filters, $filterValues, $knownFilterKeys, $context);
+            $this->renameFilters($filterCollection, $renameMap);
+            $this->addDynamicFilters($filterCollection, $filterValues, $knownFilterKeys, $context);
+        }
+        if ($this->filterGroup) {
+            $filterCollection->setDefaultGroupName($this->filterGroup);
+            $allFilterValues->setDefaultGroupName($this->filterGroup);
+        }
+        $context->setProcessed(self::OPERATION_NAME);
+    }
+
+    /**
+     * @param FilterCollection $filterCollection
+     */
+    private function prepareFiltersForDocumentation(FilterCollection $filterCollection): void
+    {
+        if (!$this->filterGroup) {
+            return;
+        }
+
+        $filters = $filterCollection->all();
+        foreach ($filters as $filterKey => $filter) {
+            $filterCollection->remove($filterKey);
+            $filterCollection->add(
+                $filterCollection->getGroupedFilterKey($this->filterGroup, $filterKey),
+                $filter
+            );
         }
     }
 
     /**
-     * @param FilterCollection $filters
+     * @param FilterValueAccessorInterface $allFilterValues
+     *
+     * @return FilterValue[]
+     */
+    private function getFilterValues(FilterValueAccessorInterface $allFilterValues): array
+    {
+        if ($this->filterGroup) {
+            return $allFilterValues->getGroup($this->filterGroup);
+        }
+
+        return $allFilterValues->getAll();
+    }
+
+    /**
+     * @param string                         $filterKey
+     * @param InvalidFilterValueKeyException $e
+     *
+     * @return Error
+     */
+    private function createInvalidFilterValueKeyError(string $filterKey, InvalidFilterValueKeyException $e): Error
+    {
+        return Error::createValidationError(Constraint::FILTER)
+            ->setInnerException($e)
+            ->setSource(
+                ErrorSource::createByParameter(
+                    $e->getFilterValue()->getSourceKey() ?: $filterKey
+                )
+            );
+    }
+
+    /**
+     * @param FilterCollection $filterCollection
      * @param array            $renameMap
      */
-    protected function renameFilters($filters, $renameMap)
+    private function renameFilters(FilterCollection $filterCollection, array $renameMap): void
     {
-        foreach ($renameMap as $filterKey => $newFilterKey) {
-            $filter = $filters->get($filterKey);
-            $filters->remove($filterKey);
-            $filters->add($newFilterKey, $filter);
+        foreach ($renameMap as $filterKey => $newFilterKeys) {
+            if (null !== $newFilterKeys) {
+                $filter = $filterCollection->get($filterKey);
+                foreach ($newFilterKeys as $newFilterKey) {
+                    $filterCollection->add($newFilterKey, $filter);
+                }
+            }
+            $filterCollection->remove($filterKey);
         }
     }
 
     /**
-     * @param FilterCollection $filters
+     * @param FilterCollection $filterCollection
      * @param FilterValue[]    $filterValues
      * @param string[]         $knownFilterKeys
      * @param Context          $context
      */
-    protected function addDynamicFilters($filters, $filterValues, $knownFilterKeys, $context)
-    {
+    private function addDynamicFilters(
+        FilterCollection $filterCollection,
+        array $filterValues,
+        array $knownFilterKeys,
+        Context $context
+    ): void {
         foreach ($filterValues as $filterKey => $filterValue) {
             if (isset($knownFilterKeys[$filterKey])) {
                 continue;
@@ -114,12 +210,7 @@ class RegisterDynamicFilters extends RegisterFilters
 
             $filter = $this->getFilter($filterValue->getPath(), $context);
             if ($filter) {
-                $filters->add($filterKey, $filter);
-            } else {
-                $context->addError(
-                    Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
-                        ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey() ?: $filterKey))
-                );
+                $filterCollection->add($filterKey, $filter);
             }
         }
     }
@@ -130,30 +221,26 @@ class RegisterDynamicFilters extends RegisterFilters
      *
      * @return StandaloneFilter|null
      */
-    protected function getFilter($propertyPath, Context $context)
+    private function getFilter(string $propertyPath, Context $context): ?StandaloneFilter
     {
-        /** @var ClassMetadata $metadata */
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($context->getClassName(), false);
-        if (!$metadata) {
+        $entityClass = $this->doctrineHelper->getManageableEntityClass(
+            $context->getClassName(),
+            $context->getConfig()
+        );
+        if (!$entityClass) {
+            // only manageable entities or resources based on manageable entities are supported
             return null;
         }
 
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $filterInfo = $this->getFilterInfo($propertyPath, $metadata, $context);
         if (null === $filterInfo) {
             return null;
         }
 
-        list($filterConfig, $propertyPath, $isCollection) = $filterInfo;
-        $filter = $this->createFilter($filterConfig, $propertyPath, $context);
-        if (null !== $filter) {
-            // @todo BAP-11881. Update this code when NEQ operator for to-many collection
-            // will be implemented in Oro\Bundle\ApiBundle\Filter\ComparisonFilter
-            if ($isCollection) {
-                $filter->setSupportedOperators([StandaloneFilter::EQ]);
-            }
-        }
+        list($filterConfig, $propertyPath) = $filterInfo;
 
-        return $filter;
+        return $this->createFilter($filterConfig, $propertyPath, $context);
     }
 
     /**
@@ -161,20 +248,19 @@ class RegisterDynamicFilters extends RegisterFilters
      * @param ClassMetadata $metadata
      * @param Context       $context
      *
-     * @return array|null [filter config, property path, is collection]
+     * @return array|null [filter config, property path]
      */
-    protected function getFilterInfo($propertyPath, ClassMetadata $metadata, Context $context)
+    private function getFilterInfo(string $propertyPath, ClassMetadata $metadata, Context $context): ?array
     {
         $filtersConfig = null;
         $associationPropertyPath = null;
-        $isCollection = false;
 
-        $path = explode('.', $propertyPath);
-        if (count($path) > 1) {
-            $fieldName = array_pop($path);
+        $path = \explode('.', $propertyPath);
+        if (\count($path) > 1) {
+            $fieldName = \array_pop($path);
             $associationInfo = $this->getAssociationInfo($path, $context, $metadata);
             if (null !== $associationInfo) {
-                list($filtersConfig, $associationPropertyPath, $isCollection) = $associationInfo;
+                list($filtersConfig, $associationPropertyPath) = $associationInfo;
             }
         } else {
             $fieldName = $propertyPath;
@@ -189,7 +275,7 @@ class RegisterDynamicFilters extends RegisterFilters
                 if ($associationPropertyPath) {
                     $propertyPath = $associationPropertyPath . '.' . $propertyPath;
                 }
-                $result = [$filterConfig, $propertyPath, $isCollection];
+                $result = [$filterConfig, $propertyPath];
             }
         }
 
@@ -201,9 +287,9 @@ class RegisterDynamicFilters extends RegisterFilters
      * @param Context       $context
      * @param ClassMetadata $metadata
      *
-     * @return array|null [filters config, association property path, is collection]
+     * @return array|null [filters config, association property path]
      */
-    protected function getAssociationInfo(array $path, Context $context, ClassMetadata $metadata)
+    private function getAssociationInfo(array $path, Context $context, ClassMetadata $metadata): ?array
     {
         $targetConfigExtras = [
             new EntityDefinitionConfigExtra($context->getAction()),
@@ -213,7 +299,6 @@ class RegisterDynamicFilters extends RegisterFilters
         $config = $context->getConfig();
         $filters = null;
         $associationPath = [];
-        $isCollection = false;
 
         foreach ($path as $fieldName) {
             $field = $config->getField($fieldName);
@@ -237,16 +322,12 @@ class RegisterDynamicFilters extends RegisterFilters
                 return null;
             }
 
-            if ($metadata->isCollectionValuedAssociation($associationPropertyPath)) {
-                $isCollection = true;
-            }
-
             $metadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
             $config = $targetConfig->getDefinition();
             $filters = $targetConfig->getFilters();
             $associationPath[] = $associationPropertyPath;
         }
 
-        return [$filters, implode('.', $associationPath), $isCollection];
+        return [$filters, \implode('.', $associationPath)];
     }
 }

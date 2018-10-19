@@ -4,12 +4,12 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider;
 
-class ChainVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
+class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainVirtualFieldProvider */
     protected $chainProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject[] */
+    /** @var \PHPUnit\Framework\MockObject\MockObject[] */
     protected $providers = [];
 
     protected function setUp()

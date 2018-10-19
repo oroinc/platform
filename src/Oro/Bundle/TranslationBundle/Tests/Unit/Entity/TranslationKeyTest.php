@@ -5,7 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Entity;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class TranslationKeyTest extends \PHPUnit_Framework_TestCase
+class TranslationKeyTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 

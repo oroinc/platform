@@ -12,14 +12,14 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
 class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityTitleProvider */
-    protected $entityTitleProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityTitleProvider */
+    private $entityTitleProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ExpandedAssociationExtractor */
-    protected $expandedAssociationExtractor;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExpandedAssociationExtractor */
+    private $expandedAssociationExtractor;
 
     /** @var LoadTitleMetaPropertyForCollection */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -153,12 +153,12 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
         $titles = [
             ['entity' => 'Test\Entity', 'id' => 123, 'title' => 'title 123'],
-            ['entity' => 'Test\TargetEntity1', 'id' => 1, 'title' => 'association title 1'],
+            ['entity' => 'Test\TargetEntity1', 'id' => 1, 'title' => 'association title 1']
         ];
 
         $identifierMap = [
             'Test\Entity'        => ['id', [123]],
-            'Test\TargetEntity1' => ['id', [1]],
+            'Test\TargetEntity1' => ['id', [1]]
         ];
 
         $this->expandedAssociationExtractor->expects(self::exactly(4))
@@ -166,7 +166,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ->willReturnMap(
                 [
                     [$config, $expandedAssociations],
-                    [$associationTargetConfig, []],
+                    [$associationTargetConfig, []]
                 ]
             );
         $this->entityTitleProvider->expects(self::once())
@@ -269,12 +269,12 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
         $titles = [
             ['entity' => 'Test\Entity', 'id' => 123, 'title' => 'title 123'],
-            ['entity' => 'Test\TargetEntity1', 'id' => 1, 'title' => 'association title 1'],
+            ['entity' => 'Test\TargetEntity1', 'id' => 1, 'title' => 'association title 1']
         ];
 
         $identifierMap = [
             'Test\Entity'        => ['realId', [123]],
-            'Test\TargetEntity1' => ['associationRealId', [1]],
+            'Test\TargetEntity1' => ['associationRealId', [1]]
         ];
 
         $this->expandedAssociationExtractor->expects(self::exactly(4))
@@ -282,7 +282,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ->willReturnMap(
                 [
                     [$config, $expandedAssociations],
-                    [$associationTargetConfig, []],
+                    [$associationTargetConfig, []]
                 ]
             );
         $this->entityTitleProvider->expects(self::once())
@@ -336,12 +336,12 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
         $titles = [
             ['entity' => 'Test\Entity', 'id' => 123, 'title' => 'title 123'],
-            ['entity' => 'Test\TargetEntity1', 'id' => 1, 'title' => 'association title 1'],
+            ['entity' => 'Test\TargetEntity1', 'id' => 1, 'title' => 'association title 1']
         ];
 
         $identifierMap = [
             'Test\Entity'        => ['id', [123]],
-            'Test\TargetEntity1' => ['associationId', [1]],
+            'Test\TargetEntity1' => ['associationId', [1]]
         ];
 
         $this->expandedAssociationExtractor->expects(self::exactly(4))
@@ -349,7 +349,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ->willReturnMap(
                 [
                     [$config, $expandedAssociations],
-                    [$associationTargetConfig, []],
+                    [$associationTargetConfig, []]
                 ]
             );
         $this->entityTitleProvider->expects(self::once())
@@ -403,11 +403,11 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         ];
 
         $titles = [
-            ['entity' => 'Test\Entity', 'id' => 123, 'title' => 'title 123'],
+            ['entity' => 'Test\Entity', 'id' => 123, 'title' => 'title 123']
         ];
 
         $identifierMap = [
-            'Test\Entity' => ['id', [123]],
+            'Test\Entity' => ['id', [123]]
         ];
 
         $this->expandedAssociationExtractor->expects(self::exactly(2))
@@ -415,7 +415,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ->willReturnMap(
                 [
                     [$config, $expandedAssociations],
-                    [$associationTargetConfig, []],
+                    [$associationTargetConfig, []]
                 ]
             );
         $this->entityTitleProvider->expects(self::once())
@@ -488,12 +488,12 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
                 'entity' => 'Test\TargetEntity1',
                 'id'     => ['associationId1' => 11, 'associationId2' => 22],
                 'title'  => 'association title 1'
-            ],
+            ]
         ];
 
         $identifierMap = [
             'Test\Entity'        => [['id1', 'id2'], [[1, 2]]],
-            'Test\TargetEntity1' => [['associationId1', 'associationId2'], [[11, 22]]],
+            'Test\TargetEntity1' => [['associationId1', 'associationId2'], [[11, 22]]]
         ];
 
         $this->expandedAssociationExtractor->expects(self::exactly(4))
@@ -501,7 +501,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ->willReturnMap(
                 [
                     [$config, $expandedAssociations],
-                    [$associationTargetConfig, []],
+                    [$associationTargetConfig, []]
                 ]
             );
         $this->entityTitleProvider->expects(self::once())

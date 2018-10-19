@@ -26,7 +26,7 @@ services:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_activity.type.multiple_association_choice:
-        class: %oro_activity.type.multiple_association_choice.class%
+        class: '%oro_activity.type.multiple_association_choice.class%'
         arguments:
             - '@oro_entity_extend.association_type_helper'
             - '@oro_entity_config.config_manager'

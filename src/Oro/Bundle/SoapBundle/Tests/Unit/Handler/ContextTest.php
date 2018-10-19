@@ -6,7 +6,7 @@ use Oro\Bundle\SoapBundle\Handler\Context;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ContextTest extends \PHPUnit_Framework_TestCase
+class ContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Request */
     protected $request;

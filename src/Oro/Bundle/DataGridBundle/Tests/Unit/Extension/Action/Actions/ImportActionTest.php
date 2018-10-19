@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Action\Actions;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ImportAction;
 
-class ImportActionTest extends \PHPUnit_Framework_TestCase
+class ImportActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImportAction */
     protected $action;

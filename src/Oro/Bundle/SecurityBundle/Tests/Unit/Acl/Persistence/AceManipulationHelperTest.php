@@ -6,12 +6,12 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\NullAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AceManipulationHelper;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 
-class AceManipulationHelperTest extends \PHPUnit_Framework_TestCase
+class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AceManipulationHelper */
     private $manipulator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $acl;
 
     protected function setUp()

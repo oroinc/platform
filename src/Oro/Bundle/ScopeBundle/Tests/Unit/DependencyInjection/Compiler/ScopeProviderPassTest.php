@@ -6,7 +6,7 @@ use Oro\Bundle\ScopeBundle\DependencyInjection\Compiler\ScopeProviderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ScopeProviderPassTest extends \PHPUnit_Framework_TestCase
+class ScopeProviderPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ScopeProviderPass
@@ -14,7 +14,7 @@ class ScopeProviderPassTest extends \PHPUnit_Framework_TestCase
     protected $compilerPass;
 
     /**
-     * @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $containerBuilder;
 

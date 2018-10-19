@@ -196,13 +196,13 @@ entity_config:
                     page_component_options:  { redirectRoute: 'oro_entityconfig_index', route: 'oro_entityextend_update' }
                 -
                     name:                   oro.entity_extend.entity_config.extend.field.layout_action.update_schema
-                    route:                  'oro_entityextend_attribute_schema_update'
+                    route:                  'oro_entityextend_update'
                     aCss:                   'btn-danger entity-extend-apply'
                     void:                   true
                     filter:                  { upgradeable: true, state: ['New', 'Requires update', 'Deleted', 'Restored'] }
                     display_only:           'attribute'
                     page_component_module:   'oroentityextend/js/schema-update-action-component'
-                    page_component_options:  { route: 'oro_entityextend_attribute_schema_update' }
+                    page_component_options:  { route: 'oro_entityextend_update' }
 
             items:
                 owner:
@@ -251,7 +251,7 @@ entity_config:
                             min:            1
                             max:            255
                     form:
-                        type:               oro_entity_extend_text
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextType
                         options:
                             required:       false
                             label:          oro.entity_extend.entity_config.extend.field.items.length
@@ -274,7 +274,7 @@ entity_config:
                         - Range:
                             min:            0
                     form:
-                        type:               oro_entity_extend_text
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextType
                         options:
                             required:       false
                             label:          oro.entity_extend.entity_config.extend.field.items.precision
@@ -297,7 +297,7 @@ entity_config:
                         - Range:
                             min:            0
                     form:
-                        type:               oro_entity_extend_text
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextType
                         options:
                             required:       false
                             label:          oro.entity_extend.entity_config.extend.field.items.scale
@@ -336,7 +336,7 @@ entity_config:
                             code:           is_extend
                             value:          true
                     form:
-                        type:               oro_entity_relation_type
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\RelationType
                         options:
                             block:          general
                             subblock:       properties
@@ -397,6 +397,12 @@ entity_config:
                 # and this cannot be changed through the config
                 # this attribute is applicable to any type of relations
                 cascade: # array of strings
+                    options:
+                        auditable:          false
+
+                # the type of fetch mode for the relation.
+                # the set of possible values are: 'lazy', 'extra_lazy' and 'eager'
+                fetch: # string
                     options:
                         auditable:          false
 
@@ -487,8 +493,10 @@ entity_config:
                     #        block:          general
                     #        subblock:       properties
                     #        required:       false
-                    #        choices:        ['No', 'Yes']
-                    #        empty_value:    false
+                    #        choices:
+                    #            No:         0
+                    #            Yes:        1
+                    #        placeholder:    false
                     #        label:          oro.entity_extend.enum_public
                     #        tooltip:        oro.entity_extend.enum_public.tooltip
 
@@ -502,7 +510,7 @@ entity_config:
                         allowed_type:       [enum, multiEnum]
                         auditable:          false
                     form:
-                        type:               oro_entity_extend_enum_value_collection
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueCollectionType
                         options:
                             block:          general
                             subblock:       properties
@@ -522,10 +530,12 @@ entity_config:
                             code:           owner
                             value:          Custom
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
-                            empty_value:    false
+                            choices:
+                                No:         0
+                                Yes:        1
+                            placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
                             tooltip:        oro.entity_extend.entity_config.search.entity.items.searchable.tooltip
@@ -542,10 +552,12 @@ entity_config:
                             code:           owner
                             value:          Custom
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
-                            empty_value:    false
+                            choices:
+                                No:         0
+                                Yes:        1
+                            placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
                             tooltip:        oro.entity_extend.entity_config.search.field.items.searchable.tooltip
@@ -560,10 +572,12 @@ entity_config:
                             code:           owner
                             value:          Custom
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
-                            empty_value:    false
+                            choices:
+                                No:         0
+                                Yes:        1
+                            placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.title_field
                             tooltip:        oro.entity_extend.entity_config.search.field.items.title_field.tooltip

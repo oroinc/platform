@@ -279,7 +279,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->getEntityManager()->flush();
 
         $message = $this->getFirstEntitiesChangedMessage();
-        $this->assertCollectionsUpdatedInMessageCount(0, $message);
+        $this->assertCollectionsUpdatedInMessageCount(1, $message);
         $this->assertEntitiesDeletedInMessageCount(0, $message);
         $this->assertEntitiesInsertedInMessageCount(2, $message);
         $this->assertEntitiesUpdatedInMessageCount(0, $message);
@@ -314,7 +314,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->getEntityManager()->flush();
 
         $message = $this->getFirstEntitiesChangedMessage();
-        $this->assertCollectionsUpdatedInMessageCount(0, $message);
+        $this->assertCollectionsUpdatedInMessageCount(1, $message);
         $this->assertEntitiesDeletedInMessageCount(0, $message);
         $this->assertEntitiesInsertedInMessageCount(1, $message);
         $this->assertEntitiesUpdatedInMessageCount(1, $message);
@@ -348,7 +348,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->getEntityManager()->flush();
 
         $message = $this->getFirstEntitiesChangedMessage();
-        $this->assertCollectionsUpdatedInMessageCount(0, $message);
+        $this->assertCollectionsUpdatedInMessageCount(1, $message);
         $this->assertEntitiesDeletedInMessageCount(0, $message);
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(1, $message);
@@ -379,7 +379,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->getEntityManager()->flush();
 
         $message = $this->getFirstEntitiesChangedMessage();
-        $this->assertCollectionsUpdatedInMessageCount(0, $message);
+        $this->assertCollectionsUpdatedInMessageCount(1, $message);
         $this->assertEntitiesDeletedInMessageCount(0, $message);
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(1, $message);
@@ -414,7 +414,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->getEntityManager()->flush();
 
         $message = $this->getFirstEntitiesChangedMessage();
-        $this->assertCollectionsUpdatedInMessageCount(0, $message);
+        $this->assertCollectionsUpdatedInMessageCount(1, $message);
         $this->assertEntitiesDeletedInMessageCount(0, $message);
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(1, $message);
@@ -451,7 +451,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->getEntityManager()->flush();
 
         $message = $this->getFirstEntitiesChangedMessage();
-        $this->assertCollectionsUpdatedInMessageCount(0, $message);
+        $this->assertCollectionsUpdatedInMessageCount(1, $message);
         $this->assertEntitiesDeletedInMessageCount(1, $message);
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(0, $message);
@@ -478,7 +478,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->getEntityManager()->flush();
 
         $message = $this->getFirstEntitiesChangedMessage();
-        $this->assertCollectionsUpdatedInMessageCount(0, $message);
+        $this->assertCollectionsUpdatedInMessageCount(1, $message);
         $this->assertEntitiesDeletedInMessageCount(0, $message);
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(1, $message);

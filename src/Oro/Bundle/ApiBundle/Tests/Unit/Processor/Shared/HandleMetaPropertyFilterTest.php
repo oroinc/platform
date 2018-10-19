@@ -13,19 +13,17 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
 class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $valueNormalizer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
+    private $valueNormalizer;
 
     /** @var HandleMetaPropertyFilter */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->valueNormalizer = $this->getMockBuilder(ValueNormalizer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
         $this->processor = new HandleMetaPropertyFilter($this->valueNormalizer);
     }

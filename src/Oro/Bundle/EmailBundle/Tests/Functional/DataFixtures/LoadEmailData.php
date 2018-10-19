@@ -7,8 +7,11 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -99,7 +102,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
         $adminUser = $om->getRepository('OroUserBundle:User')->findOneByUsername('admin');
 
         foreach ($this->templates as $index => $template) {
-            $owner = $this->getReference('simple_user');
+            $owner = $this->getEmailOwner($om);
             $simpleUser2 = $this->getReference('simple_user2');
             $origin = $this->emailOriginHelper->getEmailOrigin($owner->getEmail());
 
@@ -115,7 +118,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
                 "bcc{$index}@example.com"
             );
 
-            $emailUser->addFolder($origin->getFolder(FolderType::SENT));
+            $emailUser->addFolder($this->getFolder($origin));
             $emailUser->getEmail()->addActivityTarget($owner);
             $emailUser->getEmail()->addActivityTarget($simpleUser2);
             $emailUser->getEmail()->setHead(true);
@@ -150,5 +153,25 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
         $this->setReference('emailUser_for_mass_mark_test', $emailUser);
 
         $this->emailEntityBuilder->getBatch()->persist($om);
+    }
+
+    /**
+     * Returns user object that should be set as email user owner.
+     *
+     * @param ObjectManager $om
+     * @return User
+     */
+    protected function getEmailOwner(ObjectManager $om)
+    {
+        return $this->getReference('simple_user');
+    }
+
+    /**
+     * @param EmailOrigin $origin
+     * @return EmailFolder
+     */
+    protected function getFolder($origin)
+    {
+        return $origin->getFolder(FolderType::SENT);
     }
 }

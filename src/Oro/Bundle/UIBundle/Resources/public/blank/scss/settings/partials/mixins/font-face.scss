@@ -1,0 +1,149 @@
+/* @theme: blank; */
+
+// Use: @include font-face('Lato', '../fonts/lato/lato-regular-webfont', 400, normal);
+@mixin font-face($font-family, $file-path, $font-weight, $font-style) {
+    @font-face {
+        font-family: $font-family;
+        src: url('#{$file-path}.woff') format('woff'),
+            url('#{$file-path}.ttf') format('truetype'),
+            url('#{$file-path}.svg##{$font-family}') format('svg');
+        font-weight: $font-weight;
+        font-style: $font-style;
+    }
+
+    // Chrome for Windows rendering fix: http://www.adtrak.co.uk/blog/font-face-chrome-rendering/
+    @media screen and (-webkit-min-device-pixel-ratio: 0) {
+        @font-face {
+            font-family: $font-family;
+            src: url('#{$file-path}.svg##{$font-family}') format('svg');
+        }
+    }
+}
+
+// Parse list with $fonts and call Mixin font-face();
+// $fonts: (
+//     'main': (
+//         'family': 'Test1',
+//         'variants': (
+//             (
+//                 'path': '...',
+//                 'weight': normal,
+//                 'style': normal
+//             ),
+//             (
+//                 'path': '..',
+//                 'weight': 700,
+//                 'style': normal
+//             )
+//         ),
+//     ),
+//     'secondary': (
+//         'family': 'Test2',
+//         'variants': (
+//             (
+//                 'path': '...',
+//             )
+//         )
+//     )
+// );
+// Use: @include use-font-face($fonts);
+@mixin include-font-face($font-family, $file-path, $font-weigh, $font-style) {
+    @if ($font-family and $file-path) {
+        // Calling mixin font-face(family, path, $weigh, style);
+        @include font-face($font-family, $file-path, $font-weigh, $font-style);
+    } @else {
+        @warn 'Absent family or path keys in a list.';
+    }
+}
+
+@mixin use-font-face($fonts: ()) {
+    // Iterate index;
+    $font-index: 0;
+
+    // List with section keys
+    // ('main', 'secondary', 'icon')
+    $font-names: map_keys($fonts);
+
+    @if (length($fonts) >= 1) {
+        @each $font in $fonts {
+            $font-index: $font-index + 1;
+
+            // Iterate section name
+            // 'main' or 'secondary' or 'icon' or '...'
+            $current-section-name: nth($font-names, $font-index);
+
+            // Iterate section
+            // (
+            //    'family': '...',
+            //    'variants': (
+            //       (
+            //            'path': '...',
+            //            'weight': normal,
+            //            'style': normal
+            //        )
+            //     )
+            //  )
+            $current-section: map_get($fonts, $current-section-name);
+
+            // Iterate 'variants' section
+            // (
+            //     (
+            //         'path': '...',
+            //         'weight': normal,
+            //         'style': normal
+            //     )
+            // )
+
+            // Iterate font variants
+            $font-variants: map_get($current-section, 'variants');
+
+            @if (type-of($font-variants) == 'map' or type-of($font-variants) == 'list') {
+                // Get Iterate section 'family'
+                $font-family: map_get($current-section, 'family');
+
+                // Default value
+                $file-path: null;
+
+                // Default value
+                $font-weigh: normal;
+
+                // Default value
+                $font-style: normal;
+
+                @if (type-of($font-variants) == 'map') {
+                    $file-path: map_get($font-variants, 'path');
+
+                    // Sections 'variants' and 'style' not required.
+                    // Update only if They are defined in iterate  section.
+                    @if (map_has_key($font-variants, 'weight')) {
+                        $font-weigh: map_get($font-variants, 'weight');
+                    }
+                    @if (map_has_key($font-variants, 'style')) {
+                        $font-style: map_get($font-variants, 'style');
+                    }
+
+                    @include include-font-face($font-family, $file-path, $font-weigh, $font-style);
+                }
+
+                @if (type-of($font-variants) == 'list') {
+                    @each $font-variant in $font-variants {
+                        $file-path: map_get($font-variant, 'path');
+
+                        // Sections 'variants' and 'style' not required.
+                        // Update only if They are defined in iterate  section.
+                        @if (map_has_key($font-variant, 'weight')) {
+                            $font-weigh: map_get($font-variant, 'weight');
+                        }
+                        @if (map_has_key($font-variant, 'style')) {
+                            $font-style: map_get($font-variant, 'style');
+                        }
+
+                        @include include-font-face($font-family, $file-path, $font-weigh, $font-style);
+                    }
+                }
+            } @else {
+                @warn 'Section "variants" should be of a "map" or "list" type.';
+            }
+        }
+    }
+}

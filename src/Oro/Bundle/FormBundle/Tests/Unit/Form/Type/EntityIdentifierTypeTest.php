@@ -3,13 +3,10 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class EntityIdentifierTypeTest extends FormIntegrationTestCase
@@ -20,29 +17,41 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
     private $type;
 
     /**
-     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     private $managerRegistry;
 
     /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $entityManager;
 
     /**
-     * @var EntitiesToIdsTransformer|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntitiesToIdsTransformer|\PHPUnit\Framework\MockObject\MockObject
      */
     private $entitiesToIdsTransformer;
 
     protected function setUp()
     {
-        parent::setUp();
         $this->type = $this->getMockBuilder('Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType')
             ->setMethods(array('createEntitiesToIdsTransformer'))
             ->setConstructorArgs(array($this->getMockManagerRegistry()))
             ->getMock();
         $this->type->expects($this->any())->method('createEntitiesToIdsTransformer')
             ->will($this->returnValue($this->getMockEntitiesToIdsTransformer()));
+        parent::setUp();
+    }
+
+    /**
+     * @return array
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension([
+                EntityIdentifierType::class => $this->type
+            ], [])
+        ];
     }
 
     /**
@@ -76,7 +85,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
             $this->addMockExpectedCalls($key, $calls);
         }
 
-        $form = $this->factory->create($this->getTestFormType(), null, $options);
+        $form = $this->factory->create(EntityIdentifierType::class, null, $options);
 
         $form->submit($bindData);
 
@@ -207,7 +216,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
 
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedExceptionMessage);
-        $this->factory->create($this->getTestFormType(), null, $options);
+        $this->factory->create(EntityIdentifierType::class, null, $options);
     }
 
     /**
@@ -289,32 +298,32 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
                 $this->callback(
                     function ($transformer) use ($options, $isMultiple) {
                         if ($isMultiple) {
-                            \PHPUnit_Framework_TestCase::assertInstanceOf(
+                            \PHPUnit\Framework\TestCase::assertInstanceOf(
                                 'Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer',
                                 $transformer
                             );
                         } else {
-                            \PHPUnit_Framework_TestCase::assertInstanceOf(
+                            \PHPUnit\Framework\TestCase::assertInstanceOf(
                                 'Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer',
                                 $transformer
                             );
                         }
-                        \PHPUnit_Framework_TestCase::assertAttributeEquals(
+                        \PHPUnit\Framework\TestCase::assertAttributeEquals(
                             $options['em'],
                             'em',
                             $transformer
                         );
-                        \PHPUnit_Framework_TestCase::assertAttributeEquals(
+                        \PHPUnit\Framework\TestCase::assertAttributeEquals(
                             $options['class'],
                             'className',
                             $transformer
                         );
-                        \PHPUnit_Framework_TestCase::assertAttributeEquals(
+                        \PHPUnit\Framework\TestCase::assertAttributeEquals(
                             $options['property'],
                             'property',
                             $transformer
                         );
-                        \PHPUnit_Framework_TestCase::assertAttributeEquals(
+                        \PHPUnit\Framework\TestCase::assertAttributeEquals(
                             $options['queryBuilder'],
                             'queryBuilderCallback',
                             $transformer
@@ -349,7 +358,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
      *
      * @param string $property
      * @param array $values
-     * @return \PHPUnit_Framework_MockObject_MockObject[]
+     * @return \PHPUnit\Framework\MockObject\MockObject[]
      */
     private function createMockEntityList($property, array $values)
     {
@@ -366,7 +375,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
      *
      * @param string $property
      * @param mixed $value
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     private function createMockEntity($property, $value)
     {
@@ -378,7 +387,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject|string $mock
+     * @param \PHPUnit\Framework\MockObject\MockObject|string $mock
      * @param array $expectedCalls
      */
     private function addMockExpectedCalls($mock, array $expectedCalls)
@@ -406,7 +415,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @return ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMockManagerRegistry()
     {
@@ -418,7 +427,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @return EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMockEntityManager()
     {
@@ -433,7 +442,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return EntitiesToIdsTransformer|\PHPUnit_Framework_MockObject_MockObject
+     * @return EntitiesToIdsTransformer|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMockEntitiesToIdsTransformer()
     {

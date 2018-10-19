@@ -95,8 +95,8 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
             );
 
             $this->assertNotEmpty($permissions);
-        } catch (\PHPUnit_Framework_AssertionFailedError $e) {
-            throw new \PHPUnit_Framework_AssertionFailedError(
+        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+            throw new \PHPUnit\Framework\AssertionFailedError(
                 sprintf(
                     'Failed asserting that enable %s configurable permission for entity %s',
                     $permissionName,
@@ -115,11 +115,11 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
     {
         try {
             $this->assertHasEntityPermission($gridData, $entityClass, $permissionName);
-        } catch (\PHPUnit_Framework_AssertionFailedError $e) {
+        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
             return;
         }
 
-        throw new \PHPUnit_Framework_AssertionFailedError(
+        throw new \PHPUnit\Framework\AssertionFailedError(
             sprintf(
                 'Failed asserting that disable %s configurable permission for entity %s',
                 $entityClass,

@@ -6,13 +6,14 @@ use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\EventListener\SendEmailTransportListener;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
-class SendEmailTransportListenerTest extends \PHPUnit_Framework_TestCase
+class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|UserEmailOrigin */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|UserEmailOrigin */
     protected $userEmailOrigin;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ImapEmailGoogleOauth2Manager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ImapEmailGoogleOauth2Manager */
     protected $imapEmailGoogleOauth2Manager;
 
     protected function setUp()
@@ -33,37 +34,92 @@ class SendEmailTransportListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendWithSmtpConfigured($host, $port, $username, $encryption, $authMode, $password)
     {
-        $transport = new \Swift_SmtpTransport();
-        $encoder = $this->getEncoderMock($password);
+        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransportMock */
+        $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['setHost', 'setPort', 'setEncryption', 'setUsername', 'setPassword', 'setAuthMode'])
+            ->getMock();
+        $streamOptions = ['ssl' => ['verify_peer' => false]];
+        $smtpTransportMock->setStreamOptions($streamOptions);
 
+        $smtpTransportMock->expects($this->once())
+            ->method('setHost')
+            ->with($host)
+            ->willReturnSelf();
+        $smtpTransportMock->expects($this->once())
+            ->method('setEncryption')
+            ->with($encryption)
+            ->willReturnSelf();
+        $smtpTransportMock->expects($this->once())
+            ->method('setPort')
+            ->with($port)
+            ->willReturnSelf();
+        $smtpTransportMock->expects($this->once())
+            ->method('setUsername')
+            ->with($username)
+            ->willReturnSelf();
+
+        $encoder = $this->getEncoderMock($password);
         if ($authMode) {
             $this->imapEmailGoogleOauth2Manager
                 ->expects($this->once())
                 ->method('getAccessTokenWithCheckingExpiration')
                 ->willReturn('test');
+            $smtpTransportMock->expects($this->once())
+                ->method('setAuthMode')
+                ->with($authMode)
+                ->willReturnSelf();
+        } else {
+            $smtpTransportMock->expects($this->once())
+                ->method('setPassword')
+                ->with($password)
+                ->willReturnSelf();
         }
         $sendEmailTransportListener = new SendEmailTransportListener($encoder, $this->imapEmailGoogleOauth2Manager);
 
         $this->prepareUserEmailOriginMock($host, $port, $username, $encryption);
-        $event = $this->prepareEventMock($transport);
+        $event = $this->prepareEventMock($smtpTransportMock);
 
         $sendEmailTransportListener->setSmtpTransport($event);
+        $this->assertSame($streamOptions, $smtpTransportMock->getStreamOptions());
+    }
 
+    public function testNewTransportInstanceCreatedInSetSmtpTransport()
+    {
+        $host = 'host';
+        $port = 442;
+        $encryption = 'tls';
+        $username = 'test';
+        $password = 'pass';
+
+        /** @var \Swift_Transport_AbstractSmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransportMock */
+        $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_AbstractSmtpTransport::class)
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $encoder = $this->getEncoderMock($password);
+        $sendEmailTransportListener = new SendEmailTransportListener($encoder, $this->imapEmailGoogleOauth2Manager);
+
+        $this->prepareUserEmailOriginMock($host, $port, $username, $encryption);
+
+        $event = new SendEmailTransport($this->userEmailOrigin, $smtpTransportMock);
+        $sendEmailTransportListener->setSmtpTransport($event);
+
+        $transport = $event->getTransport();
+        $this->assertInstanceOf(\Swift_SmtpTransport::class, $transport);
         $this->assertEquals($host, $transport->getHost());
         $this->assertEquals($port, $transport->getPort());
+        $this->assertEquals($encryption, $transport->getEncryption());
         $this->assertEquals($username, $transport->getUsername());
         $this->assertEquals($password, $transport->getPassword());
-        $this->assertEquals($authMode, $transport->getAuthMode());
-        $this->assertEquals($encryption, $transport->getEncryption());
     }
 
     /**
      * @param $password
-     * @return \Oro\Bundle\SecurityBundle\Encoder\Mcrypt|\PHPUnit_Framework_MockObject_MockObject
+     * @return SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getEncoderMock($password)
     {
-        $encoder = $this->createMock('Oro\Bundle\SecurityBundle\Encoder\Mcrypt');
+        $encoder = $this->createMock(SymmetricCrypterInterface::class);
         $encoder->expects($this->once())
             ->method('decryptData')
             ->willReturn($password);

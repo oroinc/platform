@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ApiBundle\Form\Type\CollectionType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
@@ -21,7 +21,7 @@ class CollectionTypeTest extends TypeTestCase
         return [
             new ValidatorExtension(Validation::createValidator()),
             new PreloadedExtension(
-                ['collection_entry' => new CollectionEntryType()],
+                [CollectionEntryType::class => new CollectionEntryType()],
                 []
             )
         ];
@@ -29,7 +29,7 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testShouldUseAdder()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|User $entity */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
             ->setMethods(['addGroup', 'removeGroup'])
             ->getMock();
@@ -49,27 +49,27 @@ class CollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new CollectionType(),
+            CollectionType::class,
             [
                 'entry_data_class' => Group::class,
-                'entry_type'       => 'collection_entry'
+                'entry_type'       => CollectionEntryType::class
             ]
         );
         $form = $formBuilder->getForm();
 
-        $entity->expects($this->once())
+        $entity->expects(self::once())
             ->method('addGroup')
             ->with($group2);
-        $entity->expects($this->never())
+        $entity->expects(self::never())
             ->method('removeGroup');
 
         $form->submit(['groups' => [['name' => 'group1'], ['name' => 'group2']]]);
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testShouldUseRemover()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|User $entity */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
             ->setMethods(['addGroup', 'removeGroup'])
             ->getMock();
@@ -91,27 +91,27 @@ class CollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new CollectionType(),
+            CollectionType::class,
             [
                 'entry_data_class' => Group::class,
-                'entry_type'       => 'collection_entry'
+                'entry_type'       => CollectionEntryType::class
             ]
         );
         $form = $formBuilder->getForm();
 
-        $entity->expects($this->never())
+        $entity->expects(self::never())
             ->method('addGroup');
-        $entity->expects($this->once())
+        $entity->expects(self::once())
             ->method('removeGroup')
-            ->with($this->identicalTo($group2));
+            ->with(self::identicalTo($group2));
 
         $form->submit(['groups' => [['name' => 'group1']]]);
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testShouldUpdateExistingEntity()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|User $entity */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
             ->setMethods(['addGroup', 'removeGroup'])
             ->getMock();
@@ -129,28 +129,28 @@ class CollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new CollectionType(),
+            CollectionType::class,
             [
                 'entry_data_class' => Group::class,
-                'entry_type'       => 'collection_entry'
+                'entry_type'       => CollectionEntryType::class
             ]
         );
         $form = $formBuilder->getForm();
 
-        $entity->expects($this->never())
+        $entity->expects(self::never())
             ->method('addGroup');
-        $entity->expects($this->never())
+        $entity->expects(self::never())
             ->method('removeGroup');
 
         $form->submit(['groups' => [['name' => 'group2']]]);
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertEquals('group2', $group1->getName());
+        self::assertEquals('group2', $group1->getName());
     }
 
     public function testShouldUseRemoverWhenRemoveAllItems()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|User $entity */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
             ->setMethods(['addGroup', 'removeGroup'])
             ->getMock();
@@ -168,27 +168,27 @@ class CollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new CollectionType(),
+            CollectionType::class,
             [
                 'entry_data_class' => Group::class,
-                'entry_type'       => 'collection_entry'
+                'entry_type'       => CollectionEntryType::class
             ]
         );
         $form = $formBuilder->getForm();
 
-        $entity->expects($this->never())
+        $entity->expects(self::never())
             ->method('addGroup');
-        $entity->expects($this->once())
+        $entity->expects(self::once())
             ->method('removeGroup')
-            ->with($this->identicalTo($group1));
+            ->with(self::identicalTo($group1));
 
         $form->submit(['groups' => []]);
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testShouldValidateEntryEntity()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|User $entity */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
             ->setMethods(['addGroup', 'removeGroup'])
             ->getMock();
@@ -206,44 +206,38 @@ class CollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new CollectionType(),
+            CollectionType::class,
             [
                 'entry_data_class' => Group::class,
-                'entry_type'       => 'collection_entry'
+                'entry_type'       => CollectionEntryType::class
             ]
         );
         $form = $formBuilder->getForm();
 
-        $entity->expects($this->never())
+        $entity->expects(self::never())
             ->method('addGroup');
-        $entity->expects($this->never())
+        $entity->expects(self::never())
             ->method('removeGroup');
 
         $form->submit(['groups' => ['']]);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertFalse($form->isValid());
-        $this->assertCount(0, $form->getErrors());
-        $this->assertCount(0, $form->get('groups')->getErrors());
-        $this->assertCount(1, $form->get('groups')->get(0)->getErrors());
+        self::assertTrue($form->isSynchronized());
+        self::assertFalse($form->isValid());
+        self::assertCount(0, $form->getErrors());
+        self::assertCount(0, $form->get('groups')->getErrors());
+        self::assertCount(1, $form->get('groups')->get(0)->getErrors());
     }
 
     public function testWithInvalidValue()
     {
         $form = $this->factory->create(
-            new CollectionType(),
+            CollectionType::class,
             null,
             [
                 'entry_data_class' => Group::class,
-                'entry_type'       => 'collection_entry'
+                'entry_type'       => CollectionEntryType::class
             ]
         );
         $form->submit('test');
-        $this->assertFalse($form->isSynchronized());
-    }
-
-    public function testGetName()
-    {
-        $type = new CollectionType();
-        $this->assertEquals('oro_api_collection', $type->getName());
+        self::assertFalse($form->isSynchronized());
     }
 }

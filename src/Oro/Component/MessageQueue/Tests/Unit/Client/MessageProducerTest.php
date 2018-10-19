@@ -11,7 +11,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class MessageProducerTest extends \PHPUnit_Framework_TestCase
+class MessageProducerTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 
@@ -444,7 +444,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DriverInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|DriverInterface
      */
     protected function createDriverStub($config = null, $queue = null)
     {

@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Testing\Validator;
 
-use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest as ParentTest;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase as ParentTest;
 
 abstract class AbstractConstraintValidatorTest extends ParentTest
 {

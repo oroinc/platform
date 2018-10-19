@@ -3,8 +3,10 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form;
 
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetDateType;
+use Oro\Bundle\FormBundle\Form\Type\OroDateType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
-class WidgetDateTypeTest extends \PHPUnit_Framework_TestCase
+class WidgetDateTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetDateType */
     protected $formType;
@@ -12,11 +14,6 @@ class WidgetDateTypeTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->formType = new WidgetDateType();
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_type_widget_date', $this->formType->getName());
     }
 
     public function testBuildFormWithDate()
@@ -29,10 +26,10 @@ class WidgetDateTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
         $builder->expects($this->at(0))
             ->method('add')
-            ->with('useDate', 'checkbox');
+            ->with('useDate', CheckboxType::class);
         $builder->expects($this->at(1))
             ->method('add')
-            ->with('date', 'oro_date');
+            ->with('date', OroDateType::class);
         $this->formType->buildForm($builder, ['enable_date' => true]);
     }
 
@@ -43,7 +40,7 @@ class WidgetDateTypeTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $builder->expects($this->once())
             ->method('add')
-            ->with('useDate', 'checkbox')
+            ->with('useDate', CheckboxType::class)
             ->will($this->returnSelf());
         $this->formType->buildForm($builder, ['enable_date' => false]);
     }

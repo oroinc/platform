@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SSOBundle\Tests\Entity;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider;
 use Oro\Bundle\SSOBundle\Tests\Unit\Stub\TestingUser;
@@ -12,7 +13,7 @@ use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 
-class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
+class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
 {
     const USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
     const TEST_NAME  = 'Jack';
@@ -29,17 +30,17 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
     protected $userManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $om;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $repository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $cm;
 
@@ -49,7 +50,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
     protected $oauthProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $registry;
 
@@ -90,7 +91,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $class->expects($this->any())
             ->method('getName')
             ->will($this->returnValue(static::USER_CLASS));
-        /** @var EnumValueProvider|\PHPUnit_Framework_MockObject_MockObject $enumValueProvider */
+        /** @var EnumValueProvider|\PHPUnit\Framework\MockObject\MockObject $enumValueProvider */
         $enumValueProvider = $this->getMockBuilder(EnumValueProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -102,7 +103,13 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
                 return new StubEnumValue($id, $id, 0, false);
             }
         );
-        $this->userManager = new UserManager(static::USER_CLASS, $this->registry, $ef, $enumValueProvider);
+        $this->userManager = new UserManager(
+            static::USER_CLASS,
+            $this->registry,
+            $ef,
+            $enumValueProvider,
+            $this->createMock(ConfigManager::class)
+        );
 
         $this->oauthProvider = new OAuthUserProvider($this->userManager, $this->cm);
     }

@@ -17,16 +17,16 @@ use Symfony\Component\DependencyInjection\Container;
 
 class DoctrineListenerTest extends OrmTestCase
 {
-    /** @var MultiEnumManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var MultiEnumManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $enumManager;
 
-    /** @var ExtendMetadataBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExtendMetadataBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $metadataBuilder;
 
     /** @var AnnotationReader */
     protected $reader;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendConfigProvider;
 
     /** @var DoctrineListener */

@@ -9,9 +9,9 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * EntityConfig controller.
  * @Route("/entity/config")
- * TODO: Discuss ACL impl., currently management of configurable entities can be on or off only
+ * BAP-17635 Discuss ACL impl., currently management of configurable entities can be on or off only
  * @Acl(
  *      id="oro_entityconfig_manage",
  *      label="oro.entity_config.action.manage",
@@ -98,15 +98,15 @@ class ConfigController extends Controller
             ->find($id);
 
         $form = $this->createForm(
-            'oro_entity_config_type',
+            ConfigType::class,
             null,
             ['config_model' => $entity]
         );
 
         if ($request->getMethod() == 'POST') {
-            $form->submit($request);
+            $form->handleRequest($request);
 
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 //persist data inside the form
                 $this->get('session')->getFlashBag()->add(
                     'success',
@@ -168,7 +168,6 @@ class ConfigController extends Controller
     }
 
     /**
-     * TODO: Check if this method ever used
      * Lists Entity fields
      * @Route("/fields/{id}", name="oro_entityconfig_fields", requirements={"id"="\d+"}, defaults={"id"=0})
      * @Template()

@@ -3,13 +3,13 @@
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\DataCollector;
 
 use Oro\Bundle\LoggerBundle\DataCollector\LoggerDataCollector;
-use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Oro\Bundle\LoggerBundle\Tests\Unit\Stub\DebugLoggerStub;
 
-class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
+class LoggerDataCollectorTest extends \PHPUnit\Framework\TestCase
 {
     public function testLateCollect()
     {
-        $logger = $this->createMock(DebugLoggerInterface::class);
+        $logger = $this->createMock(DebugLoggerStub::class);
         $logger->expects($this->once())
             ->method('countErrors');
         $logger->expects($this->any())

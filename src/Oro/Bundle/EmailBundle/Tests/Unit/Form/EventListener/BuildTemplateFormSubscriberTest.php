@@ -3,16 +3,17 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
+class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var BuildTemplateFormSubscriber */
     protected $listener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $tokenStorage;
 
@@ -109,10 +110,11 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(array('auto_initialize' => true)));
 
         $formType   = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $formType->expects($this->once())->method('getName')
-            ->will($this->returnValue('template'));
         $configMock->expects($this->once())->method('getType')
             ->will($this->returnValue($formType));
+        $formType->expects($this->once())
+            ->method('getInnerType')
+            ->willReturn(new SubmitType());
 
         $fieldMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()
@@ -168,10 +170,11 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(array('auto_initialize' => true)));
 
         $formType   = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $formType->expects($this->once())->method('getName')
-            ->will($this->returnValue('template'));
         $configMock->expects($this->once())->method('getType')
             ->will($this->returnValue($formType));
+        $formType->expects($this->once())
+            ->method('getInnerType')
+            ->willReturn(new SubmitType());
 
         $fieldMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()

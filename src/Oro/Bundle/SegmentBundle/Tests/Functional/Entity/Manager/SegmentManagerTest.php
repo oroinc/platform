@@ -33,7 +33,13 @@ class SegmentManagerTest extends WebTestCase
             LoadUserData::class
         ]);
 
-        $this->manager = $this->getContainer()->get('oro_segment.segment_manager');
+        $this->manager = self::getContainer()->get('oro_segment.segment_manager');
+    }
+
+    protected function tearDown()
+    {
+        self::getContainer()->get('oro_segment.segment_manager.cache')->flushAll();
+        parent::tearDown();
     }
 
     public function testGetSegmentTypeChoices()
@@ -44,8 +50,8 @@ class SegmentManagerTest extends WebTestCase
         $staticSegment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
 
         $this->assertEquals([
-            $dynamicSegment->getType()->getName() => $dynamicSegment->getType()->getLabel(),
-            $staticSegment->getType()->getName() => $staticSegment->getType()->getLabel(),
+            $dynamicSegment->getType()->getLabel() => $dynamicSegment->getType()->getName(),
+            $staticSegment->getType()->getLabel() => $staticSegment->getType()->getName(),
         ], $this->manager->getSegmentTypeChoices());
     }
 

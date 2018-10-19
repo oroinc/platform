@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-class NumberFilterTest extends \PHPUnit_Framework_TestCase
+class NumberFilterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var NumberFilter
@@ -36,12 +36,12 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
     protected $parameterName = 'parameter_name';
 
     /**
-     * @var FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $formFactory;
 
     /**
-     * @var FilterUtility|\PHPUnit_Framework_MockObject_MockObject
+     * @var FilterUtility|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $filterUtility;
 
@@ -357,9 +357,9 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
     public function testGetMetadata()
     {
         $form = $this->createMock(FormInterface::class);
-        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
+        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = $this->createMock(FormView::class);
-        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $typeView */
+        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $typeView */
         $typeView = $this->createMock(FormView::class);
         $typeView->vars['choices'] = [];
         $view->vars['formatter_options'] = ['decimals' => 0, 'grouping' => false];
@@ -401,7 +401,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
      */
     protected function prepareDatasource()
     {
-        /* @var $em EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $em EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
         $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
         $em->expects($this->any())
             ->method('getExpressionBuilder')

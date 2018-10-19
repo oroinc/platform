@@ -4,10 +4,18 @@ namespace Oro\Component\EntitySerializer;
 
 use Doctrine\Common\Util\ClassUtils;
 
+/**
+ * Reads property values from entity objects or arrays.
+ */
 class EntityDataAccessor implements DataAccessorInterface
 {
+    private const NO_GETTER = '';
+
     /** @var \ReflectionClass[] */
     private $reflCache = [];
+
+    /** @var array [class name => [property name => getter name, ...], ...] */
+    private $getterCache = [];
 
     /**
      * {@inheritdoc}
@@ -15,16 +23,9 @@ class EntityDataAccessor implements DataAccessorInterface
     public function hasGetter($className, $property)
     {
         $reflClass = $this->getReflectionClass($className);
-
         $getter = $this->findGetterName($reflClass, $property);
-        if ($getter) {
-            return true;
-        }
-        if ($reflClass->hasProperty($property)) {
-            return true;
-        }
 
-        return false;
+        return $getter || $reflClass->hasProperty($property);
     }
 
     /**
@@ -32,31 +33,27 @@ class EntityDataAccessor implements DataAccessorInterface
      */
     public function tryGetValue($object, $property, &$value)
     {
-        if (is_array($object)) {
-            if (array_key_exists($property, $object)) {
+        $hasValue = false;
+        if (\is_array($object)) {
+            if (\array_key_exists($property, $object)) {
+                $hasValue = true;
                 $value = $object[$property];
-
-                return true;
             }
         } else {
-            $reflClass = $this->getReflectionClass(get_class($object));
-
+            $reflClass = $this->getReflectionClass(\get_class($object));
             $getter = $this->findGetterName($reflClass, $property);
             if ($getter) {
+                $hasValue = true;
                 $value = $object->{$getter}();
-
-                return true;
-            }
-            if ($reflClass->hasProperty($property)) {
+            } elseif ($reflClass->hasProperty($property)) {
+                $hasValue = true;
                 $prop = $reflClass->getProperty($property);
                 $prop->setAccessible(true);
                 $value = $prop->getValue($object);
-
-                return true;
             }
         }
 
-        return false;
+        return $hasValue;
     }
 
     /**
@@ -66,22 +63,14 @@ class EntityDataAccessor implements DataAccessorInterface
     {
         $value = null;
         if (!$this->tryGetValue($object, $property, $value)) {
-            if (is_array($object)) {
-                throw new \RuntimeException(
-                    sprintf(
-                        'Cannot get a value of "%s" field.',
-                        $property
-                    )
+            $message = \is_array($object)
+                ? \sprintf('Cannot get a value of "%s" field.', $property)
+                : \sprintf(
+                    'Cannot get a value of "%s" field from "%s" entity.',
+                    $property,
+                    ClassUtils::getClass($object)
                 );
-            } else {
-                throw new \RuntimeException(
-                    sprintf(
-                        'Cannot get a value of "%s" field from "%s" entity.',
-                        $property,
-                        ClassUtils::getClass($object)
-                    )
-                );
-            }
+            throw new \RuntimeException($message);
         };
 
         return $value;
@@ -96,7 +85,7 @@ class EntityDataAccessor implements DataAccessorInterface
      */
     protected function camelize($string)
     {
-        return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
+        return \strtr(\ucwords(\strtr($string, ['_' => ' '])), [' ' => '']);
     }
 
     /**
@@ -126,6 +115,24 @@ class EntityDataAccessor implements DataAccessorInterface
      */
     protected function findGetterName(\ReflectionClass $reflClass, $property)
     {
+        if (isset($this->getterCache[$reflClass->name][$property])) {
+            $getterName = $this->getterCache[$reflClass->name][$property];
+        } else {
+            $getterName = $this->getGetterName($reflClass, $property);
+            $this->getterCache[$reflClass->name][$property] = $getterName;
+        }
+
+        return self::NO_GETTER === $getterName ? null : $getterName;
+    }
+
+    /**
+     * @param \ReflectionClass $reflClass
+     * @param string           $property
+     *
+     * @return string
+     */
+    protected function getGetterName(\ReflectionClass $reflClass, $property)
+    {
         $camelized = $this->camelize($property);
 
         $getter = 'get' . $camelized;
@@ -140,19 +147,19 @@ class EntityDataAccessor implements DataAccessorInterface
         if ($this->isGetter($reflClass, $getter)) {
             return $getter;
         }
-        $getter = lcfirst($camelized);
+        $getter = \lcfirst($camelized);
         if ($this->isGetter($reflClass, $getter)) {
             return $getter;
         }
 
-        return null;
+        return self::NO_GETTER;
     }
 
     /**
      * @param \ReflectionClass $reflClass
      * @param string           $methodName
      *
-     * @return string|null
+     * @return bool
      */
     protected function isGetter(\ReflectionClass $reflClass, $methodName)
     {

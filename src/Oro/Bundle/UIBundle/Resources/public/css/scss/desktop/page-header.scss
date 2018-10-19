@@ -1,0 +1,94 @@
+/* @theme: admin.oro; */
+
+.container-fluid.page-title {
+    padding-#{$end}: 0;
+    padding-#{$start}: $content-padding;
+
+    .navbar-extra > .row {
+        > .pull-right {
+            max-width: calc(100% - 180px);
+
+            > .title-buttons-container {
+                text-align: #{$end};
+
+                > .pull-left,
+                > .btn-group {
+                    text-align: #{$start};
+                    display: inline-block;
+                    margin-bottom: 4px;
+                    vertical-align: top;
+                }
+
+                > .pinned-dropdown > .btn-group {
+                    text-align: #{$start};
+                }
+            }
+
+            .separator-btn {
+                margin-top: 2px;
+            }
+        }
+
+        > .pull-left + .pull-right {
+            max-width: none;
+        }
+    }
+
+    .page-title-center.under-left-block {
+        clear: #{$start};
+        position: relative;
+        top: 8px;
+    }
+
+    .navigation {
+        .row {
+            display: flex;
+            align-items: center;
+
+            > .pull-left-extra {
+                width: 100%;
+                margin-#{$start}: 0;
+            }
+
+            > .pull-right {
+                max-width: 100%;
+                flex-shrink: 0;
+            }
+        }
+    }
+
+    .customer-content {
+        .top-row {
+            .pull-left {
+                float: none;
+                display: inline;
+            }
+        }
+    }
+}
+
+.customer-info {
+    h1 {
+        margin: 0 0 3px;
+
+        &.user-name {
+            margin-#{$end}: 5px;
+        }
+    }
+
+    .sub-title {
+        a {
+            color: $link-color;
+
+            &:hover {
+                color: $link-color-hover;
+            }
+        }
+    }
+
+    .sub-title,
+    .separator,
+    .user-name {
+        display: inline;
+    }
+}

@@ -5,11 +5,11 @@ namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 
-class EntityPaginationManagerTest extends \PHPUnit_Framework_TestCase
+class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
 {
     const WRONG_SCOPE = 'wrong_scope';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var EntityPaginationManager */

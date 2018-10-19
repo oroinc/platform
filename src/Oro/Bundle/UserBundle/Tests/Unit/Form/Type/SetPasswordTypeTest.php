@@ -5,9 +5,11 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Form\Type\SetPasswordType;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
+class SetPasswordTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SetPasswordType */
     protected $formType;
@@ -41,7 +43,7 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $builder->expects($this->once())->method('add')
-            ->with('password', 'password', [
+            ->with('password', PasswordType::class, [
                 'required'      => true,
                 'label'         => 'oro.user.new_password.label',
                 'tooltip' => 'test',
@@ -57,14 +59,9 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType->buildForm($builder, []);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_set_password', $this->formType->getName());
-    }
-
     public function testGetParent()
     {
-        $this->assertEquals('text', $this->formType->getParent());
+        $this->assertEquals(TextType::class, $this->formType->getParent());
     }
 
     public function testConfigureOptions()

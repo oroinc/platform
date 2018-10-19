@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
+/**
+ * The class that contains a set of methods to simplify execution of console commands.
+ */
 class CommandExecutor
 {
     const DEFAULT_TIMEOUT = 300;
@@ -47,13 +50,6 @@ class CommandExecutor
 
     /** @var array */
     protected $defaultOptions;
-
-    /**
-     * @var int
-     *
-     * @deprecated since 1.8. Use {@see getDefaultOption('process-timeout')} instead
-     */
-    protected $defaultTimeout = self::DEFAULT_TIMEOUT;
 
     /**
      * Constructor
@@ -129,12 +125,15 @@ class CommandExecutor
             $this->lastCommandLine = $process->getCommandLine();
 
             $output = $this->output;
-            $process->run(
-                function ($type, $data) use ($output) {
-                    $output->write($data);
-                }
-            );
-            $this->lastCommandExitCode = $process->getExitCode();
+            try {
+                $process->run(
+                    function ($type, $data) use ($output) {
+                        $output->write($data);
+                    }
+                );
+            } finally {
+                $this->lastCommandExitCode = $process->getExitCode();
+            }
 
             // synchronize all data caches
             if ($this->dataCacheManager) {
@@ -148,7 +147,11 @@ class CommandExecutor
             $this->lastCommandLine = '';
 
             $this->application->setAutoExit(false);
-            $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
+            try {
+                $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
+            } finally {
+                $this->application->setAutoExit(true);
+            }
         }
 
         $this->processResult($ignoreErrors);
@@ -299,26 +302,6 @@ class CommandExecutor
     protected function getPhp()
     {
         return self::getPhpExecutable();
-    }
-
-    /**
-     * @return int
-     *
-     * @deprecated since 1.8. Use {@see getDefaultOption('process-timeout')} instead
-     */
-    public function getDefaultTimeout()
-    {
-        return $this->getDefaultOption('process-timeout');
-    }
-
-    /**
-     * @param int $defaultTimeout
-     *
-     * @deprecated since 1.8. Use {@see setDefaultOption('process-timeout', $timeout)} instead
-     */
-    public function setDefaultTimeout($defaultTimeout)
-    {
-        $this->setDefaultOption('process-timeout', $defaultTimeout);
     }
 
     /**

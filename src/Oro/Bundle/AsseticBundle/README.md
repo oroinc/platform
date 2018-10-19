@@ -1,14 +1,11 @@
-OroAsseticBundle
-================
+# OroAsseticBundle
 
-OroAsseticBundle is based on AsseticBundle and enables expandable and optimized way to manage CSS assets that are
-distributed across many bundles.
+OroAsseticBundle introduces configuration of CSS files groups via the assets.yml file, which can be configured in any active bundle. Such files are automatically merged and optimized for a web presentation.
+ 
+## Overview
+ 
+Example of an assets.yml file:
 
-With OroAsseticBundle developer can define CSS files groups in assets.yml configuration of the bundle. Defined files
-will be automatically merged and optimized for web presentation. For development and debug purposes some files can
-be excluded from optimization process.
-
-Example of assets.yml file:
 ```yaml
 assets:
     css:
@@ -22,44 +19,56 @@ assets:
             - 'Second/Assets/Path/To/Css/third.css'
 ```
 
-CSS section contain groups of files. This groups can be excluded from optimization process debugging purposes.
+The CSS section contains groups of files. These groups can be excluded from optimization process to simplify debugging purposes.
 
-The path to file can be defined as bundles/bundle/path/to/file.ext. There is a command "assets:install" that should be
+The path to the file can be defined as bundles/bundle/path/to/file.ext. There is an `assets:install` command that should be
 used for correct work.
 
-To turn off compression of css files in 'css_group' group the following configuration should be added
-to app/config/config.yml (or app/config/config_{mode}.yml) file:
+To turn off compression of the css files in the `css_group` group, the following configuration should be added
+to the config/config.yml (or config/config_{mode}.yml) file:
 
 ```yaml
 oro_assetic:
     css_debug: [css_group]
 ```
 
-In order to enable debug mode for all CSS files following configuration can be applied:
+To enable a debug mode for all CSS files, the following configuration should be used:
 
 ```yaml
 oro_assetic:
     css_debug_all: true
 ```
 
-After this configuration was changed cleanup and assets install required:
+After this configuration change, the cleanup and assets install is required:
 
 ```php
-php app/console cache:clear
-php app/console assets:install
+php bin/console cache:clear
+php bin/console assets:install
 ```
 
-To get list of all available asset groups next command should be used:
+To get the list of all available asset groups, the following command should be used:
 
 ```php
-php app/console oro:assetic:groups
+php bin/console oro:assetic:groups
 ```
 
-The next code must be added in main template:
+The following code must be added to the main template:
 
 ```
     {% oro_css filter='array with filters' output='css/name_of_output_file.css' %}
         <link rel="stylesheet" media="all" href="{{ asset_url }}" />
     {% endoro_css %}
 ```
-These tag is the same as AsseticBundle's "stylesheet" tag but without list of files.
+This tag is similar to the AsseticBundle `stylesheet` tag, but without the list of files.
+
+## Excluding bundles from assetic
+
+By default all bundles are included into assetic unless the whitelist is defined with the `assetic.bundles` configuration.
+Oro Assetic bundle provides ability to exclude only specific bundles with `oro_assetic.excluded_bundles`
+
+```yaml
+oro_assetic:
+    excluded_bundles:
+        - DoctrineBundle
+```
+

@@ -88,7 +88,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalMessageConsumer
+     * @return \PHPUnit\Framework\MockObject\MockObject|DbalMessageConsumer
      */
     private function createMessageConsumerMock()
     {

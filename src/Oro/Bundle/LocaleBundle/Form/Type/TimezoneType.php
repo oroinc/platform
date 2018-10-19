@@ -4,8 +4,12 @@ namespace Oro\Bundle\LocaleBundle\Form\Type;
 
 use Doctrine\Common\Cache\Cache;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type that can be used to select timezone.
+ */
 class TimezoneType extends AbstractType
 {
     /**
@@ -33,16 +37,17 @@ class TimezoneType extends AbstractType
     {
         $cacheKey = 'timezones';
         if ($this->cache) {
-            if ($this->cache->contains($cacheKey)) {
-                self::$timezones = $this->cache->fetch($cacheKey);
-            } else {
+            $timezones = $this->cache->fetch($cacheKey);
+            if (false === $timezones) {
                 $this->cache->save($cacheKey, self::getTimezones());
+            } else {
+                self::$timezones = $timezones;
             }
         }
 
         $resolver->setDefaults(
             array(
-                'choices' => self::$timezones,
+                'choices' => self::$timezones ? array_flip(self::$timezones) : null,
             )
         );
     }
@@ -52,7 +57,7 @@ class TimezoneType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**

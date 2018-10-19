@@ -60,7 +60,7 @@ class TestActivityProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getRoutes()
+    public function getRoutes($activityEntity)
     {
         return ['delete' => 'test_delete_route'];
     }

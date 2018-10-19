@@ -1,3 +1,10 @@
+## FROM 2.6.0 to 3.0.0
+* To sucessfully upgrade to 3.0.0 version which uses Symfony 3 you need to replace all form alias by their respective FQCN's in entity configs and embedded forms.
+Use the following script to find out which values should be changed.
+```bash
+php vendor/oro/platform/bin/oro-form-alias-checker/oro-form-alias-checker
+```
+
 ## FROM 2.5.0 to 2.6.0
 * Changed minimum required php version to 7.1
 

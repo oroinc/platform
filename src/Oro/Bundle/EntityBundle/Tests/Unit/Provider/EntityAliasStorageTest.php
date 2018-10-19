@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EntityBundle\Exception\DuplicateEntityAliasException;
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 
-class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
+class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityAliasStorage */
-    protected $storage;
+    private $storage;
 
     protected function setUp()
     {
         $this->storage = new EntityAliasStorage();
-        $this->storage->setDebug(true);
     }
 
     public function testGetEntityAlias()
@@ -21,11 +22,11 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
         $entityAlias = new EntityAlias('entity1_alias', 'entity1_plural_alias');
         $this->storage->addEntityAlias('Test\Entity1', $entityAlias);
 
-        $this->assertSame(
+        self::assertSame(
             $entityAlias,
             $this->storage->getEntityAlias('Test\Entity1')
         );
-        $this->assertNull(
+        self::assertNull(
             $this->storage->getEntityAlias('Test\Unknown')
         );
     }
@@ -37,11 +38,11 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
             new EntityAlias('entity1_alias', 'entity1_plural_alias')
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             'Test\Entity1',
             $this->storage->getClassByAlias('entity1_alias')
         );
-        $this->assertNull(
+        self::assertNull(
             $this->storage->getClassByAlias('unknown')
         );
     }
@@ -53,11 +54,11 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
             new EntityAlias('entity1_alias', 'entity1_plural_alias')
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             'Test\Entity1',
             $this->storage->getClassByPluralAlias('entity1_plural_alias')
         );
-        $this->assertNull(
+        self::assertNull(
             $this->storage->getClassByPluralAlias('unknown')
         );
     }
@@ -69,7 +70,7 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
             new EntityAlias('entity1_alias', 'entity1_plural_alias')
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Entity1' => new EntityAlias('entity1_alias', 'entity1_plural_alias')],
             $this->storage->getAll()
         );
@@ -83,13 +84,12 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
         );
         /** @var EntityAliasStorage $unserialized */
         $unserialized = unserialize(serialize($this->storage));
-        $unserialized->setDebug(true);
-        $this->assertEquals($this->storage, $unserialized);
+        self::assertEquals($this->storage, $unserialized);
     }
 
     /**
      * @dataProvider             emptyAliasDataProvider
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException
      * @expectedExceptionMessage The alias for the "Test\Entity1" entity must not be empty.
      */
     public function testValidateEmptyEntityAlias($value)
@@ -102,7 +102,7 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider             emptyAliasDataProvider
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException
      * @expectedExceptionMessage The plural alias for the "Test\Entity1" entity must not be empty.
      */
     public function testValidateEmptyEntityPluralAlias($value)
@@ -117,7 +117,7 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [null],
-            [''],
+            ['']
         ];
     }
 
@@ -126,7 +126,7 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateInvalidEntityAlias($value)
     {
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(InvalidEntityAliasException::class);
         $this->expectExceptionMessage(
             sprintf(
                 'The string "%s" cannot be used as the alias for the "Test\Entity1" entity '
@@ -148,7 +148,7 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateInvalidEntityPluralAlias($value)
     {
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(InvalidEntityAliasException::class);
         $this->expectExceptionMessage(
             sprintf(
                 'The string "%s" cannot be used as the plural alias for the "Test\Entity1" entity '
@@ -181,39 +181,18 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
             new EntityAlias('alias', 'plural_alias1')
         );
 
-        $this->expectException('\Oro\Bundle\EntityBundle\Exception\RuntimeException');
+        $this->expectException(DuplicateEntityAliasException::class);
         $this->expectExceptionMessage(
             'The alias "alias" cannot be used for the entity "Test\Entity2" because it is already '
             . 'used for the entity "Test\Entity1". To solve this problem you can use "entity_aliases" or '
-            . '"entity_alias_exclusions" section in the "Resources/config/oro/entity.yml" of your bundle or '
+            . '"entity_alias_exclusions" section in "Resources/config/oro/entity.yml" or '
             . 'create a service to provide aliases for conflicting classes and register it '
-            . 'with the "oro_entity.alias_provider" tag in DI container.'
+            . 'with "oro_entity.alias_provider" tag in DI container.'
         );
 
         $this->storage->addEntityAlias(
             'Test\Entity2',
             new EntityAlias('alias', 'plural_alias2')
-        );
-    }
-
-    public function testValidateDuplicateAliasesNoDebug()
-    {
-        $this->storage->setDebug(false);
-
-        $this->storage->addEntityAlias(
-            'Test\Entity1',
-            new EntityAlias('alias', 'plural_alias1')
-        );
-        $this->storage->addEntityAlias(
-            'Test\Entity2',
-            new EntityAlias('alias', 'plural_alias2')
-        );
-
-        $this->assertEquals(
-            [
-                'Test\Entity1' => new EntityAlias('alias', 'plural_alias1')
-            ],
-            $this->storage->getAll()
         );
     }
 
@@ -224,40 +203,18 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
             new EntityAlias('alias1', 'plural_alias')
         );
 
-        $this->expectException('\Oro\Bundle\EntityBundle\Exception\RuntimeException');
+        $this->expectException(DuplicateEntityAliasException::class);
         $this->expectExceptionMessage(
             'The plural alias "plural_alias" cannot be used for the entity "Test\Entity2" because it is already '
             . 'used for the entity "Test\Entity1". To solve this problem you can use "entity_aliases" or '
-            . '"entity_alias_exclusions" section in the "Resources/config/oro/entity.yml" of your bundle or '
+            . '"entity_alias_exclusions" section in "Resources/config/oro/entity.yml" or '
             . 'create a service to provide aliases for conflicting classes and register it '
-            . 'with the "oro_entity.alias_provider" tag in DI container.'
+            . 'with "oro_entity.alias_provider" tag in DI container.'
         );
 
         $this->storage->addEntityAlias(
             'Test\Entity2',
             new EntityAlias('alias2', 'plural_alias')
-        );
-    }
-
-    public function testValidateDuplicatePluralAliasesNoDebug()
-    {
-        $this->storage->setDebug(false);
-
-        $this->storage->addEntityAlias(
-            'Test\Entity1',
-            new EntityAlias('alias1', 'plural_alias')
-        );
-        $this->storage->addEntityAlias(
-            'Test\Entity2',
-            new EntityAlias('alias2', 'plural_alias')
-        );
-
-
-        $this->assertEquals(
-            [
-                'Test\Entity1' => new EntityAlias('alias1', 'plural_alias')
-            ],
-            $this->storage->getAll()
         );
     }
 
@@ -268,39 +225,18 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
             new EntityAlias('alias1', 'plural_alias1')
         );
 
-        $this->expectException('\Oro\Bundle\EntityBundle\Exception\RuntimeException');
+        $this->expectException(DuplicateEntityAliasException::class);
         $this->expectExceptionMessage(
             'The plural alias "alias1" cannot be used for the entity "Test\Entity2" because it is already '
             . 'used as an alias for the entity "Test\Entity1". To solve this problem you can use "entity_aliases" or '
-            . '"entity_alias_exclusions" section in the "Resources/config/oro/entity.yml" of your bundle or '
+            . '"entity_alias_exclusions" section in "Resources/config/oro/entity.yml" or '
             . 'create a service to provide aliases for conflicting classes and register it '
-            . 'with the "oro_entity.alias_provider" tag in DI container.'
+            . 'with "oro_entity.alias_provider" tag in DI container.'
         );
 
         $this->storage->addEntityAlias(
             'Test\Entity2',
             new EntityAlias('alias2', 'alias1')
-        );
-    }
-
-    public function testValidateDuplicateAliasAndPluralAliasNoDebug()
-    {
-        $this->storage->setDebug(false);
-
-        $this->storage->addEntityAlias(
-            'Test\Entity1',
-            new EntityAlias('alias1', 'plural_alias1')
-        );
-        $this->storage->addEntityAlias(
-            'Test\Entity2',
-            new EntityAlias('alias2', 'alias1')
-        );
-
-        $this->assertEquals(
-            [
-                'Test\Entity1' => new EntityAlias('alias1', 'plural_alias1')
-            ],
-            $this->storage->getAll()
         );
     }
 
@@ -311,39 +247,18 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
             new EntityAlias('alias1', 'plural_alias1')
         );
 
-        $this->expectException('\Oro\Bundle\EntityBundle\Exception\RuntimeException');
+        $this->expectException(DuplicateEntityAliasException::class);
         $this->expectExceptionMessage(
             'The alias "plural_alias1" cannot be used for the entity "Test\Entity2" because it is already '
             . 'used as a plural alias for the entity "Test\Entity1". To solve this problem you can use "entity_aliases"'
-            . ' or "entity_alias_exclusions" section in the "Resources/config/oro/entity.yml" of your bundle or '
+            . ' or "entity_alias_exclusions" section in "Resources/config/oro/entity.yml" or '
             . 'create a service to provide aliases for conflicting classes and register it '
-            . 'with the "oro_entity.alias_provider" tag in DI container.'
+            . 'with "oro_entity.alias_provider" tag in DI container.'
         );
 
         $this->storage->addEntityAlias(
             'Test\Entity2',
             new EntityAlias('plural_alias1', 'plural_alias2')
-        );
-    }
-
-    public function testValidateDuplicatePluralAliasAndAliasNoDebug()
-    {
-        $this->storage->setDebug(false);
-
-        $this->storage->addEntityAlias(
-            'Test\Entity1',
-            new EntityAlias('alias1', 'plural_alias1')
-        );
-        $this->storage->addEntityAlias(
-            'Test\Entity2',
-            new EntityAlias('plural_alias1', 'plural_alias2')
-        );
-
-        $this->assertEquals(
-            [
-                'Test\Entity1' => new EntityAlias('alias1', 'plural_alias1')
-            ],
-            $this->storage->getAll()
         );
     }
 }

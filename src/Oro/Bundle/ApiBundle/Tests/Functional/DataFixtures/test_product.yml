@@ -1,0 +1,3 @@
+Oro\Bundle\TestFrameworkBundle\Entity\TestProduct:
+    test_product:
+        name: Test Product

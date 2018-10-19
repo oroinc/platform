@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerCompoundVerifier;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerVerifierInterface;
 
-class TransitionEventTriggerCompoundVerifierTest extends \PHPUnit_Framework_TestCase
+class TransitionEventTriggerCompoundVerifierTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddVerifier()
     {

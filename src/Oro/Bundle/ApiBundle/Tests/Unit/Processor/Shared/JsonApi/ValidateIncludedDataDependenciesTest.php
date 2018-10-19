@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
 {
     /** @var ValidateIncludedDataDependencies */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -32,6 +32,25 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasErrors());
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage The "data" section must exist in the request data.
+     */
+    public function testProcessIncludedDataWithoutPrimaryData()
+    {
+        $requestData = [
+            'included' => [
+                [
+                    'type' => 'groups',
+                    'id'   => 'included_group_1'
+                ]
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
     }
 
     public function testProcessDirectToOneRelationship()
@@ -136,7 +155,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
                 [
                     'type' => 'grouptypes',
                     'id'   => 'included_group_type_1'
-                ],
+                ]
             ]
         ];
 
@@ -174,7 +193,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
                 [
                     'type' => 'grouptypes',
                     'id'   => 'included_group_type_1'
-                ],
+                ]
             ]
         ];
 
@@ -209,7 +228,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
                             'data' => ['type' => 'groups', 'id' => 'included_group_1']
                         ]
                     ]
-                ],
+                ]
             ]
         ];
 
@@ -264,7 +283,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
                 [
                     'type' => 'groups',
                     'id'   => 'included_group_2'
-                ],
+                ]
             ]
         ];
 
@@ -354,7 +373,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
                 [
                     'type' => 'grouptypes',
                     'id'   => 'included_group_type_1'
-                ],
+                ]
             ]
         ];
 
@@ -372,11 +391,12 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
      *
      * @return Error
      */
-    protected function createValidationError($includedObjectIndex)
+    private function createValidationError($includedObjectIndex)
     {
         $error = Error::createValidationError(
             Constraint::REQUEST_DATA,
             'The entity should have a relationship with the primary entity'
+            . ' and this should be explicitly specified in the request'
         );
         $error->setSource(
             ErrorSource::createByPointer(sprintf('/included/%s', $includedObjectIndex))

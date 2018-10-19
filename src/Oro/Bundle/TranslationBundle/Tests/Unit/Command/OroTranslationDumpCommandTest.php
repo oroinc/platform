@@ -9,18 +9,18 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class OroTranslationDumpCommandTest extends \PHPUnit_Framework_TestCase
+class OroTranslationDumpCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
-    /** @var JsTranslationDumper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject */
     protected $jsDumper;
 
-    /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $input;
 
-    /** @var OutputInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $output;
 
     /** @var OroTranslationDumpCommand */

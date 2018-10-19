@@ -8,19 +8,15 @@ class TagGeneratorChain implements TagGeneratorInterface
     protected $generators = [];
 
     /**
-     * @param array $generators
+     * @param TagGeneratorInterface $generator
+     *
+     * @return TagGeneratorChain
      */
-    public function __construct(array $generators = [])
+    public function addGenerator(TagGeneratorInterface $generator)
     {
-        array_walk(
-            $generators,
-            function ($generator) {
-                if (!$generator instanceof TagGeneratorInterface) {
-                    throw new \LogicException('Generator should implement "TagGeneratorInterface"');
-                }
-            }
-        );
-        $this->generators = $generators;
+        $this->generators[] = $generator;
+
+        return $this;
     }
 
     /**

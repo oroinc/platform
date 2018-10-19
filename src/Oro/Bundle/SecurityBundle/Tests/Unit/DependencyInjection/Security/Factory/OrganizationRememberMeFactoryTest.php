@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection\Security\Fact
 
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationRememberMeFactory;
 
-class OrganizationRememberMeFactoryTest extends \PHPUnit_Framework_TestCase
+class OrganizationRememberMeFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OrganizationRememberMeFactory

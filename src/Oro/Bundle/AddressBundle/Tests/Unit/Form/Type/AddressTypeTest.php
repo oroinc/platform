@@ -2,9 +2,13 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AddressBundle\Form\Type\AddressType;
+use Oro\Bundle\AddressBundle\Form\Type\CountryType;
+use Oro\Bundle\AddressBundle\Form\Type\RegionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormView;
 
-class AddressTypeTest extends \PHPUnit_Framework_TestCase
+class AddressTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AddressType
@@ -40,63 +44,63 @@ class AddressTypeTest extends \PHPUnit_Framework_TestCase
 
         $builder->expects($this->at(1))
             ->method('add')
-            ->with('id', 'hidden');
+            ->with('id', HiddenType::class);
 
         $builder->expects($this->at(2))
             ->method('add')
-            ->with('label', 'text');
+            ->with('label', TextType::class);
 
         $builder->expects($this->at(3))
             ->method('add')
-            ->with('namePrefix', 'text');
+            ->with('namePrefix', TextType::class);
 
         $builder->expects($this->at(4))
             ->method('add')
-            ->with('firstName', 'text');
+            ->with('firstName', TextType::class);
 
         $builder->expects($this->at(5))
             ->method('add')
-            ->with('middleName', 'text');
+            ->with('middleName', TextType::class);
 
         $builder->expects($this->at(6))
             ->method('add')
-            ->with('lastName', 'text');
+            ->with('lastName', TextType::class);
 
         $builder->expects($this->at(7))
             ->method('add')
-            ->with('nameSuffix', 'text');
+            ->with('nameSuffix', TextType::class);
 
         $builder->expects($this->at(8))
             ->method('add')
-            ->with('organization', 'text');
+            ->with('organization', TextType::class);
 
         $builder->expects($this->at(9))
             ->method('add')
-            ->with('country', 'oro_country');
+            ->with('country', CountryType::class);
 
         $builder->expects($this->at(10))
             ->method('add')
-            ->with('street', 'text');
+            ->with('street', TextType::class);
 
         $builder->expects($this->at(11))
             ->method('add')
-            ->with('street2', 'text');
+            ->with('street2', TextType::class);
 
         $builder->expects($this->at(12))
             ->method('add')
-            ->with('city', 'text');
+            ->with('city', TextType::class);
 
         $builder->expects($this->at(13))
             ->method('add')
-            ->with('region', 'oro_region');
+            ->with('region', RegionType::class);
 
         $builder->expects($this->at(14))
             ->method('add')
-            ->with('region_text', 'hidden');
+            ->with('region_text', HiddenType::class);
 
         $builder->expects($this->at(15))
             ->method('add')
-            ->with('postalCode', 'text');
+            ->with('postalCode', TextType::class);
 
         $this->type->buildForm($builder, array());
     }
@@ -121,10 +125,5 @@ class AddressTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayHasKey('region_route', $view->vars);
         $this->assertEquals('test', $view->vars['region_route']);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_address', $this->type->getName());
     }
 }

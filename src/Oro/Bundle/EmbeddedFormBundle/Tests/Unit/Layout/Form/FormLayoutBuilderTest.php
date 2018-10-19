@@ -5,23 +5,26 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Form;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldType;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilder;
+use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Form\Type\Stub\CompoundFormTypeStub;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormType;
 
-class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
+class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
 {
     const ROOT_ID = 'rootId';
     const FORM_NAME = 'testForm';
     const FIELD_PREFIX = 'testForm_';
     const GROUP_PREFIX = 'testForm:group_';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $layoutManipulator;
 
-    /** @var BlockBuilderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BlockBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $blockBuilder;
 
     /** @var FormLayoutBuilder */
@@ -59,8 +62,8 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $options      = $this->getOptions();
         $form         = $this->getForm();
         $formAccessor = new FormAccessor($form);
-        $form->add($this->getForm(false, 'type1', 'field1'));
-        $form->add($this->getForm(false, 'type2', 'field2'));
+        $form->add($this->getForm(false, TextType::class, 'field1'));
+        $form->add($this->getForm(false, TextareaType::class, 'field2'));
 
         $this->layoutManipulator->expects($this->at(0))
             ->method('add')
@@ -98,10 +101,10 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $options      = $this->getOptions();
         $form         = $this->getForm();
         $formAccessor = new FormAccessor($form);
-        $childForm    = $this->getForm(true, 'type1', 'field1');
-        $childForm->add($this->getForm(false, 'type11', 'field11'));
+        $childForm    = $this->getForm(true, CompoundFormTypeStub::class, 'field1');
+        $childForm->add($this->getForm(false, TextareaType::class, 'field11'));
         $form->add($childForm);
-        $form->add($this->getForm(false, 'type2', 'field2'));
+        $form->add($this->getForm(false, TextType::class, 'field2'));
 
         $this->layoutManipulator->expects($this->at(0))
             ->method('add')
@@ -149,10 +152,10 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $options      = $this->getOptions();
         $form         = $this->getForm();
         $formAccessor = new FormAccessor($form);
-        $childForm    = $this->getForm(true, 'type1', 'field1');
-        $childForm->add($this->getForm(false, 'type11', 'field11'));
+        $childForm    = $this->getForm(true, CompoundFormTypeStub::class, 'field1');
+        $childForm->add($this->getForm(false, TextType::class, 'field11'));
         $form->add($childForm);
-        $form->add($this->getForm(false, 'type2', 'field2'));
+        $form->add($this->getForm(false, TextareaType::class, 'field2'));
 
         $this->layoutManipulator->expects($this->at(0))
             ->method('add')
@@ -175,7 +178,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(2))
             ->method('add');
 
-        $this->builder->addSimpleFormTypes(['type1']);
+        $this->builder->addSimpleFormTypes([CompoundFormTypeStub::class]);
         $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
         $this->assertSame(
             [
@@ -193,8 +196,8 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
 
         $form         = $this->getForm();
         $formAccessor = new FormAccessor($form);
-        $form->add($this->getForm(false, 'type1', 'field1'));
-        $form->add($this->getForm(false, 'type2', 'field2'));
+        $form->add($this->getForm(false, TextType::class, 'field1'));
+        $form->add($this->getForm(false, TextareaType::class, 'field2'));
 
         $this->layoutManipulator->expects($this->at(0))
             ->method('add')
@@ -234,9 +237,9 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
 
         $form         = $this->getForm();
         $formAccessor = new FormAccessor($form);
-        $form->add($this->getForm(false, 'type1', 'field1'));
-        $childForm = $this->getForm(true, 'type2', 'field2');
-        $childForm->add($this->getForm(false, 'type21', 'field21'));
+        $form->add($this->getForm(false, TextType::class, 'field1'));
+        $childForm = $this->getForm(true, CompoundFormTypeStub::class, 'field2');
+        $childForm->add($this->getForm(false, TextType::class, 'field21'));
         $form->add($childForm);
 
         $this->layoutManipulator->expects($this->at(0))
@@ -282,20 +285,16 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param bool   $compound
-     * @param string $type
+     * @param string $innerType
      * @param string $name
      *
      * @return FormInterface
      */
-    protected function getForm($compound = true, $type = 'form', $name = 'some_form')
+    protected function getForm($compound = true, $innerType = TextType::class, $name = 'some_form')
     {
         $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $form       = new Form($formConfig);
-        $formType   = $this->createMock('Symfony\Component\Form\FormTypeInterface');
-        $formType->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($type));
-        $resolvedType = new ResolvedFormType($formType);
+        $resolvedType = new ResolvedFormType(new $innerType());
         $formConfig->expects($this->any())
             ->method('getCompound')
             ->will($this->returnValue($compound));

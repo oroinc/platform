@@ -1,4 +1,4 @@
-// @theme: default;
+/* @theme: default; */
 
 // Update styles in /default/scss/components/shopping-list-dropdown/shopping-list-dropdown.scss
 
@@ -12,7 +12,13 @@
     &__input,
     &__control,
     input[type='radio'] {
-        display: none;
+        position: absolute;
+        height: 0;
+        width: 0;
+        margin: 0;
+        padding: 0;
+        border: 0 none;
+        opacity: 0;
     }
 
     &__input,

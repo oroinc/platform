@@ -9,7 +9,7 @@ Feature: Create Report with Segment as filter
     Given I login as administrator
     # There are 2 users from fixtures assigned to default organization
     When I go to Reports & Segments / Manage Segments
-    And I press "Create Segment"
+    And I click "Create Segment"
     And I fill form with:
       | Name   | Test Organization Segment |
       | Entity | Organization              |
@@ -19,7 +19,7 @@ Feature: Create Report with Segment as filter
     And I save and close form
     Then I should see "Segment saved" flash message
     When I go to Reports & Segments / Manage Custom Reports
-    And I press "Create Report"
+    And I click "Create Report"
     And I fill "Report Form" with:
       | Name        | Test Organization Report |
       | Entity      | Organization             |

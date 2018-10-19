@@ -8,18 +8,18 @@ use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
-class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
+class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Controller|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Controller|\PHPUnit\Framework\MockObject\MockObject */
     protected $translationControllerMock;
 
-    /** @var Router|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
     protected $routerMock;
 
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
-    /** @var LanguageProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $languageProvider;
 
     /** @var JsTranslationDumper */

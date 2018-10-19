@@ -16,6 +16,7 @@
 "copy": "copy"
 "remove": "remove"
 "Status": "Status"
+"oro.datagrid.headerCell.selectAll.label": "Select rows"
 "oro.datagrid.headerCell.selectAll.all": "All"
 "oro.datagrid.headerCell.selectAll.allVisible": "All visible"
 "oro.datagrid.headerCell.selectAll.none": "None"
@@ -35,8 +36,10 @@
 "Please select view": "Please select view"
 "oro.datagrid.entityHint": "Entities"
 "oro.datagrid.no.entities": "No records found"
-"oro.datagrid.no.results": "No {{ entityHint }} were found to match your search. Try modifying your search criteria..."
+"oro.datagrid.no.resultsTitle": "No Results Found"
+"oro.datagrid.no.results": "No {{ entityHint }} were found to match your search.<br/>Try modifying your search criteria"
 "oro.datagrid.no.columns": "No columns configured for this grid"
+"oro.datagrid.pagination.input-aria": "data grid pagination input"
 "oro.datagrid.pagination.label": "Page"
 "oro.datagrid.pagination.prev": "Prev"
 "oro.datagrid.pagination.next": "Next"
@@ -50,9 +53,12 @@ oro_datagrid.label_add_filter: "Manage filters"
 oro_datagrid.label_reset_button: "Reset Filter"
 oro_datagrid.action.reset: "Reset"
 oro_datagrid.action.refresh: "Refresh"
+oro_datagrid.action.appearance: "Data appearance"
 "oro.datagrid.action.save_grid_view": "Save"
 "oro.datagrid.action.rename_grid_view": "Rename"
 "oro.datagrid.name_modal.title": "Grid view"
+"oro.datagrid.row_actions.label": "Row actions"
+"oro.datagrid.card_actions.label": "Card actions"
 "oro.datagrid.action.discard_grid_view_changes": "Discard changes"
 "oro.datagrid.action.save_grid_view_as": "Save As"
 "oro.datagrid.action.share_grid_view": "Share With Others"
@@ -76,7 +82,8 @@ oro:
         loading_failed_message: "Data loading failed, try reloading the page. If the issue appears again please contact your administrator."
         toolbar_sorting:
             label: "Sorted By"
-        column_manager:
+        settings:
+            header.title: "Settings"
             title: "Grid Settings"
             tooltip: "Use drag and drop to sort items"
             select_all: "Select All"
@@ -87,6 +94,7 @@ oro:
                 all: 'All'
                 selected: 'Selected'
                 select_all: 'Select All'
+                unselect_all: 'Select Default'
                 search_placeholder: "Quick Search"
                 clear_search_tooltip: "Clear Quick Search"
             column:
@@ -95,6 +103,7 @@ oro:
                 sort: "Sort"
             close_tooltip: "Close Column Manager"
             empty_list: "No columns found"
+            close.label: "Close"
         not_number: Not a number
         inline_editing:
             message:

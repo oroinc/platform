@@ -6,15 +6,15 @@ use Oro\Component\Routing\Loader\CumulativeRoutingFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class CumulativeRoutingFileLoaderTest extends \PHPUnit_Framework_TestCase
+class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $kernel;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $routeOptionsResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $loaderResolver;
 
     /** @var CumulativeRoutingFileLoader */
@@ -51,7 +51,7 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loadedRoutes->add('route1', new Route('/route1'));
         $loadedRoutes->add('route2', new Route('/route2', [], [], ['priority' => 1]));
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject[] $bundles */
+        /** @var \PHPUnit\Framework\MockObject\MockObject[] $bundles */
         $bundles = [
             'bundle1' => $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface'),
             'bundle2' => $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface'),

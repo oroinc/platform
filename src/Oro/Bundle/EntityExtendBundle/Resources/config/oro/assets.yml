@@ -1,5 +1,4 @@
 assets:
     css:
       'oroentityextend':
-          - 'bundles/oroentityextend/css/extend.css'
-          - 'bundles/oroentityextend/css/less/main.less'
+          - 'bundles/oroentityextend/css/scss/main.scss'

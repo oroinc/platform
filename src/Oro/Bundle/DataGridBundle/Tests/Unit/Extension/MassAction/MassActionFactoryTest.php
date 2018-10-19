@@ -9,9 +9,9 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class MassActionFactoryTest extends \PHPUnit_Framework_TestCase
+class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     /** @var MassActionFactory */

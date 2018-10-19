@@ -1,9 +1,11 @@
 'Remove': 'Remove'
 'Primary': 'Primary'
+'More': 'More'
 'Create Address': 'Create Address'
 'Update Address': 'Update Address'
 'Add Address': 'Add Address'
 'Address saved': 'Address saved'
+'Address actions': 'Address actions'
 'Empty Address Book':  'Address book is empty'
 
 map:

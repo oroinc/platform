@@ -4,20 +4,21 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Util\EntityMapper;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 
-class FormContextTest extends \PHPUnit_Framework_TestCase
+class FormContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormContext */
-    protected $context;
+    private $context;
 
     protected function setUp()
     {
-        $configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $metadataProvider = $this->createMock(MetadataProvider::class);
 
         $this->context = new FormContextStub($configProvider, $metadataProvider);
     }
@@ -26,57 +27,81 @@ class FormContextTest extends \PHPUnit_Framework_TestCase
     {
         $requestData = [];
         $this->context->setRequestData($requestData);
-        $this->assertSame($requestData, $this->context->getRequestData());
+        self::assertSame($requestData, $this->context->getRequestData());
     }
 
     public function testIncludedData()
     {
         $includedData = [];
         $this->context->setIncludedData($includedData);
-        $this->assertSame($includedData, $this->context->getIncludedData());
+        self::assertSame($includedData, $this->context->getIncludedData());
     }
 
     public function testIncludedEntities()
     {
-        $this->assertNull($this->context->getIncludedEntities());
+        self::assertNull($this->context->getIncludedEntities());
 
         $includedEntities = $this->createMock(IncludedEntityCollection::class);
         $this->context->setIncludedEntities($includedEntities);
-        $this->assertSame($includedEntities, $this->context->getIncludedEntities());
+        self::assertSame($includedEntities, $this->context->getIncludedEntities());
 
         $this->context->setIncludedEntities();
-        $this->assertNull($this->context->getIncludedEntities());
+        self::assertNull($this->context->getIncludedEntities());
+    }
+
+    public function testEntityMapper()
+    {
+        $entityMapper = $this->createMock(EntityMapper::class);
+
+        self::assertNull($this->context->getEntityMapper());
+
+        $this->context->setEntityMapper($entityMapper);
+        self::assertSame($entityMapper, $this->context->getEntityMapper());
+
+        $this->context->setEntityMapper();
+        self::assertNull($this->context->getEntityMapper());
     }
 
     public function testFormBuilder()
     {
-        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
 
-        $this->assertFalse($this->context->hasFormBuilder());
-        $this->assertNull($this->context->getFormBuilder());
+        self::assertFalse($this->context->hasFormBuilder());
+        self::assertNull($this->context->getFormBuilder());
 
         $this->context->setFormBuilder($formBuilder);
-        $this->assertTrue($this->context->hasFormBuilder());
-        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+        self::assertTrue($this->context->hasFormBuilder());
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
 
         $this->context->setFormBuilder();
-        $this->assertFalse($this->context->hasFormBuilder());
-        $this->assertNull($this->context->getFormBuilder());
+        self::assertFalse($this->context->hasFormBuilder());
+        self::assertNull($this->context->getFormBuilder());
     }
 
     public function testForm()
     {
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
 
-        $this->assertFalse($this->context->hasForm());
-        $this->assertNull($this->context->getForm());
+        self::assertFalse($this->context->hasForm());
+        self::assertNull($this->context->getForm());
 
         $this->context->setForm($form);
-        $this->assertTrue($this->context->hasForm());
-        $this->assertSame($form, $this->context->getForm());
+        self::assertTrue($this->context->hasForm());
+        self::assertSame($form, $this->context->getForm());
 
         $this->context->setForm();
-        $this->assertFalse($this->context->hasForm());
-        $this->assertNull($this->context->getForm());
+        self::assertFalse($this->context->hasForm());
+        self::assertNull($this->context->getForm());
+    }
+
+    public function testSkipFormValidation()
+    {
+        self::assertFalse($this->context->isFormValidationSkipped());
+
+        $this->context->skipFormValidation(true);
+        self::assertTrue($this->context->isFormValidationSkipped());
+
+        $this->context->skipFormValidation(false);
+        self::assertFalse($this->context->isFormValidationSkipped());
     }
 }

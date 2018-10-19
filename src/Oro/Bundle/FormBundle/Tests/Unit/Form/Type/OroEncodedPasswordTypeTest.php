@@ -3,7 +3,8 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroEncodedPasswordType;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -12,15 +13,29 @@ class OroEncodedPasswordTypeTest extends FormIntegrationTestCase
     /** @var OroEncodedPasswordType */
     protected $formType;
 
-    /** @var Mcrypt|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $encryptor;
 
     protected function setUp()
     {
-        parent::setUp();
-
-        $this->encryptor = $this->createMock('Oro\Bundle\SecurityBundle\Encoder\Mcrypt');
+        $this->encryptor = $this->createMock(SymmetricCrypterInterface::class);
         $this->formType = new OroEncodedPasswordType($this->encryptor);
+        parent::setUp();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    OroEncodedPasswordType::class => $this->formType
+                ],
+                []
+            ),
+        ];
     }
 
     public function testBuildForm()
@@ -30,13 +45,13 @@ class OroEncodedPasswordTypeTest extends FormIntegrationTestCase
         $this->encryptor->expects($this->once())
             ->method('encryptData')
             ->will($this->returnValue($encPassword));
-        $form = $this->factory->create($this->formType);
+        $form = $this->factory->create(OroEncodedPasswordType::class);
         $form->submit('test');
 
         $this->assertEquals($encPassword, $form->getData());
 
         // test empty password with old password defined
-        $form = $this->factory->create($this->formType, 'test');
+        $form = $this->factory->create(OroEncodedPasswordType::class, 'test');
         $form->submit('');
 
         $this->assertEquals('test', $form->getData());
@@ -50,7 +65,7 @@ class OroEncodedPasswordTypeTest extends FormIntegrationTestCase
      */
     public function testBuildViewWithAutocompleteAttribute($state, $expected)
     {
-        $form = $this->factory->create($this->formType, null, ['browser_autocomplete' => $state]);
+        $form = $this->factory->create(OroEncodedPasswordType::class, null, ['browser_autocomplete' => $state]);
         $view = $form->createView();
 
         static::assertArraySubset($expected, $view->vars['attr']);
@@ -69,7 +84,7 @@ class OroEncodedPasswordTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /* @var $resolver \PHPUnit_Framework_MockObject_MockObject|OptionsResolver */
+        /* @var $resolver \PHPUnit\Framework\MockObject\MockObject|OptionsResolver */
         $resolver = $this->createMock(OptionsResolver::class);
 
         $options = ['encode' => true, 'browser_autocomplete' => false];

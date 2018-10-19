@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -19,19 +20,18 @@ class EnumChoiceType extends AbstractEnumType
 
         $resolver->setDefaults(
             [
-                'empty_value' => null,
+                'placeholder' => null,
                 'empty_data'  => null
             ]
         );
 
-        $resolver->setNormalizers(
-            [
-                'empty_value' => function (Options $options, $value) {
-                    return (null === $value) && !$options['expanded'] && !$options['multiple']
-                        ? 'oro.form.choose_value'
-                        : $value;
-                }
-            ]
+        $resolver->setNormalizer(
+            'placeholder',
+            function (Options $options, $value) {
+                return (null === $value) && !$options['expanded'] && !$options['multiple']
+                    ? 'oro.form.choose_value'
+                    : $value;
+            }
         );
     }
 
@@ -40,7 +40,7 @@ class EnumChoiceType extends AbstractEnumType
      */
     public function getParent()
     {
-        return 'translatable_entity';
+        return TranslatableEntityType::class;
     }
 
     /**

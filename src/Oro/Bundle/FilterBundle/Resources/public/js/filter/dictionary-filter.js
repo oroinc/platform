@@ -94,7 +94,10 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
+            // Each filter should have own copy,
+            // otherwise 2 filters on same page will show same values
             this.selectedData = {};
+
             if (this.filterParams) {
                 this.dictionaryClass = this.filterParams.class.replace(/\\/g, '_');
             } else {
@@ -251,7 +254,6 @@ define(function(require) {
             }));
 
             this._appendFilter($filter);
-            this._refreshWidth();
         },
 
         /**
@@ -471,19 +473,6 @@ define(function(require) {
         },
 
         /**
-         * Update width of filter
-         */
-        _refreshWidth: function() {
-            var valueFrame = this.$('.value-field-frame');
-            // update left and right margins of value field frame
-            var leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
-            var rightWidth = this.$('.filter-update').outerWidth();
-
-            valueFrame.css('margin-left', leftWidth);
-            valueFrame.css('padding-right', rightWidth);
-        },
-
-        /**
          * @inheritDoc
          */
         _getCriteriaHint: function() {
@@ -506,9 +495,9 @@ define(function(require) {
             if (this.valueIsLoaded(value.value)) {
                 var self = this;
 
-                var hintRawValue = _.isObject(_.first(value.value)) ?
-                    _.map(value.value, _.property('text')) :
-                    _.chain(value.value)
+                var hintRawValue = _.isObject(_.first(value.value))
+                    ? _.map(value.value, _.property('text'))
+                    : _.chain(value.value)
                         .map(function(id) {
                             var item = _.find(self.selectedData, function(item) {
                                 return item.id.toString() === id.toString();

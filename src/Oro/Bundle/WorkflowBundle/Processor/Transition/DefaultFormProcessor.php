@@ -31,9 +31,9 @@ class DefaultFormProcessor implements ProcessorInterface
         $context->setSaved(false);
         if ($request->isMethod('POST')) {
             $form = $context->getForm();
-            $form->submit($request);
+            $form->handleRequest($request);
 
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $context->getWorkflowItem()->setUpdated();
                 $this->doctrineHelper->getEntityManager(WorkflowItem::class)->flush();
 

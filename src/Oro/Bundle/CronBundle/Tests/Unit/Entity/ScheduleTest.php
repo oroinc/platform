@@ -4,7 +4,7 @@ namespace Oro\Bundle\CronBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\CronBundle\Entity\Schedule;
 
-class ScheduleTest extends \PHPUnit_Framework_TestCase
+class ScheduleTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Schedule */
     protected $object;

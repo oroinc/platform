@@ -5,6 +5,7 @@ namespace Oro\Bundle\FilterBundle\Filter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
@@ -342,8 +343,10 @@ class DateGroupingFilter extends ChoiceFilter
                 )
             )
             ->from($this->getCalendarEntity(), $calendarTableForGrouping)
-            ->innerJoin($this->getTargetEntity(), $joinedTable)
-            ->where(
+            ->innerJoin(
+                $this->getTargetEntity(),
+                $joinedTable,
+                Join::WITH,
                 sprintf(
                     '(CAST(%s.%s as %s) = CAST(%s.%s as %s) %s)',
                     $calendarTableForGrouping,

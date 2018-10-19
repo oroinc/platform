@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 
-class HandleTransitionCronTriggerCommandTest extends \PHPUnit_Framework_TestCase
+class HandleTransitionCronTriggerCommandTest extends \PHPUnit\Framework\TestCase
 {
     /** @var HandleProcessTriggerCommand */
     private $command;

@@ -5,7 +5,7 @@ namespace Oro\Bundle\RequireJSBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\RequireJSBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataProviderExceptionConfigTree
@@ -77,7 +77,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'config' => array(
                         'waitSeconds' => 0,
                     ),
-                    'web_root' => '%kernel.root_dir%/../web',
+                    'web_root' => '%kernel.project_dir%/public',
                     'build_path' => 'js/app.min.js',
                     'building_timeout' => 60,
                     'build_logger' => false,
@@ -113,7 +113,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'scriptType' => 'text/javascript',
                     ),
                     'js_engine' => 'node',
-                    'web_root' => '%kernel.root_dir%/../web',
+                    'web_root' => '%kernel.project_dir%/public',
                     'build_path' => 'js/test/app.min.js',
                     'building_timeout' => 3600,
                     'build_logger' => false,

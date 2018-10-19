@@ -5,7 +5,7 @@ namespace Oro\Component\Layout\Tests\Unit\Model;
 use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
 use Oro\Component\Layout\Model\LayoutUpdateImport;
 
-class LayoutUpdateImportTest extends \PHPUnit_Framework_TestCase
+class LayoutUpdateImportTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetters()
     {

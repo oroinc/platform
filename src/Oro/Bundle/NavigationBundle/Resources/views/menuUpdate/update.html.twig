@@ -192,7 +192,9 @@
 
             {% block content %}
                 {% autoescape %}
-                    {{ twoColumnContent|raw}}
+                    <div class="category-data">
+                        {{ twoColumnContent|raw}}
+                    </div>
                 {% endautoescape %}
             {% endblock content %}
         {% endembed %}

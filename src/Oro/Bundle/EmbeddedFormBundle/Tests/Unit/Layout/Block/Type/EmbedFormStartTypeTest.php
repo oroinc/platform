@@ -45,7 +45,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
             ->method('getEnctype')
             ->will($this->returnValue($formEnctype));
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(EmbedFormStartType::NAME, ['form_name' => $formName]);
 
@@ -83,7 +83,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
             ->method('getEnctype')
             ->will($this->returnValue($formEnctype));
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(EmbedFormStartType::NAME, ['form_name' => $formName]);
 
@@ -120,7 +120,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
             ->method('getEnctype')
             ->will($this->returnValue($formEnctype));
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(EmbedFormStartType::NAME, ['form_name' => $formName]);
 
@@ -154,7 +154,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
             ->method('getEnctype')
             ->will($this->returnValue(null));
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(EmbedFormStartType::NAME, ['form_name' => $formName]);
 
@@ -188,7 +188,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $formAccessor->expects($this->never())
             ->method('getEnctype');
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             EmbedFormStartType::NAME,
@@ -231,7 +231,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $formAccessor->expects($this->never())
             ->method('getEnctype');
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             EmbedFormStartType::NAME,
@@ -274,7 +274,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $formAccessor->expects($this->never())
             ->method('getEnctype');
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             EmbedFormStartType::NAME,
@@ -316,19 +316,12 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
     {
         $formName = 'test_form';
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, 123);
         $this->getBlockView(
             EmbedFormStartType::NAME,
             ['form_name' => $formName]
         );
-    }
-
-    public function testGetName()
-    {
-        $type = $this->getBlockType(EmbedFormStartType::NAME);
-
-        $this->assertSame(EmbedFormStartType::NAME, $type->getName());
     }
 
     public function testGetParent()

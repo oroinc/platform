@@ -57,4 +57,59 @@ class CountryRepositoryTest extends WebTestCase
             $countries
         );
     }
+
+    public function testGetAllIdentities()
+    {
+        $result = $this->repository->getAllIdentities();
+
+        $this->assertGreaterThanOrEqual(3, count($result));
+
+        /** @var Country $usa */
+        $usa = $this->getReference(LoadCountryData::COUNTRY_USA);
+        /** @var Country $mexico */
+        $mexico = $this->getReference(LoadCountryData::COUNTRY_MEXICO);
+        /** @var Country $germany */
+        $germany = $this->getReference(LoadCountryData::COUNTRY_GERMANY);
+
+        $this->assertContains($usa->getIso2Code(), $result);
+        $this->assertContains($mexico->getIso2Code(), $result);
+        $this->assertContains($germany->getIso2Code(), $result);
+    }
+
+    public function testUpdateTranslations()
+    {
+        $this->repository->updateTranslations(
+            [
+                'US' => 'États Unis',
+                'DE' => 'Allemagne',
+            ]
+        );
+        $this->repository->clear();
+
+        $actual = $this->repository->findBy(['iso2Code' => ['US', 'DE']]);
+
+        $this->assertCount(2, $actual);
+        $this->assertTranslationExists('US', 'États Unis', $actual);
+        $this->assertTranslationExists('DE', 'Allemagne', $actual);
+    }
+
+    /**
+     * @param string $expectedCode
+     * @param string $expectedTranslation
+     * @param array|Country[] $entities
+     */
+    private function assertTranslationExists(string $expectedCode, string $expectedTranslation, array $entities)
+    {
+        $actual = null;
+        foreach ($entities as $entity) {
+            if ($entity->getIso2Code() === $expectedCode) {
+                $actual = $entity;
+                break;
+            }
+        }
+
+        $this->assertNotNull($actual);
+        $this->assertInstanceOf(Country::class, $actual);
+        $this->assertEquals($expectedTranslation, $actual->getName());
+    }
 }

@@ -96,5 +96,14 @@ define(function(require) {
         }
     };
 
+    /**
+     * Shortcut method for the check if the cell is editable
+     *
+     * @return {boolean}
+     */
+    Backgrid.Cell.prototype.isEditableColumn = function() {
+        return Backgrid.callByNeed(this.column.editable(), this.column, this.model);
+    };
+
     return Backgrid;
 });

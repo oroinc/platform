@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\ApiBundle\Form\ApiResolvedFormTypeFactory;
 use Oro\Bundle\ApiBundle\Form\SwitchableFormRegistry;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -9,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Form\FormRegistry;
 
 /**
  * Configures all services required for Data API forms.
@@ -16,14 +18,11 @@ use Symfony\Component\DependencyInjection\Reference;
 class FormCompilerPass implements CompilerPassInterface
 {
     private const FORM_REGISTRY_SERVICE_ID                 = 'form.registry';
-    private const EXPECTED_FORM_REGISTRY_CLASS             = 'Symfony\Component\Form\FormRegistry';
     private const FORM_EXTENSION_SERVICE_ID                = 'form.extension';
     private const FORM_TYPE_TAG                            = 'form.type';
     private const FORM_TYPE_EXTENSION_TAG                  = 'form.type_extension';
     private const FORM_TYPE_GUESSER_TAG                    = 'form.type_guesser';
     private const FORM_TYPE_FACTORY_SERVICE_ID             = 'form.resolved_type_factory';
-    private const API_FORM_REGISTRY_CLASS                  = 'Oro\Bundle\ApiBundle\Form\SwitchableFormRegistry';
-    private const API_FORM_TYPE_FACTORY_CLASS              = 'Oro\Bundle\ApiBundle\Form\ApiResolvedFormTypeFactory';
     private const API_FORM_TYPE_FACTORY_SERVICE_ID         = 'oro_api.form.resolved_type_factory';
     private const API_FORM_EXTENSION_STATE_SERVICE_ID      = 'oro_api.form.state';
     private const API_FORM_SWITCHABLE_EXTENSION_SERVICE_ID = 'oro_api.form.switchable_extension';
@@ -48,7 +47,7 @@ class FormCompilerPass implements CompilerPassInterface
 
         $formRegistryDef = $container->getDefinition(self::FORM_REGISTRY_SERVICE_ID);
         $this->assertExistingFormRegistry($formRegistryDef, $container);
-        $formRegistryDef->setClass(self::API_FORM_REGISTRY_CLASS);
+        $formRegistryDef->setClass(SwitchableFormRegistry::class);
         $formRegistryDef->replaceArgument(0, [new Reference(self::API_FORM_SWITCHABLE_EXTENSION_SERVICE_ID)]);
         $formRegistryDef->addArgument(new Reference(self::API_FORM_EXTENSION_STATE_SERVICE_ID));
 
@@ -72,9 +71,18 @@ class FormCompilerPass implements CompilerPassInterface
             );
 
             // reuse existing form types, form type extensions and form type guessers
+            $formTypeClassNames = [];
+            $formTypeServiceIds = [];
+            foreach ($config['form_types'] as $formType) {
+                if ($container->hasDefinition($formType)) {
+                    $formTypeServiceIds[] = $formType;
+                } else {
+                    $formTypeClassNames[] = $formType;
+                }
+            }
             $this->addFormApiTag(
                 $container,
-                $config['form_types'],
+                $formTypeServiceIds,
                 self::FORM_TYPE_TAG,
                 self::API_FORM_TYPE_TAG
             );
@@ -92,7 +100,7 @@ class FormCompilerPass implements CompilerPassInterface
             );
 
             // load form types, form type extensions and form type guessers for Data API form extension
-            $apiFormExtensionDef->replaceArgument(1, $this->getApiFormTypes($container));
+            $apiFormExtensionDef->replaceArgument(1, $this->getApiFormTypes($container, $formTypeClassNames));
             $apiFormExtensionDef->replaceArgument(2, $this->getApiFormTypeExtensions($container));
             $apiFormExtensionDef->replaceArgument(3, $this->getApiFormTypeGuessers($container));
         }
@@ -111,17 +119,14 @@ class FormCompilerPass implements CompilerPassInterface
      */
     private function decorateFormTypeFactory(ContainerBuilder $container)
     {
-        $factoryDef = new Definition(
-            self::API_FORM_TYPE_FACTORY_CLASS,
-            [
+        $container
+            ->register(self::API_FORM_TYPE_FACTORY_SERVICE_ID, ApiResolvedFormTypeFactory::class)
+            ->setArguments([
                 new Reference(self::API_FORM_TYPE_FACTORY_SERVICE_ID . '.inner'),
                 new Reference(self::API_FORM_EXTENSION_STATE_SERVICE_ID)
-            ]
-        );
-        $factoryDef->setPublic(false);
-        $factoryDef->setDecoratedService(self::FORM_TYPE_FACTORY_SERVICE_ID);
-
-        $container->setDefinition(self::API_FORM_TYPE_FACTORY_SERVICE_ID, $factoryDef);
+            ])
+            ->setPublic(false)
+            ->setDecoratedService(self::FORM_TYPE_FACTORY_SERVICE_ID);
     }
 
     /**
@@ -134,45 +139,39 @@ class FormCompilerPass implements CompilerPassInterface
         if (0 === strpos($formRegistryClass, '%')) {
             $formRegistryClass = $container->getParameter(substr($formRegistryClass, 1, -1));
         }
-        if (self::EXPECTED_FORM_REGISTRY_CLASS !== $formRegistryClass) {
-            throw new LogicException(
-                sprintf(
-                    'Expected class of the "%s" service is "%s", actual class is "%s".',
-                    self::FORM_REGISTRY_SERVICE_ID,
-                    self::EXPECTED_FORM_REGISTRY_CLASS,
-                    $formRegistryClass
-                )
-            );
+        if (FormRegistry::class !== $formRegistryClass) {
+            throw new LogicException(sprintf(
+                'Expected class of the "%s" service is "%s", actual class is "%s".',
+                self::FORM_REGISTRY_SERVICE_ID,
+                FormRegistry::class,
+                $formRegistryClass
+            ));
         }
 
         $formExtensions = $formRegistryDef->getArgument(0);
         if (!is_array($formExtensions)) {
-            throw new LogicException(
-                sprintf(
-                    'Cannot register Data API form extension because it is expected'
-                    . ' that the first argument of "%s" service is array. "%s" given.',
-                    self::FORM_REGISTRY_SERVICE_ID,
-                    is_object($formExtensions) ? get_class($formExtensions) : gettype($formExtensions)
-                )
-            );
+            throw new LogicException(sprintf(
+                'Cannot register Data API form extension because it is expected'
+                . ' that the first argument of "%s" service is array. "%s" given.',
+                self::FORM_REGISTRY_SERVICE_ID,
+                is_object($formExtensions) ? get_class($formExtensions) : gettype($formExtensions)
+            ));
         } elseif (count($formExtensions) !== 1) {
-            throw new LogicException(
-                sprintf(
-                    'Cannot register Data API form extension because it is expected'
-                    . ' that the first argument of "%s" service is array contains only one element.'
-                    . ' Detected the following form extension: %s.',
-                    self::FORM_REGISTRY_SERVICE_ID,
-                    implode(
-                        ', ',
-                        array_map(
-                            function (Reference $ref) {
-                                return (string)$ref;
-                            },
-                            $formExtensions
-                        )
+            throw new LogicException(sprintf(
+                'Cannot register Data API form extension because it is expected'
+                . ' that the first argument of "%s" service is array contains only one element.'
+                . ' Detected the following form extension: %s.',
+                self::FORM_REGISTRY_SERVICE_ID,
+                implode(
+                    ', ',
+                    array_map(
+                        function (Reference $ref) {
+                            return (string)$ref;
+                        },
+                        $formExtensions
                     )
                 )
-            );
+            ));
         }
     }
 
@@ -197,12 +196,13 @@ class FormCompilerPass implements CompilerPassInterface
 
     /**
      * @param ContainerBuilder $container
+     * @param string[]         $formTypeClassNames
      *
      * @return array
      */
-    private function getApiFormTypes(ContainerBuilder $container)
+    private function getApiFormTypes(ContainerBuilder $container, array $formTypeClassNames)
     {
-        $types = [];
+        $types = array_fill_keys($formTypeClassNames, null);
         foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_TAG) as $serviceId => $tag) {
             $alias = DependencyInjectionUtil::getAttribute($tag[0], 'alias', $serviceId);
             $types[$alias] = $serviceId;

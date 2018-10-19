@@ -7,10 +7,10 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
@@ -20,17 +20,17 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
     /** @var AttributeMultiSelectType */
     private $formType;
 
-    /** @var AttributeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $managerMock;
 
     protected function setUp()
     {
-        parent::setUp();
         $this->managerMock = $this->getMockBuilder(AttributeManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->formType = new AttributeMultiSelectType($this->managerMock);
+        parent::setUp();
     }
 
     /**
@@ -41,10 +41,7 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    'oro_select2_choice' => new Select2Type(
-                        'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
-                        'oro_select2_choice'
-                    ),
+                    AttributeMultiSelectType::class => $this->formType
                 ],
                 []
             )
@@ -67,7 +64,7 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
 
         $submittedData = [777];
 
-        $form = $this->factory->create($this->formType, [], ['attributeEntityClass' => 'some\class']);
+        $form = $this->factory->create(AttributeMultiSelectType::class, [], ['attributeEntityClass' => 'some\class']);
 
         $form->submit($submittedData);
         $this->assertTrue($form->isValid());
@@ -110,13 +107,8 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
         $this->assertEquals(['locked' => 'locked'], $locked);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(AttributeMultiSelectType::NAME, $this->formType->getName());
-    }
-
     public function testGetParent()
     {
-        $this->assertEquals('oro_select2_choice', $this->formType->getParent());
+        $this->assertEquals(Select2ChoiceType::class, $this->formType->getParent());
     }
 }

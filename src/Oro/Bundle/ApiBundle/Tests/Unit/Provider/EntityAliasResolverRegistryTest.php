@@ -8,18 +8,18 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class EntityAliasResolverRegistryTest extends \PHPUnit_Framework_TestCase
+class EntityAliasResolverRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityAliasResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasResolver */
     private $defaultResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityAliasResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasResolver */
     private $firstResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityAliasResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasResolver */
     private $secondResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
     protected function setUp()
@@ -46,7 +46,7 @@ class EntityAliasResolverRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find a entity alias resolver for the request "rest,another".
+     * @expectedExceptionMessage Cannot find an entity alias resolver for the request "rest,another".
      */
     public function testGetEntityAliasResolverForUnsupportedRequestType()
     {

@@ -126,7 +126,7 @@ class EmailNotificationTypeListener
             [
                 'label' => 'workflow',
                 'required' => true,
-                'empty_value' => '',
+                'placeholder' => '',
                 'constraints' => [
                     new NotBlank()
                 ],
@@ -158,7 +158,7 @@ class EmailNotificationTypeListener
             [
                 'label' => 'transition',
                 'required' => true,
-                'empty_value' => '',
+                'placeholder' => '',
                 'constraints' => [
                     new NotBlank()
                 ],

@@ -29,7 +29,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
+class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
 {
     const SERVICE_BITS        = -16;
     const REMOVE_SERVICE_BITS = 15;
@@ -53,13 +53,13 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     /** @var UserSecurityIdentity */
     private $sid;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenInterface */
     private $securityToken;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|PermissionGrantingStrategyContextInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|PermissionGrantingStrategyContextInterface */
     private $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclExtensionInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclExtensionInterface */
     private $extension;
 
     /** @var PermissionGrantingStrategy */
@@ -91,7 +91,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     /**
      * @param object $service
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ServiceLink
+     * @return \PHPUnit\Framework\MockObject\MockObject|ServiceLink
      */
     private function createServiceLink($service)
     {
@@ -951,5 +951,86 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
                 [$this->sid]
             )
         );
+    }
+
+    public function testIsGrantedInCaseOfTwoRolesShouldReturnCorrectAccessLevel()
+    {
+        $object = new TestEntity(123);
+        $this->setObjectToContext($object);
+
+        $acl = $this->getAcl();
+
+        $sidRole1 = new RoleSecurityIdentity('ROLE_USER1');
+        $sidRole2 = new RoleSecurityIdentity('ROLE_USER2');
+
+        $acl->insertObjectAce($sidRole1, 0, 0);
+        $acl->insertObjectAce($sidRole2, self::MASK_CREATE_BASIC, 1);
+
+        $this->extension->expects(self::once())
+            ->method('decideIsGranting')
+            ->with(self::MASK_CREATE_BASIC)
+            ->willReturn(true);
+
+        $this->extension->expects($this->any())
+            ->method('getAccessLevel')
+            ->willReturnMap([
+                [self::MASK_CREATE_BASIC, null, $object, AccessLevel::BASIC_LEVEL],
+                [self::MASK_CREATE_SYSTEM, null, $object, AccessLevel::SYSTEM_LEVEL],
+            ]);
+
+        // The Basic access level should be set to context.
+        $this->context->expects($this->once())
+            ->method('setTriggeredMask')
+            ->with(self::MASK_CREATE_BASIC, AccessLevel::BASIC_LEVEL);
+
+        $isGranted = $this->strategy->isGranted(
+            $acl,
+            [self::MASK_CREATE_BASIC, self::MASK_CREATE_SYSTEM],
+            [$sidRole1, $sidRole2]
+        );
+
+        $this->assertTrue($isGranted);
+    }
+
+    public function testIsGrantedInCaseOfTwoRolesShouldReturnCorrectAccessLevelForField()
+    {
+        $field = 'testField';
+        $object = new TestEntity(123);
+        $this->setObjectToContext($object);
+        $this->setFieldSecurityMetadata($object, new FieldSecurityMetadata($field));
+
+        $acl = $this->getAcl();
+
+        $sidRole1 = new RoleSecurityIdentity('ROLE_USER1');
+        $sidRole2 = new RoleSecurityIdentity('ROLE_USER2');
+
+        $acl->insertObjectFieldAce($field, $sidRole1, 0, 0);
+        $acl->insertObjectFieldAce($field, $sidRole2, self::MASK_CREATE_BASIC, 1);
+
+        $this->extension->expects(self::once())
+            ->method('decideIsGranting')
+            ->with(self::MASK_CREATE_BASIC)
+            ->willReturn(true);
+
+        $this->extension->expects($this->any())
+            ->method('getAccessLevel')
+            ->willReturnMap([
+                [self::MASK_CREATE_BASIC, null, $object, AccessLevel::BASIC_LEVEL],
+                [self::MASK_CREATE_SYSTEM, null, $object, AccessLevel::SYSTEM_LEVEL],
+            ]);
+
+        // The Basic access level should be set to context.
+        $this->context->expects($this->once())
+            ->method('setTriggeredMask')
+            ->with(self::MASK_CREATE_BASIC, AccessLevel::BASIC_LEVEL);
+
+        $isGranted = $this->strategy->isFieldGranted(
+            $acl,
+            $field,
+            [self::MASK_CREATE_BASIC, self::MASK_CREATE_SYSTEM],
+            [$sidRole1, $sidRole2]
+        );
+
+        $this->assertTrue($isGranted);
     }
 }

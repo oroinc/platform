@@ -53,7 +53,7 @@ Please note that:
 
 - The name of a processor usually starts with a verb and the `Processor` suffix is not used.
 - A processor must be a public service because it is loaded on demand.
-- The `priority` attribute is used to control the order in which processors are executed. The higherst the priority, the earlier a processor is executed. The default value is 0. The possible range is from -255 to 255. However, for some types of processors the range can be different. For more details, see the [documentation of the ChainProcessor](../../../../Component/ChainProcessor/README.md#types-of-processors) component. If several processors have the same priority, the order in which they are executed is unpredictable.
+- The `priority` attribute is used to control the order in which processors are executed. The highest the priority, the earlier a processor is executed. The default value is 0. The possible range is from -255 to 255. However, for some types of processors the range can be different. For more details, see the [documentation of the ChainProcessor](../../../../Component/ChainProcessor/README.md#types-of-processors) component. If several processors have the same priority, the order in which they are executed is unpredictable.
 - Each processor should check whether its work is already done because there can be a processor with a higher priority which does the same but in another way. For example, such processors can be created for customization purposes.
 - As the data API resources can be created for any type of objects, not only ORM entities, it is always a good idea to check whether a processor is applicable for ORM entities. This check is very fast and allows avoiding possible logic issues and performance impact. Please use the `oro_api.doctrine_helper` service to get an instance of [Oro\Bundle\ApiBundle\Util\DoctrineHelper](../../Util/DoctrineHelper.php) as this class is optimized to be used in the data API stack. An example:
 
@@ -329,7 +329,7 @@ use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 
 /**
- * Makes sure that the identifier of an entity exists in the Context.
+ * Makes sure that the identifier of an entity exists in the context.
  */
 class ValidateEntityIdExists implements ProcessorInterface
 {

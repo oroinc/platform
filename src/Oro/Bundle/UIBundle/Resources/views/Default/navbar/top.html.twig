@@ -1,6 +1,8 @@
 {% if isMobileVersion() or oro_config_value('oro_ui.navbar_position') == 'top' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
 {% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
-<div id="main-menu" class="main-menu-top">
+<nav id="main-menu" class="main-menu-top"
+    {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/main-menu-view'}) }}>
     {{ block('application_menu') }}
-</div>
+</nav>
 {% endif %}

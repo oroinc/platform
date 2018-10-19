@@ -8,11 +8,15 @@ use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Component\PhpUtils\Formatter\BytesFormatter;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFileSystem;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+/**
+ * General methods of working with attachments
+ */
 class AttachmentManager
 {
     /**
@@ -207,11 +211,7 @@ class AttachmentManager
      */
     public function getFileSize($bytes)
     {
-        $sz = ['B', 'KB', 'MB', 'GB'];
-        $factor = floor((strlen($bytes) - 1) / 3);
-        $key = (int)$factor;
-
-        return isset($sz[$key]) ? sprintf("%.2f", $bytes / pow(1000, $factor)) . ' ' . $sz[$key] : $bytes;
+        return BytesFormatter::format($bytes);
     }
 
     /**
@@ -255,7 +255,7 @@ class AttachmentManager
                 'codedString' => $urlString,
                 'extension'   => $entity->getExtension()
             ],
-            $absolute
+            $absolute ? RouterInterface::ABSOLUTE_URL : RouterInterface::ABSOLUTE_PATH
         );
     }
 
@@ -343,7 +343,7 @@ class AttachmentManager
     }
 
     /**
-     * Generate url for prod env (without prefix "/app_dev.php")
+     * Generate url for prod env (without prefix "/index_dev.php")
      *
      * @param string $name
      * @param array $parameters
@@ -410,13 +410,15 @@ class AttachmentManager
      */
     public function parseFileKey($key)
     {
-        if (!($decoded = base64_decode(str_replace('_', '/', $key)))
-            || count($result = @unserialize($decoded)) !== 3
-        ) {
-            throw new \InvalidArgumentException(sprintf('Invalid file key: "%s".', $key));
+        $decoded = base64_decode(str_replace('_', '/', $key));
+        if ($decoded) {
+            $result = @unserialize($decoded);
+            if (!empty($result) && count($result) === 3) {
+                return $result;
+            }
         }
 
-        return $result;
+        throw new \InvalidArgumentException(sprintf('Invalid file key: "%s".', $key));
     }
 
     /**

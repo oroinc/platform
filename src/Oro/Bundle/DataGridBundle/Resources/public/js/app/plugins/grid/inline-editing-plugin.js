@@ -165,27 +165,29 @@ define(function(require) {
                     this.column = options.column;
                     Cell.apply(this, arguments);
                 },
-                className: _.isFunction(oldClassName) ?
-                    function() {
+                className: _.isFunction(oldClassName)
+                    ? function() {
                         var calculatedClassName = oldClassName.call(this);
-                        var addClassName = inlineEditingPlugin.isEditable(this) ?
-                            'editable view-mode prevent-text-selection-on-dblclick' :
-                            '';
+                        var addClassName = inlineEditingPlugin.isEditable(this)
+                            ? 'editable view-mode prevent-text-selection-on-dblclick' : '';
                         return (calculatedClassName ? calculatedClassName + ' ' : '') + addClassName;
-                    } :
-                    function() {
-                        var addClassName = inlineEditingPlugin.isEditable(this) ?
-                            'editable view-mode prevent-text-selection-on-dblclick' :
-                            '';
+                    }
+                    : function() {
+                        var addClassName = inlineEditingPlugin.isEditable(this)
+                            ? 'editable view-mode prevent-text-selection-on-dblclick' : '';
                         return (oldClassName ? oldClassName + ' ' : '') + addClassName;
                     },
                 events: splitEventsList.generateDeclaration(),
 
                 delayedIconRender: function() {
-                    if (!this.$el.find('> [data-role="edit"]').length) {
-                        this.$el.append('<i data-role="edit" ' +
-                            'class="fa-pencil skip-row-click hide-text inline-editor__edit-action"' +
-                            'title="' + __('Edit') + '">' + __('Edit') + '</i>');
+                    if (!this.$('[data-role="edit"]').length) {
+                        this.$el.append('<span class="inline-editor-edit-action">' +
+                            '<button data-role="edit" ' +
+                                    'class="inline-actions-btn skip-row-click hide-text"' +
+                                    'title="' + __('Edit') + '">' +
+                                '<span class="fa-pencil" aria-hidden="true"></span>' +
+                            '</button>' +
+                        '</span>');
                         this.$el.attr('title', inlineEditingPlugin.helpMessage);
                     }
                 },
@@ -236,10 +238,10 @@ define(function(require) {
             if (fullRestriction) {
                 return false;
             }
-            return columnMetadata.inline_editing && columnMetadata.inline_editing.enable ?
-                this.getCellEditorOptions(cell)
-                    .save_api_accessor.validateUrlParameters(cell.model.toJSON()) :
-                false;
+            return columnMetadata.inline_editing && columnMetadata.inline_editing.enable
+                ? this.getCellEditorOptions(cell)
+                    .save_api_accessor.validateUrlParameters(cell.model.toJSON())
+                : false;
         },
 
         getCellEditorOptions: function(cell) {

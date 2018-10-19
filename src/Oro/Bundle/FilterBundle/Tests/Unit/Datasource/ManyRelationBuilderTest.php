@@ -4,12 +4,12 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Datasource;
 
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 
-class ManyRelationBuilderTest extends \PHPUnit_Framework_TestCase
+class ManyRelationBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ManyRelationBuilder */
     protected $builder;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $childBuilder1;
 
     protected function setUp()

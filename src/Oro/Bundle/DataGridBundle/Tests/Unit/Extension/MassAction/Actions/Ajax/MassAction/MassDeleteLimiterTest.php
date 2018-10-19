@@ -9,12 +9,12 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassD
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
-class MassDeleteLimiterTest extends \PHPUnit_Framework_TestCase
+class MassDeleteLimiterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MassDeleteLimiter */
     protected $limiter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclHelper */
     protected $helper;
 
     public function setUp()
@@ -51,13 +51,13 @@ class MassDeleteLimiterTest extends \PHPUnit_Framework_TestCase
         $accessRestriction = false,
         $maxLimitRestriction = false
     ) {
-        /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject $queryBuilder */
+        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $queryBuilder */
         $queryBuilder = $this
             ->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var MassActionHandlerArgs|\PHPUnit_Framework_MockObject_MockObject $args */
+        /** @var MassActionHandlerArgs|\PHPUnit\Framework\MockObject\MockObject $args */
         $args = $this
             ->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs')
             ->disableOriginalConstructor()

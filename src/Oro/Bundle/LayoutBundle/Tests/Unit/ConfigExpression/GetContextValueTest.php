@@ -6,7 +6,7 @@ use Oro\Bundle\LayoutBundle\ConfigExpression\GetContextValue;
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
-class GetContextValueTest extends \PHPUnit_Framework_TestCase
+class GetContextValueTest extends \PHPUnit\Framework\TestCase
 {
     /** @var GetContextValue */
     protected $function;

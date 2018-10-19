@@ -6,12 +6,12 @@ use Oro\Bundle\TranslationBundle\Extractor\PhpCodeExtractor;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Fixtures\SomeClass;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class PhpCodeExtractorTest extends \PHPUnit_Framework_TestCase
+class PhpCodeExtractorTest extends \PHPUnit\Framework\TestCase
 {
     const MESSAGE_FROM_VARIABLE = 'oro.translation.some_another_string';
     const MESSAGE_FROM_ARGUMENT = 'vendor.bundle.type.message_string';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     /** @var PhpCodeExtractor */

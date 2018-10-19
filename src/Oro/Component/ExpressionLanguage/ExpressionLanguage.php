@@ -2,16 +2,16 @@
 
 namespace Oro\Component\ExpressionLanguage;
 
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage as SymfonyExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
-use Symfony\Component\ExpressionLanguage\ParserCache\ArrayParserCache;
-use Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface;
 
 class ExpressionLanguage extends SymfonyExpressionLanguage
 {
     /**
-     * @var ParserCacheInterface
+     * @var CacheItemPoolInterface
      */
     protected $cache;
 
@@ -26,12 +26,12 @@ class ExpressionLanguage extends SymfonyExpressionLanguage
     protected $parser;
 
     /**
-     * @param ParserCacheInterface|null $cache
+     * @param CacheItemPoolInterface|null $cache
      * @param array $providers
      */
-    public function __construct(ParserCacheInterface $cache = null, array $providers = [])
+    public function __construct(CacheItemPoolInterface $cache = null, array $providers = [])
     {
-        $this->cache = $cache ?: new ArrayParserCache();
+        $this->cache = $cache ?: new ArrayAdapter();
         parent::__construct($cache, $providers);
     }
 
@@ -56,13 +56,15 @@ class ExpressionLanguage extends SymfonyExpressionLanguage
             $cacheKeyItems[] = is_int($nameKey) ? $name : $nameKey.':'.$name;
         }
 
-        $key = $expression.'//'.implode('|', $cacheKeyItems);
+        $key = rawurlencode($expression.'//'.implode('|', $cacheKeyItems));
 
-        if (null === $parsedExpression = $this->cache->fetch($key)) {
+        $cacheItem = $this->cache->getItem($key);
+        if (null === $parsedExpression = $cacheItem->get()) {
             $nodes = $this->getParser()->parse($this->getLexer()->tokenize((string)$expression), $names);
             $parsedExpression = new ParsedExpression((string)$expression, $nodes);
 
-            $this->cache->save($key, $parsedExpression);
+            $cacheItem->set($parsedExpression);
+            $this->cache->save($cacheItem);
         }
 
         return $parsedExpression;

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
@@ -17,10 +17,27 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class RegisterConfiguredFilters extends RegisterFilters
 {
-    const ASSOCIATION_ALLOWED_OPERATORS = [ComparisonFilter::EQ, ComparisonFilter::NEQ];
+    private const ASSOCIATION_ALLOWED_OPERATORS            = [
+        ComparisonFilter::EQ,
+        ComparisonFilter::NEQ,
+        ComparisonFilter::EXISTS,
+        ComparisonFilter::NEQ_OR_NULL
+    ];
+    private const COLLECTION_ASSOCIATION_ALLOWED_OPERATORS = [
+        ComparisonFilter::EQ,
+        ComparisonFilter::NEQ,
+        ComparisonFilter::EXISTS,
+        ComparisonFilter::NEQ_OR_NULL,
+        ComparisonFilter::CONTAINS,
+        ComparisonFilter::NOT_CONTAINS
+    ];
+    private const SINGLE_IDENTIFIER_EXCLUDED_OPERATORS     = [
+        ComparisonFilter::EXISTS,
+        ComparisonFilter::NEQ_OR_NULL
+    ];
 
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /**
      * @param FilterFactoryInterface $filterFactory
@@ -36,7 +53,6 @@ class RegisterConfiguredFilters extends RegisterFilters
 
     /**
      * {@inheritdoc}
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function process(ContextInterface $context)
@@ -49,18 +65,17 @@ class RegisterConfiguredFilters extends RegisterFilters
             return;
         }
 
-        if (!$configOfFilters->isExcludeAll()) {
-            // it seems that filters' configuration was not normalized
-            throw new RuntimeException(
-                sprintf(
-                    'Expected "all" exclusion policy for filters. Got: %s.',
-                    $configOfFilters->getExclusionPolicy()
-                )
-            );
+        $metadata = null;
+        $entityClass = $this->doctrineHelper->getManageableEntityClass(
+            $context->getClassName(),
+            $context->getConfig()
+        );
+        if ($entityClass) {
+            // only manageable entities or resources based on manageable entities can have the metadata
+            $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         }
 
-        /** @var ClassMetadata|null $metadata */
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($context->getClassName(), false);
+        $idFieldName = $this->getSingleIdentifierFieldName($context->getConfig());
         $associationNames = $this->getAssociationNames($metadata);
         $filters = $context->getFilters();
         $fields = $configOfFilters->getFields();
@@ -72,16 +87,11 @@ class RegisterConfiguredFilters extends RegisterFilters
             $filter = $this->createFilter($field, $propertyPath, $context);
             if (null !== $filter) {
                 if ($filter instanceof FieldAwareFilterInterface) {
-                    // @todo BAP-11881. Update this code when NEQ operator for to-many collection
-                    // will be implemented in Oro\Bundle\ApiBundle\Filter\ComparisonFilter
-                    if (null !== $metadata && $this->isCollection($metadata, $propertyPath)) {
-                        $filter->setSupportedOperators([StandaloneFilter::EQ]);
+                    if ($idFieldName && $filterKey === $idFieldName) {
+                        $this->updateSingleIdentifierOperators($filter);
                     }
-                    // only EQ and NEQ operators should be available for association filters
-                    if (in_array($propertyPath, $associationNames, true) &&
-                        [] !== array_diff($filter->getSupportedOperators(), self::ASSOCIATION_ALLOWED_OPERATORS)
-                    ) {
-                        $filter->setSupportedOperators(self::ASSOCIATION_ALLOWED_OPERATORS);
+                    if (\in_array($propertyPath, $associationNames, true)) {
+                        $this->updateAssociationOperators($filter, $field->isCollection());
                     }
                 }
 
@@ -91,40 +101,56 @@ class RegisterConfiguredFilters extends RegisterFilters
     }
 
     /**
+     * @param EntityDefinitionConfig|null $config
+     *
+     * @return string|null
+     */
+    private function getSingleIdentifierFieldName(EntityDefinitionConfig $config = null)
+    {
+        if (null === $config) {
+            return null;
+        }
+        $idFieldNames = $config->getIdentifierFieldNames();
+        if (\count($idFieldNames) !== 1) {
+            return null;
+        }
+
+        return \reset($idFieldNames);
+    }
+
+    /**
      * @param ClassMetadata|null $metadata
      *
      * @return string[]
      */
-    protected function getAssociationNames(ClassMetadata $metadata = null)
+    private function getAssociationNames(?ClassMetadata $metadata)
     {
         return null !== $metadata
-            ? array_keys($this->doctrineHelper->getIndexedAssociations($metadata))
+            ? \array_keys($this->doctrineHelper->getIndexedAssociations($metadata))
             : [];
     }
 
     /**
-     * @param ClassMetadata $metadata
-     * @param string        $propertyPath
-     *
-     * @return bool
+     * @param StandaloneFilter $filter
      */
-    protected function isCollection(ClassMetadata $metadata, $propertyPath)
+    private function updateSingleIdentifierOperators(StandaloneFilter $filter)
     {
-        $isCollection = false;
-        $path = explode('.', $propertyPath);
-        foreach ($path as $fieldName) {
-            if ($metadata->isCollectionValuedAssociation($fieldName)) {
-                $isCollection = true;
-                break;
-            } elseif (!$metadata->hasAssociation($fieldName)) {
-                break;
-            }
+        $filter->setSupportedOperators(
+            \array_diff($filter->getSupportedOperators(), self::SINGLE_IDENTIFIER_EXCLUDED_OPERATORS)
+        );
+    }
 
-            $metadata = $this->doctrineHelper->getEntityMetadataForClass(
-                $metadata->getAssociationTargetClass($fieldName)
-            );
+    /**
+     * @param StandaloneFilter $filter
+     * @param bool             $isCollection
+     */
+    private function updateAssociationOperators(StandaloneFilter $filter, bool $isCollection)
+    {
+        $allowedOperators = $isCollection
+            ? self::COLLECTION_ASSOCIATION_ALLOWED_OPERATORS
+            : self::ASSOCIATION_ALLOWED_OPERATORS;
+        if ([] !== \array_diff($filter->getSupportedOperators(), $allowedOperators)) {
+            $filter->setSupportedOperators($allowedOperators);
         }
-
-        return $isCollection;
     }
 }

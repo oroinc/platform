@@ -59,28 +59,30 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function($, Backbone, 
             var self = this;
             $groups.add($root).each(function(i) {
                 var $group = $(this);
-                var $header = $group.find('a[href="#"]>span').first();
+                var isActive = $group.hasClass('active');
+                var autoCollapse = self.options.autoCollapse;
+                var $header = $group.find('a>span').first();
                 var $target = $group.find('.accordion-body').first();
-
+                var headerId = self._getGroupId(i + 1) + '-header';
                 var targetId = self._getGroupId(i + 1);
-                $target.attr('id', targetId);
 
                 $header.addClass('accordion-toggle')
+                    .toggleClass('collapsed', !isActive)
                     .attr({
+                        'id': headerId,
                         'data-toggle': 'collapse',
-                        'data-target': '#' + targetId
+                        'data-target': '#' + targetId,
+                        'aria-controls': targetId,
+                        'aria-expanded': isActive
                     })
                     .closest('a').addClass('accordion-heading');
 
-                if (self.options.autoCollapse) {
-                    $header.attr('data-parent', '#' + $header.closest('.accordion').attr('id'));
-                }
-
-                if ($group.hasClass('active')) {
-                    $target.addClass('in');
-                } else {
-                    $header.addClass('collapsed');
-                }
+                $target.attr({
+                    'id': targetId,
+                    'role': 'menu',
+                    'data-parent': autoCollapse ? '#' + $header.closest('.accordion').attr('id') : null,
+                    'aria-labelledby': headerId
+                }).toggleClass('show', isActive);
 
                 if ($target.has('.accordion-group')) {
                     $target.addClass('accordion');
@@ -94,14 +96,15 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function($, Backbone, 
          * @private
          */
         _convertToDropdown: function() {
-            this.element.find('.accordion').removeClass('accordion');
+            this.element.find('.accordion').removeClass('accordion collapsed');
             this.element.find('.accordion-body')
-                .removeClass('accordion-body collapse in')
-                .removeAttr('id')
-                .removeAttr('style')
+                .removeClass('accordion-body collapse show')
+                .removeAttr('id style role aria-labelledby')
                 .addClass('dropdown-menu');
             this.element.find('.accordion-group').removeClass('accordion-group').addClass('dropdown');
-            this.element.find('.accordion-toggle').removeClass('accordion-toggle collapsed');
+            this.element.find('.accordion-toggle')
+                .removeClass('accordion-toggle collapsed')
+                .removeAttr('id data-toggle data-target data-parent aria-controls aria-expanded');
             this.element.find('.accordion-heading').removeClass('accordion-heading');
         },
 

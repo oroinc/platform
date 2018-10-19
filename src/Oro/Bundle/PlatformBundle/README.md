@@ -1,7 +1,6 @@
-OroPlatformBundle
-=================
+# OroPlatformBundle
 
-The Oro Platform version holder, maintenance mode support, lazy services functionality and provide easy way to add application configuration settings from any bundle.
+OroPlatformBundle provides adjustments to the Symfony framework that enable you to configure the application settings in bundles' YAML configuration files, switch the application to the maintenance mode, and define the global command options, etc.
 
 
 ## Table of Contents
@@ -54,6 +53,8 @@ In maintenance mode all cron jobs disabled for execution.
 
 Other documentation could be found [here](https://github.com/lexik/LexikMaintenanceBundle/blob/master/Resources/doc/index.md).
 
+**Note**: Ensure that you have read bundle documentation to understand how the installed OroHealthCheckBundle affects
+the default behavior of the maintenance mode.
 
 ## Lazy services
 
@@ -87,7 +88,7 @@ lazy_services:
 
 ## Add application configuration settings from any bundle
 
-Sometime you need to add some settings to the application configuration from your bundle. For instance a bundle can implement new data type for Doctrine. The more native way to register it is to change _app/config.yml_. But it is the better way to achieve the same result if your bundle is used in ORO Platform. In this case you just need to add _app.yml_ in _Resources/config/oro_ directory of your bundle and the platform will add all setting from this file to the application configuration. The format of _app.yml_ is the same as _app/config.yml_.
+Sometime you need to add some settings to the application configuration from your bundle. For instance a bundle can implement new data type for Doctrine. The more native way to register it is to change _config.yml_. But it is the better way to achieve the same result if your bundle is used in OroPlatform. In this case you just need to add _app.yml_ in _Resources/config/oro_ directory of your bundle and the platform will add all setting from this file to the application configuration. The format of _app.yml_ is the same as _config.yml_.
 The following example shows how `money` data type can be registered:
 
 ``` yaml
@@ -97,7 +98,7 @@ doctrine:
             money: Oro\Bundle\EntityBundle\Entity\Type\MoneyType
 ```
 
-Please note that setting added through _app.yml_ can be overwrote in _app/config.yml_. So, you can consider settings in _app.yml_ as default ones.
+Please note that setting added through _app.yml_ can be overwrote in _config.yml_. So, you can consider settings in _app.yml_ as default ones.
 
 
 ## Optional listeners
@@ -109,7 +110,7 @@ Each console command have additional option `disabled_listeners`. Using this opt
 As value, this option takes `all` string or array of optional listener services. In the first case, will be disabled all optional listeners. In the second case, will be disabled only the specified listeners. For example:
 
 ```
- app/console some.command --disabled_listeners=first_listener --disabled_listeners=second_listener
+ bin/console some.command --disabled_listeners=first_listener --disabled_listeners=second_listener
 ```
 
 In this case, command will be run with disabled listeners: first_listener and second_listener.
@@ -129,7 +130,7 @@ performance of each request, because all of these services need to be fetched fr
 To solve this issue the Symfony provides an ability to mark the listeners as lazily loaded. For details see
 [Lazy loading for Event Listeners](https://symfony.com/doc/current/doctrine/event_listeners_subscribers.html#lazy-loading-for-event-listeners).
 But it is easy to forget about this, especially in a big project with a lot of listeners. This is the reason why in
-the Oro Platform all the listeners are marked as lazily loaded. But if needed, you can remove the lazy loading
+OroPlatform all the listeners are marked as lazily loaded. But if needed, you can remove the lazy loading
 for your listeners by adding `lazy: false` to `doctrine.event_listener` or `doctrine.orm.entity_listener` tags. E.g.:
 
 ```yaml

@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 class TestMetadataAccessor implements MetadataAccessorInterface
 {
     /** @var EntityMetadata[] */
-    protected $metadata = [];
+    private $metadata = [];
 
     /**
      * @param EntityMetadata[] $metadata

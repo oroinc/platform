@@ -5,6 +5,9 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
+use Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 class DateTimeRangeTypeTest extends AbstractTypeTestCase
 {
@@ -33,11 +36,16 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
             ->method('getTimezone')
             ->will($this->returnValue($this->defaultTimezone));
 
+        $this->type = new DateTimeRangeType($localeSettings);
         $this->formExtensions[] = new CustomFormExtension([new DateRangeType($localeSettings)]);
+        $this->formExtensions[] = new PreloadedExtension(
+            [$this->type],
+            [
+                DateTimeType::class => [new DateTimeExtension()]
+            ]
+        );
 
         parent::setUp();
-
-        $this->type = new DateTimeRangeType($localeSettings);
     }
 
     /**
@@ -48,11 +56,6 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(DateTimeRangeType::NAME, $this->type->getName());
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -61,7 +64,7 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
         return array(
             array(
                 'defaultOptions' => array(
-                    'field_type' => 'datetime',
+                    'field_type' => DateTimeType::class,
                     'field_options' => array(
                         'format' => 'yyyy-MM-dd HH:mm',
                         'view_timezone' => $this->defaultTimezone,

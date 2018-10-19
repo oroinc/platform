@@ -43,7 +43,7 @@ class EntityObjectSecurityCheck implements ProcessorInterface
         $entity = $context->getResult();
         if ($entity) {
             $config = $context->getConfig();
-            if ($config && $config->hasAclResource()) {
+            if (null !== $config && $config->hasAclResource()) {
                 $aclResource = $config->getAclResource();
                 if ($aclResource) {
                     $isGranted = $this->authorizationChecker->isGranted($aclResource, $entity);

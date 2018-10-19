@@ -344,7 +344,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->end()
                     ->end()
                     ->scalarNode('form_type')
-                        ->defaultValue(WorkflowTransitionType::NAME)
+                        ->defaultValue(WorkflowTransitionType::class)
                     ->end()
                     ->enumNode('display_type')
                         ->values([self::TRANSITION_DISPLAY_TYPE_DIALOG, self::TRANSITION_DISPLAY_TYPE_PAGE])

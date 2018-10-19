@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Extension\Stub;
 
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizationSelectTypeStub extends AbstractType
@@ -11,7 +12,7 @@ class LocalizationSelectTypeStub extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return LocalizationSelectType::NAME;
     }
@@ -37,6 +38,6 @@ class LocalizationSelectTypeStub extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

@@ -5,6 +5,8 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\Type\OroAutocompleteType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroAutocompleteTypeTest extends FormIntegrationTestCase
@@ -15,20 +17,19 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
     protected $formType;
 
     /**
-     * @var SearchRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var SearchRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $searchRegistry;
 
     /**
-     * @var SearchHandlerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var SearchHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $searchHandler;
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->formType = new OroAutocompleteType($this->getMockSearchRegistry());
+        parent::setUp();
     }
 
     protected function tearDown()
@@ -39,7 +40,22 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return SearchRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    OroAutocompleteType::class => $this->formType
+                ],
+                []
+            ),
+        ];
+    }
+
+    /**
+     * @return SearchRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockSearchRegistry()
     {
@@ -52,7 +68,7 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return SearchHandlerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return SearchHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockSearchHandler()
     {
@@ -64,14 +80,9 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
         return $this->searchHandler;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_autocomplete', $this->formType->getName());
-    }
-
     public function testGetParent()
     {
-        $this->assertEquals('text', $this->formType->getParent());
+        $this->assertEquals(TextType::class, $this->formType->getParent());
     }
 
     /**
@@ -83,7 +94,7 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
      */
     public function testBuildForm(array $options, array $expectedFormOptions, array $expectedComponentOptions)
     {
-        $form = $this->factory->create($this->formType, null, ['autocomplete' => $options]);
+        $form = $this->factory->create(OroAutocompleteType::class, null, ['autocomplete' => $options]);
         $view = $form->createView();
 
         $formOptions = $form->getConfig()->getOption('autocomplete');

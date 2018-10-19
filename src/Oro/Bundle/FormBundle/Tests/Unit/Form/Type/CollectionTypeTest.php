@@ -3,10 +3,11 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType as BaseCollectionType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CollectionTypeTest extends \PHPUnit_Framework_TestCase
+class CollectionTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CollectionType
@@ -224,7 +225,7 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('collection', $this->type->getParent());
+        $this->assertEquals(BaseCollectionType::class, $this->type->getParent());
     }
 
     public function testGetName()

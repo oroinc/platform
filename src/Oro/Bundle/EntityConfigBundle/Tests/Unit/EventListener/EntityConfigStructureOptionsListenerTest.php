@@ -10,11 +10,11 @@ use Oro\Bundle\EntityConfigBundle\EventListener\EntityConfigStructureOptionsList
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class EntityConfigStructureOptionsListenerTest extends \PHPUnit_Framework_TestCase
+class EntityConfigStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigProvider;
 
     /** @var EntityConfigStructureOptionsListener */

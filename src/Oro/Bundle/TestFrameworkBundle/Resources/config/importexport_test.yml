@@ -13,5 +13,5 @@ services:
             - [setDataConverter, ['@oro_user.importexport.template_fixture.data_converter']]
             - [setStrategy, ['@oro_user.importexport.strategy.user.add_or_replace']]
         tags:
-            - { name: oro_importexport.processor, type: import, entity: %oro_user.entity.class%, alias: oro_user.add_or_replace }
-            - { name: oro_importexport.processor, type: import_validation, entity: %oro_user.entity.class%, alias: oro_user.add_or_replace }
+            - { name: oro_importexport.processor, type: import, entity: '%oro_user.entity.class%', alias: oro_user.add_or_replace }
+            - { name: oro_importexport.processor, type: import_validation, entity: '%oro_user.entity.class%', alias: oro_user.add_or_replace }

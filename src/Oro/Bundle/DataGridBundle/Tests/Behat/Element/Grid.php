@@ -68,7 +68,7 @@ class Grid extends Table implements GridInterface
      */
     public function getMassActionLink($title)
     {
-        return $this->elementFactory->createElement($this->getMappedChildElementName('GridFloatingMenu'))
+        return $this->elementFactory->createElement($this->getMappedChildElementName('GridMassActionMenu'))
             ->findLink($title);
     }
 
@@ -224,7 +224,7 @@ class Grid extends Table implements GridInterface
         $massActionHeadCheckboxElementName = $this->getMappedChildElementName('MassActionHeadCheckbox');
 
         $this->elementFactory->createElement($massActionHeadCheckboxElementName, $this)->click();
-        $this->elementFactory->createElement('GridFloatingMenu')->clickLink($title);
+        $this->elementFactory->createElement('GridMassCheckMenu')->clickLink($title);
     }
 
     /**
@@ -242,6 +242,7 @@ class Grid extends Table implements GridInterface
      */
     public function clickActionLink($content, $action)
     {
+        /** @var GridRow $row */
         $row = $this->getRowByContent($content);
         $link = $row->getActionLink($action);
         $link->click();

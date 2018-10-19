@@ -30,7 +30,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -38,14 +38,14 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
+class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     /** @var EntityAclExtension */
     private $extension;
 
-    /** @var EntitySecurityMetadataProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntitySecurityMetadataProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $securityMetadataProvider;
 
     /** @var OwnershipMetadataProviderStub */
@@ -57,13 +57,13 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var EntityOwnershipDecisionMaker */
     private $decisionMaker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|PermissionManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|PermissionManager */
     private $permissionManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
     private $groupProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
     protected function setUp()
@@ -93,7 +93,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id')
         );
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProvider $treeProviderMock */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnerTreeProvider $treeProviderMock */
         $treeProviderMock = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -420,7 +420,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 'UNKNOWN' => 7
             ]);
 
-        /* @var $entityClassResolver EntityClassResolver|\PHPUnit_Framework_MockObject_MockObject  */
+        /* @var $entityClassResolver EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject  */
         $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
@@ -483,7 +483,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|UsernamePasswordOrganizationToken $token */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|UsernamePasswordOrganizationToken $token */
         $token =
             $this->getMockBuilder('Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken')
                 ->disableOriginalConstructor()
@@ -1137,7 +1137,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupports($id, $type, $class, $isEntity, $isProtectedEntity, $expected)
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver $entityClassResolverMock */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassResolver $entityClassResolverMock */
         $entityClassResolverMock = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
@@ -1146,7 +1146,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($class)
             ->willReturn($class);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|EntitySecurityMetadataProvider $entityMetadataProvider */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|EntitySecurityMetadataProvider $entityMetadataProvider */
         $entityMetadataProvider = $this
             ->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
             ->disableOriginalConstructor()
@@ -1298,7 +1298,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PermissionManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|PermissionManager
      */
     protected function getPermissionManagerMock()
     {

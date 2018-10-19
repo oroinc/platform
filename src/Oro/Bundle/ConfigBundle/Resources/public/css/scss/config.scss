@@ -1,0 +1,113 @@
+/* @theme: admin.oro; */
+
+.left-panel-container {
+    background-color: #fff;
+
+    & > .placeholder {
+        margin-left: 334px;
+        background-color: #f1f1f1;
+        border-left: 1px solid #e2e2e2;
+
+        & > * {
+            margin-left: -335px;
+
+            & > .left-panel {
+                float: left;
+                width: 334px;
+                border-top: 1px solid #f2f2f2;
+                margin: 0;
+            }
+
+            & > .content {
+                margin-left: 335px;
+                padding: $content-padding-medium $content-padding-medium 0;
+                box-sizing: border-box;
+            }
+        }
+    }
+}
+
+.system-configuration-container {
+    padding: 0 $content-padding;
+
+    .controls.control-subgroup {
+        width: auto;
+        margin: side-values( 0 $content-padding-medium 0 0);
+        float: #{$start};
+
+        input,
+        textarea {
+            min-width: 294px;
+        }
+    }
+
+    .controls .parent-scope-checkbox {
+        color: #777;
+
+        label, .checkbox-view__text {
+            float: left;
+            margin: 0 4px;
+        }
+
+        input[type="checkbox"] {
+            margin: -4px 10px 0 0;
+        }
+    }
+
+    .container-fluid:after {
+        clear: none;
+    }
+
+}
+
+.system-configuration-content {
+    &-wrapper {
+        padding-#{$start}: $content-padding-medium;
+        margin-bottom: 15px;
+    }
+
+    &-inner {
+        padding: $content-padding $content-padding $content-padding-medium;
+        width: 100%;
+        overflow-y: auto;
+    }
+
+    &-header {
+        display: flex;
+        justify-content: space-between;
+        background: $primary-900;
+        border-radius: 4px;
+        padding: 8px 12px;
+    }
+
+    &-title {
+        font-size: 14px;
+        font-weight: bold;
+    }
+}
+
+.scrollable-container .container-fluid.configuration-header {
+    background-color: #fff;
+
+    @include clearfix();
+
+    h1 {
+        font-size: 20px;
+        margin-top: 12px;
+        line-height: 28px;
+        float: left;
+    }
+
+    > .pull-right {
+        margin: 10px 0;
+    }
+
+    > .pull-left {
+        margin: 10px 0 0;
+    }
+
+    .sub-title,
+    .separator {
+        line-height: 28px;
+    }
+}

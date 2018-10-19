@@ -1,0 +1,27 @@
+/* @theme: blank; */
+
+// Maintain an elements aspect ratio, even as it scales
+// $width and $height arguments for aspect ratio
+// $content selector for inner content block
+// $position [static|relative|absolute|fixed]
+@mixin aspect-ratio($width: 1, $height: 1, $content: null, $position: relative) {
+    position: $position;
+
+    &:before {
+        content: '';
+
+        display: block;
+        width: 100%;
+        padding-top: ($height / $width) * 100%;
+    }
+
+    @if $content != null {
+        > #{$content} {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+    }
+}

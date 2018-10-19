@@ -1,0 +1,145 @@
+/* @theme: admin.oro; */
+
+&.login-page {
+    height: 100%;
+    overflow: visible;
+
+    .app-page {
+        &__central-panel {
+            padding-top: 0;
+            height: 100%;
+        }
+    }
+
+    .btn,
+    .btn.disabled,
+    .btn[disabled],
+    .btn.disabled:active,
+    .btn[disabled]:active,
+    .ui-datepicker .ui-datepicker-buttonpane button {
+        font-size: 14px;
+        line-height: 38px;
+        height: 40px;
+        border-radius: 20px;
+    }
+}
+
+.form-wrapper {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 0 30px;
+
+    &__title {
+        background: $primary-300;
+        font-size: 17px;
+        font-weight: bold;
+        color: #fff;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 16px;
+        padding: 14px 16px;
+    }
+
+    &__inner {
+        margin-top: 0;
+        padding: 25px 15px;
+        max-width: 575px;
+        min-width: inherit;
+        width: 100%;
+    }
+}
+
+.form-signin {
+    margin: 0 auto;
+
+    &__info {
+        margin: 16px 0;
+
+        .alert {
+            padding: 8px;
+        }
+    }
+
+    &__footer {
+        padding-left: 0;
+    }
+
+    &__oauth {
+        padding-left: 0;
+    }
+
+    &__roles-item {
+        display: block;
+    }
+
+    .title-box {
+        margin: 0 0 5px;
+
+        .title {
+            font-size: 20px;
+            line-height: 1.5;
+        }
+    }
+
+    .add-on {
+        width: auto;
+        height: auto;
+        line-height: normal;
+        text-align: left;
+        padding-right: 0;
+
+        & + input[type="text"],
+        & + input[type="email"],
+        & + input[type="password"] {
+            width: 100%;
+        }
+
+        & + select {
+            width: 174px;
+            height: 36px;
+            box-sizing: border-box;
+        }
+    }
+
+    .oro-remember-me {
+        padding-left: 0;
+    }
+
+    span.validation-failed {
+        font-size: 13px;
+    }
+
+    .input-field-group {
+        margin-bottom: 15px;
+    }
+
+    .input-append,
+    .input-prepend {
+        display: block;
+    }
+}
+
+.form-reset {
+    max-width: 320px !important;
+
+    .add-on {
+        width: 120px;
+        font-size: 12px;
+
+        & + input[type="text"],
+        & + input[type="email"],
+        & + input[type="password"] {
+            width: 138px;
+        }
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    .form-signin {
+        &__roles {
+            display: flex;
+            justify-content: space-around;
+        }
+    }
+}

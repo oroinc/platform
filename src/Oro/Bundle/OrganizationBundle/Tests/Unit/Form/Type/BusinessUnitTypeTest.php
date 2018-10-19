@@ -5,7 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
-class BusinessUnitTypeTest extends \PHPUnit_Framework_TestCase
+class BusinessUnitTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var BusinessUnitType */
     protected $form;
@@ -54,10 +54,5 @@ class BusinessUnitTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
 
         $this->form->buildForm($builder, array());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_business_unit', $this->form->getName());
     }
 }

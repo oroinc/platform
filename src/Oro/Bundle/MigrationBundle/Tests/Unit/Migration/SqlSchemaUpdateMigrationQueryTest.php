@@ -4,7 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\MigrationBundle\Migration\SqlSchemaUpdateMigrationQuery;
 
-class SqlSchemaUpdateMigrationQueryTest extends \PHPUnit_Framework_TestCase
+class SqlSchemaUpdateMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
     public function testIsUpdateRequired()
     {

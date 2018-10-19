@@ -6,7 +6,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Event\Action\ChannelDisableEvent;
 use Oro\Bundle\IntegrationBundle\Factory\Event\ChannelDisableEventFactory;
 
-class ChannelDisableEventFactoryTest extends \PHPUnit_Framework_TestCase
+class ChannelDisableEventFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {

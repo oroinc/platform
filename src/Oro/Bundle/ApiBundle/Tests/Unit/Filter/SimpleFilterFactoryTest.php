@@ -3,39 +3,43 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class SimpleFilterFactoryTest extends \PHPUnit_Framework_TestCase
+class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SimpleFilterFactory */
-    protected $filterFactory;
+    private $filterFactory;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->filterFactory = new SimpleFilterFactory(new PropertyAccessor());
+        $this->filterFactory = new SimpleFilterFactory(
+            new PropertyAccessor(),
+            new FilterOperatorRegistry([
+                ComparisonFilter::EQ  => '=',
+                ComparisonFilter::NEQ => '!='
+            ])
+        );
     }
 
     public function testForUnknownFilter()
     {
-        $this->assertNull($this->filterFactory->createFilter('unknown'));
+        self::assertNull($this->filterFactory->createFilter('unknown'));
     }
 
     public function testForFilterWithoutAdditionalParameters()
     {
         $filterType = 'string';
 
-        $this->filterFactory->addFilter(
-            $filterType,
-            'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'
-        );
+        $this->filterFactory->addFilter($filterType, ComparisonFilter::class);
 
         $expectedFilter = new ComparisonFilter($filterType);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedFilter,
             $this->filterFactory->createFilter($filterType)
         );
@@ -44,18 +48,17 @@ class SimpleFilterFactoryTest extends \PHPUnit_Framework_TestCase
     public function testForFilterWithAdditionalParameters()
     {
         $filterType = 'string';
-        $supportedOperators = ['=', '!='];
 
         $this->filterFactory->addFilter(
             $filterType,
-            'Oro\Bundle\ApiBundle\Filter\ComparisonFilter',
-            ['supported_operators' => $supportedOperators]
+            ComparisonFilter::class,
+            ['supported_operators' => ['=', '!=']]
         );
 
         $expectedFilter = new ComparisonFilter($filterType);
-        $expectedFilter->setSupportedOperators($supportedOperators);
+        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedFilter,
             $this->filterFactory->createFilter($filterType)
         );
@@ -67,14 +70,14 @@ class SimpleFilterFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->filterFactory->addFilter(
             $filterType,
-            'Oro\Bundle\ApiBundle\Filter\ComparisonFilter',
+            ComparisonFilter::class,
             ['supported_operators' => ['=', '!=']]
         );
 
         $expectedFilter = new ComparisonFilter($filterType);
-        $expectedFilter->setSupportedOperators(['=']);
+        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedFilter,
             $this->filterFactory->createFilter($filterType, ['supported_operators' => ['=']])
         );
@@ -87,12 +90,12 @@ class SimpleFilterFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->filterFactory->addFilter(
             $filterType,
-            'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'
+            ComparisonFilter::class
         );
 
         $expectedFilter = new ComparisonFilter($dataType);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedFilter,
             $this->filterFactory->createFilter($filterType, ['data_type' => $dataType])
         );
@@ -109,7 +112,7 @@ class SimpleFilterFactoryTest extends \PHPUnit_Framework_TestCase
             'create'
         );
 
-        $this->assertSame(
+        self::assertSame(
             $filter,
             $this->filterFactory->createFilter($filterType)
         );

@@ -7,26 +7,30 @@ use Oro\Bundle\ApiBundle\Filter\SelfIdentifiableFilterInterface;
 
 class SelfIdentifiableFilterStub extends ComparisonFilter implements SelfIdentifiableFilterInterface
 {
-    /** @var string|\Exception|null */
-    protected $foundFilterKey;
+    /** @var string[]|\Exception|null */
+    private $foundFilterKeys;
 
     /**
-     * @param string|\Exception|null $filterKey
+     * @param string[]|\Exception|null $filterKeys
      */
-    public function setFoundFilterKey($filterKey)
+    public function setFoundFilterKeys($filterKeys)
     {
-        $this->foundFilterKey = $filterKey;
+        $this->foundFilterKeys = $filterKeys;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function searchFilterKey(array $filterValues)
+    public function searchFilterKeys(array $filterValues): array
     {
-        if ($this->foundFilterKey instanceof \Exception) {
-            throw $this->foundFilterKey;
+        if ($this->foundFilterKeys instanceof \Exception) {
+            throw $this->foundFilterKeys;
         }
 
-        return $this->foundFilterKey;
+        if (null === $this->foundFilterKeys) {
+            return [];
+        }
+
+        return $this->foundFilterKeys;
     }
 }

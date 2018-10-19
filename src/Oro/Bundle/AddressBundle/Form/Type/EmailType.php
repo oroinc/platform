@@ -3,6 +3,9 @@
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType as SymfonyEmailType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class EmailType extends AbstractType
@@ -13,10 +16,10 @@ class EmailType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('id', 'hidden')
+            ->add('id', HiddenType::class)
             ->add(
                 'email',
-                'email',
+                SymfonyEmailType::class,
                 array(
                     'label' => 'Email',
                     'required' => true
@@ -24,7 +27,7 @@ class EmailType extends AbstractType
             )
             ->add(
                 'primary',
-                'radio',
+                RadioType::class,
                 array(
                     'label' => 'Primary',
                     'required' => false

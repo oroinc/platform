@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Event\Action\ChannelDeleteEvent;
 
-class ChannelDeleteEventTest extends \PHPUnit_Framework_TestCase
+class ChannelDeleteEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetName()
     {

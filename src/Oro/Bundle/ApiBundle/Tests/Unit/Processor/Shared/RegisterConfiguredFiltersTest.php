@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Processor\Shared\RegisterConfiguredFilters;
 use Oro\Bundle\ApiBundle\Tests\Unit\Filter\RequestAwareFilterStub;
@@ -14,11 +16,11 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelated
 
 class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var RegisterConfiguredFilters */
-    protected $processor;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FilterFactoryInterface */
+    private $filterFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $filterFactory;
+    /** @var RegisterConfiguredFilters */
+    private $processor;
 
     protected function setUp()
     {
@@ -26,7 +28,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $this->context->setAction('get_list');
 
-        $this->filterFactory = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface');
+        $this->filterFactory = $this->createMock(FilterFactoryInterface::class);
 
         $this->processor = new RegisterConfiguredFilters(
             $this->filterFactory,
@@ -36,13 +38,15 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 
     /**
      * @param string $dataType
+     * @param bool   $isCollection
      *
      * @return ComparisonFilter
      */
-    protected function getComparisonFilter($dataType)
+    private function getComparisonFilter($dataType, $isCollection = false)
     {
         $filter = new ComparisonFilter($dataType);
-        $filter->setSupportedOperators(['=', '!=']);
+        $filter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $filter->setCollection($isCollection);
 
         return $filter;
     }
@@ -51,23 +55,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
     {
         $filtersConfig = new FiltersConfig();
 
-        $this->filterFactory->expects($this->never())
-            ->method('createFilter');
-
-        $this->context->setConfigOfFilters($filtersConfig);
-        $this->processor->process($this->context);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage Expected "all" exclusion policy for filters. Got: none.
-     */
-    public function testProcessWithNotNormalizedFiltersConfig()
-    {
-        $filtersConfig = new FiltersConfig();
-        $filtersConfig->setExcludeNone();
-
-        $this->filterFactory->expects($this->never())
+        $this->filterFactory->expects(self::never())
             ->method('createFilter');
 
         $this->context->setConfigOfFilters($filtersConfig);
@@ -86,22 +74,23 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $filterConfig->setDataType('string');
         $filtersConfig->addField('someField', $filterConfig);
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
             ->willReturn($this->getComparisonFilter('string'));
 
         $this->context->setClassName($className);
         $this->context->setConfigOfFilters($filtersConfig);
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('someField');
-        $expectedFilter->setSupportedOperators(['=', '!=']);
+        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('someField', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForComparisonFilterForManageableEntity()
@@ -113,7 +102,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $filterConfig->setDataType('string');
         $filtersConfig->addField('someField', $filterConfig);
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
             ->willReturn($this->getComparisonFilter('string'));
@@ -124,11 +113,11 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('someField');
-        $expectedFilter->setSupportedOperators(['=', '!=']);
+        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('someField', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForFilterWithOptions()
@@ -143,10 +132,10 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $filterConfig->setDataType('integer');
         $filterConfig->setPropertyPath('someField');
         $filterConfig->setArrayAllowed();
-        $filterConfig->setOperators(['=', '<', '>']);
+        $filterConfig->setOperators([ComparisonFilter::EQ, '<', '>']);
         $filtersConfig->addField('filter', $filterConfig);
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('someFilter', ['some_option' => 'val', 'data_type' => 'integer'])
             ->willReturnCallback(
@@ -164,11 +153,11 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $expectedFilter->setDataType('integer');
         $expectedFilter->setField('someField');
         $expectedFilter->setArrayAllowed(true);
-        $expectedFilter->setSupportedOperators(['=', '<', '>']);
+        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, '<', '>']);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('filter', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForComparisonFilterForToOneAssociation()
@@ -179,10 +168,9 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $filterConfig = new FilterFieldConfig();
         $filterConfig->setDataType('string');
         $filterConfig->setPropertyPath('category');
-        $filterConfig->setOperators([ComparisonFilter::GT]);
         $filtersConfig->addField('filter', $filterConfig);
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
             ->willReturn($this->getComparisonFilter('string'));
@@ -193,11 +181,14 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category');
-        $expectedFilter->setSupportedOperators(['=', '!=']);
+        $expectedFilter->setSupportedOperators([
+            ComparisonFilter::EQ,
+            ComparisonFilter::NEQ
+        ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('filter', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForComparisonFilterForToOneAssociationField()
@@ -210,7 +201,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $filterConfig->setPropertyPath('category.name');
         $filtersConfig->addField('filter', $filterConfig);
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
             ->willReturn($this->getComparisonFilter('string'));
@@ -221,11 +212,48 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category.name');
-        $expectedFilter->setSupportedOperators(['=', '!=']);
+        $expectedFilter->setSupportedOperators([
+            ComparisonFilter::EQ,
+            ComparisonFilter::NEQ
+        ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('filter', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
+    }
+
+    public function testProcessForComparisonFilterForToOneAssociationWithConfiguredOperators()
+    {
+        $filtersConfig = new FiltersConfig();
+        $filtersConfig->setExcludeAll();
+
+        $filterConfig = new FilterFieldConfig();
+        $filterConfig->setDataType('string');
+        $filterConfig->setPropertyPath('category');
+        $filterConfig->setOperators([ComparisonFilter::EQ, ComparisonFilter::GT]);
+        $filtersConfig->addField('filter', $filterConfig);
+
+        $this->filterFactory->expects(self::once())
+            ->method('createFilter')
+            ->with('string', [])
+            ->willReturn($this->getComparisonFilter('string'));
+
+        $this->context->setClassName(Entity\User::class);
+        $this->context->setConfigOfFilters($filtersConfig);
+        $this->processor->process($this->context);
+
+        $expectedFilter = new ComparisonFilter('string');
+        $expectedFilter->setField('category');
+        $expectedFilter->setSupportedOperators([
+            ComparisonFilter::EQ,
+            ComparisonFilter::NEQ,
+            ComparisonFilter::EXISTS,
+            ComparisonFilter::NEQ_OR_NULL
+        ]);
+        $expectedFilters = new FilterCollection();
+        $expectedFilters->add('filter', $expectedFilter);
+
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForComparisonFilterForToManyAssociation()
@@ -235,25 +263,32 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $filterConfig = new FilterFieldConfig();
         $filterConfig->setDataType('string');
+        $filterConfig->setIsCollection(true);
         $filterConfig->setPropertyPath('groups');
         $filtersConfig->addField('filter', $filterConfig);
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
-            ->willReturn($this->getComparisonFilter('string'));
+            ->willReturn($this->getComparisonFilter('string', true));
 
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfigOfFilters($filtersConfig);
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
+        $expectedFilter->setCollection(true);
         $expectedFilter->setField('groups');
-        $expectedFilter->setSupportedOperators(['=']);
+        $expectedFilter->setSupportedOperators([
+            ComparisonFilter::EQ,
+            ComparisonFilter::NEQ,
+            ComparisonFilter::CONTAINS,
+            ComparisonFilter::NOT_CONTAINS
+        ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('filter', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForComparisonFilterForToManyAssociationField()
@@ -263,25 +298,117 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $filterConfig = new FilterFieldConfig();
         $filterConfig->setDataType('string');
+        $filterConfig->setIsCollection(true);
         $filterConfig->setPropertyPath('groups.name');
         $filtersConfig->addField('filter', $filterConfig);
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
-            ->willReturn($this->getComparisonFilter('string'));
+            ->willReturn($this->getComparisonFilter('string', true));
 
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfigOfFilters($filtersConfig);
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
+        $expectedFilter->setCollection(true);
         $expectedFilter->setField('groups.name');
-        $expectedFilter->setSupportedOperators(['=']);
+        $expectedFilter->setSupportedOperators([
+            ComparisonFilter::EQ,
+            ComparisonFilter::NEQ,
+            ComparisonFilter::CONTAINS,
+            ComparisonFilter::NOT_CONTAINS
+        ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('filter', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
+    }
+
+    public function testProcessForComparisonFilterForToManyAssociationWithConfiguredOperators()
+    {
+        $filtersConfig = new FiltersConfig();
+        $filtersConfig->setExcludeAll();
+
+        $filterConfig = new FilterFieldConfig();
+        $filterConfig->setDataType('string');
+        $filterConfig->setIsCollection(true);
+        $filterConfig->setPropertyPath('groups');
+        $filterConfig->setOperators([ComparisonFilter::EQ, ComparisonFilter::GT]);
+        $filtersConfig->addField('filter', $filterConfig);
+
+        $this->filterFactory->expects(self::once())
+            ->method('createFilter')
+            ->with('string', [])
+            ->willReturn($this->getComparisonFilter('string', true));
+
+        $this->context->setClassName(Entity\User::class);
+        $this->context->setConfigOfFilters($filtersConfig);
+        $this->processor->process($this->context);
+
+        $expectedFilter = new ComparisonFilter('string');
+        $expectedFilter->setCollection(true);
+        $expectedFilter->setField('groups');
+        $expectedFilter->setSupportedOperators([
+            ComparisonFilter::EQ,
+            ComparisonFilter::NEQ,
+            ComparisonFilter::EXISTS,
+            ComparisonFilter::NEQ_OR_NULL,
+            ComparisonFilter::CONTAINS,
+            ComparisonFilter::NOT_CONTAINS
+        ]);
+        $expectedFilters = new FilterCollection();
+        $expectedFilters->add('filter', $expectedFilter);
+
+        self::assertEquals($expectedFilters, $this->context->getFilters());
+    }
+
+    public function testProcessForComparisonFilterForToOneAssociationFieldForModelInheritedFromManageableEntity()
+    {
+        $this->notManageableClassNames = [Entity\UserProfile::class];
+
+        $config = new EntityDefinitionConfig();
+        $config->setParentResourceClass(Entity\User::class);
+
+        $filtersConfig = new FiltersConfig();
+        $filtersConfig->setExcludeAll();
+
+        $filterConfig = new FilterFieldConfig();
+        $filterConfig->setDataType('integer');
+        $filterConfig->setOperators([
+            ComparisonFilter::EQ,
+            ComparisonFilter::NEQ,
+            ComparisonFilter::GT,
+            ComparisonFilter::LT
+        ]);
+        $filtersConfig->addField('owner', $filterConfig);
+
+        $existingAssociationFilter = new ComparisonFilter('string');
+        $existingAssociationFilter->setDataType('integer');
+
+        $this->filterFactory->expects(self::once())
+            ->method('createFilter')
+            ->with('integer', [])
+            ->willReturn($this->getComparisonFilter('integer'));
+
+        $this->context->setClassName(Entity\UserProfile::class);
+        $this->context->setConfigOfFilters($filtersConfig);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        $expectedFilter = new ComparisonFilter('integer');
+        $expectedFilter->setField('owner');
+        $expectedFilter->setSupportedOperators([
+            ComparisonFilter::EQ,
+            ComparisonFilter::NEQ,
+            ComparisonFilter::EXISTS,
+            ComparisonFilter::NEQ_OR_NULL
+        ]);
+        $expectedFilters = new FilterCollection();
+        $expectedFilters->add('owner', $expectedFilter);
+
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForSortFilter()
@@ -293,7 +420,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $filterConfig->setDataType('string');
         $filtersConfig->addField('sort', $filterConfig);
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
             ->willReturn(new SortFilter('string'));
@@ -306,7 +433,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('sort', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForRequestTypeAwareFilter()
@@ -323,15 +450,16 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $filter = new RequestAwareFilterStub('string');
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
             ->willReturn($filter);
 
         $this->context->setClassName($className);
         $this->context->setConfigOfFilters($filtersConfig);
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
-        $this->assertSame($this->context->getRequestType(), $filter->getRequestType());
+        self::assertSame($this->context->getRequestType(), $filter->getRequestType());
     }
 }

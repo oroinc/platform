@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\NoteSoap;
 use Symfony\Component\Form\FormInterface;
@@ -16,6 +17,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class NoteApiHandler
 {
+    use RequestHandlerTrait;
+
     /** @var FormInterface */
     protected $form;
 
@@ -59,7 +62,7 @@ class NoteApiHandler
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
             $request = $this->processRequest($request);
-            $this->form->submit($request);
+            $this->submitPostPutRequest($this->form, $request);
             if ($this->form->isValid()) {
                 $this->onSuccess($entity);
 

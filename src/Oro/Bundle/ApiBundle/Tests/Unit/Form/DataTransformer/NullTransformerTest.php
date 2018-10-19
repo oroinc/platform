@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DateTransformer;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NullTransformer;
 
-class NullTransformerTest extends \PHPUnit_Framework_TestCase
+class NullTransformerTest extends \PHPUnit\Framework\TestCase
 {
     public function testTransform()
     {

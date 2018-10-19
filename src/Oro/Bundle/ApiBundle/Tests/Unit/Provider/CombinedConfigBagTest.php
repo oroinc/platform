@@ -7,18 +7,18 @@ use Oro\Bundle\ApiBundle\Config\RelationConfigMerger;
 use Oro\Bundle\ApiBundle\Provider\CombinedConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagInterface;
 
-class CombinedConfigBagTest extends \PHPUnit_Framework_TestCase
+class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigBagInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
     private $configBag1;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigBagInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
     private $configBag2;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityConfigMerger */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityConfigMerger */
     private $entityConfigMerger;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RelationConfigMerger */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RelationConfigMerger */
     private $relationConfigMerger;
 
     /** @var CombinedConfigBag */

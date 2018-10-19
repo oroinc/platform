@@ -10,9 +10,9 @@ use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
-class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
+class DataCollectorExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LayoutDataCollector|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutDataCollector|\PHPUnit\Framework\MockObject\MockObject */
     protected $dataCollector;
 
     /** @var DataCollectorExtension */
@@ -36,7 +36,7 @@ class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
         $blockTypeName = 'root';
         $options = new Options(['optionKey' => 'optionValue']);
 
-        /** @var BlockBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
+        /** @var BlockBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(BlockBuilderInterface::class);
         $builder->expects($this->once())
             ->method('getId')
@@ -55,9 +55,9 @@ class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildView()
     {
-        /** @var BlockView|\PHPUnit_Framework_MockObject_MockObject $view */
+        /** @var BlockView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = $this->createMock(BlockView::class);
-        /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
+        /** @var BlockInterface|\PHPUnit\Framework\MockObject\MockObject $block */
         $block = $this->createMock(BlockInterface::class);
         $options = new Options(['optionKey' => 'optionValue']);
 

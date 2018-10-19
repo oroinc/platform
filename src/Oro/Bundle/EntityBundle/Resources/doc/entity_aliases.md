@@ -93,7 +93,7 @@ Please, note that you can specify the priority for the alias provider. The bigge
 
 **Viewing existing entity aliases**
 
-You can use `php app/console oro:entity-alias:debug` CLI command to see all the aliases.
+You can use `php bin/console oro:entity-alias:debug` CLI command to see all the aliases.
 The output will look something like this:
 
 ```
@@ -108,8 +108,6 @@ Oro\Bundle\AttachmentBundle\Entity\File                  file                   
 Oro\Bundle\CalendarBundle\Entity\Calendar                calendar               calendars
 Oro\Bundle\CalendarBundle\Entity\CalendarEvent           calendarevent          calendarevents
 ```
-
-Alternatively, you may use `GET /api/rest/{version}/entities/aliases.{_format}` API to get the list of all available aliases.
 
 **Suggestions for aliases naming**
 

@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Tests\Unit\Util\Fixtures\JsonSerializableClass;
 use Oro\Component\MessageQueue\Tests\Unit\Util\Fixtures\SimpleClass;
 use Oro\Component\MessageQueue\Util\JSON;
 
-class JSONTest extends \PHPUnit_Framework_TestCase
+class JSONTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldDecodeString()
     {

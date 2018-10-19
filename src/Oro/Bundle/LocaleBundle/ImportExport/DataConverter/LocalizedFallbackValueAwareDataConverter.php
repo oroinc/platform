@@ -5,8 +5,13 @@ namespace Oro\Bundle\LocaleBundle\ImportExport\DataConverter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizationCodeFormatter;
-use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Extends parent data conversion behavior in methods
+ * getRelatedEntityRules
+ * getRelatedEntityRulesAndBackendHeaders
+ * by processLocalizationCodes of $targetField found using $fieldConfigValue['fallback_field']
+ */
 class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConverter
 {
     const FIELD_VALUE = 'value';
@@ -60,7 +65,7 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
         if (null === $this->names) {
             /* @var $localizationRepository LocalizationRepository */
             $localizationRepository = $this->registry->getRepository($this->localizationClassName);
-            $this->names = ArrayUtil::arrayColumn($localizationRepository->getNames(), 'name');
+            $this->names = \array_column($localizationRepository->getNames(), 'name');
             array_unshift($this->names, LocalizationCodeFormatter::DEFAULT_LOCALIZATION);
         }
 

@@ -1,0 +1,23 @@
+/* @theme: admin.oro; */
+
+.base-currency-wrapper {
+    &--convert {
+        .control-group {
+            label.control-label {
+                float: none;
+                margin-left: 170px;
+                text-align: left;
+                padding-left: 5px;
+                font-size: 11px;
+            }
+
+            .controls {
+                .control-label {
+                    padding-top: 0;
+                    margin-top: -3px;
+                    float: none;
+                }
+            }
+        }
+    }
+}

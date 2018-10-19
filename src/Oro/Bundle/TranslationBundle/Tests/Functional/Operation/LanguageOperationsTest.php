@@ -98,7 +98,7 @@ class LanguageOperationsTest extends ActionTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ExternalTranslationsProvider
+     * @return \PHPUnit\Framework\MockObject\MockObject|ExternalTranslationsProvider
      */
     private function assertExternalTranslationsProviderCalled()
     {
@@ -113,7 +113,7 @@ class LanguageOperationsTest extends ActionTestCase
     /**
      * @param string $method
      *
-     * @return LanguageHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @return LanguageHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private function assertLanguageHelperCalled($method)
     {

@@ -8,11 +8,12 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Component\Testing\Unit\EntityTrait;
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType as EntityTypeStub;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -22,7 +23,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
 
     const WORKFLOW_ENTITY_NAME = 'stdClass';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WorkflowRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowRegistry */
     protected $workflowRegistry;
 
     /** @var WorkflowDefinitionSelectType */
@@ -31,13 +32,11 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
     /** @var array|WorkflowDefinition[] */
     protected $definitions = [];
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     protected $translator;
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -45,6 +44,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
         $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->type = new WorkflowDefinitionSelectType($this->workflowRegistry, $this->translator);
+        parent::setUp();
     }
 
     public function testSubmitWithWorkflowNameOption()
@@ -60,7 +60,11 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
             ->with($definition->getLabel())
             ->willReturn($workflow);
 
-        $form = $this->factory->create($this->type, null, ['workflow_name' => $definition->getLabel()]);
+        $form = $this->factory->create(
+            WorkflowDefinitionSelectType::class,
+            null,
+            ['workflow_name' => $definition->getLabel()]
+        );
 
         $this->assertFormSubmit(
             $form,
@@ -81,7 +85,11 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
             ->with(self::WORKFLOW_ENTITY_NAME)
             ->willReturn($this->getWorkflows());
 
-        $form = $this->factory->create($this->type, null, ['workflow_entity_class' => self::WORKFLOW_ENTITY_NAME]);
+        $form = $this->factory->create(
+            WorkflowDefinitionSelectType::class,
+            null,
+            ['workflow_entity_class' => self::WORKFLOW_ENTITY_NAME]
+        );
 
         $this->assertFormSubmit(
             $form,
@@ -115,14 +123,9 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(WorkflowDefinitionSelectType::NAME, $this->type->getName());
-    }
-
     public function testGetParent()
     {
-        $this->assertEquals('entity', $this->type->getParent());
+        $this->assertEquals(EntityType::class, $this->type->getParent());
     }
 
     /**
@@ -135,7 +138,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
      */
     public function testNormalizersException(array $options)
     {
-        $this->factory->create($this->type, null, $options);
+        $this->factory->create(WorkflowDefinitionSelectType::class, null, $options);
     }
 
     /**
@@ -150,7 +153,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
             [
                 [
                     'class' => 'OroWorkflowBundle:WorkflowStep',
-                    'property' => 'label'
+                    'choice_label' => 'label'
                 ]
             ]
         ];
@@ -161,9 +164,17 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $entityType = new EntityType($this->getDefinitions());
+        $entityType = new EntityTypeStub($this->getDefinitions());
 
-        return [new PreloadedExtension([$entityType->getName() => $entityType], [])];
+        return [
+            new PreloadedExtension(
+                [
+                    $this->type,
+                    EntityType::class => $entityType
+                ],
+                []
+            )
+        ];
     }
 
     /**

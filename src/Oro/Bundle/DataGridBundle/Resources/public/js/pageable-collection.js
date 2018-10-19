@@ -158,6 +158,13 @@ define([
         onePagePagination: false,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function PageableCollection() {
+            PageableCollection.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize basic parameters from source options
          *
          * @param models
@@ -586,8 +593,8 @@ define([
                     throw new RangeError('"pageSize" must be >= 0');
                 }
 
-                state.totalPages = pageSize === 0 ?
-                    1 : totalPages = state.totalPages = Math.ceil(totalRecords / pageSize);
+                state.totalPages = pageSize === 0
+                    ? 1 : totalPages = state.totalPages = Math.ceil(totalRecords / pageSize);
 
                 if (firstPage < 0 || firstPage > 1) {
                     throw new RangeError('"firstPage" must be 0 or 1');
@@ -747,6 +754,7 @@ define([
             }
             data = this.processQueryParams(data, state);
             this.processFiltersParams(data, state);
+            this.processColumnsParams(data, state);
 
             var self = this;
             var success = options.success;
@@ -770,9 +778,9 @@ define([
                         resetQuickly(fullCollection, models, opts);
                     } else if (links[currentPage]) { // refetching a page
                         var pageSize = state.pageSize;
-                        var pageStart = (state.firstPage === 0 ?
-                            currentPage :
-                            currentPage - 1) * pageSize;
+                        var pageStart = (state.firstPage === 0
+                            ? currentPage
+                            : currentPage - 1) * pageSize;
                         var fullModels = fullCollection.models;
                         var head = fullModels.slice(0, pageStart);
                         var tail = fullModels.slice(pageStart + pageSize);
@@ -841,9 +849,9 @@ define([
             var pageablePrototype = PageableCollection.prototype;
 
             // map params except directions
-            var queryParams = this.mode === 'client' ?
-                _.pick(this.queryParams, 'sorters') :
-                _.omit(_.pick(this.queryParams, _.keys(pageablePrototype.queryParams)), 'directions');
+            var queryParams = this.mode === 'client'
+                ? _.pick(this.queryParams, 'sorters')
+                : _.omit(_.pick(this.queryParams, _.keys(pageablePrototype.queryParams)), 'directions');
 
             var i;
             var kvp;
@@ -979,7 +987,7 @@ define([
          * @return {PageableCollection}
          */
         clone: function() {
-            var newCollection = new PageableCollection(this.toJSON(), tools.deepClone(this.options));
+            var newCollection = new (this.constructor)(this.toJSON(), tools.deepClone(this.options));
             newCollection.state = tools.deepClone(this.state);
             newCollection.initialState = tools.deepClone(this.initialState);
             return newCollection;

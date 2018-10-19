@@ -9,11 +9,11 @@ use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\TranslationBundle\EventListener\TranslationListener;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
-class TranslationListenerTest extends \PHPUnit_Framework_TestCase
+class TranslationListenerTest extends \PHPUnit\Framework\TestCase
 {
     const JOB_NAME = 'test_job_name';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DynamicTranslationMetadataCache */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DynamicTranslationMetadataCache */
     protected $metadataCache;
 
     /** @var TranslationListener */

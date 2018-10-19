@@ -11,15 +11,15 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-abstract class AbstractSearchEnumFilterTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractSearchEnumFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formFactory;
 
-    /** @var FilterUtility|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FilterUtility|\PHPUnit\Framework\MockObject\MockObject */
     protected $filterUtility;
 
-    /** @var DictionaryApiEntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DictionaryApiEntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $dictionaryManager;
 
     /** @var SearchEnumFilter */
@@ -56,7 +56,7 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit_Framework_TestCase
         $formView = new FormView();
         $formView->children['type'] = $childFormView;
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
             ->method('createView')
@@ -69,7 +69,7 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit_Framework_TestCase
         $this->formFactory->expects($this->once())
             ->method('create')
             ->with(
-                SearchEnumFilterType::NAME,
+                SearchEnumFilterType::class,
                 [],
                 ['csrf_protection' => false, 'class' => \stdClass::class]
             )

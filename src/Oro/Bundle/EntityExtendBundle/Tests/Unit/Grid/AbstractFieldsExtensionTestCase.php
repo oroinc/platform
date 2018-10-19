@@ -9,32 +9,36 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension;
 use Oro\Bundle\EntityExtendBundle\Grid\FieldsHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
-abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CLASS = 'Test\Entity';
     const ENTITY_NAME = 'Test:Entity';
     const FIELD_NAME = 'testField';
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var EntityClassResolver|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityClassResolver;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendConfigProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $viewConfigProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $datagridConfigProvider;
 
-    /** @var FieldsHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    protected $attributeConfigProvider;
+
+    /** @var FieldsHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $fieldsHelper;
 
     /**
@@ -68,6 +72,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
         $this->extendConfigProvider = $this->getConfigProviderMock();
         $this->datagridConfigProvider = $this->getConfigProviderMock();
         $this->viewConfigProvider = $this->getConfigProviderMock();
+        $this->attributeConfigProvider = $this->getConfigProviderMock();
 
         $this->configManager->expects($this->any())
             ->method('getProvider')
@@ -78,6 +83,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                         ['extend', $this->extendConfigProvider],
                         ['datagrid', $this->datagridConfigProvider],
                         ['view', $this->viewConfigProvider],
+                        ['attribute', $this->attributeConfigProvider],
                     ]
                 )
             );
@@ -105,7 +111,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
 
     /**
      * @param bool $isEnabled
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getFeatureCheckerMock($isEnabled = true)
     {
@@ -121,7 +127,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProviderMock()
     {
@@ -470,10 +476,10 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                                 'enabled' => true,
                                 'translatable' => true,
                                 'options' => [
-                                    'field_type' => 'entity',
+                                    'field_type' => EntityType::class,
                                     'field_options' => [
                                         'class' => null,
-                                        'property' => 'name',
+                                        'choice_label' => 'name',
                                         'multiple' => true,
                                     ],
                                 ],

@@ -8,15 +8,15 @@ use Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
-class EntityRelationGridListenerTest extends \PHPUnit_Framework_TestCase
+class EntityRelationGridListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $cm;
 
     /** @var EntityRelationGridListener */
     protected $listener;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     protected function setUp()

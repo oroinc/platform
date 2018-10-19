@@ -2,8 +2,9 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AddressBundle\Form\Type\AddressCollectionType;
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 
-class AddressCollectionTypeTest extends \PHPUnit_Framework_TestCase
+class AddressCollectionTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AddressCollectionType
@@ -20,7 +21,7 @@ class AddressCollectionTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_collection', $this->type->getParent());
+        $this->assertEquals(CollectionType::class, $this->type->getParent());
     }
 
     public function testGetName()

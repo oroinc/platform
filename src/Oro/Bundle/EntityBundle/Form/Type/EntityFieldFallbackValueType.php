@@ -237,7 +237,7 @@ class EntityFieldFallbackValueType extends AbstractType
                 continue;
             }
 
-            $choices[$fallbackId] = $this->fallbackResolver->getFallbackLabel($fallbackId);
+            $choices[$this->fallbackResolver->getFallbackLabel($fallbackId)] = $fallbackId;
         }
         $fallbackOptions['choices'] = $choices;
 

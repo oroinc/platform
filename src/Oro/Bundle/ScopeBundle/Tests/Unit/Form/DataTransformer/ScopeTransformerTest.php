@@ -6,14 +6,14 @@ use Oro\Bundle\ScopeBundle\Form\DataTransformer\ScopeTransformer;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class ScopeTransformerTest extends \PHPUnit_Framework_TestCase
+class ScopeTransformerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     const SCOPE_TYPE = 'test_scope_type';
 
     /**
-     * @var ScopeManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $scopeManager;
 

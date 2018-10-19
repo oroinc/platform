@@ -18,13 +18,12 @@
     {% set conditionBuilderOptions = {
         fieldsRelatedCriteria: ['condition-item']
     }|merge_recursive(params.conditionBuilderOptions|default({})) %}
-    <div class="condition-builder left-panel-container"
+    <div class="condition-builder"
          data-page-component-module="oroquerydesigner/js/app/components/condition-builder-component"
          data-page-component-options="{{ conditionBuilderOptions|json_encode }}"
          data-page-component-name="{{ params.componentName|default('condition-builder') }}">
         <div class="row-fluid">
-            <div class="left-area filter-criteria">
-                <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
+            <div class="criteria-list-container filter-criteria">
                 <ul class="criteria-list">
                     <li class="option" data-criteria="condition-item"
                         data-module="{{ fieldConditionModule }}"
@@ -36,8 +35,8 @@
                     </li>
                 </ul>
             </div>
-            <div class="right-area">
-                <div class="condition-container"></div>
+            <div class="condition-container">
+                <div class="drag-n-drop-hint"><div>{{ 'oro.query_designer.condition_builder.drag_n_drop_hint'|trans }}</div></div>
             </div>
         </div>
     </div>
@@ -194,7 +193,7 @@
         }) }}
         {% endif %}
         {% if ('action' in showItems) %}
-        <div class="pull-right">
+        <div class="pull-right submit-cancel-buttons">
             {{ UI.clientButton({
                 'aCss': 'no-hash cancel-button column-form-button',
                 'label' : 'oro.query_designer.form.action.cancel'|trans
@@ -216,7 +215,7 @@
 
 {% macro query_designer_grouping_form(form, attr, params) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-grouping-form query-designer-form clearfix')|trim}) %}
+    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-grouping-form query-designer-form')|trim}) %}
     <div{{ UI.attributes(attr) }}>
         {# @todo own formtype for this kind field based on hidden input #}
         {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
@@ -227,7 +226,7 @@
                 'data-validation': { NotBlank: null }|json_encode
             }
         }) }}
-        <div class="pull-right">
+        <div class="pull-right submit-cancel-buttons">
             {{ UI.clientButton({
                 'aCss': 'no-hash cancel-button',
                 'label' : 'oro.query_designer.form.action.cancel'|trans

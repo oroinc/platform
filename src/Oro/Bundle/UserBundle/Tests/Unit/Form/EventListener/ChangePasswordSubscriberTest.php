@@ -10,13 +10,13 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class ChangePasswordSubscriberTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
     /** @var  ChangePasswordSubscriber */
     protected $subscriber;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $token;
 
     protected function setUp()

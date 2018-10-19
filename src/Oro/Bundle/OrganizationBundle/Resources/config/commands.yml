@@ -1,0 +1,6 @@
+services:
+    Oro\Bundle\OrganizationBundle\Command\UpdateOrganizationCommand:
+        public: false
+        class: Oro\Bundle\OrganizationBundle\Command\UpdateOrganizationCommand
+        tags:
+            - { name: console.command }

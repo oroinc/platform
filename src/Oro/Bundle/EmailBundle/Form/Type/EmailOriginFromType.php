@@ -9,11 +9,13 @@ use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Form\DataTransformer\OriginTransformer;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailOriginFromType extends AbstractType
@@ -83,9 +85,15 @@ class EmailOriginFromType extends AbstractType
     {
         $choices = $this->createChoices();
         $resolver->setDefaults([
-            'choices'   => $choices,
-            'read_only' => count($choices) === 1,
+            'choices' => $choices,
+            'attr' => [],
         ]);
+
+        $resolver->setNormalizer('attr', function (Options $options, $value) {
+            $value['readonly'] = (count($options['choices']) === 1);
+
+            return $value;
+        });
     }
 
     /**
@@ -112,7 +120,7 @@ class EmailOriginFromType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_choice';
+        return Select2ChoiceType::class;
     }
 
     /**
@@ -146,7 +154,7 @@ class EmailOriginFromType extends AbstractType
                     $owner = $origin->getOwner();
                     $email = $origin->getOwner()->getEmail();
                     $this->helper->preciseFullEmailAddress($email, ClassUtils::getClass($owner), $owner->getId());
-                    $origins[$origin->getId() . '|' . $origin->getOwner()->getEmail()] = $email;
+                    $origins[$email] = $origin->getId() . '|' . $origin->getOwner()->getEmail();
                 }
             }
         }
@@ -188,7 +196,7 @@ class EmailOriginFromType extends AbstractType
             } else {
                 $this->helper->preciseFullEmailAddress($email);
             }
-            $origins[$key] = $email;
+            $origins[$email] = $key;
         }
 
         return $origins;
@@ -212,7 +220,7 @@ class EmailOriginFromType extends AbstractType
                 $email = $mailbox->getEmail();
                 $this->helper->preciseFullEmailAddress($email);
                 $email .= ' (Mailbox)';
-                $origins[$origin->getId() . '|' . $mailbox->getEmail()] = $email;
+                $origins[$email] = $origin->getId() . '|' . $mailbox->getEmail();
             }
         }
 

@@ -5,7 +5,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Layouts;
 
-class LayoutsTest extends \PHPUnit_Framework_TestCase
+class LayoutsTest extends \PHPUnit\Framework\TestCase
 {
     public function testCoreExtensionIsAdded()
     {

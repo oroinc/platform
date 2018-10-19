@@ -4,12 +4,12 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\EmailBundle\Datagrid\EmailTemplateGridHelper;
 
-class EmailTemplateGridHelperTest extends \PHPUnit_Framework_TestCase
+class EmailTemplateGridHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     /** @var EmailTemplateGridHelper */
@@ -50,9 +50,9 @@ class EmailTemplateGridHelperTest extends \PHPUnit_Framework_TestCase
         $result = $this->helper->getEntityNames();
         $this->assertSame(
             [
-                '_empty_'     => 'oro.email.datagrid.emailtemplate.filter.entityName.empty',
-                'TestEntity1' => 'entity1_label',
-                'TestEntity2' => 'entity2_label',
+                'oro.email.datagrid.emailtemplate.filter.entityName.empty' => '_empty_',
+                'entity1_label' => 'TestEntity1',
+                'entity2_label' => 'TestEntity2',
             ],
             $result
         );

@@ -1,8 +1,8 @@
 parameters:
     oro_imap.user_form_name:                         oro_user_emailsettings
-    oro_imap.user_form_type:                         oro_user_emailsettings
+    oro_imap.user_form_type:                         Oro\Bundle\UserBundle\Form\Type\EmailSettingsType
     oro_imap.email_mailbox_form_name:                oro_email_mailbox
-    oro_imap.email_mailbox_form_type:                oro_email_mailbox
+    oro_imap.email_mailbox_form_type:                Oro\Bundle\EmailBundle\Form\Type\MailboxType
     oro_imap.connector.factory.class:                Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory
     oro_imap.connector.class:                        Oro\Bundle\ImapBundle\Connector\ImapConnector
     oro_imap.services.factory.class:                 Oro\Bundle\ImapBundle\Connector\ImapServicesFactory
@@ -31,25 +31,25 @@ parameters:
 
 services:
     oro_imap.connector.factory:
-        class: %oro_imap.connector.factory.class%
+        class: '%oro_imap.connector.factory.class%'
         arguments:
             - '@oro_imap.services.factory'
-            - %oro_imap.connector.class%
+            - '%oro_imap.connector.class%'
 
     oro_imap.services.factory:
         public: false
-        class: %oro_imap.services.factory.class%
+        class: '%oro_imap.services.factory.class%'
         arguments:
             - # The configuration of IMAP services. The empty key is used to configure IMAP servers which have not any special preferences
-                "": [%oro_imap.storage.other.class%, %oro_imap.search_string_manager.other.class%]
-                X-GM-EXT-1: [%oro_imap.storage.gmail.class%, %oro_imap.search_string_manager.gmail.class%]
+                "": ['%oro_imap.storage.other.class%', '%oro_imap.search_string_manager.other.class%']
+                X-GM-EXT-1: ['%oro_imap.storage.gmail.class%', '%oro_imap.search_string_manager.gmail.class%']
 
     oro_imap.email_body_loader:
         public: false
-        class: %oro_imap.email_body_loader.class%
+        class: '%oro_imap.email_body_loader.class%'
         arguments:
             - '@oro_imap.connector.factory'
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_imap.imap_email_google_oauth2_manager'
             - '@oro_config.global'
         tags:
@@ -57,23 +57,23 @@ services:
 
     oro_imap.email_flag_manager_loader:
         public: false
-        class: %oro_imap.email_flag_manager_loader.class%
+        class: '%oro_imap.email_flag_manager_loader.class%'
         arguments:
             - '@oro_imap.connector.factory'
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_imap.imap_email_google_oauth2_manager'
         tags:
             - { name: oro_email.email_flag_manager_loader }
 
     oro_imap.email_synchronizer:
         shared: false
-        class: %oro_imap.email_synchronizer.class%
+        class: '%oro_imap.email_synchronizer.class%'
         arguments:
             - '@doctrine'
             - '@oro_email.known_email_address_checker_factory'
             - '@oro_imap.email_sync_processor_factory'
             - '@oro_imap.connector.factory'
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_imap.imap_email_google_oauth2_manager'
         calls:
             - ['setMessageProducer', ['@oro_message_queue.client.message_producer']]
@@ -83,7 +83,7 @@ services:
             - { name: oro_email.email_synchronizer }
 
     oro_imap.email_sync_processor_factory:
-        class: %oro_imap.email_sync_processor_factory.class%
+        class: '%oro_imap.email_sync_processor_factory.class%'
         public: false
         shared: false
         arguments:
@@ -96,35 +96,35 @@ services:
             - { name: monolog.logger, channel: oro_imap_email }
 
     oro_imap.imap_email_remove_manager:
-        class: %oro_imap.imap_email_remove_manager.class%
+        class: '%oro_imap.imap_email_remove_manager.class%'
         arguments:
             - '@doctrine'
         calls:
             - [setLogger, ['@logger']]
 
     oro_imap.form.type.configuration:
-        class: %oro_imap.form.type.configuration.class%
+        class: '%oro_imap.form.type.configuration.class%'
         arguments:
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_security.token_accessor'
             - '@translator'
         tags:
              - { name: form.type, alias: oro_imap_configuration }
 
     oro_imap.form.type.check_button:
-        class: %oro_imap.form.type.check_button.class%
+        class: '%oro_imap.form.type.check_button.class%'
         tags:
             - { name: form.type, alias: oro_imap_configuration_check }
 
     oro_imap.form.type.choice_account:
-        class: %oro_imap.form.type.choice_account.class%
+        class: '%oro_imap.form.type.choice_account.class%'
         arguments:
              - '@translator'
         tags:
              - { name: form.type, alias: oro_imap_choice_account_type }
 
     oro_imap.form.configuration_gmail_type:
-        class: %oro_imap.form.configuration_gmail_type.class%
+        class: '%oro_imap.form.configuration_gmail_type.class%'
         arguments:
              - '@translator'
              - '@oro_config.user'
@@ -135,7 +135,7 @@ services:
     oro_imap.listener.user_email_origin:
         class: Oro\Bundle\ImapBundle\EventListener\UserEmailOriginListener
         arguments:
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_imap.connector.factory'
             - '@doctrine'
             - '@oro_imap.imap_email_google_oauth2_manager'
@@ -143,7 +143,7 @@ services:
             - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\ImapBundle\Entity\UserEmailOrigin, event: prePersist }
 
     oro_imap.manager.clear:
-        class: %oro_imap.imap_clear_manager.class%
+        class: '%oro_imap.imap_clear_manager.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_search.async.indexer'
@@ -151,7 +151,7 @@ services:
             - [setLogger, ['@logger']]
 
     oro_imap.form.type.google_sync_checkbox:
-        class: %oro_imap.form.type.google_sync_checkbox.class%
+        class: '%oro_imap.form.type.google_sync_checkbox.class%'
         tags:
             - { name: form.type, alias: oro_config_google_imap_sync_checkbox }
 
@@ -163,7 +163,7 @@ services:
             - '@logger'
 
     oro_imap.imap_email_google_oauth2_manager:
-        class: %oro_imap.imap_email_google_oauth2_manager.class%
+        class: '%oro_imap.imap_email_google_oauth2_manager.class%'
         arguments:
             - '@hwi_oauth.http_client'
             - '@hwi_oauth.resource_ownermap.main'
@@ -171,22 +171,22 @@ services:
             - '@doctrine'
 
     oro_imap.manager.controller.connection:
-        class: %oro_imap.manager.connection_controller_manager.class%
+        class: '%oro_imap.manager.connection_controller_manager.class%'
         arguments:
             - '@form.factory'
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@doctrine'
             - '@oro_imap.connector.factory'
             - '@oro_imap.imap_email_google_oauth2_manager'
-            - %oro_imap.user_form_name%
-            - %oro_imap.user_form_type%
-            - %oro_imap.email_mailbox_form_name%
-            - %oro_imap.email_mailbox_form_type%
+            - '%oro_imap.user_form_name%'
+            - '%oro_imap.user_form_type%'
+            - '%oro_imap.email_mailbox_form_name%'
+            - '%oro_imap.email_mailbox_form_type%'
 
     oro_imap.listener.send_email_transport_listener:
-        class: %oro_imap.listener.send_email_transport_listener.class%
+        class: '%oro_imap.listener.send_email_transport_listener.class%'
         arguments:
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_imap.imap_email_google_oauth2_manager'
         tags:
             - { name: kernel.event_listener, event: oro_email.send_email_transport, method: setSmtpTransport }
@@ -218,15 +218,8 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_imap.command.email_sync:
-        class: 'Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand'
-        tags:
-            - { name: console.command }
-
     oro_imap.validator.email_folders:
         class: 'Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator'
-        arguments:
-            - '@translator'
         tags:
             - { name: validator.constraint_validator, alias: oro_imap.validator.email_folders }
 
@@ -251,17 +244,16 @@ services:
     oro_imap.origin_credentials.notification_sender.socket:
         class: Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\SocketNotificationSender
         arguments:
-            - '@oro_wamp.publisher'
+            - '@oro_sync.websocket_client'
+            - '@oro_sync.client.connection_checker'
         tags:
             - {name: oro_imap.origin_credentials.notification_sender}
 
     oro_imap.origin_credentials.notification_sender.email:
         class: Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\EmailNotificationSender
         arguments:
-            - '@oro_config.global'
-            - '@oro_email.email_renderer'
-            - '@doctrine'
-            - '@oro_email.direct_mailer'
+            - '@oro_notification.model.notification_settings'
+            - '@oro_email.manager.template_email'
         tags:
             - {name: oro_imap.origin_credentials.notification_sender}
 
@@ -279,3 +271,11 @@ services:
              - '@oro_imap.origin_credentials.issue_manager'
         tags:
             - { name: kernel.event_listener, event: security.interactive_login, method: onLogin }
+
+    oro_imap.topic.sync_fail:
+        class: Oro\Bundle\ImapBundle\Topic\SyncFailTopic
+        arguments:
+            - 'oro_imap.sync_fail'
+            - '@gos_web_socket.websocket.client_manipulator'
+        tags:
+            - { name: gos_web_socket.topic }

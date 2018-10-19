@@ -5,10 +5,10 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 
-class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
+class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $stepExecution;
 

@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
+/**
+ * Delegates the extraction of information from an exception object to all child extractors.
+ */
 class ChainExceptionTextExtractor implements ExceptionTextExtractorInterface
 {
-    /**
-     * @var ExceptionTextExtractorInterface[]
-     */
-    protected $extractors = [];
+    /** @var ExceptionTextExtractorInterface[] */
+    private $extractors = [];
 
     /**
      * Registers a given extractor in the chain.

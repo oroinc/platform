@@ -7,15 +7,15 @@ use Oro\Bundle\IntegrationBundle\ActionHandler\ChannelActionHandlerInterface;
 use Oro\Bundle\IntegrationBundle\ActionHandler\Decorator\ChannelActionHandlerTransactionDecorator;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
-class ChannelActionHandlerTransactionDecoratorTest extends \PHPUnit_Framework_TestCase
+class ChannelActionHandlerTransactionDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $entityManager;
 
     /**
-     * @var ChannelActionHandlerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ChannelActionHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $actionHandler;
 

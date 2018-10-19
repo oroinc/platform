@@ -4,20 +4,23 @@ namespace Oro\Bundle\EmailBundle\Form\Configurator;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\DependencyInjection\Configuration as Config;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * This class adds configuration for email system configuration.
+ */
 class EmailConfigurationConfigurator
 {
-    /** @var Mcrypt */
+    /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
     /**
-     * @param Mcrypt $encryptor
+     * @param SymmetricCrypterInterface $encryptor
      */
-    public function __construct(Mcrypt $encryptor)
+    public function __construct(SymmetricCrypterInterface $encryptor)
     {
         $this->encryptor = $encryptor;
     }

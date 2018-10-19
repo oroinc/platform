@@ -5,15 +5,15 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Provider;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Provider\TagVirtualRelationProvider;
 
-class TagVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
+class TagVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TagVirtualRelationProvider */
     protected $provider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TaggableHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TaggableHelper */
     protected $taggableHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TaggableHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TaggableHelper */
     protected $doctrineHelper;
 
     public function setUp()

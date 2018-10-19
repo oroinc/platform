@@ -12,22 +12,22 @@ use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
-class ReplaceStrategyTest extends \PHPUnit_Framework_TestCase
+class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ReplaceStrategy $strategy
      */
     protected $strategy;
 
-    /** @var ActivityListManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ActivityListManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $activityListManager;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var ActivityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $activityManager;
 
     protected function setUp()

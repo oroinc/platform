@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory;
 
-class KnownEmailAddressCheckerFactoryTest extends \PHPUnit_Framework_TestCase
+class KnownEmailAddressCheckerFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {

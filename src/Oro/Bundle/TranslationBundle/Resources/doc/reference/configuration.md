@@ -48,5 +48,5 @@ oro_translation:
 If you turned off JS translations generation you must do it manually by executing following command:
 
 ```bash
-php app/console oro:translation:dump
+php bin/console oro:translation:dump
 ```

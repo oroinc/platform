@@ -6,12 +6,12 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Layout\Extension\IsLoggedInContextConfigurator;
 use Oro\Component\Layout\LayoutContext;
 
-class IsLoggedInContextConfiguratorTest extends \PHPUnit_Framework_TestCase
+class IsLoggedInContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var IsLoggedInContextConfigurator */
     protected $contextConfigurator;
 
-    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
     /**

@@ -5,7 +5,7 @@ namespace Oro\Bundle\FilterBundle\Filter;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 
 class ChoiceFilter extends AbstractFilter
 {
@@ -14,7 +14,7 @@ class ChoiceFilter extends AbstractFilter
      */
     protected function getFormType()
     {
-        return ChoiceFilterType::NAME;
+        return ChoiceFilterType::class;
     }
 
     /**

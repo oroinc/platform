@@ -4,7 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form;
 
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 
-abstract class RendererEngineTest extends \PHPUnit_Framework_TestCase
+abstract class RendererEngineTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddDefaultThemes()
     {

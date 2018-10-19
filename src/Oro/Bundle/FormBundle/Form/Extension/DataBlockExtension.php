@@ -17,7 +17,7 @@ class DataBlockExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(
+        $resolver->setDefined(
             array(
                 'block',
                 'subblock',

@@ -8,7 +8,7 @@ define(function(require) {
     AbstractConditionContainerView = BaseView.extend({
         tagName: 'li',
 
-        className: 'condition controls',
+        className: 'condition',
 
         /**
          * @type {string}
@@ -41,7 +41,7 @@ define(function(require) {
         },
 
         events: {
-            'click >.close': 'onCloseClick'
+            'click >.btn-close': 'onCloseClick'
         },
 
         constructor: function AbstractConditionContainerView(options) {
@@ -78,6 +78,10 @@ define(function(require) {
             AbstractConditionContainerView.__super__.render.call(this);
             this.$content = this.$('[data-role="condition-content"]:first');
             return this;
+        },
+
+        initControls: function() {
+            // all controls are defined by subviews
         },
 
         onCloseClick: function(e) {

@@ -6,12 +6,12 @@ use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 
-class WorkflowManagerRegistryTest extends \PHPUnit_Framework_TestCase
+class WorkflowManagerRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowManager[]|\PHPUnit_Framework_MockObject_MockObject[] */
+    /** @var WorkflowManager[]|\PHPUnit\Framework\MockObject\MockObject[] */
     protected $managers = [];
 
-    /** @var CurrentApplicationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $applicationProvider;
 
     /** @var WorkflowManagerRegistry */
@@ -73,7 +73,7 @@ class WorkflowManagerRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $name
-     * @return WorkflowManager|\PHPUnit_Framework_MockObject_MockObject
+     * @return WorkflowManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getWorkflowManager($name)
     {

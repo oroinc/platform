@@ -12,7 +12,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
-class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredAttributes()
     {
@@ -61,7 +61,7 @@ class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | ImapClearManager
+     * @return \PHPUnit\Framework\MockObject\MockObject | ImapClearManager
      */
     private function createImapClearManagerMock()
     {
@@ -72,7 +72,7 @@ class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
      */
     private function createJobRunnerMock()
     {
@@ -83,7 +83,7 @@ class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     protected function createLoggerMock()
     {

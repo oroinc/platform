@@ -152,14 +152,15 @@ class OptimizedProcessorIterator extends ProcessorIterator
      */
     protected function getIndexOfUngroupedProcessor($index)
     {
-        while ($index <= $this->maxIndex) {
-            if (!$this->getGroupByIndex($index)) {
+        $i = $this->maxIndex;
+        while ($i > $index) {
+            if ($this->getGroupByIndex($i)) {
                 break;
             }
-            $index++;
+            $i--;
         }
 
-        return $index;
+        return $i + 1;
     }
 
     /**

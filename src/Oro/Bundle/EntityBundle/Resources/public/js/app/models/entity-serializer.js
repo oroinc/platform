@@ -30,8 +30,9 @@ define(function(require) {
             if (model === currentModel || model.cid in modelStack) {
                 return model.identifier || null;
             }
-            attributes = _.isFunction(model.getAttributesAndRelationships) ? model.getAttributesAndRelationships() :
-                _.isFunction(model.getAttributes) ? model.getAttributes() : model.attributes;
+            attributes = _.isFunction(model.getAttributesAndRelationships)
+                ? model.getAttributesAndRelationships()
+                : _.isFunction(model.getAttributes) ? model.getAttributes() : model.attributes;
             return this.serializeAttributes(model, attributes, modelStack);
         }
     };

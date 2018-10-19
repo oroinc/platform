@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Grid\Formatter;
 
 use Oro\Bundle\EmbeddedFormBundle\DataGrid\Formatter\EmbeddedFormTypeProperty;
 
-class EmbeddedFormTypePropertyTest extends \PHPUnit_Framework_TestCase
+class EmbeddedFormTypePropertyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test
@@ -44,7 +44,7 @@ class EmbeddedFormTypePropertyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createEmbeddedFormManagerMock()
     {
@@ -57,7 +57,7 @@ class EmbeddedFormTypePropertyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createTranslatorMock()
     {

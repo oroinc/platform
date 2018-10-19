@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
 * Load products
 *
-* Execute with "php app/console doctrine:fixtures:load"
+* Execute with "php bin/console doctrine:fixtures:load"
 *
 */
 class LoadProductData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface

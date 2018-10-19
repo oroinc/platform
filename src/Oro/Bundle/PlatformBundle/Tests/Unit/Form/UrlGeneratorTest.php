@@ -7,15 +7,15 @@ use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\PlatformBundle\Form\UrlGenerator;
 use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
 
-class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
+class UrlGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var UrlGenerator */
     protected $generator;
 
-    /** @var PackageProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var PackageProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $packageProvider;
 
-    /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $cacheProvider;
 
     protected function setUp()

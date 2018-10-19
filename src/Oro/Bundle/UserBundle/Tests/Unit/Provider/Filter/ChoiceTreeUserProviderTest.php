@@ -4,15 +4,15 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Provider\Filter;
 
 use Oro\Bundle\UserBundle\Provider\Filter\ChoiceTreeUserProvider;
 
-class ChoiceTreeUserProviderTest extends \PHPUnit_Framework_TestCase
+class ChoiceTreeUserProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChoiceTreeUserProvider */
     protected $choiceTreeUserProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $aclHelper;
 
     public function setUp()

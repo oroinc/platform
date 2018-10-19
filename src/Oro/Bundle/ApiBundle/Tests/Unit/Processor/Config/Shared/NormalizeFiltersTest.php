@@ -5,22 +5,21 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\NormalizeFilters;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class NormalizeFiltersTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var NormalizeFilters */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->processor = new NormalizeFilters($this->doctrineHelper);
     }
@@ -62,7 +61,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
      */
     public function testProcessForNotManageableEntity($definition, $filters, $expectedFilters)
     {
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(false);
@@ -70,7 +69,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
         $this->context->setResult($this->createConfigObject($definition));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
         $this->processor->process($this->context);
-        $this->assertEquals($expectedFilters, $this->context->getFilters()->toArray());
+        self::assertEquals($expectedFilters, $this->context->getFilters()->toArray());
     }
 
     /**
@@ -82,7 +81,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
             'empty'                                                          => [
                 'definition'      => [],
                 'filters'         => [],
-                'expectedFilters' => [],
+                'expectedFilters' => []
             ],
             'no child filters'                                               => [
                 'definition'      => [
@@ -91,17 +90,17 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                 'filters'         => [
                     'fields' => [
                         'field1' => [
-                            'data_type' => 'string',
+                            'data_type' => 'string'
                         ]
                     ]
                 ],
                 'expectedFilters' => [
                     'fields' => [
                         'field1' => [
-                            'data_type' => 'string',
+                            'data_type' => 'string'
                         ]
                     ]
-                ],
+                ]
             ],
             'child filters'                                                  => [
                 'definition'      => [
@@ -110,7 +109,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                             'filters' => [
                                 'fields' => [
                                     'field21' => [
-                                        'data_type' => 'string',
+                                        'data_type' => 'string'
                                     ]
                                 ]
                             ]
@@ -120,17 +119,17 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                 'filters'         => [
                     'fields' => [
                         'field1' => [
-                            'data_type' => 'string',
+                            'data_type' => 'string'
                         ]
                     ]
                 ],
                 'expectedFilters' => [
                     'fields' => [
                         'field1'         => [
-                            'data_type' => 'string',
+                            'data_type' => 'string'
                         ],
                         'field2.field21' => [
-                            'data_type' => 'string',
+                            'data_type' => 'string'
                         ]
                     ]
                 ]
@@ -151,7 +150,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                             'filters'       => [
                                 'fields' => [
                                     'field21' => [
-                                        'data_type' => 'string',
+                                        'data_type' => 'string'
                                     ]
                                 ]
                             ]
@@ -160,19 +159,19 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                             'property_path' => 'realField3',
                             'fields'        => [
                                 'field31' => [
-                                    'property_path' => 'realField31',
+                                    'property_path' => 'realField31'
                                 ],
                                 'field32' => [
                                     'property_path' => 'realField32',
                                     'fields'        => [
                                         'field321' => [
-                                            'property_path' => 'realField321',
+                                            'property_path' => 'realField321'
                                         ]
                                     ],
                                     'filters'       => [
                                         'fields' => [
                                             'field321' => [
-                                                'data_type' => 'string',
+                                                'data_type' => 'string'
                                             ]
                                         ]
                                     ]
@@ -181,7 +180,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                             'filters'       => [
                                 'fields' => [
                                     'field32' => [
-                                        'data_type' => 'string',
+                                        'data_type' => 'string'
                                     ]
                                 ]
                             ]
@@ -191,7 +190,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                 'filters'         => [
                     'fields' => [
                         'field1' => [
-                            'data_type' => 'string',
+                            'data_type' => 'string'
                         ]
                     ]
                 ],
@@ -226,7 +225,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                             'property_path' => 'realField2',
                             'fields'        => [
                                 'field21' => [
-                                    'property_path' => 'realField21',
+                                    'property_path' => 'realField21'
                                 ]
                             ],
                             'filters'       => [
@@ -260,7 +259,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                         ]
                     ]
                 ]
-            ],
+            ]
         ];
     }
 
@@ -271,71 +270,71 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
     {
         $rootMetadata = $this->getClassMetadataMock();
         $toOne1Metadata = $this->getClassMetadataMock();
-        $toOne1Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toOne1_id']);
+        $toOne1Metadata->expects(self::any())->method('getIdentifierFieldNames')->willReturn(['toOne1_id']);
         $toOne1toOne11Metadata = $this->getClassMetadataMock();
-        $toOne1toOne11Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toOne11_id']);
+        $toOne1toOne11Metadata->expects(self::any())->method('getIdentifierFieldNames')->willReturn(['toOne11_id']);
         $toOne1toMany11Metadata = $this->getClassMetadataMock();
-        $toOne1toMany11Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toMany11_id']);
+        $toOne1toMany11Metadata->expects(self::any())->method('getIdentifierFieldNames')->willReturn(['toMany11_id']);
         $toMany1Metadata = $this->getClassMetadataMock();
-        $toMany1Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toMany1_id']);
+        $toMany1Metadata->expects(self::any())->method('getIdentifierFieldNames')->willReturn(['toMany1_id']);
 
-        $rootMetadata->expects($this->any())
+        $rootMetadata->expects(self::any())
             ->method('hasAssociation')
             ->willReturnMap(
                 [
                     ['toOne1', true],
-                    ['toMany1', true],
+                    ['toMany1', true]
                 ]
             );
-        $rootMetadata->expects($this->any())
+        $rootMetadata->expects(self::any())
             ->method('isCollectionValuedAssociation')
             ->willReturnMap(
                 [
                     ['toOne1', false],
-                    ['toMany1', true],
+                    ['toMany1', true]
                 ]
             );
 
-        $toOne1Metadata->expects($this->any())
+        $toOne1Metadata->expects(self::any())
             ->method('hasAssociation')
             ->willReturnMap(
                 [
                     ['toOne1_toOne11', true],
-                    ['toOne1_toMany11', true],
+                    ['toOne1_toMany11', true]
                 ]
             );
-        $toOne1Metadata->expects($this->any())
+        $toOne1Metadata->expects(self::any())
             ->method('isCollectionValuedAssociation')
             ->willReturnMap(
                 [
                     ['toOne1_toOne11', false],
-                    ['toOne1_toMany11', true],
+                    ['toOne1_toMany11', true]
                 ]
             );
 
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootMetadata);
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('findEntityMetadataByPath')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, ['toOne1'], $toOne1Metadata],
                     [self::TEST_CLASS_NAME, ['toOne1', 'toOne1_toOne11'], $toOne1toOne11Metadata],
                     [self::TEST_CLASS_NAME, ['toOne1', 'toOne1_toMany11'], $toOne1toMany11Metadata],
-                    [self::TEST_CLASS_NAME, ['toMany1'], $toMany1Metadata],
+                    [self::TEST_CLASS_NAME, ['toMany1'], $toMany1Metadata]
                 ]
             );
 
         $this->context->setResult($this->createConfigObject($definition));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
         $this->processor->process($this->context);
-        $this->assertEquals($expectedFilters, $this->context->getFilters()->toArray());
+        self::assertEquals($expectedFilters, $this->context->getFilters()->toArray());
     }
 
     /**
@@ -372,7 +371,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                                             ]
                                         ]
                                     ]
-                                ],
+                                ]
                             ],
                             'filters' => [
                                 'fields' => [
@@ -402,7 +401,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                                     ]
                                 ]
                             ]
-                        ],
+                        ]
                     ]
                 ],
                 'filters'         => [
@@ -425,14 +424,14 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                         ],
                         'toOne1.toOne1_toOne11.toOne1_toOne11_field111' => [
                             'data_type' => 'string'
-                        ],
+                        ]
                     ]
                 ]
-            ],
+            ]
         ];
     }
 
-    public function testFiltersByRenamedIdField()
+    public function testFiltersByRenamedField()
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -444,12 +443,15 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                 'renamedIdField' => [
                     'property_path' => 'field2'
                 ],
+                'renamedField'   => [
+                    'property_path' => 'field3'
+                ],
                 'field10'        => [
                     'property_path' => 'realField10'
                 ],
                 'anotherField11' => [
                     'property_path' => 'field11'
-                ],
+                ]
             ]
         ];
         $filters = [
@@ -461,6 +463,9 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                 'field2'  => [
                     'data_type' => 'string'
                 ],
+                'field3'  => [
+                    'data_type' => 'string'
+                ],
                 'field10' => [
                     'data_type'     => 'string',
                     'property_path' => 'filterField10'
@@ -468,7 +473,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                 'field11' => [
                     'data_type'     => 'string',
                     'property_path' => 'filterField11'
-                ],
+                ]
             ]
         ];
 
@@ -488,6 +493,10 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                         'data_type'     => 'string',
                         'property_path' => 'field2'
                     ],
+                    'renamedField'   => [
+                        'data_type'     => 'string',
+                        'property_path' => 'field3'
+                    ],
                     'field10'        => [
                         'data_type'     => 'string',
                         'property_path' => 'filterField10'
@@ -495,7 +504,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                     'field11'        => [
                         'data_type'     => 'string',
                         'property_path' => 'filterField11'
-                    ],
+                    ]
                 ]
             ],
             $this->context->getFilters()

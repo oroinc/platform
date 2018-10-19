@@ -1,10 +1,14 @@
 # Documenting API Resources
 
+ - [Overview](.md#overview)
+ - [Documentation File Format](#documentation-file-format)
+
+
 ## Overview
 
 Documentation is an important part of API and helps developers to use your API. Therefore, it is necessary to provide detailed documentation for your API resources.
 
-The Oro Platform collects documentation for API resources from several sources:
+OroPlatform collects documentation for API resources from several sources:
 
 * The documentation can be written in a [configuration file](./configuration.md).
 * A [Markdown](https://daringfireball.net/projects/markdown/) document. The detailed information you can find bellow in this document.
@@ -19,7 +23,7 @@ api:
             documentation_resource: '@AcmeAppBundle/Resources/doc/api/acme_entity.md'
 ```
 
-If the documentation was not found neither the configuration file nor in the Markdown documentation file, the Oro Platform tries to use system-wide descriptions of entities and fields. These descriptions are usually provided in translation files. This is the best way to document fields because the descriptions can be used in other places, not only in API. Here is an example of a translation file that contains descriptions for entities and fields:
+If the documentation was not found neither the configuration file nor in the Markdown documentation file, OroPlatform tries to use system-wide descriptions of entities and fields. These descriptions are usually provided in translation files. This is the best way to document fields because the descriptions can be used in other places, not only in API. Here is an example of a translation file that contains descriptions for entities and fields:
 
 ```yaml
 # Acme/Bundle/AppBundle/Resources/translations/messages.en.yml
@@ -91,7 +95,9 @@ The fourth level `####` (h4) header can be used only for the **FIELDS** and **SU
 Use it for the **FIELDS** section when you need to specify a description for a field in a particular action. 
 Use it for the **SUBRESOURCES** section when you need to specify a sub-resource action name.
 
-The action names in **FIELDS** section can be combined using comma, e.g. "Create, Update". It helps avoid copy-pasting when you need the same description for several actions.
+The action names in **FIELDS** section can be combined using comma, e.g. "create, update". It helps avoid copy-pasting when you need the same description for several actions.
+
+The description of filters should be a plain text, the markdown markup language is not supported there.
 
 **Example:**
 
@@ -139,7 +145,7 @@ The documentation for a sub-resource action. It is a "get_subresource" action fo
 May contain any formatting e.g.: ordered or unordered lists, request or response examples, links, text in bold or italic, etc.
 ```
 
-Use the `{@inheritdoc}` placeholder to get the common documentation for an action or a field. This placeholder works only for the **ACTIONS** and **FIELDS** sections.
+Use the `{@inheritdoc}` placeholder to get the common documentation for an action, a field or a filter. This placeholder works only for the **ACTIONS**, **FIELDS** and **FILTERS** sections.
 
 **Example:**
 
@@ -151,6 +157,7 @@ Use the `{@inheritdoc}` placeholder to get the common documentation for an actio
 ### create
 
 Create a new Acme entity record.
+
 The created record is returned in the response.
 
 {@inheritdoc}
@@ -184,14 +191,13 @@ For example, to add a text for the JSON API request type for all requests exclud
 ### create
 
 Create a new Acme entity record.
+
 The created record is returned in the response.
 
 {@inheritdoc}
 
 {@request:json_api}
 Example:
-
-`</api/entities>`
 
 ` ` `JSON
 {

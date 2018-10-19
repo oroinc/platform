@@ -6,7 +6,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Event\Action\ChannelEnableEvent;
 use Oro\Bundle\IntegrationBundle\Factory\Event\ChannelEnableEventFactory;
 
-class ChannelEnableEventFactoryTest extends \PHPUnit_Framework_TestCase
+class ChannelEnableEventFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {

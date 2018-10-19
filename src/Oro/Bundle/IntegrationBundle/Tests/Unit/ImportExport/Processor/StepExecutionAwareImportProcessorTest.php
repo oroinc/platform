@@ -15,12 +15,12 @@ class StepExecutionAwareImportProcessorTest extends ImportProcessorTest
     protected $processor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|StepExecution
+     * @var \PHPUnit\Framework\MockObject\MockObject|StepExecution
      */
     protected $stepExecution;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContextRegistry
+     * @var \PHPUnit\Framework\MockObject\MockObject|ContextRegistry
      */
     protected $contextRegistry;
 

@@ -4,23 +4,23 @@ parameters:
 
 services:
     oro_translation.form.type.translatable_entity:
-        class: %oro_translation.form.type.translatable_entity.class%
-        arguments: ["@doctrine"]
+        class: '%oro_translation.form.type.translatable_entity.class%'
+        arguments:
+          - "@doctrine"
+          - "@form.choice_list_factory.default"
+          - "@oro_security.acl_helper"
         tags:
             - { name: form.type, alias: translatable_entity }
 
-    oro_translation.form.type.jqueryselect2_translatable_entity:
-        parent: oro_form.type.select2
-        arguments:
-            - 'Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType'
-            - 'oro_select2_translatable_entity'
+    oro_translation.form.type.select2_translatable_entity:
+        class: Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType
         tags:
             - { name: form.type, alias: oro_select2_translatable_entity }
 
     oro_translation.form.extension.translatable_choice:
-        class: %oro_translation.form.extension.translatable_choice.class%
+        class: '%oro_translation.form.extension.translatable_choice.class%'
         tags:
-            - { name: form.type_extension, alias: choice }
+            - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\ChoiceType, alias: choice }
 
     oro_translation.form.type.add_language:
         class: 'Oro\Bundle\TranslationBundle\Form\Type\AddLanguageType'
@@ -32,9 +32,26 @@ services:
         tags:
             - { name: form.type, alias: oro_translation_add_language }
 
-    oro_translationr.form.type.filter.language:
+    oro_translation.form.type.filter.language:
         class: 'Oro\Bundle\TranslationBundle\Form\Type\Filter\LanguageFilterType'
         arguments: 
             - '@oro_locale.formatter.language_code'
         tags:
             - { name: form.type, alias: oro_translation_filter_language }
+
+    oro_translation.form.type.gedmo_translations:
+        class: 'Oro\Bundle\TranslationBundle\Form\Type\GedmoTranslationsType'
+        arguments:
+            - '@oro_translation.form.gedmo_translation_form'
+            - '%oro_translation.locales%'
+            - '%oro_translation.default_required%'
+        tags:
+            - { name: form.type, alias: oro_gedmo_translations_from }
+
+    oro_translation.form.gedmo_translation_form:
+        class: 'Oro\Bundle\TranslationBundle\Form\TranslationForm\GedmoTranslationForm'
+        arguments:
+            - '@form.registry'
+            - '@doctrine'
+        calls:
+            - [setGedmoTranslatableListener, ['@stof_doctrine_extensions.listener.translatable']]

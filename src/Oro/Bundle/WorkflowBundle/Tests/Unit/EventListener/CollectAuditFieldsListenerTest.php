@@ -12,10 +12,10 @@ use Oro\Bundle\WorkflowBundle\EventListener\CollectAuditFieldsListener;
 use Oro\Bundle\WorkflowBundle\EventListener\SendWorkflowStepChangesToAuditListener;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidArgumentException;
 
-class CollectAuditFieldsListenerTest extends \PHPUnit_Framework_TestCase
+class CollectAuditFieldsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $doctrineHelper;
 

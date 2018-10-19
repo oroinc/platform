@@ -3,10 +3,11 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\LocaleBundle\Form\Type\CountryType;
-use Symfony\Component\Intl\Intl;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\CountryType as BaseCountryType;
 
-class CountryTypeTest extends \PHPUnit_Framework_TestCase
+class CountryTypeTest extends FormIntegrationTestCase
 {
     /**
      * @var CountryType
@@ -18,25 +19,25 @@ class CountryTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+        parent::setUp();
         $this->formType = new CountryType();
     }
 
     public function testConfigureOptions()
     {
-        /* @var $resolver OptionsResolver|\PHPUnit_Framework_MockObject_MockObject */
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
-        $resolver->expects($this->once())
-            ->method('setDefaults')
-            ->with([
-                'choices' => array_flip(Intl::getRegionBundle()->getCountryNames('en')),
-            ]);
+        $choices = $this->factory->create(CountryType::class)
+            ->createView()->vars['choices'];
 
-        $this->formType->configureOptions($resolver);
+        $this->assertContains(new ChoiceView('DE', 'DE', 'Germany'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('GB', 'GB', 'United Kingdom'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('US', 'US', 'United States'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('FR', 'FR', 'France'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('MY', 'MY', 'Malaysia'), $choices, '', false, false);
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('country', $this->formType->getParent());
+        $this->assertEquals(BaseCountryType::class, $this->formType->getParent());
     }
 
     public function testGetName()

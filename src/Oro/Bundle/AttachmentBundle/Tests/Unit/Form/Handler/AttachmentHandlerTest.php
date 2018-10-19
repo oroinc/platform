@@ -4,22 +4,23 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Form\Handler\AttachmentHandler;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class AttachmentHandlerTest extends \PHPUnit_Framework_TestCase
+class AttachmentHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $form;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var Request
      */
     private $request;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $om;
 
@@ -36,7 +37,7 @@ class AttachmentHandlerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
+        $this->request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
         $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
@@ -47,9 +48,7 @@ class AttachmentHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testNotValidForm()
     {
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('POST'));
+        $this->request->setMethod('POST');
 
         $this->form->expects($this->once())
             ->method('submit');
@@ -69,9 +68,7 @@ class AttachmentHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testBadRequest()
     {
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('GET'));
+        $this->request->setMethod('GET');
 
         $this->form->expects($this->never())
             ->method('submit');
@@ -85,9 +82,7 @@ class AttachmentHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testGoodRequest()
     {
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('POST'));
+        $this->request->setMethod('POST');
 
         $this->form->expects($this->once())
             ->method('submit');

@@ -14,45 +14,45 @@ use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ExportHandlerTest extends \PHPUnit_Framework_TestCase
+class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var BatchFileManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var BatchFileManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $batchFileManager;
 
     /**
-     * @var ReaderChain|\PHPUnit_Framework_MockObject_MockObject
+     * @var ReaderChain|\PHPUnit\Framework\MockObject\MockObject
      */
     private $readerChain;
 
     /**
-     * @var WriterChain|\PHPUnit_Framework_MockObject_MockObject
+     * @var WriterChain|\PHPUnit\Framework\MockObject\MockObject
      */
     private $writerChain;
 
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $translator;
 
     /**
-     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configProvider;
 
     /**
-     * @var ProcessorRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     private $processorRegistry;
 
     /**
-     * @var JobExecutor|\PHPUnit_Framework_MockObject_MockObject
+     * @var JobExecutor|\PHPUnit\Framework\MockObject\MockObject
      */
     private $jobExecutor;
 
     /**
-     * @var FileManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var FileManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fileManager;
 
@@ -90,7 +90,7 @@ class ExportHandlerTest extends \PHPUnit_Framework_TestCase
         $jobName = 'job-name';
         $processorType = 'export';
         $outputFormat = 'csv';
-        $files = [];
+        $files = ['test1.csv', 'test2.csv'];
 
         $writer = $this->createMock(FileStreamWriter::class);
         $this->writerChain
@@ -103,6 +103,26 @@ class ExportHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects(self::once())
             ->method('getReader')
             ->willReturn($reader);
+
+        $this->fileManager->expects($this->at(0))
+            ->method('writeToTmpLocalStorage')
+            ->with('test1.csv')
+            ->willReturn('test1.csv');
+
+        $this->fileManager->expects($this->at(1))
+            ->method('fixNewLines')
+            ->with('test1.csv')
+            ->willReturn('test1.csv');
+
+        $this->fileManager->expects($this->at(2))
+            ->method('writeToTmpLocalStorage')
+            ->with('test2.csv')
+            ->willReturn('test2.csv');
+
+        $this->fileManager->expects($this->at(3))
+            ->method('fixNewLines')
+            ->with('test2.csv')
+            ->willReturn('test2.csv');
 
         $exceptionMessage = 'Exception message';
         $exception = new \Exception($exceptionMessage);

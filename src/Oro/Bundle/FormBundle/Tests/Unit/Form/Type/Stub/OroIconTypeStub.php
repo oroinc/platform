@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type\Stub;
 
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -27,7 +28,7 @@ class OroIconTypeStub extends AbstractType
             [
                 'placeholder' => 'oro.form.choose_value',
                 'choices' => ['fa-anchor' => 'fa-anchor'],
-                'empty_value' => '',
+                'placeholder' => '',
                 'configs' => [
                     'placeholder' => 'oro.form.choose_value',
                     'result_template_twig' => 'OroFormBundle:Autocomplete:icon/result.html.twig',
@@ -41,13 +42,13 @@ class OroIconTypeStub extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_icon_select';
     }
 
     public function getParent()
     {
-        return 'oro_select2_choice';
+        return Select2ChoiceType::class;
     }
 }

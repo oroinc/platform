@@ -5,7 +5,7 @@ Feature: Create email template
   Scenario: Create email template
     Given I login as administrator
     And go to System/ Emails/ Templates
-    And press "Create Email Template"
+    And click "Create Email Template"
     And fill form with:
       |Owner         | John Doe       |
       |Template Name | Test Template  |

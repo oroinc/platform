@@ -13,10 +13,10 @@ use Psr\Log\LoggerInterface;
  */
 class ImapEmailIteratorTest extends TestCase
 {
-    /** @var ImapMessageIterator|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ImapMessageIterator|\PHPUnit\Framework\MockObject\MockObject */
     private $messageIterator;
 
-    /** @var ImapEmailManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ImapEmailManager|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
 
     /** @var ImapEmailIterator */

@@ -4,7 +4,7 @@ namespace Oro\Bundle\SidebarBundle\Tests\Unit\Model;
 
 use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
 
-class WidgetDefinitionRegistryTest extends \PHPUnit_Framework_TestCase
+class WidgetDefinitionRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider configurationDataProvider

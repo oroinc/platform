@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 class GetImportExportConfigurationExtensionTest extends TestCase
 {
     /**
-     * @var ImportExportConfigurationRegistryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ImportExportConfigurationRegistryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configurationRegistry;
 

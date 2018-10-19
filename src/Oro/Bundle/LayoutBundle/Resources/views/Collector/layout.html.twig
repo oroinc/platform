@@ -1,6 +1,6 @@
 {% extends '@WebProfiler/Collector/form.html.twig' %}
 
-{% from _self import view_tree_entry, view_tree_details, view_block_details, not_applied_actions_tab %}
+{% import _self as tree %}
 
 {% block toolbar %}
     {% if collector.data.views|length %}
@@ -172,14 +172,14 @@
                             </div>
                             <ul>
                                 {% for viewId, viewData in collector.data.views %}
-                                    {{ view_tree_entry(viewId, viewData, true) }}
+                                    {{ tree.view_tree_entry(viewId, viewData, true) }}
                                 {% endfor %}
                             </ul>
                         </div>
                     </div>
                     <div id="tree-details-container">
                         {% for viewId, viewData in collector.data.views %}
-                            {{ view_tree_details(viewId, viewData) }}
+                            {{ tree.view_tree_details(viewId, viewData) }}
                         {% endfor %}
                     </div>
                 {% else %}
@@ -196,7 +196,7 @@
             </h3>
             <div class="tab-content">
                 {% if collector.data.not_applied_actions_count > 0 %}
-                    {{ not_applied_actions_tab(collector.data.not_applied_actions) }}
+                    {{ tree.not_applied_actions_tab(collector.data.not_applied_actions) }}
                 {% endif %}
             </div>
         </div>
@@ -205,11 +205,11 @@
             <div class="tab-content">
                 <div class="tree-details">
                     {% if collector.data.context.items|length %}
-                        {{ view_block_details('context', 'Context', {'Items': collector.data.context.items}) }}
+                        {{ tree.view_block_details('context', 'Context', {'Items': collector.data.context.items}) }}
                     {% endif %}
 
                     {% if collector.data.context.data|length %}
-                        {{ view_block_details('context-data', 'Context Data', {'Items': collector.data.context.data}, true) }}
+                        {{ tree.view_block_details('context-data', 'Context Data', {'Items': collector.data.context.data}, true) }}
                     {% endif %}
                 </div>
             </div>

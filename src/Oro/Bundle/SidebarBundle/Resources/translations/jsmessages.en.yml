@@ -5,6 +5,12 @@ oro.sidebar:
         title: "Sidebar Widgets"
       content:
         section_title: "Add widget"
+    actions: "Widget actions"
+    action:
+      remove: Remove
+      configure: Configure
+      refresh: Refresh
+      close: Close
     remove:
       confirm:
         message: "The widget will be removed"

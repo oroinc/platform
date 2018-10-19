@@ -1,11 +1,6 @@
-OroEntityExtendBundle
-=====================
+# OroEntityExtendBundle
 
-- Allows to add an additional fields into existing entities
-- Allows to add an additional relations into existing entities
-- Allows to add new entities
-
-All additions can be done through UI or using [migration scripts](../MigrationBundle/README.md).
+OroEntityExtendBundle enables the entities structure extension using UI or migration scripts without changing the entity definition class. The bundle also supports the creation of new entities (custom entities) using the UI.
 
 You can find additional information about the bundle's features in their dedicated sections:
 
@@ -13,14 +8,11 @@ You can find additional information about the bundle's features in their dedicat
  - [Associations](./Resources/doc/associations.md)
  - [Creating API to Manage Associations](./Resources/doc/associations_api.md)
 
-
-Manage entities through UI
---------------------------
+## Manage entities through UI
 
 To manage existing entities or create new ones through UI go to **System > Entities > Entity Management** page. On this page you can see a list of all entities, but please note that you can modify only entities marked as extendable. Check **IS EXTEND** column to see whether an entity can be modified or not. To create a new entity click **Create entity** button at the top right corner of the page, fill the form and click **Save And Close**. Next add necessary fields to your entity clicking **Create field** button. To add new field to existing entity go to a view page of this entity and click **Create field** button. When all changes are made do not forget to click **Update schema** button to apply your changes to a database.
 
-Modify entities using migration scripts
----------------------------------------
+## Modify entities using migration scripts
 
 The existing entity can be extended using migration scripts. To create new extended field you can use `addColumn` method with a special options named `oro_options`. The following example shows it:
 
@@ -54,7 +46,7 @@ class OroAccountBundle implements Migration
     }
 }
 ```
-Please pay attention on `owner` attribute in `extend` scope. In this example we use `ExtendScope::OWNER_CUSTOM`, it means that Oro platform is fully responsible for render this field on edit and view pages, as well as grids. The default value of `owner` attribute is `ExtendScope::OWNER_SYSTEM`, and in this case you have to add such field in forms, views and grids manually.
+Please pay attention on `owner` attribute in `extend` scope. In this example we use `ExtendScope::OWNER_CUSTOM`, it means that OroPlatform is fully responsible for render this field on edit and view pages, as well as grids. The default value of `owner` attribute is `ExtendScope::OWNER_SYSTEM`, and in this case you have to add such field in forms, views and grids manually.
 
 Also you can use [OroOptions](Migration/OroOptions.php) class to build `oro_options`. It can be helpful in same cases, for example if you work with arrays. The following example shows how to use this class:
 
@@ -102,9 +94,9 @@ Extend fields can be also marked as unique:
     $table->addUniqueIndex(['phone'], 'oro_idx_user_phone');
  ```
 
-Add relation
-------------
-Creating relations is more complex task than creation of regular field. Oro Platform provides a special extension for [Migration bundle](../MigrationBundle/README.md#extensions-for-database-structure-migrations) named [ExtendExtension](Migration/Extension/ExtendExtension.php) to help you. To use this extension your migration should implement [ExtendExtensionAwareInterface](Migration/Extension/ExtendExtensionAwareInterface.php). The following example shows how to create many-to-one relation:
+## Add relation
+
+Creating relations is more complex task than creation of regular field. OroPlatform provides a special extension for [Migration bundle](../MigrationBundle/README.md#extensions-for-database-structure-migrations) named [ExtendExtension](Migration/Extension/ExtendExtension.php) to help you. To use this extension your migration should implement [ExtendExtensionAwareInterface](Migration/Extension/ExtendExtensionAwareInterface.php). The following example shows how to create many-to-one relation:
 
 ``` php
 <?php
@@ -146,9 +138,9 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 
 More examples you can find in [relations chapter](./Resources/doc/relations.md).
 
-Add option set field
---------------------
-The option set is a special type of a field which allows to choose one or more options from a predefined set of options. Oro Platform provides two different data types for these purposes:
+## Add option set field
+
+The option set is a special type of a field which allows to choose one or more options from a predefined set of options. OroPlatform provides two different data types for these purposes:
 
  - `enum` (named `Select` on UI) - only one option can be selected
  - `multiEnum` (named `Multi-Select` on UI) - several options can be selected
@@ -238,7 +230,7 @@ class LoadLeadSourceData extends AbstractFixture
 }
 ```
 
-As you can see in this example we use `buildEnumValueClassName` function to convert the option set code to the class name of an entity responsible to store all options of this option set. It is important because such entities are generated automatically by Oro Platform and you should not use the class name directly.
+As you can see in this example we use `buildEnumValueClassName` function to convert the option set code to the class name of an entity responsible to store all options of this option set. It is important because such entities are generated automatically by OroPlatform and you should not use the class name directly.
 Also there are other functions in [ExtendHelper](Tools/ExtendHelper.php) class which can be helpful when you work with option sets:
 
  - `buildEnumCode` - builds an option set code based on its name.
@@ -256,8 +248,8 @@ If by some reasons you create system option sets and you have to render it manua
  - Symfony form types which can be used to build forms contain option set fields: [EnumChoiceType](Form/Type/EnumChoiceType.php) and [EnumSelectType](Form/Type/EnumSelectType.php).
  - Grid filters: [EnumFilter](Filter/EnumFilter.php) and [MultiEnumFilter](Filter/MultiEnumFilter.php). Some help how to use these filters in `datagrids.yml` and how to configure datagrid formatters for option sets you can find in [ExtendColumnOptionsGuesser](Grid/ExtendColumnOptionsGuesser.php). Please take in account that this class pass the class name as the option set identifier, but you can use the enum code as well.
 
-Create custom entity
---------------------
+## Create custom entity
+
 A custom entity is an entity which has no PHP class in any bundle. The definition of such entity is created automatically in Symfony cache. To create a custom entity you can use [ExtendExtension](Migration/Extension/ExtendExtension.php). The following example shows it:
 
 ``` php
@@ -308,46 +300,45 @@ class AcmeTestBundle implements Migration, ExtendExtensionAwareInterface
 }
 ```
 
-Preparing entity extend configuration
--------------------------------------
+## Preparing entity extend configuration
+
 The following command prepares extended entities configuration:
 
 ```bash
-php app/console oro:entity-extend:update-config
+php bin/console oro:entity-extend:update-config
 ```
 
-Updating database schema for extended entities
-----------------------------------------------
+## Updating database schema for extended entities
+
 The following command updates a database schema for extended entities:
 
 ```bash
-php app/console oro:entity-extend:update-schema
+php bin/console oro:entity-extend:update-schema
 ```
 
-Warming up the cache
---------------------
+## Warming up the cache
+
 To save entity extend configuration stored in the database to the application cache, the following command can be used:
 
 ```bash
-php app/console oro:entity-extend:cache:warmup
+php bin/console oro:entity-extend:cache:warmup
 ```
 
-Clearing up the cache
----------------------
+## Clearing up the cache
+
 The following command removes all data related to entity extend functionality from the application cache:
 
 ```bash
-php app/console oro:entity-extend:cache:clear --no-warmup
+php bin/console oro:entity-extend:cache:clear --no-warmup
 ```
 To reload all cached data just run this command without `--no-warmup` option.
 
-Custom form type and options
----------------------
+## Custom form type and options
 
 To configure custom form type and options for extended field, read [Custom form type and options](Resources/doc/custom_form_type.md)
 
-Validation for extended fields
----------------------
+## Validation for extended fields
+
 By default all extended fields are not validated. In general extended fields rendered as usual forms, same way as not extended,
 but there's a way to define validation constraints for all extended fields by their type.
 This is done through the configuration of oro_entity_extend.validation_loader:
@@ -379,8 +370,7 @@ To pass constraints there are two ways:
 
 Pay attention to the fact that all constraints defined here applied to all extended fields with corresponding type.
 
-Extend Fields View
----------------------
+## Extend Fields View
 
 Before extend fields rendering in view page, event "oro.entity_extend_event.before_value_render" fired. 
 There is possibility for customize field rendering using this event.
@@ -418,8 +408,7 @@ In this code we:
 
 In variable `$viewData` can be simple string or array `[ 'link' => 'example.com', 'title' => 'some text representation']`. In case of string it will be formatted in twig template automatically based on field type. In case of array we show field with text equal to `'title'`. Also title will be escaped. If `'link'` option exists we show field as link with href equal to `'link'` option value.
 
-Custom fields and entities in search
-------------------------------------
+## Custom fields and entities in search
 
 During creation or editing custom entity or field, user can set parameter 'searchable'. If this parameter will be set to true, this custom entity or field will be indexed by search engine.
 

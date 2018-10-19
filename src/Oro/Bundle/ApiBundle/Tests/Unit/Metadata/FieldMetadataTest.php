@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class FieldMetadataTest extends \PHPUnit_Framework_TestCase
+class FieldMetadataTest extends \PHPUnit\Framework\TestCase
 {
     public function testClone()
     {
@@ -18,7 +18,7 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
 
         $fieldMetadataClone = clone $fieldMetadata;
 
-        $this->assertEquals($fieldMetadata, $fieldMetadataClone);
+        self::assertEquals($fieldMetadata, $fieldMetadataClone);
     }
 
     public function testToArray()
@@ -30,13 +30,13 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
         $fieldMetadata->setIsNullable(true);
         $fieldMetadata->setMaxLength(123);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'name'          => 'testName',
                 'property_path' => 'testPropertyPath',
                 'data_type'     => 'testDataType',
                 'nullable'      => true,
-                'max_length'    => 123,
+                'max_length'    => 123
             ],
             $fieldMetadata->toArray()
         );
@@ -47,9 +47,39 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName('testName');
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'name' => 'testName'
+            ],
+            $fieldMetadata->toArray()
+        );
+    }
+
+    public function testToArrayInputOnlyField()
+    {
+        $fieldMetadata = new FieldMetadata();
+        $fieldMetadata->setName('testName');
+        $fieldMetadata->setDirection(true, false);
+
+        self::assertEquals(
+            [
+                'name'      => 'testName',
+                'direction' => 'input-only'
+            ],
+            $fieldMetadata->toArray()
+        );
+    }
+
+    public function testToArrayOutputOnlyField()
+    {
+        $fieldMetadata = new FieldMetadata();
+        $fieldMetadata->setName('testName');
+        $fieldMetadata->setDirection(false, true);
+
+        self::assertEquals(
+            [
+                'name'      => 'testName',
+                'direction' => 'output-only'
             ],
             $fieldMetadata->toArray()
         );
@@ -58,57 +88,80 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
     public function testNameInConstructor()
     {
         $fieldMetadata = new FieldMetadata('fieldName');
-        $this->assertEquals('fieldName', $fieldMetadata->getName());
+        self::assertEquals('fieldName', $fieldMetadata->getName());
     }
 
     public function testName()
     {
         $fieldMetadata = new FieldMetadata();
 
-        $this->assertNull($fieldMetadata->getName());
+        self::assertNull($fieldMetadata->getName());
         $fieldMetadata->setName('fieldName');
-        $this->assertEquals('fieldName', $fieldMetadata->getName());
+        self::assertEquals('fieldName', $fieldMetadata->getName());
     }
 
     public function testPropertyPath()
     {
         $fieldMetadata = new FieldMetadata();
 
-        $this->assertNull($fieldMetadata->getPropertyPath());
+        self::assertNull($fieldMetadata->getPropertyPath());
         $fieldMetadata->setName('name');
-        $this->assertEquals('name', $fieldMetadata->getPropertyPath());
+        self::assertEquals('name', $fieldMetadata->getPropertyPath());
         $fieldMetadata->setPropertyPath('propertyPath');
-        $this->assertEquals('propertyPath', $fieldMetadata->getPropertyPath());
+        self::assertEquals('propertyPath', $fieldMetadata->getPropertyPath());
         $fieldMetadata->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
-        $this->assertNull($fieldMetadata->getPropertyPath());
+        self::assertNull($fieldMetadata->getPropertyPath());
         $fieldMetadata->setPropertyPath(null);
-        $this->assertEquals('name', $fieldMetadata->getPropertyPath());
+        self::assertEquals('name', $fieldMetadata->getPropertyPath());
     }
 
     public function testDataType()
     {
         $fieldMetadata = new FieldMetadata();
 
-        $this->assertNull($fieldMetadata->getDataType());
+        self::assertNull($fieldMetadata->getDataType());
         $fieldMetadata->setDataType('fieldType');
-        $this->assertEquals('fieldType', $fieldMetadata->getDataType());
+        self::assertEquals('fieldType', $fieldMetadata->getDataType());
+    }
+
+    public function testDirection()
+    {
+        $fieldMetadata = new FieldMetadata();
+
+        self::assertTrue($fieldMetadata->isInput());
+        self::assertTrue($fieldMetadata->isOutput());
+        $fieldMetadata->setDirection(true, false);
+        self::assertTrue($fieldMetadata->isInput());
+        self::assertFalse($fieldMetadata->isOutput());
+        $fieldMetadata->setDirection(false, true);
+        self::assertFalse($fieldMetadata->isInput());
+        self::assertTrue($fieldMetadata->isOutput());
+        $fieldMetadata->setDirection(true, false);
+        self::assertTrue($fieldMetadata->isInput());
+        self::assertFalse($fieldMetadata->isOutput());
+        $fieldMetadata->setDirection(false, false);
+        self::assertFalse($fieldMetadata->isInput());
+        self::assertFalse($fieldMetadata->isOutput());
+        $fieldMetadata->setDirection(true, true);
+        self::assertTrue($fieldMetadata->isInput());
+        self::assertTrue($fieldMetadata->isOutput());
     }
 
     public function testNullable()
     {
         $fieldMetadata = new FieldMetadata();
 
-        $this->assertFalse($fieldMetadata->isNullable());
+        self::assertFalse($fieldMetadata->isNullable());
         $fieldMetadata->setIsNullable(true);
-        $this->assertTrue($fieldMetadata->isNullable());
+        self::assertTrue($fieldMetadata->isNullable());
     }
 
     public function testMaxLength()
     {
         $fieldMetadata = new FieldMetadata();
 
-        $this->assertNull($fieldMetadata->getMaxLength());
+        self::assertNull($fieldMetadata->getMaxLength());
         $fieldMetadata->setMaxLength(123);
-        $this->assertEquals(123, $fieldMetadata->getMaxLength());
+        self::assertEquals(123, $fieldMetadata->getMaxLength());
     }
 }

@@ -12,14 +12,18 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
+/**
+ * This entity listener handles prePersist doctrine entity event
+ * and creates ImapEmailFolder entities based on information from UserEmailOrigin
+ */
 class UserEmailOriginListener
 {
     /**
-     * @var Mcrypt
+     * @var SymmetricCrypterInterface
      */
-    protected $mcrypt;
+    protected $crypter;
 
     /**
      * @var ImapConnectorFactory
@@ -37,18 +41,18 @@ class UserEmailOriginListener
     protected $imapEmailGoogleOauth2Manager;
 
     /**
-     * @param Mcrypt $mcrypt
+     * @param SymmetricCrypterInterface $crypter
      * @param ImapConnectorFactory $connectorFactory
      * @param Registry $doctrine
      * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
      */
     public function __construct(
-        Mcrypt $mcrypt,
+        SymmetricCrypterInterface $crypter,
         ImapConnectorFactory $connectorFactory,
         Registry $doctrine,
         ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
     ) {
-        $this->mcrypt = $mcrypt;
+        $this->crypter = $crypter;
         $this->connectorFactory = $connectorFactory;
         $this->doctrine = $doctrine;
         $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
@@ -107,7 +111,7 @@ class UserEmailOriginListener
             $origin->getImapPort(),
             $origin->getImapEncryption(),
             $origin->getUser(),
-            $this->mcrypt->decryptData($origin->getPassword()),
+            $this->crypter->decryptData($origin->getPassword()),
             $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($origin)
         );
 

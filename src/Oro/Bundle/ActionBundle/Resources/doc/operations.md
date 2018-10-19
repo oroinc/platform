@@ -138,7 +138,7 @@ operations:
 Execute a command to validate all operations configuration:
 
 ```
-php app/console oro:action:configuration:validate
+php bin/console oro:action:configuration:validate
 ```
 
 **Note:** All configurations apply automatically after their changes made in developer environment.
@@ -153,7 +153,7 @@ php app/console oro:action:configuration:validate
 
   If the default operations are used in the nondefault applications, as in `commerce`, for example, the routes are retrieved from the `routeCommerceUpdate` and `routeCommerceDelete` options.
 
-  Configurations for the default operations are allocated in the `Resources/config/oro/action.yml` file under the **Oro Action Bundle** directory.
+  Configurations for the default operations are allocated in the `Resources/config/oro/actions.yml` file under the **Oro Action Bundle** directory.
 
 ### Questions and Answers
 
@@ -187,7 +187,7 @@ datagrids:
 However, action_configuration can accept callable as value, so sometimes the options are occupied by service callback.
 If it is so, we can use another approach.
 
- The **second way** is to disable the operation for custom datagrid using the `exclude_datagrids` option in operation definition.So you can specify the name of the datagrid that should be excluded from the *operation* matching. If your operation is defined by another bundle, you can use the *merge* behavior of operation configuration and just add anadditional property value under your bundle configuration. For example, the operation that should not be displayed for the `product_view` datagrid is the default `DELETE` operation from `OroActionBundle`. You can exclude your grid from matching with the next addition to `<YourBundle>/Resources/config/oro/action.yml`
+ The **second way** is to disable the operation for custom datagrid using the `exclude_datagrids` option in operation definition.So you can specify the name of the datagrid that should be excluded from the *operation* matching. If your operation is defined by another bundle, you can use the *merge* behavior of operation configuration and just add anadditional property value under your bundle configuration. For example, the operation that should not be displayed for the `product_view` datagrid is the default `DELETE` operation from `OroActionBundle`. You can exclude your grid from matching with the next addition to `<YourBundle>/Resources/config/oro/actions.yml`
 
 ```
 operations:

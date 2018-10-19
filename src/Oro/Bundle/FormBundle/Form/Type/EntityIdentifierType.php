@@ -10,6 +10,7 @@ use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Form\EventListener\FixArrayToStringListener;
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -79,11 +80,7 @@ class EntityIdentifierType extends AbstractType
                 'values_delimiter' => ','
             )
         )
-        ->setAllowedValues(
-            array(
-                'multiple' => array(true, false),
-            )
-        );
+        ->setAllowedValues('multiple', [true, false]);
         $resolver->setRequired(array('class'));
 
         $registry = $this->registry;
@@ -130,12 +127,8 @@ class EntityIdentifierType extends AbstractType
             return $queryBuilder;
         };
 
-        $resolver->setNormalizers(
-            array(
-                'em' => $emNormalizer,
-                'queryBuilder' => $queryBuilderNormalizer,
-            )
-        );
+        $resolver->setNormalizer('em', $emNormalizer)
+            ->setNormalizer('queryBuilder', $queryBuilderNormalizer);
     }
 
     /**
@@ -159,6 +152,6 @@ class EntityIdentifierType extends AbstractType
      */
     public function getParent()
     {
-        return 'hidden';
+        return HiddenType::class;
     }
 }

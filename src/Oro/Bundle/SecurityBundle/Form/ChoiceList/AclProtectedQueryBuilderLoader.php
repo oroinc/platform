@@ -4,13 +4,15 @@ namespace Oro\Bundle\SecurityBundle\Form\ChoiceList;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
+/**
+ * The loader for entities in the choice list that protects loaded data by ACL.
+ */
 class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
 {
     /** @var AclHelper */
@@ -22,8 +24,8 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
     /** @var string */
     protected $permission;
 
-    /** @var bool */
-    protected $checkRelations;
+    /** @var array */
+    protected $options = [];
 
     /**
      * @param AclHelper $aclHelper
@@ -31,7 +33,7 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
      * @param null      $manager
      * @param null      $class
      * @param string    $permission
-     * @param bool      $checkRelations
+     * @param array     $options
      */
     public function __construct(
         AclHelper $aclHelper,
@@ -39,7 +41,7 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
         $manager = null,
         $class = null,
         $permission = 'VIEW',
-        $checkRelations = false
+        $options = []
     ) {
         if (!($queryBuilder instanceof QueryBuilder || $queryBuilder instanceof \Closure)) {
             throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder or \Closure');
@@ -60,7 +62,7 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
         $this->queryBuilder   = $queryBuilder;
         $this->aclHelper      = $aclHelper;
         $this->permission     = $permission;
-        $this->checkRelations = $checkRelations;
+        $this->options = $options;
     }
 
     /**
@@ -70,7 +72,7 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
     {
         $query = $this->queryBuilder->getQuery();
 
-        return $this->applyACL($query)->execute();
+        return $this->aclHelper->apply($query, $this->permission, $this->options)->execute();
     }
 
     /**
@@ -105,16 +107,7 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
 
         $query = $qb->getQuery();
 
-        return $this->applyACL($query)->getResult();
-    }
-
-    /**
-     * @param Query $query
-     *
-     * @return Query
-     */
-    protected function applyACL($query)
-    {
-        return $this->aclHelper->apply($query, $this->permission, $this->checkRelations);
+        return $this->aclHelper->apply($query, $this->permission, $this->options)
+            ->getResult();
     }
 }

@@ -1,0 +1,228 @@
+/* @theme: admin.oro; */
+
+.activity-list-widget {
+    position: relative;
+
+    .title {
+        display: none;
+    }
+
+    .grid-toolbar {
+        margin-bottom: $activity-toolbar-offset;
+    }
+
+    .filter-box {
+        padding: 0;
+        width: 33%;
+        flex-grow: 1;
+    }
+
+    .pagination {
+        margin: 0;
+    }
+
+    .actions-panel {
+        width: $activity-filter-box-width;
+        flex-grow: 1;
+        display: flex;
+        justify-content: flex-end;
+        margin: 0;
+    }
+
+    .activity-list {
+        position: relative;
+
+        .filter-item {
+            margin-#{$end}: $activity-filter-item-offset;
+
+            &:last-child {
+                margin-#{$end}: 0;
+            }
+        }
+
+        .info {
+            margin: $activity-filter-info-offset;
+        }
+
+        .info.responsive-cell {
+            .box-content {
+                padding: 0;
+            }
+        }
+    }
+
+    .list-box {
+        &:empty {
+            display: none;
+        }
+    }
+
+    .actions {
+        position: static;
+    }
+
+    .user {
+        font-style: normal;
+    }
+
+    .date {
+        font-size: $activity-date-font-size;
+    }
+
+    .list-item:last-child {
+        border-bottom: 0;
+    }
+
+    .icon {
+        width: $activity-icon-size;
+
+        font-size: $activity-icon-font-size;
+        text-align: center;
+
+        color: $activity-icon-color;
+    }
+
+    .activity-actions {
+        margin-#{$start}: $activity-actions-offset;
+
+        .dropdown-toggle {
+            font-size: $activity-icon-font-size;
+        }
+    }
+
+    .comment-count {
+        margin: $activity-count-offset;
+
+        color: $activity-count-color;
+
+        .count {
+            margin-#{$start}: $activity-actions-offset;
+        }
+    }
+
+    .accordion {
+        padding: 0;
+        margin: 0;
+    }
+
+    .accordion-heading {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        min-height: $activity-heading-min-height;
+        padding: $activity-heading-offset;
+
+        cursor: pointer;
+
+        @include clearfix();
+
+        .details,
+        .message,
+        .message-subject,
+        .actions {
+            @include text-line-truncate(null);
+        }
+
+        .accordion-icon {
+            width: auto;
+            font-size: $activity-icon-font-size;
+            font-weight: normal;
+
+            padding: $activity-accordion-icon-offset;
+            margin: 0;
+
+            &:hover {
+                color: $activity-accordion-icon-color-hover;
+            }
+
+            @include fa-icon($activity-accordion-icon-expanded);
+
+            &.collapsed {
+                @include fa-icon($activity-accordion-icon-collapsed);
+            }
+        }
+
+        .actions {
+            margin-#{$start}: auto;
+
+            overflow: visible;
+        }
+
+        .details {
+            max-width: $activity-details-width;
+            min-width: $activity-details-width;
+
+            margin: $activity-details-offset;
+
+            &:hover {
+                width: auto;
+                z-index: 1;
+            }
+        }
+
+        .extra-info {
+            width: $activity-info-width;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .created-at {
+            color: $activity-icon-color;
+        }
+
+        .message-item {
+            color: $activity-icon-color;
+
+            @include text-line-truncate();
+        }
+
+        .message-subject {
+            color: $activity-message-subject-color;
+        }
+    }
+
+    .accordion-body {
+        padding: 0;
+
+        .user-fieldset {
+            margin: $activity-user-fieldset-offset;
+        }
+
+        .comment {
+            padding: $activity-comment-offset;
+        }
+    }
+
+    .no-data {
+        @include no-data;
+    }
+
+    .responsive-block {
+        margin-bottom: $activity-responsive-block-offset;
+    }
+}
+
+.condition-item.condition-activity {
+    .btn.filter-select {
+        border: none;
+        background: none transparent;
+        font-weight: normal;
+        padding-#{$start}: 0;
+        padding-#{$end}: 0;
+        color: $activity-filter-select-color;
+        box-shadow: none;
+    }
+
+    .filter-item {
+        margin-#{$end}: 0;
+
+        .fa-close {
+            margin-#{$end}: 0;
+        }
+    }
+
+    .dropdown-toggle:after {
+        display: none;
+    }
+}

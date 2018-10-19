@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcesso
 class ValidateParentEntityIdExistsTest extends GetSubresourceProcessorTestCase
 {
     /** @var ValidateParentEntityIdExists */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -28,7 +28,7 @@ class ValidateParentEntityIdExistsTest extends GetSubresourceProcessorTestCase
     {
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError(
                     'entity identifier constraint',

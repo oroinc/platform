@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\NavigationBundle\Twig\TitleSetTokenParser;
 
-class TitleSetTokenParserTest extends \PHPUnit_Framework_TestCase
+class TitleSetTokenParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Tests token parser

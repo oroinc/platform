@@ -4,9 +4,9 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UIBundle\Provider\ActionButtonWidgetProvider;
 
-class ActionButtonWidgetProviderTest extends \PHPUnit_Framework_TestCase
+class ActionButtonWidgetProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $placeholderProvider;
 
     protected function setUp()

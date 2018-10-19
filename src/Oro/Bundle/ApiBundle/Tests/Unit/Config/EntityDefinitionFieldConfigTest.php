@@ -6,229 +6,292 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
-class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
+class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testCustomAttribute()
     {
         $attrName = 'test';
 
         $config = new EntityDefinitionFieldConfig();
-        $this->assertFalse($config->has($attrName));
-        $this->assertNull($config->get($attrName));
-        $this->assertSame([], $config->keys());
+        self::assertFalse($config->has($attrName));
+        self::assertNull($config->get($attrName));
+        self::assertSame([], $config->keys());
 
         $config->set($attrName, null);
-        $this->assertFalse($config->has($attrName));
-        $this->assertNull($config->get($attrName));
-        $this->assertEquals([], $config->toArray());
-        $this->assertSame([], $config->keys());
+        self::assertFalse($config->has($attrName));
+        self::assertNull($config->get($attrName));
+        self::assertEquals([], $config->toArray());
+        self::assertSame([], $config->keys());
 
         $config->set($attrName, false);
-        $this->assertTrue($config->has($attrName));
-        $this->assertFalse($config->get($attrName));
-        $this->assertEquals([$attrName => false], $config->toArray());
-        $this->assertEquals([$attrName], $config->keys());
+        self::assertTrue($config->has($attrName));
+        self::assertFalse($config->get($attrName));
+        self::assertEquals([$attrName => false], $config->toArray());
+        self::assertEquals([$attrName], $config->keys());
 
         $config->remove($attrName);
-        $this->assertFalse($config->has($attrName));
-        $this->assertNull($config->get($attrName));
-        $this->assertSame([], $config->toArray());
-        $this->assertSame([], $config->keys());
+        self::assertFalse($config->has($attrName));
+        self::assertNull($config->get($attrName));
+        self::assertSame([], $config->toArray());
+        self::assertSame([], $config->keys());
     }
 
     public function testExcluded()
     {
         $config = new EntityDefinitionFieldConfig();
-        $this->assertFalse($config->hasExcluded());
-        $this->assertFalse($config->isExcluded());
+        self::assertFalse($config->hasExcluded());
+        self::assertFalse($config->isExcluded());
 
         $config->setExcluded();
-        $this->assertTrue($config->hasExcluded());
-        $this->assertTrue($config->isExcluded());
-        $this->assertEquals(['exclude' => true], $config->toArray());
+        self::assertTrue($config->hasExcluded());
+        self::assertTrue($config->isExcluded());
+        self::assertEquals(['exclude' => true], $config->toArray());
 
         $config->setExcluded(false);
-        $this->assertTrue($config->hasExcluded());
-        $this->assertFalse($config->isExcluded());
-        $this->assertEquals([], $config->toArray());
+        self::assertTrue($config->hasExcluded());
+        self::assertFalse($config->isExcluded());
+        self::assertEquals([], $config->toArray());
     }
 
     public function testPropertyPath()
     {
         $config = new EntityDefinitionFieldConfig();
-        $this->assertFalse($config->hasPropertyPath());
-        $this->assertNull($config->getPropertyPath());
-        $this->assertEquals('default', $config->getPropertyPath('default'));
+        self::assertFalse($config->hasPropertyPath());
+        self::assertNull($config->getPropertyPath());
+        self::assertEquals('default', $config->getPropertyPath('default'));
 
         $config->setPropertyPath('path');
-        $this->assertTrue($config->hasPropertyPath());
-        $this->assertEquals('path', $config->getPropertyPath());
-        $this->assertEquals('path', $config->getPropertyPath('default'));
-        $this->assertEquals(['property_path' => 'path'], $config->toArray());
+        self::assertTrue($config->hasPropertyPath());
+        self::assertEquals('path', $config->getPropertyPath());
+        self::assertEquals('path', $config->getPropertyPath('default'));
+        self::assertEquals(['property_path' => 'path'], $config->toArray());
 
         $config->setPropertyPath(null);
-        $this->assertFalse($config->hasPropertyPath());
-        $this->assertNull($config->getPropertyPath());
-        $this->assertEquals([], $config->toArray());
+        self::assertFalse($config->hasPropertyPath());
+        self::assertNull($config->getPropertyPath());
+        self::assertEquals([], $config->toArray());
 
         $config->setPropertyPath('path');
         $config->setPropertyPath('');
-        $this->assertFalse($config->hasPropertyPath());
-        $this->assertNull($config->getPropertyPath());
-        $this->assertEquals('default', $config->getPropertyPath('default'));
-        $this->assertEquals([], $config->toArray());
+        self::assertFalse($config->hasPropertyPath());
+        self::assertNull($config->getPropertyPath());
+        self::assertEquals('default', $config->getPropertyPath('default'));
+        self::assertEquals([], $config->toArray());
     }
 
     public function testDescription()
     {
         $config = new EntityDefinitionFieldConfig();
-        $this->assertFalse($config->hasDescription());
-        $this->assertNull($config->getDescription());
+        self::assertFalse($config->hasDescription());
+        self::assertNull($config->getDescription());
 
         $config->setDescription('text');
-        $this->assertTrue($config->hasDescription());
-        $this->assertEquals('text', $config->getDescription());
-        $this->assertEquals(['description' => 'text'], $config->toArray());
+        self::assertTrue($config->hasDescription());
+        self::assertEquals('text', $config->getDescription());
+        self::assertEquals(['description' => 'text'], $config->toArray());
 
         $config->setDescription(null);
-        $this->assertFalse($config->hasDescription());
-        $this->assertNull($config->getDescription());
-        $this->assertEquals([], $config->toArray());
+        self::assertFalse($config->hasDescription());
+        self::assertNull($config->getDescription());
+        self::assertEquals([], $config->toArray());
 
         $config->setDescription('text');
         $config->setDescription('');
-        $this->assertFalse($config->hasDescription());
-        $this->assertNull($config->getDescription());
-        $this->assertEquals([], $config->toArray());
+        self::assertFalse($config->hasDescription());
+        self::assertNull($config->getDescription());
+        self::assertEquals([], $config->toArray());
+    }
+
+    public function testDataType()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        self::assertFalse($config->hasDataType());
+        self::assertNull($config->getDataType());
+        self::assertTrue($config->isEmpty());
+
+        $config->setDataType('string');
+        self::assertTrue($config->hasDataType());
+        self::assertEquals('string', $config->getDataType());
+        self::assertFalse($config->isEmpty());
+
+        $config->setDataType(null);
+        self::assertFalse($config->hasDataType());
+        self::assertNull($config->getDataType());
+        self::assertTrue($config->isEmpty());
+    }
+
+    public function testDirection()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        self::assertFalse($config->hasDirection());
+        self::assertTrue($config->isInput());
+        self::assertTrue($config->isOutput());
+
+        $config->setDirection('input-only');
+        self::assertTrue($config->hasDirection());
+        self::assertTrue($config->isInput());
+        self::assertFalse($config->isOutput());
+        self::assertEquals(['direction' => 'input-only'], $config->toArray());
+
+        $config->setDirection('output-only');
+        self::assertTrue($config->hasDirection());
+        self::assertFalse($config->isInput());
+        self::assertTrue($config->isOutput());
+        self::assertEquals(['direction' => 'output-only'], $config->toArray());
+
+        $config->setDirection('bidirectional');
+        self::assertTrue($config->hasDirection());
+        self::assertTrue($config->isInput());
+        self::assertTrue($config->isOutput());
+        self::assertEquals(['direction' => 'bidirectional'], $config->toArray());
+
+        $config->setDirection(null);
+        self::assertFalse($config->hasDirection());
+        self::assertTrue($config->isInput());
+        self::assertTrue($config->isOutput());
+        self::assertEquals([], $config->toArray());
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The possible values for the direction are "input-only", "output-only" or "bidirectional".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testSetInvalidDirection()
+    {
+        $config = new EntityDefinitionFieldConfig();
+
+        $config->setDirection('another');
     }
 
     public function testMetaProperty()
     {
         $config = new EntityDefinitionFieldConfig();
-        $this->assertFalse($config->isMetaProperty());
+        self::assertFalse($config->isMetaProperty());
 
         $config->setMetaProperty(true);
-        $this->assertTrue($config->isMetaProperty());
-        $this->assertEquals(['meta_property' => true], $config->toArray());
+        self::assertTrue($config->isMetaProperty());
+        self::assertEquals(['meta_property' => true], $config->toArray());
 
         $config->setMetaProperty(false);
-        $this->assertFalse($config->isMetaProperty());
-        $this->assertEquals([], $config->toArray());
+        self::assertFalse($config->isMetaProperty());
+        self::assertEquals([], $config->toArray());
     }
 
     public function testGetOrCreateTargetEntity()
     {
         $config = new EntityDefinitionFieldConfig();
-        $this->assertFalse($config->hasTargetEntity());
-        $this->assertNull($config->getTargetEntity());
+        self::assertFalse($config->hasTargetEntity());
+        self::assertNull($config->getTargetEntity());
 
         $targetEntity = $config->getOrCreateTargetEntity();
-        $this->assertTrue($config->hasTargetEntity());
-        $this->assertSame($targetEntity, $config->getTargetEntity());
+        self::assertTrue($config->hasTargetEntity());
+        self::assertSame($targetEntity, $config->getTargetEntity());
 
         $targetEntity1 = $config->getOrCreateTargetEntity();
-        $this->assertSame($targetEntity, $targetEntity1);
-        $this->assertSame($targetEntity1, $config->getTargetEntity());
+        self::assertSame($targetEntity, $targetEntity1);
+        self::assertSame($targetEntity1, $config->getTargetEntity());
     }
 
     public function testCreateAndSetTargetEntity()
     {
         $config = new EntityDefinitionFieldConfig();
-        $this->assertFalse($config->hasTargetEntity());
-        $this->assertNull($config->getTargetEntity());
+        self::assertFalse($config->hasTargetEntity());
+        self::assertNull($config->getTargetEntity());
 
         $targetEntity = $config->createAndSetTargetEntity();
-        $this->assertTrue($config->hasTargetEntity());
-        $this->assertSame($targetEntity, $config->getTargetEntity());
+        self::assertTrue($config->hasTargetEntity());
+        self::assertSame($targetEntity, $config->getTargetEntity());
 
         $targetEntity1 = $config->createAndSetTargetEntity();
-        $this->assertNotSame($targetEntity, $targetEntity1);
-        $this->assertSame($targetEntity1, $config->getTargetEntity());
+        self::assertNotSame($targetEntity, $targetEntity1);
+        self::assertSame($targetEntity1, $config->getTargetEntity());
     }
 
     public function testTargetClass()
     {
         $config = new EntityDefinitionFieldConfig();
-        $this->assertNull($config->getTargetClass());
+        self::assertNull($config->getTargetClass());
 
         $config->setTargetClass('Test\Class');
-        $this->assertEquals('Test\Class', $config->getTargetClass());
-        $this->assertEquals(['target_class' => 'Test\Class'], $config->toArray());
+        self::assertEquals('Test\Class', $config->getTargetClass());
+        self::assertEquals(['target_class' => 'Test\Class'], $config->toArray());
 
         $config->setTargetClass(null);
-        $this->assertNull($config->getTargetClass());
-        $this->assertEquals([], $config->toArray());
+        self::assertNull($config->getTargetClass());
+        self::assertEquals([], $config->toArray());
     }
 
     public function testTargetType()
     {
         $config = new EntityDefinitionFieldConfig();
-        $this->assertFalse($config->hasTargetType());
-        $this->assertNull($config->getTargetType());
-        $this->assertNull($config->isCollectionValuedAssociation());
+        self::assertFalse($config->hasTargetType());
+        self::assertNull($config->getTargetType());
+        self::assertNull($config->isCollectionValuedAssociation());
 
         $config->setTargetType('to-one');
-        $this->assertTrue($config->hasTargetType());
-        $this->assertEquals('to-one', $config->getTargetType());
-        $this->assertFalse($config->isCollectionValuedAssociation());
-        $this->assertEquals(['target_type' => 'to-one'], $config->toArray());
+        self::assertTrue($config->hasTargetType());
+        self::assertEquals('to-one', $config->getTargetType());
+        self::assertFalse($config->isCollectionValuedAssociation());
+        self::assertEquals(['target_type' => 'to-one'], $config->toArray());
 
         $config->setTargetType('to-many');
-        $this->assertTrue($config->hasTargetType());
-        $this->assertEquals('to-many', $config->getTargetType());
-        $this->assertTrue($config->isCollectionValuedAssociation());
-        $this->assertEquals(['target_type' => 'to-many'], $config->toArray());
+        self::assertTrue($config->hasTargetType());
+        self::assertEquals('to-many', $config->getTargetType());
+        self::assertTrue($config->isCollectionValuedAssociation());
+        self::assertEquals(['target_type' => 'to-many'], $config->toArray());
 
         $config->setTargetType(null);
-        $this->assertFalse($config->hasTargetType());
-        $this->assertNull($config->getTargetType());
-        $this->assertNull($config->isCollectionValuedAssociation());
-        $this->assertEquals([], $config->toArray());
+        self::assertFalse($config->hasTargetType());
+        self::assertNull($config->getTargetType());
+        self::assertNull($config->isCollectionValuedAssociation());
+        self::assertEquals([], $config->toArray());
     }
 
     public function testCollapsed()
     {
         $config = new EntityDefinitionFieldConfig();
-        $this->assertFalse($config->hasCollapsed());
-        $this->assertFalse($config->isCollapsed());
+        self::assertFalse($config->hasCollapsed());
+        self::assertFalse($config->isCollapsed());
 
         $config->setCollapsed();
-        $this->assertTrue($config->hasCollapsed());
-        $this->assertTrue($config->isCollapsed());
-        $this->assertEquals(['collapse' => true], $config->toArray());
+        self::assertTrue($config->hasCollapsed());
+        self::assertTrue($config->isCollapsed());
+        self::assertEquals(['collapse' => true], $config->toArray());
 
         $config->setCollapsed(false);
-        $this->assertTrue($config->hasCollapsed());
-        $this->assertFalse($config->isCollapsed());
-        $this->assertEquals([], $config->toArray());
+        self::assertTrue($config->hasCollapsed());
+        self::assertFalse($config->isCollapsed());
+        self::assertEquals([], $config->toArray());
     }
 
     public function testFormType()
     {
         $config = new EntityDefinitionFieldConfig();
-        $this->assertNull($config->getFormType());
+        self::assertNull($config->getFormType());
 
         $config->setFormType('test');
-        $this->assertEquals('test', $config->getFormType());
-        $this->assertEquals(['form_type' => 'test'], $config->toArray());
+        self::assertEquals('test', $config->getFormType());
+        self::assertEquals(['form_type' => 'test'], $config->toArray());
 
         $config->setFormType(null);
-        $this->assertNull($config->getFormType());
-        $this->assertEquals([], $config->toArray());
+        self::assertNull($config->getFormType());
+        self::assertEquals([], $config->toArray());
     }
 
     public function testFormOptions()
     {
         $config = new EntityDefinitionFieldConfig();
-        $this->assertNull($config->getFormOptions());
+        self::assertNull($config->getFormOptions());
 
         $config->setFormOptions(['key' => 'val']);
-        $this->assertEquals(['key' => 'val'], $config->getFormOptions());
-        $this->assertEquals(['form_options' => ['key' => 'val']], $config->toArray());
+        self::assertEquals(['key' => 'val'], $config->getFormOptions());
+        self::assertEquals(['form_options' => ['key' => 'val']], $config->toArray());
 
         $config->setFormOptions(null);
-        $this->assertNull($config->getFormOptions());
-        $this->assertEquals([], $config->toArray());
+        self::assertNull($config->getFormOptions());
+        self::assertEquals([], $config->toArray());
     }
 
     public function testSetFormOption()
@@ -237,62 +300,67 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
 
         $config->setFormOption('option1', 'value1');
         $config->setFormOption('option2', 'value2');
-        $this->assertEquals(
+        self::assertEquals(
             ['option1' => 'value1', 'option2' => 'value2'],
             $config->getFormOptions()
         );
 
         $config->setFormOption('option1', 'newValue');
-        $this->assertEquals(
+        self::assertEquals(
             ['option1' => 'newValue', 'option2' => 'value2'],
             $config->getFormOptions()
         );
     }
 
-    public function testAddFormConstraint()
+    public function testFormConstraints()
     {
         $config = new EntityDefinitionFieldConfig();
 
+        self::assertNull($config->getFormOptions());
+        self::assertNull($config->getFormConstraints());
+
         $config->addFormConstraint(new NotNull());
-        $this->assertEquals(['constraints' => [new NotNull()]], $config->getFormOptions());
+        self::assertEquals(['constraints' => [new NotNull()]], $config->getFormOptions());
+        self::assertEquals([new NotNull()], $config->getFormConstraints());
 
         $config->addFormConstraint(new NotBlank());
-        $this->assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
+        self::assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
+        self::assertEquals([new NotNull(), new NotBlank()], $config->getFormConstraints());
     }
 
     public function testSetDataTransformers()
     {
         $config = new EntityDefinitionFieldConfig();
-        $this->assertFalse($config->hasDataTransformers());
-        $this->assertEquals([], $config->getDataTransformers());
+        self::assertFalse($config->hasDataTransformers());
+        self::assertEquals([], $config->getDataTransformers());
 
         $config->setDataTransformers('service_id');
-        $this->assertTrue($config->hasDataTransformers());
-        $this->assertEquals(['service_id'], $config->getDataTransformers());
-        $this->assertEquals(['data_transformer' => ['service_id']], $config->toArray());
+        self::assertTrue($config->hasDataTransformers());
+        self::assertEquals(['service_id'], $config->getDataTransformers());
+        self::assertEquals(['data_transformer' => ['service_id']], $config->toArray());
 
         $config->setDataTransformers(['service_id', ['class', 'method']]);
-        $this->assertTrue($config->hasDataTransformers());
-        $this->assertEquals(['service_id', ['class', 'method']], $config->getDataTransformers());
-        $this->assertEquals(['data_transformer' => ['service_id', ['class', 'method']]], $config->toArray());
+        self::assertTrue($config->hasDataTransformers());
+        self::assertEquals(['service_id', ['class', 'method']], $config->getDataTransformers());
+        self::assertEquals(['data_transformer' => ['service_id', ['class', 'method']]], $config->toArray());
 
         $config->setDataTransformers([]);
-        $this->assertFalse($config->hasDataTransformers());
-        $this->assertEquals([], $config->getDataTransformers());
-        $this->assertEquals([], $config->toArray());
+        self::assertFalse($config->hasDataTransformers());
+        self::assertEquals([], $config->getDataTransformers());
+        self::assertEquals([], $config->toArray());
     }
 
     public function testDependsOn()
     {
         $config = new EntityDefinitionFieldConfig();
-        $this->assertNull($config->getDependsOn());
+        self::assertNull($config->getDependsOn());
 
         $config->setDependsOn(['field1']);
-        $this->assertEquals(['field1'], $config->getDependsOn());
-        $this->assertEquals(['depends_on' => ['field1']], $config->toArray());
+        self::assertEquals(['field1'], $config->getDependsOn());
+        self::assertEquals(['depends_on' => ['field1']], $config->toArray());
 
         $config->setDependsOn([]);
-        $this->assertNull($config->getDependsOn());
-        $this->assertEquals([], $config->toArray());
+        self::assertNull($config->getDependsOn());
+        self::assertEquals([], $config->toArray());
     }
 }

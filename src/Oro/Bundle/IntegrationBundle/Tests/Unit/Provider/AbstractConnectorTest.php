@@ -15,15 +15,15 @@ use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\TestConnector;
 use Psr\Log\NullLogger;
 
-class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
+class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|StepExecution */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|StepExecution */
     protected $stepExecutionMock;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Transport */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Transport */
     protected $transportSettings;
 
-    /** @var TransportInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TransportInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $transportMock;
 
     protected function setUp()
@@ -58,7 +58,7 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider initializationDataProvider
      *
-     * @param \PHPUnit_Framework_MockObject_MockObject|mixed $transport
+     * @param \PHPUnit\Framework\MockObject\MockObject|mixed $transport
      * @param null                                           $source
      * @param bool|string                                    $expectedException
      */

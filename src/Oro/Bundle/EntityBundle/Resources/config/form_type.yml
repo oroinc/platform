@@ -10,19 +10,19 @@ parameters:
 
 services:
     oro_entity.form.type.custom_entity:
-        class: %oro_entity.form.type.custom_entity.class%
+        class: '%oro_entity.form.type.custom_entity.class%'
         tags:
             - { name: form.type, alias: custom_entity_type }
 
     oro_entity.form.type.entity_choice:
-        class: %oro_entity.form.type.entity_choice.class%
+        class: '%oro_entity.form.type.entity_choice.class%'
         arguments:
             - '@oro_entity.entity_provider'
         tags:
             - { name: form.type, alias: oro_entity_choice }
 
     oro_entity.form.type.entity_field_choice:
-        class: %oro_entity.form.type.entity_field_choice.class%
+        class: '%oro_entity.form.type.entity_field_choice.class%'
         arguments:
             - '@oro_entity.entity_provider'
             - '@oro_entity.entity_field_provider'
@@ -31,7 +31,7 @@ services:
             - { name: form.type, alias: oro_entity_field_choice }
 
     oro_entity.form.type.entity_field_select:
-        class: %oro_entity.form.type.entity_field_select.class%
+        class: '%oro_entity.form.type.entity_field_select.class%'
         arguments:
             - '@oro_entity.entity_provider'
             - '@oro_entity.entity_field_provider'
@@ -40,14 +40,14 @@ services:
             - { name: form.type, alias: oro_entity_field_select }
 
     oro_entity.form.type.entity_select:
-        class: %oro_entity.form.type.entity_select.class%
+        class: '%oro_entity.form.type.entity_select.class%'
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
             - { name: form.type, alias: oro_entity_select }
 
     oro_entity.form.handler.entity_select:
-        class: %oro_entity.form.handler.entity_select.class%
+        class: '%oro_entity.form.handler.entity_select.class%'
         calls:
             - [initDoctrinePropertiesByManagerRegistry, ["@doctrine"]]
             - [setAclHelper, ["@oro_security.acl_helper"]]
@@ -55,7 +55,7 @@ services:
             - { name: oro_form.autocomplete.search_handler, alias: entity_select, acl_resource: oro_search }
 
     oro_entity.form.guesser.form_config:
-        class: %oro_entity.form.guesser.form_config.class%
+        class: '%oro_entity.form.guesser.form_config.class%'
         arguments:
             - '@doctrine'
             - '@oro_entity_config.provider.entity'
@@ -64,28 +64,28 @@ services:
             - { name: form.type_guesser, priority: 20 }
 
     oro_entity.form.guesser.doctrine_type:
-        class: %oro_entity.form.guesser.doctrine_type.class%
+        class: '%oro_entity.form.guesser.doctrine_type.class%'
         arguments:
             - '@doctrine'
             - '@oro_entity_config.provider.entity'
         calls:
             # default types
-            - [addDoctrineTypeMapping, ["string", "text"]]
-            - [addDoctrineTypeMapping, ["integer", "text"]] # to be able validate numbers properly, we need text input
-            - [addDoctrineTypeMapping, ["smallint", "integer", { precision: 0 }]]
-            - [addDoctrineTypeMapping, ["bigint", "integer", { precision: 0 }]]
-            - [addDoctrineTypeMapping, ["boolean", "checkbox"]]
-            - [addDoctrineTypeMapping, ["decimal", "number"]]
-            - [addDoctrineTypeMapping, ["date", "oro_date"]]
-            - [addDoctrineTypeMapping, ["time", "time", { model_timezone: "UTC", view_timezone: "UTC" }]]
-            - [addDoctrineTypeMapping, ["datetime", "oro_datetime"]]
-            - [addDoctrineTypeMapping, ["datetimetz", "oro_datetime"]]
-            - [addDoctrineTypeMapping, ["text", "textarea"]]
-            - [addDoctrineTypeMapping, ["float", "number"]]
-            - [addDoctrineTypeMapping, ["guid", "text"]]
+            - [addDoctrineTypeMapping, ["string", Symfony\Component\Form\Extension\Core\Type\TextType]]
+            - [addDoctrineTypeMapping, ["integer", Symfony\Component\Form\Extension\Core\Type\TextType]] # to be able validate numbers properly, we need text input
+            - [addDoctrineTypeMapping, ["smallint", Symfony\Component\Form\Extension\Core\Type\IntegerType, { precision: 0 }]]
+            - [addDoctrineTypeMapping, ["bigint", Symfony\Component\Form\Extension\Core\Type\IntegerType, { precision: 0 }]]
+            - [addDoctrineTypeMapping, ["boolean", Symfony\Component\Form\Extension\Core\Type\CheckboxType]]
+            - [addDoctrineTypeMapping, ["decimal", Symfony\Component\Form\Extension\Core\Type\NumberType]]
+            - [addDoctrineTypeMapping, ["date", Oro\Bundle\FormBundle\Form\Type\OroDateType]]
+            - [addDoctrineTypeMapping, ["time", Symfony\Component\Form\Extension\Core\Type\TimeType, { model_timezone: "UTC", view_timezone: "UTC" }]]
+            - [addDoctrineTypeMapping, ["datetime", Oro\Bundle\FormBundle\Form\Type\OroDateTimeType]]
+            - [addDoctrineTypeMapping, ["datetimetz", Oro\Bundle\FormBundle\Form\Type\OroDateTimeType]]
+            - [addDoctrineTypeMapping, ["text", Symfony\Component\Form\Extension\Core\Type\TextareaType]]
+            - [addDoctrineTypeMapping, ["float", Symfony\Component\Form\Extension\Core\Type\NumberType]]
+            - [addDoctrineTypeMapping, ["guid", Symfony\Component\Form\Extension\Core\Type\TextType]]
             # custom types
-            - [addDoctrineTypeMapping, ["percent", "oro_percent"]]
-            - [addDoctrineTypeMapping, ["money", "oro_money"]]
+            - [addDoctrineTypeMapping, ["percent", Oro\Bundle\FormBundle\Form\Type\OroPercentType]]
+            - [addDoctrineTypeMapping, ["money", Oro\Bundle\FormBundle\Form\Type\OroMoneyType]]
             # cannot set default form types for compound and binary types (array, object, blob)
         tags:
             - { name: form.type_guesser, priority: 10 }

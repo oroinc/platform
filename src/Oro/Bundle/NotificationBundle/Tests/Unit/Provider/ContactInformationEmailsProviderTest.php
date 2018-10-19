@@ -8,15 +8,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ContactInformationEmailsProviderTest extends \PHPUnit_Framework_TestCase
+class ContactInformationEmailsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContactInformationEmailsProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContactInformationEmailsProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $provider;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     protected function setUp()
@@ -72,6 +72,6 @@ class ContactInformationEmailsProviderTest extends \PHPUnit_Framework_TestCase
 
         $recipients = $this->provider->getRecipients($entity);
 
-        $this->assertEquals(['email' => 'Translated label'], $recipients);
+        $this->assertEquals(['Translated label' => 'email'], $recipients);
     }
 }

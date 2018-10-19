@@ -4,9 +4,9 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 /**
  * Provides an interface for different kind requests for additional configuration sections.
- * This interface can be used to tell the Context that an additional data should be available
+ * This interface can be used to tell the context that an additional data should be available
  * as additional configuration section. So, "hasConfigOf", "getConfigOf" and "setConfigOf" methods
- * of the Context can be used to access these data.
+ * of the context can be used to access these data.
  */
 interface ConfigExtraSectionInterface extends ConfigExtraInterface
 {

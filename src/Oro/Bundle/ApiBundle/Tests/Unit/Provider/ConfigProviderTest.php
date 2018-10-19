@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -11,9 +10,9 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
-class ConfigProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionProcessorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorInterface */
     private $processor;
 
     /** @var ConfigProvider */
@@ -88,7 +87,6 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
             });
 
         $result = $this->configProvider->getConfig($className, $version, $requestType, [$extra, $sectionExtra]);
-        self::assertInstanceOf(Config::class, $result);
         self::assertEquals('Test\Class|test_extra_key', $result->getDefinition()->getKey());
         self::assertTrue($definition->hasField('test_field'));
         self::assertEquals(['test_section_key' => 'value'], $result->get('test_section_extra'));
@@ -124,7 +122,7 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \LogicException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage Cannot build the configuration of "Test\Class" because this causes the circular dependency.
      */
     // @codingStandardsIgnoreEnd

@@ -10,20 +10,20 @@ use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
+class DetailedLogsHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $config;
 
     /**
-     * @var HandlerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var HandlerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $nestedHandler;
 
     /**
-     * @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $container;
 
@@ -57,8 +57,14 @@ class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testIsHandlingApplicationIsNotInstalled()
     {
-        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cacheProvider */
+        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cacheProvider */
         $cacheProvider = $this->getMockBuilder(CacheProvider::class)->getMock();
+
+        $cacheProvider->expects($this->once())
+            ->method('fetch')
+            ->with(Configuration::LOGS_LEVEL_KEY)
+            ->willReturn(false);
+
         $this->container
             ->expects($this->once())
             ->method('get')
@@ -79,12 +85,8 @@ class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testIsHandlingWithCache()
     {
-        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cacheProvider */
+        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cacheProvider */
         $cacheProvider = $this->getMockBuilder(CacheProvider::class)->getMock();
-        $cacheProvider->expects($this->once())
-            ->method('contains')
-            ->with(Configuration::LOGS_LEVEL_KEY)
-            ->willReturn(true);
 
         $cacheProvider->expects($this->once())
             ->method('fetch')

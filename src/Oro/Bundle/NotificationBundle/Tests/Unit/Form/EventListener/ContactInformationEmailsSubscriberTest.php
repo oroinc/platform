@@ -9,10 +9,10 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 
-class ContactInformationEmailsSubscriberTest extends \PHPUnit_Framework_TestCase
+class ContactInformationEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ContactInformationEmailsProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContactInformationEmailsProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $contactInformationEmailsProvider;
 
@@ -58,7 +58,7 @@ class ContactInformationEmailsSubscriberTest extends \PHPUnit_Framework_TestCase
                     'multiple' => true,
                     'expanded' => true,
                     'choices' => $emailFields,
-                    'tooltip'     => 'oro.notification.emailnotification.additional_emails.tooltip',
+                    'tooltip' => 'oro.notification.emailnotification.additional_emails.tooltip',
                 ]
             );
 
@@ -68,7 +68,7 @@ class ContactInformationEmailsSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with('recipientList')
             ->willReturn($recipientListForm);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FormEvent $event */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|FormEvent $event */
         $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getData')
@@ -111,7 +111,7 @@ class ContactInformationEmailsSubscriberTest extends \PHPUnit_Framework_TestCase
                     'multiple' => true,
                     'expanded' => true,
                     'choices' => $emailFields,
-                    'tooltip'     => 'oro.notification.emailnotification.additional_emails.tooltip',
+                    'tooltip' => 'oro.notification.emailnotification.additional_emails.tooltip',
                 ]
             );
 
@@ -121,7 +121,7 @@ class ContactInformationEmailsSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with('recipientList')
             ->willReturn($recipientListForm);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FormEvent $event */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|FormEvent $event */
         $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getData')

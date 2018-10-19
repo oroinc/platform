@@ -3,12 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 
-class MetadataContextTest extends \PHPUnit_Framework_TestCase
+class MetadataContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MetadataContext */
-    protected $context;
+    private $context;
 
     protected function setUp()
     {
@@ -17,65 +18,65 @@ class MetadataContextTest extends \PHPUnit_Framework_TestCase
 
     public function testInitialize()
     {
-        $this->assertTrue($this->context->has(MetadataContext::REQUEST_TYPE));
+        self::assertTrue($this->context->has(MetadataContext::REQUEST_TYPE));
 
-        $this->assertTrue($this->context->has(MetadataContext::EXTRA));
-        $this->assertEquals([], $this->context->get(MetadataContext::EXTRA));
+        self::assertTrue($this->context->has(MetadataContext::EXTRA));
+        self::assertEquals([], $this->context->get(MetadataContext::EXTRA));
     }
 
     public function testClassName()
     {
-        $this->assertNull($this->context->getClassName());
+        self::assertNull($this->context->getClassName());
 
         $this->context->setClassName('test');
-        $this->assertEquals('test', $this->context->getClassName());
-        $this->assertEquals('test', $this->context->get(MetadataContext::CLASS_NAME));
+        self::assertEquals('test', $this->context->getClassName());
+        self::assertEquals('test', $this->context->get(MetadataContext::CLASS_NAME));
     }
 
     public function testTargetAction()
     {
-        $this->assertNull($this->context->getTargetAction());
+        self::assertNull($this->context->getTargetAction());
 
         $this->context->setTargetAction('test');
-        $this->assertEquals('test', $this->context->getTargetAction());
-        $this->assertEquals('test', $this->context->get(MetadataContext::TARGET_ACTION));
+        self::assertEquals('test', $this->context->getTargetAction());
+        self::assertEquals('test', $this->context->get(MetadataContext::TARGET_ACTION));
     }
 
     public function testConfig()
     {
-        $this->assertNull($this->context->getConfig());
+        self::assertNull($this->context->getConfig());
 
         $config = new EntityDefinitionConfig();
         $this->context->setConfig($config);
-        $this->assertSame($config, $this->context->getConfig());
+        self::assertSame($config, $this->context->getConfig());
     }
 
     public function testHasExtraAndGetExtras()
     {
-        $extra = $this->createMock('Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface');
-        $extra->expects($this->any())
+        $extra = $this->createMock(MetadataExtraInterface::class);
+        $extra->expects(self::any())
             ->method('getName')
             ->willReturn('test');
 
         $this->context->setExtras([$extra]);
-        $this->assertEquals([$extra], $this->context->getExtras());
+        self::assertEquals([$extra], $this->context->getExtras());
 
-        $this->assertTrue($this->context->hasExtra('test'));
-        $this->assertFalse($this->context->hasExtra('another'));
+        self::assertTrue($this->context->hasExtra('test'));
+        self::assertFalse($this->context->hasExtra('another'));
     }
 
     public function testSetExtras()
     {
-        $extra = $this->createMock('Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface');
-        $extra->expects($this->once())
+        $extra = $this->createMock(MetadataExtraInterface::class);
+        $extra->expects(self::once())
             ->method('getName')
             ->willReturn('test');
-        $extra->expects($this->once())
+        $extra->expects(self::once())
             ->method('configureContext')
-            ->with($this->identicalTo($this->context));
+            ->with(self::identicalTo($this->context));
 
         $this->context->setExtras([$extra]);
-        $this->assertEquals(['test'], $this->context->get(MetadataContext::EXTRA));
+        self::assertEquals(['test'], $this->context->get(MetadataContext::EXTRA));
     }
 
     /**
@@ -89,10 +90,10 @@ class MetadataContextTest extends \PHPUnit_Framework_TestCase
 
     public function testWithExcludedProperties()
     {
-        $this->assertFalse($this->context->getWithExcludedProperties());
+        self::assertFalse($this->context->getWithExcludedProperties());
 
         $this->context->setWithExcludedProperties(true);
-        $this->assertTrue($this->context->getWithExcludedProperties());
-        $this->assertTrue($this->context->get(MetadataContext::WITH_EXCLUDED_PROPERTIES));
+        self::assertTrue($this->context->getWithExcludedProperties());
+        self::assertTrue($this->context->get(MetadataContext::WITH_EXCLUDED_PROPERTIES));
     }
 }

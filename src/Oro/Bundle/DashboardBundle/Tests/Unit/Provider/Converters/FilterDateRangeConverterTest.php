@@ -6,21 +6,21 @@ use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 use Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 
-class FilterDateRangeConverterTest extends \PHPUnit_Framework_TestCase
+class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FilterDateRangeConverter */
     protected $converter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $formatter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $dateCompiler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $dateHelper;
 
     public function setUp()
@@ -76,7 +76,7 @@ class FilterDateRangeConverterTest extends \PHPUnit_Framework_TestCase
         $result = $this->converter->getConvertedValue([], null, ['options' => ['value_types' => true]]);
 
         $this->assertEquals('2016-01-01 00:00:00', $result['start']->format('Y-m-d H:i:s'));
-        $this->assertEquals('2016-01-31 23:59:59', $result['end']->format('Y-m-d H:i:s'));
+        $this->assertEquals('2016-02-01 00:00:00', $result['end']->format('Y-m-d H:i:s'));
     }
 
     public function testGetConvertedValueBetween()

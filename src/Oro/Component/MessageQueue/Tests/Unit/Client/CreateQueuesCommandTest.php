@@ -9,7 +9,7 @@ use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 
-class CreateQueuesCommandTest extends \PHPUnit_Framework_TestCase
+class CreateQueuesCommandTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CreateQueuesCommand */
     private $command;
@@ -17,10 +17,10 @@ class CreateQueuesCommandTest extends \PHPUnit_Framework_TestCase
     /** @var Container */
     private $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $driver;
 
     protected function setUp()

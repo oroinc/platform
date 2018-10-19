@@ -29,7 +29,7 @@ define(function(require) {
          */
         initialize: function(options) {
             BaseCollectionView.__super__.initialize.apply(this, arguments);
-            this.itemView = this.itemView.extend({
+            this.itemView = this.itemView.extend({// eslint-disable-line oro/named-constructor
                 inputName: options.inputName,
                 fileIcons: options.fileIcons,
                 collectionView: this

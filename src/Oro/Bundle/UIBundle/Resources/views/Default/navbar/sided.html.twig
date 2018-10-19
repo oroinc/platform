@@ -1,17 +1,41 @@
-{% if isDesktopVersion() and oro_config_value('oro_ui.navbar_position') == placement %}
+{% if isDesktopVersion() and oro_config_value('oro_ui.navbar_position') == 'left' %}
     {% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
-
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-    <div class="main-menu-sided minimized" {{ UI.renderPageComponentAttributes({
-        jquery: {
-            widgetModule: 'oroui/js/desktop/side-menu',
-            toggleSelector: '#main-menu-toggler'
-        }
-    }) }}>
-        <div class="scroller" id="main-menu">
+    <div id="side-menu" class="main-menu-sided minimized"
+        {{ UI.renderPageComponentAttributes({
+            module: 'oroui/js/app/components/jquery-widget-component',
+            options: {
+                widgetModule: 'oroui/js/desktop/side-menu',
+                toggleSelector: '#main-menu-toggler'
+            }
+        }) }}>
+        <header class="main-menu__header">
+            {% set organization_name %}
+                {% spaceless %}
+                    {% placeholder organization_name %}
+                {% endspaceless %}
+            {% endset %}
+            {{ UI.app_logo(organization_name) }}
+        </header>
+
+        <nav class="scroller" id="main-menu"
+                {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/main-menu-view'}) }}>
+            <button class="main-menu-sided__scroll invisible"
+                    data-role="scroll-trigger"
+                    data-direction="up"
+                    aria-label="{{ 'oro.ui.navbar.scroll_up_label'|trans }}"
+            >
+            </button>
             {{ block('application_menu') }}
-        </div>
-        <div id="main-menu-toggler" class="menu-toggler" ></div>
+            <button class="main-menu-sided__scroll invisible"
+                    data-role="scroll-trigger"
+                    data-direction="down"
+                    aria-label="{{ 'oro.ui.navbar.scroll_down_label'|trans }}"
+            >
+            </button>
+        </nav>
+
+        <button id="main-menu-toggler" class="main-menu-toggler" aria-label="{{ 'oro.ui.navbar.toggler_label'|trans }}"></button>
     </div>
 {% endif %}

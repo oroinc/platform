@@ -5,12 +5,17 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Provides WYSIWYG editor functionality. WYSIWYG editor can be disabled from System Configuration.
+ */
 class OroRichTextType extends AbstractType
 {
     const NAME            = 'oro_rich_text';
@@ -26,6 +31,9 @@ class OroRichTextType extends AbstractType
 
     /** @var HtmlTagProvider */
     protected $htmlTagProvider;
+
+    /** @var ContextInterface */
+    protected $context;
 
     /** @var string */
     protected $cacheDir;
@@ -54,14 +62,20 @@ class OroRichTextType extends AbstractType
     ];
 
     /**
-     * @param ConfigManager   $configManager
+     * @param ConfigManager $configManager
      * @param HtmlTagProvider $htmlTagProvider
-     * @param string          $cacheDir
+     * @param ContextInterface $context
+     * @param string $cacheDir
      */
-    public function __construct(ConfigManager $configManager, HtmlTagProvider $htmlTagProvider, $cacheDir = null)
-    {
+    public function __construct(
+        ConfigManager $configManager,
+        HtmlTagProvider $htmlTagProvider,
+        ContextInterface $context,
+        $cacheDir = null
+    ) {
         $this->configManager   = $configManager;
         $this->htmlTagProvider = $htmlTagProvider;
+        $this->context         = $context;
         $this->cacheDir        = $cacheDir;
     }
 
@@ -91,6 +105,7 @@ class OroRichTextType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $assetsBaseUrl = ltrim($this->context->getBasePath() . '/', '/');
         $assetsVersionBaseUrl   = '';
         $assetsVersionFormatted = '';
         if ($this->assetHelper) {
@@ -106,7 +121,7 @@ class OroRichTextType extends AbstractType
         $defaultWysiwygOptions = [
             'plugins'            => self::$defaultPlugins,
             'toolbar_type'       => self::TOOLBAR_DEFAULT,
-            'skin_url'           => 'bundles/oroform/css/tinymce',
+            'skin_url'           => $assetsBaseUrl . 'bundles/oroform/css/tinymce',
             'valid_elements'     => implode(',', $this->htmlTagProvider->getAllowedElements()),
             'menubar'            => false,
             'statusbar'          => false,
@@ -115,7 +130,7 @@ class OroRichTextType extends AbstractType
             'convert_urls'       => true,
             'cache_suffix'       => $assetsVersionFormatted,
             'document_base_url'  => $assetsVersionBaseUrl,
-            'paste_data_images'  => true //to avoid of a paste plugin restriction
+            'paste_data_images'  => false
         ];
 
         $defaults = [
@@ -125,49 +140,52 @@ class OroRichTextType extends AbstractType
                 'module'  => 'oroui/js/app/components/view-component',
                 'options' => [
                     'view'        => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                    'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
+                    'content_css' => $assetsBaseUrl . 'bundles/oroform/css/wysiwyg-editor.css',
                 ]
             ],
         ];
 
         $resolver->setDefaults($defaults);
-        $resolver->setNormalizers(
-            [
-                'wysiwyg_options' => function (Options $options, $wysiwygOptions) use ($defaultWysiwygOptions) {
-                    if (!empty($wysiwygOptions['toolbar'])) {
-                        $wysiwygOptions = array_merge($defaultWysiwygOptions, $wysiwygOptions);
-                        unset($wysiwygOptions['toolbar_type']);
 
-                        return $wysiwygOptions;
-                    }
-
-                    if (empty($wysiwygOptions['toolbar_type'])
-                        || !array_key_exists($wysiwygOptions['toolbar_type'], self::$toolbars)
-                    ) {
-                        $toolbarType = self::TOOLBAR_DEFAULT;
-                    } else {
-                        $toolbarType = $wysiwygOptions['toolbar_type'];
-                    }
-                    $wysiwygOptions['toolbar'] = self::$toolbars[$toolbarType];
-
+        $resolver->setNormalizer(
+            'wysiwyg_options',
+            function (Options $options, $wysiwygOptions) use ($defaultWysiwygOptions) {
+                if (!empty($wysiwygOptions['toolbar'])) {
                     $wysiwygOptions = array_merge($defaultWysiwygOptions, $wysiwygOptions);
                     unset($wysiwygOptions['toolbar_type']);
 
                     return $wysiwygOptions;
-                },
-                'attr'            => function (Options $options, $attr) {
-                    $pageComponent  = $options->get('page-component');
-                    $wysiwygOptions = (array) $options->get('wysiwyg_options');
-
-                    $pageComponent['options']            = array_merge($pageComponent['options'], $wysiwygOptions);
-                    $pageComponent['options']['enabled'] = (bool) $options->get('wysiwyg_enabled');
-
-                    $attr['data-page-component-module']  = $pageComponent['module'];
-                    $attr['data-page-component-options'] = json_encode($pageComponent['options']);
-
-                    return $attr;
                 }
-            ]
+
+                if (empty($wysiwygOptions['toolbar_type'])
+                    || !array_key_exists($wysiwygOptions['toolbar_type'], self::$toolbars)
+                ) {
+                    $toolbarType = self::TOOLBAR_DEFAULT;
+                } else {
+                    $toolbarType = $wysiwygOptions['toolbar_type'];
+                }
+                $wysiwygOptions['toolbar'] = self::$toolbars[$toolbarType];
+
+                $wysiwygOptions = array_merge($defaultWysiwygOptions, $wysiwygOptions);
+                unset($wysiwygOptions['toolbar_type']);
+
+                return $wysiwygOptions;
+            }
+        )
+        ->setNormalizer(
+            'attr',
+            function (Options $options, $attr) {
+                $pageComponent  = $options['page-component'];
+                $wysiwygOptions = (array) $options['wysiwyg_options'];
+
+                $pageComponent['options']            = array_merge($pageComponent['options'], $wysiwygOptions);
+                $pageComponent['options']['enabled'] = (bool) $options['wysiwyg_enabled'];
+
+                $attr['data-page-component-module']  = $pageComponent['module'];
+                $attr['data-page-component-options'] = json_encode($pageComponent['options']);
+
+                return $attr;
+            }
         );
     }
 
@@ -192,6 +210,6 @@ class OroRichTextType extends AbstractType
      */
     public function getParent()
     {
-        return 'textarea';
+        return TextareaType::class;
     }
 }

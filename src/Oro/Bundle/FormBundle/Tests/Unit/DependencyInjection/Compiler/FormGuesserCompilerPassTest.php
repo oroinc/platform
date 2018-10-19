@@ -3,14 +3,16 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormGuesserCompilerPass;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
-class FormGuesserCompilerPassTest extends \PHPUnit_Framework_TestCase
+class FormGuesserCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessNoDefinition()
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
+        $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->once())
             ->method('hasDefinition')
             ->with('form.extension')
@@ -24,27 +26,27 @@ class FormGuesserCompilerPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        $guesserTags = array(
-            'third.guesser' => array(array()),
-            'first.guesser' => array(array('priority' => 20)),
-            'second.guesser' => array(array('priority' => 10)),
-        );
-        $expectedGuessers = array(
-            'first.guesser',
-            'second.guesser',
-            'third.guesser'
-        );
+        $guesserTags = [
+            'third.guesser' => [[]],
+            'first.guesser' => [['priority' => 20]],
+            'second.guesser' => [['priority' => 10]],
+        ];
+
+        $expectedGuessers = new IteratorArgument([
+            new Reference('first.guesser'),
+            new Reference('second.guesser'),
+            new Reference('third.guesser')
+        ]);
 
         $formExtension = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
         $formExtension->expects($this->once())
             ->method('replaceArgument')
-            ->with(3, $expectedGuessers);
+            ->with(2, $expectedGuessers);
 
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
+        $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->once())
             ->method('hasDefinition')
             ->with('form.extension')

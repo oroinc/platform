@@ -41,13 +41,13 @@ class LoadParentEntity implements ProcessorInterface
             return;
         }
 
-        $parentEntityClass = $context->getParentClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($parentEntityClass)) {
+        $parentEntityClass = $this->doctrineHelper->getManageableEntityClass(
+            $context->getParentClassName(),
+            $context->getParentConfig()
+        );
+        if (!$parentEntityClass) {
             // only manageable entities or resources based on manageable entities are supported
-            $parentEntityClass = $context->getParentConfig()->getParentResourceClass();
-            if (!$parentEntityClass || !$this->doctrineHelper->isManageableEntityClass($parentEntityClass)) {
-                return;
-            }
+            return;
         }
 
         $parentEntity = $this->entityLoader->findEntity(

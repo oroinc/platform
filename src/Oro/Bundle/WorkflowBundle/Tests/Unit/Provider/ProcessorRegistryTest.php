@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 
-class ProcessorRegistryTest extends \PHPUnit_Framework_TestCase
+class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var SyncProcessorRegistry

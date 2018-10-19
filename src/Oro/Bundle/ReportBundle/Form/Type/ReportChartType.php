@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ReportBundle\Form\Type;
 
+use Oro\Bundle\ChartBundle\Form\Type\ChartType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -17,7 +18,7 @@ class ReportChartType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('data_schema', 'oro_report_chart_data_schema_collection');
+        $builder->add('data_schema', ReportChartSchemaCollectionType::class);
     }
 
     /**
@@ -47,7 +48,7 @@ class ReportChartType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_chart';
+        return ChartType::class;
     }
 
     /**

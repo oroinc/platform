@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\DataTransformer\AttributeRelationsTransformer;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
@@ -42,7 +43,7 @@ class AttributeMultiSelectType extends AbstractType
 
             /** @var FieldConfigModel $field */
             foreach ($fields as $field) {
-                $this->choices[$field->getId()] = $this->attributeManager->getAttributeLabel($field);
+                $this->choices[$this->attributeManager->getAttributeLabel($field)] = $field->getId();
                 $this->configFields[$field->getId()] = $field;
             }
         }
@@ -102,7 +103,7 @@ class AttributeMultiSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_choice';
+        return Select2ChoiceType::class;
     }
 
     /**

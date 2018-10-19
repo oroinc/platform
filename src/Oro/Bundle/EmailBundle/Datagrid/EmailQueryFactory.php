@@ -6,7 +6,6 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Filter\EmailStringFilter;
@@ -18,6 +17,9 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * Provides reusable utility methods to modify the query builder for email grids.
+ */
 class EmailQueryFactory
 {
     /** @var EmailOwnerProviderStorage */
@@ -218,7 +220,7 @@ class EmailQueryFactory
             list(
                 $threadedExpressions,
                 $threadedExpressionsParameters
-            ) = $this->prepareSearchFilters($datagrid, $filters, 'mm');
+            ) = $this->prepareSearchFilters($qb, $datagrid, $filters, 'mm');
         }
 
         if ($threadedExpressions) {
@@ -234,7 +236,7 @@ class EmailQueryFactory
             list(
                 $notThreadedExpressions,
                 $notThreadedExpressionsParameters
-            ) = $this->prepareSearchFilters($datagrid, $filters, 'e');
+            ) = $this->prepareSearchFilters($qb, $datagrid, $filters, 'e');
 
             $expression->addMultiple($notThreadedExpressions);
 
@@ -310,13 +312,14 @@ class EmailQueryFactory
     }
 
     /**
+     * @param QueryBuilder      $qb
      * @param DatagridInterface $datagrid
      * @param array             $filters
      * @param string            $alias
      *
      * @return array
      */
-    protected function prepareSearchFilters($datagrid, $filters, $alias = '')
+    protected function prepareSearchFilters($qb, $datagrid, $filters, $alias = '')
     {
         $searchExpressions = null;
         $searchExpressionsParameters = null;
@@ -330,9 +333,7 @@ class EmailQueryFactory
         );
 
         if ($searchFilters) {
-            /** @var OrmDatasource $ormDataSource */
-            $ormDataSource = $datagrid->getDatasource();
-            $queryBuilder = clone $ormDataSource->getQueryBuilder();
+            $queryBuilder = clone $qb;
 
             $parameters = $datagrid->getParameters();
 

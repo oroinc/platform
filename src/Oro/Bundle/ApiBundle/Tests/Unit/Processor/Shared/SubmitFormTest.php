@@ -4,16 +4,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Shared\SubmitForm;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Symfony\Component\Form\FormInterface;
 
 class SubmitFormTest extends FormProcessorTestCase
 {
     /** @var SubmitForm */
-    protected $processor;
+    private $processor;
 
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -30,12 +31,12 @@ class SubmitFormTest extends FormProcessorTestCase
 
     public function testProcessForAlreadySubmittedForm()
     {
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
 
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $form->expects($this->never())
+        $form->expects(self::never())
             ->method('submit');
 
         $this->context->setForm($form);
@@ -55,16 +56,16 @@ class SubmitFormTest extends FormProcessorTestCase
             'field1' => 123,
             'field2' => 'false',
             'field3' => [
-                'key1' => false
+                'key1' => 'false'
             ]
         ];
 
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
 
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('isSubmitted')
             ->willReturn(false);
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('submit')
             ->with($expectedRequestData, false);
 

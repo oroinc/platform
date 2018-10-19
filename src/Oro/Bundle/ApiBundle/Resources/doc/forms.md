@@ -50,19 +50,20 @@ Consequently, all the data API form types, extensions, and guessers should be re
 - Use the application configuration file.
 - Tag the form elements by appropriate tags in the dependency injection container.
 
-To register a new form elements using the application configuration file, add `Resources/config/oro/app.yml` in any bundle or use `app/config/config.yml` of your application:
+To register a new form elements using the application configuration file, add `Resources/config/oro/app.yml` in any bundle or use `config/config.yml` of your application:
 
 ```yaml
 api:
     form_types:
-        - form.type.date # service id of "date" form type
+        - Symfony\Component\Form\Extension\Core\Type\DateType # the class name of a form type
+        - form.type.date # the service id of a form type
     form_type_extensions:
-        - form.type_extension.form.validator # service id of Symfony form validation extension
+        - form.type_extension.form.http_foundation # service id of a form type extension
     form_type_guessers:
-        - form.type_guesser.validator # service id of Symfony form type guesser based on validation constraints
+        - acme.form.type_guesser # service id of a form type guesser
     form_type_guesses:
         datetime: # data type
-            form_type: datetime # the name of guessed form type
+            form_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType # the guessed form type
             options: # guessed form type options
                 model_timezone: UTC
                 view_timezone: UTC
@@ -70,6 +71,9 @@ api:
                 widget: single_text
                 format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ" # HTML5
 ```
+
+**Please note** that the `form_types` section can contain either the class name or the service id of a form type.
+Usually the service id is used if a form type depends on other services in the dependency injection container.
 
 You can find the already registered data API form elements in [Resources/config/oro/app.yml](../config/oro/app.yml).
 
@@ -87,20 +91,26 @@ If you need to add new form elements can by tagging them in the dependency injec
     acme.form.type.datetime:
         class: Acme\Bundle\AcmeBundle\Form\Type\DateTimeType
         tags:
-            - { name: form.type, alias: acme_datetime } # Enable usage of the form type on the UI.
-            - { name: oro.api.form.type, alias: acme_datetime } # Enable usage of the form type in the data API.
+            # Enable usage of the form type on the UI.
+            - { name: form.type, alias: acme_datetime }
+            # Enable usage of the form type in the data API.
+            - { name: oro.api.form.type, alias: acme_datetime }
 
     acme.form.extension.datetime:
         class: Acme\Bundle\AcmeBundle\Form\Extension\DateTimeExtension
         tags:
-            - { name: form.type_extension, alias: acme_datetime } # Add the form extension to the UI forms.
-            - { name: oro.api.form.type_extension, alias: acme_datetime } # Add the form extension to the data API forms.
+            # Add the form extension to the UI forms.
+            - { name: form.type_extension, extended_type: Acme\Bundle\AcmeBundle\Form\Type\DateTimeType }
+            # Add the form extension to the data API forms.
+            - { name: oro.api.form.type_extension, extended_type: Acme\Bundle\AcmeBundle\Form\Type\DateTimeType }
 
     acme.form.guesser.test:
         class: Acme\Bundle\AcmeBundle\Form\Guesser\TestGuesser
         tags:
-            - { name: form.type_guesser } # Add the form type guesser to the UI forms.
-            - { name: oro.api.form.type_guesser } # Add the form type guesser to the data API forms.
+            # Add the form type guesser to the UI forms.
+            - { name: form.type_guesser }
+            # Add the form type guesser to the data API forms.
+            - { name: oro.api.form.type_guesser }
 ```
 
 To switch between the general and data API forms, use the [Processor\Shared\InitializeApiFormExtension](../../Processor/Shared/InitializeApiFormExtension.php) and [Processor\Shared\RestoreDefaultFormExtension](../../Processor/Shared/RestoreDefaultFormExtension.php) processors.

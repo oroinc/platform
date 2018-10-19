@@ -12,10 +12,10 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Tests\Unit\Formatter\Stub\Category;
 use Oro\Bundle\SearchBundle\Tests\Unit\Formatter\Stub\Product;
 
-class ResultFormatterTest extends \PHPUnit_Framework_TestCase
+class ResultFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityManager;
 

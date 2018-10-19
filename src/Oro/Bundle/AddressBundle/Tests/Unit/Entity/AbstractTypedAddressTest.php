@@ -5,7 +5,7 @@ namespace Oro\Bundle\AddressBundle\Tests\Entity;
 use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 
-class AbstractTypedAddressTest extends \PHPUnit_Framework_TestCase
+class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AbstractTypedAddress

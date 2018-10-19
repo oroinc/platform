@@ -10,9 +10,9 @@ use Oro\Bundle\WorkflowBundle\Datagrid\EmailNotificationDatagridListener;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class EmailNotificationDatagridListenerTest extends \PHPUnit_Framework_TestCase
+class EmailNotificationDatagridListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     /** @var EmailNotificationDatagridListener */
@@ -79,11 +79,11 @@ class EmailNotificationDatagridListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return BuildBefore|\PHPUnit_Framework_MockObject_MockObject
+     * @return BuildBefore|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getBuildBeforeEvent()
     {
-        /** @var BuildBefore|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var BuildBefore|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(BuildBefore::class);
         $event->expects($this->any())->method('getConfig')->willReturn(DatagridConfiguration::create([]));
 
@@ -92,11 +92,11 @@ class EmailNotificationDatagridListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $records
-     * @return OrmResultAfter|\PHPUnit_Framework_MockObject_MockObject
+     * @return OrmResultAfter|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getOrmResultAfterEvent(array $records = [])
     {
-        /** @var OrmResultAfter|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var OrmResultAfter|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(OrmResultAfter::class);
         $event->expects($this->any())->method('getRecords')->willReturn($records);
 

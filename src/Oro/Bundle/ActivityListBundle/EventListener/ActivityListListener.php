@@ -8,11 +8,13 @@ use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
+/**
+ * The Doctrine event listener that collects the changes related to activity entities
+ * and delegate processing of them to the CollectListManager.
+ * @see \Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager
+ */
 class ActivityListListener
 {
-    /** @var array */
-    protected $insertedOwnerEntities = [];
-
     /** @var array */
     protected $insertedEntities = [];
 
@@ -85,10 +87,7 @@ class ActivityListListener
             $this->insertedEntities = [];
             $hasChanges = true;
         }
-        if ($this->activityListManager->processFillOwners($this->insertedOwnerEntities, $entityManager)) {
-            $this->insertedOwnerEntities = [];
-            $hasChanges = true;
-        }
+
         if ($hasChanges) {
             $entityManager->flush();
             $entityManager->clear('Oro\Bundle\ActivityListBundle\Entity\ActivityList');
@@ -165,18 +164,13 @@ class ActivityListListener
     }
 
     /**
-     * Collect inserted activities and activity owners
+     * Collect inserted activities
      *
      * @param array $entities
      */
     protected function collectInsertedEntities(array $entities)
     {
         foreach ($entities as $hash => $entity) {
-            if (empty($this->insertedOwnerEntities[$hash])
-                && $this->activityListManager->isSupportedOwnerEntity($entity)
-            ) {
-                $this->insertedOwnerEntities[$hash] = $entity;
-            }
             if (empty($this->insertedEntities[$hash])
                 && $this->activityListManager->isSupportedEntity($entity)
             ) {

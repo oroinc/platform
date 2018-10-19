@@ -7,9 +7,9 @@ use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
-class PageTemplatesManagerTest extends \PHPUnit_Framework_TestCase
+class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ThemeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $themeManagerMock;
 
     /** @var PageTemplatesManager */
@@ -62,13 +62,13 @@ class PageTemplatesManagerTest extends \PHPUnit_Framework_TestCase
                     'route_name_1' => [
                         'label' => 'Route Title 1',
                         'choices' => [
-                            'some_key1_1' => 'Page Template 1',
+                            'Page Template 1' => 'some_key1_1',
                         ]
                     ],
                     'route_name_2' => [
                         'label' => 'Route Title 2',
                         'choices' => [
-                            'some_key2_1' => 'Page Template 2'
+                            'Page Template 2' => 'some_key2_1',
                         ]
                     ],
                 ]
@@ -90,8 +90,8 @@ class PageTemplatesManagerTest extends \PHPUnit_Framework_TestCase
                     'route_name_1' => [
                         'label' => 'New Route Title 1',
                         'choices' => [
-                            'some_key1_1' => 'Page Template 1',
-                            'some_key2_1' => 'Page Template 2'
+                            'Page Template 1' => 'some_key1_1',
+                            'Page Template 2' => 'some_key2_1',
                         ]
                     ],
                 ]
@@ -106,7 +106,7 @@ class PageTemplatesManagerTest extends \PHPUnit_Framework_TestCase
                     'route_name_1' => [
                         'label' => 'route_name_1',
                         'choices' => [
-                            'some_key1_1' => 'Page Template 1',
+                            'Page Template 1' => 'some_key1_1',
                         ]
                     ]
                 ]

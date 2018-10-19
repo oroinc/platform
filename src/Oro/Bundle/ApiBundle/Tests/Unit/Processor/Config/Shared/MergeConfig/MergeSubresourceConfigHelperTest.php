@@ -6,25 +6,21 @@ use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHe
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeFilterConfigHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeSubresourceConfigHelper;
 
-class MergeSubresourceConfigHelperTest extends \PHPUnit_Framework_TestCase
+class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $mergeActionConfigHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MergeActionConfigHelper */
+    private $mergeActionConfigHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $mergeFilterConfigHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MergeFilterConfigHelper */
+    private $mergeFilterConfigHelper;
 
     /** @var MergeSubresourceConfigHelper */
-    protected $mergeSubresourceConfigHelper;
+    private $mergeSubresourceConfigHelper;
 
     protected function setUp()
     {
-        $this->mergeActionConfigHelper = $this->getMockBuilder(MergeActionConfigHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->mergeFilterConfigHelper = $this->getMockBuilder(MergeFilterConfigHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mergeActionConfigHelper = $this->createMock(MergeActionConfigHelper::class);
+        $this->mergeFilterConfigHelper = $this->createMock(MergeFilterConfigHelper::class);
 
         $this->mergeSubresourceConfigHelper = new MergeSubresourceConfigHelper(
             $this->mergeActionConfigHelper,

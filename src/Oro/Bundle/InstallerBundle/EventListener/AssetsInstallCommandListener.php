@@ -19,16 +19,16 @@ class AssetsInstallCommandListener
     private $filesystem;
 
     /** @var string */
-    private $kernelRootDir;
+    private $kernelProjectDir;
 
     /**
      * @param Filesystem $filesystem
-     * @param string     $kernelRootDir
+     * @param string     $kernelProjectDir
      */
-    public function __construct(Filesystem $filesystem, $kernelRootDir)
+    public function __construct(Filesystem $filesystem, $kernelProjectDir)
     {
         $this->filesystem = $filesystem;
-        $this->kernelRootDir = $kernelRootDir;
+        $this->kernelProjectDir = $kernelProjectDir;
     }
 
     /**
@@ -104,7 +104,7 @@ class AssetsInstallCommandListener
      */
     private function getAssetsDir(InputInterface $input)
     {
-        return $this->getWebDir($input) . '/bundles/';
+        return $this->getPublicDir($input) . '/bundles/';
     }
 
     /**
@@ -114,7 +114,7 @@ class AssetsInstallCommandListener
      */
     private function getTempDir(InputInterface $input)
     {
-        return $this->getWebDir($input) . '/js/';
+        return $this->getPublicDir($input) . '/js/';
     }
 
     /**
@@ -122,11 +122,12 @@ class AssetsInstallCommandListener
      *
      * @return string
      */
-    private function getWebDir(InputInterface $input)
+    private function getPublicDir(InputInterface $input)
     {
         $dir = rtrim($input->getArgument('target'), '/');
-        if ('web' === $dir) {
-            $dir = $this->kernelRootDir . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $dir;
+
+        if ('public' === $dir) {
+            $dir = $this->kernelProjectDir . DIRECTORY_SEPARATOR . $dir;
         }
 
         return $dir;

@@ -9,8 +9,8 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Extension\Stub\LocalizationSelectTyp
 use Oro\Bundle\ScopeBundle\Form\Type\ScopeType;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Validator\Validation;
 
 class LocalizationScopeExtensionTest extends FormIntegrationTestCase
@@ -21,7 +21,7 @@ class LocalizationScopeExtensionTest extends FormIntegrationTestCase
     protected $localizationScopeExtension;
 
     /**
-     * @var ScopeManager|\PHPUnit_Framework_MockObject_MockObject $scopeManager
+     * @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject $scopeManager
      */
     protected $scopeManager;
 
@@ -40,7 +40,7 @@ class LocalizationScopeExtensionTest extends FormIntegrationTestCase
             ->willReturn(['localization' => Localization::class]);
 
         $form = $this->factory->create(
-            ScopeType::NAME,
+            ScopeType::class,
             null,
             [ScopeType::SCOPE_TYPE_OPTION => 'web_content']
         );
@@ -65,11 +65,11 @@ class LocalizationScopeExtensionTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    ScopeType::NAME => new ScopeType($this->scopeManager),
-                    LocalizationSelectType::NAME => new LocalizationSelectTypeStub(),
+                    ScopeType::class => new ScopeType($this->scopeManager),
+                    LocalizationSelectType::class => new LocalizationSelectTypeStub(),
                 ],
                 [
-                    ScopeType::NAME => [$this->localizationScopeExtension],
+                    ScopeType::class => [$this->localizationScopeExtension],
                 ]
             ),
             new ValidatorExtension(Validation::createValidator()),

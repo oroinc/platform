@@ -1,0 +1,26 @@
+/* @theme: admin.oro; */
+
+.inline-editor__fields {
+    textarea {
+        box-shadow: none;
+        border-radius: 0;
+        box-sizing: border-box;
+        font-size: 13px;
+        height: 60px;
+        line-height: 19px;
+        margin: 0;
+        width: 100%;
+
+        &:focus {
+            box-shadow: none;
+        }
+
+        &:first-child {
+            padding-left: 9px;
+        }
+
+        &:last-child {
+            padding-right: 52px;
+        }
+    }
+}

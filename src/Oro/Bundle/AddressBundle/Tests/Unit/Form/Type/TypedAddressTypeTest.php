@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\AddressBundle\Form\Type\AddressType;
 use Oro\Bundle\AddressBundle\Form\Type\TypedAddressType;
+use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
-class TypedAddressTypeTest extends \PHPUnit_Framework_TestCase
+class TypedAddressTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|TypedAddressType
+     * @var \PHPUnit\Framework\MockObject\MockObject|TypedAddressType
      */
     protected $type;
 
@@ -57,10 +60,10 @@ class TypedAddressTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'types',
-                'translatable_entity',
+                TranslatableEntityType::class,
                 array(
                     'class'    => 'OroAddressBundle:AddressType',
-                    'property' => 'label',
+                    'choice_label' => 'label',
                     'required' => false,
                     'multiple' => true,
                     'expanded' => true,
@@ -72,7 +75,7 @@ class TypedAddressTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'primary',
-                'checkbox',
+                CheckboxType::class,
                 array(
                     'required' => false
                 )
@@ -111,7 +114,7 @@ class TypedAddressTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_address', $this->type->getParent());
+        $this->assertEquals(AddressType::class, $this->type->getParent());
     }
 
     public function testGetName()

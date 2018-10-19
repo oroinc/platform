@@ -5,11 +5,13 @@ oro_behat_extension:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
         - OroDataGridBundle::GridContext
         - OroNavigationBundle::FeatureContext
+        - OroNavigationBundle::PinbarContext
         - OroEmailBundle::FeatureContext
         - OroEmailBundle::EmailFeatureToggleContext
         - OroFormBundle::FormContext
         - OroUserBundle::FeatureContext
         - OroActivityListBundle::ActivityContext
+        - OroConfigBundle::FeatureContext
       paths:
         - '@OroEmailBundle/Tests/Behat/Features'
   elements:
@@ -26,6 +28,18 @@ oro_behat_extension:
             type: 'named'
             locator: ['field', 'From']
             element: Select2Offscreen
+
+    Email Template Form:
+      selector: "form[id^='oro_email_emailtemplate']"
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Subject:
+            type: 'css'
+            locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__subject"]'
+          Content:
+            type: 'css'
+            locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__content"]'
 
     EmailNotificationLink:
       selector: 'a.email-notification-icon'
@@ -44,11 +58,28 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     ReadUnreadIcon:
-      selector: 'i.fa-envelope'
+      selector: 'i.mail-icon'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     RemoveEmail:
       selector: '.select2-search-choice-close'
+
+    Email Templates Grid:
+      selector: '[id^="grid-email-templates"]'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
+
+    Email body:
+      selector: '.email-info.in .email-body iframe'
+
+    Red dot image:
+      selector:
+        type: xpath
+        locator: '//img[@alt="Red dot"][@src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAAEklEQVR42mP8z8AARBDAiJMDAIzoBf5Dp2P2AAAAAElFTkSuQmCC"]'
+
+    Blue dot image:
+      selector:
+        type: xpath
+        locator: '//img[@alt="Blue dot"][@src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAAEklEQVR42mNkYPj/nwEKGHFyAIbuBf4sIeHsAAAAAElFTkSuQmCC"]'
 
   pages:
     User Emails:
@@ -58,3 +89,7 @@ oro_behat_extension:
     Email View:
       class: Oro\Bundle\EmailBundle\Tests\Behat\Page\EmailView
       route: 'oro_email_thread_view'
+
+  optional_listeners:
+    required_for_fixtures:
+      - 'oro_email.listener.entity_listener'

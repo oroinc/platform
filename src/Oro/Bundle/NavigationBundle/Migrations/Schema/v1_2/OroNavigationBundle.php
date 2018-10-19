@@ -62,7 +62,7 @@ class OroNavigationBundle implements Migration, ContainerAwareInterface
 
         foreach ($paginator as $navItem) {
             try {
-                $url       = str_replace('app_dev.php/', '', $navItem['url']);
+                $url       = str_replace('index_dev.php/', '', $navItem['url']);
                 $routeData = $this->router->match($url);
                 $entityId  = isset($routeData['id']) ? (int)$routeData['id'] : null;
                 $route     = $routeData['_route'];

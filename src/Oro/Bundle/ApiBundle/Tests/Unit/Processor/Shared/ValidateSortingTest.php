@@ -7,21 +7,22 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
-use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\ValidateSorting;
 use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
 class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 {
-    const ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';
-
     /** @var ValidateSorting */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -34,14 +35,12 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessWhenQueryIsAlreadyBuilt()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $query = new \stdClass();
 
-        $this->context->setQuery($qb);
+        $this->context->setQuery($query);
         $this->processor->process($this->context);
 
-        $this->assertSame($qb, $this->context->getQuery());
+        self::assertSame($query, $this->context->getQuery());
     }
 
     public function testProcessWhenSortByExcludedFieldRequested()
@@ -49,17 +48,12 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $sortersConfig = $this->getSortersConfig(['id']);
         $sortersConfig->getField('id')->setExcluded(true);
 
-        $sorterFilter = new SortFilter('integer');
-        $filters      = new FilterCollection();
-        $filters->add('sort', $sorterFilter);
-
         $this->prepareFilters();
 
         $this->context->setConfigOfSorters($sortersConfig);
-        $this->context->set('filters', $filters);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError('sort constraint', 'Sorting by "id" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
@@ -73,18 +67,13 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $sortersConfig = $this->getSortersConfig(['id']);
         $sortersConfig->getField('id')->setExcluded(true);
 
-        $sorterFilter = new SortFilter('integer');
-        $filters      = new FilterCollection();
-        $filters->add('sort', $sorterFilter);
-
         $this->prepareFilters();
         $this->context->getFilterValues()->get('sort')->setSourceKey('sortFilterSourceKey');
 
         $this->context->setConfigOfSorters($sortersConfig);
-        $this->context->set('filters', $filters);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError('sort constraint', 'Sorting by "id" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sortFilterSourceKey'))
@@ -102,7 +91,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError('sort constraint', 'Sorting by "id" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
@@ -121,7 +110,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError('sort constraint', 'Sorting by "id" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
@@ -140,7 +129,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError('sort constraint', 'Sorting by "id, label" fields are not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
@@ -158,7 +147,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
 
-        $this->assertEmpty($this->context->getErrors());
+        self::assertEmpty($this->context->getErrors());
     }
 
     public function testProcessWhenSortByAllowedRenamedFieldRequested()
@@ -170,14 +159,14 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('name1');
 
-        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setClassName(User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfSorters($primarySortersConfig);
 
         $this->processor->process($this->context);
 
-        $this->assertEmpty($this->context->getErrors());
-        $this->assertEquals(
+        self::assertEmpty($this->context->getErrors());
+        self::assertEquals(
             ['name' => 'ASC'],
             $this->context->getFilterValues()->get('sort')->getValue()
         );
@@ -190,13 +179,13 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('category.name');
 
-        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setClassName(User::class);
         $this->context->setConfig($primaryEntityConfig);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
-                $this->getEntityClass('Category'),
+                Category::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
                 [
@@ -208,8 +197,8 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertEmpty($this->context->getErrors());
-        $this->assertEquals(
+        self::assertEmpty($this->context->getErrors());
+        self::assertEquals(
             ['category.name' => 'ASC'],
             $this->context->getFilterValues()->get('sort')->getValue()
         );
@@ -223,13 +212,13 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('category1.name');
 
-        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setClassName(User::class);
         $this->context->setConfig($primaryEntityConfig);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
-                $this->getEntityClass('Category'),
+                Category::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
                 [
@@ -241,8 +230,8 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertEmpty($this->context->getErrors());
-        $this->assertEquals(
+        self::assertEmpty($this->context->getErrors());
+        self::assertEquals(
             ['category.name' => 'ASC'],
             $this->context->getFilterValues()->get('sort')->getValue()
         );
@@ -259,13 +248,13 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('category1.name1');
 
-        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setClassName(User::class);
         $this->context->setConfig($primaryEntityConfig);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
-                $this->getEntityClass('Category'),
+                Category::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
                 [
@@ -277,8 +266,43 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertEmpty($this->context->getErrors());
-        $this->assertEquals(
+        self::assertEmpty($this->context->getErrors());
+        self::assertEquals(
+            ['category.name' => 'ASC'],
+            $this->context->getFilterValues()->get('sort')->getValue()
+        );
+    }
+
+    public function testProcessWhenSortByAllowedAssociationFieldRequestedForModelInheritedFromManageableEntity()
+    {
+        $this->notManageableClassNames = [UserProfile::class];
+
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['category']);
+        $categoryConfig = $this->getConfig(['name'], ['name']);
+
+        $this->prepareFilters('category.name');
+
+        $this->context->setClassName(UserProfile::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $primaryEntityConfig->setParentResourceClass(User::class);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                Category::class,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [
+                    new EntityDefinitionConfigExtra($this->context->getAction()),
+                    new SortersConfigExtra()
+                ]
+            )
+            ->willReturn($categoryConfig);
+
+        $this->processor->process($this->context);
+
+        self::assertEmpty($this->context->getErrors());
+        self::assertEquals(
             ['category.name' => 'ASC'],
             $this->context->getFilterValues()->get('sort')->getValue()
         );
@@ -291,13 +315,13 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('category.name');
 
-        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setClassName(User::class);
         $this->context->setConfig($primaryEntityConfig);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
-                $this->getEntityClass('Category'),
+                Category::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
                 [
@@ -309,7 +333,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError('sort constraint', 'Sorting by "category.name" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
@@ -324,15 +348,15 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('category1.name');
 
-        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setClassName(User::class);
         $this->context->setConfig($primaryEntityConfig);
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError('sort constraint', 'Sorting by "category1.name" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
@@ -347,15 +371,15 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('category1.name');
 
-        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setClassName(User::class);
         $this->context->setConfig($primaryEntityConfig);
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError('sort constraint', 'Sorting by "category1.name" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
@@ -366,21 +390,21 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessWhenSortByAssociationRequestedButForNotManageableEntity()
     {
-        $this->notManageableClassNames = [$this->getEntityClass('User')];
+        $this->notManageableClassNames = [User::class];
 
         $primaryEntityConfig = $this->getEntityDefinitionConfig(['category']);
 
         $this->prepareFilters('category.name');
 
-        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setClassName(User::class);
         $this->context->setConfig($primaryEntityConfig);
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError('sort constraint', 'Sorting by "category.name" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
@@ -392,19 +416,10 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
     /**
      * @param string $sortBy
      */
-    protected function prepareFilters($sortBy = '-id')
+    private function prepareFilters($sortBy = '-id')
     {
-        $sorterFilter = new SortFilter(DataType::ORDER_BY);
-        $filters      = new FilterCollection();
-        $filters->add('sort', $sorterFilter);
-
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->once())
-            ->method('getQueryString')
-            ->willReturn('sort=' . $sortBy);
-        $filterValues = new RestFilterValueAccessor($request);
+        $filterValues = new TestFilterValueAccessor();
+        $filterValues->set('sort', new FilterValue('sort', $sortBy));
 
         // emulate sort normalizer
         $orderBy = [];
@@ -419,18 +434,8 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         }
         $filterValues->get('sort')->setValue($orderBy);
 
-        $this->context->set('filters', $filters);
         $this->context->setFilterValues($filterValues);
-    }
-
-    /**
-     * @param string $entityShortClass
-     *
-     * @return string
-     */
-    protected function getEntityClass($entityShortClass)
-    {
-        return self::ENTITY_NAMESPACE . $entityShortClass;
+        $this->context->getFilters()->add('sort', new SortFilter(DataType::ORDER_BY));
     }
 
     /**
@@ -439,7 +444,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
      *
      * @return Config
      */
-    protected function getConfig(array $fields = [], array $sortFields = [])
+    private function getConfig(array $fields = [], array $sortFields = [])
     {
         $config = new Config();
         $config->setDefinition($this->getEntityDefinitionConfig($fields));
@@ -453,7 +458,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
      *
      * @return EntityDefinitionConfig
      */
-    protected function getEntityDefinitionConfig(array $fields = [])
+    private function getEntityDefinitionConfig(array $fields = [])
     {
         $config = new EntityDefinitionConfig();
         foreach ($fields as $field) {
@@ -468,7 +473,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
      *
      * @return SortersConfig
      */
-    protected function getSortersConfig(array $fields = [])
+    private function getSortersConfig(array $fields = [])
     {
         $config = new SortersConfig();
         foreach ($fields as $field) {

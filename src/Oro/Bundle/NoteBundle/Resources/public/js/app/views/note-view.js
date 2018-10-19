@@ -48,6 +48,13 @@ define([
             }
         },
 
+        render: function() {
+            NoteView.__super__.render.apply(this, arguments);
+            this._onRender();
+
+            return this;
+        },
+
         getTemplateData: function() {
             var data = NoteView.__super__.getTemplateData.call(this);
 
@@ -87,17 +94,19 @@ define([
             this.toggle();
         },
 
+        _onRender: function() {
+            this.$('.accordion-toggle').toggleClass('collapsed', this.collapsed);
+            this.$('.collapse').toggleClass('in', !this.collapsed);
+        },
+
         /**
          * Collapses/expands view elements
          *
          * @param {boolean=} collapse
          */
         toggle: function(collapse) {
-            if (_.isUndefined(collapse)) {
-                collapse = !this.isCollapsed();
-            }
-            this.$('.accordion-toggle').toggleClass('collapsed', collapse);
-            this.$('.collapse').toggleClass('in', !collapse);
+            this.collapsed = !_.isUndefined(collapse) ? collapse : !this.collapsed;
+            this._onRender();
         },
 
         isCollapsed: function() {

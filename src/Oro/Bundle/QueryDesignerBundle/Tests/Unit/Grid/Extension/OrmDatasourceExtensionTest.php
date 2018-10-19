@@ -19,12 +19,12 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs\OrmDatasourceExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\PreloadedExtension;
 
 class OrmDatasourceExtensionTest extends OrmTestCase
 {
@@ -65,7 +65,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                         array()
                     ),
                     new CsrfExtension(
-                        $this->createMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
+                        $this->createMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')
                     )
                 )
             )
@@ -197,7 +197,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
                     . 'INNER JOIN user.address address '
                     . 'WHERE user_name NOT LIKE :string1 AND ('
-                    . '(user_status < :datetime2 OR user_status > :datetime3) '
+                    . '(user_status < :datetime2 OR user_status >= :datetime3) '
                     . 'AND (address.country LIKE :string4 '
                     . 'OR address.city LIKE :string5 OR '
                     . 'address.zip LIKE :string6))'
@@ -249,7 +249,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
                     . 'INNER JOIN user.address address '
                     . 'WHERE user_name NOT LIKE :string1 OR ('
-                    . 'user_status < :datetime2 OR user_status > :datetime3 '
+                    . 'user_status < :datetime2 OR user_status >= :datetime3 '
                     . 'OR address.country LIKE :string4)'
             ],
             'test with OR filters between simple and group conditions' => [
@@ -299,7 +299,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
                     . 'INNER JOIN user.address address '
                     . 'WHERE user_name NOT LIKE :string1 OR ('
-                    . '(user_status < :datetime2 OR user_status > :datetime3) '
+                    . '(user_status < :datetime2 OR user_status >= :datetime3) '
                     . 'AND address.country LIKE :string4)'
             ],
         ];

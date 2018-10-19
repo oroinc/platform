@@ -9,17 +9,17 @@ use Oro\Bundle\RequireJSBundle\Twig\OroRequireJSExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
+class OroRequireJSExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var OroRequireJSExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $config;
 
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     protected function setUp()
@@ -43,7 +43,7 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             ->add('twig', $twig)
             ->getContainer($this);
 
-        $this->extension = new OroRequireJSExtension($this->container, './web/root', false);
+        $this->extension = new OroRequireJSExtension($this->container, './public/root', false);
     }
 
     public function testGetRequireJSConfig()
@@ -135,7 +135,7 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRequireJSBuildLoggerReturnEmptyString()
     {
-        $extension = new OroRequireJSExtension($this->container, './web/root', false);
+        $extension = new OroRequireJSExtension($this->container, './public/root', false);
         $result = $extension->getRequireJSBuildLogger();
 
         $this->assertEquals('', $result);
@@ -143,7 +143,7 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRequireJSBuildLogger()
     {
-        $extension = new OroRequireJSExtension($this->container, './web/root', true);
+        $extension = new OroRequireJSExtension($this->container, './public/root', true);
 
         $this->config->expects($this->once())
             ->method('getBuildConfig')

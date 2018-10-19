@@ -21,7 +21,7 @@ define(function(require) {
          */
         notificationHandler: null,
 
-        clankEvent: '',
+        wsChannel: '',
 
         dropdownContainer: null,
 
@@ -42,16 +42,16 @@ define(function(require) {
          */
         initialize: function(options) {
             var emails = options.emails || [];
-            _.extend(this, _.pick(options, ['clankEvent']));
+            _.extend(this, _.pick(options, ['wsChannel']));
             if (typeof emails === 'string') {
                 emails = JSON.parse(emails);
             }
             this.collection = new EmailNotificationCollection(emails);
             this.countModel = new EmailNotificationCountModel({unreadEmailsCount: options.count});
-            this.dropdownContainer = options._sourceElement.parent();
+            this.dropdownContainer = options._sourceElement;
 
             this.notificationHandler = _.debounce(_.bind(this._notificationHandler, this), 1000);
-            sync.subscribe(this.clankEvent, this.notificationHandler);
+            sync.subscribe(this.wsChannel, this.notificationHandler);
 
             UserMenuEmailNotificationComponent.__super__.initialize.apply(this, arguments);
         },
@@ -70,7 +70,7 @@ define(function(require) {
         },
 
         dispose: function() {
-            sync.unsubscribe(this.clankEvent, this.notificationHandler);
+            sync.unsubscribe(this.wsChannel, this.notificationHandler);
             UserMenuEmailNotificationComponent.__super__.dispose.call(this);
         }
     });

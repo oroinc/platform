@@ -4,7 +4,7 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\Action\Transformer;
 
 use Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToCronFormatTransformer;
 
-class DateTimeToCronFormatTransformerTest extends \PHPUnit_Framework_TestCase
+class DateTimeToCronFormatTransformerTest extends \PHPUnit\Framework\TestCase
 {
     public function testTransform()
     {

@@ -5,6 +5,8 @@ namespace Oro\Bundle\CurrencyBundle\Form\Type;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Form\DataTransformer\PriceTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -40,17 +42,17 @@ class PriceType extends AbstractType
         $isRequiredPrice = $this->isRequired($options);
 
         if (empty($options['hide_currency'])) {
-            $currencyType = CurrencySelectionType::NAME;
+            $currencyType = CurrencySelectionType::class;
             $currencyOptions = [
                 'additional_currencies' => $options['additional_currencies'],
                 'currencies_list' => $options['currencies_list'],
                 'full_currency_list' => $options['full_currency_list'],
                 'compact' => $options['compact'],
                 'required' => $isRequiredPrice,
-                'empty_value' => $options['currency_empty_value'],
+                'placeholder' => $options['currency_empty_value'],
             ];
         } else {
-            $currencyType = 'hidden';
+            $currencyType = HiddenType::class;
             $currencyOptions = [
                 'data' => $options['default_currency']
             ];
@@ -59,10 +61,13 @@ class PriceType extends AbstractType
         $builder
             ->add(
                 'value',
-                'number',
+                NumberType::class,
                 [
                     'required' => $isRequiredPrice,
-                    'scale' => Price::MAX_VALUE_SCALE
+                    'scale' => Price::MAX_VALUE_SCALE,
+                    'attr' => [
+                        'data-match-price-on-null' =>  $options['match_price_on_null'] ? 1 : 0
+                    ]
                 ]
             )
             ->add('currency', $currencyType, $currencyOptions);
@@ -84,7 +89,8 @@ class PriceType extends AbstractType
             'full_currency_list' => false,
             'currency_empty_value' => 'oro.currency.currency.form.choose',
             'compact' => false,
-            'validation_groups'=> ['Default']
+            'validation_groups'=> ['Default'],
+            'match_price_on_null' => true
         ]);
     }
 

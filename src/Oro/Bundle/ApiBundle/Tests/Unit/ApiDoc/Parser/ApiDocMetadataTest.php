@@ -3,62 +3,59 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadata;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class ApiDocMetadataTest extends \PHPUnit_Framework_TestCase
+class ApiDocMetadataTest extends \PHPUnit\Framework\TestCase
 {
     /** @var string */
-    protected $action;
+    private $action;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadata;
+    /** @var  \PHPUnit\Framework\MockObject\MockObject|EntityMetadata */
+    private $metadata;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $config;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDefinitionConfig */
+    private $config;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $requestType;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RequestType */
+    private $requestType;
 
     /** @var ApiDocMetadata */
-    protected $apiDocMetadata;
+    private $apiDocMetadata;
 
     protected function setUp()
     {
         $this->action = 'testAction';
-        $this->metadata = $this->getMockBuilder('Oro\Bundle\ApiBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->config = $this->getMockBuilder('Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->requestType = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\RequestType')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->metadata = $this->createMock(EntityMetadata::class);
+        $this->config = $this->createMock(EntityDefinitionConfig::class);
+        $this->requestType = $this->createMock(RequestType::class);
 
         $this->apiDocMetadata = new ApiDocMetadata($this->action, $this->metadata, $this->config, $this->requestType);
     }
 
     public function testGetAction()
     {
-        $this->assertEquals($this->action, $this->apiDocMetadata->getAction());
+        self::assertEquals($this->action, $this->apiDocMetadata->getAction());
     }
 
     public function testGetMetadata()
     {
-        $this->assertEquals($this->metadata, $this->apiDocMetadata->getMetadata());
+        self::assertEquals($this->metadata, $this->apiDocMetadata->getMetadata());
     }
 
     public function testGetConfig()
     {
-        $this->assertEquals($this->config, $this->apiDocMetadata->getConfig());
+        self::assertEquals($this->config, $this->apiDocMetadata->getConfig());
     }
 
     public function testGetRequestType()
     {
-        $this->assertEquals($this->requestType, $this->apiDocMetadata->getRequestType());
+        self::assertEquals($this->requestType, $this->apiDocMetadata->getRequestType());
     }
 
     public function testSerialize()
     {
-        $this->assertSame('', $this->apiDocMetadata->serialize());
+        self::assertSame('', $this->apiDocMetadata->serialize());
     }
 }

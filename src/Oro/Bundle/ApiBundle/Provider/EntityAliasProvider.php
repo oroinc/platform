@@ -12,6 +12,9 @@ use Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface;
  */
 class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassProviderInterface
 {
+    /** @var ConfigCache */
+    private $configCache;
+
     /** @var array */
     private $entityAliases;
 
@@ -19,13 +22,11 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
     private $exclusions;
 
     /**
-     * @param array $entityAliases The Data API specific aliases
-     * @param array $exclusions    The Data API specific exclusions
+     * @param ConfigCache $configCache
      */
-    public function __construct(array $entityAliases, array $exclusions)
+    public function __construct(ConfigCache $configCache)
     {
-        $this->entityAliases = $entityAliases;
-        $this->exclusions = array_fill_keys($exclusions, true);
+        $this->configCache = $configCache;
     }
 
     /**
@@ -33,17 +34,22 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
      */
     public function getEntityAlias($entityClass)
     {
+        $this->ensureInitialized();
+
         if (isset($this->exclusions[$entityClass])) {
             return false;
         }
+
         if (!isset($this->entityAliases[$entityClass])) {
             return null;
         }
 
-        return new EntityAlias(
-            $this->entityAliases[$entityClass]['alias'],
-            $this->entityAliases[$entityClass]['plural_alias']
-        );
+        $aliases = $this->entityAliases[$entityClass];
+        if (empty($aliases)) {
+            return null;
+        }
+
+        return new EntityAlias($aliases['alias'], $aliases['plural_alias']);
     }
 
     /**
@@ -51,6 +57,16 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
      */
     public function getClassNames()
     {
+        $this->ensureInitialized();
+
         return array_keys($this->entityAliases);
+    }
+
+    private function ensureInitialized()
+    {
+        if (null === $this->entityAliases) {
+            $this->entityAliases = $this->configCache->getAliases();
+            $this->exclusions = array_fill_keys($this->configCache->getExcludedEntities(), true);
+        }
     }
 }

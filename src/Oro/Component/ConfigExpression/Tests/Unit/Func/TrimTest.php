@@ -7,7 +7,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Func;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class TrimTest extends \PHPUnit_Framework_TestCase
+class TrimTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Func\Trim */
     protected $function;

@@ -1,0 +1,112 @@
+/* @theme: admin.oro; */
+
+.editable {
+    span.validation-failed {
+        @include floating-validation-message();
+
+        display: block;
+        white-space: nowrap;
+        position: absolute;
+        top: -6px;
+        bottom: auto;
+
+        > span {
+            position: absolute;
+            top: auto !important;
+            left: auto !important;
+            margin-top: 0;
+            text-align: left;
+        }
+
+        &:after {
+            border-width: 6px 4px 0;
+            margin-top: 0;
+        }
+    }
+
+    &.error-message-below {
+        .validation-failed {
+            bottom: -7px;
+            top: auto;
+
+            > span {
+                > span {
+                    top: 0;
+                    bottom: auto;
+                }
+            }
+
+            &:after {
+                border-width: 0 4px 6px;
+                top: auto;
+                bottom: 100%;
+            }
+        }
+    }
+
+    &.error-message-right {
+        .validation-failed {
+            bottom: 0;
+            top: auto;
+            left: 100%;
+            margin-left: 6px;
+
+            &:after {
+                border-width: 4px 6px 4px 0;
+                border-color: transparent $error-message-balloon-background;
+                top: -16px;
+                left: -6px;
+            }
+        }
+    }
+
+    &.error-message-left {
+        .validation-failed {
+            bottom: 0;
+            top: auto;
+            right: 100%;
+            margin-right: 6px;
+
+            > span {
+                margin-left: -280px;
+
+                > span {
+                    right: 0;
+                }
+            }
+
+            &:after {
+                border-width: 4px 0 4px 6px;
+                border-color: transparent $error-message-balloon-background;
+                top: -16px;
+                right: -6px;
+                left: auto;
+            }
+        }
+    }
+
+    .error-holder {
+        position: absolute;
+        display: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1;
+    }
+
+    &.error-message-below .error-holder {
+        top: auto;
+        bottom: 0;
+    }
+
+    &.error-message-left,
+    &.error-message-right {
+        .error-holder {
+            top: 24px;
+        }
+    }
+
+    &.view-mode:hover .error-holder {
+        display: block;
+    }
+}

@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Model;
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class EntityFieldStructureTest extends \PHPUnit_Framework_TestCase
+class EntityFieldStructureTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 

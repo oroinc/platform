@@ -7,15 +7,20 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ActivityListBundle\AccessRule\ActivityListAccessRule;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
-use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
+use Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ * Provider that allows to select email recipients by related entity.
+ */
 class EmailRecipientsProvider implements EmailRecipientsProviderInterface
 {
     /** @var Registry */
@@ -27,31 +32,25 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
     /** @var RelatedEmailsProvider */
     protected $relatedEmailsProvider;
 
-    /** @var ActivityListAclCriteriaHelper */
-    protected $activityListAclHelper;
-
-    /** @var ActivityListChainProvider */
-    protected $activityListProvider;
+    /** @var AclHelper */
+    private $aclHelper;
 
     /**
      * @param Registry $registry
      * @param ActivityManager $activityManager
      * @param RelatedEmailsProvider $relatedEmailsProvider
-     * @param ActivityListAclCriteriaHelper $activityListAclHelper
-     * @param ActivityListChainProvider $activityListChainProvider
+     * @param AclHelper $aclHelper
      */
     public function __construct(
         Registry $registry,
         ActivityManager $activityManager,
         RelatedEmailsProvider $relatedEmailsProvider,
-        ActivityListAclCriteriaHelper $activityListAclHelper,
-        ActivityListChainProvider $activityListChainProvider
+        AclHelper $aclHelper
     ) {
         $this->registry = $registry;
         $this->activityManager = $activityManager;
         $this->relatedEmailsProvider = $relatedEmailsProvider;
-        $this->activityListAclHelper = $activityListAclHelper;
-        $this->activityListProvider = $activityListChainProvider;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -92,8 +91,17 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
             foreach ($activityListQb->getParameters() as $param) {
                 $qb->setParameter($param->getName(), $param->getValue(), $param->getType());
             }
+            
+            $query = $this->aclHelper->apply(
+                $qb,
+                'VIEW',
+                [
+                    AclAccessRule::DISABLE_RULE => true,
+                    ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS => 'ao'
+                ]
+            );
 
-            $iterator = new BufferedIdentityQueryResultIterator($qb);
+            $iterator = new BufferedIdentityQueryResultIterator($query);
             $iterator->setBufferSize($limit);
 
             foreach ($iterator as $entity) {
@@ -139,8 +147,6 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
         $activityListQb
             ->andWhere('activity.relatedActivityId = e.id')
             ->andWhere('activity.relatedActivityClass = :related_activity_class');
-
-        $this->activityListAclHelper->applyAclCriteria($activityListQb, $this->activityListProvider->getProviders());
 
         return $activityListQb;
     }

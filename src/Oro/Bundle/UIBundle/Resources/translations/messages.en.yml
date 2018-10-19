@@ -17,6 +17,8 @@
 "View more...": "View more..."
 "All": "All"
 "Any": "Any"
+"Expand": "Expand"
+"Collapse": "Collapse"
 "Expand All": "Expand All"
 "Collapse All": "Collapse All"
 "Ascending Order": "Ascending order - Click to sort in descending order"
@@ -31,6 +33,13 @@ oro.age: "{0} newborn|]0,Inf[age %count%"
 "Additional Information": "Additional Information"
 
 oro:
+    auth:
+        description:
+            logo: OroPlatform
+            main: OroPlatform
+            text: The Rapid Application Development Platform for Web Applications
+        copy: © 2018 Oro, Inc. All Rights Reserved
+
     ui:
         actions:          "%entityName% Actions"
         actions.activity: More actions
@@ -125,6 +134,10 @@ oro:
                 source.label: 'Selected items'
                 target.label: 'Move to'
                 confirm_slug_change.title: 'Create 301 Redirect from old to new URLs'
+        navbar:
+          toggler_label: 'Maximize/minimize menu'
+          scroll_up_label: 'Scroll menu up'
+          scroll_down_label: 'Scroll menu down'
 'Click to go back': 'Click to go back'
 'Show more': 'Show more'
 'Show less': 'Show less'

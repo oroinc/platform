@@ -3,9 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\WorkflowBundle\DependencyInjection\OroWorkflowExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class OroWorkflowExtensionTest extends \PHPUnit_Framework_TestCase
+class OroWorkflowExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array
@@ -27,9 +28,7 @@ class OroWorkflowExtensionTest extends \PHPUnit_Framework_TestCase
         $actualDefinitions = [];
         $actualParameters  = [];
 
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(['setDefinition', 'setParameter'])
-            ->getMock();
+        $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->any())
             ->method('setDefinition')
             ->will(

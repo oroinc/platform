@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\ImportExportBundle\Utils\ArrayUtil;
 
-class ArrayUtilTest extends \PHPUnit_Framework_TestCase
+class ArrayUtilTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider filterEmptyArraysDataProvider

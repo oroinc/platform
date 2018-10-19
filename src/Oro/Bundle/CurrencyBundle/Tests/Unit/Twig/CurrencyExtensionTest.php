@@ -9,14 +9,14 @@ use Oro\Bundle\CurrencyBundle\Twig\CurrencyExtension;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class CurrencyExtensionTest extends \PHPUnit_Framework_TestCase
+class CurrencyExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var CurrencyExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|NumberFormatter */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|NumberFormatter */
     protected $formatter;
 
     protected function setUp()

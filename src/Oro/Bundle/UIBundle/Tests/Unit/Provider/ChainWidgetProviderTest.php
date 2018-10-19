@@ -4,18 +4,18 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UIBundle\Provider\ChainWidgetProvider;
 
-class ChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
+class ChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainWidgetProvider */
     protected $chainProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $highPriorityProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $lowPriorityProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $unsupportedProvider;
 
     protected function setUp()

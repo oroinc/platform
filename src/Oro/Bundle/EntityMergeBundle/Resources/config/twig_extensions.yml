@@ -11,7 +11,7 @@ services:
             - { name: twig.extension }
 
     oro_entity_merge.twig.renderer:
-        class: %oro_entity_merge.twig.renderer.class%
+        class: '%oro_entity_merge.twig.renderer.class%'
         arguments:
             - '@twig'
             - '@event_dispatcher'

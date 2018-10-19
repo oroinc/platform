@@ -15,7 +15,7 @@ class ChoiceOriginFolderFilter extends ChoiceFilter
      */
     protected function getFormType()
     {
-        return ChoiceOriginFolderFilterType::NAME;
+        return ChoiceOriginFolderFilterType::class;
     }
 
     /**

@@ -4,7 +4,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\DistributionBundle\Entity\Bundle;
 
-class BundleTest extends \PHPUnit_Framework_TestCase
+class BundleTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test

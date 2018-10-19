@@ -13,7 +13,7 @@ Feature: "is any of" and "is not any of" number filters
         And I fill form with:
             | Field name    | float_field |
             | Type          | Float       |
-        And I press "Continue"
+        And I click "Continue"
         And I save and close form
         Then click update schema
 

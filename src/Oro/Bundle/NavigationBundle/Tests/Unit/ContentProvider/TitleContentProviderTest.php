@@ -4,10 +4,10 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\ContentProvider;
 
 use Oro\Bundle\NavigationBundle\ContentProvider\TitleContentProvider;
 
-class TitleContentProviderTest extends \PHPUnit_Framework_TestCase
+class TitleContentProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $titleService;
 

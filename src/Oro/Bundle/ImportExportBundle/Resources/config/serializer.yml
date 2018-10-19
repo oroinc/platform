@@ -7,28 +7,28 @@ parameters:
 
 services:
     oro_importexport.serializer:
-        class: %oro_importexport.serializer.class%
+        class: '%oro_importexport.serializer.class%'
         arguments:
           - []
           - ['@oro_importexport.serializer.dummy_encoder']
 
     oro_importexport.serializer.dummy_encoder:
-        class: %oro_importexport.serializer.dummy_encoder.class%
+        class: '%oro_importexport.serializer.dummy_encoder.class%'
 
     oro_importexport.serializer.datetime_normalizer:
-        class: %oro_importexport.serializer.datetime_normalizer.class%
+        class: '%oro_importexport.serializer.datetime_normalizer.class%'
         calls:
             - [setFormatter, ['@oro_importexport.formatter.excel_datetime']]
         tags:
             - { name: oro_importexport.normalizer, priority: -10 }
 
     oro_importexport.serializer.collection_normalizer:
-        class: %oro_importexport.serializer.collection_normalizer.class%
+        class: '%oro_importexport.serializer.collection_normalizer.class%'
         tags:
             - { name: oro_importexport.normalizer, priority: -10 }
 
     oro_importexport.serializer.configurable_entity_normalizer:
-        class: %oro_importexport.serializer.configurable_entity_normalizer.class%
+        class: '%oro_importexport.serializer.configurable_entity_normalizer.class%'
         arguments:
             - '@oro_entity.helper.field_helper'
         calls:

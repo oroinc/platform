@@ -26,7 +26,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('composer_cache_home')
-                    ->defaultValue('%kernel.root_dir%/cache/composer')
+                    ->defaultValue('%kernel.project_dir%/var/cache/composer')
                 ->end()
             ->end();
 

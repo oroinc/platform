@@ -271,19 +271,11 @@ define(function(require) {
         },
 
         _togglePrevious: function(enable) {
-            if (_.isUndefined(enable)) {
-                $(this.options.listWidgetSelector + ' .pagination-previous').addClass('disabled');
-            } else {
-                $(this.options.listWidgetSelector + ' .pagination-previous').removeClass('disabled');
-            }
+            $(this.options.listWidgetSelector + ' .pagination-previous').attr('disabled', enable === void 0);
         },
 
         _toggleNext: function(enable) {
-            if (_.isUndefined(enable)) {
-                $(this.options.listWidgetSelector + ' .pagination-next').addClass('disabled');
-            } else {
-                $(this.options.listWidgetSelector + ' .pagination-next').removeClass('disabled');
-            }
+            $(this.options.listWidgetSelector + ' .pagination-next').attr('disabled', enable === void 0);
         },
 
         _reloadOnAdd: function() {
@@ -490,9 +482,9 @@ define(function(require) {
          * @protected
          */
         _getUrl: function(actionKey, model) {
-            var className = model.getRelatedActivityClass();
-            var route = this.options.configuration[className].routes[actionKey];
-            return routing.generate(route, {id: model.get('relatedActivityId')});
+            var routes = model.get('routes');
+
+            return routing.generate(routes[actionKey], {id: model.get('relatedActivityId')});
         },
 
         _getMessage: function(labelKey) {

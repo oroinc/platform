@@ -13,7 +13,7 @@ use Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
 
-class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCase
+class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ReportDatagridConfigurationProvider
@@ -21,37 +21,37 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
     protected $target;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $functionProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $virtualFieldProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrine;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configManager;
 
     /**
-     * @var DatagridDateGroupingBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var DatagridDateGroupingBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $dateGroupingBuilder;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject | Cache
+     * @var \PHPUnit\Framework\MockObject\MockObject | Cache
      */
     protected $reportCacheManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SystemAwareResolver
+     * @var \PHPUnit\Framework\MockObject\MockObject|SystemAwareResolver
      */
     protected $resolver;
 
@@ -111,7 +111,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
 
     public function testIsReportValid()
     {
-        $this->reportCacheManager->expects(self::once())->method('contains')->willReturn(false);
+        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
         $exception = new InvalidConfigurationException();
         $this->doctrine->expects($this->once())->method('getRepository')
             ->will($this->throwException($exception));
@@ -125,7 +125,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
         $this->prepareMetadata();
         $report = $this->getReportEntity($entity, ['columns' => ['column' => ['name' => 'street']]]);
         $this->prepareRepository($report);
-        $this->reportCacheManager->expects(self::once())->method('contains')->willReturn(false);
+        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
 
         $this->resolver->expects($this->once())
             ->method('resolve')
@@ -148,7 +148,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
             ]
         ];
 
-        $this->reportCacheManager->expects(self::once())->method('contains')->willReturn(false);
+        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
 
         $metadata = $this->prepareMetadata();
 
@@ -195,7 +195,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
             ]
         ];
 
-        $this->reportCacheManager->expects(self::once())->method('contains')->willReturn(false);
+        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
 
         $metadata = $this->prepareMetadata();
 
@@ -235,7 +235,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
         $expectedViewRoute = 'oro_sample_view';
         $entityMetadata    = $this->getEntityMetadata($expectedViewRoute);
 
-        $this->reportCacheManager->expects(self::once())->method('contains')->willReturn(false);
+        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
 
         $metadata = $this->prepareMetadata();
         $metadata->expects($this->once())
@@ -358,8 +358,6 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
 
         $expectedConfiguration = $this->buildConfiguration($gridName, $report);
         $this->reportCacheManager->expects(self::once())
-            ->method('contains')->willReturn(true);
-        $this->reportCacheManager->expects(self::once())
             ->method('fetch')->willReturn($expectedConfiguration);
 
         $configuration = $this->target->getConfiguration($gridName);
@@ -382,7 +380,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function prepareMetadata()
     {
@@ -410,7 +408,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
      * @param string $className
      * @param array  $definition
      *
-     * @return Report|\PHPUnit_Framework_MockObject_MockObject
+     * @return Report|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getReportEntity($className, array $definition)
     {
@@ -450,7 +448,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
     /**
      * @param string $viewRoute
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getEntityMetadata($viewRoute)
     {

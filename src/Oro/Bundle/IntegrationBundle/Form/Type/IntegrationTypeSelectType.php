@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\Form\AbstractType;
@@ -35,7 +36,7 @@ class IntegrationTypeSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $choices = $options['choice_list']->getChoices();
+        $choices = $options['choices'];
 
         if (empty($choices)) {
             $options['configs']['placeholder'] = 'oro.integration.form.no_available_integrations';
@@ -68,7 +69,7 @@ class IntegrationTypeSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_choice';
+        return Select2ChoiceType::class;
     }
 
     /**

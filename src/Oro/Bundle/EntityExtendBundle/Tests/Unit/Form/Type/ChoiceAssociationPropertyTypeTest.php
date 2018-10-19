@@ -4,16 +4,15 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceAssociationPropertyType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class ChoiceAssociationPropertyTypeTest extends AssociationTypeTestCase
 {
-    /** @var ChoiceAssociationPropertyType */
-    protected $type;
-
-    protected function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFormType()
     {
-        parent::setUp();
-
         $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
@@ -21,7 +20,7 @@ class ChoiceAssociationPropertyTypeTest extends AssociationTypeTestCase
             ->method('getEntityClass')
             ->will($this->returnArgument(0));
 
-        $this->type = new ChoiceAssociationPropertyType(
+        return new ChoiceAssociationPropertyType(
             new AssociationTypeHelper($this->configManager, $entityClassResolver),
             $this->configManager
         );
@@ -31,15 +30,15 @@ class ChoiceAssociationPropertyTypeTest extends AssociationTypeTestCase
     {
         $this->assertEquals(
             'oro_entity_extend_association_property_choice',
-            $this->type->getName()
+            $this->getFormType()->getName()
         );
     }
 
     public function testGetParent()
     {
         $this->assertEquals(
-            'choice',
-            $this->type->getParent()
+            ChoiceType::class,
+            $this->getFormType()->getParent()
         );
     }
 

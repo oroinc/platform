@@ -10,8 +10,8 @@ Feature: Users groups
   Scenario: Create user group
     Given I login as administrator
     When I go to System/ User Management/ Groups
-    And I press "Create Group"
-    And I check first 5 records in 1 column
+    And I click "Create Group"
+    And I check first 5 records in 0 column
     When I save and close form
     Then I should see validation errors:
       | Name      | This value should not be blank.  |
@@ -42,7 +42,7 @@ Feature: Users groups
   Scenario: Remove users from user group
     Then I should see Edited test group in grid
     When I click Edit Edited test group in grid
-    And I uncheck first 5 records in 1 column
+    And I uncheck first 5 records in 0 column
     And I save and close form
     Then I should see Edited test group in grid
     When I click Edit Edited test group in grid
@@ -53,7 +53,7 @@ Feature: Users groups
   Scenario: Add users to group
     Then I should see Edited test group in grid
     When I click Edit Edited test group in grid
-    And I check first 4 records in 1 column
+    And I check first 4 records in 0 column
     And I save and close form
     Then I should see Edited test group in grid
     When I click Edit Edited test group in grid

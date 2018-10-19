@@ -30,8 +30,8 @@ define(['underscore'
                 _.each(_.rest(chain), _.bind(function(item, index) {
                     data = this._getChildren(this._getField(prevFieldName, data));
                     var pair = this._getPair(item);
-                    var label = index < lastItemIndex ?
-                        this._getFieldGroupLabel(_.last(pair), data)
+                    var label = index < lastItemIndex
+                        ? this._getFieldGroupLabel(_.last(pair), data)
                         : this._getFieldLabel(_.last(pair), data);
                     result.push({
                         entity: this.findEntity(_.first(pair)),
@@ -69,8 +69,8 @@ define(['underscore'
                 var lastItemIndex = _.size(chain) - 2;
                 _.each(_.rest(chain), _.bind(function(item, index) {
                     var fieldName = _.last(this._getPair(item));
-                    result = index < lastItemIndex ?
-                        this._getField(fieldName, data)
+                    result = index < lastItemIndex
+                        ? this._getField(fieldName, data)
                         : this._getFieldData(fieldName, data);
                     data = this._getChildren(result);
                 }, this));
@@ -187,8 +187,8 @@ define(['underscore'
         _convertData: function(fields, entityName, parentFieldId) {
             var result = [];
             _.each(fields, _.bind(function(field) {
-                var fieldId = (null !== parentFieldId) ?
-                    parentFieldId + '+' + entityName + '::' + field.name
+                var fieldId = (null !== parentFieldId)
+                    ? parentFieldId + '+' + entityName + '::' + field.name
                     : field.name;
                 if (_.isUndefined(field.relation_type)) {
                     if (_.isUndefined(this.exclude) ||

@@ -6,7 +6,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\Routing\Route;
 
 /**
- * An interface for classes that can be used to update ApiDoc annotation
+ * Provides an interface for classes that can be used to update ApiDoc annotation
  * before it will be processed by ApiDocExtractor.
  */
 interface ApiDocAnnotationHandlerInterface

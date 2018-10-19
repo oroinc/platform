@@ -9,7 +9,7 @@ use Oro\Bundle\IntegrationBundle\Test\FakeRestClientFactory;
 /**
  * Class FakeRestClientFactoryTest is unit test for fake factory
  */
-class FakeRestClientFactoryTest extends \PHPUnit_Framework_TestCase
+class FakeRestClientFactoryTest extends \PHPUnit\Framework\TestCase
 {
     const FAKE_BASE_URL = 'http://localhost';
 

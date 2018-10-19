@@ -7,7 +7,7 @@ use Oro\Bundle\DataAuditBundle\Tests\Unit\Fixture\LoggableClass;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
-class AuditableFilterTest extends \PHPUnit_Framework_TestCase
+class AuditableFilterTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_ENTITY_REFERENCE = 'Oro\Bundle\DataAuditBundle\Tests\Unit\Fixture\LoggableClass';
 
@@ -17,7 +17,7 @@ class AuditableFilterTest extends \PHPUnit_Framework_TestCase
     protected $filter;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configProvider;
 

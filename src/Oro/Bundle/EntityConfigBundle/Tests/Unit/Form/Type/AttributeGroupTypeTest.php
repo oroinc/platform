@@ -8,19 +8,20 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\FormBundle\Tests\Unit\Stub\StripTagsExtensionStub;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
 use Oro\Bundle\LocaleBundle\Form\Type\FallbackValueType;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionTypeStub;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class AttributeGroupTypeTest extends FormIntegrationTestCase
@@ -29,17 +30,14 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
 
     use EntityTrait;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var AttributeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $attributeManager;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
-
-    /** @var AttributeGroupType */
-    protected $formType;
 
     protected function setUp()
     {
@@ -77,8 +75,6 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         parent::setUp();
-
-        $this->formType = new AttributeGroupType();
     }
 
     /**
@@ -89,24 +85,20 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionType(
+                    LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionType(
                         $this->registry
                     ),
-                    AttributeMultiSelectType::NAME => new AttributeMultiSelectType($this->attributeManager),
-                    'oro_select2_choice' => new Select2Type(
-                        'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
-                        'oro_select2_choice'
-                    ),
-                    LocalizedPropertyType::NAME => new LocalizedPropertyType(),
-                    LocalizationCollectionTypeStub::NAME => new LocalizationCollectionTypeStub(
+                    AttributeMultiSelectType::class => new AttributeMultiSelectType($this->attributeManager),
+                    LocalizedPropertyType::class => new LocalizedPropertyType(),
+                    LocalizationCollectionType::class => new LocalizationCollectionTypeStub(
                         [
                             $this->getEntity(Localization::class, ['id' => self::LOCALIZATION_ID])
                         ]
                     ),
-                    FallbackValueType::NAME => new FallbackValueType(),
-                    FallbackPropertyType::NAME => new FallbackPropertyType($this->translator),
+                    FallbackValueType::class => new FallbackValueType(),
+                    FallbackPropertyType::class => new FallbackPropertyType($this->translator),
                 ],
-                ['form' => [new StripTagsExtensionStub($this->createMock(HtmlTagHelper::class))]]
+                [FormType::class => [new StripTagsExtensionStub($this->createMock(HtmlTagHelper::class))]]
             ),
             $this->getValidatorExtension(true)
         ];
@@ -146,7 +138,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
         ];
 
         $form = $this->factory->create(
-            $this->formType,
+            AttributeGroupType::class,
             new AttributeGroup(),
             ['attributeEntityClass' => 'EntityClass']
         );
@@ -170,6 +162,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
 
     public function testGetName()
     {
-        $this->assertEquals(AttributeGroupType::NAME, $this->formType->getName());
+        $formType = new AttributeGroupType();
+        $this->assertEquals(AttributeGroupType::NAME, $formType->getName());
     }
 }

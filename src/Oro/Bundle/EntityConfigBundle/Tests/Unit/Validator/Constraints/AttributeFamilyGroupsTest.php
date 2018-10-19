@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\AttributeFamilyGroups;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\AttributeFamilyGroupsValidator;
 
-class AttributeFamilyGroupsTest extends \PHPUnit_Framework_TestCase
+class AttributeFamilyGroupsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AttributeFamilyGroups

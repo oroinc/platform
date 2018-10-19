@@ -5,10 +5,10 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\ImportExport\Serializer\Normalizer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\FormBundle\ImportExport\Serializer\Normalizer\PrimaryItemCollectionNormalizer;
 
-class PrimaryItemCollectionNormalizerTest extends \PHPUnit_Framework_TestCase
+class PrimaryItemCollectionNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $serializer;
 

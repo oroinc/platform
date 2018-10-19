@@ -12,7 +12,7 @@ class UserProfileConfiguration extends Page
     public function open(array $parameters = [])
     {
         $userMenu = $this->elementFactory->createElement('UserMenu');
-        $userMenu->find('css', 'i.fa-sort-desc')->click();
+        $userMenu->find('css', '[data-toggle="dropdown"]')->click();
 
         $userMenu->clickLink('My Configuration');
     }

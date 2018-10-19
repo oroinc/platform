@@ -8,9 +8,9 @@ use Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class WorkflowVariableFormatterTest extends \PHPUnit_Framework_TestCase
+class WorkflowVariableFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     protected $translator;
 
     /** @var WorkflowVariableFormatter */

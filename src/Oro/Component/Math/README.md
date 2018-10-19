@@ -2,7 +2,7 @@
 
 A library to work with arbitrary precision numbers. Currently based on the [Brick\Math](https://github.com/brick/math) library.
 
-### Package contents
+## Package contents
 
 This library provides the following public classes in the Oro\Component\Math namespace:
 
@@ -12,9 +12,9 @@ This library provides the following public classes in the Oro\Component\Math nam
 - [BigRational](./BigRational.php): represents an arbitrary-precision rational number (fraction).
 - [RoundingMode](./RoundingMode.php): holds constants for the rounding modes.
 
-### Overview
+## Overview
 
-#### Instantiation
+### Instantiation
 
 The constructors of the classes are not public, you must use a factory method to obtain an instance.
 
@@ -68,7 +68,7 @@ echo BigDecimal::of(1.99999999999999999999); // 2
 echo BigDecimal::of('1.99999999999999999999'); // 1.99999999999999999999
 ```
 
-#### Immutability & chaining
+### Immutability & chaining
 
 The `BigInteger`, `BigDecimal` and `BigRational` classes are immutable: their value never changes,
 so that they can be safely passed around. All methods that return a `BigInteger`, `BigDecimal` or `BigRational`
@@ -87,7 +87,7 @@ The methods can be chained for better readability:
 echo BigInteger::of(10)->plus(5)->multipliedBy(3); // 45
 ```
 
-#### Parameter types
+### Parameter types
 
 All methods that accept a number: `plus()`, `minus()`, `multipliedBy()`, etc. accept the same types as `of()`.
 For example, given the following number:
@@ -112,9 +112,9 @@ echo BigInteger::of(2)->multipliedBy(BigDecimal::of('2.5')); // ArithmeticExcept
 echo BigDecimal::of(2.5)->multipliedBy(BigInteger::of(2)); // 5.0
 ```
 
-#### Division & rounding
+### Division & rounding
 
-##### BigInteger
+#### BigInteger
 
 By default, dividing a `BigInteger` returns the exact result of the division, or throws an exception if the remainder
 of the division is not zero:
@@ -144,7 +144,7 @@ You can even get both at the same time:
 list ($quotient, $remainder) = BigInteger::of(1000)->quotientAndRemainder(3);
 ```
 
-##### BigDecimal
+#### BigDecimal
 
 Dividing a `BigDecimal` always requires a scale to be specified. If the exact result of the division does not fit in
 the given scale, a [rounding mode](http://brick.io/math/class-Brick.Math.RoundingMode.html) must be provided.
@@ -165,7 +165,7 @@ echo BigDecimal::of(1)->exactlyDividedBy(256); // 0.00390625
 echo BigDecimal::of(1)->exactlyDividedBy(11); // RoundingNecessaryException
 ```
 
-##### BigRational
+#### BigRational
 
 The result of the division of a `BigRational` can always be represented exactly:
 
@@ -174,7 +174,7 @@ echo BigRational::of('123/456')->dividedBy('7'); // 123/3192
 echo BigRational::of('123/456')->dividedBy('9/8'); // 984/4104
 ```
 
-#### Serialization
+### Serialization
 
 `BigInteger`, `BigDecimal` and `BigRational` can be safely serialized on a machine and unserialized on another,
 even if these machines do not share the same set of PHP extensions.

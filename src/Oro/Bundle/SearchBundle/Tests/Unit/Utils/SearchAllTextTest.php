@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Utils;
 use Oro\Bundle\SearchBundle\Utils\SearchAllText;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class SearchAllTextTest extends \PHPUnit_Framework_TestCase
+class SearchAllTextTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOperatorChoices()
     {
@@ -22,8 +22,8 @@ class SearchAllTextTest extends \PHPUnit_Framework_TestCase
         $searchAllTextUtil = new SearchAllText($translator);
 
         $expected = [
-            1 => 'contains',
-            2 => 'does not contain'
+            'contains' => 1,
+            'does not contain' => 2,
         ];
 
         $this->assertEquals($expected, $searchAllTextUtil->getOperatorChoices());

@@ -3,63 +3,56 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Validator;
 
 use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\DataGridBundle\Datagrid\Builder;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint;
 use Oro\Bundle\QueryDesignerBundle\Validator\QueryValidator;
+use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class QueryValidatorTest extends \PHPUnit_Framework_TestCase
+class QueryValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    const MESSAGE = 'Invalid query';
+    /** @var QueryValidator */
+    private $validator;
 
-    /**
-     * @var QueryValidator
-     */
-    protected $validator;
+    /** @var QueryConstraint */
+    private $constraint;
 
-    /**
-     * @var QueryConstraint
-     */
-    protected $constraint;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $context;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $context;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $configurationProvider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $chainConfigurationProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $gridBuilder;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $gridBuilder;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $translator;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
     protected function setUp()
     {
-        $this->chainConfigurationProvider = $this->createMock(
-            'Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider'
-        );
-
-        $this->gridBuilder = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Builder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->configurationProvider = $this->createMock(ChainConfigurationProvider::class);
+        $this->gridBuilder = $this->createMock(Builder::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->validator = new QueryValidator(
-            $this->chainConfigurationProvider,
+            $this->configurationProvider,
             $this->gridBuilder,
+            $this->doctrineHelper,
             $this->translator,
             false
         );
@@ -72,8 +65,8 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
         $this->translator
             ->expects($this->any())
             ->method('trans')
-            ->with($this->equalTo($this->constraint->message))
-            ->will($this->returnValue(self::MESSAGE));
+            ->with($this->constraint->message)
+            ->will($this->returnValue('Invalid query'));
     }
 
     public function testValidateNotMatchedQuery()
@@ -86,7 +79,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $datasource
+     * @param \PHPUnit\Framework\MockObject\MockObject $datasource
      * @param bool                                     $useOrmDatasource
      * @param \Exception                               $exception
      * @param \Exception                               $configurationException
@@ -96,14 +89,15 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidate($datasource, $useOrmDatasource, $exception, $configurationException, $expectsCount)
     {
-        $provider = $this
-            ->getMockBuilder('Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $builder = $this
-            ->getMockBuilder('Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $value = new Segment();
+        $this->doctrineHelper
+            ->expects($this->any())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(123);
+
+
+        $provider = $this->createMock(ReportDatagridConfigurationProvider::class);
+        $builder = $this->createMock(DatagridConfigurationBuilder::class);
 
         $provider
             ->expects($this->once())
@@ -113,7 +107,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getBuilder')
             ->will($this->returnValue($builder));
-        $this->chainConfigurationProvider
+        $this->configurationProvider
             ->expects($this->once())
             ->method('getProviders')
             ->will($this->returnValue([$provider, new \stdClass()]));
@@ -124,16 +118,13 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
                 ->method('getConfiguration')
                 ->will($this->throwException($configurationException));
         } else {
-            $configuration = $this
-                ->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-                ->disableOriginalConstructor()
-                ->getMock();
+            $configuration = $this->createMock(DatagridConfiguration::class);
             $builder
                 ->expects($this->once())
                 ->method('getConfiguration')
                 ->will($this->returnValue($configuration));
         }
-        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock(DatagridInterface::class);
 
         $this->gridBuilder
             ->expects($this->exactly($expectsCount))
@@ -141,12 +132,14 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($datagrid));
         $datagrid
             ->expects($this->exactly($expectsCount))
-            ->method('getDatasource')
-            ->will($this->returnValue($datasource));
-        $qb = $this
-            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->method('getAcceptedDatasource')
+            ->willReturnCallback(function () use ($datasource, $value) {
+                $this->validator->initialize($this->createMock(ExecutionContextInterface::class));
+                $this->validator->validate($value, $this->constraint);
+
+                return $datasource;
+            });
+        $qb = $this->createMock(QueryBuilder::class);
         $datasource
             ->expects($this->exactly($expectsCount))
             ->method('getQueryBuilder')
@@ -180,7 +173,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
                 ->method('addViolation');
         }
 
-        $this->validator->validate(new Segment(), $this->constraint);
+        $this->validator->validate($value, $this->constraint);
     }
 
     /**
@@ -190,42 +183,42 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                $this->getOrmDataSourceInterfaceMock(),
+                $this->createMock(OrmDatasource::class),
                 false,
                 new DBALException('failed'),
                 null,
                 1
             ],
             [
-                $this->getOrmDataSourceInterfaceMock(),
+                $this->createMock(OrmDatasource::class),
                 false,
                 new InvalidConfigurationException(),
                 null,
                 1
             ],
             [
-                $this->getOrmDataSourceInterfaceMock(),
+                $this->createMock(OrmDatasource::class),
                 false,
                 null,
                 null,
                 1
             ],
             [
-                $this->getOrmDataSourceInterfaceMock(),
+                $this->createMock(OrmDatasource::class),
                 true,
                 new DBALException('failed'),
                 null,
                 1
             ],
             [
-                $this->getOrmDataSourceInterfaceMock(),
+                $this->createMock(OrmDatasource::class),
                 true,
                 new InvalidConfigurationException(),
                 null,
                 1
             ],
             [
-                $this->getOrmDataSourceInterfaceMock(),
+                $this->createMock(OrmDatasource::class),
                 false,
                 null,
                 new InvalidConfigurationException(),
@@ -235,24 +228,12 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getOrmDataSourceInterfaceMock()
-    {
-        return $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
-            ->disableOriginalConstructor()
-            ->disableOriginalClone()
-            ->getMock();
-    }
-
-    /**
      * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
      * @expectedExceptionMessage Builder is missing
      */
     public function testBuilderIsMissing()
     {
-        $this->chainConfigurationProvider
+        $this->configurationProvider
             ->expects($this->once())
             ->method('getProviders')
             ->will($this->returnValue([]));
@@ -266,15 +247,9 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testExistingEntityValidation()
     {
-        $helper = $this->createMock(DoctrineHelper::class);
-        $this->validator->setDoctrineHelper($helper);
+        $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->willReturn(1);
 
-        $helper->expects($this->once())->method('getSingleEntityIdentifier')->willReturn(1);
-
-        $provider = $this
-            ->getMockBuilder('Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $provider = $this->createMock(ReportDatagridConfigurationProvider::class);
 
         $provider
             ->expects($this->once())
@@ -282,7 +257,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             ->with(Segment::GRID_PREFIX.'1')
             ->will($this->returnValue(false));
 
-        $this->chainConfigurationProvider
+        $this->configurationProvider
             ->expects($this->once())
             ->method('getProviders')
             ->will($this->returnValue([$provider]));
@@ -296,23 +271,17 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testNewEntityValidation()
     {
-        $helper = $this->createMock(DoctrineHelper::class);
-        $this->validator->setDoctrineHelper($helper);
+        $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->willReturn(null);
 
-        $helper->expects($this->once())->method('getSingleEntityIdentifier')->willReturn(null);
-
-        $provider = $this
-            ->getMockBuilder('Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $provider = $this->createMock(ReportDatagridConfigurationProvider::class);
 
         $provider
             ->expects($this->once())
             ->method('isApplicable')
-            ->with($this->stringStartsWith(Segment::GRID_PREFIX.'grid'))
+            ->with($this->stringStartsWith(Segment::GRID_PREFIX))
             ->will($this->returnValue(false));
 
-        $this->chainConfigurationProvider
+        $this->configurationProvider
             ->expects($this->once())
             ->method('getProviders')
             ->will($this->returnValue([$provider]));

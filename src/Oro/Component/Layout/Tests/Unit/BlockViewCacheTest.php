@@ -21,12 +21,12 @@ class BlockViewCacheTest extends LayoutTestCase
     protected $blockViewCache;
 
     /**
-     * @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $cacheProvider;
 
     /**
-     * @var Serializer|\PHPUnit_Framework_MockObject_MockObject
+     * @var Serializer|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $serializer;
 
@@ -77,12 +77,9 @@ class BlockViewCacheTest extends LayoutTestCase
             ->willReturn($this::CONTEXT_HASH_VALUE);
 
         $this->cacheProvider->expects(static::once())
-            ->method('contains')
+            ->method('fetch')
             ->with($this::CONTEXT_HASH_VALUE)
             ->willReturn(false);
-
-        $this->cacheProvider->expects(static::never())
-            ->method('fetch');
 
         $this->assertNull($this->blockViewCache->fetch($context));
     }
@@ -96,11 +93,6 @@ class BlockViewCacheTest extends LayoutTestCase
         $context->expects(static::once())
             ->method('getHash')
             ->willReturn($this::CONTEXT_HASH_VALUE);
-
-        $this->cacheProvider->expects(static::once())
-            ->method('contains')
-            ->with($this::CONTEXT_HASH_VALUE)
-            ->willReturn(true);
 
         $this->cacheProvider->expects(static::once())
             ->method('fetch')

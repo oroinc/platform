@@ -101,7 +101,7 @@ class GridRow extends TableRow
         $cell->mouseOver();
 
         /** @var NodeElement $pencilIcon */
-        $pencilIcon = $cell->find('css', 'i[data-role="edit"]');
+        $pencilIcon = $cell->find('css', '[data-role="edit"]');
         self::assertNotNull($pencilIcon, "Cell with '$header' is not inline editable");
         self::assertTrue(
             $pencilIcon->isValid() && $pencilIcon->isVisible(),
@@ -170,11 +170,13 @@ class GridRow extends TableRow
      */
     public function findActionLink($action)
     {
-        if ($showMoreLink = $this->find('named', ['link', '...'])) {
+        if ($showMoreLink = $this->find('css', '.more-bar-holder .dropdown-toggle')) {
             $showMoreLink->mouseOver();
-            $link = $this->elementFactory
-                ->createElement('GridFloatingMenu')
-                ->find('named', ['link', ucfirst($action)]);
+            $link = $this->waitFor(5, function () use ($action) {
+                return $this->elementFactory
+                    ->createElement('GridRowActionMenu')
+                    ->find('named', ['link', ucfirst($action)]);
+            });
         } else {
             $link = $this->find('named', ['link', ucfirst($action)]);
         }
@@ -199,9 +201,9 @@ class GridRow extends TableRow
      */
     public function getActionLinks()
     {
-        if (null !== ($showMoreLink = $this->find('named', ['link', '...']))) {
+        if (null !== ($showMoreLink = $this->find('css', '.more-bar-holder .dropdown-toggle'))) {
             $showMoreLink->mouseOver();
-            $links = $this->elementFactory->createElement('GridFloatingMenu')->getElements('GridRowAction');
+            $links = $this->elementFactory->createElement('GridRowActionMenu')->getElements('GridRowAction');
         } else {
             $links = $this->getElements('GridRowAction');
         }

@@ -11,42 +11,20 @@ use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Reader\BatchIdsReaderInterface;
-use Oro\Bundle\ImportExportBundle\Reader\ReaderChain;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
-use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * Handles export logic such as getting export result, merging exported files, etc.
+ */
 class ExportHandler extends AbstractHandler
 {
     /**
      * @var MimeTypeGuesser
      */
     protected $mimeTypeGuesser;
-
-    /**
-     * @var ReaderChain
-     */
-    protected $readerChain;
-
-    /**
-     * @var FileManager
-     */
-    protected $fileManager;
-
-    /**
-     * @var WriterChain
-     */
-    protected $writerChain;
-    
-    /**
-     * @param FileManager $fileManager
-     */
-    public function setFileManager(FileManager $fileManager)
-    {
-        $this->fileManager = $fileManager;
-    }
 
     /**
      * @param MimeTypeGuesser $mimeTypeGuesser
@@ -56,21 +34,6 @@ class ExportHandler extends AbstractHandler
         $this->mimeTypeGuesser = $mimeTypeGuesser;
     }
 
-    /**
-     * @param ReaderChain $readerChain
-     */
-    public function setReaderChain(ReaderChain $readerChain)
-    {
-        $this->readerChain = $readerChain;
-    }
-
-    /**
-     * @param WriterChain $writerChain
-     */
-    public function setWriterChain(WriterChain $writerChain)
-    {
-        $this->writerChain = $writerChain;
-    }
     /**
      * Get export result
      *
@@ -197,12 +160,16 @@ class ExportHandler extends AbstractHandler
         $fileName = FileManager::generateFileName($processorType, $outputFormat);
         $localFilePath = FileManager::generateTmpFilePath($fileName);
 
-        if (! ($writer = $this->writerChain->getWriter($outputFormat)) instanceof FileStreamWriter) {
+        $writer = $this->writerChain->getWriter($outputFormat);
+        if (!$writer instanceof FileStreamWriter) {
             throw new LogicException('Writer must be instance of FileStreamWriter');
         }
-        if (! ($reader = $this->readerChain->getReader($outputFormat)) instanceof AbstractFileReader) {
+
+        $reader = $this->readerChain->getReader($outputFormat);
+        if (!$reader instanceof AbstractFileReader) {
             throw new LogicException('Reader must be instance of AbstractFileReader');
         }
+
         $this->batchFileManager->setWriter($writer);
         $this->batchFileManager->setReader($reader);
 
@@ -210,7 +177,12 @@ class ExportHandler extends AbstractHandler
 
         try {
             foreach ($files as $file) {
-                $localFiles[] = $this->fileManager->writeToTmpLocalStorage($file);
+                $tmpPath = $this->fileManager->writeToTmpLocalStorage($file);
+                if ($outputFormat === 'csv') {
+                    $tmpPath = $this->fileManager->fixNewLines($tmpPath);
+                }
+
+                $localFiles[] = $tmpPath;
             }
             $this->batchFileManager->mergeFiles($localFiles, $localFilePath);
 
@@ -282,9 +254,7 @@ class ExportHandler extends AbstractHandler
             $headers['Content-Type'] = $contentType;
         }
 
-        $response = new Response($content, 200, $headers);
-
-        return $response;
+        return new Response($content, 200, $headers);
     }
 
     /**

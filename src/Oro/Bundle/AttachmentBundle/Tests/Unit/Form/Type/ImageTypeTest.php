@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 
-class ImageTypeTest extends \PHPUnit_Framework_TestCase
+class ImageTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImageType */
     protected $type;
@@ -17,6 +18,6 @@ class ImageTypeTest extends \PHPUnit_Framework_TestCase
     public function testInterface()
     {
         $this->assertSame('oro_image', $this->type->getName());
-        $this->assertSame('oro_file', $this->type->getParent());
+        $this->assertSame(FileType::class, $this->type->getParent());
     }
 }

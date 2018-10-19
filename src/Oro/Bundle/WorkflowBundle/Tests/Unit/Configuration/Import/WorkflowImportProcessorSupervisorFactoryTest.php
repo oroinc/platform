@@ -7,12 +7,12 @@ use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessorSuperv
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
 
-class WorkflowImportProcessorSupervisorFactoryTest extends \PHPUnit_Framework_TestCase
+class WorkflowImportProcessorSupervisorFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  WorkflowConfigFinderBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  WorkflowConfigFinderBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $finderBuilder;
 
-    /** @var ConfigFileReaderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigFileReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $reader;
 
     /** @var WorkflowImportProcessorSupervisorFactory */

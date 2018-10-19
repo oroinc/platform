@@ -11,7 +11,7 @@ use Oro\Bundle\FilterBundle\Filter\StringFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class StringFilterTest extends \PHPUnit_Framework_TestCase
+class StringFilterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var StringFilter
@@ -38,10 +38,10 @@ class StringFilterTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        /* @var $formFactory FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $formFactory FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
         $formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
 
-        /* @var $filterUtility FilterUtility|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $filterUtility FilterUtility|\PHPUnit\Framework\MockObject\MockObject */
         $filterUtility = $this->createMock('Oro\Bundle\FilterBundle\Filter\FilterUtility');
 
         $this->filter = new StringFilter($formFactory, $filterUtility);
@@ -132,11 +132,11 @@ class StringFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return OrmFilterDatasourceAdapter|\PHPUnit_Framework_MockObject_MockObject
+     * @return OrmFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function prepareDatasource()
     {
-        /* @var $em EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $em EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
         $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
         $em->expects($this->any())
             ->method('getExpressionBuilder')

@@ -5,7 +5,7 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
 
-class EntityConfigTest extends \PHPUnit_Framework_TestCase
+class EntityConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testToArray()
     {
@@ -38,6 +38,9 @@ class EntityConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($entityConfig->isEmpty());
 
         $entityConfig->setExcludeNone();
+        $this->assertFalse($entityConfig->isEmpty());
+
+        $entityConfig->setExclusionPolicy(null);
         $this->assertTrue($entityConfig->isEmpty());
 
         $entityConfig->addField('test');
@@ -72,22 +75,33 @@ class EntityConfigTest extends \PHPUnit_Framework_TestCase
     {
         $entityConfig = new EntityConfig();
         $this->assertFalse($entityConfig->isExcludeAll());
+        $this->assertEquals([], $entityConfig->toArray());
+        $this->assertTrue($entityConfig->isEmpty());
 
         $entityConfig->setExcludeAll();
         $this->assertTrue($entityConfig->isExcludeAll());
         $this->assertEquals(['exclusion_policy' => 'all'], $entityConfig->toArray());
+        $this->assertFalse($entityConfig->isEmpty());
 
         $entityConfig->setExcludeNone();
         $this->assertFalse($entityConfig->isExcludeAll());
         $this->assertEquals([], $entityConfig->toArray());
+        $this->assertFalse($entityConfig->isEmpty());
 
-        $entityConfig->setExclusionPolicy(EntityConfig::EXCLUSION_POLICY_ALL);
+        $entityConfig->setExclusionPolicy('all');
         $this->assertTrue($entityConfig->isExcludeAll());
         $this->assertEquals(['exclusion_policy' => 'all'], $entityConfig->toArray());
+        $this->assertFalse($entityConfig->isEmpty());
 
-        $entityConfig->setExclusionPolicy(EntityConfig::EXCLUSION_POLICY_NONE);
+        $entityConfig->setExclusionPolicy('none');
         $this->assertFalse($entityConfig->isExcludeAll());
         $this->assertEquals([], $entityConfig->toArray());
+        $this->assertFalse($entityConfig->isEmpty());
+
+        $entityConfig->setExclusionPolicy(null);
+        $this->assertFalse($entityConfig->isExcludeAll());
+        $this->assertEquals([], $entityConfig->toArray());
+        $this->assertTrue($entityConfig->isEmpty());
     }
 
     public function testPartialLoad()

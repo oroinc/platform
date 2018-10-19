@@ -7,6 +7,9 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 
+/**
+ * Adds metadata to all associations.
+ */
 class AssociationMetadataLoader
 {
     /** @var MetadataProvider */
@@ -42,8 +45,18 @@ class AssociationMetadataLoader
                 continue;
             }
 
+            $targetClass = $field->getTargetClass();
+            if ($targetClass && $association->getTargetClassName() !== $targetClass) {
+                $acceptableTargetClassNames = $association->getAcceptableTargetClassNames();
+                $i = \array_search($association->getTargetClassName(), $acceptableTargetClassNames, true);
+                if (false !== $i) {
+                    $acceptableTargetClassNames[$i] = $targetClass;
+                    $association->setAcceptableTargetClassNames($acceptableTargetClassNames);
+                }
+                $association->setTargetClassName($targetClass);
+            }
             $targetMetadata = $this->metadataProvider->getMetadata(
-                $association->getTargetClassName(),
+                $targetClass,
                 $context->getVersion(),
                 $context->getRequestType(),
                 $field->getTargetEntity(),

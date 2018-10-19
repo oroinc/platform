@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
+/**
+ * The base class for filters that can be used to filter data by different kind of custom associations.
+ */
 abstract class AssociationFilter extends ComparisonFilter implements
     NamedValueFilterInterface,
     SelfIdentifiableFilterInterface,
@@ -44,16 +47,16 @@ abstract class AssociationFilter extends ComparisonFilter implements
     /**
      * {@inheritdoc}
      */
-    public function searchFilterKey(array $filterValues)
+    public function searchFilterKeys(array $filterValues): array
     {
-        $result = null;
+        $result = [];
 
         $prefix = $this->field . '.';
         /** @var FilterValue $filterValue */
         foreach ($filterValues as $filterKey => $filterValue) {
             $path = $filterValue->getPath();
-            if (0 === strpos($path, $prefix)) {
-                $filterValueName = substr($path, strlen($this->field) + 1);
+            if (0 === \strpos($path, $prefix)) {
+                $filterValueName = \substr($path, \strlen($this->field) + 1);
                 if (empty($filterValueName)) {
                     throw new InvalidFilterValueKeyException(
                         'The target type of an association is not specified.',
@@ -62,15 +65,14 @@ abstract class AssociationFilter extends ComparisonFilter implements
                 }
                 if ($this->getFilterValueName() === $filterValueName) {
                     throw new InvalidFilterValueKeyException(
-                        sprintf(
+                        \sprintf(
                             'Replace "%s" placeholder with the target type of an association.',
                             $this->getFilterValueName()
                         ),
                         $filterValue
                     );
                 }
-                $result = $filterKey;
-                break;
+                $result[] = $filterKey;
             } elseif ($path === $this->field) {
                 throw new InvalidFilterValueKeyException(
                     'The target type of an association is not specified.',
@@ -102,9 +104,9 @@ abstract class AssociationFilter extends ComparisonFilter implements
      */
     protected function assertFilterValuePath($field, $path)
     {
-        if (0 !== strpos($path, $field . '.')) {
+        if (0 !== \strpos($path, $field . '.')) {
             throw new \InvalidArgumentException(
-                sprintf('The filter value path must starts with "%s".', $field)
+                \sprintf('The filter value path must starts with "%s".', $field)
             );
         }
     }

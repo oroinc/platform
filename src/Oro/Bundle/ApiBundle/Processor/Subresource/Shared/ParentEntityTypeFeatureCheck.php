@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Validates whether an feature is enabled for the type of entities specified
- * in the "parentClass" property of the Context.
+ * in the "parentClass" property of the context.
  */
 class ParentEntityTypeFeatureCheck implements ProcessorInterface
 {

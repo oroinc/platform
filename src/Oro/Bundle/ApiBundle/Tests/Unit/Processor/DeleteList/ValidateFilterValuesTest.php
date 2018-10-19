@@ -3,14 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\DeleteList;
 
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\ValidateFilterValues;
-use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 
 class ValidateFilterValuesTest extends DeleteListProcessorTestCase
 {
     /** @var ValidateFilterValues */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -24,24 +25,20 @@ class ValidateFilterValuesTest extends DeleteListProcessorTestCase
         $this->context->setQuery(new \stdClass());
         $context = clone $this->context;
         $this->processor->process($this->context);
-        $this->assertEquals($context, $this->context);
+        self::assertEquals($context, $this->context);
     }
 
     public function testProcess()
     {
-        $filters       = $this->context->getFilters();
+        $filters = $this->context->getFilters();
         $integerFilter = new ComparisonFilter('integer');
-        $stringFilter  = new ComparisonFilter('string');
+        $stringFilter = new ComparisonFilter('string');
         $filters->add('id', $integerFilter);
         $filters->add('label', $stringFilter);
 
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->once())
-            ->method('getQueryString')
-            ->willReturn('id=1&label=test');
-        $filterValues = new RestFilterValueAccessor($request);
+        $filterValues = new TestFilterValueAccessor();
+        $filterValues->set('id', new FilterValue('id', '1'));
+        $filterValues->set('label', new FilterValue('label', 'test'));
 
         $this->context->setFilterValues($filterValues);
         $this->processor->process($this->context);
@@ -49,24 +46,18 @@ class ValidateFilterValuesTest extends DeleteListProcessorTestCase
 
     public function testProcessWhenNoFilters()
     {
-        $filters       = $this->context->getFilters();
+        $filters = $this->context->getFilters();
         $integerFilter = new ComparisonFilter('integer');
-        $stringFilter  = new ComparisonFilter('string');
+        $stringFilter = new ComparisonFilter('string');
         $filters->add('id', $integerFilter);
         $filters->add('label', $stringFilter);
 
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->once())
-            ->method('getQueryString')
-            ->willReturn('');
-        $filterValues = new RestFilterValueAccessor($request);
+        $filterValues = new TestFilterValueAccessor();
 
         $this->context->setFilterValues($filterValues);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError('filter constraint', 'At least one filter must be provided.')
             ],

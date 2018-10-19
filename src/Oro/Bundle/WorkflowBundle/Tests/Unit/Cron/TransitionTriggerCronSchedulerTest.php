@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class TransitionTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
+class TransitionTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -17,7 +17,7 @@ class TransitionTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
     private $scheduler;
 
     /**
-     * @var DeferredScheduler|\PHPUnit_Framework_MockObject_MockObject
+     * @var DeferredScheduler|\PHPUnit\Framework\MockObject\MockObject
      */
     private $deferredScheduler;
 

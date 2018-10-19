@@ -20,24 +20,24 @@ use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
+class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ObjectIdAccessor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ObjectIdAccessor|\PHPUnit\Framework\MockObject\MockObject */
     protected $objectIdAccessor;
 
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $metadataProvider;
 
-    /** @var EntityOwnerAccessor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityOwnerAccessor|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityOwnerAccessor;
 
-    /** @var AccessLevelOwnershipDecisionMakerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AccessLevelOwnershipDecisionMakerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $decisionMaker;
 
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TransitionOptionsResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionOptionsResolver */
     protected $optionsResolver;
 
     /** @var WorkflowTransitionAclExtension */

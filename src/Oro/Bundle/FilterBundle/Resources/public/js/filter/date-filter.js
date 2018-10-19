@@ -256,8 +256,8 @@ define(function(require) {
         },
 
         _getPickerConstructor: function() {
-            return tools.isMobile() || !this.dateWidgetOptions.showDatevariables ? DatePickerView :
-                VariableDatePickerView;
+            return tools.isMobile() || !this.dateWidgetOptions.showDatevariables
+                ? DatePickerView : VariableDatePickerView;
         },
 
         onChangeFilterType: function(e) {
@@ -311,7 +311,7 @@ define(function(require) {
 
                 this.$(this.criteriaValueSelectors.date_type)
                     .closest('.dropdown')
-                    .find('.dropdown-toggle')
+                    .find('[data-toggle="dropdown"]')
                     .html(this.$(this.criteriaValueSelectors.date_type + ' :selected').text());
             } else {
                 // it's part
@@ -322,7 +322,7 @@ define(function(require) {
 
                 this.$(this.criteriaValueSelectors.date_part)
                     .closest('.dropdown')
-                    .find('.dropdown-toggle')
+                    .find('[data-toggle="dropdown"]')
                     .attr('title', this._getPartTooltip(value));
             }
         },
@@ -475,6 +475,14 @@ define(function(require) {
                         break;
                     case this.typeValues.lessThan.toString():
                         hint += [__('less than'), end].join(' ');
+                        break;
+                    case this.typeValues.equal.toString():
+                        option = this._getChoiceOption(this.typeValues.equal);
+                        hint += [option.label, start].join(' ');
+                        break;
+                    case this.typeValues.notEqual.toString():
+                        option = this._getChoiceOption(this.typeValues.notEqual);
+                        hint += [option.label, end].join(' ');
                         break;
                     case this.typeValues.notBetween.toString():
                         if (start && end) {

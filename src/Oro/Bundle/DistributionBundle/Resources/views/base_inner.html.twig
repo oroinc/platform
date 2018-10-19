@@ -92,7 +92,7 @@
         <div class="wrapper">
             <div id="alerts">
                 {% if errors is defined and errors|length > 0 %}
-                    <div class="alert fade in alert-error">
+                    <div class="alert fade in alert-error" role="alert">
                         <i class="fa-error"></i>
                         {{ 'oro.distribution.messages.unexpected_error'|trans }}:
                         <ul>
@@ -103,7 +103,7 @@
                     </div>
                 {% endif %}
                 {% if notWritableSystemPaths|length > 0 %}
-                    <div class="alert fade in alert-notice">
+                    <div class="alert fade in alert-notice" role="alert">
                         <i class="fa-info-circle"></i>
                         {{ 'oro.distribution.messages.not_writable'|trans }}:
                         <ul>
@@ -125,7 +125,7 @@
                         {% block menu %} {% endblock %}
                     </div>
                 </div>
-                <div class="alert alert-warning">
+                <div class="alert alert-warning" role="alert">
                     {{ 'oro.distribution.settings.recommendation'|trans|raw }}
                 </div>
                 <div class="body">

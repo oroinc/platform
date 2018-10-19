@@ -6,9 +6,9 @@ use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 use Symfony\Component\Routing\RouterInterface;
 
-class TranslationsDatagridRouteHelperTest extends \PHPUnit_Framework_TestCase
+class TranslationsDatagridRouteHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DatagridRouteHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DatagridRouteHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $datagridRouteHelper;
 
     /** @var TranslationsDatagridRouteHelper */

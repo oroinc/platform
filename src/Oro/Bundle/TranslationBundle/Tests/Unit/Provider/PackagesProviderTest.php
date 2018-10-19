@@ -7,9 +7,9 @@ use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Oro\Bundle\TranslationBundle\Provider\PackageProviderInterface;
 use Oro\Bundle\TranslationBundle\Provider\PackagesProvider;
 
-class PackagesProviderTest extends \PHPUnit_Framework_TestCase
+class PackagesProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var PackageManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var PackageManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $pm;
 
     protected function setUp()
@@ -79,7 +79,7 @@ class PackagesProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array|string[] $names
-     * @return PackageProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return PackageProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getPackagesProvider(array $names = [])
     {

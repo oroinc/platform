@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Event;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 
-class PrepareEntityMapEventTest extends \PHPUnit_Framework_TestCase
+class PrepareEntityMapEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

@@ -7,7 +7,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullTopic;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
-class MessageTranslatorProcessorTest extends \PHPUnit_Framework_TestCase
+class MessageTranslatorProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
@@ -64,7 +64,7 @@ class MessageTranslatorProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     protected function createSessionMock()
     {
@@ -72,7 +72,7 @@ class MessageTranslatorProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
      */
     protected function createMessageProducerMock()
     {

@@ -6,7 +6,7 @@ use Oro\Bundle\EntityMergeBundle\DependencyInjection\OroEntityMergeExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class OroEntityMergeExtensionTest extends \PHPUnit_Framework_TestCase
+class OroEntityMergeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OroEntityMergeExtension

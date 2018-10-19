@@ -12,6 +12,9 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Calculate root job status asynchronously
+ */
 class CalculateRootJobStatusProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /** @var JobStorage */
@@ -70,9 +73,10 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
         );
 
         if ($isRootJobStopped) {
+            $rootJob = $job->isRoot() ? $job : $job->getRootJob();
             $this->producer->send(
                 Topics::ROOT_JOB_STOPPED,
-                new Message(['jobId' => $job->getRootJob()->getId()], MessagePriority::HIGH)
+                new Message(['jobId' => $rootJob->getId()], MessagePriority::HIGH)
             );
         }
 

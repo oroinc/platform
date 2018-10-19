@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
+class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ProcessTrigger

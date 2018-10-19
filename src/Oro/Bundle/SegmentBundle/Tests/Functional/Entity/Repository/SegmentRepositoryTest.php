@@ -40,11 +40,11 @@ class SegmentRepositoryTest extends WebTestCase
         $staticSegmentWithSegmentFilter = $this->getReference(LoadSegmentData::SEGMENT_STATIC_WITH_SEGMENT_FILTER);
 
         $this->assertEquals([
-            $dynamicSegment->getId() => $dynamicSegment->getName(),
-            $dynamicSegmentWithFilter->getId() => $dynamicSegmentWithFilter->getName(),
-            $staticSegment->getId() => $staticSegment->getName(),
-            $staticSegmentWithFilter->getId() => $staticSegmentWithFilter->getName(),
-            $staticSegmentWithSegmentFilter->getId() => $staticSegmentWithSegmentFilter->getName(),
+            $dynamicSegment->getName() => $dynamicSegment->getId(),
+            $dynamicSegmentWithFilter->getName() => $dynamicSegmentWithFilter->getId(),
+            $staticSegment->getName() => $staticSegment->getId(),
+            $staticSegmentWithFilter->getName() => $staticSegmentWithFilter->getId(),
+            $staticSegmentWithSegmentFilter->getName() => $staticSegmentWithSegmentFilter->getId()
         ], $result);
     }
 }

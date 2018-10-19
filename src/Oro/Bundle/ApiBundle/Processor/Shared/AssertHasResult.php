@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Makes sure that the result exists in the Context.
+ * Makes sure that the result exists in the context.
  */
 class AssertHasResult implements ProcessorInterface
 {
@@ -24,7 +24,7 @@ class AssertHasResult implements ProcessorInterface
 
         if (!$context->hasResult()) {
             $responseStatusCode = $context->getResponseStatusCode();
-            if (null === $responseStatusCode || !$this->isResponseWithoutContent($responseStatusCode)) {
+            if (null === $responseStatusCode || !$this->isErrorResponseWithoutContent($responseStatusCode)) {
                 throw new RuntimeException('The result does not exist.');
             }
         }

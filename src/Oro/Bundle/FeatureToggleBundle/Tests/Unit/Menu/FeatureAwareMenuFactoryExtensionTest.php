@@ -5,10 +5,10 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Menu;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension;
 
-class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
+class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject
+     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
      */
     private $featureChecker;
 

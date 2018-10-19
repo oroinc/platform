@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
-class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
+class EntityFieldStateCheckerTest extends \PHPUnit\Framework\TestCase
 {
     const SCOPE_EXTEND = 'extend';
     const SCOPE_DATAGRID = 'datagrid';
@@ -21,12 +21,12 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
     const FORM_TYPE_EXTEND = 'form_type_extend';
 
     /**
-     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $configManager;
 
     /**
-     * @var FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $formFactory;
 
@@ -44,7 +44,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
 
     public function testIsSchemaUpdateNeededWhenNoProviders()
     {
-        /** @var FieldConfigModel|\PHPUnit_Framework_MockObject_MockObject $fieldConfigModel **/
+        /** @var FieldConfigModel|\PHPUnit\Framework\MockObject\MockObject $fieldConfigModel **/
         $fieldConfigModel = $this->createMock(FieldConfigModel::class);
         $this->configManager
             ->expects($this->once())
@@ -56,7 +56,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
 
     public function testIsSchemaUpdateNeededWhenNoChangeSet()
     {
-        /** @var FieldConfigModel|\PHPUnit_Framework_MockObject_MockObject $fieldConfigModel **/
+        /** @var FieldConfigModel|\PHPUnit\Framework\MockObject\MockObject $fieldConfigModel **/
         $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
         /** @var PropertyConfigContainer $extendPropertyConfig */
@@ -94,10 +94,10 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
 
     public function testIsSchemaUpdateNeededWhenNoSchemaUpdateRequiredForCode()
     {
-        /** @var FieldConfigModel|\PHPUnit_Framework_MockObject_MockObject $fieldConfigModel **/
+        /** @var FieldConfigModel|\PHPUnit\Framework\MockObject\MockObject $fieldConfigModel **/
         $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
-        /** @var PropertyConfigContainer|\PHPUnit_Framework_MockObject_MockObject $extendPropertyConfig */
+        /** @var PropertyConfigContainer|\PHPUnit\Framework\MockObject\MockObject $extendPropertyConfig */
         $extendPropertyConfig = $this->createMock(PropertyConfigContainer::class);
         $extendPropertyConfig
             ->expects($this->once())
@@ -137,10 +137,10 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
 
     public function testIsSchemaUpdateNeededWhenNoFormItemsForCode()
     {
-        /** @var FieldConfigModel|\PHPUnit_Framework_MockObject_MockObject $fieldConfigModel **/
+        /** @var FieldConfigModel|\PHPUnit\Framework\MockObject\MockObject $fieldConfigModel **/
         $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
-        /** @var PropertyConfigContainer|\PHPUnit_Framework_MockObject_MockObject $extendPropertyConfig */
+        /** @var PropertyConfigContainer|\PHPUnit\Framework\MockObject\MockObject $extendPropertyConfig */
         $extendPropertyConfig = $this->createMock(PropertyConfigContainer::class);
         $extendPropertyConfig
             ->expects($this->once())
@@ -186,10 +186,10 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
 
     public function testIsSchemaUpdateNeededWhenNoUpdateNeededByCallback()
     {
-        /** @var FieldConfigModel|\PHPUnit_Framework_MockObject_MockObject $fieldConfigModel **/
+        /** @var FieldConfigModel|\PHPUnit\Framework\MockObject\MockObject $fieldConfigModel **/
         $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
-        /** @var PropertyConfigContainer|\PHPUnit_Framework_MockObject_MockObject $extendPropertyConfig */
+        /** @var PropertyConfigContainer|\PHPUnit\Framework\MockObject\MockObject $extendPropertyConfig */
         $extendPropertyConfig = $this->createMock(PropertyConfigContainer::class);
         $extendPropertyConfig
             ->expects($this->once())
@@ -261,10 +261,10 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
 
     public function testIsSchemaUpdate()
     {
-        /** @var FieldConfigModel|\PHPUnit_Framework_MockObject_MockObject $fieldConfigModel **/
+        /** @var FieldConfigModel|\PHPUnit\Framework\MockObject\MockObject $fieldConfigModel **/
         $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
-        /** @var PropertyConfigContainer|\PHPUnit_Framework_MockObject_MockObject $extendPropertyConfig */
+        /** @var PropertyConfigContainer|\PHPUnit\Framework\MockObject\MockObject $extendPropertyConfig */
         $extendPropertyConfig = $this->createMock(PropertyConfigContainer::class);
         $extendPropertyConfig
             ->expects($this->once())
@@ -337,7 +337,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param $scope
      * @param PropertyConfigContainer $propertyConfig
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConfigProvider
+     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigProvider
      */
     private function configureProvider($scope, PropertyConfigContainer $propertyConfig)
     {

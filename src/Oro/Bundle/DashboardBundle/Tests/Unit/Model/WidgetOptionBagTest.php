@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 
-class WidgetOptionBagTest extends \PHPUnit_Framework_TestCase
+class WidgetOptionBagTest extends \PHPUnit\Framework\TestCase
 {
     public function testExistingOptionsOfOptionsBag()
     {

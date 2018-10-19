@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Form\Type\AttachmentType;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -12,7 +13,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 class AttachmentController extends Controller
 {
@@ -64,7 +65,7 @@ class AttachmentController extends Controller
         $attachmentEntity->setTarget($entity);
 
         $form       = $this->createForm(
-            $this->container->get('oro_attachment.form.type'),
+            AttachmentType::class,
             $attachmentEntity,
             ['parentEntityClass' => $entityClass, 'checkEmptyFile' => true]
         );
@@ -97,7 +98,7 @@ class AttachmentController extends Controller
     {
         $formAction = $request->getUri();
         $form       = $this->createForm(
-            $this->container->get('oro_attachment.form.type'),
+            AttachmentType::class,
             $attachment,
             [
                 'parentEntityClass' => ClassUtils::getRealClass($attachment->getTarget()),

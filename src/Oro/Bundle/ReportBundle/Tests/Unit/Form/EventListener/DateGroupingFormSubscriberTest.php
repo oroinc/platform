@@ -10,7 +10,7 @@ use Oro\Bundle\ReportBundle\Form\Type\ReportType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 
-class DateGroupingFormSubscriberTest extends \PHPUnit_Framework_TestCase
+class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DateGroupingFormSubscriber
@@ -18,17 +18,17 @@ class DateGroupingFormSubscriberTest extends \PHPUnit_Framework_TestCase
     protected $dateGroupingFormSubscriber;
 
     /**
-     * @var FormEvent|\PHPUnit_Framework_MockObject_MockObject
+     * @var FormEvent|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $event;
 
     /**
-     * @var FormInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var FormInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $form;
 
     /**
-     * @var FormInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var FormInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $dateForm;
 
@@ -210,7 +210,7 @@ class DateGroupingFormSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return FormInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return FormInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getNewForm()
     {

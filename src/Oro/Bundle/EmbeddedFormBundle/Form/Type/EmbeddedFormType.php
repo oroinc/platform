@@ -1,7 +1,10 @@
 <?php
 namespace Oro\Bundle\EmbeddedFormBundle\Form\Type;
 
+use Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -29,11 +32,11 @@ class EmbeddedFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('title', 'text', ['label' => 'oro.embeddedform.title.label'])
-            ->add('formType', 'oro_available_embedded_forms', ['label' => 'oro.embeddedform.form_type.label'])
+            ->add('title', TextType::class, ['label' => 'oro.embeddedform.title.label'])
+            ->add('formType', AvailableEmbeddedFormType::class, ['label' => 'oro.embeddedform.form_type.label'])
             ->add(
                 'css',
-                'textarea',
+                TextareaType::class,
                 [
                     'label'   => 'oro.embeddedform.css.label',
                     'tooltip' => 'oro.embeddedform.css.description'
@@ -41,7 +44,7 @@ class EmbeddedFormType extends AbstractType
             )
             ->add(
                 'successMessage',
-                'textarea',
+                TextareaType::class,
                 [
                     'label'   => 'oro.embeddedform.success_message.label',
                     'tooltip' => 'oro.embeddedform.success_message.description'
@@ -49,7 +52,7 @@ class EmbeddedFormType extends AbstractType
             )
             ->add(
                 'allowedDomains',
-                'textarea',
+                TextareaType::class,
                 [
                     'label'   => 'oro.embeddedform.allowed_domains.label',
                     'required' => false,

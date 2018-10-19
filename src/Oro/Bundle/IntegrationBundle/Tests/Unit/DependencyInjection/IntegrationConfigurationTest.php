@@ -7,7 +7,7 @@ use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\Bundles\TestBundle1\TestBund
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
 
-class IntegrationConfigurationTest extends \PHPUnit_Framework_TestCase
+class IntegrationConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcess()
     {
@@ -21,7 +21,7 @@ class IntegrationConfigurationTest extends \PHPUnit_Framework_TestCase
                     ],
                     'enabled'      => [
                         'type'       => 'choice',
-                        'options'    => ['choices' => ['Enabled', 'Disabled']],
+                        'options'    => ['choices' => ['Enabled' => 0, 'Disabled' => 1]],
                         'priority'   => -200,
                         'applicable' => [],
                     ],

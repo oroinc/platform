@@ -2,29 +2,39 @@
 
 namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
+use Oro\Bundle\ApiBundle\Util\EntityMapper;
 
+/**
+ * Transforms class name and identifier of an entity to an entity object.
+ */
 class EntityToIdTransformer extends AbstractEntityAssociationTransformer
 {
+    /** @var EntityMapper|null */
+    protected $entityMapper;
+
     /** @var IncludedEntityCollection|null */
     protected $includedEntities;
 
     /**
-     * @param ManagerRegistry               $doctrine
+     * @param DoctrineHelper                $doctrineHelper
      * @param EntityLoader                  $entityLoader
      * @param AssociationMetadata           $metadata
+     * @param EntityMapper|null             $entityMapper
      * @param IncludedEntityCollection|null $includedEntities
      */
     public function __construct(
-        ManagerRegistry $doctrine,
+        DoctrineHelper $doctrineHelper,
         EntityLoader $entityLoader,
         AssociationMetadata $metadata,
+        EntityMapper $entityMapper = null,
         IncludedEntityCollection $includedEntities = null
     ) {
-        parent::__construct($doctrine, $entityLoader, $metadata);
+        parent::__construct($doctrineHelper, $entityLoader, $metadata);
+        $this->entityMapper = $entityMapper;
         $this->includedEntities = $includedEntities;
     }
 
@@ -38,7 +48,11 @@ class EntityToIdTransformer extends AbstractEntityAssociationTransformer
     {
         $entity = $this->getIncludedEntity($entityClass, $entityId);
         if (null === $entity) {
-            $entity = $this->loadEntity($entityClass, $entityId);
+            $resolvedEntityClass = $this->resolveEntityClass($entityClass);
+            $entity = $this->loadEntity($resolvedEntityClass, $entityId);
+            if (null !== $this->entityMapper && $resolvedEntityClass !== $entityClass) {
+                $entity = $this->entityMapper->getModel($entity, $entityClass);
+            }
         }
 
         return $entity;
@@ -60,6 +74,11 @@ class EntityToIdTransformer extends AbstractEntityAssociationTransformer
             return $this->includedEntities->getPrimaryEntity();
         }
 
-        return $this->includedEntities->get($entityClass, $entityId);
+        $entity = $this->includedEntities->get($entityClass, $entityId);
+        if (null !== $this->entityMapper && null !== $entity) {
+            $entity = $this->entityMapper->getModel($entity);
+        }
+
+        return $entity;
     }
 }

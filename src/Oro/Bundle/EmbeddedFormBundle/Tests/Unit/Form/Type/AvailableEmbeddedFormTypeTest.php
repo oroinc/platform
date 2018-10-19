@@ -2,8 +2,9 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-class AvailableEmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
+class AvailableEmbeddedFormTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test
@@ -27,7 +28,9 @@ class AvailableEmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
         $resolver = $this->createMock('\Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
-            ->with(['choices' => $availableForms]);
+            ->with([
+                'choices' => array_flip($availableForms),
+            ]);
 
         $formType = new AvailableEmbeddedFormType($manager);
         $formType->configureOptions($resolver);
@@ -50,11 +53,11 @@ class AvailableEmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
     {
         $formType = new AvailableEmbeddedFormType($this->createEmbeddedFormManagerMock());
 
-        $this->assertEquals('choice', $formType->getParent());
+        $this->assertEquals(ChoiceType::class, $formType->getParent());
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createEmbeddedFormManagerMock()
     {

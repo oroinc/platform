@@ -13,7 +13,7 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 
-class DbalSessionTest extends \PHPUnit_Framework_TestCase
+class DbalSessionTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
@@ -104,7 +104,7 @@ class DbalSessionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalConnection
+     * @return \PHPUnit\Framework\MockObject\MockObject|DbalConnection
      */
     private function createConnectionMock()
     {

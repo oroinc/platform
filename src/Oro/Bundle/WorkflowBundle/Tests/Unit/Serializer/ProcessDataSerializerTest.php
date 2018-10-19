@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessObjectNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessTraversableNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer;
 
-class ProcessDataSerializerTest extends \PHPUnit_Framework_TestCase
+class ProcessDataSerializerTest extends \PHPUnit\Framework\TestCase
 {
     public function testNormalizeAndDenormalize()
     {

@@ -484,9 +484,10 @@ define(function(require) {
         _extractFieldData: function(entityData, fieldData) {
             fieldData = _.clone(fieldData);
             fieldData.parentEntity = entityData;
-            if (fieldData.relationType && fieldData.type === 'enum') {
+            if (fieldData.relationType && _.contains(['enum', 'multiEnum'], fieldData.type)) {
                 // @todo, should be fixed in API
-                // `enum` field has to be with empty relationType, same as `tag` and `dictionary` types
+                // `enum` or `multiEnum` field has to be with empty relationType
+                // same as `tag` and `dictionary` types
                 fieldData.relationType = '';
             }
             Object.defineProperty(fieldData, 'relatedEntity', {

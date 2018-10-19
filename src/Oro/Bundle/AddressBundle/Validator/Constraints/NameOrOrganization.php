@@ -4,6 +4,9 @@ namespace Oro\Bundle\AddressBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * NameOrOrganization constraint. It's data is passed to js validator as params.
+ */
 class NameOrOrganization extends Constraint
 {
     /** @var string */
@@ -14,6 +17,15 @@ class NameOrOrganization extends Constraint
 
     /** @var string */
     public $organizationMessage = 'oro.address.validation.invalid_organization_field';
+
+    /**
+     * Form name parent form (which also has parent). This helps to distinguish between different addresses in one form
+     * for js validation.
+     * @see Resources/public/js/validator/name-or-organization.js
+     *
+     * @var string
+     */
+    public $parentFormName;
 
     /**
      * {@inheritdoc}

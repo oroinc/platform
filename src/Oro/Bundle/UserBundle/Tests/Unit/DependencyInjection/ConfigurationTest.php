@@ -6,7 +6,7 @@ use Oro\Bundle\UserBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetConfigTreeBuilder()
     {
@@ -45,6 +45,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'scope' => 'app'
                 ],
                 'send_password_in_invitation_email' => [
+                    'value' => false,
+                    'scope' => 'app'
+                ],
+                'case_insensitive_email_addresses_enabled' => [
                     'value' => false,
                     'scope' => 'app'
                 ],

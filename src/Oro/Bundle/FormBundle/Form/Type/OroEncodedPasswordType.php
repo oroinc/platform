@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -11,15 +12,18 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * This class provides ability to encrypt/decrypt form fields
+ */
 class OroEncodedPasswordType extends AbstractType
 {
-    /** @var Mcrypt */
+    /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
     /**
-     * @param Mcrypt $encryptor
+     * @param SymmetricCrypterInterface $encryptor
      */
-    public function __construct(Mcrypt $encryptor)
+    public function __construct(SymmetricCrypterInterface $encryptor)
     {
         $this->encryptor = $encryptor;
     }
@@ -92,7 +96,7 @@ class OroEncodedPasswordType extends AbstractType
      */
     public function getParent()
     {
-        return 'password';
+        return PasswordType::class;
     }
 
     /**

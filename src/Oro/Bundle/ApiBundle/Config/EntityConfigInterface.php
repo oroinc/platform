@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+/**
+ * An interface for configuration sections that are a container for fields.
+ */
 interface EntityConfigInterface extends ConfigBagInterface
 {
     /**
-     * Checks whether the configuration of at least one field exists.
+     * Indicates whether the configuration of at least one field exists.
      *
      * @return bool
      */
@@ -19,7 +22,7 @@ interface EntityConfigInterface extends ConfigBagInterface
     public function getFields();
 
     /**
-     * Checks whether the field configuration exists.
+     * Indicates whether the field configuration exists.
      *
      * @param string $fieldName
      *
@@ -92,14 +95,15 @@ interface EntityConfigInterface extends ConfigBagInterface
     /**
      * Gets the exclusion strategy that should be used for the entity.
      *
-     * @return string One of EntityConfig::EXCLUSION_POLICY_* constant
+     * @return string An exclusion strategy, e.g. "none" or "all"
      */
     public function getExclusionPolicy();
 
     /**
      * Sets the exclusion strategy that should be used for the entity.
      *
-     * @param string $exclusionPolicy One of EntityConfig::EXCLUSION_POLICY_* constant
+     * @param string|null $exclusionPolicy An exclusion strategy, e.g. "none" or "all",
+     *                                     or NULL to remove this option
      */
     public function setExclusionPolicy($exclusionPolicy);
 

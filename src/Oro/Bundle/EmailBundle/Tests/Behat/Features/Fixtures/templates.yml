@@ -7,3 +7,23 @@ Oro\Bundle\EmailBundle\Entity\EmailTemplate:
     type: 'html'
     subject: 'Test Subject'
     content: '<h1>Test Content</h1>'
+
+  not_system_emails{1..3}:
+    organization: '@organization'
+    owner: '@admin'
+    is_system: 0
+    name: 'not_system_email_<current()>'
+    entity_name: 'Oro\Bundle\UserBundle\Entity\User'
+    type: 'txt'
+    subject: 'Not System Email Template #<current()>'
+    content: 'Not System Email Template Content #<current()>'
+
+  system_email:
+    organization: '@organization'
+    owner: '@admin'
+    is_system: 1
+    name: 'system_email'
+    entity_name: 'Oro\Bundle\UserBundle\Entity\User'
+    type: 'txt'
+    subject: 'System Email Template'
+    content: 'System Email Template Content'

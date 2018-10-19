@@ -1,0 +1,23 @@
+data:
+    -
+        type: regions
+        id: GB-ABD
+        attributes:
+            code: ABD
+            name: Aberdeenshire
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: GB
+    -
+        type: regions
+        id: GB-ABE
+        attributes:
+            code: ABE
+            name: 'Aberdeen City'
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: GB

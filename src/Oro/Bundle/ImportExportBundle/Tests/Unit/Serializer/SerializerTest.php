@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer;
 
 use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
 
-class SerializerTest extends \PHPUnit_Framework_TestCase
+class SerializerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Serializer

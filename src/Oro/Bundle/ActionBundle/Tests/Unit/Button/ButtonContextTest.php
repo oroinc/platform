@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Button;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class ButtonContextTest extends \PHPUnit_Framework_TestCase
+class ButtonContextTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 

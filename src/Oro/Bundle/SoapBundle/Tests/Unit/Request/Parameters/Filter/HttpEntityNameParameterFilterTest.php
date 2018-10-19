@@ -4,7 +4,7 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\Request\Parameters\Filter;
 
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpEntityNameParameterFilter;
 
-class HttpEntityNameParameterFilterTest extends \PHPUnit_Framework_TestCase
+class HttpEntityNameParameterFilterTest extends \PHPUnit\Framework\TestCase
 {
     public function testFilter()
     {

@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeDataContext;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * The context for the "customize_form_data" action.
+ * The execution context for processors for "customize_form_data" action.
  */
 class CustomizeFormDataContext extends CustomizeDataContext
 {
@@ -29,15 +29,19 @@ class CustomizeFormDataContext extends CustomizeDataContext
     public const EVENT_POST_SUBMIT = 'post_submit';
 
     /**
-     * This event is dispatched after the Form::submit() method, but after FormEvents::POST_SUBMIT.
+     * This event is dispatched at the end of the form submitting process.
      * It can be used to finalize the form after all listeners, including data validation listener,
      * are executed. E.g. it can be used to correct form validation result.
-     * @see \Symfony\Component\Form\FormEvents::POST_SUBMIT
+     * @see \Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
+     * @see \Oro\Bundle\ApiBundle\Form\FormValidationHandler
      */
     public const EVENT_FINISH_SUBMIT = 'finish_submit';
 
     /** the form event name */
-    public const EVENT = 'event';
+    private const EVENT = 'event';
+
+    /** the name of the action which causes this action, e.g. "create" or "update" */
+    private const PARENT_ACTION = 'parentAction';
 
     /** @var FormInterface */
     private $form;
@@ -60,9 +64,33 @@ class CustomizeFormDataContext extends CustomizeDataContext
      *
      * @param string $event One of "pre_submit", "submit", "post_submit" and "finish_submit"
      */
-    public function setEvent(string $event)
+    public function setEvent(string $event): void
     {
         $this->set(self::EVENT, $event);
+    }
+
+    /**
+     * Gets the name of the action which causes this action, e.g. "create" or "update".
+     *
+     * @return string|null
+     */
+    public function getParentAction()
+    {
+        return $this->get(self::PARENT_ACTION);
+    }
+
+    /**
+     * Sets the name of the action which causes this action, e.g. "create" or "update".
+     *
+     * @param string|null $action
+     */
+    public function setParentAction($action)
+    {
+        if ($action) {
+            $this->set(self::PARENT_ACTION, $action);
+        } else {
+            $this->remove(self::PARENT_ACTION);
+        }
     }
 
     /**
@@ -80,13 +108,13 @@ class CustomizeFormDataContext extends CustomizeDataContext
      *
      * @param FormInterface $form
      */
-    public function setForm(FormInterface $form)
+    public function setForm(FormInterface $form): void
     {
         $this->form = $form;
     }
 
     /**
-     * Gets the data associated with form event event.
+     * Gets the data associated with the form event.
      * For "pre_submit" event it is the submitted data.
      * For "submit" event it is the norm data.
      * For "post_submit" and "finish_submit" events it is the view data.
@@ -99,11 +127,11 @@ class CustomizeFormDataContext extends CustomizeDataContext
     }
 
     /**
-     * Sets the data associated with form event event.
+     * Sets the data associated with the form event.
      *
      * @param mixed $data
      */
-    public function setData($data)
+    public function setData($data): void
     {
         $this->data = $data;
     }

@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
-class ChainProcessorTest extends \PHPUnit_Framework_TestCase
+class ChainProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testExecuteProcessors()
     {

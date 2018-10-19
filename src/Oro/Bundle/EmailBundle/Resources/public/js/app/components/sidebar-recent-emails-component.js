@@ -7,8 +7,7 @@ define(function(require) {
     var module = require('module');
     var mediator = require('oroui/js/mediator');
     var sync = require('orosync/js/sync');
-    var Backbone = require('backbone');
-    var channel = module.config().clankEvent;
+    var channel = module.config().wsChannel;
     var countCache = require('oroemail/js/util/unread-email-count-cache');
     var EmailNotificationCollection =
         require('oroemail/js/app/models/email-notification/email-notification-collection');
@@ -22,15 +21,14 @@ define(function(require) {
         notificationHandler: null,
 
         listen: {
-            'change:settings model': 'onSettingsChange',
-            'widget_dialog:open mediator': 'onWidgetDialogOpen'
+            'change:settings model': 'onSettingsChange'
         },
 
         /**
          * @inheritDoc
          */
-        constructor: function SidebarRecentEmailsComponent() {
-            SidebarRecentEmailsComponent.__super__.constructor.apply(this, arguments);
+        constructor: function SidebarRecentEmailsComponent(options) {
+            SidebarRecentEmailsComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -80,10 +78,6 @@ define(function(require) {
             _.delay(function() {
                 model.emailNotificationCollection.setRouteParams(settings);
             }, 0);
-        },
-
-        onWidgetDialogOpen: function() {
-            Backbone.trigger('closeWidget', this.model.cid);
         },
 
         _notificationHandler: function() {

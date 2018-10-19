@@ -5,6 +5,8 @@ namespace Oro\Bundle\CurrencyBundle\Form\Type;
 use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MoneyValueTransformer;
+use Oro\Bundle\FormBundle\Form\Type\OroMoneyType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -47,7 +49,7 @@ class MultiCurrencyType extends PriceType
         $builder
             ->add(
                 'value',
-                'number',
+                NumberType::class,
                 [
                     'required' => $isRequired,
                     'scale' => Price::MAX_VALUE_SCALE,
@@ -56,14 +58,14 @@ class MultiCurrencyType extends PriceType
             )
             ->add(
                 'currency',
-                CurrencySelectionType::NAME,
+                CurrencySelectionType::class,
                 [
                     'additional_currencies' => $options['additional_currencies'],
                     'currencies_list' => $options['currencies_list'],
                     'full_currency_list' => $options['full_currency_list'],
                     'compact' => false,
                     'required' => $isRequired,
-                    'empty_value' => false
+                    'placeholder' => false
                 ]
             );
 
@@ -82,7 +84,7 @@ class MultiCurrencyType extends PriceType
                     ];
                 }
 
-                $event->getForm()->add('baseCurrencyValue', 'oro_money', $options);
+                $event->getForm()->add('baseCurrencyValue', OroMoneyType::class, $options);
             }
         );
     }

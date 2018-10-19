@@ -16,17 +16,17 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-class SearchEntityFilterTest extends \PHPUnit_Framework_TestCase
+class SearchEntityFilterTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formFactory;
 
-    /** @var FilterUtility|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FilterUtility|\PHPUnit\Framework\MockObject\MockObject */
     protected $filterUtility;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var SearchEntityFilter */
@@ -74,7 +74,7 @@ class SearchEntityFilterTest extends \PHPUnit_Framework_TestCase
         $formView->children['value'] = $valueFormView;
         $formView->vars['populate_default'] = true;
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->any())
             ->method('createView')
@@ -83,7 +83,7 @@ class SearchEntityFilterTest extends \PHPUnit_Framework_TestCase
         $this->formFactory->expects($this->once())
             ->method('create')
             ->with(
-                SearchEntityFilterType::NAME,
+                SearchEntityFilterType::class,
                 [],
                 ['csrf_protection' => false, 'class' => \stdClass::class]
             )
@@ -129,7 +129,7 @@ class SearchEntityFilterTest extends \PHPUnit_Framework_TestCase
                 $entity3->getId()
             );
 
-        /** @var SearchFilterDatasourceAdapter|\PHPUnit_Framework_MockObject_MockObject $ds */
+        /** @var SearchFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject $ds */
         $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
         $ds->expects($this->once())
             ->method('addRestriction')

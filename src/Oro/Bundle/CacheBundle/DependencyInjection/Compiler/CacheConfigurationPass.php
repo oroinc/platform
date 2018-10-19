@@ -5,20 +5,25 @@ namespace Oro\Bundle\CacheBundle\DependencyInjection\Compiler;
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Configures cache
+ */
 class CacheConfigurationPass implements CompilerPassInterface
 {
     /** this cache should be used to caching data private for each node in a web farm */
-    const FILE_CACHE_SERVICE = 'oro.file_cache.abstract';
+    public const FILE_CACHE_SERVICE = 'oro.file_cache.abstract';
     /** this cache should be used to caching data which need to be shared between nodes in a web farm */
-    const DATA_CACHE_SERVICE = 'oro.cache.abstract';
+    public const DATA_CACHE_SERVICE = 'oro.cache.abstract';
+    /** the same as "oro.cache.abstract" but without additional in-memory caching */
+    public const DATA_CACHE_NO_MEMORY_SERVICE = 'oro.cache.abstract.without_memory_cache';
     /** data cache manager service */
-    const MANAGER_SERVICE_KEY = 'oro_cache.oro_data_cache_manager';
+    public const MANAGER_SERVICE_KEY = 'oro_cache.oro_data_cache_manager';
 
     /**
      * {@inheritdoc}
@@ -37,9 +42,9 @@ class CacheConfigurationPass implements CompilerPassInterface
      */
     protected function ensureAbstractFileCacheExists(ContainerBuilder $container)
     {
-        $cacheProviders = $this->getCacheProviders($container, static::FILE_CACHE_SERVICE);
+        $cacheProvider = $this->getCacheProvider($container, static::FILE_CACHE_SERVICE);
 
-        $container->setDefinition(self::FILE_CACHE_SERVICE, $this->getMemoryCacheChain($cacheProviders));
+        $container->setDefinition(self::FILE_CACHE_SERVICE, $this->getMemoryCacheChain($cacheProvider));
     }
 
     /**
@@ -49,9 +54,10 @@ class CacheConfigurationPass implements CompilerPassInterface
      */
     protected function ensureAbstractDataCacheExists(ContainerBuilder $container)
     {
-        $cacheProviders = $this->getCacheProviders($container, static::DATA_CACHE_SERVICE);
+        $cacheProvider = $this->getCacheProvider($container, static::DATA_CACHE_SERVICE);
 
-        $container->setDefinition(self::DATA_CACHE_SERVICE, $this->getMemoryCacheChain($cacheProviders));
+        $container->setDefinition(self::DATA_CACHE_SERVICE, $this->getMemoryCacheChain($cacheProvider));
+        $container->setDefinition(self::DATA_CACHE_NO_MEMORY_SERVICE, $cacheProvider);
     }
 
     /**
@@ -65,12 +71,17 @@ class CacheConfigurationPass implements CompilerPassInterface
             return;
         }
 
+        $parentServices = [
+            self::FILE_CACHE_SERVICE,
+            self::DATA_CACHE_SERVICE,
+            self::DATA_CACHE_NO_MEMORY_SERVICE
+        ];
         $managerDef  = $container->getDefinition(self::MANAGER_SERVICE_KEY);
         $definitions = $container->getDefinitions();
         foreach ($definitions as $serviceId => $def) {
-            if ($def instanceof DefinitionDecorator
+            if ($def instanceof ChildDefinition
                 && !$def->isAbstract()
-                && in_array($def->getParent(), [self::FILE_CACHE_SERVICE, self::DATA_CACHE_SERVICE])
+                && in_array($def->getParent(), $parentServices, true)
             ) {
                 $managerDef->addMethodCall(
                     'registerCacheProvider',
@@ -83,16 +94,15 @@ class CacheConfigurationPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      * @param string           $cacheDefinitionId
-     * @return array
+     *
+     * @return Definition
      *
      * @throws \InvalidArgumentException
      */
-    private function getCacheProviders(ContainerBuilder $container, $cacheDefinitionId)
+    private function getCacheProvider(ContainerBuilder $container, $cacheDefinitionId)
     {
-        $cacheProviders = [];
         if ($container->hasDefinition($cacheDefinitionId)) {
             $cacheDefinition = $container->getDefinition($cacheDefinitionId);
-
             if (!in_array(CacheProvider::class, class_parents($cacheDefinition->getClass()), true)) {
                 throw new \InvalidArgumentException(sprintf(
                     'Cache providers for `%s` should extend doctrine CacheProvider::class. `%s` given',
@@ -100,13 +110,11 @@ class CacheConfigurationPass implements CompilerPassInterface
                     $cacheDefinition->getClass()
                 ));
             }
-
-            $cacheProviders[] = $cacheDefinition;
         } else {
-            $cacheProviders[] = $this->getFilesystemCache($cacheDefinitionId);
+            $cacheDefinition = $this->getFilesystemCache($cacheDefinitionId);
         }
 
-        return $cacheProviders;
+        return $cacheDefinition;
     }
 
     /**
@@ -128,16 +136,13 @@ class CacheConfigurationPass implements CompilerPassInterface
     }
 
     /**
-     * @param array $cacheProviders
+     * @param Definition $cacheProvider
      *
      * @return Definition
      */
-    private function getMemoryCacheChain(array $cacheProviders)
+    public static function getMemoryCacheChain(Definition $cacheProvider)
     {
-        $definition = new Definition(
-            MemoryCacheChain::class,
-            [$cacheProviders]
-        );
+        $definition = new Definition(MemoryCacheChain::class, [$cacheProvider]);
         $definition->setAbstract(true);
 
         return $definition;

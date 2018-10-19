@@ -8,7 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\MigrationState;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
 
-class UpdateBundleVersionMigrationTest extends \PHPUnit_Framework_TestCase
+class UpdateBundleVersionMigrationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider upProvider

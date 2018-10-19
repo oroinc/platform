@@ -45,8 +45,8 @@
 {% endblock %}
 
 {% block attribute_label_widget %}
-    {% if label|first != '_' %}
-        <label>{{ label }}:</label>
+    {% if label|trans|first != '_' %}
+        <label>{{ label|trans }}:</label>
     {% endif %}
 {% endblock %}
 
@@ -83,14 +83,14 @@
 {% endblock %}
 
 {% block attribute_multiselect_widget %}
-    {% for item in value %}
-        {{ item }}
-        {% if not loop.last %}
+    {%- for item in value -%}
+        {{- item -}}
+        {%- if not loop.last -%}
             ,&nbsp;
-        {% endif %}
-    {% else %}
+        {%- endif -%}
+    {%- else -%}
         {{ 'N/A'|trans }}
-    {% endfor %}
+    {%- endfor -%}
 {% endblock %}
 
 {% block attribute_image_widget %}

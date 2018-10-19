@@ -1,8 +1,6 @@
-OroEmbeddedFormBundle
-=====================
+# OroEmbeddedFormBundle
 
-The Bundle provides mechanism to create forms, embed them into third party sites, store and view data submitted via them.
-Basically an `EmbeddedForm` is a `FormType`. Also it contains custom css and a success message.
+OroEmbeddedFormBundle enables the application users to create integrated forms using UI, embed them into third-party sites with inline or iframe codes and collect the submitted information in the Oro application database.
 
 ## Configuration
 

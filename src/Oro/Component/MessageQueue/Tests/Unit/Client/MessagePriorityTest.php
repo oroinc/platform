@@ -3,7 +3,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Oro\Component\MessageQueue\Client\MessagePriority;
 
-class MessagePriorityTest extends \PHPUnit_Framework_TestCase
+class MessagePriorityTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldVeryLowPriorityHasExpectedValue()
     {

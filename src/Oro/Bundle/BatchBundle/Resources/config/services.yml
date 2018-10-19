@@ -6,19 +6,20 @@ parameters:
 
 services:
     oro_batch.orm.query_builder.count_query_optimizer:
-        class: %oro_batch.orm.query_builder.count_query_optimizer.class%
+        class: '%oro_batch.orm.query_builder.count_query_optimizer.class%'
         calls:
             - [setEventDispatcher, ['@event_dispatcher']]
             - [setRelationHelper, ['@oro_entity.helper.relation_helper']]
 
     oro_batch.job.repository:
-        class: %oro_batch.job.repository.class%
+        class: '%oro_batch.job.repository.class%'
         arguments:
             - '@doctrine'
             - '%akeneo_batch.entity.job_execution.class%'
         decorates: akeneo_batch.job_repository
 
     oro_batch.cache.doctrine_metadata:
-        parent: oro.cache.abstract
+        public: false
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [ setNamespace, [ 'doctrine_metadata_batch' ] ]

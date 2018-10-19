@@ -58,3 +58,15 @@
 {% block oro_user_apikey_gen_key_row %}
     <span class="api-key" id="{{ apiKeyElementId }}">{{ value|escape|default('N/A') }}</span>
 {% endblock %}
+
+{% block _user_settings_oro_user___case_insensitive_email_addresses_enabled_value_errors %}
+    {%- spaceless -%}
+        {% if errors|length > 0 %}
+            {% set combinedError = '' %}
+            {% for error in errors %}
+                {% set combinedError = (combinedError != '') ? combinedError ~ '; ' ~ error.message : error.message %}
+            {% endfor %}
+            <span class="validation-failed"><span><span>{{ combinedError|raw }}</span></span></span>
+        {% endif %}
+    {% endspaceless %}
+{% endblock %}

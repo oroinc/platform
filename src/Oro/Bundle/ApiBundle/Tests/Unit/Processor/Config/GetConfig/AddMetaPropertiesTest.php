@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 class AddMetaPropertiesTest extends ConfigProcessorTestCase
 {
     /** @var AddMetaProperties */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -52,7 +52,7 @@ class AddMetaPropertiesTest extends ConfigProcessorTestCase
                         'data_type'                 => 'integer',
                         'meta_property'             => true,
                         'meta_property_result_name' => 'prop3'
-                    ],
+                    ]
                 ]
             ],
             $this->context->getResult()

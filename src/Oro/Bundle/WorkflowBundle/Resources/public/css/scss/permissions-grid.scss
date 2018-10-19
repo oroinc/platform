@@ -1,0 +1,16 @@
+/* @theme: admin.oro; */
+
+.workflow-permission-grid {
+    .grid-header-cell:first-child {
+        width: 500px;
+    }
+
+    .collapse-expand-action-container,
+    .entity-name {
+        width: 492px;
+    }
+
+    .field-name {
+        width: 462px;
+    }
+}

@@ -7,9 +7,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class MenuExtensionPassTest extends \PHPUnit_Framework_TestCase
+class MenuExtensionPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     /** @var MenuExtensionPass */
@@ -82,7 +82,7 @@ class MenuExtensionPassTest extends \PHPUnit_Framework_TestCase
                 'extension_2' => [['priority' => '20']]
             ]));
 
-        /** @var Definition|\PHPUnit_Framework_MockObject_MockObject $definition */
+        /** @var Definition|\PHPUnit\Framework\MockObject\MockObject $definition */
         $definition = $this->createMock(Definition::class);
         $definition->expects($this->exactly(2))
             ->method('addMethodCall')

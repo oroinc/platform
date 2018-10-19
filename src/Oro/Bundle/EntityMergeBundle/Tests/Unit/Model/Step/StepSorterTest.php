@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Step;
 
 use Oro\Bundle\EntityMergeBundle\Model\Step\StepSorter;
 
-class StepSorterTest extends \PHPUnit_Framework_TestCase
+class StepSorterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider getOrderedStepsDataProvider

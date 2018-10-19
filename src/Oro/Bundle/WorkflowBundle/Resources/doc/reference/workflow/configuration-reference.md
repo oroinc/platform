@@ -146,7 +146,7 @@ Configuration Loading
 To load configuration execute a command:
 
 ```
-php app/console oro:workflow:definitions:load
+php bin/console oro:workflow:definitions:load
 ```
 Command has two options: "directories" that allows user to specify which directories will be used to find definitions,
 and "workflows" that define names of definitions required to load.
@@ -525,7 +525,7 @@ workflows:
                 form_options:
                     attribute_fields:                       # fields of form that will be shown when transition button is clicked
                         call_timeout:
-                            form_type: integer
+                            form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                             options:
                                 required: false
                 display_type: page

@@ -4,15 +4,15 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent;
 
-class ProcessHandleEventTest extends \PHPUnit_Framework_TestCase
+class ProcessHandleEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $processTrigger;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $processData;
 

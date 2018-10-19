@@ -4,6 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Form\Type;
 
 use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MethodType extends AbstractType
@@ -27,11 +28,11 @@ class MethodType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'choices'  => $this->sendProcessorRegistry->getProcessorLabels(),
                 'expanded' => false,
                 'multiple' => false
-            )
+            ]
         );
     }
 
@@ -40,7 +41,7 @@ class MethodType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**

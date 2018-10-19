@@ -1,0 +1,4 @@
+oro_assetic:
+    excluded_bundles:
+        - DoctrineBundle
+        - SecurityBundle

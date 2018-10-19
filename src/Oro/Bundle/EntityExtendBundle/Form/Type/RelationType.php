@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NonExtendedEntityBidirectional;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -34,17 +35,12 @@ class RelationType extends AbstractType
     /** @var FormFactory */
     protected $formFactory;
 
-    /** @var TargetFieldType */
-    protected $targetFieldType;
-
     /**
      * @param ConfigManager   $configManager
-     * @param TargetFieldType $targetFieldType
      */
-    public function __construct(ConfigManager $configManager, TargetFieldType $targetFieldType)
+    public function __construct(ConfigManager $configManager)
     {
         $this->configManager   = $configManager;
-        $this->targetFieldType = $targetFieldType;
     }
 
     /**
@@ -177,13 +173,12 @@ class RelationType extends AbstractType
             $options['multiple'] = true;
         }
 
-        $targetFieldType = $this->targetFieldType;
-        $targetFieldType->setEntityClass($targetEntityClass);
+        $options['entityClass'] = $targetEntityClass;
 
         $form->add(
             $this->formFactory->createNamed(
                 $name,
-                $targetFieldType,
+                TargetFieldType::class,
                 $data,
                 $options
             )
@@ -211,8 +206,9 @@ class RelationType extends AbstractType
     {
         $builder->add(
             'target_entity',
-            new TargetType($this->configManager, $options['config_id']),
+            TargetType::class,
             [
+                'field_config_id' => $options['config_id'],
                 'constraints' => [new Assert\NotBlank()]
             ]
         );
@@ -227,7 +223,7 @@ class RelationType extends AbstractType
         /** @var FieldConfigId $fieldConfigId */
         $fieldConfigId = $this->config->getId();
 
-        // read_only when updating field (so bidirectional option already exists)
+        // readonly when updating field (so bidirectional option already exists)
         $readOnly = $this->config->get('bidirectional') !== null;
 
         // if reusing relation ("Reuse existing relation" option on UI) or for one2many relation
@@ -238,18 +234,27 @@ class RelationType extends AbstractType
             $data['bidirectional'] = true;
         }
 
+        $attr = [];
+
+        if ($readOnly) {
+            $attr['readonly'] = true;
+        }
+
         if (in_array($fieldConfigId->getFieldType(), static::ALLOWED_BIDIRECTIONAL_RELATIONS, true)) {
             $options = [
-                'choices' => ['No', 'Yes'],
-                'empty_value' => false,
+                'choices' => [
+                    'No' => 0,
+                    'Yes' => 1,
+                ],
+                'placeholder' => false,
                 'block' => 'general',
                 'subblock' => 'properties',
                 'label' => 'oro.entity_extend.entity_config.extend.field.items.bidirectional',
-                'read_only' => $readOnly,
-                'data' => $this->getArrayValue($data, 'bidirectional')
+                'data' => $this->getArrayValue($data, 'bidirectional'),
+                'attr' => $attr
             ];
 
-            $form->add('bidirectional', 'oro_select2_choice', $options);
+            $form->add('bidirectional', Select2ChoiceType::class, $options);
         }
     }
 }

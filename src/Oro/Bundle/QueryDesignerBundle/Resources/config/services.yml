@@ -9,7 +9,7 @@ parameters:
     oro_query_designer.group_by_helper.class:                       Oro\Bundle\QueryDesignerBundle\Model\GroupByHelper
 services:
     oro_query_designer.query_designer.manager:
-        class: %oro_query_designer.query_designer.manager.class%
+        class: '%oro_query_designer.query_designer.manager.class%'
         arguments:
             - []
             - '@oro_query_designer.config.resolver'
@@ -21,25 +21,25 @@ services:
             - { name: oro_service_link,  service: oro_query_designer.query_designer.manager }
 
     oro_query_designer.query_designer.restriction_builder:
-        class: %oro_query_designer.query_designer.restriction_builder.class%
+        class: '%oro_query_designer.query_designer.restriction_builder.class%'
         arguments:
             - '@oro_query_designer.query_designer.manager'
 
     oro_query_designer.config.resolver:
-        class: %oro_query_designer.config.resolver.class%
+        class: '%oro_query_designer.config.resolver.class%'
         arguments:
             - '@oro_entity.orm.entity_class_resolver'
             - '@service_container'
 
     oro_query_designer.grid.extension.orm_datasource:
-        class: %oro_query_designer.grid.extension.orm_datasource.class%
+        class: '%oro_query_designer.grid.extension.orm_datasource.class%'
         arguments:
             - '@oro_query_designer.query_designer.restriction_builder'
         tags:
             - { name: oro_datagrid.extension }
 
     oro_query_designer.exclusion_provider:
-        class: %oro_entity.exclusion_provider.chain.class%
+        class: '%oro_entity.exclusion_provider.chain.class%'
         calls:
             - [addProvider, ['@oro_entity.exclusion_provider']]
 
@@ -47,13 +47,13 @@ services:
         alias: oro_entity.virtual_field_provider.chain
 
     oro_query_designer.entity_provider:
-        class: %oro_entity.entity_provider.class%
+        class: '%oro_entity.entity_provider.class%'
         parent: oro_entity.entity_provider.abstract
         calls:
             - [setExclusionProvider, ['@oro_query_designer.exclusion_provider']]
 
     oro_query_designer.entity_field_provider:
-        class: %oro_entity.entity_field_provider.class%
+        class: '%oro_entity.entity_field_provider.class%'
         parent: oro_entity.entity_field_provider.abstract
         calls:
             - [setEntityProvider, ['@oro_query_designer.entity_provider']]
@@ -61,14 +61,14 @@ services:
             - [setExclusionProvider, ['@oro_query_designer.exclusion_provider']]
 
     oro_query_designer.entity_field_list_provider:
-        class: %oro_entity.entity_field_list_provider.class%
+        class: '%oro_entity.entity_field_list_provider.class%'
         arguments:
             - '@oro_query_designer.entity_field_provider'
             - '@oro_query_designer.entity_provider'
             - '@oro_entity_config.helper.entity_config'
 
     oro_query_designer.grid.datagrid_configuration_builder:
-        class: %oro_query_designer.grid.datagrid_configuration_builder.class%
+        class: '%oro_query_designer.grid.datagrid_configuration_builder.class%'
         arguments:
             - '@oro_query_designer.query_designer.manager'
             - '@oro_entity.virtual_field_provider.chain'
@@ -79,14 +79,13 @@ services:
             - [setVirtualRelationProvider, ['@oro_entity.virtual_relation_provider.chain']]
 
     oro_query_designer.validator.query_validator:
-        class: %oro_query_designer.validator.query_validator.class%
+        class: '%oro_query_designer.validator.query_validator.class%'
         arguments:
             - '@oro_datagrid.configuration.provider.chain'
             - '@oro_datagrid.datagrid.builder'
+            - '@oro_entity.doctrine_helper'
             - '@translator'
-            - %kernel.debug%
-        calls:
-            - [setDoctrineHelper, ['@oro_entity.doctrine_helper']]
+            - '%kernel.debug%'
         tags:
             - { name: validator.constraint_validator, alias: oro_query_designer.query_validator }
 
@@ -98,14 +97,14 @@ services:
             - { name: validator.constraint_validator, alias: oro_query_designer.definition_query_validator }
 
     oro_query_designer.validator.grouping_validator:
-        class: %oro_query_designer.validator.grouping_validator.class%
+        class: '%oro_query_designer.validator.grouping_validator.class%'
         arguments:
             - '@translator'
         tags:
             - { name: validator.constraint_validator, alias: oro_query_designer.grouping_validator }
 
     oro_query_designer.group_by_helper:
-        class: %oro_query_designer.group_by_helper.class%
+        class: '%oro_query_designer.group_by_helper.class%'
 
     oro_query_designer.query_designer.filter_processor:
         class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\FilterProcessor

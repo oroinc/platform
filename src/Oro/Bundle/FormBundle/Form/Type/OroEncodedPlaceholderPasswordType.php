@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -11,6 +12,12 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * This class provides ability to encrypt/decrypt form fields
+ *
+ * This form type supports placeholder for entered password.
+ * Placeholder("*") will be used to indicate that password has been entered
+ */
 class OroEncodedPlaceholderPasswordType extends AbstractType
 {
     /** @internal */
@@ -88,7 +95,7 @@ class OroEncodedPlaceholderPasswordType extends AbstractType
      */
     public function getParent()
     {
-        return 'password';
+        return PasswordType::class;
     }
 
     /**

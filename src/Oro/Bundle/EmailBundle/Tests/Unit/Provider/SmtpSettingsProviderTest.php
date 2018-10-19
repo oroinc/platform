@@ -7,10 +7,11 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
+class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SmtpSettingsProvider */
     protected $provider;
@@ -18,11 +19,11 @@ class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigManager */
     protected $manager;
 
-    /** @var GlobalScopeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var GlobalScopeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $globalScopeManager;
 
-    /** @var Mcrypt|\PHPUnit_Framework_MockObject_MockObject */
-    protected $mcrypt;
+    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $crypter;
 
     /**
      * @var array
@@ -54,8 +55,8 @@ class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->mcrypt = new Mcrypt();
-        $this->settings['oro_email']['smtp_settings_password']['value'] = $this->mcrypt->encryptData(
+        $this->crypter = new DefaultCrypter();
+        $this->settings['oro_email']['smtp_settings_password']['value'] = $this->crypter->encryptData(
             $this->settings['oro_email']['smtp_settings_password']['value']
         );
 
@@ -76,7 +77,7 @@ class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->manager->addManager('global', $this->globalScopeManager);
 
-        $this->provider = new SmtpSettingsProvider($this->manager, $this->globalScopeManager, $this->mcrypt);
+        $this->provider = new SmtpSettingsProvider($this->manager, $this->globalScopeManager, $this->crypter);
     }
 
     public function testSmtpSettingsProvider()
@@ -131,7 +132,7 @@ class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($smtpSettings->getUsername(), $this->getSettingValue('oro_email.smtp_settings_username'));
         $this->assertSame(
             $smtpSettings->getPassword(),
-            $this->mcrypt->decryptData($this->getSettingValue('oro_email.smtp_settings_password'))
+            $this->crypter->decryptData($this->getSettingValue('oro_email.smtp_settings_password'))
         );
 
         // check types

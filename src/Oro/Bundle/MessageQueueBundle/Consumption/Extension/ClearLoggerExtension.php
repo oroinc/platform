@@ -9,7 +9,6 @@ use Monolog\Logger;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 
 /**
  * Checks whether the container has loggers with handlers that need to be cleared after each processor,
@@ -17,7 +16,7 @@ use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
  */
 class ClearLoggerExtension extends AbstractExtension
 {
-    /** @var ContainerInterface|IntrospectableContainerInterface */
+    /** @var ContainerInterface */
     private $container;
 
     /** @var string[] */

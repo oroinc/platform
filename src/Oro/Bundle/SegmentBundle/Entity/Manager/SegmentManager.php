@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Entity\Manager;
 
+use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\Query\Expr\OrderBy;
@@ -30,19 +31,25 @@ class SegmentManager
     /** @var SubQueryLimitHelper */
     protected $subqueryLimitHelper;
 
+    /** @var Cache */
+    protected $cache;
+
     /**
      * @param EntityManager $em
      * @param SegmentQueryBuilderRegistry $builderRegistry
      * @param SubQueryLimitHelper $subQueryLimitHelper
+     * @param Cache $cache
      */
     public function __construct(
         EntityManager $em,
         SegmentQueryBuilderRegistry $builderRegistry,
-        SubQueryLimitHelper $subQueryLimitHelper
+        SubQueryLimitHelper $subQueryLimitHelper,
+        Cache $cache
     ) {
         $this->em = $em;
         $this->builderRegistry = $builderRegistry;
         $this->subqueryLimitHelper = $subQueryLimitHelper;
+        $this->cache = $cache;
     }
 
     /**
@@ -66,7 +73,7 @@ class SegmentManager
         $result = [];
         $types = $this->em->getRepository('OroSegmentBundle:SegmentType')->findAll();
         foreach ($types as $type) {
-            $result[$type->getName()] = $type->getLabel();
+            $result[$type->getLabel()] = $type->getName();
         }
 
         return $result;
@@ -138,11 +145,18 @@ class SegmentManager
      */
     public function getSegmentQueryBuilder(Segment $segment)
     {
-        $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder($segment->getType()->getName());
+        $cacheKey = $this->getQBCacheKey($segment);
+        if ($this->cache->contains($cacheKey)) {
+            return clone $this->cache->fetch($cacheKey);
+        }
 
+        $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder($segment->getType()->getName());
         if ($segmentQueryBuilder) {
             try {
-                return $segmentQueryBuilder->getQueryBuilder($segment);
+                $queryBuilder = $segmentQueryBuilder->getQueryBuilder($segment);
+                $this->cache->save($cacheKey, clone $queryBuilder);
+
+                return $queryBuilder;
             } catch (InvalidConfigurationException $e) {
                 if ($this->logger) {
                     $this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -227,8 +241,14 @@ class SegmentManager
      */
     private function applyOrderByParts(Segment $segment, QueryBuilder $qb, $alias)
     {
-        $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder(SegmentType::TYPE_DYNAMIC);
-        $segmentQb = $segmentQueryBuilder->getQueryBuilder($segment);
+        $cacheKey = $this->getQBCacheKey($segment);
+        if ($this->cache->contains($cacheKey)) {
+            $segmentQb = clone $this->cache->fetch($cacheKey);
+        } else {
+            $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder(SegmentType::TYPE_DYNAMIC);
+            $segmentQb = $segmentQueryBuilder->getQueryBuilder($segment);
+            $this->cache->save($cacheKey, clone $segmentQb);
+        }
 
         $orderBy = $segmentQb->getDQLPart('orderBy');
         $aliasToReplace = current($segmentQb->getRootAliases());
@@ -252,40 +272,49 @@ class SegmentManager
      */
     public function getFilterSubQuery(Segment $segment, QueryBuilder $externalQueryBuilder)
     {
-        $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder($segment->getType()->getName());
-        if ($segmentQueryBuilder !== null) {
-            $queryBuilder = $segmentQueryBuilder->getQueryBuilder($segment);
-
-            if ($segment->isDynamic()) {
-                $identifier = $this->getIdentifierFieldName($segment->getEntity());
-                $tableAlias = current($queryBuilder->getDQLPart('from'))->getAlias();
-                $tableIdentifier = $tableAlias . '.' . $identifier;
-                $queryBuilder->resetDQLParts(['select']);
-                $queryBuilder->select($tableIdentifier);
-
-                if ($segment->getRecordsLimit()) {
-                    $queryBuilder = $this->subqueryLimitHelper->setLimit(
-                        $queryBuilder,
-                        $segment->getRecordsLimit(),
-                        $identifier
-                    );
-                }
-
-                $subQuery = $queryBuilder->getDQL();
-            } else {
-                $subQuery = $queryBuilder->getDQL();
-            }
-
-            /** @var Parameter[] $params */
-            $params = $queryBuilder->getParameters();
-            foreach ($params as $param) {
-                $externalQueryBuilder->setParameter($param->getName(), $param->getValue(), $param->getType());
-            }
-
-            return $subQuery;
+        $queryBuilder = null;
+        $cacheKey = $this->getQBCacheKey($segment);
+        if ($this->cache->contains($cacheKey)) {
+            $queryBuilder = clone $this->cache->fetch($cacheKey);
         }
 
-        return null;
+        if (!$queryBuilder) {
+            $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder($segment->getType()->getName());
+            if ($segmentQueryBuilder === null) {
+                return null;
+            }
+
+            $queryBuilder = $segmentQueryBuilder->getQueryBuilder($segment);
+            $this->cache->save($cacheKey, clone $queryBuilder);
+        }
+
+        if ($segment->isDynamic()) {
+            $identifier = $this->getIdentifierFieldName($segment->getEntity());
+            $tableAlias = current($queryBuilder->getDQLPart('from'))->getAlias();
+            $tableIdentifier = $tableAlias . '.' . $identifier;
+            $queryBuilder->resetDQLParts(['select']);
+            $queryBuilder->select($tableIdentifier);
+
+            if ($segment->getRecordsLimit()) {
+                $queryBuilder = $this->subqueryLimitHelper->setLimit(
+                    $queryBuilder,
+                    $segment->getRecordsLimit(),
+                    $identifier
+                );
+            }
+
+            $subQuery = $queryBuilder->getDQL();
+        } else {
+            $subQuery = $queryBuilder->getDQL();
+        }
+
+        /** @var Parameter[] $params */
+        $params = $queryBuilder->getParameters();
+        foreach ($params as $param) {
+            $externalQueryBuilder->setParameter($param->getName(), $param->getValue(), $param->getType());
+        }
+
+        return $subQuery;
     }
 
     /**
@@ -333,5 +362,18 @@ class SegmentManager
         $metadata = $this->em->getClassMetadata($className);
 
         return $metadata->getSingleIdentifierFieldName();
+    }
+
+    /**
+     * @param Segment $segment
+     * @return string
+     */
+    private function getQBCacheKey(Segment $segment)
+    {
+        if ($segment->getId()) {
+            return sprintf('%s:%s', 'qb', $segment->getId());
+        }
+
+        return sprintf('%s:%s:%s', 'qb', $segment->getEntity(), $segment->getDefinition());
     }
 }

@@ -10,15 +10,15 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Provider\TransitionDataProvider;
 
-class TransitionDataProviderTest extends \PHPUnit_Framework_TestCase
+class TransitionDataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowManager;
 
-    /** @var TransitionDataProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TransitionDataProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $transitionDataProvider;
 
-    /** @var Transition|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Transition|\PHPUnit\Framework\MockObject\MockObject */
     protected $transition;
 
     /**

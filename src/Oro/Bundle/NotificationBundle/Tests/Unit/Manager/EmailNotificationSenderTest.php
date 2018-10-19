@@ -3,22 +3,34 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Model\EmailTemplate;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender;
-use Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface;
-use Oro\Bundle\NotificationBundle\Model\SenderAwareEmailNotificationInterface;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
+use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
+use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
 
-class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
+class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 
-    public function testShouldCreateWithAllRequiredArguments()
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|NotificationSettings
+     */
+    private $notificationSettings;
+
+    /**
+     * @var EmailNotificationSender
+     */
+    private $sender;
+
+    protected function setUp()
     {
-        new EmailNotificationSender(
-            $this->createConfigManagerMock(),
-            $this->createMock(MessageProducerInterface::class)
-        );
+        $this->notificationSettings = $this->createMock(NotificationSettings::class);
+
+        $this->sender = new EmailNotificationSender($this->notificationSettings, self::getMessageProducer());
     }
 
     public function testSendWithNotNotificationInterface()
@@ -27,41 +39,31 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $testSenderName = 'Test Name';
         $testSubject = 'test subject';
         $testBody = 'test body';
-        $testReceiverEmail = 'test_receiver@email.com';
+        $testReceiverEmail = new EmailHolderStub('test_receiver@email.com');
         $testContentType = 'text/html';
 
-        $configManager = $this->createConfigManagerMock();
-        $configManager
-            ->expects($this->exactly(2))
-            ->method('get')
-            ->willReturnMap([
-                ['oro_notification.email_notification_sender_email', false, false, null, $testSenderEmail],
-                ['oro_notification.email_notification_sender_name', false, false, null, $testSenderName ]
-            ])
-        ;
+        $sender = From::emailAddress($testSenderEmail, $testSenderName);
+        $this->notificationSettings
+            ->expects($this->any())
+            ->method('getSender')
+            ->willReturn($sender);
 
-        $notification = $this->createEmailNotificationMock();
+        $notification = new TemplateEmailNotification(new EmailTemplateCriteria('template'), [$testReceiverEmail]);
 
-        $notification->expects($this->once())
-            ->method('getRecipientEmails')
-            ->will($this->returnValue([$testReceiverEmail]))
-        ;
+        $emailTemplateModel = (new EmailTemplate())
+            ->setSubject($testSubject)
+            ->setContent($testBody)
+            ->setType($testContentType);
 
-        $sender = new EmailNotificationSender(
-            $configManager,
-            self::getMessageProducer()
-        );
-
-        $sender->send($notification, $testSubject, $testBody, $testContentType);
+        $this->sender->send($notification, $emailTemplateModel);
 
         self::assertMessageSent(
-            EmailNotificationSender::TOPIC,
+            \Oro\Bundle\NotificationBundle\Async\Topics::SEND_NOTIFICATION_EMAIL,
             [
-                'fromEmail' => $testSenderEmail,
-                'fromName' => $testSenderName,
-                'toEmail' => $testReceiverEmail,
-                'subject' => $testSubject,
-                'body' => $testBody,
+                'sender'      => $sender->toArray(),
+                'toEmail'     => $testReceiverEmail->getEmail(),
+                'subject'     => $testSubject,
+                'body'        => $testBody,
                 'contentType' => $testContentType
             ]
         );
@@ -73,47 +75,36 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $testSenderName = 'Test Name';
         $testSubject = 'test subject';
         $testBody = 'test body';
-        $testReceiverEmail = 'test_receiver@email.com';
+        $testReceiverEmail = new EmailHolderStub('test_receiver@email.com');
         $testContentType = 'text/html';
 
-        $configManager = $this->createConfigManagerMock();
-        $configManager
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager $configManager */
+        $this->notificationSettings
             ->expects($this->never())
-            ->method('get')
-        ;
+            ->method('getSender');
 
-        $notification = $this->createSenderAwareEmailNotificationMock();
-
-        $notification->expects($this->once())
-            ->method('getRecipientEmails')
-            ->will($this->returnValue([$testReceiverEmail]))
-        ;
-
-        $notification->expects($this->exactly(2))
-            ->method('getSenderEmail')
-            ->willReturn($testSenderEmail)
-        ;
-
-        $notification->expects($this->once())
-            ->method('getSenderName')
-            ->willReturn($testSenderName)
-        ;
-
-        $sender = new EmailNotificationSender(
-            $configManager,
-            self::getMessageProducer()
+        $sender = From::emailAddress($testSenderEmail, $testSenderName);
+        $notification = new TemplateEmailNotification(
+            new EmailTemplateCriteria('template'),
+            [$testReceiverEmail],
+            null,
+            $sender
         );
 
-        $sender->send($notification, $testSubject, $testBody, $testContentType);
+        $emailTemplateModel = (new EmailTemplate())
+            ->setSubject($testSubject)
+            ->setContent($testBody)
+            ->setType($testContentType);
+
+        $this->sender->send($notification, $emailTemplateModel);
 
         self::assertMessageSent(
-            EmailNotificationSender::TOPIC,
+            \Oro\Bundle\NotificationBundle\Async\Topics::SEND_NOTIFICATION_EMAIL,
             [
-                'fromEmail' => $testSenderEmail,
-                'fromName' => $testSenderName,
-                'toEmail' => $testReceiverEmail,
-                'subject' => $testSubject,
-                'body' => $testBody,
+                'sender'      => $sender->toArray(),
+                'toEmail'     => $testReceiverEmail->getEmail(),
+                'subject'     => $testSubject,
+                'body'        => $testBody,
                 'contentType' => 'text/html'
             ]
         );
@@ -125,50 +116,30 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $testSenderName = 'Test Name';
         $testSubject = 'test subject';
         $testBody = 'test body';
-        $testReceiverEmail = 'test_receiver@email.com';
+        $testReceiverEmail = new EmailHolderStub('test_receiver@email.com');
         $testContentType = 'text/html';
 
-        $configManager = $this->createConfigManagerMock();
-        $configManager
-            ->expects($this->exactly(2))
-            ->method('get')
-            ->willReturnMap([
-                ['oro_notification.email_notification_sender_email', false, false, null, $testSenderEmail],
-                ['oro_notification.email_notification_sender_name', false, false, null, $testSenderName ]
-            ])
-        ;
+        $sender = From::emailAddress($testSenderEmail, $testSenderName);
+        $this->notificationSettings
+            ->expects($this->any())
+            ->method('getSender')
+            ->willReturn($sender);
 
-        $notification = $this->createSenderAwareEmailNotificationMock();
+        $notification = new TemplateEmailNotification(new EmailTemplateCriteria('template'), [$testReceiverEmail]);
+        $emailTemplateModel = (new EmailTemplate())
+            ->setSubject($testSubject)
+            ->setContent($testBody)
+            ->setType($testContentType);
 
-        $notification->expects($this->once())
-            ->method('getRecipientEmails')
-            ->will($this->returnValue([$testReceiverEmail]))
-        ;
-
-        $notification->expects($this->once())
-            ->method('getSenderEmail')
-            ->willReturn(null)
-        ;
-
-        $notification->expects($this->never())
-            ->method('getSenderName')
-        ;
-
-        $sender = new EmailNotificationSender(
-            $configManager,
-            self::getMessageProducer()
-        );
-
-        $sender->send($notification, $testSubject, $testBody, $testContentType);
+        $this->sender->send($notification, $emailTemplateModel);
 
         self::assertMessageSent(
-            EmailNotificationSender::TOPIC,
+            \Oro\Bundle\NotificationBundle\Async\Topics::SEND_NOTIFICATION_EMAIL,
             [
-                'fromEmail' => $testSenderEmail,
-                'fromName' => $testSenderName,
-                'toEmail' => $testReceiverEmail,
-                'subject' => $testSubject,
-                'body' => $testBody,
+                'sender'      => $sender->toArray(),
+                'toEmail'     => $testReceiverEmail->getEmail(),
+                'subject'     => $testSubject,
+                'body'        => $testBody,
                 'contentType' => 'text/html'
             ]
         );
@@ -180,70 +151,23 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $testSenderName = 'Test Name';
         $testSubject = 'test subject';
         $testBody = 'test body';
-        $testReceiverEmail = 'test_receiver@email@com';
+        $testReceiverEmail = new EmailHolderStub('test_receiver@email@com');
         $testContentType = 'text/html';
 
-        $configManager = $this->createConfigManagerMock();
-        $configManager
-            ->expects($this->exactly(2))
-            ->method('get')
-            ->willReturnMap([
-                ['oro_notification.email_notification_sender_email', false, false, null, $testSenderEmail],
-                ['oro_notification.email_notification_sender_name', false, false, null, $testSenderName ]
-            ])
-        ;
+        $sender = From::emailAddress($testSenderEmail, $testSenderName);
+        $this->notificationSettings
+            ->expects($this->any())
+            ->method('getSender')
+            ->willReturn($sender);
 
-        $notification = $this->createSenderAwareEmailNotificationMock();
+        $notification = new TemplateEmailNotification(new EmailTemplateCriteria('template'), [$testReceiverEmail]);
+        $emailTemplateModel = (new EmailTemplate())
+            ->setSubject($testSubject)
+            ->setContent($testBody)
+            ->setType($testContentType);
 
-        $notification->expects($this->once())
-            ->method('getRecipientEmails')
-            ->will($this->returnValue([$testReceiverEmail]))
-        ;
+        $this->sender->send($notification, $emailTemplateModel);
 
-        $notification->expects($this->once())
-            ->method('getSenderEmail')
-            ->willReturn(null)
-        ;
-
-        $notification->expects($this->never())
-            ->method('getSenderName')
-        ;
-
-        $sender = new EmailNotificationSender(
-            $configManager,
-            self::getMessageProducer()
-        );
-
-        $sender->send($notification, $testSubject, $testBody, $testContentType);
-
-        self::assertMessagesCount(EmailNotificationSender::TOPIC, 0);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | ConfigManager
-     */
-    private function createConfigManagerMock()
-    {
-        return $this
-            ->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-            ;
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | EmailNotificationInterface
-     */
-    private function createEmailNotificationMock()
-    {
-        return $this->createMock(EmailNotificationInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | SenderAwareEmailNotificationInterface
-     */
-    private function createSenderAwareEmailNotificationMock()
-    {
-        return $this->createMock(SenderAwareEmailNotificationInterface::class);
+        self::assertMessagesCount(\Oro\Bundle\NotificationBundle\Async\Topics::SEND_NOTIFICATION_EMAIL, 0);
     }
 }

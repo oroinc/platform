@@ -5,10 +5,11 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
-use Symfony\Component\Validator\Constraints\Valid;
 
 class ChangePasswordType extends AbstractType
 {
@@ -39,7 +40,7 @@ class ChangePasswordType extends AbstractType
         $builder
             ->add(
                 'currentPassword',
-                'password',
+                PasswordType::class,
                 [
                     'required' => false,
                     'label' => $options['current_password_label'],
@@ -51,10 +52,10 @@ class ChangePasswordType extends AbstractType
             )
             ->add(
                 'plainPassword',
-                'repeated',
+                RepeatedType::class,
                 [
                     'required' => false,
-                    'type' => 'password',
+                    'type' => PasswordType::class,
                     'invalid_message' => $options['plain_password_invalid_message'],
                     'options' => [
                         'attr' => [

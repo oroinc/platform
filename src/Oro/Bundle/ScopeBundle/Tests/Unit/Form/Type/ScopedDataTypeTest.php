@@ -7,8 +7,8 @@ use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Form\Type\ScopedDataType;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\PreloadedExtension;
 
 class ScopedDataTypeTest extends FormIntegrationTestCase
 {
@@ -27,7 +27,8 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    StubType::NAME => new StubType(),
+                    ScopedDataType::class => $this->formType,
+                    StubType::class => new StubType(),
                 ],
                 []
             ),
@@ -36,8 +37,6 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -53,11 +52,13 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
                 )
             );
 
-        /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $registry */
+        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry */
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->method('getManagerForClass')->willReturn($em);
 
         $this->formType = new ScopedDataType($registry);
+
+        parent::setUp();
     }
 
     public function testSubmit()
@@ -66,10 +67,10 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
         $scope6 = $this->getEntity(Scope::class, ['id' => 6]);
         $scope1 = $this->getEntity(Scope::class, ['id' => 1]);
         $form = $this->factory->create(
-            $this->formType,
+            ScopedDataType::class,
             [],
             [
-                'type' => StubType::NAME,
+                'type' => StubType::class,
                 'scopes' => [$scope4, $scope6, $scope1],
                 'preloaded_scopes' => [$scope4, $scope6],
                 'options' => [
@@ -116,10 +117,10 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
             $this->getEntity(Scope::class, ['id' => 1]),
         ];
         $form = $this->factory->create(
-            $this->formType,
+            ScopedDataType::class,
             [],
             [
-                'type' => StubType::NAME,
+                'type' => StubType::class,
                 'scopes' => $scopes,
                 'options' => [
                     StubType::REQUIRED_OPTION => 'test_value',
@@ -150,10 +151,5 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
                 'expected' => ['1' => 'test', 'not_int' => 'test'],
             ],
         ];
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(ScopedDataType::NAME, $this->formType->getName());
     }
 }

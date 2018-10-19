@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
-use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
+use Oro\Bundle\ApiBundle\Provider\CacheManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -20,22 +18,13 @@ class DocCacheClearCommand extends ContainerAwareCommand
 
     private const ALL_VIEWS                    = 'all';
     private const API_DOC_VIEWS_PARAMETER_NAME = 'oro_api.api_doc.views';
-    private const API_DOC_EXTRACTOR_SERVICE    = 'nelmio_api_doc.extractor.api_doc_extractor';
 
     /**
      * {@inheritdoc}
      */
     public function isEnabled()
     {
-        if (!$this->getContainer()->has(self::API_DOC_EXTRACTOR_SERVICE)) {
-            return false;
-        }
-        $apiDocExtractor = $this->getContainer()->get(self::API_DOC_EXTRACTOR_SERVICE);
-        if (!$apiDocExtractor instanceof CachingApiDocExtractor) {
-            return false;
-        }
-
-        return parent::isEnabled();
+        return $this->getCacheManager()->isApiDocCacheEnabled() && parent::isEnabled();
     }
 
     /**
@@ -75,28 +64,26 @@ EOF
 
         $views = $input->getOption('view');
         $noWarmup = $input->getOption('no-warmup');
-        /** @var CachingApiDocExtractor $apiDocExtractor */
-        $apiDocExtractor = $this->getContainer()->get(self::API_DOC_EXTRACTOR_SERVICE);
+        $cacheManager = $this->getCacheManager();
 
         if (1 === count($views) && self::ALL_VIEWS === reset($views)) {
             $views = $this->getContainer()->getParameter(self::API_DOC_VIEWS_PARAMETER_NAME);
         }
 
-        // make sure API cache is up-to-date
-        $cacheClearCommand = $this->getApplication()->find(CacheClearCommand::COMMAND_NAME);
-        $cacheClearCommand->run(
-            new ArrayInput(['command' => CacheClearCommand::COMMAND_NAME]),
-            new NullOutput()
-        );
+        // warm up API caches
+        if (!$noWarmup) {
+            $io->comment('Warming up API cache...');
+            $cacheManager->warmUpCaches();
+        }
 
         // process documentation cache
         foreach ($views as $view) {
             if ($noWarmup) {
-                $io->comment(sprintf('Clearing the cache for the <info>%s</info> view', $view));
-                $apiDocExtractor->clear($view);
+                $io->comment(sprintf('Clearing the cache for the <info>%s</info> view...', $view));
+                $cacheManager->clearApiDocCache($view);
             } else {
                 $io->comment(sprintf('Warming up cache for the <info>%s</info> view...', $view));
-                $apiDocExtractor->warmUp($view);
+                $cacheManager->warmUpApiDocCache($view);
             }
         }
 
@@ -104,5 +91,13 @@ EOF
             'API documentation cache was successfully cleared for "%s" environment.',
             $this->getContainer()->get('kernel')->getEnvironment()
         ));
+    }
+
+    /**
+     * @return CacheManager
+     */
+    private function getCacheManager()
+    {
+        return $this->getContainer()->get('oro_api.cache_manager');
     }
 }

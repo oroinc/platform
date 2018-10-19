@@ -6,15 +6,15 @@ use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfi
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
-class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
+class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $calendarFactory;
 
@@ -391,6 +391,7 @@ class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($configurationValue));
 
         $this->assertEquals($expectedValue, $this->localeSettings->getLanguage());
+        $this->assertEquals($expectedValue, $this->localeSettings->getLanguage());
     }
 
     /**
@@ -408,6 +409,19 @@ class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
                 'configurationValue' => null,
             ),
         );
+    }
+
+    public function testGetActualLanguage()
+    {
+        $en = 'en';
+        $fr = 'fr';
+        $this->configManager->expects($this->exactly(2))
+            ->method('get')
+            ->with('oro_locale.language')
+            ->willReturnOnConsecutiveCalls($en, $fr);
+
+        $this->assertEquals($en, $this->localeSettings->getActualLanguage());
+        $this->assertEquals($fr, $this->localeSettings->getActualLanguage());
     }
 
     public function testGetCurrencySymbolByCurrency()

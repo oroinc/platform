@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Tools;
 
 use Oro\Bundle\WorkflowBundle\Model\Tools\StartedWorkflowsBag;
 
-class StartedWorkflowsBagTest extends \PHPUnit_Framework_TestCase
+class StartedWorkflowsBagTest extends \PHPUnit\Framework\TestCase
 {
     const WORKFLOW_NAME = 'test_flow';
 

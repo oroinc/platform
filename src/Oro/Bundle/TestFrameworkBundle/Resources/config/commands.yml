@@ -1,0 +1,6 @@
+services:
+    Oro\Bundle\TestFrameworkBundle\Command\ContainerTagsDocumentationCommand:
+        public: false
+        class: Oro\Bundle\TestFrameworkBundle\Command\ContainerTagsDocumentationCommand
+        tags:
+            - { name: console.command }

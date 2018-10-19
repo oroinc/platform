@@ -24,6 +24,8 @@ use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 /**
+ * Provides an ability to create extended enum tables and fields, add relations between tables.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -864,7 +866,16 @@ class ExtendExtension implements NameGeneratorAwareInterface
      */
     public function getEntityClassByTableName($tableName)
     {
-        return $this->entityMetadataHelper->getEntityClassByTableName($tableName);
+        $classes = $this->entityMetadataHelper->getEntityClassesByTableName($tableName);
+
+        if (count($classes) > 1) {
+            throw new \RuntimeException(sprintf(
+                'Table "%s" has more than 1 class. This is not supported by ExtendExtension',
+                $tableName
+            ));
+        }
+
+        return reset($classes) ?: null;
     }
 
     /**

@@ -12,7 +12,7 @@ use Oro\Bundle\ConfigBundle\Api\Processor\GetList\JsonApi\SetDefaultValueForFiel
 
 class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $valueNormalizer;
 
     /** @var SetDefaultValueForFieldsFilter */

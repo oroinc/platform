@@ -12,16 +12,16 @@ class RestPlainConfigurationTest extends RestPlainApiTestCase
 
         $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_list', ['entity' => $entityType])
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
         );
         $requestInfo = 'get_list';
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, $requestInfo);
+        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, $requestInfo);
 
         // check that the result is a list of configuration section ids
         // check that each returned section is accessible
-        $content = $this->jsonToArray($response->getContent());
+        $content = self::jsonToArray($response->getContent());
         foreach ($content as $key => $sectionId) {
-            $this->assertTrue(
+            self::assertTrue(
                 is_string($sectionId),
                 sprintf(
                     '%s. expected a string, got "%s". item index: %s',
@@ -43,14 +43,14 @@ class RestPlainConfigurationTest extends RestPlainApiTestCase
 
         $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_item', ['entity' => $entityType, 'id' => $sectionId])
+            $this->getUrl($this->getItemRouteName(), ['entity' => $entityType, 'id' => $sectionId])
         );
         $requestInfo = sprintf('get->%s', $sectionId);
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, $requestInfo);
-        $content = $this->jsonToArray($response->getContent());
+        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, $requestInfo);
+        $content = self::jsonToArray($response->getContent());
         // check that the result is a list of configuration options
         foreach ($content as $key => $item) {
-            $this->assertArrayHasKey('key', $item, sprintf('%s. item index: %s', $requestInfo, $key));
+            self::assertArrayHasKey('key', $item, sprintf('%s. item index: %s', $requestInfo, $key));
         }
     }
 }

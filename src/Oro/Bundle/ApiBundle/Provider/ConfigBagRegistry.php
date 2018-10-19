@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * The registry that allows to get the Data API resources configuratin bag
+ * The registry that allows to get the Data API resources configuration bag
  * for a specific request type.
  */
 class ConfigBagRegistry
@@ -21,7 +21,7 @@ class ConfigBagRegistry
     /** @var RequestExpressionMatcher */
     private $matcher;
 
-    /** @var ConfigBagInterface[] [request type => config bag, ...] */
+    /** @var ConfigBagInterface[] [request type => ConfigBagInterface, ...] */
     private $cache = [];
 
     /**
@@ -50,8 +50,9 @@ class ConfigBagRegistry
      */
     public function getConfigBag(RequestType $requestType): ConfigBagInterface
     {
-        if (isset($this->cache[(string)$requestType])) {
-            return $this->cache[(string)$requestType];
+        $cacheKey = (string)$requestType;
+        if (isset($this->cache[$cacheKey])) {
+            return $this->cache[$cacheKey];
         }
 
         $configBagServiceId = null;
@@ -69,7 +70,7 @@ class ConfigBagRegistry
 
         /** @var ConfigBagInterface $configBag */
         $configBag = $this->container->get($configBagServiceId);
-        $this->cache[(string)$requestType] = $configBag;
+        $this->cache[$cacheKey] = $configBag;
 
         return $configBag;
     }

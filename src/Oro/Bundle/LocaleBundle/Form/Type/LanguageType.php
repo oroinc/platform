@@ -41,10 +41,8 @@ class LanguageType extends AbstractType
         $resolver->setDefaults(
             [
                 'choices' => $this->getLanguageChoices(true),
-                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
-                'choices_as_values' => true,
                 'show_all' => false,
-                'empty_value' => '',
+                'placeholder' => '',
                 'translatable_options' => false,
                 'configs' => [
                     'placeholder' => 'oro.locale.localization.form.placeholder.select_language',
@@ -93,7 +91,7 @@ class LanguageType extends AbstractType
      */
     public function getParent()
     {
-        return OroChoiceType::NAME;
+        return OroChoiceType::class;
     }
 
     /**

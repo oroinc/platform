@@ -9,16 +9,19 @@ use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SubresourcesConfigExtension;
+use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
+use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
+class ConfigProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
-    const TEST_CLASS_NAME   = 'Test\Class';
-    const TEST_VERSION      = '1.1';
-    const TEST_REQUEST_TYPE = RequestType::REST;
+    protected const TEST_CLASS_NAME   = 'Test\Class';
+    protected const TEST_VERSION      = '1.1';
+    protected const TEST_REQUEST_TYPE = RequestType::REST;
 
     /** @var ConfigContext */
     protected $context;
@@ -36,30 +39,46 @@ class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
-        $actionProcessorBag = $this->createMock('Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface');
-        $actionProcessorBag->expects($this->any())
+        $actionProcessorBag = $this->createMock(ActionProcessorBagInterface::class);
+        $actionProcessorBag->expects(self::any())
             ->method('getActions')
-            ->willReturn(
-                [
-                    ApiActions::GET,
-                    ApiActions::GET_LIST,
-                    ApiActions::UPDATE,
-                    ApiActions::CREATE,
-                    ApiActions::DELETE,
-                    ApiActions::DELETE_LIST,
-                    ApiActions::GET_SUBRESOURCE,
-                    ApiActions::GET_RELATIONSHIP,
-                    ApiActions::UPDATE_RELATIONSHIP,
-                    ApiActions::ADD_RELATIONSHIP,
-                    ApiActions::DELETE_RELATIONSHIP,
-                ]
-            );
+            ->willReturn([
+                ApiActions::GET,
+                ApiActions::GET_LIST,
+                ApiActions::UPDATE,
+                ApiActions::CREATE,
+                ApiActions::DELETE,
+                ApiActions::DELETE_LIST,
+                ApiActions::GET_SUBRESOURCE,
+                ApiActions::GET_RELATIONSHIP,
+                ApiActions::UPDATE_RELATIONSHIP,
+                ApiActions::ADD_RELATIONSHIP,
+                ApiActions::DELETE_RELATIONSHIP
+            ]);
+        $filterOperatorRegistry = new FilterOperatorRegistry([
+            ComparisonFilter::EQ              => '=',
+            ComparisonFilter::NEQ             => '!=',
+            ComparisonFilter::GT              => '>',
+            ComparisonFilter::LT              => '<',
+            ComparisonFilter::GTE             => '>=',
+            ComparisonFilter::LTE             => '<=',
+            ComparisonFilter::EXISTS          => '*',
+            ComparisonFilter::NEQ_OR_NULL     => '!*',
+            ComparisonFilter::CONTAINS        => '~',
+            ComparisonFilter::NOT_CONTAINS    => '!~',
+            ComparisonFilter::STARTS_WITH     => '^',
+            ComparisonFilter::NOT_STARTS_WITH => '!^',
+            ComparisonFilter::ENDS_WITH       => '$',
+            ComparisonFilter::NOT_ENDS_WITH   => '!$'
+        ]);
 
         $this->configExtensionRegistry = new ConfigExtensionRegistry();
-        $this->configExtensionRegistry->addExtension(new FiltersConfigExtension());
+        $this->configExtensionRegistry->addExtension(new FiltersConfigExtension($filterOperatorRegistry));
         $this->configExtensionRegistry->addExtension(new SortersConfigExtension());
         $this->configExtensionRegistry->addExtension(new ActionsConfigExtension($actionProcessorBag));
-        $this->configExtensionRegistry->addExtension(new SubresourcesConfigExtension($actionProcessorBag));
+        $this->configExtensionRegistry->addExtension(
+            new SubresourcesConfigExtension($actionProcessorBag, $filterOperatorRegistry)
+        );
 
         $this->configLoaderFactory = new ConfigLoaderFactory($this->configExtensionRegistry);
     }
@@ -90,18 +109,16 @@ class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @param string|null $className
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     * @return \PHPUnit\Framework\MockObject\MockObject|ClassMetadata
      */
     protected function getClassMetadataMock($className = null)
     {
         if ($className) {
-            $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->setConstructorArgs([$className])
                 ->getMock();
         } else {
-            $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-                ->disableOriginalConstructor()
-                ->getMock();
+            $classMetadata = $this->createMock(ClassMetadata::class);
         }
         $classMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
 
@@ -114,7 +131,7 @@ class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function assertConfig(array $expected, $actual)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             $this->convertConfigObjectToArray($actual)
         );

@@ -28,7 +28,7 @@ class IsMobileContextConfigurator implements ContextConfiguratorInterface
     {
         $context->getResolver()
             ->setRequired(['is_mobile'])
-            ->setAllowedTypes(['is_mobile' => ['boolean']]);
+            ->setAllowedTypes('is_mobile', ['boolean']);
 
         $context->set('is_mobile', $this->userAgentProvider->getUserAgent()->isMobile());
     }

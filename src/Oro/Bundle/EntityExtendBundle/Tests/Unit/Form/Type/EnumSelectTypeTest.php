@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumSelectType;
+use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 
 class EnumSelectTypeTest extends AbstractEnumTypeTestCase
 {
@@ -19,19 +20,10 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
     public function testGetParent()
     {
         $this->assertEquals(
-            'oro_select2_translatable_entity',
+            Select2TranslatableEntityType::class,
             $this->type->getParent()
         );
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_enum_select',
-            $this->type->getName()
-        );
-    }
-
 
     public function testBuildForm()
     {
@@ -89,7 +81,7 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
 
         $this->assertEquals(
             [
-                'empty_value' => $expectedEmptyValue,
+                'placeholder' => $expectedEmptyValue,
                 'empty_data'  => $expectedEmptyData,
                 'configs'     => [
                     'allowClear'  => true,
@@ -136,7 +128,7 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
 
         $this->assertEquals(
             [
-                'empty_value' => null,
+                'placeholder' => null,
                 'empty_data'  => '',
                 'configs'     => [
                     'allowClear'  => true,

@@ -85,7 +85,16 @@ define(function(require) {
             var $input = this.$(this.inputSelector);
             var onSelect = _.bind(function() {
                 this.dialogWidget.remove();
-                this.$(this.inputSelector).inputWidget('focus');
+                this.dialogWidget = null;
+
+                var $input = this.$(this.inputSelector);
+                var $form = $input.closest('form');
+
+                if ($form.length && $form.data('validator')) {
+                    $form.validate().element($input);
+                }
+
+                $input.inputWidget('focus');
             }, this);
             this.dialogWidget._showLoading();
             $input.one('select2-data-request.' + eventNamespace, function() {
@@ -122,6 +131,12 @@ define(function(require) {
                 $input.inputWidget('val', id, true);
                 this.dialogWidget.remove();
                 this.dialogWidget = null;
+
+                var $form = $input.closest('form');
+                if ($form.length && $form.data('validator')) {
+                    $form.validate().element($input);
+                }
+
                 $input.inputWidget('focus');
             }, this));
 

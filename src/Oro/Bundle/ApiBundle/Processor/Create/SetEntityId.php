@@ -8,7 +8,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Checks whether entity identifier exists in the Context,
+ * Checks whether entity identifier exists in the context,
  * and if so, sets it to the entity.
  */
 class SetEntityId implements ProcessorInterface
@@ -44,6 +44,11 @@ class SetEntityId implements ProcessorInterface
         }
 
         $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            // the metadata does not exist
+            return;
+        }
+
         if ($metadata->hasIdentifierGenerator()) {
             // ignore entities with an identity generator
             return;

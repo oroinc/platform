@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -32,6 +33,7 @@ class SystemEmailTemplateSelectType extends AbstractType
         $resolver->setDefaults([
             'query_builder' => $this->getRepository()->getSystemTemplatesQueryBuilder(),
             'class' => 'OroEmailBundle:EmailTemplate',
+            'choice_label' => 'name',
             'choice_value' => 'name',
         ]);
     }
@@ -77,7 +79,7 @@ class SystemEmailTemplateSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_translatable_entity';
+        return Select2TranslatableEntityType::class;
     }
 
     /**

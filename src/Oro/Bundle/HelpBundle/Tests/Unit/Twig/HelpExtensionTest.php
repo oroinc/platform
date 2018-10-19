@@ -6,11 +6,11 @@ use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
 use Oro\Bundle\HelpBundle\Twig\HelpExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class HelpExtensionTest extends \PHPUnit_Framework_TestCase
+class HelpExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $linkProvider;
 
     /** @var HelpExtension */

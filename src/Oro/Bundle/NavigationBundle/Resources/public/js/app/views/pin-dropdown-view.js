@@ -1,12 +1,10 @@
-define([
-    'jquery',
-    'underscore',
-    'chaplin',
-    'oroui/js/app/views/base/collection-view'
-], function($, _, Chaplin, BaseCollectionView) {
+define(function(require) {
     'use strict';
 
     var DropdownCollectionView;
+    var _ = require('underscore');
+    var Chaplin = require('chaplin');
+    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     var utils = Chaplin.utils;
 
     DropdownCollectionView = BaseCollectionView.extend({
@@ -14,7 +12,8 @@ define([
             'visibilityChange': 'updateVisibility',
             'add collection': 'updateDropdown',
             'remove collection': 'updateDropdown',
-            'page:afterChange mediator': 'updateDropdown'
+            'page:afterChange mediator': 'updateDropdown',
+            'layout:reposition mediator': 'updateDropdown'
         },
 
         /**
@@ -31,17 +30,13 @@ define([
             _.extend(this, _.pick(options, ['position']));
             DropdownCollectionView.__super__.initialize.apply(this, arguments);
             // handle resize event once per frame (1000 ms / 25 frames)
-            $(window).on('resize.' + this.cid, _.debounce(_.bind(this.updateDropdown, this), 40));
+            this.updateDropdown = _.debounce(this.updateDropdown.bind(this), 40);
         },
 
-        dispose: function() {
-            $(window).off('.' + this.cid);
-            DropdownCollectionView.__super__.dispose.call(this);
-        },
 
         render: function() {
             DropdownCollectionView.__super__.render.call(this);
-            this.positionUpdate();
+            this.updateDropdown();
             return this;
         },
 

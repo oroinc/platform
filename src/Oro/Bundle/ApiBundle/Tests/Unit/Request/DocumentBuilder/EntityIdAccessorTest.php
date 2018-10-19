@@ -1,27 +1,33 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi\JsonApiDocument;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\DocumentBuilder;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ArrayAccessor;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\EntityIdAccessor;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
+class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityIdTransformer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerRegistry */
+    private $entityIdTransformerRegistry;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
+    private $entityIdTransformer;
 
     /** @var EntityIdAccessor */
-    protected $entityIdAccessor;
+    private $entityIdAccessor;
 
     protected function setUp()
     {
+        $this->entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
         $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
 
         $this->entityIdAccessor = new EntityIdAccessor(
             new ArrayAccessor(),
-            $this->entityIdTransformer
+            $this->entityIdTransformerRegistry
         );
     }
 
@@ -31,15 +37,20 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
         $metadata = new EntityMetadata();
         $metadata->setClassName('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
+        $requestType = new RequestType([RequestType::REST]);
 
-        $this->entityIdTransformer->expects($this->once())
+        $this->entityIdTransformerRegistry->expects(self::once())
+            ->method('getEntityIdTransformer')
+            ->with($requestType)
+            ->willReturn($this->entityIdTransformer);
+        $this->entityIdTransformer->expects(self::once())
             ->method('transform')
             ->with(123, self::identicalTo($metadata))
             ->willReturn('transformedId');
 
-        $this->assertEquals(
+        self::assertEquals(
             'transformedId',
-            $this->entityIdAccessor->getEntityId($entity, $metadata)
+            $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType)
         );
     }
 
@@ -53,11 +64,14 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
         $metadata = new EntityMetadata();
         $metadata->setClassName('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
+        $requestType = new RequestType([RequestType::REST]);
 
-        $this->entityIdTransformer->expects($this->never())
+        $this->entityIdTransformerRegistry->expects(self::never())
+            ->method('getEntityIdTransformer');
+        $this->entityIdTransformer->expects(self::never())
             ->method('transform');
 
-        $this->entityIdAccessor->getEntityId($entity, $metadata);
+        $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
 
     public function testGetEntityIdForEntityWithCompositeId()
@@ -66,15 +80,20 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
         $metadata = new EntityMetadata();
         $metadata->setClassName('Test\Entity');
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
+        $requestType = new RequestType([RequestType::REST]);
 
-        $this->entityIdTransformer->expects($this->once())
+        $this->entityIdTransformerRegistry->expects(self::once())
+            ->method('getEntityIdTransformer')
+            ->with($requestType)
+            ->willReturn($this->entityIdTransformer);
+        $this->entityIdTransformer->expects(self::once())
             ->method('transform')
             ->with(['id1' => 123, 'id2' => 456], self::identicalTo($metadata))
             ->willReturn('transformedId');
 
-        $this->assertEquals(
+        self::assertEquals(
             'transformedId',
-            $this->entityIdAccessor->getEntityId($entity, $metadata)
+            $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType)
         );
     }
 
@@ -88,11 +107,14 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
         $metadata = new EntityMetadata();
         $metadata->setClassName('Test\Entity');
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
+        $requestType = new RequestType([RequestType::REST]);
 
-        $this->entityIdTransformer->expects($this->never())
+        $this->entityIdTransformerRegistry->expects(self::never())
+            ->method('getEntityIdTransformer');
+        $this->entityIdTransformer->expects(self::never())
             ->method('transform');
 
-        $this->entityIdAccessor->getEntityId($entity, $metadata);
+        $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
 
     /**
@@ -104,8 +126,14 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
         $entity   = ['id' => 123, 'name' => 'val'];
         $metadata = new EntityMetadata();
         $metadata->setClassName('Test\Entity');
+        $requestType = new RequestType([RequestType::REST]);
 
-        $this->entityIdAccessor->getEntityId($entity, $metadata);
+        $this->entityIdTransformerRegistry->expects(self::never())
+            ->method('getEntityIdTransformer');
+        $this->entityIdTransformer->expects(self::never())
+            ->method('transform');
+
+        $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
 
     /**
@@ -118,13 +146,18 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
         $metadata = new EntityMetadata();
         $metadata->setClassName('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
+        $requestType = new RequestType([RequestType::REST]);
 
-        $this->entityIdTransformer->expects($this->once())
+        $this->entityIdTransformerRegistry->expects(self::once())
+            ->method('getEntityIdTransformer')
+            ->with($requestType)
+            ->willReturn($this->entityIdTransformer);
+        $this->entityIdTransformer->expects(self::once())
             ->method('transform')
             ->with(null, self::identicalTo($metadata))
             ->willReturn(null);
 
-        $this->entityIdAccessor->getEntityId($entity, $metadata);
+        $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
 
     /**
@@ -137,12 +170,17 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
         $metadata = new EntityMetadata();
         $metadata->setClassName('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
+        $requestType = new RequestType([RequestType::REST]);
 
-        $this->entityIdTransformer->expects($this->once())
+        $this->entityIdTransformerRegistry->expects(self::once())
+            ->method('getEntityIdTransformer')
+            ->with($requestType)
+            ->willReturn($this->entityIdTransformer);
+        $this->entityIdTransformer->expects(self::once())
             ->method('transform')
             ->with(123, self::identicalTo($metadata))
             ->willReturn('');
 
-        $this->entityIdAccessor->getEntityId($entity, $metadata);
+        $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
 }

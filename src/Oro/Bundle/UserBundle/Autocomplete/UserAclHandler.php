@@ -7,6 +7,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -40,7 +41,10 @@ class UserAclHandler implements SearchHandlerInterface
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /** @var AclVoter */
+    /** @var EntityRoutingHelper */
+    protected $entityRoutingHelper;
+
+    /** @var AclVoter|null */
     protected $aclVoter;
 
     /** @var OwnershipConditionDataBuilder */
@@ -62,7 +66,8 @@ class UserAclHandler implements SearchHandlerInterface
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param TokenAccessorInterface        $tokenAccessor
      * @param OwnerTreeProvider             $treeProvider
-     * @param AclVoter                      $aclVoter
+     * @param EntityRoutingHelper $entityRoutingHelper
+     * @param AclVoter|null                 $aclVoter
      */
     public function __construct(
         EntityManager $em,
@@ -71,15 +76,17 @@ class UserAclHandler implements SearchHandlerInterface
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
         OwnerTreeProvider $treeProvider,
+        EntityRoutingHelper $entityRoutingHelper,
         AclVoter $aclVoter = null
     ) {
         $this->em = $em;
         $this->attachmentManager = $attachmentManager;
         $this->className = $className;
-        $this->aclVoter = $aclVoter;
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
         $this->treeProvider = $treeProvider;
+        $this->entityRoutingHelper = $entityRoutingHelper;
+        $this->aclVoter = $aclVoter;
     }
 
     /**
@@ -90,7 +97,7 @@ class UserAclHandler implements SearchHandlerInterface
     public function search($query, $page, $perPage, $searchById = false)
     {
         list($search, $entityClass, $permission, $entityId, $excludeCurrentUser) = explode(';', $query);
-        $entityClass = $this->decodeClassName($entityClass);
+        $entityClass = $this->entityRoutingHelper->resolveEntityClass($entityClass);
 
         $hasMore  = false;
         $object   = $entityId
@@ -366,25 +373,5 @@ class UserAclHandler implements SearchHandlerInterface
     {
         $queryBuilder->andWhere('user.id != :userId');
         $queryBuilder->setParameter('userId', $user->getId());
-    }
-
-    /**
-     * Decodes the given string into the class name
-     *
-     * @param string $className The encoded class name
-     *
-     * @return string The class name
-     *
-     * @deprecated since 1.6. Will be removed in 2.0. Use oro_entity.routing_helper->resolveEntityClass($entityName);
-     */
-    public function decodeClassName($className)
-    {
-        $result = str_replace('_', '\\', $className);
-        if (strpos($result, ExtendHelper::ENTITY_NAMESPACE) === 0) {
-            // a custom entity can contain _ in class name
-            $result = ExtendHelper::ENTITY_NAMESPACE . substr($className, strlen(ExtendHelper::ENTITY_NAMESPACE));
-        }
-
-        return $result;
     }
 }

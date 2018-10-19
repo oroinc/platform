@@ -1,0 +1,15 @@
+/* @theme: admin.oro; */
+
+.flash-messages {
+    position: relative;
+}
+
+.flash-messages-frame {
+    position: absolute;
+    left: 25%;
+    z-index: 900;
+    width: 50%;
+    box-sizing: border-box;
+    padding: 0 10px;
+    opacity: .9;
+}

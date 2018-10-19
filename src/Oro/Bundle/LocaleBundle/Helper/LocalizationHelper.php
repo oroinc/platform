@@ -7,8 +7,11 @@ use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
+use Oro\Bundle\LocaleBundle\Provider\LocalizationProviderInterface;
 
+/**
+ * Handles logic to work with localization
+ */
 class LocalizationHelper
 {
     use FallbackTrait;
@@ -19,17 +22,17 @@ class LocalizationHelper
     protected $localizationManager;
 
     /**
-     * @var CurrentLocalizationProvider
+     * @var LocalizationProviderInterface
      */
     protected $currentLocalizationProvider;
 
     /**
      * @param LocalizationManager $localizationManager
-     * @param CurrentLocalizationProvider $currentLocalizationProvider
+     * @param LocalizationProviderInterface $currentLocalizationProvider
      */
     public function __construct(
         LocalizationManager $localizationManager,
-        CurrentLocalizationProvider $currentLocalizationProvider
+        LocalizationProviderInterface $currentLocalizationProvider
     ) {
         $this->localizationManager = $localizationManager;
         $this->currentLocalizationProvider = $currentLocalizationProvider;

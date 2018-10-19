@@ -4,10 +4,10 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
 
-class MetadataRegistryTest extends \PHPUnit_Framework_TestCase
+class MetadataRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $metadataBuilder;
 

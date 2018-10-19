@@ -6,9 +6,10 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Extension\ConfigExtension;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
@@ -17,12 +18,12 @@ use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
 
-class AbstractConfigTypeTestCase extends TypeTestCase
+abstract class AbstractConfigTypeTestCase extends TypeTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $testConfigProvider;
 
     protected function setUp()
@@ -36,6 +37,11 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         parent::setUp();
     }
 
+    /**
+     * @return AbstractType
+     */
+    abstract protected function getFormType();
+
     protected function getExtensions()
     {
         $validator = new RecursiveValidator(
@@ -46,9 +52,11 @@ class AbstractConfigTypeTestCase extends TypeTestCase
 
         return [
             new PreloadedExtension(
-                [],
                 [
-                    'form' => [
+                    $this->getFormType()
+                ],
+                [
+                    FormType::class => [
                         new FormTypeValidatorExtension($validator),
                         new ConfigExtension()
                     ]
@@ -59,9 +67,9 @@ class AbstractConfigTypeTestCase extends TypeTestCase
 
     /**
      * @param string                                     $formName
-     * @param AbstractType                               $formType
+     * @param string                                     $formTypeClass
      * @param array                                      $options
-     * @param \PHPUnit_Framework_MockObject_MockObject[] $configProviders
+     * @param \PHPUnit\Framework\MockObject\MockObject[] $configProviders
      * @param mixed                                      $newVal
      * @param mixed                                      $oldVal
      * @param string                                     $state
@@ -71,7 +79,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
      */
     protected function doTestSubmit(
         $formName,
-        AbstractType $formType,
+        $formTypeClass,
         array $options,
         array $configProviders,
         $newVal,
@@ -117,7 +125,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
             ->method('getProvider')
             ->will($this->returnValueMap($configProvidersMap));
 
-        $form = $this->factory->createNamed($formName, $formType, $oldVal, $options);
+        $form = $this->factory->createNamed($formName, $formTypeClass, $oldVal, $options);
 
         $expectedExtendConfig = new Config($extendConfigId);
         $schemaUpdateRequired = call_user_func(
@@ -152,10 +160,6 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         }
 
         // flush should be never called
-        foreach ($configProviders as $configProvider) {
-            $configProvider->expects($this->never())
-                ->method('flush');
-        }
         $this->configManager->expects($this->never())
             ->method('flush');
 
@@ -173,7 +177,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProviderMock()
     {

@@ -1,0 +1,246 @@
+/* @theme: admin.oro; */
+
+body {
+    min-width: $width-body-page-mobile;
+}
+
+& {
+    min-height: 100vh;
+}
+
+.app-page {
+    &__central-panel {
+        padding-top: $app-header-height;
+    }
+}
+
+.mobile-hide {
+    display: none;
+    width: 0;
+    height: 0;
+    visibility: hidden;
+    position: absolute;
+    top: -9999px;
+    #{$start}: -9999px;
+}
+
+/**
+ * Fixes issue when header with position fixed loses its place after blur event on some input
+ * $see fixStickyHeader() in oroui/js/mobile/layout.js
+ */
+&.input-focused .app-header {
+    position: absolute;
+}
+
+.scrollspy.container-fluid,
+.page-title + [data-bound-component*="datagrid"],
+.page-title + .product-container {
+    margin-top: -10px;
+
+    .content-with-sidebar--container {
+        padding: 0;
+    }
+
+    > .no-data-visible {
+        padding-top: 1px;
+    }
+}
+
+.page-title + [data-bound-component*="datagrid"] {
+    @include safe-area-property-left(padding-left, $content-padding, false);
+    @include safe-area-property-right(padding-right, $content-padding, false);
+}
+
+.layout-content .responsive-section {
+    &:only-child {
+        padding: 0;
+    }
+
+    .form-horizontal {
+        padding: $content-padding 0;
+    }
+}
+
+.container-fluid > .responsive-section {
+    .responsive-cell,
+    .responsive-cell:only-child {
+        padding: 0 $content-padding;
+    }
+}
+
+.responsive-cell .box-type1 {
+    .filter-box {
+        .btn-group {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.responsive-section {
+    .inner-grid {
+        margin: -#{$content-padding} 0 $content-padding;
+    }
+}
+
+.customer-without-border-tabs {
+    min-width: 280px;
+    padding-#{$end}: 0;
+    margin-#{$start}: -10px;
+    margin-#{$end}: -10px;
+    width: calc(100% + 20px);
+}
+
+.tab-content {
+    .oro-tabs {
+        margin: 0;
+        box-sizing: border-box;
+        width: 100%;
+
+        .nav-tabs {
+            & > li {
+                & > a {
+                    border-top-width: 1px;
+                }
+            }
+        }
+    }
+
+    .tab-pane {
+        padding: 0 10px;
+    }
+}
+
+.box-type1 {
+    margin: 0 $content-padding $content-padding;
+    border-radius: 3px;
+
+    .title {
+        padding-bottom: $content-padding;
+    }
+
+    .calendar-container {
+        padding: 0;
+    }
+}
+
+.responsive-cell {
+    margin-bottom: 15px;
+
+    .tab-content {
+        .box-type1 {
+            margin-bottom: 0;
+
+            .container-fluid {
+                padding-#{$start}: $content-padding;
+                padding-#{$end}: $content-padding;
+            }
+        }
+    }
+
+    .box-type1 {
+        margin-#{$end}: 0;
+        margin-#{$start}: 0;
+
+        .filter-box {
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .container-fluid {
+            padding-#{$start}: 0;
+            padding-#{$end}: 0;
+        }
+    }
+}
+
+.layout-content {
+    > .scrollable-container {
+        @include safe-area-property-left(padding-left, $content-padding, false);
+        @include safe-area-property-right(padding-right, $content-padding, false);
+    }
+
+    // Update offset on pages with sidebar
+    > .sidebar-container .category-data {
+        padding-#{$start}: $content-padding;
+    }
+
+    //  Update offset on view pages
+    .layout-content .scrollspy-main-container > .scrollable-container {
+        margin-#{$start}: -$content-padding;
+        margin-#{$end}: -$content-padding;
+        padding-#{$start}: $content-padding;
+        padding-#{$end}: $content-padding;
+    }
+}
+
+//  Update offset on create / update pages
+form > .layout-content {
+    padding-#{$start}: $content-padding;
+    padding-#{$end}: $content-padding;
+
+    .scrollspy-main-container > .scrollable-container {
+        margin-#{$start}: -$content-padding;
+        margin-#{$end}: -$content-padding;
+        padding-#{$start}: $content-padding;
+        padding-#{$end}: $content-padding;
+    }
+}
+
+.page-title + [data-bound-component*="datagrid"] {
+    padding-#{$start}: $content-padding;
+    padding-#{$end}: $content-padding;
+}
+
+.oro-page {
+    &.collapsible-sidebar {
+        @media only screen and (min-width: 820px) {
+            .oro-page-sidebar {
+                > .dropdown-menu {
+                    display: block !important;
+                    z-index: inherit;
+                }
+            }
+        }
+
+        @media only screen and (max-width: 820px) {
+            overflow: visible;
+
+            .oro-page-sidebar {
+                overflow: visible;
+                clear: both;
+                width: 100%;
+
+                > .dropdown-toggle:focus {
+                    font-weight: normal;
+                }
+
+                > .dropdown-toggle {
+                    display: block;
+                    background: $primary-inverse;
+                    line-height: 30px;
+                    margin: 0 10px;
+                }
+
+                > .dropdown-menu {
+                    z-index: 900;
+                    position: absolute;
+                    padding: 5px 0;
+                    margin: 2px 0 0;
+                    background-color: $primary-inverse;
+                    border: 1px solid rgba(0, 0, 0, .2);
+                    border-radius: 6px;
+                    box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+
+                    > li {
+                        width: auto;
+                    }
+                }
+            }
+
+            .oro-page-body {
+                width: 100%;
+                overflow: hidden;
+            }
+        }
+    }
+}

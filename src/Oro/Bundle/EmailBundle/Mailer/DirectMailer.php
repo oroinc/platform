@@ -10,7 +10,6 @@ use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -126,7 +125,7 @@ class DirectMailer extends \Swift_Mailer
         $port = $smtpSettings->getPort();
         $encryption = $smtpSettings->getEncryption();
 
-        if ($transport instanceof \Swift_SmtpTransport) {
+        if ($transport instanceof \Swift_Transport_EsmtpTransport) {
             $transport->setHost($host);
             $transport->setPort($port);
             $transport->setEncryption($encryption);
@@ -163,15 +162,22 @@ class DirectMailer extends \Swift_Mailer
                 }
             }
 
-            if ($transport instanceof \Swift_Transport_EsmtpTransport) {
-                $this->addXOAuth2Authenticator($transport);
-            }
-
-            if ($transport instanceof \Swift_Transport_AbstractSmtpTransport) {
-                $this->configureTransportLocalDomain($transport);
-            }
-
             $this->transport = $transport;
+
+            // replacing the original transport with SMTP transport
+            // which configured with parameters from the System Configuration -> SMTP Settings
+            $this->prepareSmtpTransport(null);
+            if ($this->smtpTransport) {
+                $this->transport = $this->smtpTransport;
+            }
+
+            if ($this->transport instanceof \Swift_Transport_EsmtpTransport) {
+                $this->addXOAuth2Authenticator($this->transport);
+            }
+
+            if ($this->transport instanceof \Swift_Transport_AbstractSmtpTransport) {
+                $this->configureTransportLocalDomain($this->transport);
+            }
         }
 
         return $this->transport;
@@ -258,20 +264,13 @@ class DirectMailer extends \Swift_Mailer
         $realTransport = null;
         $mailers       = array_keys($this->container->getParameter('swiftmailer.mailers'));
         foreach ($mailers as $name) {
-            if ($this->container instanceof IntrospectableContainerInterface
-                && !$this->container->initialized(sprintf('swiftmailer.mailer.%s', $name))
+            if (!$this->container->initialized(sprintf('swiftmailer.mailer.%s', $name))
             ) {
                 continue;
             }
             $mailer = $this->container->get(sprintf('swiftmailer.mailer.%s', $name));
             if ($mailer === $this->baseMailer) {
-                if ($name === 'default') {
-                    $realTransport = $this->container->get('oro_email.util.configurable_transport')
-                        ->getDefaultTransport();
-                } else {
-                    $realTransport = $this->container->get(sprintf('swiftmailer.mailer.%s.transport.real', $name));
-                }
-
+                $realTransport = $this->container->get(sprintf('swiftmailer.mailer.%s.transport.real', $name));
                 break;
             }
         }

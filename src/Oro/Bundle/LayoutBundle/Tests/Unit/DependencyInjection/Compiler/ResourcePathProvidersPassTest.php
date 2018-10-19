@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ResourcePathProvidersPassTest extends \PHPUnit_Framework_TestCase
+class ResourcePathProvidersPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ResourcePathProvidersPass */
     protected $pass;

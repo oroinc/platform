@@ -13,6 +13,8 @@ use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
@@ -21,7 +23,7 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
     use EntityTrait;
 
-    /** @var VariableGuesser|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var VariableGuesser|\PHPUnit\Framework\MockObject\MockObject */
     protected $variableGuesser;
 
     /** @var WorkflowVariablesType */
@@ -29,21 +31,35 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $classMetadata = $this->createMock(ClassMetadataInfo::class);
         $classMetadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['id']);
 
         $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects($this->any())->method('getClassMetadata')->willReturn($classMetadata);
 
-        /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $managerRegistry */
+        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $managerRegistry */
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $managerRegistry->expects($this->any())->method('getManagerForClass')->willReturn($entityManager);
 
         $this->variableGuesser = $this->createMock(VariableGuesser::class);
 
         $this->type = new WorkflowVariablesType($this->variableGuesser, $managerRegistry);
+        parent::setUp();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    $this->type
+                ],
+                []
+            ),
+        ];
     }
 
     public function testBuildForm()
@@ -68,11 +84,11 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->method('addModelTransformer')
             ->with($this->isInstanceOf(WorkflowVariableDataTransformer::class));
 
-        /** @var FormBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
+        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->once())
             ->method('create')
-            ->with('variableName', 'entity', ['label' => 'testLabel'])
+            ->with('variableName', EntityType::class, ['label' => 'testLabel'])
             ->willReturn($field);
         $builder->expects($this->once())->method('add')->with($field);
 
@@ -101,7 +117,7 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             $this->variableGuesser->expects($this->at($number))->method('guessVariableForm')->willReturn($typeGuess);
         }
 
-        $form = $this->factory->create($this->type, null, $formOptions);
+        $form = $this->factory->create(WorkflowVariablesType::class, null, $formOptions);
 
         $this->assertSameSize($childrenOptions, $form->all());
 
@@ -284,7 +300,7 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             );
         }
 
-        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
         $workflow = $this->createMock(Workflow::class);
         $workflow->expects($this->any())->method('getVariables')->willReturn($variableCollection);
 

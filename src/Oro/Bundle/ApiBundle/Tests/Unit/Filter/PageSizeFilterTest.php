@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
 
-class PageSizeFilterTest extends \PHPUnit_Framework_TestCase
+class PageSizeFilterTest extends \PHPUnit\Framework\TestCase
 {
     public function testApplyWithoutFilter()
     {
@@ -16,7 +16,7 @@ class PageSizeFilterTest extends \PHPUnit_Framework_TestCase
 
         $filter->apply($criteria);
 
-        $this->assertNull($criteria->getMaxResults());
+        self::assertNull($criteria->getMaxResults());
     }
 
     public function testApplyWithFilter()
@@ -27,6 +27,6 @@ class PageSizeFilterTest extends \PHPUnit_Framework_TestCase
 
         $filter->apply($criteria, $filterValue);
 
-        $this->assertSame(10, $criteria->getMaxResults());
+        self::assertSame(10, $criteria->getMaxResults());
     }
 }

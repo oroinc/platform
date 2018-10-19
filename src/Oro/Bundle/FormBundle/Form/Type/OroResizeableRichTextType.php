@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Symfony\Component\Form\AbstractType;
 
 class OroResizeableRichTextType extends AbstractType
@@ -29,6 +30,6 @@ class OroResizeableRichTextType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_rich_text';
+        return OroRichTextType::class;
     }
 }

@@ -3,31 +3,37 @@ parameters:
         'Doctrine\ORM\Query::HYDRATE_OBJECT':
             name: ObjectHydrator
             class: Doctrine\ORM\Internal\Hydration\ObjectHydrator
+            collection: true
         'Doctrine\ORM\Query::HYDRATE_ARRAY':
             name: ArrayHydrator
             class: Doctrine\ORM\Internal\Hydration\ArrayHydrator
+            collection: true
         'Doctrine\ORM\Query::HYDRATE_SCALAR':
             name: ScalarHydrator
             class: Doctrine\ORM\Internal\Hydration\ScalarHydrator
+            collection: true
         'Doctrine\ORM\Query::HYDRATE_SINGLE_SCALAR':
             name: SingleScalarHydrator
             class: Doctrine\ORM\Internal\Hydration\SingleScalarHydrator
+            collection: false
         'Doctrine\ORM\Query::HYDRATE_SIMPLEOBJECT':
             name: SimpleObjectHydrator
             class: Doctrine\ORM\Internal\Hydration\SimpleObjectHydrator
+            collection: true
         'Gedmo\Translatable\Query\TreeWalker\TranslationWalker::HYDRATE_OBJECT_TRANSLATION':
             name: TranslatableObjectHydrator
             class: Gedmo\Translatable\Hydrator\ORM\ObjectHydrator
+            collection: true
         'Gedmo\Translatable\Query\TreeWalker\TranslationWalker::HYDRATE_SIMPLE_OBJECT_TRANSLATION':
             name: TranslatableSimpleObjectHydrator
             class: Gedmo\Translatable\Hydrator\ORM\SimpleObjectHydrator
-
+            collection: true
 services:
     oro_entity.cache.warmer.logging_hydrator:
         public: false
         class: Oro\Bundle\EntityBundle\Cache\LoggingHydratorWarmer
         arguments:
-            - %oro_entity.orm.hydrators%
+            - '%oro_entity.orm.hydrators%'
         tags:
             - { name: kernel.cache_warmer, priority: 30 }
 
@@ -35,7 +41,7 @@ services:
         public: false
         class: Oro\Bundle\EntityBundle\DataCollector\OrmLogger
         arguments:
-            - %oro_entity.orm.hydrators%
+            - '%oro_entity.orm.hydrators%'
             - '@doctrine'
             - "@?debug.stopwatch"
 

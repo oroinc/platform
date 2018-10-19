@@ -4,7 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\OrganizationUniqueEntity;
 
-class OrganizationUniqueEntityTest extends \PHPUnit_Framework_TestCase
+class OrganizationUniqueEntityTest extends \PHPUnit\Framework\TestCase
 {
     public function testService()
     {

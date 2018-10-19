@@ -8,7 +8,7 @@ use Oro\Bundle\EntityMergeBundle\Model\Accessor\InverseAssociationAccessor;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\CollectionItemStub;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
-class InverseAssociationAccessorTest extends \PHPUnit_Framework_TestCase
+class InverseAssociationAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var InverseAssociationAccessor
@@ -16,7 +16,7 @@ class InverseAssociationAccessorTest extends \PHPUnit_Framework_TestCase
     protected $accessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 

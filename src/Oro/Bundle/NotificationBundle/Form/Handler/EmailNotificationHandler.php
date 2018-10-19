@@ -4,12 +4,15 @@ namespace Oro\Bundle\NotificationBundle\Form\Handler;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class EmailNotificationHandler implements FormHandlerInterface
 {
+    use  RequestHandlerTrait;
+
     const SUBMIT_MARKER = 'formSubmitMarker';
 
     /** @var ManagerRegistry */
@@ -35,7 +38,7 @@ class EmailNotificationHandler implements FormHandlerInterface
         $form->setData($data);
 
         if ($this->isApplicable($request)) {
-            $form->submit($request);
+            $this->submitPostPutRequest($form, $request);
 
             if ($form->isValid()) {
                 $manager = $this->registry->getManagerForClass('OroNotificationBundle:EmailNotification');

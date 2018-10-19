@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Form\Handler;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent;
 use Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent;
@@ -12,6 +13,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ChannelHandler
 {
+    use RequestHandlerTrait;
+
     const UPDATE_MARKER = 'formUpdateMarker';
 
     /** @var RequestStack */
@@ -67,7 +70,7 @@ class ChannelHandler
             // We must not clear missing values if it is just a form update, i.e ($updateMarker == true),
             // because we will lose default values of underlying entity.
             // Otherwise, if it just a normal submit, we have to submit form in a normal way.
-            $this->form->submit($request, !$updateMarker);
+            $this->submitPostPutRequest($this->form, $request, !$updateMarker);
             if (!$updateMarker && $this->form->isValid()) {
                 $this->em->persist($entity);
                 $this->em->flush();

@@ -8,7 +8,7 @@ use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CreateObjectTest extends \PHPUnit_Framework_TestCase
+class CreateObjectTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CreateObject

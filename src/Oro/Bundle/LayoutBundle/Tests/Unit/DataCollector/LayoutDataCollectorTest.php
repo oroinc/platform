@@ -12,9 +12,9 @@ use Oro\Component\Layout\Tests\Unit\Stubs\ContextItemStub;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
+class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LayoutContextHolder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutContextHolder|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextHolder;
 
     /** @var LayoutDataCollector */
@@ -28,7 +28,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
             'oro_layout.debug_developer_toolbar' => true
         ];
 
-        /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
+        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())
             ->method('get')
@@ -110,7 +110,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
         foreach ($blockViews as $blockView) {
             $blockView->vars = $options[$blockView->vars['id']];
 
-            /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
+            /** @var BlockInterface|\PHPUnit\Framework\MockObject\MockObject $block */
             $block = $this->createMock(BlockInterface::class);
             $block->expects($this->any())
                 ->method('getId')
@@ -144,7 +144,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
         $blockViews = $this->getBlockViews($rootBlock, current($tree));
 
         foreach ($options as $id => $blockOptions) {
-            /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
+            /** @var BlockInterface|\PHPUnit\Framework\MockObject\MockObject $block */
             $block = $this->createMock(BlockInterface::class);
             $block->expects($this->any())
                 ->method('getId')
@@ -156,7 +156,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
         foreach ($blockViews as $blockView) {
             $blockView->vars = $options[$blockView->vars['id']];
 
-            /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
+            /** @var BlockInterface|\PHPUnit\Framework\MockObject\MockObject $block */
             $block = $this->createMock(BlockInterface::class);
             $block->expects($this->any())
                 ->method('getId')
@@ -247,7 +247,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * @return Request|\PHPUnit_Framework_MockObject_MockObject
+     * @return Request|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMockRequest()
     {
@@ -255,7 +255,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Response|\PHPUnit_Framework_MockObject_MockObject
+     * @return Response|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMockResponse()
     {

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\EntityExtendBundle\Form\Type\EnumChoiceType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumIdChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -12,10 +13,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EnumIdChoiceTypeTest extends TypeTestCase
 {
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
     /** @var EnumIdChoiceType */
@@ -35,7 +36,7 @@ class EnumIdChoiceTypeTest extends TypeTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_enum_choice', $this->type->getParent());
+        $this->assertEquals(EnumChoiceType::class, $this->type->getParent());
     }
 
     public function testGetName()
@@ -45,7 +46,7 @@ class EnumIdChoiceTypeTest extends TypeTestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver **/
+        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver **/
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')

@@ -1,0 +1,11 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/mixins";
+
+.mobile-version {
+    @import "oroui/css/scss/mobile/variables";
+    @import "variables";
+    @import "./big-numbers";
+    @import "./dashboard";
+    @import "./launchpad";
+}

@@ -1,4 +1,0 @@
-assets:
-    css:
-      'oroorganization':
-          - 'bundles/oroorganization/css/less/oro.organization.less'

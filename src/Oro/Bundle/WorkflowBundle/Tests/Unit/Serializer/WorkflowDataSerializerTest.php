@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer;
 
-class WorkflowDataSerializerTest extends \PHPUnit_Framework_TestCase
+class WorkflowDataSerializerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var WorkflowDataSerializer
@@ -24,7 +24,7 @@ class WorkflowDataSerializerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createWorkflowRegistryMock()
     {

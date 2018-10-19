@@ -7,12 +7,12 @@ use Oro\Bundle\FormBundle\Validator\Constraints\EntityClass;
 use Oro\Bundle\FormBundle\Validator\Constraints\EntityClassValidator;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
-class EntityClassValidatorTest extends \PHPUnit_Framework_TestCase
+class EntityClassValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityClassNameHelper;
 
     /** @var EntityClassValidator */

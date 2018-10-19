@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CollectSubresources;
 
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -28,13 +27,18 @@ class InitializeSubresources extends LoadSubresources
 
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
-
-        $accessibleResources = array_fill_keys($context->getAccessibleResources(), true);
+        $accessibleResources = \array_fill_keys($context->getAccessibleResources(), true);
         $resources = $context->getResources();
         foreach ($resources as $resource) {
-            $subresources->add(
-                $this->createEntitySubresources($resource, $version, $requestType, $accessibleResources)
+            $entitySubresources = $this->createEntitySubresources(
+                $resource,
+                $version,
+                $requestType,
+                $accessibleResources
             );
+            if (null !== $entitySubresources) {
+                $subresources->add($entitySubresources);
+            }
         }
     }
 
@@ -44,33 +48,38 @@ class InitializeSubresources extends LoadSubresources
      * @param RequestType $requestType
      * @param array       $accessibleResources
      *
-     * @return ApiResourceSubresources
+     * @return ApiResourceSubresources|null
      */
-    protected function createEntitySubresources(
+    private function createEntitySubresources(
         ApiResource $resource,
-        $version,
+        string $version,
         RequestType $requestType,
         array $accessibleResources
-    ) {
+    ): ?ApiResourceSubresources {
         $entityClass = $resource->getEntityClass();
         $config = $this->getConfig($entityClass, $version, $requestType);
+        if (null === $config) {
+            return null;
+        }
         $metadata = $this->getMetadata($entityClass, $version, $requestType, $config);
         if (null === $metadata) {
-            throw new RuntimeException(sprintf('A metadata for "%s" entity does not exist.', $entityClass));
+            return null;
         }
 
-        $subresourceExcludedActions = $this->getSubresourceExcludedActions($resource);
         $entitySubresources = new ApiResourceSubresources($entityClass);
         $associations = $metadata->getAssociations();
-        foreach ($associations as $associationName => $association) {
-            if ($this->isExcludedAssociation($associationName, $config)) {
-                continue;
-            }
+        if (!empty($associations) && $this->isSubresourcesEnabled($resource)) {
+            $subresourceExcludedActions = $this->getSubresourceExcludedActions($resource);
+            foreach ($associations as $associationName => $association) {
+                if ($this->isExcludedAssociation($associationName, $config)) {
+                    continue;
+                }
 
-            $entitySubresources->addSubresource(
-                $associationName,
-                $this->createSubresource($association, $accessibleResources, $subresourceExcludedActions)
-            );
+                $entitySubresources->addSubresource(
+                    $associationName,
+                    $this->createSubresource($association, $accessibleResources, $subresourceExcludedActions)
+                );
+            }
         }
 
         return $entitySubresources;

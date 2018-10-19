@@ -4,39 +4,39 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 
-class EntityIdentifierTest extends \PHPUnit_Framework_TestCase
+class EntityIdentifierTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructorWithoutArguments()
     {
         $entityIdentifier = new EntityIdentifier();
-        $this->assertNull($entityIdentifier->getId());
-        $this->assertNull($entityIdentifier->getClass());
-        $this->assertSame([], $entityIdentifier->getAttributes());
+        self::assertNull($entityIdentifier->getId());
+        self::assertNull($entityIdentifier->getClass());
+        self::assertSame([], $entityIdentifier->getAttributes());
     }
 
     public function testConstructor()
     {
         $entityIdentifier = new EntityIdentifier('id', 'class');
-        $this->assertEquals('id', $entityIdentifier->getId());
-        $this->assertEquals('class', $entityIdentifier->getClass());
+        self::assertEquals('id', $entityIdentifier->getId());
+        self::assertEquals('class', $entityIdentifier->getClass());
     }
 
     public function testId()
     {
         $entityIdentifier = new EntityIdentifier();
-        $this->assertNull($entityIdentifier->getId());
+        self::assertNull($entityIdentifier->getId());
 
         $entityIdentifier->setId('test');
-        $this->assertEquals('test', $entityIdentifier->getId());
+        self::assertEquals('test', $entityIdentifier->getId());
     }
 
     public function testClass()
     {
         $entityIdentifier = new EntityIdentifier();
-        $this->assertNull($entityIdentifier->getClass());
+        self::assertNull($entityIdentifier->getClass());
 
         $entityIdentifier->setClass('test');
-        $this->assertEquals('test', $entityIdentifier->getClass());
+        self::assertEquals('test', $entityIdentifier->getClass());
     }
 
     public function testAttributes()
@@ -44,13 +44,13 @@ class EntityIdentifierTest extends \PHPUnit_Framework_TestCase
         $entityIdentifier = new EntityIdentifier();
 
         $entityIdentifier->setAttribute('name', 'value');
-        $this->assertTrue($entityIdentifier->hasAttribute('name'));
-        $this->assertEquals('value', $entityIdentifier->getAttribute('name'));
-        $this->assertEquals(['name' => 'value'], $entityIdentifier->getAttributes());
+        self::assertTrue($entityIdentifier->hasAttribute('name'));
+        self::assertEquals('value', $entityIdentifier->getAttribute('name'));
+        self::assertEquals(['name' => 'value'], $entityIdentifier->getAttributes());
 
         $entityIdentifier->removeAttribute('name');
-        $this->assertFalse($entityIdentifier->hasAttribute('name'));
-        $this->assertSame([], $entityIdentifier->getAttributes());
+        self::assertFalse($entityIdentifier->hasAttribute('name'));
+        self::assertSame([], $entityIdentifier->getAttributes());
     }
 
     /**
@@ -68,13 +68,13 @@ class EntityIdentifierTest extends \PHPUnit_Framework_TestCase
         $entityIdentifier = new EntityIdentifier();
 
         $entityIdentifier['name'] = 'value';
-        $this->assertTrue(isset($entityIdentifier['name']));
-        $this->assertEquals('value', $entityIdentifier['name']);
-        $this->assertEquals(['name' => 'value'], $entityIdentifier->getAttributes());
+        self::assertTrue(isset($entityIdentifier['name']));
+        self::assertEquals('value', $entityIdentifier['name']);
+        self::assertEquals(['name' => 'value'], $entityIdentifier->getAttributes());
 
         unset($entityIdentifier['name']);
-        $this->assertFalse(isset($entityIdentifier['name']));
-        $this->assertSame([], $entityIdentifier->getAttributes());
+        self::assertFalse(isset($entityIdentifier['name']));
+        self::assertSame([], $entityIdentifier->getAttributes());
     }
 
     /**

@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceCollection;
 
 /**
+ * The execution context for processors for "collect_resources" action.
  * @method ApiResourceCollection|ApiResource[] getResult()
  */
 class CollectResourcesContext extends ApiContext

@@ -3,9 +3,19 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Controller;
 
 use Oro\Bundle\TranslationBundle\Controller\Controller;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Component\HttpFoundation\Request;
 
-class ControllerTest extends \PHPUnit_Framework_TestCase
+class ControllerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    protected $translator;
+
+    /** @var EngineInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $templating;
+
+    /** @var array */
     protected $translations = [
         'jsmessages' => [
             'foo' => 'Foo',
@@ -17,62 +27,63 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         ],
     ];
 
+    protected function setUp()
+    {
+        $this->translator = $this->createMock(Translator::class);
+        $this->templating = $this->createMock(EngineInterface::class);
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Please provide valid twig template as third argument
      */
     public function testConstructor()
     {
-        $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')
-            ->getMockForAbstractClass();
-        $translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        new Controller($translator, $templating, '', []);
+        new Controller($this->translator, $this->templating, '', []);
     }
 
     public function testIndexAction()
     {
         $content = 'CONTENT';
-        $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')
-            ->getMockForAbstractClass();
-        $templating->expects($this->once())
+
+        $this->templating->expects($this->once())
             ->method('render')
             ->will($this->returnValue($content));
-        $translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $translator->expects($this->once())
+
+        $this->translator->expects($this->once())
             ->method('getTranslations')
             ->will($this->returnValue([]));
+
         $controller = new Controller(
-            $translator,
-            $templating,
+            $this->translator,
+            $this->templating,
             'OroTranslationBundle:Translation:translation.js.twig',
             []
         );
 
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
+        $request = $this->createMock(Request::class);
         $request->expects($this->once())
             ->method('getMimeType')
-            ->with('js')
-            ->will($this->returnValue('JS'));
+            ->with('json')
+            ->will($this->returnValue('JSON'));
+
         $response = $controller->indexAction($request, 'en');
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
         $this->assertEquals($content, $response->getContent());
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('JS', $response->headers->get('Content-Type'));
+        $this->assertEquals('JSON', $response->headers->get('Content-Type'));
     }
 
     /**
      * @dataProvider dataProviderRenderJsTranslationContent
+     *
+     * @param $params
+     * @param $expected
      */
     public function testRenderJsTranslationContent($params, $expected)
     {
-        $templating = $this->createMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
-        $templating
+        $this->templating
             ->expects($this->any())
             ->method('render')
             ->will(
@@ -84,25 +95,21 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
 
-        $translations = $this->translations;
-        $translator
+        $this->translator
             ->expects($this->any())
             ->method('getTranslations')
             ->will(
                 $this->returnCallback(
-                    function ($domains) use ($translations) {
-                        return array_intersect_key($translations, array_flip($domains));
+                    function ($domains) {
+                        return array_intersect_key($this->translations, array_flip($domains));
                     }
                 )
             );
 
         $controller = new Controller(
-            $translator,
-            $templating,
+            $this->translator,
+            $this->templating,
             'OroTranslationBundle:Translation:translation.js.twig',
             []
         );
@@ -111,6 +118,9 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
+    /**
+     * @return array
+     */
     public function dataProviderRenderJsTranslationContent()
     {
         return [

@@ -8,7 +8,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
- * Class DictionaryFilter implements enum filter
+ * A filter that can be used on any grid to get entities by any related entity to original one.
  */
 class DictionaryFilter extends BaseMultiChoiceFilter
 {
@@ -55,7 +55,7 @@ class DictionaryFilter extends BaseMultiChoiceFilter
      */
     protected function getFormType()
     {
-        return DictionaryFilterType::NAME;
+        return DictionaryFilterType::class;
     }
 
     /**
@@ -90,6 +90,7 @@ class DictionaryFilter extends BaseMultiChoiceFilter
         try {
             $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
             list($joinAlias) = explode('.', $fieldName);
+
             $join = QueryBuilderUtil::findJoinByAlias($ds->getQueryBuilder(), $joinAlias);
             if ($join && $this->isToOne($ds)) {
                 return $join->getJoin();
@@ -100,7 +101,9 @@ class DictionaryFilter extends BaseMultiChoiceFilter
             $class = $this->get('options')['class'];
             $metadata = $em->getClassMetadata($class);
             $fieldNames = $metadata->getIdentifierFieldNames();
-            if ($count = count($fieldNames) !== 1) {
+
+            $count = count($fieldNames);
+            if ($count !== 1) {
                 throw new \LogicException('Class needs to have exactly 1 identifier, but it has "%d"', $count);
             }
             $field = sprintf('%s.%s', $joinAlias, $fieldNames[0]);

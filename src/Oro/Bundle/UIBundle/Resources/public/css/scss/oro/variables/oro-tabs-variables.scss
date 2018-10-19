@@ -1,0 +1,22 @@
+/* @theme: admin.oro; */
+
+$oro-tabs-vertical-display: flex !default;
+
+$oro-tabs-head-width: 180px !default;
+$oro-tabs-head-flex-grow: 0 !default;
+$oro-tabs-head-flex-shrink: 0 !default;
+$oro-tabs-head-outer-offset-right: -2px !default;
+$oro-tabs-head-position: relative !default;
+
+$oro-tabs-content-flex-grow: 1 !default;
+$oro-tabs-content-border-left: 2px solid $primary-750 !default;
+
+$oro-tabs-subtitle-inner-offset: 8px 12px !default;
+$oro-tabs-subtitle-font-weight: bold !default;
+
+$oro-tabs-tab-pane-min-height: 104px !default;
+
+$oro-tabs-fill-tab-border: none !default;
+$oro-tabs-fill-tab-box-shadow: none !default;
+$oro-tabs-fill-tab-box-sizing: border-box !default;
+$oro-tabs-fill-tab-width: 100% !default;

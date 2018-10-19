@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
+namespace Oro\Bundle\LocaleBundle\Tests\Unit\Manager;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ObjectRepository;
@@ -13,23 +13,26 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
+class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ObjectRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ObjectRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var LocalizationManager */
     protected $manager;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $cacheProvider;
 
     /** @var Localization[]|array */
@@ -261,14 +264,12 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function assertRepositoryCalls(Localization $entity = null, array $entities = [])
     {
-        $this->repository->expects($this->never())->method('find');
-
         if (count($entities) > 0) {
             $this->repository->expects($this->once())->method('findBy')->willReturn($entities);
         }
 
         if ($entity) {
-            $this->repository->expects($this->once())->method('findOneBy')->willReturn($entity);
+            $this->repository->expects($this->once())->method('find')->willReturn($entity);
         }
     }
 

@@ -9,7 +9,7 @@ Feature: Managing users roles
   Scenario: User role create
     Given I login as administrator
     And go to System/User Management/Roles
-    When I press "Create Role"
+    When I click "Create Role"
     And I save and close form
     Then I should see validation errors:
       | Role      | This value should not be blank.  |
@@ -33,7 +33,7 @@ Feature: Managing users roles
       | Manage abandoned cart campaigns |
 
   Scenario: Edit user role
-    Given I press "Edit"
+    Given I click "Edit"
     When I fill form with:
       | Role        | Edited test role              |
       | Description | Hello it's edited description |

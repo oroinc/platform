@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class DatagridGuesserTest extends \PHPUnit_Framework_TestCase
+class DatagridGuesserTest extends \PHPUnit\Framework\TestCase
 {
     public function testApplyColumnGuesses()
     {

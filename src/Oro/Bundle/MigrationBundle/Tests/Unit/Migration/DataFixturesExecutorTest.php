@@ -9,12 +9,12 @@ use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutor;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DataFixturesExecutorTest extends \PHPUnit_Framework_TestCase
+class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
     /** @var DataFixturesExecutor */

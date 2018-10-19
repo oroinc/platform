@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Form\Type;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -44,7 +45,7 @@ class EntityChoiceType extends AbstractType
                 'choice_attr'          => function ($choice) {
                     return $this->getChoiceAttributes($choice);
                 },
-                'empty_value'          => '',
+                'placeholder'          => '',
                 'show_plural'          => false,
                 'configs'              => $defaultConfigs,
                 'translatable_options' => false,
@@ -66,13 +67,13 @@ class EntityChoiceType extends AbstractType
                 }
             ]
         );
-        $resolver->setNormalizers(
-            [
-                // this normalizer allows to add/override config options outside
-                'configs' => function (Options $options, $configs) use ($defaultConfigs) {
-                    return array_merge($defaultConfigs, $configs);
-                }
-            ]
+
+        // this normalizer allows to add/override config options outside
+        $resolver->setNormalizer(
+            'configs',
+            function (Options $options, $configs) use ($defaultConfigs) {
+                return array_merge($defaultConfigs, $configs);
+            }
         );
     }
 
@@ -111,7 +112,8 @@ class EntityChoiceType extends AbstractType
     {
         $choices = [];
         foreach ($this->getEntities($showPlural, $applyExclusions) as $entityClass => $entity) {
-            $choices[$entityClass] = $showPlural ? $entity['plural_label'] : $entity['label'];
+            $key = $showPlural ? $entity['plural_label'] : $entity['label'];
+            $choices[$key] = $entityClass;
         }
 
         return $choices;
@@ -139,7 +141,7 @@ class EntityChoiceType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_choice';
+        return Select2ChoiceType::class;
     }
 
     /**

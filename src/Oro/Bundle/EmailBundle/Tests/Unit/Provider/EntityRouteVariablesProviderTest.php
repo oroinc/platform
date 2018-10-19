@@ -11,7 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Translation\Translator;
 
-class EntityRouteVariablesProviderTest extends \PHPUnit_Framework_TestCase
+class EntityRouteVariablesProviderTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_ENTITY_NAME = 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEntityForVariableProvider';
     const TEST_EXTEND_ENTITY_NAME = ExtendHelper::ENTITY_NAMESPACE . 'TestEntity';
@@ -19,16 +19,16 @@ class EntityRouteVariablesProviderTest extends \PHPUnit_Framework_TestCase
     /** @var EntityRouteVariablesProvider */
     protected $provider;
 
-    /** @var  Translator|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  Translator|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var  EntityConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigManager;
 
-    /** @var  ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendConfigProvider;
 
-    /** @var  ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigProvider;
 
     protected function setUp()

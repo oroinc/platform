@@ -1,11 +1,14 @@
 define(function(require) {
     'use strict';
 
+    var BaseController;
     var $ = require('jquery');
     var Chaplin = require('chaplin');
-    var BaseController;
-    var reuses;
-    var promiseLoads;
+    var beforeActionPromises = [
+        // add DOM Ready promise to loads promises,
+        // in order to prevent route action execution before the page is ready
+        $.ready
+    ];
 
     BaseController = Chaplin.Controller.extend({
         /**
@@ -18,20 +21,13 @@ define(function(require) {
         beforeAction: function(params, route, options) {
             BaseController.__super__.beforeAction.apply(this, arguments);
 
-            var self = this;
+            // if it's first time route
+            if (!route.previous) {
+                // initializes page cache
+                this.cache.init(route);
+            }
 
-            return $.when.apply($, promiseLoads).then(function() {
-                var i;
-                // if it's first time route
-                if (!route.previous) {
-                    // initializes page cache
-                    self.cache.init(route);
-                }
-                // compose global instances
-                for (i = 0; i < reuses.length; i += 1) {
-                    self.reuse.apply(self, reuses[i]);
-                }
-            });
+            return $.when.apply($, beforeActionPromises);
         },
 
         /**
@@ -79,44 +75,17 @@ define(function(require) {
                 }, path);
             }
         }
+    }, {
+        /**
+         * Adds custom promise object in to beforeAction promises collection
+         *
+         * @param {Promise} promise
+         * @static
+         */
+        addBeforeActionPromise: function(promise) {
+            beforeActionPromises.push(promise);
+        }
     });
-
-    reuses = [];
-    promiseLoads = [
-        // add DOM Ready promise to loads promises,
-        // in order to prevent route action execution before the page is ready
-        $.ready
-    ];
-
-    /**
-     * Collects compositions to reuse before controller action
-     * @static
-     */
-    BaseController.addToReuse = function() {
-        var args = Array.prototype.slice.call(arguments, 0);
-        reuses.push(args);
-    };
-
-    /**
-     * Wrapper over "require" method.
-     *  - loads modules, executes callback and resolves deferred object
-     *
-     * @param {Array} modules
-     * @param {function(...[*])} initCallback
-     * @returns {jQuery.Deferred}
-     * @static
-     */
-    BaseController.loadBeforeAction = function(modules, initCallback) {
-        var deferredLoad = $.Deferred();
-        promiseLoads.push(deferredLoad.promise());
-        var callback = function() {
-            var args;
-            args = Array.prototype.slice.call(arguments, 0);
-            initCallback.apply(null, args);
-            deferredLoad.resolve();
-        };
-        require(modules, callback);
-    };
 
     return BaseController;
 });

@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetModel;
 
-class WidgetModelTest extends \PHPUnit_Framework_TestCase
+class WidgetModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array
@@ -12,12 +12,12 @@ class WidgetModelTest extends \PHPUnit_Framework_TestCase
     public static $expanded = true;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $widgetEntity;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $widgetState;
 

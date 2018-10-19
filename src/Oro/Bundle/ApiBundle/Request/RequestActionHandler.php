@@ -10,7 +10,9 @@ use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
+use Oro\Bundle\ApiBundle\Processor\Options\OptionsContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\AddRelationshipContext;
+use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship\DeleteRelationshipContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetRelationship\GetRelationshipContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\GetSubresourceContext;
@@ -22,6 +24,9 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * The base class for handling Data API actions.
+ */
 abstract class RequestActionHandler
 {
     /** @var string[] */
@@ -192,6 +197,78 @@ abstract class RequestActionHandler
     }
 
     /**
+     * Handles "PATCH /api/{entity}/{id}/{association}" request,
+     * that updates an entity (or entities, it depends on the association type) connected
+     * to the given entity by the given association.
+     * This type of the request is non-standard and do not have default implementation,
+     * additional processors should be added for each association requires it.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleUpdateSubresource(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiActions::UPDATE_SUBRESOURCE);
+        /** @var ChangeSubresourceContext $context */
+        $context = $processor->createContext();
+        $this->prepareSubresourceContext($context, $request);
+        $context->setRequestData($this->getRequestData($request));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Handles "POST /api/{entity}/{id}/{association}" request,
+     * that adds an entity (or entities, it depends on the association type) connected
+     * to the given entity by the given association.
+     * This type of the request is non-standard and do not have default implementation,
+     * additional processors should be added for each association requires it.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleAddSubresource(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiActions::ADD_SUBRESOURCE);
+        /** @var ChangeSubresourceContext $context */
+        $context = $processor->createContext();
+        $this->prepareSubresourceContext($context, $request);
+        $context->setRequestData($this->getRequestData($request));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Handles "DELETE /api/{entity}/{id}/{association}" request,
+     * that deletes an entity (or entities, it depends on the association type) connected
+     * to the given entity by the given association.
+     * This type of the request is non-standard and do not have default implementation,
+     * additional processors should be added for each association requires it.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleDeleteSubresource(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiActions::DELETE_SUBRESOURCE);
+        /** @var ChangeSubresourceContext $context */
+        $context = $processor->createContext();
+        $this->prepareSubresourceContext($context, $request);
+        $context->setRequestData($this->getRequestData($request));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
      * Handles "GET /api/{entity}/{id}/relationships/{association}" request,
      * that returns an entity identifier (for to-one association)
      * or a list of entity identifiers (for to-many association)
@@ -273,6 +350,91 @@ abstract class RequestActionHandler
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
         $context->setRequestData($this->getRequestData($request));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Handles "OPTIONS /api/{entity}/{id}" request,
+     * that returns the communication options for the target resource.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleOptionsItem(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiActions::OPTIONS);
+        /** @var OptionsContext $context */
+        $context = $processor->createContext();
+        $this->preparePrimaryContext($context, $request);
+        $this->prepareOptionsContext($context, $request, OptionsContext::ACTION_TYPE_ITEM);
+        $context->setId($this->getRequestParameter($request, 'id'));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Handles "OPTIONS /api/{entity}" request,
+     * that returns the communication options for the target resource.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleOptionsList(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiActions::OPTIONS);
+        /** @var OptionsContext $context */
+        $context = $processor->createContext();
+        $this->preparePrimaryContext($context, $request);
+        $this->prepareOptionsContext($context, $request, OptionsContext::ACTION_TYPE_LIST);
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Handles "OPTIONS /api/{entity}/{id}/{association}" request,
+     * that returns the communication options for the target resource.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleOptionsSubresource(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiActions::OPTIONS);
+        /** @var OptionsContext $context */
+        $context = $processor->createContext();
+        $this->prepareSubresourceContext($context, $request);
+        $this->prepareOptionsContext($context, $request, OptionsContext::ACTION_TYPE_SUBRESOURCE);
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Handles "OPTIONS /api/{entity}/{id}/relationships/{association}" request,
+     * that returns the communication options for the target resource.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleOptionsRelationship(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiActions::OPTIONS);
+        /** @var OptionsContext $context */
+        $context = $processor->createContext();
+        $this->prepareSubresourceContext($context, $request);
+        $this->prepareOptionsContext($context, $request, OptionsContext::ACTION_TYPE_RELATIONSHIP);
 
         $processor->process($context);
 
@@ -402,6 +564,16 @@ abstract class RequestActionHandler
         $context->setParentClassName($this->getRequestParameter($request, 'entity'));
         $context->setParentId($this->getRequestParameter($request, 'id'));
         $context->setAssociationName($this->getRequestParameter($request, 'association'));
+    }
+
+    /**
+     * @param OptionsContext $context
+     * @param Request        $request
+     * @param string         $actionType
+     */
+    protected function prepareOptionsContext(OptionsContext $context, Request $request, string $actionType): void
+    {
+        $context->setActionType($actionType);
     }
 
     /**

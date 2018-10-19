@@ -53,7 +53,7 @@ class AddLanguageType extends AbstractType
         $resolver->setDefaults(
             [
                 'choices' => $this->getLanguageChoices(),
-                'empty_value' => 'oro.translation.language.form.select.empty_value',
+                'placeholder' => 'oro.translation.language.form.select.empty_value',
             ]
         );
     }
@@ -81,8 +81,10 @@ class AddLanguageType extends AbstractType
         array_walk($intlLangs, [$this, 'formatLanguageLabel']);
 
         return [
-            $this->translator->trans('oro.translation.language.form.select.group.crowdin') => $crowdinLangs,
-            $this->translator->trans('oro.translation.language.form.select.group.intl') => $intlLangs,
+            $this->translator->trans('oro.translation.language.form.select.group.crowdin')
+                => array_flip($crowdinLangs),
+            $this->translator->trans('oro.translation.language.form.select.group.intl')
+                => array_flip($intlLangs),
         ];
     }
 
@@ -91,7 +93,7 @@ class AddLanguageType extends AbstractType
      */
     public function getParent()
     {
-        return OroChoiceType::NAME;
+        return OroChoiceType::class;
     }
 
     /**

@@ -10,15 +10,15 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class UserCheckerTest extends \PHPUnit_Framework_TestCase
+class UserCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var UserChecker|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var UserChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $userChecker;
 
-    /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenStorage;
 
-    /** @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FlashBagInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $flashBag;
 
     protected function setUp()

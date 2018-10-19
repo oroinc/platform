@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Consumption\Exception\ExceptionInterface;
 use Oro\Component\MessageQueue\Consumption\Exception\IllegalContextModificationException;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class IllegalContextModificationExceptionTest extends \PHPUnit_Framework_TestCase
+class IllegalContextModificationExceptionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
     

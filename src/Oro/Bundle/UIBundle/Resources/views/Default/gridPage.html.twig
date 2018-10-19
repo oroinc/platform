@@ -1,9 +1,4 @@
 {% extends "OroUIBundle:Default:index.html.twig" %}
-{% block head %}
-    {{ parent() }}
-    <script type="text/javascript" src="{{ asset('bundles/bowerassets/bootstrap/docs/assets/js/bootstrap-tooltip.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('bundles/bowerassets/bootstrap/docs/assets/js/bootstrap-popover.js') }}"></script>
-{% endblock %}
 {% block content %}
         <div class="layout-content">
             <div class="clearfix"><div class="navbar application-menu">
@@ -11,9 +6,9 @@
                     <div class="container">
                         <div class=" navbar-responsive-collapse">
                             <ul class="nav nav-tabs" id="myTab">
-                                <li class="home"><a href="#myhome"><span>Home</span></a></li>
-                                <li><a href="#mycrm">My CRM</a></li>
-                                <li><a href="#mypim">My PIM</a></li>
+                                <li class="nav-item home"><a href="#myhome" class="nav-link"><span>Home</span></a></li>
+                                <li class="nav-item"><a href="#mycrm" class="nav-link">My CRM</a></li>
+                                <li class="nav-item"><a href="#mypim" class="nav-link">My PIM</a></li>
                             </ul>
                         </div>
                     </div>
@@ -2344,7 +2339,7 @@
                 require(['jquery'],
                 function($) {
                     $(function() {
-                        var _qtyTh = $('table.grid thead th').size();
+                        var _qtyTh = $('table.grid thead th').length;
                         $('table.grid .grid-info td').attr('colspan', _qtyTh);
                         $('table.grid tbody tr:not(.grid-info)').each(function(){
                             var _myRow = $(this);
@@ -2409,8 +2404,6 @@
                 });
             </script>
         </div>
-
-    </div>
 
     </div>
 {% endblock content %}

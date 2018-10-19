@@ -7,9 +7,9 @@ use Oro\Component\Layout\DataProviderDecorator;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutRegistryInterface;
 
-class DataAccessorTest extends \PHPUnit_Framework_TestCase
+class DataAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LayoutRegistryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
     /** @var LayoutContext */
@@ -69,7 +69,7 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
         $expectedData         = new \stdClass();
 
         $this->context[$name] = 'other';
-        $this->context->getResolver()->setOptional([$name]);
+        $this->context->getResolver()->setDefined([$name]);
         $this->context->data()->set($name, $expectedData);
         $this->context->resolve();
 
@@ -87,7 +87,7 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
         $expectedData         = new \stdClass();
 
         $this->context[$name] = 'other';
-        $this->context->getResolver()->setOptional([$name]);
+        $this->context->getResolver()->setDefined([$name]);
         $this->context->data()->set($name, $expectedData);
         $this->context->resolve();
 

@@ -13,23 +13,19 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedAssociationMetadataH
 
 class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $nestedAssociationMetadataHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|NestedAssociationMetadataHelper */
+    private $nestedAssociationMetadataHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityMetadataFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadataFactory */
+    private $entityMetadataFactory;
 
     /** @var EntityNestedAssociationMetadataFactory */
-    protected $entityNestedAssociationMetadataFactory;
+    private $entityNestedAssociationMetadataFactory;
 
     protected function setUp()
     {
-        $this->nestedAssociationMetadataHelper = $this->getMockBuilder(NestedAssociationMetadataHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityMetadataFactory = $this->getMockBuilder(EntityMetadataFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->nestedAssociationMetadataHelper = $this->createMock(NestedAssociationMetadataHelper::class);
+        $this->entityMetadataFactory = $this->createMock(EntityMetadataFactory::class);
 
         $this->entityNestedAssociationMetadataFactory = new EntityNestedAssociationMetadataFactory(
             $this->nestedAssociationMetadataHelper,

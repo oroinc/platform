@@ -82,7 +82,6 @@
 
     {% set dataBlocks = [{
         'title': 'General'|trans,
-        'class': 'active',
         'subblocks': [
             {
                 'title': '',
@@ -112,15 +111,22 @@
     {% endif %}
 
     {% set rolePermissionsGrid %}
+        {% set entityTabPanelId = 'entity-tab-panel-'|uniqid %}
+        {% set tabsOptions = tabsOptions|merge({
+            controlTabPanel: entityTabPanelId
+        }) %}
+
         <div {{ UI.renderPageComponentAttributes({
             module: 'orouser/js/components/role/entity-category-tabs-component',
             options: tabsOptions
         }) }}></div>
-        {{ dataGrid.renderGrid('role-permission-grid', {role: entity}, { cssClass: 'inner-permissions-grid', themeOptions: {readonly: false} }) }}
-        <div {{ UI.renderPageComponentAttributes({
-            module: 'orouser/js/components/role/capability-set-component',
-            options: capabilitySetOptions
-        }) }}></div>
+        <div id="{{ entityTabPanelId }}" role="tabpanel">
+            {{ dataGrid.renderGrid('role-permission-grid', {role: entity}, { cssClass: 'inner-permissions-grid', themeOptions: {readonly: false} }) }}
+            <div {{ UI.renderPageComponentAttributes({
+                module: 'orouser/js/components/role/capability-set-component',
+                options: capabilitySetOptions
+            }) }}></div>
+        </div>
     {% endset %}
 
     {% set dataBlocks = dataBlocks|merge([{

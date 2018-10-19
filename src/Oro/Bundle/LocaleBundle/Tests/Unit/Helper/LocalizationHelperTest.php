@@ -7,17 +7,17 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
+use Oro\Bundle\LocaleBundle\Provider\LocalizationProviderInterface;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\FallbackTrait;
 
-class LocalizationHelperTest extends \PHPUnit_Framework_TestCase
+class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
 {
     use FallbackTrait;
 
-    /** @var LocalizationManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $localizationManager;
 
-    /** @var CurrentLocalizationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $currentLocalizationProvider;
 
     /** @var LocalizationHelper */
@@ -32,7 +32,7 @@ class LocalizationHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->currentLocalizationProvider = $this->getMockBuilder(CurrentLocalizationProvider::class)
+        $this->currentLocalizationProvider = $this->getMockBuilder(LocalizationProviderInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 

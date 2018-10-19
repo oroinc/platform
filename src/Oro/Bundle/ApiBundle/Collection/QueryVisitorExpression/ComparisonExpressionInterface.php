@@ -2,25 +2,29 @@
 
 namespace Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression;
 
-use Doctrine\Common\Collections\Expr\Comparison;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 
+/**
+ * Provides an interface for different kind of comparison expressions.
+ */
 interface ComparisonExpressionInterface
 {
     /**
-     * Builds a comparison expression.
+     * Builds a comparison expression for a specific field.
      *
-     * @param QueryExpressionVisitor $visitor
-     * @param Comparison             $comparison
-     * @param string                 $fieldName
-     * @param string                 $parameterName
+     * @param QueryExpressionVisitor $visitor       The visitor that is used to build a query
+     * @param string                 $field         The unique name of a field
+     * @param string                 $expression    The DQL expression for a field, e.g. LOWER(field)
+     * @param string                 $parameterName The name of parameter unique for each field
+     * @param mixed                  $value         The value of a field
      *
      * @return mixed
      */
     public function walkComparisonExpression(
         QueryExpressionVisitor $visitor,
-        Comparison $comparison,
-        $fieldName,
-        $parameterName
+        string $field,
+        string $expression,
+        string $parameterName,
+        $value
     );
 }

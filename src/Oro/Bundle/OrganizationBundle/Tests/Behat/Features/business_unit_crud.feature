@@ -8,7 +8,7 @@ Feature: Business Unit crud
   Scenario: Required fields Business Unit create form
     Given I login as administrator
     And I go to System/ User Management/ Business Units
-    And press "Create Business Unit"
+    And click "Create Business Unit"
     When I save and close form
     Then I should see validation errors:
       | Name | This value should not be blank. |
@@ -21,7 +21,7 @@ Feature: Business Unit crud
       | Email       | acme@example.com   |
       | Fax         | 45-96-24           |
       | Description | Important guy      |
-    And I check first one record in 1 column
+    And I check first one record in 0 column
     When I save and close form
     Then I should see "Business unit saved" flash message
     And I should see Business Unit with:
@@ -35,7 +35,7 @@ Feature: Business Unit crud
 
   Scenario: Checking user business units
     Given I go to System/ User Management/ Users
-    When I click on John in grid
+    When I click View John in grid
     Then I should see User with:
       | Username       | admin                   |
       | Business Units | Main Acme Business Unit |
@@ -63,7 +63,7 @@ Feature: Business Unit crud
 
   Scenario: Checking user business units
     Given I go to System/ User Management/ Users
-    When I click on John in grid
+    When I click View John in grid
     Then I should see User with:
       | Username       | admin                   |
       | Business Units | Main Demo Business Unit |

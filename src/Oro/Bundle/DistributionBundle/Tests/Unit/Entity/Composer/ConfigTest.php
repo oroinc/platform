@@ -6,7 +6,7 @@ use Oro\Bundle\DistributionBundle\Entity\Composer\Config;
 use Oro\Bundle\DistributionBundle\Entity\Composer\Repository;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends \PHPUnit\Framework\TestCase
 {
     use MockHelperTrait;
 
@@ -151,7 +151,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $data
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createJsonFileMock($data = [])
     {

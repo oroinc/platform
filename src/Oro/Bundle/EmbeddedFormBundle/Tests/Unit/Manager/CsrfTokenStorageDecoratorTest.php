@@ -2,25 +2,26 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager;
 
+use Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorage;
 use Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorageDecorator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
-class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
+class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_SESSION_FIELD_NAME = '_test_sid';
     const TEST_PHP_SESSION_NAME   = 'test_php_sid';
     const TEST_ROUTE_NAME         = 'test_route';
     const TEST_CSRF_TOKEN_ID      = 'test_token_id';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $mainTokenStorage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $embeddedFormTokenStorage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $requestStack;
 
     /** @var CsrfTokenStorageDecorator */
@@ -29,7 +30,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->mainTokenStorage = $this->createMock(TokenStorageInterface::class);
-        $this->embeddedFormTokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->embeddedFormTokenStorage = $this->createMock(CsrfTokenStorage::class);
         $this->requestStack = $this->createMock(RequestStack::class);
 
         $this->csrfTokenStorageDecorator = new CsrfTokenStorageDecorator(
@@ -189,5 +190,20 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_CSRF_TOKEN_ID);
 
         $this->csrfTokenStorageDecorator->removeToken(self::TEST_CSRF_TOKEN_ID);
+    }
+
+    public function testClear()
+    {
+        $request = Request::create('http://test');
+        $request->attributes->set('_route', self::TEST_ROUTE_NAME);
+
+        $this->requestStack->expects(self::once())
+            ->method('getMasterRequest')
+            ->willReturn($request);
+
+        $this->embeddedFormTokenStorage->expects(self::once())
+            ->method('clear');
+
+        $this->csrfTokenStorageDecorator->clear();
     }
 }

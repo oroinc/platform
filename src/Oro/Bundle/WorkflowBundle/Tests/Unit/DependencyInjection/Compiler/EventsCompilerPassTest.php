@@ -7,15 +7,15 @@ use Oro\Bundle\WorkflowBundle\Migrations\Data\ORM\LoadWorkflowNotificationEvents
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class EventsCompilerPassTest extends \PHPUnit_Framework_TestCase
+class EventsCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EventsCompilerPass */
     protected $compilerPass;
 
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $containerBuilder;
 
-    /** @var Definition|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Definition|\PHPUnit\Framework\MockObject\MockObject */
     protected $definition;
 
     protected function setUp()

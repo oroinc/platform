@@ -3,33 +3,39 @@
 namespace Oro\Bundle\SyncBundle\EventListener;
 
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
-use Psr\Log\LoggerInterface;
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 
 class MaintenanceListener
 {
-    /** @var TopicPublisher */
-    protected $publisher;
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var LoggerInterface */
-    protected $logger;
+    /**
+     * @var WebsocketClientInterface
+     */
+    private $client;
 
     /**
-     * @param TopicPublisher         $publisher
+     * @var ConnectionChecker
+     */
+    private $connectionChecker;
+
+    /**
+     * @var TokenAccessorInterface
+     */
+    private $tokenAccessor;
+
+    /**
+     * @param WebsocketClientInterface $client
+     * @param ConnectionChecker $connectionChecker
      * @param TokenAccessorInterface $tokenAccessor
-     * @param LoggerInterface        $logger
      */
     public function __construct(
-        TopicPublisher $publisher,
-        TokenAccessorInterface $tokenAccessor,
-        LoggerInterface $logger
+        WebsocketClientInterface $client,
+        ConnectionChecker $connectionChecker,
+        TokenAccessorInterface $tokenAccessor
     ) {
-        $this->publisher = $publisher;
+        $this->client = $client;
+        $this->connectionChecker = $connectionChecker;
         $this->tokenAccessor = $tokenAccessor;
-        $this->logger = $logger;
     }
 
     public function onModeOn()
@@ -45,17 +51,14 @@ class MaintenanceListener
     /**
      * @param bool $isOn
      */
-    protected function onMode($isOn)
+    private function onMode(bool $isOn)
     {
+        if (!$this->connectionChecker->checkConnection()) {
+            return;
+        }
+
         $userId = $this->tokenAccessor->getUserId();
 
-        try {
-            $this->publisher->send('oro/maintenance', array('isOn' => (bool)$isOn, 'userId' => $userId));
-        } catch (\Exception $e) {
-            $this->logger->error(
-                'Failed to send a message to the topic "oro/maintenance"',
-                ['exception' => $e]
-            );
-        }
+        $this->client->publish('oro/maintenance', ['isOn' => $isOn, 'userId' => $userId]);
     }
 }

@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessor;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface;
 
 /**
- * A base class for different kind of response document builders.
+ * The base class for document builders for different types of Data API responses.
  */
 abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 {
@@ -163,9 +163,9 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     abstract protected function convertToEntityType($entityClass, RequestType $requestType, $throwException = true);
 
     /**
-     * @param mixed               $object
-     * @param RequestType         $requestType
-     * @param EntityMetadata|null $metadata
+     * @param mixed          $object
+     * @param RequestType    $requestType
+     * @param EntityMetadata $metadata
      *
      * @return string
      */

@@ -7,7 +7,6 @@ use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\RelationConfigMerger;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\LoadFromConfigBag as BaseLoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
-use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
@@ -19,25 +18,18 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     private $configBagRegistry;
 
     /**
-     * @param ConfigExtensionRegistry   $configExtensionRegistry
-     * @param ConfigLoaderFactory       $configLoaderFactory
-     * @param ResourceHierarchyProvider $resourceHierarchyProvider
-     * @param ConfigBagRegistry         $configBagRegistry
-     * @param RelationConfigMerger      $relationConfigMerger
+     * @param ConfigExtensionRegistry $configExtensionRegistry
+     * @param ConfigLoaderFactory     $configLoaderFactory
+     * @param ConfigBagRegistry       $configBagRegistry
+     * @param RelationConfigMerger    $relationConfigMerger
      */
     public function __construct(
         ConfigExtensionRegistry $configExtensionRegistry,
         ConfigLoaderFactory $configLoaderFactory,
-        ResourceHierarchyProvider $resourceHierarchyProvider,
         ConfigBagRegistry $configBagRegistry,
         RelationConfigMerger $relationConfigMerger
     ) {
-        parent::__construct(
-            $configExtensionRegistry,
-            $configLoaderFactory,
-            $resourceHierarchyProvider,
-            $relationConfigMerger
-        );
+        parent::__construct($configExtensionRegistry, $configLoaderFactory, $relationConfigMerger);
         $this->configBagRegistry = $configBagRegistry;
     }
 

@@ -8,6 +8,9 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Installs the assets for installer bundle, bower and npm dependencies
+ */
 class ScriptHandler extends SensioScriptHandler
 {
     /**
@@ -22,10 +25,6 @@ class ScriptHandler extends SensioScriptHandler
         $vendorDir = $event->getComposer()->getConfig()->get('vendor-dir');
 
         $config = [
-            [
-                'from' => __DIR__.'/../Resources/public',
-                'to' => $webDir.'/bundles/oroinstaller',
-            ],
             [
                 'from' => $vendorDir.'/bower-asset',
                 'to' => $webDir.'/bundles/bowerassets',
@@ -61,9 +60,9 @@ class ScriptHandler extends SensioScriptHandler
         $parametersFile = self::getParametersFile($options);
 
         $directories = [
-            'app/cache',
-            'app/logs',
-            'app/attachment',
+            'var/cache',
+            'var/logs',
+            'var/attachment',
             $webDir,
             $parametersFile
         ];
@@ -72,7 +71,7 @@ class ScriptHandler extends SensioScriptHandler
         foreach ($directories as $directory) {
             $permissionHandler->setPermissions($directory);
         }
-        if (file_exists($importExportDir = 'app/import_export')) {
+        if (file_exists($importExportDir = 'var/import_export')) {
             $permissionHandler->setPermissions($importExportDir);
         }
     }
@@ -139,7 +138,7 @@ class ScriptHandler extends SensioScriptHandler
     {
         return isset($options['incenteev-parameters']['file'])
             ? $options['incenteev-parameters']['file']
-            : 'app/config/parameters.yml';
+            : 'config/parameters.yml';
     }
 
     /**

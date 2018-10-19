@@ -1,16 +1,15 @@
-OroRequireJSBundle
-====================
-This bundle provides an easy way to:
+# OroRequireJSBundle
 
- -  generate require.js config file for a project;
- -  optimize, minify and merge all JS-file into one resources.
+OroRequireJSBundle uses the [RequireJS](http://requirejs.org/) library to enable a modular structure of JS components in Oro applications.
 
-For details of configuration options see [RequireJS API].<br />
-For details of build options see [example.build.js].
+The bundle enables developers to define RequireJS configuration in YAML files on the bundle level. It also provides a CLI tool to collect RequireJS modules and configuration from bundles, merge and minify them in the production mode.
+
+For details of the RequireJS configuration options, see [RequireJS API].
+For details of the RequireJS build options, see [example.build.js].
 
 ## Require.js config generation
 ### Configuration
-Common options for require.js config are placed in ```app/config.yml```:
+Common options for require.js config are placed in ```config.yml```:
 
     oro_require_js:
         config: # common options which will eventually get into require.js config file
@@ -100,7 +99,7 @@ See ```@OroRequireJSBundle::scripts.html.twig```
 
 ## Build project
 ### Configuration
-Build configuration starts in ```app/config.yml```
+Build configuration starts in ```config.yml```
 
     oro_require_js:
         build_path: "js/oro.min.js"     # relative path from document root folder to project built
@@ -126,11 +125,11 @@ This directive will prevent module from getting concatenated into build file.
 ### Building
 To make a build for JS-resources, just execute a command in console:
 
-    php app/console oro:requirejs:build
+    php bin/console oro:requirejs:build
 
 It will:
 
-1. take initial configuration from ```oro_require_js.build``` (```app/config.yml```);
+1. take initial configuration from ```oro_require_js.build``` (```config.yml```);
 1. extend it with configuration found in bundles (```%BundleName%\Resources\config\requirejs.yml```);
 1. generate ```build.js``` - a config for builder;
 1. run builder (time consuming process, especially for Rhino JS-engine);

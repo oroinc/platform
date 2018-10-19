@@ -8,15 +8,15 @@ use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Provider\FieldSearchProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class FieldSearchProviderTest extends \PHPUnit_Framework_TestCase
+class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigBag|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigBag|\PHPUnit\Framework\MockObject\MockObject */
     private $configBag;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translate;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
     /** @var FieldSearchProvider */
@@ -110,7 +110,7 @@ class FieldSearchProviderTest extends \PHPUnit_Framework_TestCase
         $field = [
             'search_type' => 'choice',
             'options' => [
-                'choices' => ['choice.1.key', 'choice.2.key']
+                'choices' => ['choice.1.key' => 0, 'choice.2.key' => 1]
             ]
         ];
 

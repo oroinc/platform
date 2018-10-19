@@ -2,44 +2,43 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
+use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Asset\Context\ContextInterface;
+use Symfony\Component\Asset\Packages;
+use Symfony\Component\Asset\PathPackage;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroRichTextTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var OroRichTextType
-     */
+    /** @var OroRichTextType */
     protected $formType;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     protected $configManager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Packages */
     protected $assetsHelper;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $context;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|HtmlTagProvider */
     protected $htmlTagProvider;
 
     protected function setUp()
     {
-        parent::setUp();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->assetsHelper = $this->createMock(Packages::class);
+        $this->htmlTagProvider = $this->createMock(HtmlTagProvider::class);
+        $this->context = $this->createMock(ContextInterface::class);
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->assetsHelper = $this->getMockBuilder('Symfony\Component\Asset\Packages')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->htmlTagProvider = $this->createMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
-        $this->formType = new OroRichTextType($this->configManager, $this->htmlTagProvider);
+        $this->formType = new OroRichTextType($this->configManager, $this->htmlTagProvider, $this->context);
         $this->formType->setAssetHelper($this->assetsHelper);
+        parent::setUp();
     }
 
     protected function tearDown()
@@ -48,9 +47,24 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
         unset($this->formType, $this->configManager);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    OroRichTextType::class => $this->formType
+                ],
+                []
+            ),
+        ];
+    }
+
     public function testGetParent()
     {
-        $this->assertEquals('textarea', $this->formType->getParent());
+        $this->assertEquals(TextareaType::class, $this->formType->getParent());
     }
 
     public function testGetName()
@@ -65,13 +79,15 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
      * @param array $viewData
      * @param array $elements
      * @param bool $expectedEnable
+     * @param string $subfolder
      */
     public function testBuildForm(
         array $options,
         $globalEnable,
         array $viewData,
         array $elements,
-        $expectedEnable = true
+        $expectedEnable = true,
+        $subfolder = ''
     ) {
         $data = 'test';
 
@@ -80,7 +96,11 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             ->with('oro_form.wysiwyg_enabled')
             ->will($this->returnValue($globalEnable));
 
-        $this->assetsHelper->expects($this->once())
+        $this->context->expects($this->any())
+            ->method('getBasePath')
+            ->willReturn($subfolder);
+
+        $this->assetsHelper->expects($this->any())
             ->method('getUrl')
             ->will(
                 $this->returnCallback(
@@ -94,16 +114,12 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             ->method('getAllowedElements')
             ->willReturn($elements);
 
-        $viewData['attr']['data-page-component-options']['content_css']
-            = '/prefix/' . $viewData['attr']['data-page-component-options']['content_css'];
-        $viewData['attr']['data-page-component-options']['skin_url']
-            = '/prefix/' . $viewData['attr']['data-page-component-options']['skin_url'];
         $viewData['attr']['data-page-component-options']['enabled'] = $expectedEnable;
         $viewData['attr']['data-page-component-options'] = json_encode(
             $viewData['attr']['data-page-component-options']
         );
 
-        $form = $this->factory->create($this->formType, $data, $options);
+        $form = $this->factory->create(OroRichTextType::class, $data, $options);
         $view = $form->createView();
 
         foreach ($viewData as $key => $value) {
@@ -111,8 +127,12 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             $this->assertEquals($value['data-page-component-module'], $view->vars[$key]['data-page-component-module']);
             
             $expected = json_decode($value['data-page-component-options'], true);
+            ksort($expected);
+
             $actual = json_decode($view->vars[$key]['data-page-component-options'], true);
-            $this->assertEquals(ksort($expected), ksort($actual));
+            ksort($actual);
+
+            $this->assertEquals($expected, $actual);
         }
     }
 
@@ -122,7 +142,10 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
      */
     public function optionsDataProvider()
     {
-        $toolbar = ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code'];
+        $toolbar = [
+            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo 
+             | fullscreen'
+        ];
         $elements = [
             '@[style|class]',
             'table[cellspacing|cellpadding|border|align|width]',
@@ -159,14 +182,17 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                 'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
                 'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
                 'skin_url' => 'bundles/oroform/css/tinymce',
-                'plugins' => ['textcolor', 'code', 'link'],
+                'plugins' => ['textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen', 'paste', 'lists', 'advlist'],
                 'toolbar' => $toolbar,
-                'valid_elements' => implode(',', $elements),
+                'valid_elements' => '',
                 'menubar' => false,
                 'statusbar' => false,
                 'relative_urls' => false,
                 'remove_script_host' => false,
                 'convert_urls' => true,
+                'cache_suffix' => '',
+                'document_base_url' => '/prefix//',
+                'paste_data_images' => false,
             ]
         ];
 
@@ -211,28 +237,53 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                     'attr' => [
                         'data-page-component-module' => 'oroui/js/app/components/view-component',
                         'data-page-component-options' => array_merge(
-                            [
-                                'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                                'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
-                                'skin_url' => 'bundles/oroform/css/tinymce',
-                                'plugins' => ['textcolor', 'code', 'link'],
-                                'toolbar' => $toolbar,
-                                'menubar' => false,
-                                'statusbar' => false,
-                                'relative_urls' => false,
-                                'remove_script_host' => false,
-                                'convert_urls' => true,
-                            ],
+                            $defaultAttrs['data-page-component-options'],
                             [
                                 'plugins' => ['textcolor'],
                                 'menubar' => true,
-                                'statusbar' => false,
-                                'toolbar' => ['undo redo | bold italic underline | bullist numlist link']
+                                'toolbar' => [
+                                    'undo redo | bold italic underline | bullist numlist link | bdesk_photo | ' .
+                                    'fullscreen'
+                                ],
+                                'valid_elements' => implode(',', $elements),
                             ]
                         )
                     ]
                 ],
                 $elements,
+            ],
+            'wysiwyg_options with subfolder' => [
+                [
+                    'wysiwyg_options' => [
+                        'plugins' => ['textcolor'],
+                        'menubar' => true,
+                        'statusbar' => false,
+                        'toolbar_type' => OroRichTextType::TOOLBAR_SMALL
+                    ]
+                ],
+                true,
+                [
+                    'attr' => [
+                        'data-page-component-module' => 'oroui/js/app/components/view-component',
+                        'data-page-component-options' => array_merge(
+                            $defaultAttrs['data-page-component-options'],
+                            [
+                                'plugins' => ['textcolor'],
+                                'menubar' => true,
+                                'toolbar' => [
+                                    'undo redo | bold italic underline | bullist numlist link | bdesk_photo | ' .
+                                    'fullscreen'
+                                ],
+                                'valid_elements' => implode(',', $elements),
+                                'content_css' => 'subfolder/bundles/oroform/css/wysiwyg-editor.css',
+                                'skin_url' => 'subfolder/bundles/oroform/css/tinymce'
+                            ]
+                        )
+                    ]
+                ],
+                $elements,
+                true,
+                '/subfolder'
             ],
         ];
     }

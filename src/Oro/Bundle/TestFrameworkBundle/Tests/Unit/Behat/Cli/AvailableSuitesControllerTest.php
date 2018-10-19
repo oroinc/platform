@@ -11,7 +11,7 @@ use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Symfony\Component\Console\Command\Command;
 
-class AvailableSuitesControllerTest extends \PHPUnit_Framework_TestCase
+class AvailableSuitesControllerTest extends \PHPUnit\Framework\TestCase
 {
     private $suites = [
         'One',

@@ -5,6 +5,8 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Form\Type\ResetType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -14,7 +16,7 @@ class ResetTypeTest extends FormIntegrationTestCase
     /** @var ResetType */
     protected $type;
 
-    /** @var PasswordFieldOptionsProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var PasswordFieldOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $optionsProvider;
 
     protected function setUp()
@@ -35,7 +37,7 @@ class ResetTypeTest extends FormIntegrationTestCase
 
     public function testBuildForm()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FormBuilderInterface $builder */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|FormBuilderInterface $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
 
         $this->optionsProvider->expects($this->once())
@@ -44,8 +46,8 @@ class ResetTypeTest extends FormIntegrationTestCase
 
         $builder->expects($this->exactly(1))
             ->method('add')
-            ->with('plainPassword', 'repeated', [
-                'type'            => 'password',
+            ->with('plainPassword', RepeatedType::class, [
+                'type'            => PasswordType::class,
                 'required'        => true,
                 'invalid_message' => 'oro.user.message.password_mismatch',
                 'first_options' => [
@@ -66,7 +68,7 @@ class ResetTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OptionsResolver $resolver */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|OptionsResolver $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
 
         $resolver->expects($this->once())

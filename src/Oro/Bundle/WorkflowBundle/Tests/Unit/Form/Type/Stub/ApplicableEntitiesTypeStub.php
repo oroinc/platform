@@ -6,6 +6,7 @@ use Doctrine\Common\Util\Inflector;
 use Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ApplicableEntitiesTypeStub extends AbstractType
@@ -18,8 +19,8 @@ class ApplicableEntitiesTypeStub extends AbstractType
         $resolver->setDefaults(
             [
                 'choices' => [
-                    StubEntity::class => Inflector::tableize(StubEntity::class),
-                    \stdClass::class => Inflector::tableize(\stdClass::class)
+                    Inflector::tableize(StubEntity::class) => StubEntity::class,
+                    Inflector::tableize(\stdClass::class) => \stdClass::class
                 ]
             ]
         );
@@ -46,6 +47,6 @@ class ApplicableEntitiesTypeStub extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

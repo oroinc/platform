@@ -97,7 +97,10 @@ define(function(require) {
                 autoRender: true,
                 el: this.$('.board-header'),
                 collection: this.columns,
-                itemView: this.columnHeaderView,
+                itemView: function(options) {
+                    options = _.extend(_.pick(board, 'boardCollection'), options);
+                    return new board.columnHeaderView(options);
+                },
                 readonly: this.readonly
             }));
             this.subview('body', new BaseCollectionView({
@@ -166,13 +169,19 @@ define(function(require) {
             var noDataVisible = this.serverCollection.models.length <= 0;
             if (noDataVisible) {
                 var placeholders = {
-                    entityHint: (this.boardPlugin.main.grid.entityHint || __('oro.datagrid.entityHint')).toLowerCase()
+                    entityHint: (
+                        this.boardPlugin.main.grid.entityHint ||
+                        __(this.boardPlugin.main.grid.noDataTranslations.entityHint)).toLowerCase()
                 };
-                var message = _.isEmpty(this.serverCollection.state.filters) ?
-                    'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
 
+                var hints = [];
+
+                hints.push(__(this.boardPlugin.main.grid.noDataTranslations.noEntities));
+                if (!_.isEmpty(this.serverCollection.state.filters)) {
+                    hints.push(__(this.boardPlugin.main.grid.noDataTranslations.noResults, placeholders));
+                }
                 this.$('.no-data').html(this.boardPlugin.main.grid.noDataTemplate({
-                    hint: __(message, placeholders).replace('\n', '<br />')
+                    hints: hints
                 }));
             }
             this.$el.toggleClass('no-data-visible', noDataVisible);

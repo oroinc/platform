@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockViewCollection;
 
-class BlockViewCollectionTest extends \PHPUnit_Framework_TestCase
+class BlockViewCollectionTest extends \PHPUnit\Framework\TestCase
 {
     public function testGet()
     {

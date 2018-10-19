@@ -5,9 +5,9 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\ActivityListBundle\DependencyInjection\Compiler\ActivityListProvidersPass;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ActivityListProvidersPassTest extends \PHPUnit_Framework_TestCase
+class ActivityListProvidersPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
     protected function setUp()

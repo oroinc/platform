@@ -8,7 +8,7 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class SaveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
+class SaveFieldsChangesActionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var SaveFieldsChangesAction
@@ -70,7 +70,7 @@ class SaveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteAction(array $options, array $context)
     {
-        /** @var FieldsChangesManager|\PHPUnit_Framework_MockObject_MockObject $fieldsChangesManager */
+        /** @var FieldsChangesManager|\PHPUnit\Framework\MockObject\MockObject $fieldsChangesManager */
         $fieldsChangesManager = $this
             ->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager')
             ->disableOriginalConstructor()

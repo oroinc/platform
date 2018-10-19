@@ -1,6 +1,6 @@
 datagrids:
     business-unit-grid:
-        extended_entity_name: %oro_organization.business_unit.entity.class%
+        extended_entity_name: '%oro_organization.business_unit.entity.class%'
         options:
             entityHint: business units
             entity_pagination: true
@@ -19,7 +19,7 @@ datagrids:
                     - u.createdAt
                     - owner.name as ownerName
                 from:
-                    - { table: %oro_organization.business_unit.entity.class%, alias: u }
+                    - { table: '%oro_organization.business_unit.entity.class%', alias: u }
                 join:
                     left:
                         owner:
@@ -93,7 +93,7 @@ datagrids:
                     data_name: u.createdAt
 
             default:
-                name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
 
         filters:
             columns:
@@ -151,8 +151,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Disabled
-                   - Enabled
+                   Disabled: 0
+                   Enabled: 1
         filters:
             columns:
                 hasCurrentBusinessUnit:
@@ -176,14 +176,14 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Disabled
-                                1: Enabled
+                                Disabled: 2
+                                Enabled: 1
         sorters:
             columns:
                 hasCurrentBusinessUnit:
                     data_name: hasCurrentBusinessUnit
             default:
-                hasCurrentBusinessUnit: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+                hasCurrentBusinessUnit: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
         options:
             entityHint: users
             rowSelection:
@@ -218,11 +218,11 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Disabled
-                   - Enabled
+                   Disabled: 0
+                   Enabled: 1
         sorters:
             default:
-                lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                lastName: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
 
         filters:
             columns:
@@ -244,5 +244,5 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Disabled
-                                1: Enabled
+                                Disabled: 2
+                                Enabled: 1

@@ -7,9 +7,9 @@ use Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry;
 use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
 use Oro\Component\DependencyInjection\ServiceLinkRegistry;
 
-class VariableProcessorRegistryTest extends \PHPUnit_Framework_TestCase
+class VariableProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ServiceLinkRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ServiceLinkRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $serviceLinkRegistry;
 
     /** @var  VariableProcessorRegistry */
@@ -81,7 +81,7 @@ class VariableProcessorRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|VariableProcessorInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|VariableProcessorInterface
      */
     protected function getProcessorMock()
     {

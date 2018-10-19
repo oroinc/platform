@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\DashboardBundle\Form\Type\DashboardType;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\StateManager;
@@ -117,7 +118,7 @@ class DashboardController extends Controller
         $form->setData($this->get('oro_dashboard.widget_configs')->getFormValues($widget));
 
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $widget->setOptions($form->getData());
             $this->getEntityManager()->flush();
             $saved = true;
@@ -178,21 +179,24 @@ class DashboardController extends Controller
     protected function update(Request $request, DashboardModel $dashboardModel)
     {
         $form = $this->createForm(
-            $this->container->get('oro_dashboard.form.type.edit'),
+            DashboardType::class,
             $dashboardModel->getEntity(),
             [
                 'create_new' => !$dashboardModel->getId()
             ]
         );
 
-        if ($request->isMethod('POST') && $form->submit($request)->isValid()) {
-            $this->getDashboardManager()->save($dashboardModel, true);
-            $this->get('session')->getFlashBag()->add(
-                'success',
-                $this->get('translator')->trans('oro.dashboard.saved_message')
-            );
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $this->getDashboardManager()->save($dashboardModel, true);
+                $this->get('session')->getFlashBag()->add(
+                    'success',
+                    $this->get('translator')->trans('oro.dashboard.saved_message')
+                );
 
-            return $this->get('oro_ui.router')->redirect($dashboardModel->getEntity());
+                return $this->get('oro_ui.router')->redirect($dashboardModel->getEntity());
+            }
         }
 
         return ['entity' => $dashboardModel, 'form' => $form->createView()];

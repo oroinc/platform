@@ -4,6 +4,7 @@ define(function(require) {
     var OriginalLexer = require('oroexpressionlanguage/js/library/lexer');
     var Token = require('oroexpressionlanguage/js/extend/token');
     var TokenStream = require('oroexpressionlanguage/js/library/token-stream');
+    var ExpressionSyntaxError = require('oroexpressionlanguage/js/library/expression-syntax-error');
     var stripcslashes = require('oroexpressionlanguage/lib/php-to-js/stripcslashes');
 
     function Lexer() {

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class CheckButtonTypeTest extends FormIntegrationTestCase
@@ -27,7 +27,7 @@ class CheckButtonTypeTest extends FormIntegrationTestCase
 
     public function testForm()
     {
-        $btn  = $this->factory->create('oro_imap_configuration_check');
+        $btn  = $this->factory->create(CheckButtonType::class);
         $view = $btn->createView();
 
         $this->assertArrayHasKey('class', $view->vars['attr']);

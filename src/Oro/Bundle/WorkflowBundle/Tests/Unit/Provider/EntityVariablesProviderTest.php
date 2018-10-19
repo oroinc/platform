@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Provider;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Provider\EntityVariablesProvider;
 
-class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
+class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityVariablesProvider */
     protected $provider;

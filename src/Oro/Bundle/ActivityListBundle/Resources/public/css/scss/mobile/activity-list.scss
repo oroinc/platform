@@ -1,0 +1,65 @@
+/* @theme: admin.oro; */
+
+.activity-list-widget {
+    .grid-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: $activity-mobile-toolbar-offset;
+    }
+
+    .filter-box {
+        padding: 0;
+        width: 100%;
+        flex-grow: 1;
+    }
+
+    .filter-item {
+        margin-bottom: $activity-mobile-toolbar-item-offset;
+    }
+
+    .pagination {
+        margin: 0;
+    }
+
+    .actions-panel {
+        width: auto;
+    }
+
+    .accordion-heading {
+        flex-wrap: wrap;
+
+        .details {
+            margin: $activity-mobile-details-offset;
+        }
+
+        .extra-info {
+            order: 1;
+            width: 100%;
+        }
+    }
+
+    .accordion-toggle {
+        background: transparent;
+    }
+
+    .accordion-icon {
+        padding-#{$start}: 0;
+    }
+
+    .comment {
+        .user {
+            display: block;
+        }
+    }
+}
+
+@media only screen and (max-width: $small-devices-media-breakpoint) {
+    .activity-list-widget {
+        .accordion-heading {
+            .details {
+                max-width: $activity-mobile-details-small-width;
+                min-width: $activity-mobile-details-small-width;
+            }
+        }
+    }
+}

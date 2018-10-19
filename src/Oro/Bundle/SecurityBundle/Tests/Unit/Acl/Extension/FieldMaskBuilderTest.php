@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldMaskBuilder;
 
-class FieldMaskBuilderTest extends \PHPUnit_Framework_TestCase
+class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testViewGroup()
     {

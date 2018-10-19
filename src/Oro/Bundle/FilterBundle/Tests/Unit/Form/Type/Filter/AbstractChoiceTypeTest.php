@@ -3,16 +3,16 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractChoiceType;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-class AbstractChoiceTypeTest extends \PHPUnit_Framework_TestCase
+class AbstractChoiceTypeTest extends \PHPUnit\Framework\TestCase
 {
     const TRANSLATION_PREFIX = 'trans_';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 

@@ -6,7 +6,7 @@ use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
 use Symfony\Component\HttpFoundation\Request;
 
-class SmtpSettingsFactoryTest extends \PHPUnit_Framework_TestCase
+class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testWithoutRequestValues()
     {

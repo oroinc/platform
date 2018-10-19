@@ -4,12 +4,12 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\ChainVirtualRelationProvider;
 
-class ChainVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
+class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainVirtualRelationProvider */
     protected $chainProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject[] */
+    /** @var \PHPUnit\Framework\MockObject\MockObject[] */
     protected $providers = [];
 
     protected function setUp()

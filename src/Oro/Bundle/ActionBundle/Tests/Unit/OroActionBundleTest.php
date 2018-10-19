@@ -6,11 +6,11 @@ use Oro\Bundle\ActionBundle\OroActionBundle;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroActionBundleTest extends \PHPUnit_Framework_TestCase
+class OroActionBundleTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuild()
     {
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $containerBuilder */
         $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
             ->disableOriginalConstructor()
             ->setMethods(['addCompilerPass'])

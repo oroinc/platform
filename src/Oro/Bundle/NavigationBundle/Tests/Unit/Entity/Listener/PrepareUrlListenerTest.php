@@ -8,9 +8,9 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\NavigationBundle\Entity\Listener\PrepareUrlListener;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\UrlAwareStub;
 
-class PrepareUrlListenerTest extends \PHPUnit_Framework_TestCase
+class PrepareUrlListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
     /** @var PrepareUrlListener */

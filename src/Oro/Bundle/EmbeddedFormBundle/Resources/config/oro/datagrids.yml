@@ -22,7 +22,7 @@ datagrids:
                 title:
                     data_name: embedded_form.title
             default:
-                title: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                title: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
 
         filters:
             columns:
@@ -34,7 +34,7 @@ datagrids:
                     data_name: embedded_form.formType
                     options:
                         field_options:
-                            choices: "@oro_embedded_form.manager->getAll"
+                            choices: "@oro_embedded_form.manager->getAllChoices"
 
         properties:
             id: ~

@@ -11,12 +11,12 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Template\FormSubmitTemplateResponseProcessor;
 use Symfony\Component\HttpFoundation\Response;
 
-class FormSubmitTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCase
+class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ViewHandlerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ViewHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $viewHandler;
 
-    /** @var \Twig_Environment|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject */
     protected $twig;
 
     /** @var FormSubmitTemplateResponseProcessor */
@@ -84,7 +84,7 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCas
 
     public function testCompleteResponseWithoutCode()
     {
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
 
@@ -142,7 +142,7 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCas
 
     public function testShouldSkipUnsupportedResponseTypes()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
             ->method('getResultType')

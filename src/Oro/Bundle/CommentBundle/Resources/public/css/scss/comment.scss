@@ -1,0 +1,211 @@
+/* @theme: admin.oro; */
+
+.comments-view-header,
+.comments-view-body,
+.comments-view-footer {
+    margin: $comment-view-offset;
+
+    @include clearfix();
+}
+
+.comments-header-view-title {
+    margin: 0;
+
+    font-size: $comment-view-title-font-size;
+    font-weight: $comment-view-title-font-weight;
+}
+
+.comments-view-header {
+    .load-more {
+        display: inline-block;
+
+        width: 100%;
+
+        &.process {
+            .load-more-label {
+                display: inline-block;
+                width: 100%;
+                padding: $comment-view-load-mode-offset;
+
+                text-align: $comment-view-load-mode-align;
+
+                &:before {
+                    display: inline-block;
+
+                    content: '';
+
+                    @include loader($comment-view-loader-size, $comment-view-loader-width);
+                }
+            }
+        }
+    }
+}
+
+.comments-view-footer {
+    margin-top: $comment-view-base-offset;
+}
+
+.comment-form-container {
+    .comment-form {
+        padding-bottom: $comment-view-content-offset;
+
+        .comment-text-field {
+            width: 100%;
+        }
+
+        .attachment-item {
+            margin-top: $comment-view-attachment-item-offset;
+        }
+    }
+
+    .attachment-item {
+        .remove-attachment {
+            text-decoration: none;
+            border: none;
+            background: transparent;
+            font-family: FontAwesome !important;
+        }
+    }
+}
+
+.responsive-section {
+    .email-content .responsive-cell .comment-list {
+        padding-#{$start}: $horizontal-padding;
+    }
+
+    &.responsive-small .email-content .responsive-cell .comment-list {
+        padding-#{$start}: 0;
+    }
+}
+
+.email-content {
+    .responsive-cell {
+        .comment-list {
+            padding-#{$start}: $horizontal-padding;
+        }
+    }
+}
+
+.comments-block {
+    color: $comments-block-color;
+    margin: 0;
+    min-width: inherit;
+
+    .comment-item {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .comment-title {
+        width: $comments-block-title-size;
+        position: relative;
+    }
+
+    .comment-author-info {
+        margin-bottom: $comments-block-author-info-offset;
+    }
+
+    .comment-content {
+        flex-grow: 1;
+        padding: $comments-block-content-offset;
+    }
+
+    .comment-item:first-child {
+        .comment-content {
+            padding-top: 0;
+        }
+    }
+
+    .comment-item:last-child {
+        .comment-content {
+            padding-bottom: 0;
+        }
+    }
+
+    .comment-title {
+        .comment-title-avatar {
+            width: $comments-block-title-size;
+            height: $comments-block-title-size;
+
+            border-radius: $comments-block-avatar-radius;
+        }
+
+        .no-avatar {
+            background: $comments-avatar-placeholder;
+            background-size: $comments-block-title-size $comments-block-title-size;
+        }
+    }
+
+    .comment-body {
+        color: $comments-block-body-color;
+
+        word-break: break-all;
+
+        .scrollspy-title {
+            display: none;
+        }
+    }
+
+    .comment-attachments {
+        .thumbnail {
+            display: block;
+            width: $comments-thumbnail-width;
+            height: $comments-thumbnail-height;
+
+            text-align: center;
+
+            background:  $comments-thumbnail-background;
+            border-radius: $comments-thumbnail-border-radius;
+
+            @media only screen and (max-width: 500px) {
+                display: none; // hide thumbnails on mobile
+            }
+
+            .fa {
+                padding-top: $comments-thumbnail-icon-offset;
+                color: $comments-thumbnail-icon-color;
+            }
+        }
+
+        .link-to-record {
+            padding-top: $comment-view-base-offset;
+
+            .dropdown-toggle {
+                display: inline-block;
+            }
+
+            .dropdown-menu {
+                .view-image {
+                    display: none;
+                }
+
+                @media only screen and (max-width: 500px) {
+                    .view-image {
+                        display: block;
+                    }
+                }
+            }
+
+            .fa {
+                color: $comments-thumbnail-icon-record-color;
+                font-size: $comments-thumbnail-icon-record-font-size;
+                margin-#{$end}: 1px;
+                margin-#{$start}: 0;
+            }
+        }
+    }
+
+    .attachment-icon.accordion-toggle {
+        display: none;
+
+        &.collapsed {
+            display: inline-block;
+        }
+    }
+}
+
+.ui-dialog .comment-form textarea,
+.ui-dialog .comment-form .mce-tinymce {
+    width: 100%;
+    box-sizing: border-box;
+}

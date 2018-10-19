@@ -9,15 +9,15 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Psr\Log\LoggerInterface;
 
-class ConsumerHeartbeatExtensionTest extends \PHPUnit_Framework_TestCase
+class ConsumerHeartbeatExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConsumerHeartbeat */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConsumerHeartbeat */
     protected $consumerHeartbeat;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
     protected $logger;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
     protected $container;
 
     /** @var Context */

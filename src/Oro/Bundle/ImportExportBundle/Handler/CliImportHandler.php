@@ -5,6 +5,9 @@ namespace Oro\Bundle\ImportExportBundle\Handler;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
+/**
+ * Handles import, checks whatever job was successful otherwise fills errors array
+ */
 class CliImportHandler extends AbstractImportHandler
 {
     /**
@@ -79,6 +82,7 @@ class CliImportHandler extends AbstractImportHandler
             'message' => $message,
             'importInfo' => $this->getImportInfo($counts, $entityName),
             'postponedRows' => $jobResult->getContext()->getPostponedRows(),
+            'deadlockDetected' => $jobResult->getContext()->getValue('deadlockDetected')
         ];
     }
 

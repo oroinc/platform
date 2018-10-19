@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 
-class OwnerTreeTest extends \PHPUnit_Framework_TestCase
+class OwnerTreeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider addBusinessUnitRelationProvider

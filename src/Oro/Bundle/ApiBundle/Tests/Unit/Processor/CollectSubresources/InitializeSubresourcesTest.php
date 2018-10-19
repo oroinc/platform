@@ -9,35 +9,34 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\CollectSubresourcesContext;
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\InitializeSubresources;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
+class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    private $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
+    private $metadataProvider;
 
     /** @var CollectSubresourcesContext */
-    protected $context;
+    private $context;
 
     /** @var InitializeSubresources */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
-        $this->context = new CollectSubresourcesContext($this->configProvider, $this->metadataProvider);
+        $this->context = new CollectSubresourcesContext();
         $this->processor = new InitializeSubresources($this->configProvider, $this->metadataProvider);
     }
 
@@ -46,7 +45,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $this->context->getResult()->add(new ApiResourceSubresources('Test\Class'));
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Class' => new ApiResourceSubresources('Test\Class')],
             $this->context->getResult()->toArray()
         );
@@ -72,7 +71,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $this->context->setResources([$resource]);
         $this->context->setAccessibleResources([]);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $resource->getEntityClass(),
@@ -81,7 +80,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $resource->getEntityClass(),
@@ -97,7 +96,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
 
         $expectedSubresources = new ApiResourceSubresources($resource->getEntityClass());
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Class' => $expectedSubresources],
             $this->context->getResult()->toArray()
         );
@@ -122,7 +121,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $this->context->setResources([$resource]);
         $this->context->setAccessibleResources([]);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $resource->getEntityClass(),
@@ -131,7 +130,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $resource->getEntityClass(),
@@ -154,16 +153,19 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $toOneAssociationSubresource->setIsCollection($toOneAssociation->isCollection());
         $toOneAssociationSubresource->setExcludedActions(
             [
-                'get_subresource',
-                'get_relationship',
-                'update_relationship',
-                'add_relationship',
-                'delete_relationship'
+                ApiActions::GET_SUBRESOURCE,
+                ApiActions::UPDATE_SUBRESOURCE,
+                ApiActions::ADD_SUBRESOURCE,
+                ApiActions::DELETE_SUBRESOURCE,
+                ApiActions::GET_RELATIONSHIP,
+                ApiActions::UPDATE_RELATIONSHIP,
+                ApiActions::ADD_RELATIONSHIP,
+                ApiActions::DELETE_RELATIONSHIP
             ]
         );
         $expectedSubresources->addSubresource($toOneAssociation->getName(), $toOneAssociationSubresource);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Class' => $expectedSubresources],
             $this->context->getResult()->toArray()
         );
@@ -188,7 +190,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $this->context->setResources([$resource]);
         $this->context->setAccessibleResources([]);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $resource->getEntityClass(),
@@ -197,7 +199,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $resource->getEntityClass(),
@@ -220,16 +222,19 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $toManyAssociationSubresource->setIsCollection($toManyAssociation->isCollection());
         $toManyAssociationSubresource->setExcludedActions(
             [
-                'get_subresource',
-                'get_relationship',
-                'update_relationship',
-                'add_relationship',
-                'delete_relationship'
+                ApiActions::GET_SUBRESOURCE,
+                ApiActions::UPDATE_SUBRESOURCE,
+                ApiActions::ADD_SUBRESOURCE,
+                ApiActions::DELETE_SUBRESOURCE,
+                ApiActions::GET_RELATIONSHIP,
+                ApiActions::UPDATE_RELATIONSHIP,
+                ApiActions::ADD_RELATIONSHIP,
+                ApiActions::DELETE_RELATIONSHIP
             ]
         );
         $expectedSubresources->addSubresource($toManyAssociation->getName(), $toManyAssociationSubresource);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Class' => $expectedSubresources],
             $this->context->getResult()->toArray()
         );
@@ -254,7 +259,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $this->context->setResources([$resource]);
         $this->context->setAccessibleResources(['Test\Association1Target']);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $resource->getEntityClass(),
@@ -263,7 +268,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $resource->getEntityClass(),
@@ -284,10 +289,18 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
             $toOneAssociation->getAcceptableTargetClassNames()
         );
         $toOneAssociationSubresource->setIsCollection($toOneAssociation->isCollection());
-        $toOneAssociationSubresource->setExcludedActions(['add_relationship', 'delete_relationship']);
+        $toOneAssociationSubresource->setExcludedActions(
+            [
+                ApiActions::UPDATE_SUBRESOURCE,
+                ApiActions::ADD_SUBRESOURCE,
+                ApiActions::DELETE_SUBRESOURCE,
+                ApiActions::ADD_RELATIONSHIP,
+                ApiActions::DELETE_RELATIONSHIP
+            ]
+        );
         $expectedSubresources->addSubresource($toOneAssociation->getName(), $toOneAssociationSubresource);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Class' => $expectedSubresources],
             $this->context->getResult()->toArray()
         );
@@ -312,7 +325,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $this->context->setResources([$resource]);
         $this->context->setAccessibleResources(['Test\Association1Target']);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $resource->getEntityClass(),
@@ -321,7 +334,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $resource->getEntityClass(),
@@ -342,9 +355,16 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
             $toManyAssociation->getAcceptableTargetClassNames()
         );
         $toManyAssociationSubresource->setIsCollection($toManyAssociation->isCollection());
+        $toManyAssociationSubresource->setExcludedActions(
+            [
+                ApiActions::UPDATE_SUBRESOURCE,
+                ApiActions::ADD_SUBRESOURCE,
+                ApiActions::DELETE_SUBRESOURCE
+            ]
+        );
         $expectedSubresources->addSubresource($toManyAssociation->getName(), $toManyAssociationSubresource);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Class' => $expectedSubresources],
             $this->context->getResult()->toArray()
         );
@@ -370,7 +390,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $this->context->setResources([$resource]);
         $this->context->setAccessibleResources(['Test\Association1Target']);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $resource->getEntityClass(),
@@ -379,7 +399,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $resource->getEntityClass(),
@@ -400,10 +420,18 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
             $toOneAssociation->getAcceptableTargetClassNames()
         );
         $toOneAssociationSubresource->setIsCollection($toOneAssociation->isCollection());
-        $toOneAssociationSubresource->setExcludedActions(['add_relationship', 'delete_relationship']);
+        $toOneAssociationSubresource->setExcludedActions(
+            [
+                ApiActions::UPDATE_SUBRESOURCE,
+                ApiActions::ADD_SUBRESOURCE,
+                ApiActions::DELETE_SUBRESOURCE,
+                ApiActions::ADD_RELATIONSHIP,
+                ApiActions::DELETE_RELATIONSHIP
+            ]
+        );
         $expectedSubresources->addSubresource($toOneAssociation->getName(), $toOneAssociationSubresource);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Class' => $expectedSubresources],
             $this->context->getResult()->toArray()
         );
@@ -429,7 +457,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $this->context->setResources([$resource]);
         $this->context->setAccessibleResources(['Test\Association1Target']);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $resource->getEntityClass(),
@@ -438,7 +466,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $resource->getEntityClass(),
@@ -459,9 +487,16 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
             $toManyAssociation->getAcceptableTargetClassNames()
         );
         $toManyAssociationSubresource->setIsCollection($toManyAssociation->isCollection());
+        $toManyAssociationSubresource->setExcludedActions(
+            [
+                ApiActions::UPDATE_SUBRESOURCE,
+                ApiActions::ADD_SUBRESOURCE,
+                ApiActions::DELETE_SUBRESOURCE
+            ]
+        );
         $expectedSubresources->addSubresource($toManyAssociation->getName(), $toManyAssociationSubresource);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Class' => $expectedSubresources],
             $this->context->getResult()->toArray()
         );
@@ -487,7 +522,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $this->context->setResources([$resource]);
         $this->context->setAccessibleResources(['Test\Association1Target']);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $resource->getEntityClass(),
@@ -496,7 +531,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $resource->getEntityClass(),
@@ -518,11 +553,18 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         );
         $toOneAssociationSubresource->setIsCollection($toOneAssociation->isCollection());
         $toOneAssociationSubresource->setExcludedActions(
-            ['update_relationship', 'add_relationship', 'delete_relationship']
+            [
+                ApiActions::UPDATE_SUBRESOURCE,
+                ApiActions::ADD_SUBRESOURCE,
+                ApiActions::DELETE_SUBRESOURCE,
+                ApiActions::UPDATE_RELATIONSHIP,
+                ApiActions::ADD_RELATIONSHIP,
+                ApiActions::DELETE_RELATIONSHIP
+            ]
         );
         $expectedSubresources->addSubresource($toOneAssociation->getName(), $toOneAssociationSubresource);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Class' => $expectedSubresources],
             $this->context->getResult()->toArray()
         );
@@ -548,7 +590,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $this->context->setResources([$resource]);
         $this->context->setAccessibleResources(['Test\Association1Target']);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $resource->getEntityClass(),
@@ -557,7 +599,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $resource->getEntityClass(),
@@ -579,21 +621,53 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         );
         $toManyAssociationSubresource->setIsCollection($toManyAssociation->isCollection());
         $toManyAssociationSubresource->setExcludedActions(
-            ['update_relationship', 'add_relationship', 'delete_relationship']
+            [
+                ApiActions::UPDATE_SUBRESOURCE,
+                ApiActions::ADD_SUBRESOURCE,
+                ApiActions::DELETE_SUBRESOURCE,
+                ApiActions::UPDATE_RELATIONSHIP,
+                ApiActions::ADD_RELATIONSHIP,
+                ApiActions::DELETE_RELATIONSHIP
+            ]
         );
         $expectedSubresources->addSubresource($toManyAssociation->getName(), $toManyAssociationSubresource);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Class' => $expectedSubresources],
             $this->context->getResult()->toArray()
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage A metadata for "Test\Class" entity does not exist.
-     */
-    public function testProcessForAssociationWithoutTargetMetadata()
+    public function testProcessWithoutEntityConfig()
+    {
+        $resource = new ApiResource('Test\Class');
+        $resource->setExcludedActions(['update']);
+
+        $this->context->getRequestType()->add(RequestType::REST);
+        $this->context->setVersion('1.1');
+        $this->context->setResources([$resource]);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $resource->getEntityClass(),
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra()]
+            )
+            ->willReturn(new Config());
+        $this->metadataProvider->expects(self::never())
+            ->method('getMetadata');
+
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [],
+            $this->context->getResult()->toArray()
+        );
+    }
+
+    public function testProcessWithoutEntityMetadata()
     {
         $resource = new ApiResource('Test\Class');
         $resource->setExcludedActions(['update']);
@@ -605,7 +679,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $this->context->setVersion('1.1');
         $this->context->setResources([$resource]);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $resource->getEntityClass(),
@@ -614,7 +688,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $resource->getEntityClass(),
@@ -627,6 +701,11 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
             ->willReturn(null);
 
         $this->processor->process($this->context);
+
+        self::assertEquals(
+            [],
+            $this->context->getResult()->toArray()
+        );
     }
 
     /**
@@ -652,7 +731,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $this->context->setResources([$resource]);
         $this->context->setAccessibleResources([]);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $resource->getEntityClass(),
@@ -661,7 +740,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $resource->getEntityClass(),
@@ -677,7 +756,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
 
         $expectedSubresources = new ApiResourceSubresources($resource->getEntityClass());
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Class' => $expectedSubresources],
             $this->context->getResult()->toArray()
         );
@@ -688,7 +767,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         return [
             ['array'],
             ['object'],
-            ['scalar'],
+            ['scalar']
         ];
     }
 
@@ -710,7 +789,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $this->context->setResources([$resource]);
         $this->context->setAccessibleResources(['Test\Association1Target']);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $resource->getEntityClass(),
@@ -719,7 +798,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $resource->getEntityClass(),
@@ -741,11 +820,17 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         );
         $toOneAssociationSubresource->setIsCollection($toOneAssociation->isCollection());
         $toOneAssociationSubresource->setExcludedActions(
-            ['add_relationship', 'delete_relationship']
+            [
+                ApiActions::UPDATE_SUBRESOURCE,
+                ApiActions::ADD_SUBRESOURCE,
+                ApiActions::DELETE_SUBRESOURCE,
+                ApiActions::ADD_RELATIONSHIP,
+                ApiActions::DELETE_RELATIONSHIP
+            ]
         );
         $expectedSubresources->addSubresource($toOneAssociation->getName(), $toOneAssociationSubresource);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Class' => $expectedSubresources],
             $this->context->getResult()->toArray()
         );
@@ -769,7 +854,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $this->context->setResources([$resource]);
         $this->context->setAccessibleResources(['Test\Association1Target']);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $resource->getEntityClass(),
@@ -778,7 +863,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $resource->getEntityClass(),
@@ -800,11 +885,65 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         );
         $toManyAssociationSubresource->setIsCollection($toManyAssociation->isCollection());
         $toManyAssociationSubresource->setExcludedActions(
-            []
+            [
+                ApiActions::UPDATE_SUBRESOURCE,
+                ApiActions::ADD_SUBRESOURCE,
+                ApiActions::DELETE_SUBRESOURCE
+            ]
         );
         $expectedSubresources->addSubresource($toManyAssociation->getName(), $toManyAssociationSubresource);
 
-        $this->assertEquals(
+        self::assertEquals(
+            ['Test\Class' => $expectedSubresources],
+            $this->context->getResult()->toArray()
+        );
+    }
+
+    public function testProcessWhenSubresourcesAreDisabled()
+    {
+        $resource = new ApiResource('Test\Class');
+        $resource->setExcludedActions([ApiActions::GET_SUBRESOURCE]);
+
+        $resourceConfig = new Config();
+        $resourceConfig->setDefinition(new EntityDefinitionConfig());
+        $resourceMetadata = new EntityMetadata();
+        $association = new AssociationMetadata();
+        $association->setName('association1');
+        $association->setTargetClassName('Test\AssociationTarget');
+        $association->setIsCollection(false);
+        $resourceMetadata->addAssociation($association);
+
+        $this->context->getRequestType()->add(RequestType::REST);
+        $this->context->setVersion('1.1');
+        $this->context->setResources([$resource]);
+        $this->context->setAccessibleResources(['Test\AssociationTarget']);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $resource->getEntityClass(),
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra()]
+            )
+            ->willReturn($resourceConfig);
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $resource->getEntityClass(),
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
+                [],
+                true
+            )
+            ->willReturn($resourceMetadata);
+
+        $this->processor->process($this->context);
+
+        $expectedSubresources = new ApiResourceSubresources($resource->getEntityClass());
+
+        self::assertEquals(
             ['Test\Class' => $expectedSubresources],
             $this->context->getResult()->toArray()
         );

@@ -3,23 +3,18 @@
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi;
 
 use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
-use Oro\Bundle\ApiBundle\Request\Constraint;
-use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Oro\Bundle\ApiBundle\Request\JsonApi\RelationshipRequestDataValidator;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
  * Validates that the request data contains valid JSON.API object
- * that can be used to update the relationship.
- * This processor validates both "to-one" and "to-many" relationship data.
+ * that can be used to update a relationship.
  */
 class ValidateRequestData implements ProcessorInterface
 {
-    /** @var ChangeRelationshipContext */
-    protected $context;
+    public const OPERATION_NAME = 'validate_request_data';
 
     /**
      * {@inheritdoc}
@@ -28,168 +23,31 @@ class ValidateRequestData implements ProcessorInterface
     {
         /** @var ChangeRelationshipContext $context */
 
-        $this->context = $context;
-        try {
-            $pointer = $this->buildPointer('', JsonApiDoc::DATA);
-            $requestData = $context->getRequestData();
-            if ($this->validateRequestData($requestData, $pointer)) {
-                $data = $requestData[JsonApiDoc::DATA];
-                if ($this->context->isCollection()) {
-                    $this->validatePrimaryCollectionDataObject($data, $pointer);
-                } else {
-                    $this->validatePrimarySingleItemDataObject($data, $pointer);
-                }
-            }
-        } finally {
-            $this->context = null;
+        if ($context->isProcessed(self::OPERATION_NAME)) {
+            // the request data were already validated
+            return;
         }
+
+        $errors = $this->validateRequestData($context);
+        foreach ($errors as $error) {
+            $context->addError($error);
+        }
+        $context->setProcessed(self::OPERATION_NAME);
     }
 
     /**
-     * @param array  $data
-     * @param string $pointer
+     * @param ChangeRelationshipContext $context
      *
-     * @return bool
+     * @return Error[]
      */
-    protected function validateRequestData(array $data, $pointer)
+    private function validateRequestData(ChangeRelationshipContext $context): array
     {
-        if (!array_key_exists(JsonApiDoc::DATA, $data)) {
-            $this->addError(
-                $pointer,
-                sprintf('The "%s" top-level section should exist', JsonApiDoc::DATA)
-            );
+        $validator = new RelationshipRequestDataValidator();
 
-            return false;
+        if ($context->isCollection()) {
+            return $validator->validateResourceIdentifierObjectCollection($context->getRequestData());
         }
 
-        return true;
-    }
-
-    /**
-     * @param mixed  $data
-     * @param string $pointer
-     */
-    protected function validatePrimaryCollectionDataObject($data, $pointer)
-    {
-        if (!is_array($data) || ArrayUtil::isAssoc($data)) {
-            $this->addError(
-                $pointer,
-                'The list of resource identifier objects should be an array'
-            );
-
-            return;
-        }
-
-        foreach ($data as $key => $value) {
-            if (!is_array($value)) {
-                $this->addError(
-                    $this->buildPointer($pointer, $key),
-                    'The resource identifier object should be an object'
-                );
-            } else {
-                $this->validateResourceObject($value, $this->buildPointer($pointer, $key));
-            }
-        }
-    }
-
-    /**
-     * @param mixed  $data
-     * @param string $pointer
-     */
-    protected function validatePrimarySingleItemDataObject($data, $pointer)
-    {
-        if (null === $data) {
-            return;
-        }
-        if (!is_array($data)) {
-            $this->addError(
-                $pointer,
-                'The resource identifier object should be NULL or an object'
-            );
-
-            return;
-        }
-
-        $this->validateResourceObject($data, $pointer);
-    }
-
-    /**
-     * @param array  $data
-     * @param string $pointer
-     */
-    protected function validateResourceObject(array $data, $pointer)
-    {
-        if (empty($data)) {
-            $this->addError(
-                $pointer,
-                'The resource identifier object should be not empty object'
-            );
-
-            return;
-        }
-        if (!ArrayUtil::isAssoc($data)) {
-            $this->addError(
-                $pointer,
-                'The resource identifier object should be an object'
-            );
-
-            return;
-        }
-
-        $this->validateRequiredNotBlankString($data, JsonApiDoc::ID, $pointer);
-        $this->validateRequiredNotBlankString($data, JsonApiDoc::TYPE, $pointer);
-    }
-
-    /**
-     * @param array  $data
-     * @param string $property
-     * @param string $pointer
-     */
-    protected function validateRequiredNotBlankString(array $data, $property, $pointer)
-    {
-        if (!array_key_exists($property, $data)) {
-            $this->addError(
-                $this->buildPointer($pointer, $property),
-                sprintf('The \'%s\' property is required', $property)
-            );
-        } elseif (null === $data[$property]) {
-            $this->addError(
-                $this->buildPointer($pointer, $property),
-                sprintf('The \'%s\' property should not be null', $property)
-            );
-        } elseif (!is_string($data[$property])) {
-            $this->addError(
-                $this->buildPointer($pointer, $property),
-                sprintf('The \'%s\' property should be a string', $property)
-            );
-        } elseif ('' === trim($data[$property])) {
-            $this->addError(
-                $this->buildPointer($pointer, $property),
-                sprintf('The \'%s\' property should not be blank', $property)
-            );
-        }
-    }
-
-    /**
-     * @param string $parentPath
-     * @param string $property
-     *
-     * @return string
-     */
-    protected function buildPointer($parentPath, $property)
-    {
-        return $parentPath . '/' . $property;
-    }
-
-    /**
-     * @param string $pointer
-     * @param string $message
-     */
-    protected function addError($pointer, $message)
-    {
-        $error = Error::createValidationError(Constraint::REQUEST_DATA, $message)
-            ->setSource(ErrorSource::createByPointer($pointer));
-
-        $this->context->addError($error);
+        return $validator->validateResourceIdentifierObject($context->getRequestData());
     }
 }

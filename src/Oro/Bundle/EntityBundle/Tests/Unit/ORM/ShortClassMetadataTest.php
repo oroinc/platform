@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
 use Oro\Bundle\EntityBundle\ORM\ShortClassMetadata;
 
-class ShortClassMetadataTest extends \PHPUnit_Framework_TestCase
+class ShortClassMetadataTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {

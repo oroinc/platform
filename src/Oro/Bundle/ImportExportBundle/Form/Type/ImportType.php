@@ -5,6 +5,8 @@ namespace Oro\Bundle\ImportExportBundle\Form\Type;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -31,14 +33,14 @@ class ImportType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('file', 'file');
+        $builder->add('file', FileType::class);
 
         $processorChoices = $this->getImportProcessorsChoices($options['entityName']);
-        $processorNames = array_keys($processorChoices);
+        $processorNames = array_values($processorChoices);
 
         $builder->add(
             'processorAlias',
-            'choice',
+            ChoiceType::class,
             array_merge(
                 [
                     'choices' => $processorChoices,
@@ -64,7 +66,7 @@ class ImportType extends AbstractType
 
         $result = [];
         foreach ($aliases as $alias) {
-            $result[$alias] = $this->generateProcessorLabel($alias);
+            $result[$this->generateProcessorLabel($alias)] = $alias;
         }
 
         return $result;
@@ -92,12 +94,9 @@ class ImportType extends AbstractType
             ]
         );
         $resolver->setRequired(['entityName']);
-        $resolver->setAllowedTypes(
-            [
-                'entityName' => 'string',
-                'processorAliasOptions' => 'array',
-            ]
-        );
+
+        $resolver->setAllowedTypes('entityName', 'string');
+        $resolver->setAllowedTypes('processorAliasOptions', 'array');
     }
 
     /**

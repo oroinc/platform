@@ -4,10 +4,13 @@
     <input type="text" name="value" value=""/>
 </script>
 <script type="text/template" id="choice-filter-template-embedded">
+    <% var togglerId = _.uniqueId('dropdown-') %>
     <span> <%= _.__('oro.filter.embedded.choice.field_to_value') %> </span>
     <div class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%- selectedChoiceLabel %></a>:
-        <ul class="dropdown-menu">
+        <a id="<%- togglerId %>" class="dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+            aria-label="<%- _.__('Filter criteria') %>"
+            aria-haspopup="true" aria-expanded="false"><%- selectedChoiceLabel %></a>:
+        <ul class="dropdown-menu" role="menu" aria-labelledby="<%- togglerId %>">
             <% _.each(choices, function (option) { %>
                 <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
                     <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
@@ -20,10 +23,13 @@
 </script>
 
 <script type="text/template" id="many-to-many-filter-template-embedded">
+    <% var togglerId = _.uniqueId('dropdown-') %>
     <span> <%= _.__('oro.filter.embedded.choice.field_to_value') %> </span>
     <div class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%- selectedChoiceLabel %></a>:
-        <ul class="dropdown-menu">
+        <a id="<%- togglerId %>" class="dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+            aria-label="<%- _.__('Filter criteria') %>"
+            aria-haspopup="true" aria-expanded="false"><%- selectedChoiceLabel %></a>:
+        <ul class="dropdown-menu" role="menu" aria-labelledby="<%- togglerId %>">
             <% _.each(choices, function (option) { %>
                 <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
                     <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>

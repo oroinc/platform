@@ -4,7 +4,7 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Oro\Component\EntitySerializer\ConfigConverter;
 
-class ConfigConverterTest extends \PHPUnit_Framework_TestCase
+class ConfigConverterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider convertConfigProvider

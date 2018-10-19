@@ -5,18 +5,18 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\TagBundle\Form\Type\TagSelectType;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class TagSelectTypeTest extends \PHPUnit_Framework_TestCase
+class TagSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TagSelectType */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $transformer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $subscriber;
 
     protected function setUp()
@@ -69,10 +69,5 @@ class TagSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
 
         $this->type->buildForm($builder, array());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_tag_select', $this->type->getName());
     }
 }

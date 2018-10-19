@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
+use Doctrine\Common\Cache\ApcCache;
+use Doctrine\Common\Cache\XcacheCache;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -24,6 +26,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 
 /**
+ * Handler that saves role data with privileges to db.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AclRoleHandler
@@ -47,13 +51,6 @@ class AclRoleHandler
      * @var ManagerRegistry
      */
     protected $managerRegistry;
-
-    /**
-     * @var ObjectManager
-     *
-     * @deprecated since 1.8
-     */
-    protected $manager;
 
     /**
      * @var AclManager
@@ -123,16 +120,6 @@ class AclRoleHandler
     public function setManagerRegistry(ManagerRegistry $registry)
     {
         $this->managerRegistry = $registry;
-    }
-
-    /**
-     * @param ObjectManager $manager
-     *
-     * @deprecated since 1.8
-     */
-    public function setEntityManager(ObjectManager $manager)
-    {
-        $this->manager = $manager;
     }
 
     /**
@@ -209,7 +196,7 @@ class AclRoleHandler
     protected function createRoleFormInstance(AbstractRole $role, array $privilegeConfig)
     {
         return $this->formFactory->create(
-            new AclRoleType($privilegeConfig),
+            AclRoleType::class,
             $role
         );
     }
@@ -356,6 +343,13 @@ class AclRoleHandler
         );
 
         $this->aclCache->clearCache();
+
+        // Clear doctrine query cache to be sure that queries will process hints
+        // again with updated security information.
+        $cacheDriver = $this->managerRegistry->getManager()->getConfiguration()->getQueryCacheImpl();
+        if ($cacheDriver && !($cacheDriver instanceof ApcCache && $cacheDriver instanceof XcacheCache)) {
+            $cacheDriver->deleteAll();
+        }
     }
 
     /**

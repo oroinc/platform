@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\ApiDocAnnotationHandlerInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\ChainApiDocAnnotationHandler;
 use Symfony\Component\Routing\Route;
 
-class ChainApiDocAnnotationHandlerTest extends \PHPUnit_Framework_TestCase
+class ChainApiDocAnnotationHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainApiDocAnnotationHandler */
     private $chainHandler;

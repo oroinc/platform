@@ -9,15 +9,15 @@ use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Bundle\TestBundle\TestBundle;
 
-class ThemeResourceProviderTest extends \PHPUnit_Framework_TestCase
+class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ThemeResourceProvider */
     protected $provider;
 
-    /** @var LayoutUpdateLoaderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutUpdateLoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $loader;
 
-    /** @var BlockViewCache|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BlockViewCache|\PHPUnit\Framework\MockObject\MockObject */
     protected $blockViewCache;
 
     /** @var array */
@@ -138,7 +138,7 @@ class ThemeResourceProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        /** @var Cache|\PHPUnit_Framework_MockObject_MockObject $cache */
+        /** @var Cache|\PHPUnit\Framework\MockObject\MockObject $cache */
         $cache = $this->createMock(Cache::class);
         $cache->expects($this->exactly(2))
             ->method('save');

@@ -7,31 +7,19 @@ use Oro\Bundle\ChartBundle\Form\Type\ChartType;
 use Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaCollectionType;
 use Oro\Bundle\ReportBundle\Form\Type\ReportChartType;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ReportChartTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @var ReportChartType
-     */
-    protected $type;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configProvider;
 
-    protected function setUp()
-    {
-        $this->type = new ReportChartType();
-
-        parent::setUp();
-    }
-
     public function testBuildForm()
     {
-        $form = $this->factory->create($this->type, null, []);
+        $form = $this->factory->create(ReportChartType::class, null, []);
 
         $this->assertTrue($form->has('data_schema'));
     }

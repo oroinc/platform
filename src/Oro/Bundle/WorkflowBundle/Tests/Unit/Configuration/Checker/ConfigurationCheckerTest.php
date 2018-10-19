@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\Checker\ConfigurationChecker;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
-class ConfigurationCheckerTest extends \PHPUnit_Framework_TestCase
+class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigurationChecker */
     protected $checker;

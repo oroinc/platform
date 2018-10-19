@@ -4,9 +4,11 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailAddressFromType extends AbstractType
@@ -46,8 +48,14 @@ class EmailAddressFromType extends AbstractType
 
         $resolver->setDefaults([
             'choices'   => $choices,
-            'read_only' => count($choices) === 1,
+            'attr' => []
         ]);
+
+        $resolver->setNormalizer('attr', function (Options $options, $value) {
+            $value['readonly'] = (count($options['choices']) === 1);
+
+            return $value;
+        });
     }
 
     /**
@@ -73,7 +81,7 @@ class EmailAddressFromType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_choice';
+        return Select2ChoiceType::class;
     }
 
     /**

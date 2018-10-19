@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
+use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -30,7 +32,7 @@ class EntityFilterType extends AbstractChoiceType
      */
     public function getParent()
     {
-        return ChoiceFilterType::NAME;
+        return ChoiceFilterType::class;
     }
 
     /**
@@ -40,22 +42,21 @@ class EntityFilterType extends AbstractChoiceType
     {
         $resolver->setDefaults(
             array(
-                'field_type'    => 'entity',
+                'field_type'    => EntityType::class,
                 'field_options' => array(),
                 'translatable'  => false,
             )
         );
 
-        $resolver->setNormalizers(
-            array(
-                'field_type' => function (Options $options, $value) {
-                    if (!empty($options['translatable'])) {
-                        $value = 'translatable_entity';
-                    }
-
-                    return $value;
+        $resolver->setNormalizer(
+            'field_type',
+            function (Options $options, $value) {
+                if (!empty($options['translatable'])) {
+                    $value = TranslatableEntityType::class;
                 }
-            )
+
+                return $value;
+            }
         );
     }
 }

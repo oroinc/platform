@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActivityListBundle\Model\ActivityListQueryDesigner;
 
-class ActivityListQueryDesignerTest extends \PHPUnit_Framework_TestCase
+class ActivityListQueryDesignerTest extends \PHPUnit\Framework\TestCase
 {
     public function testGettersAndSetter()
     {
