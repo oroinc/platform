@@ -80,7 +80,6 @@ class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
 
         $this->context->incrementReadCount();
         self::assertEquals(1, $this->context->getReadCount());
-
     }
 
     public function testGetReadCount()
