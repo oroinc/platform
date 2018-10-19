@@ -8,7 +8,6 @@ use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Oro\Component\DoctrineUtils\ORM\HookUnionTrait;
 
 /**
- * @TODO: This walker will be replaced according to logic #BAP-13404
  * Dynamicly applies limit to subquery which is "hooked" by SubQueryLimitHelper
  */
 class SqlWalker extends TranslationWalker

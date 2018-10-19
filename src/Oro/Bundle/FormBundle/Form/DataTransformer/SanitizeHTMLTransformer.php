@@ -73,6 +73,7 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
                 'URI.AllowedSchemes',
                 ['http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'data' => true, 'tel' => true]
             );
+            $config->set('Attr.EnableID', true);
             $config->set('Attr.AllowedFrameTargets', ['_blank']);
             $this->htmlPurifier = new \HTMLPurifier($config);
         }
