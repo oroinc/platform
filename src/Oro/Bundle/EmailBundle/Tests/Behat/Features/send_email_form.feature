@@ -1,6 +1,5 @@
 @ticket-BAP-16290
 @fixture-OroUserBundle:user.yml
-
 Feature: Send email form
   In order to have ability to send email
   As Administrator
@@ -42,8 +41,8 @@ Feature: Send email form
       | Apply template | test_user_template       |
     And I click "Yes, Proceed"
     And "Email Form" must contains values:
-      | Subject | Test Template Subject |
-      | Body    | Test Template Body    |
+      | Subject | Test Template Subject     |
+      | Body    | <p>Test Template Body</p> |
     And click "Send"
     Then I should see "The email was sent" flash message
     Then I should see following grid:
@@ -82,7 +81,9 @@ Feature: Send email form
       | Subject        | Behat test                            |
     When I select "test_error_template_entity" from "Apply template"
     And I click "Yes, Proceed"
-    And I should see that "Body" contains "Test N/A Body"
+    And "Email Form" must contains values:
+      | Subject | Test Template Subject |
+      | Body    | <p>Test N/A Body</p>  |
     When I select "test_error_template_no_entity" from "Apply template"
     And I click "Yes, Proceed"
     Then I should see "This email template can't be used"
