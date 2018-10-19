@@ -72,7 +72,7 @@ define(function(require) {
          */
         render: function() {
             if (this.fixSidebarHeight && !tools.isMobile()) {
-                layoutHelper.setAvailableHeight(this.scrollbar, this.$el);
+                layoutHelper.setAvailableHeight(this.scrollbar, this.sidebar);
             }
 
             this._toggle(this.getSidebarState());
