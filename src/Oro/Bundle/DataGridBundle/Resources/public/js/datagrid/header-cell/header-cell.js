@@ -5,8 +5,6 @@ define(function(require) {
     var _ = require('underscore');
     var Backgrid = require('backgrid');
     var textUtil = require('oroui/js/tools/text-util');
-    var template = require('tpl!orodatagrid/templates/datagrid/header-cell.html');
-    var popoverTemplate = require('tpl!orodatagrid/templates/datagrid/header-cell-popover.html');
 
     /**
      * Datagrid header cell
@@ -18,10 +16,18 @@ define(function(require) {
     HeaderCell = Backgrid.HeaderCell.extend({
 
         /** @property */
-        template: template,
-
-        /** @property */
-        popoverTemplate: popoverTemplate,
+        template: _.template(
+            '<% if (sortable) { %>' +
+                '<a class="grid-header-cell__link" href="#" role="button">' +
+                    '<span class="grid-header-cell__label"><%- label %></span>' +
+                    '<span class="caret" aria-hidden="true"></span>' +
+                '</a>' +
+            '<% } else { %>' +
+                '<span class="grid-header-cell__label-container">' +
+                    '<span class="grid-header-cell__label"><%- label %></span>' +
+                '</span>' +
+            '<% } %>'
+        ),
 
         /** @property {Boolean} */
         allowNoSorting: true,
@@ -208,7 +214,11 @@ define(function(require) {
                 animation: false,
                 container: 'body',
                 offset: this.calcPopoverOffset(),
-                template: this.popoverTemplate()
+                template: '<div class="popover" role="tooltip">' +
+                              '<div class="arrow"></div>' +
+                              '<h3 class="popover-header"></h3>' +
+                              '<div class="popover-body popover-no-close-button"></div>' +
+                          '</div>'
             });
 
             this.hintTimeout = setTimeout(function addHeaderCellHint() {
