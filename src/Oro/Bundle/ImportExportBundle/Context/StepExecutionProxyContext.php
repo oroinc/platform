@@ -105,9 +105,12 @@ class StepExecutionProxyContext implements ContextInterface, BatchContextInterfa
      */
     public function incrementReadCount($incrementBy = 1)
     {
-        $this->stepExecution->setReadCount(
-            $this->stepExecution->getReadCount() + $incrementBy
-        );
+        $incrementedRead = $this->getOption('incremented_read', true);
+        if ($incrementedRead) {
+            $this->stepExecution->setReadCount(
+                $this->stepExecution->getReadCount() + $incrementBy
+            );
+        }
     }
 
     /**
