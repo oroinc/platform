@@ -16,7 +16,7 @@ class EmailTypeTemplateAccessibilityCheckerExtensionTest extends TypeTestCase
         $authorizationChecker
             ->expects($this->once())
             ->method('isGranted')
-            ->with(['VIEW'], 'entity:' . EmailTemplate::class)
+            ->with('VIEW', 'entity:' . EmailTemplate::class)
             ->willReturn(false);
 
         $extension = new EmailTypeTemplateAccessibilityCheckerExtension($authorizationChecker);
@@ -34,7 +34,7 @@ class EmailTypeTemplateAccessibilityCheckerExtensionTest extends TypeTestCase
         $authorizationChecker
             ->expects($this->once())
             ->method('isGranted')
-            ->with(['VIEW'], 'entity:' . EmailTemplate::class)
+            ->with('VIEW', 'entity:' . EmailTemplate::class)
             ->willReturn(true);
 
         $extension = new EmailTypeTemplateAccessibilityCheckerExtension($authorizationChecker);
