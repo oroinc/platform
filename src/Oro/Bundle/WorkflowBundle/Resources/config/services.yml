@@ -465,6 +465,14 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow, datasource: orm }
 
+    oro_workflow.filter.workflow_step:
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowStepFilter'
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: workflow_step, datasource: orm }
+
     oro_workflow.filter.workflow_translation:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowTranslationFilter'
         parent: oro_workflow.filter.workflow
