@@ -1,0 +1,8 @@
+/* @theme: admin.oro; */
+
+// Example:
+// font-size: px2rem(14px);
+@function px2rem($size) {
+    // Default font size on html element is 100%, equivalent to 16px;
+    @return $size / 16px * 1rem;
+}

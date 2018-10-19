@@ -1,29 +1,15 @@
-@import "oroui/css/scss/variables";
+/* @theme: admin.oro; */
 
 .inner-permissions-grid {
-    margin: 0 -20px 20px -20px;
+    margin-top: 16px;
 
-    .more-bar-holder > ul {
-        margin-bottom: 0;
+    .oro-datagrid {
+        margin: 0;
     }
 
-    .grid-body-cell-entity {
-        font-weight: bold;
-    }
-
-    table.grid,
+    .grid,
     .grid-scrollable-container {
         overflow: visible;
-    }
-
-    table tr:last-child {
-        td:first-child {
-            border-bottom-left-radius: 4px !important;
-        }
-
-        td:last-child {
-            border-bottom-right-radius: 4px !important;
-        }
     }
 
     .grid-header-cell:first-child {
@@ -31,134 +17,140 @@
     }
 
     .collapse-expand-action-container {
+        display: flex;
+        align-items: center;
+        width: $role-collapse-expand-action-container-width - 7;
+
         .collapse-action {
-            color: #727272;
-            font-size: 13px;
-            font-family: Helvetica, Arial, sans-serif;
-            font-weight: bold;
+            margin-#{$end}: 16px;
 
-            &:before {
-                content: '−';
-                display: inline-block;
-                width: 13px;
-                height: 13px;
-                font-weight: normal;
-                border: 1px solid #c3c3c3;
-                margin-right: 8px;
-                font-size: 12px;
-                line-height: 12px;
-                padding: 1px 0 0 0;
-                text-align: center;
-                color: #727272;
-                background: linear-gradient(#fcfcfc, #e9e9e9);
-            }
+            font-size: $role-capability-icon-size;
+            text-align: center;
 
-            &.collapsed:before {
-                content: '+';
+            color: $role-capability-icon-expand-color;
+
+            @include fa-icon($fa-var-minus-square-o);
+
+            &.collapsed {
+                @include fa-icon($fa-var-plus-square-o);
             }
         }
     }
 
     .entity-name {
-        float: left;
-        width: 136px;
         font-weight: bold;
     }
 
     .entity-row-action {
         position: relative;
-        float: right;
-        width: 20px;
     }
 
     .fields-list {
-        display: none;
-
-        & > :first-child {
+        > :first-child {
             margin-top: 8px;
         }
 
-        & > :last-child {
+        > :last-child {
             margin-bottom: 8px;
         }
     }
-}
 
-.collapse-expand-action-container .collapse-action {
-    .field-less & {
-        visibility: hidden;
+    .collapse {
+        @include clearfix();
     }
 
-    .collapsed &:before {
-        content: '+';
+    .role-permissions-action-launcher {
+        max-height: 24px;
+    }
+
+    .grid-header-cell-label {
+        min-width: $role-collapse-expand-action-container-width;
+    }
+}
+.field-less .collapse-action {
+    display: none;
+}
+
+.entity-permission-container {
+    display: flex;
+    justify-content: flex-start;
+
+    .action-permissions {
+        flex-grow: 1;
     }
 }
 
 .action-permissions {
-    list-style: none;
+    display: flex;
+    align-items: center;
     margin: 0;
 
-    .entity-permission-container > & {
-        margin-left: 160px;
-        margin-right: 24px;
-    }
+    list-style: none;
 
-    & &__item {
-        float: left;
+    @include clearfix();
+
+    &__item {
         width: 160px;
-        margin-right: 15px;
-    }
+        margin-#{$end}: 15px;
 
-    & &__item-wrapper {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        padding: 0 15px 0 8px;
-        margin-left: -8px;
-        max-width: 100%;
-        box-sizing: content-box;
-        float: left;
-
-        &.dropdown-toggle {
+        .dropdown-toggle {
             cursor: pointer;
             position: relative;
 
-            &:hover:after,
-            &.active:after {
-                position: absolute;
-                right: 3px;
-                display: inline-block;
-                width: 0;
-                height: 0;
-                margin-top: 8px;
-                margin-left: 5px;
-                vertical-align: top;
-                border-top: 4px solid #000;
-                border-right: 4px solid transparent;
-                border-left: 4px solid transparent;
-                content: "";
+            &:hover,
+            &.active {
+                @include fa-icon($role-capability-icon-action, after, true) {
+                    position: absolute;
+                    top: 2px;
+                    #{$end}: 4px;
+
+                    // Reset Bootstrap styles
+                    width: auto;
+                    height: auto;
+                    border: 0;
+
+                    font-size: $role-capability-icon-size;
+                    line-height: 1;
+
+                    color: $role-capability-icon-action-color;
+                }
             }
         }
     }
 
-    & &__item-wrapper--no-access {
-        opacity: .4;
+    &__item-wrapper {
+        padding-#{$end}: 20px;
+        max-width: 100%;
+
+        float: #{$start};
+
+        color: $role-capability-item-color;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+
+        white-space: nowrap;
     }
 
-    & &__item-wrapper_changed {
-        background-color: #f5f5f5;
-        box-shadow: 0 0 0 3px #f5f5f5;
+    &__item-wrapper--no-access {
+        color: $role-capability-item-no-access-color;
     }
 
-    & &__label {
-        max-width: 85px;
+    &__item-wrapper_changed {
+        background-color: $role-capability-item-changed-color;
+    }
+
+    &__label {
         display: inline-block;
         overflow: hidden;
+
         text-overflow: ellipsis;
+
         vertical-align: bottom;
     }
 
-    & &__dropdown-toggle {
+    &__dropdown-toggle {
         &:focus {
             font-weight: normal;
         }
@@ -166,22 +158,24 @@
 }
 
 .field-permission-container {
-    margin-left: 40px;
-    padding: 4px 0;
-    border-top: 1px solid $generalBorderColor;
+    margin-#{$start}: $role-collapse-expand-action-container-offset;
+    padding: 12px 0;
+
+    border-top: 1px solid $general-border-color;
 
     &:first-child {
+        margin-top: 4px;
+
         border-top: 0 none;
     }
 
     .field-name {
-        float: left;
-        width: 120px;
-        padding-left: 10px;
+        float: #{$start};
+        width: $role-collapse-expand-action-container-width - $role-collapse-expand-action-container-offset;
     }
 
     .action-permissions {
-        margin-left: 120px;
+        margin-#{$start}: 20px;
     }
 }
 
@@ -193,11 +187,8 @@
 }
 
 .dropdown-menu__role-permissions-action {
-    .grid .entity-row-action & {
+    .grid .entity-row-action {
         padding: 5px 0;
-        right: 100%;
-        left: auto;
-        top: -7px;
     }
 
     .dropdown-menu-collection__list > li {

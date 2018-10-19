@@ -100,6 +100,9 @@ define(function(require) {
         registerWidget: function(options) {
             var list = this.list;
             mediator.execute('widgets:getByIdAsync', options.widgetId, function(widget) {
+                widget.getAction('expand_all', 'adopted', function(action) {
+                    action.on('click', _.bind(list.expandAll, list));
+                });
                 widget.getAction('collapse_all', 'adopted', function(action) {
                     action.on('click', _.bind(list.collapseAll, list));
                 });

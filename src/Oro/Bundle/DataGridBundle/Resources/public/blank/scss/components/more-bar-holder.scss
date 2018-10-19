@@ -18,8 +18,9 @@
 
         color: inherit;
 
-        &:after {
-            content: none;
+        // Hide bootstrap arrow
+        &:before {
+            content: none !important; // Override bootstrap styles
         }
 
         .action-cell & {
@@ -29,12 +30,6 @@
 
     .dropdown {
         display: inline-block;
-    }
-
-    .launchers-dropdown-menu {
-        top: -10px;
-        right: calc(100% - 5px);
-        left: auto;
     }
 
     .dropdown-menu__placeholder + .dropdown-toggle,

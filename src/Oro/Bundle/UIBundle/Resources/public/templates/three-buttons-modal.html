@@ -1,18 +1,29 @@
-<% if (title) { %>
-<div class="modal-header">
-    <% if (allowCancel) { %>
-    <a class="close">×</a>
-    <% } %>
-    <h3><%= title %></h3>
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <% if (title) { %>
+                <h3 id="<%- modalId %>" class="modal-title"><%- title %></h3>
+            <% } %>
+            <button type="button" class="close <%= closeButtonClass %>"
+                data-dismiss="modal"
+                aria-label="<%- _.__('Close') %>">
+                <% if (closeText) { %>
+                    <%- closeText %>
+                <% } else { %>
+                    <span aria-hidden="true">&times;</span>
+                <% } %>
+            </button>
+        </div>
+        <div class="modal-body"><%= content %></div>
+        <div class="modal-footer">
+            <% if (allowCancel) { %>
+                <a href="#" role="button" class="cancel <%= cancelButtonClass %>" data-dismiss="modal"><%- cancelText %></a>
+            <% } %>
+                <a href="#" role="button" class="btn" data-button-id="secondary"><%- secondaryText %></a>
+            <% if (allowOk) { %>
+                <a href="#" role="button" class="ok <%= okButtonClass %>"><%- okText %></a>
+            <% } %>
+        </div>
+    </div>
 </div>
-<% } %>
-<div class="modal-body"><%= content %></div>
-<div class="modal-footer">
-    <% if (allowCancel) { %>
-    <% if (cancelText) { %>
-    <a href="#" class="btn cancel"><%= cancelText %></a>
-    <% } %>
-    <% } %>
-    <a href="#" class="btn" data-button-id="secondary"><%= secondaryText %></a>
-    <a href="#" class="btn ok btn-primary"><%= okText %></a>
-</div>
+

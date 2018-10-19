@@ -7,8 +7,8 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var tools = require('oroui/js/tools');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
+    var Popover = require('bootstrap-popover');
 
-    require('bootstrap');
     require('jquery-ui');
     require('oroui/js/responsive-jquery-widget');
 
@@ -78,11 +78,7 @@ define(function(require) {
         },
 
         /**
-         * Initializes
-         *  - form widgets
-         *  - tooltips
-         *  - popovers
-         *  - scrollspy
+         * Initializes form widgets, scrollspy, and triggers `initLayout` event
          *
          * @param {string|HTMLElement|jQuery.Element} container
          */
@@ -95,17 +91,13 @@ define(function(require) {
 
             scrollspy.init($container);
 
-            $container.find('[data-toggle="tooltip"]').tooltip();
-
-            this.initPopover($container);
-
-            mediator.trigger('layoutInit', $container);
+            $container.trigger('initLayout');
         },
 
         initPopover: function(container, options) {
             var $items = container.find('[data-toggle="popover"]').filter(function() {
                 // skip already initialized popovers
-                return !$(this).data('popover');
+                return !$(this).data(Popover.DATA_KEY);
             });
 
             this.initPopoverForElements($items, options);
@@ -126,12 +118,12 @@ define(function(require) {
 
             $items.not('[data-close="false"]').each(function(i, el) {
                 // append close link
-                var content = $(el).data('content');
+                var content = el.getAttribute('data-content');
                 content += '<i class="fa-close popover-close"></i>';
-                $(el).data('content', content);
+                el.setAttribute('data-content', content);
             });
 
-            $items.popover(options).on('click.popover', function(e) {
+            $items.popover(options).on('click' + Popover.EVENT_KEY, function(e) {
                 if ($(this).is('.disabled, :disabled')) {
                     return;
                 }
@@ -143,13 +135,14 @@ define(function(require) {
             $('body')
                 .on('click.popover-hide', function(e) {
                     var $target = $(e.target);
-                    $items.each(function() {
+                    // '[aria-describedby]' -- meens the popover is opened
+                    $items.filter('[aria-describedby]').each(function() {
                         // the 'is' for buttons that trigger popups
                         // the 'has' for icons within a button that triggers a popup
                         if (
                             !$(this).is($target) &&
-                                $(this).has($target).length === 0 &&
-                                ($('.popover').has($target).length === 0 || $target.hasClass('popover-close'))
+                            $(this).has($target).length === 0 &&
+                            ($('.popover').has($target).length === 0 || $target.hasClass('popover-close'))
                         ) {
                             $(this).popover('hide');
                         }
@@ -159,11 +152,27 @@ define(function(require) {
                         e.preventDefault();
                     }
                 }).on('focus.popover-hide', 'select, input, textarea', function() {
-                    $items.popover('hide');
+                    // '[aria-describedby]' -- meens the popover is opened
+                    $items.filter('[aria-describedby]').popover('hide');
                 });
             mediator.once('page:request', function() {
                 $('body').off('.popover-hide .popover-prevent');
             });
+        },
+
+        /**
+         * Disposes form widgets and triggers `disposeLayout` event
+         *
+         * @param {string|HTMLElement|jQuery.Element} container
+         */
+        dispose: function(container) {
+            var $container;
+
+            $container = $(container);
+
+            this.unstyleForm($container);
+
+            $container.trigger('disposeLayout');
         },
 
         hideProgressBar: function() {

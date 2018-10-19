@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImapBundle\EventListener;
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 /**
  * Configure SMTP transport based on user IMAP settings
@@ -13,9 +13,9 @@ use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 class SendEmailTransportListener
 {
     /**
-     * @var Mcrypt
+     * @var SymmetricCrypterInterface
      */
-    protected $mcrypt;
+    protected $crypter;
     
     /**
      * @var ImapEmailGoogleOauth2Manager
@@ -23,14 +23,14 @@ class SendEmailTransportListener
     protected $imapEmailGoogleOauth2Manager;
 
     /**
-     * @param Mcrypt $mcrypt
+     * @param SymmetricCrypterInterface $crypter
      * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
      */
     public function __construct(
-        Mcrypt $mcrypt,
+        SymmetricCrypterInterface $crypter,
         ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
     ) {
-        $this->mcrypt = $mcrypt;
+        $this->crypter = $crypter;
         $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
     }
 
@@ -44,7 +44,7 @@ class SendEmailTransportListener
         $emailOrigin = $event->getEmailOrigin();
         if ($emailOrigin instanceof UserEmailOrigin) {
             $username = $emailOrigin->getUser();
-            $password = $this->mcrypt->decryptData($emailOrigin->getPassword());
+            $password = $this->crypter->decryptData($emailOrigin->getPassword());
             $host = $emailOrigin->getSmtpHost();
             $port = $emailOrigin->getSmtpPort();
             $security = $emailOrigin->getSmtpEncryption();

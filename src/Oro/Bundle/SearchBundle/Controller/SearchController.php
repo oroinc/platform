@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Provides search functionality of quick search and search page
+ */
 class SearchController extends Controller
 {
     /**
@@ -59,11 +62,10 @@ class SearchController extends Controller
 
     /**
      * @param Request $request
-     * @return array
+     * @return Response
      *
      * @Route("/suggestion", name="oro_search_suggestion")
      * @AclAncestor("oro_search")
-     * @Template("OroSearchBundle:Search:searchSuggestion.html.twig")
      */
     public function searchSuggestionAction(Request $request)
     {
@@ -84,7 +86,7 @@ class SearchController extends Controller
             $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
         }
 
-        return $searchResults->toSearchResultData();
+        return new JsonResponse($searchResults->toSearchResultData());
     }
 
     /**

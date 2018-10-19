@@ -1,0 +1,7 @@
+<% _.each(hints, function(hint, index) { %>
+    <% if (index == 0) { %>
+        <h5 class="no-data__title"><%= hint %></h5>
+    <% } else { %>
+        <p class="no-data__text"><%= hint %></p>
+    <% } %>
+<% }) %>

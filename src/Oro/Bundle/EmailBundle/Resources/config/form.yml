@@ -213,7 +213,7 @@ services:
         class: '%oro_email.form.type.mailbox.class%'
         arguments:
             - '@oro_email.mailbox.process_storage'
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_config.user'
         tags:
             - { name: form.type, alias: oro_email_mailbox }
@@ -235,7 +235,7 @@ services:
     oro_email.form.configurator.email_configuration:
         class: 'Oro\Bundle\EmailBundle\Form\Configurator\EmailConfigurationConfigurator'
         arguments:
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
 
     oro_email.form.factory:
         class: '%oro_email.form.factory.class%'

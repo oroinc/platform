@@ -6,6 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
+    var Popover = require('bootstrap-popover');
     var FuzzySearch = require('oroui/js/fuzzy-search');
     var persistentStorage = require('oroui/js/persistent-storage');
     var highlightSwitcherTemplate = require('tpl!oroui/templates/highlight-switcher.html');
@@ -329,10 +330,10 @@ define(function(require) {
          */
         getElementContent: function($el) {
             var content;
+            var popover = $el.data(Popover.DATA_KEY);
 
-            var isPopover = $el.data('popover');
-            if (isPopover) {
-                content = $el.data('popover').getContent();
+            if (popover !== void 0) {
+                content = popover.getContent();
             } else if (this._isField($el) && !this._isFieldChoice($el)) {
                 content = $el.val();
             } else {
@@ -349,9 +350,10 @@ define(function(require) {
          * @param {jQuery} $content
          */
         setElementContent: function($el, $content) {
-            var isPopover = $el.data('popover');
-            if (isPopover) {
-                $el.data('popover').updateContent($content.html());
+            var popover = $el.data(Popover.DATA_KEY);
+
+            if (popover !== void 0) {
+                popover.updateContent($content.html());
                 $el.toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($content, false));
             } else if (this._isFieldChoice($el)) {
                 $el.parent().toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($content, false));

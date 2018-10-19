@@ -34,6 +34,9 @@ define([
         /** @property */
         hidden: false,
 
+        /** @property */
+        showLabels: false,
+
         /**
          * @inheritDoc
          */
@@ -139,7 +142,8 @@ define([
                 disabled: !this.enabled || !this.collection.state.totalRecords,
                 collectionState: this.collection.state,
                 items: this.items,
-                currentSizeLabel: currentSizeLabel
+                currentSizeLabel: currentSizeLabel,
+                showLabels: this.showLabels
             })));
 
             if (this.hidden) {

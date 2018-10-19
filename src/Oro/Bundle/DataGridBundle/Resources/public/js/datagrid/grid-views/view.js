@@ -239,7 +239,7 @@ define(function(require) {
          */
         onChange: function(e) {
             e.preventDefault();
-            var value = $(e.target).data('value');
+            var value = $(e.currentTarget).data('value');
             this.changeView(value);
             this._updateTitle();
 
@@ -293,7 +293,7 @@ define(function(require) {
             });
 
             modal.open();
-            $('#gridViewName').focus();
+            modal.$el.find('[data-role="grid-view-input"]').focus();
 
             this.modal = modal;
         },

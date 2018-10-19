@@ -1,0 +1,5 @@
+<ul class="breadcrumb">
+    <% for (var i = 0; i < breadcrumbs.length; i++) { %>
+        <li class="breadcrumb-item<%= (i + 1 === breadcrumbs.length) ? ' active': '' %>"><%- breadcrumbs[i] %></li>
+    <% } %>
+</ul>

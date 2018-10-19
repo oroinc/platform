@@ -23,7 +23,7 @@
         <div class="widget-content email-form">
             {% block page_container_before_form %}{% endblock %}
             {% if not form.vars.valid and form.vars.errors|length %}
-                <div class="alert alert-error">
+                <div class="alert alert-error" role="alert">
                     <div class="message">
                         {{ form_errors(form) }}
                     </div>

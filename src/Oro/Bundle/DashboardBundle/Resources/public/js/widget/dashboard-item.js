@@ -32,10 +32,6 @@ define([
                     this.expand();
                 }
             },
-            'click .default-actions-container .move-action': function(event) {
-                event.preventDefault();
-                this.onMove();
-            },
             'click .default-actions-container .remove-action': function(event) {
                 event.preventDefault();
                 this.onRemoveFromDashboard();
@@ -227,14 +223,6 @@ define([
          */
         isCollapsed: function() {
             return !this.state.expanded;
-        },
-
-        /**
-         * Triggering move action
-         */
-        onMove: function() {
-            this.trigger('move', this.$el, this);
-            mediator.trigger('widget:dashboard:move:' + this.getWid(), this.$el, this);
         },
 
         /**

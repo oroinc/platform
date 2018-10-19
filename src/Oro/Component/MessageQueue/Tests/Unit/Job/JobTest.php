@@ -58,7 +58,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
     public function testShouldConstructWithNullChildJobs()
     {
         $job = new Job();
-        self::assertNull($job->getChildJobs());
+        self::assertEmpty($job->getChildJobs());
     }
 
     public function testShouldConstructWithNullCreatedAt()

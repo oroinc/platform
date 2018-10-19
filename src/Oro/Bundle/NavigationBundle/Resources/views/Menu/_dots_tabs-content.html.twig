@@ -12,7 +12,11 @@
             {% set componentAttrs = item.extras.component_options is defined ? UI.renderPageComponentAttributes(item.extras.component_options) : '' %}
             {% if displayable %}
                 <div class="tab-pane{% if item.extras.active_if_first_is_empty|default(false) %} active{% endif %}"
-                     id="{{- item.name|replace({' ': '_', '#': '_'})|lower|trim -}}-content" {{ componentAttrs }}>
+                     id="{{- item.name|replace({' ': '_', '#': '_'})|lower|trim -}}-content" {{ componentAttrs }}
+                     role="tabpanel"
+                     aria-labelledby="{{- item.name|replace({' ': '_', '#': '_'})|lower|trim -}}-tab"
+                     aria-orientation="vertical"
+                >
                     {% set options = {'tabTitle': item.label} %}
                     {% set options = {'defaultUrl': path("oro_default")} %}
                     {% set options = options|merge(item.extras) %}

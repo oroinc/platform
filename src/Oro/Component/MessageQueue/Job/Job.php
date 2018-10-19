@@ -1,6 +1,9 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
+/**
+ * The Job object.
+ */
 class Job
 {
     const STATUS_NEW = 'oro.message_queue_job.status.new';
@@ -49,7 +52,7 @@ class Job
     /**
      * @var Job[]
      */
-    protected $childJobs;
+    protected $childJobs = [];
 
     /**
      * @var \DateTime

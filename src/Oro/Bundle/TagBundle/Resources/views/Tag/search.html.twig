@@ -10,10 +10,12 @@
     </div>
 
     {% if '' in groupedResults|keys and groupedResults[''].count > 0 or groupedResults|length > 1 %}
+        {% set togglerId = 'dropdown-'|uniqid %}
         <div class="oro-page collapsible-sidebar clearfix">
             <div class="oro-page-sidebar search-entity-types-column dropdown">
-                <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown">
-                    <i class="fa-filter"></i>
+                <a href="#" role="button" id="{{ togglerId }}" class="dropdown-toggle" data-toggle="dropdown"
+                   aria-label="{{ 'oro.tag.result.entity_filter'|trans }}" aria-haspopup="true" aria-expanded="false">
+                    <span class="fa-filter" aria-hidden="true"></span>
                     {% if selectedResult.label is defined and selectedResult.count is defined%}
                         {{ selectedResult.label|trans}}
                         {% set selectedResultCount = selectedResult.count %}
@@ -21,9 +23,9 @@
                         {{ 'oro.search.result.all'|trans }}
                         {% set selectedResultCount = groupedResults[''].count %}
                     {% endif %}
-                    ({{ selectedResultCount }}) <i class="fa-sort-desc"></i>
+                    ({{ selectedResultCount }}) <span class="fa-sort-desc" aria-hidden="true"></span>
                 </a>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                <ul class="dropdown-menu" role="menu" aria-labelledby="{{ togglerId }}">
                 {% for alias, type in groupedResults %}
                     {% set selected = alias == from %}
                     {% if type.class is defined %}
@@ -39,9 +41,9 @@
                     {% endif %}
 
                     <li{% if selected %} class="selected"{% endif %}>
-                        <a href="{{ path('oro_tag_search', { from: alias, id: tag.id }) }}">
-                            {% if selected %}<i class="fa-chevron-right pull-right"></i>{% endif %}
-                            <i class="{{ iconClass }}"></i>
+                        <a href="{{ path('oro_tag_search', { from: alias, id: tag.id }) }}" {% if selected %}aria-selected="true"{% endif %}>
+                            {% if selected %}<span class="fa-chevron-right pull-right" aria-hidden="true"></span>{% endif %}
+                            <span class="{{ iconClass }}" aria-hidden="true"></span>
                             {{ label|trans }} ({{ type.count }})
                         </a>
                     </li>

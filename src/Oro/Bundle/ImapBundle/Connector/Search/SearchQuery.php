@@ -180,7 +180,8 @@ class SearchQuery
     private function andOperatorIfNeeded()
     {
         $exprItems = $this->expr->getItems();
-        $lastIndex = count($exprItems) - 1;
+        $itemsCount = !$this->expr->isEmpty() ? count($exprItems) : 0;
+        $lastIndex = $itemsCount - 1;
         if ($lastIndex != -1) {
             $lastItem = $exprItems[$lastIndex];
             if (!($lastItem instanceof SearchQueryExprOperator)

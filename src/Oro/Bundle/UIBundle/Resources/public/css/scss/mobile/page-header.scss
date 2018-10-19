@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 .navbar-extra-right {
     padding-right: 0;
 }
@@ -6,10 +8,7 @@
     float: left;
 }
 
-.breadcrumb-pin,
-.container-fluid.page-title,
-.navbar-extra {
-    background-color: #f1f1f1;
+.breadcrumb-pin {
     padding-right: 0;
     padding-left: 0;
 }
@@ -17,7 +16,9 @@
 .container-fluid.page-title {
     margin-bottom: 10px;
 
-    @include safe-area-offset(padding, 0);
+    @include safe-area-offset(padding, $content-padding);
+
+    padding: 0 $content-padding;
 }
 
 .navbar-extra {
@@ -38,31 +39,19 @@
         margin-left: 0;
     }
 
-    .oro-subtitle {
-        text-align: left;
-        white-space: normal;
-        padding-right: 13px;
-    }
-
     .grid-views {
         margin-left: 0;
 
+        .oro-subtitle {
+            display: inline-block;
+        }
+
         .views-group {
-            margin-right: 12px;
             vertical-align: baseline;
 
             & > .dropdown-toggle {
                 height: auto;
                 vertical-align: baseline;
-            }
-
-            .caret,
-            &.open .btn.dropdown-toggle .caret {
-                margin: 0 -13px 0 5px;
-                vertical-align: baseline;
-                display: inline;
-                line-height: initial;
-                font-size: 4px;
             }
         }
 
@@ -74,26 +63,22 @@
         .edited-label,
         .actions-group .dropdown-toggle {
             vertical-align: baseline;
-
-            &:after {
-                content: '';
-                font-size: 20px;
-            }
         }
     }
 }
 
 .page-title {
     h1 {
-        font-size: $baseFontSize * 1.75;
+        font-size: $base-font-size--xl;
+        font-weight: bold;
         margin: 0;
-        line-height: $baseFontSize * 2.5;
+        line-height: $base-font-size * 2.5;
         display: block;
     }
 
     .sub-title {
         float: none;
-        font-size: $fontSizeSmall;
+        font-size: $base-font-size--xl;
 
         & + .separator {
             display: none;
@@ -107,7 +92,7 @@
     ul.inline li {
         line-height: 18px;
         display: block;
-        font-size: $fontSizeSmall;
+        font-size: $base-font-size--s;
         padding: 0;
         border: 0;
     }
@@ -126,53 +111,13 @@
         text-align: center;
 
         &:before {
-            font-size: $fontSizeLarge;
+            font-size: $base-font-size--l;
         }
     }
 
     .dropdown-toggle {
         .caret {
             margin-left: 5px;
-        }
-    }
-
-    .btn {
-        font-size: $fontSizeLarge;
-        line-height: $fontSizeLarge * 2;
-        height: 34px;
-        padding-left: 10px;
-        padding-right: 10px;
-
-        .caret {
-            border-top-color: #666;
-            margin-top: 16px;
-        }
-
-        [class^="fa-"].hide-text:before {
-            margin: 0 0 0 -9px;
-            line-height: 35px;
-        }
-
-        &:active {
-            [class^="fa-"]:before,
-            .caret {
-                color: #444;
-            }
-        }
-    }
-
-    .btn-group > .dropdown-menu {
-        li a,
-        li button {
-            font-size: $fontSizeLarge;
-            line-height: $fontSizeLarge * 1.8;
-            padding: 1px 26px 1px 30px;
-            color: #666;
-
-            [class^="fa-"] {
-                margin-left: -25px;
-                margin-right: 5px;
-            }
         }
     }
 }

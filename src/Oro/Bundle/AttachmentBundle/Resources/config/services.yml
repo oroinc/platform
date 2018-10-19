@@ -19,7 +19,6 @@ parameters:
     oro_attachment.datagrid.action.dialog.class:                 Oro\Bundle\AttachmentBundle\DataGrid\Action\DialogAction
 
     oro_attachment.provider.attachment.class:                    Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
-    oro_attachment.config.class:                                 Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig
 
     oro_attachment.formatter.image_encoded.class:                Oro\Bundle\AttachmentBundle\Formatter\ImageEncodedFormatter
     oro_attachment.formatter.image_link.class:                   Oro\Bundle\AttachmentBundle\Formatter\ImageLinkFormatter
@@ -209,11 +208,6 @@ services:
         public: false
         tags:
             - { name: oro_entity.exclusion_provider.api }
-
-    oro_attachment.config:
-        class: '%oro_attachment.config.class%'
-        arguments:
-            - '@oro_attachment.association_helper'
 
     oro_attachment.formatter.image_encoded:
         class: '%oro_attachment.formatter.image_encoded.class%'
