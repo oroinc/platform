@@ -5,6 +5,10 @@ namespace Oro\Bundle\ImportExportBundle\Context;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Doctrine\Common\Collections\ArrayCollection;
 
+/**
+ * Provides the ability to save and manage parameters
+ * Performs the role of an adapter and provides access to the original object
+ */
 class StepExecutionProxyContext implements ContextInterface, BatchContextInterface
 {
     /**

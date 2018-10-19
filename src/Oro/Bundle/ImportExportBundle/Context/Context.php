@@ -1,8 +1,10 @@
 <?php
 
-
 namespace Oro\Bundle\ImportExportBundle\Context;
 
+/**
+ * Provides the ability to save and manage parameters
+ */
 class Context implements ContextInterface, BatchContextInterface
 {
     const OPTION_FILE_PATH = 'filePath';
