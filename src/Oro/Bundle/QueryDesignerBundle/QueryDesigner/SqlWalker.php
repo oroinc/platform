@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
+use Doctrine\ORM\Query\AST\SelectStatement;
+use Doctrine\ORM\Query\SqlWalker as GrandparentSqlWalker;
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Oro\Component\DoctrineUtils\ORM\HookUnionTrait;
 
 /**
- * @TODO: This walker will be replaced according to logic #BAP-13404
  * Dynamicly applies limit to subquery which is "hooked" by SubQueryLimitHelper
  */
 class SqlWalker extends TranslationWalker
@@ -34,5 +35,17 @@ class SqlWalker extends TranslationWalker
         }
 
         return $this->hookUnion($sql);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExecutor($AST)
+    {
+        if ($AST instanceof SelectStatement) {
+            return parent::getExecutor($AST);
+        }
+
+        return GrandparentSqlWalker::getExecutor($AST);
     }
 }
