@@ -42,11 +42,11 @@ oro_behat_extension:
       class: Oro\Bundle\UIBundle\Tests\Behat\Element\EntityStatus
 
     Breadcrumb Container:
-      selector: 'div.navigation'
-      class: Oro\Bundle\UIBundle\Tests\Behat\Element\BreadcrumbContainerElement
+      selector: 'ul.breadcrumb'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
-    Breadcrumb:
-      selector: 'a'
+    Page Title:
+      selector: '.page-title'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Entity Edit Button:
@@ -101,11 +101,11 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiWindow okButton:
-      selector: 'div.modal-footer a.ok, div.buttons-equal button.ok'
+      selector: 'div.modal-footer .ok, div.buttons-equal button.ok'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiWindow cancelButton:
-      selector: 'div.modal-footer a.cancel, div.buttons-equal button.cancel'
+      selector: 'div.modal-footer .cancel, div.buttons-equal button.cancel'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     ContextSelector:

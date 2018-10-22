@@ -4,6 +4,7 @@
     display: flex;
     flex-grow: 1;
     overflow: hidden;
+    flex-shrink: 0;
 
     .pin-holder {
         position: relative;
@@ -17,7 +18,6 @@
                 color: $pin-item-outdated-hover-color;
             }
         }
-
     }
 
     .btn-close {
@@ -69,7 +69,7 @@
         pointer-events: none;
     }
 
-    a.dropdown-toggle {
+    .dropdown-toggle {
         position: relative;
         background-color: $app-header-bg-color;
         color: $pin-item-close-color;
@@ -94,8 +94,10 @@
     }
 
     li {
-        &.active a {
-            font-weight: bold;
+        &.active {
+            a {
+                font-weight: bold;
+            }
         }
 
         a {
@@ -114,6 +116,7 @@
         list-style: none;
         display: block;
         white-space: nowrap;
+
         &:empty {
             display: none;
         }

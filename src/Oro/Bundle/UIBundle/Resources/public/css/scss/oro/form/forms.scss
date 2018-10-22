@@ -1,0 +1,164 @@
+/* @theme: admin.oro; */
+
+.form-horizontal .control-label {
+    text-align: left;
+
+    &.header-tooltips {
+        display: inline;
+        float: none;
+        margin-left: -20px;
+
+        .oro-popover-content {
+            line-height: 20px;
+        }
+    }
+}
+
+.control-group .controls p.control-label {
+    width: auto;
+}
+
+.form-horizontal {
+    .control-group {
+        display: flex;
+
+        > .control-label {
+            width: 200px;
+            min-width: 150px;
+            font-weight: normal;
+            text-align: #{$end};
+        }
+
+        label.control-label {
+            margin-bottom: 0;
+            padding-top: 9px;
+
+            .desktop-version & + .controls {
+                padding-top: 9px;
+            }
+        }
+
+        .control-label.wrap {
+            padding-top: 6px;
+            line-height: 20px;
+
+            .desktop-version & + .controls {
+                padding-top: 6px;
+            }
+
+            .tooltip-icon {
+                margin-right: 5px;
+            }
+
+            label {
+                display: inline;
+            }
+        }
+
+        .controls {
+            margin-#{$start}: 13px;
+
+            text-align: #{$start};
+
+            &:first-child {
+                margin-#{$start}: 169px;
+            }
+
+            &.autocomplete-box {
+                margin-bottom: 10px;
+                margin-top: 10px;
+            }
+
+            .control-label {
+                &.html-property {
+                    overflow: auto;
+                }
+            }
+
+            .control-subgroup {
+                display: inline-block;
+                vertical-align: top;
+                margin-right: 8px;
+
+                .controls {
+                    margin-left: 0;
+                    float: left;
+                }
+
+                .tooltip-icon {
+                    margin-right: 5px;
+                }
+            }
+        }
+
+        &.attribute-row label.control-label {
+            cursor: default;
+            color: $primary-550;
+        }
+
+        &.control-group-datetime {
+            input[type="text"] {
+                &.datepicker-input {
+                    width: 189px;
+                }
+                &.timepicker-input {
+                    width: 100px;
+                }
+            }
+        }
+    }
+}
+
+.form-horizontal-large {
+    .control-group {
+        max-width: 100%;
+
+        div.control-label,
+        label.control-label {
+            width: 230px;
+            text-align: right;
+        }
+    }
+}
+
+.user-fieldset {
+    margin-bottom: 22px;
+
+    span {
+        background-color: #fff;
+        padding: 0 20px 0 0;
+        display: inline-block;
+    }
+}
+
+input[type='radio'] + label,
+input[type='checkbox'] + label {
+    margin-bottom: 2px;
+    display: inline-block;
+}
+
+.form-pass-reset {
+    margin: 0 auto 20px;
+    max-width: 400px;
+    padding: 19px 29px 29px;
+    background: $form-pass-reset-background;
+    border: $form-pass-reset-border;
+    border-radius: $border-radius;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .065);
+}
+
+.form-row {
+    padding: 0 0 $margin-bottom-box/2;
+}
+
+@media only screen and (max-width: 1200px) {
+    .form-horizontal {
+        .control-group {
+            > div.control-label,
+            > label.control-label {
+                width: 150px;
+                min-width: 150px;
+            }
+        }
+    }
+}

@@ -1,0 +1,99 @@
+/* @theme: admin.oro; */
+
+@import "bowerassets/bootstrap/scss/pagination";
+
+.pagination {
+    margin: 0;
+    align-items: center;
+
+    &--mini {
+        font-size: $base-font-size--s;
+
+        .page-link {
+            padding: $pagination-mini-padding-y $pagination-mini-padding-x;
+
+            [class^="fa-"],
+            [class*=" fa-"] {
+                &.hide-text {
+                    &:before,
+                    &:after {
+                        font-size: px2rem(14px);
+                    }
+                }
+            }
+        }
+    }
+
+    &-previous {
+        margin-#{$end}: 4px;
+    }
+
+    &-next {
+        margin-#{$start}: 4px;
+    }
+}
+
+.page-item {
+    &.disabled .page-link {
+        opacity: .5;
+    }
+}
+
+.page-link {
+    border: none;
+
+    [class^="fa-"],
+    [class*=" fa-"] {
+        &.hide-text {
+            color: $pagination-fa-color;
+
+            &:before,
+            &:after {
+                font-size: px2rem(16px);
+            }
+        }
+    }
+
+    &:hover {
+        [class^="fa-"],
+        [class*=" fa-"] {
+            &.hide-text {
+                color: $pagination-fa-hover-color;
+            }
+        }
+    }
+
+    &:active {
+        [class^="fa-"],
+        [class*=" fa-"] {
+            &.hide-text {
+                color: $pagination-fa-active-color;
+            }
+        }
+    }
+
+    &:disabled,
+    &.disabled {
+        [class^="fa-"],
+        [class*=" fa-"] {
+            &.hide-text {
+                color: $pagination-fa-disabled-color;
+            }
+        }
+    }
+}
+
+.page-current {
+    position: relative;
+    display: block;
+    padding: $pagination-current-padding-y $pagination-current-padding-x;
+    margin-left: -$pagination-border-width;
+    line-height: $pagination-line-height;
+    color: $pagination-color;
+}
+
+.page-input {
+    width: 40px;
+    margin: 0;
+    text-align: center;
+}

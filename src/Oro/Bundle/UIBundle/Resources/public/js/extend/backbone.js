@@ -95,6 +95,7 @@ define(function(require) {
         if (this.deferredRender) {
             this._rejectDeferredRender();
         }
+        this.disposeControls();
         this.disposePageComponents();
         this.trigger('dispose', this);
 
@@ -103,6 +104,7 @@ define(function(require) {
             subview = _ref[_i];
             subview.dispose();
         }
+
         Backbone.mediator.unsubscribe(null, null, this);
         this.off();
         this.stopListening();
@@ -142,7 +144,10 @@ define(function(require) {
         return this.$el;
     };
     Backbone.View.prototype.initControls = function() {
-        Backbone.mediator.execute('layout:init', this.getLayoutElement());
+        Backbone.mediator.execute({name: 'layout:init', silent: true}, this.getLayoutElement());
+    };
+    Backbone.View.prototype.disposeControls = function() {
+        Backbone.mediator.execute({name: 'layout:dispose', silent: true}, this.$el);
     };
     Backbone.View.prototype.initLayout = function(options) {
         // initializes controls in layout

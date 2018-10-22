@@ -311,7 +311,7 @@ define(function(require) {
 
                 this.$(this.criteriaValueSelectors.date_type)
                     .closest('.dropdown')
-                    .find('.dropdown-toggle')
+                    .find('[data-toggle="dropdown"]')
                     .html(this.$(this.criteriaValueSelectors.date_type + ' :selected').text());
             } else {
                 // it's part
@@ -322,7 +322,7 @@ define(function(require) {
 
                 this.$(this.criteriaValueSelectors.date_part)
                     .closest('.dropdown')
-                    .find('.dropdown-toggle')
+                    .find('[data-toggle="dropdown"]')
                     .attr('title', this._getPartTooltip(value));
             }
         },

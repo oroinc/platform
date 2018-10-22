@@ -90,7 +90,7 @@ class ImportExportContext extends OroFeatureContext implements
             return;
         }
 
-        $activeTab = $this->getPage()->find('css', '.import-widget-content .nav-tabs .active a');
+        $activeTab = $this->getPage()->find('css', '.import-widget-content .nav-tabs .active');
         $tabToBeActivated = $this->getPage()->findLink($tabLabel);
 
         self::assertNotNull($activeTab, 'There are currently no active tabs');

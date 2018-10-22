@@ -29,7 +29,7 @@ services:
             - '@oro_message_queue.job.extensions'
 
     oro_message_queue.job.extensions:
-        class: 'Oro\Component\MessageQueue\Job\ChainExtension'
+        class: 'Oro\Component\MessageQueue\Job\Extension\ChainExtension'
         public: false
         arguments:
             - []
@@ -115,5 +115,13 @@ services:
             - '@security.token_storage'
             - '@oro_security.token_serializer'
             - '@oro_message_queue.job.storage'
+        tags:
+            - { name: oro_message_queue.job.extension }
+
+    oro_message_queue.job.root_job_status_extension:
+        class: 'Oro\Component\MessageQueue\Job\Extension\RootJobStatusExtension'
+        public: false
+        arguments:
+            - '@oro_message_queue.client.message_producer'
         tags:
             - { name: oro_message_queue.job.extension }

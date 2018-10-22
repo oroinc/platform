@@ -20,6 +20,8 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
+ * Abstract DB driver used to run search queries for ORM search engine
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class BaseDriver implements DBALPersisterInterface
@@ -632,6 +634,9 @@ abstract class BaseDriver implements DBALPersisterInterface
                 ->orderBy('orderTable.value', QueryBuilderUtil::getSortOrder($direction))
                 ->setParameter('orderField', $fieldName);
             $qb->addSelect('orderTable.value');
+        } else {
+            $qb->orderBy('search.weight', Criteria::DESC)
+                ->addOrderBy('search.id', Criteria::DESC);
         }
     }
 
@@ -837,6 +842,7 @@ abstract class BaseDriver implements DBALPersisterInterface
                     Type::STRING,
                     Type::INTEGER,
                     Type::STRING,
+                    Type::DECIMAL,
                     Type::BOOLEAN,
                     Type::DATETIME,
                     Type::DATETIME,
@@ -847,6 +853,7 @@ abstract class BaseDriver implements DBALPersisterInterface
                     Type::STRING,
                     Type::INTEGER,
                     Type::STRING,
+                    Type::DECIMAL,
                     Type::BOOLEAN,
                     Type::DATETIME,
                     Type::DATETIME,
@@ -861,6 +868,7 @@ abstract class BaseDriver implements DBALPersisterInterface
                 'alias' => $item->getAlias(),
                 'record_id' => $item->getRecordId(),
                 'title' => $item->getTitle(),
+                'weight' => $item->getWeight(),
                 'changed' => $item->getChanged(),
                 'created_at' => $item->getCreatedAt(),
                 'updated_at' => $item->getUpdatedAt(),
@@ -871,6 +879,7 @@ abstract class BaseDriver implements DBALPersisterInterface
                 'alias' => $item->getAlias(),
                 'record_id' => $item->getRecordId(),
                 'title' => $item->getTitle(),
+                'weight' => $item->getWeight(),
                 'changed' => $item->getChanged(),
                 'created_at' => $item->getCreatedAt(),
                 'updated_at' => $item->getUpdatedAt(),

@@ -23,6 +23,7 @@
         {% endif %}
         {% set availableWidgets = availableWidgets|merge([{
             'dialogIcon': icon,
+            'iconClass': widget.icon_class|default(null),
             'title': title,
             'widgetName': widgetName,
             'description': description,
@@ -65,15 +66,33 @@
                     </div>
                 </div>
                 {% endblock title %}
+
+                {% block navButtons %}
+                    {% if dashboards|length > 1 %}
+                        <div class="dashboard-selector-container pull-right title-buttons-container">
+                            <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
+                            <select id="dashboard_selector" {{ UI.renderPageComponentAttributes({
+                                view: 'orodashboard/js/app/views/dashboard-change-view'
+                            }) }}>
+                                {% for dashboardModel in dashboards %}
+                                    <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
+                                        {{ dashboardModel.getLabel()|trans|truncate(50) }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endif %}
+                {% endblock navButtons %}
+
                 {% block titleNavButtons %}
 
                     {% placeholder dashboard_navButtons_before %}
 
                     <div class="pull-right title-buttons-container">
                         {% if allowEdit %}
-                            <a href="javascript:void(0);" class="dashboard-widgets-add btn main-group pull-left">
-                                <i class="fa-plus"></i>
-                                {{ 'oro.dashboard.add_dashboard_widgets.add_widget'|trans }}
+                            <a href="javascript:void(0);" class="dashboard-widgets-add btn main-group">
+                                <span class="fa-plus"></span>
+                                {{- 'oro.dashboard.add_dashboard_widgets.add_widget'|trans|trim -}}
                             </a>
                         {% endif %}
 
@@ -84,6 +103,7 @@
                                         'path': path('oro_dashboard_update', {id:dashboard.id}),
                                         'title': 'oro.dashboard.edit_dashboard_link.title'|trans,
                                         'label': 'oro.dashboard.edit_dashboard_link.text'|trans,
+                                        'aCss': 'dropdown-item',
                                         'iCss': 'fa-pencil-square-o'
                                     }) }}
                                 {% endif %}
@@ -92,6 +112,7 @@
                                         'path': path('oro_dashboard_create'),
                                         'title': 'oro.dashboard.create_dashboard_link.title'|trans,
                                         'label': 'oro.dashboard.create_dashboard_link.text'|trans,
+                                        'aCss': 'dropdown-item',
                                         'iCss': 'fa-plus'
                                     }) }}
                                 {% endif %}
@@ -100,7 +121,7 @@
                                         {{  UI.deleteLink({
                                             'dataUrl': path('oro_api_delete_dashboard', {id:dashboard.id}),
                                             'dataRedirect': path('oro_dashboard_index'),
-                                            'aCss': 'no-hash remove-button',
+                                            'aCss': 'no-hash remove-button dropdown-item',
                                             'id': 'btn-remove-user',
                                             'dataId': dashboard.id,
                                             'entity_label': 'oro.dashboard.entity_label'|trans
@@ -117,22 +138,6 @@
                             }) }}
                         {% endif %}
                     </div>
-                    {% block navButtons %}
-                        {% if dashboards|length > 1 %}
-                            <div class="dashboard-selector-container pull-right title-buttons-container">
-                                <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
-                                <select id="dashboard_selector" {{ UI.renderPageComponentAttributes({
-                                    view: 'orodashboard/js/app/views/dashboard-change-view'
-                                }) }}>
-                                    {% for dashboardModel in dashboards %}
-                                        <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
-                                            {{ dashboardModel.getLabel()|trans|truncate(50) }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        {% endif %}
-                    {% endblock navButtons %}
 
                     {% placeholder dashboard_navButtons_after %}
 

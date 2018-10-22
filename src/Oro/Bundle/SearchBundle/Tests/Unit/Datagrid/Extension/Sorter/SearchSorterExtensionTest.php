@@ -47,7 +47,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 
         $this->sortersStateProvider
             ->expects($this->once())
-            ->method('getState')
+            ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
         $mockQuery = $this->createMock(SearchQueryInterface::class);
@@ -101,7 +101,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 
         $this->sortersStateProvider
             ->expects($this->once())
-            ->method('getState')
+            ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
         $mockDatasource = $this->getMockBuilder(SearchDatasource::class)
@@ -134,7 +134,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 
         $this->sortersStateProvider
             ->expects($this->once())
-            ->method('getState')
+            ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
         $mockQuery = $this->getMockBuilder(SearchQueryInterface::class)
@@ -159,6 +159,11 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithNoDefaultSorterAndDisableDefaultSorting()
     {
+        $this->sortersStateProvider
+            ->expects($this->any())
+            ->method('getStateFromParameters')
+            ->willReturn([]);
+
         $config = DatagridConfiguration::create([
             Configuration::SORTERS_KEY => [
                 Configuration::COLUMNS_KEY                 => [
@@ -179,6 +184,11 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithDefaultSorterAndDisableDefaultSorting()
     {
+        $this->sortersStateProvider
+            ->expects($this->any())
+            ->method('getStateFromParameters')
+            ->willReturn([]);
+
         $config = DatagridConfiguration::create([
             Configuration::SORTERS_KEY => [
                 Configuration::COLUMNS_KEY                 => [

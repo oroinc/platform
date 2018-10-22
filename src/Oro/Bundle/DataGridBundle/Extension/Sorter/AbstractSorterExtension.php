@@ -73,7 +73,7 @@ abstract class AbstractSorterExtension extends AbstractExtension
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         $sortersConfig = $this->getSorters($config);
-        $sortersState = $this->sortersStateProvider->getState($config, $this->getParameters());
+        $sortersState = $this->sortersStateProvider->getStateFromParameters($config, $this->getParameters());
         foreach ($sortersState as $sorterName => $direction) {
             $sorter = $sortersConfig[$sorterName];
 

@@ -32,6 +32,6 @@ OroDataGridBundle allows to define YAML configuration of data collection present
     - [Datagrid](./Resources/doc/frontend/datagrid.md)
     - [Datagrid Render](./Resources/doc/frontend/datagrid_render.md)
     - [Datagrid Widget](./Resources/doc/frontend/datagrid_widget.md)
-    - [Column Manager](./Resources/doc/frontend/column_manager.md)
+    - [Datagrid Settings](./Resources/doc/frontend/datagrid_settings.md)
     - [Grid layout configuring](./Resources/doc/frontend/grid_layout_configuring.md)
     - [Grid customization through 'split to cells' option](./Resources/doc/frontend/grid_customization.md)

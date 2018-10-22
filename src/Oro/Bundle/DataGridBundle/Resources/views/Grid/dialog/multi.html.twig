@@ -1,3 +1,5 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
 {#
     Required variables:
         - gridWidgetName
@@ -39,6 +41,7 @@
                 sourceEntityClassAlias: sourceEntityClassAlias
             })
         %}
+        {% set togglerId = 'dropdown-'|uniqid %}
 
         <script type="text/template" id="multi-grid-item">
             <li id="<%= entity.get('entityAlias') %>" class="context-item" data-cid="<%= entity.cid %>">
@@ -48,11 +51,12 @@
 
         <div data-page-component-module="{{ multiGridComponent|default('orodatagrid/js/app/components/multi-grid-component') }}"
              data-page-component-options="{{ options|json_encode }}" class="btn-group">
-            <button class="activity-context-current-block dropdown-toggle" data-toggle="dropdown">
+            <button class="activity-context-current-block dropdown-toggle" type="button" id="{{ togglerId }}"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="activity-context-current-item"></span>
-                <span class="fa-caret-down"></span>
+                {{ UI.insertIcon('fa-caret-down') }}
             </button>
-            <ul class="context-items-dropdown dropdown-menu"></ul>
+            <ul class="context-items-dropdown dropdown-menu" aria-labelledby="{{ togglerId }}"></ul>
         </div>
 
         {% if itemsArray %}

@@ -55,6 +55,9 @@ class EmailManagerTest extends \PHPUnit\Framework\TestCase
         $this->mailboxManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->mailboxManager->expects($this->any())
+            ->method('findAvailableMailboxIds')
+            ->willReturn([]);
 
         $this->manager = new EmailManager(
             $this->em,

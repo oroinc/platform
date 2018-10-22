@@ -8,7 +8,7 @@ define(function(require) {
 
     WidgetTabsView = BaseView.extend({
         events: {
-            'click .tab-button': 'onTabClick'
+            'shown.bs.tab .tab-button': 'onTabClick'
         },
 
         loadingMask: null,
@@ -37,13 +37,11 @@ define(function(require) {
 
         onTabClick: function(e) {
             var $currentTarget = $(e.currentTarget);
-            var $prevTab = this.$('.nav-tabs').find('li.active');
-            var $currentTab = $currentTarget.closest('li');
+            var previusActiveTab = $(e.relatedTarget);
             var loadingView = this.subview('loading');
+            var $tabContainer = this._getTabContent();
 
-            $prevTab.removeClass('active');
-            $currentTab.addClass('active');
-
+            $tabContainer.attr('aria-labelledby', $currentTarget.attr('id'));
             loadingView.show();
 
             // add style like on standard tabs realization through tabs-component
@@ -53,15 +51,14 @@ define(function(require) {
                 url: $currentTarget.data('url'),
                 dataType: 'html',
                 error: function() {
-                    $currentTab.removeClass('active');
-                    $prevTab.addClass('active');
+                    previusActiveTab.trigger('click');
                 },
                 success: function(data) {
-                    this._getTabContent().find('.content')
+                    $tabContainer.find('.content')
                         .trigger('content:remove')
                         .html(data)
                         .trigger('content:changed');
-                }.bind(this),
+                },
                 complete: function() {
                     loadingView.hide();
                     $currentTarget.removeClass(this.widgetComponentProcessingClass);

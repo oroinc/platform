@@ -1,0 +1,151 @@
+/* @theme: admin.oro; */
+
+.quick-launchpad-toolbar {
+    margin: 0;
+    padding: 16px;
+
+    text-align: center;
+
+    list-style: none;
+
+    &__item {
+        width: 110px;
+        min-width: 110px;
+        padding: 4px;
+
+        text-align: center;
+
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    &__icon {
+        width: 64px;
+        height: 64px;
+        padding-top: 16px;
+
+        color: $dashboard-launchpad-icon-color;
+        font-size: 32px;
+        text-align: center;
+
+        background: $dashboard-launchpad-icon-bg;
+
+        border-radius: 32px;
+    }
+
+    &__label {
+        padding: side-values(14px 8px 10px);
+
+        color: $dashboard-launchpad-label-color;
+        text-align: center;
+
+        display: inline-block;
+    }
+
+    &__link:hover &__icon {
+        width: 72px;
+        height: 72px;
+        margin: -4px;
+        padding-top: 20px;
+
+        color: $dashboard-launchpad-icon-active-color;
+
+        border-radius: 36px;
+    }
+
+    &__link:hover &__label {
+        margin-bottom: -2px;
+
+        border-bottom: 2px solid $dashboard-launchpad-active-underline-color;
+    }
+
+    @for $i from 1 through 7 {
+        &--with-#{$i}-items &__item {
+            width: floor(100% / $i);
+        }
+    }
+}
+
+.launchpad-widget-content {
+    @include clearfix();
+
+    width: $quick-launchpad-item-width;
+    min-height: $quick-launchpad-item-min-height;
+    margin: $quick-launchpad-item-margin;
+    padding: $quick-launchpad-item-padding;
+
+    background-color: $quick-launchpad-item-background-color;
+    box-shadow: $quick-launchpad-item-box-shadow;
+
+    &__title {
+        width: $quick-launchpad-item-title-width;
+        min-width: $quick-launchpad-item-title-width;
+
+        text-align: center;
+
+        float: #{$start};
+        vertical-align: top;
+    }
+
+    &__icon {
+        width: $quick-launchpad-item-icon-size;
+        height: $quick-launchpad-item-icon-size;
+        padding-top: $quick-launchpad-item-icon-padding-top;
+
+        color: $dashboard-launchpad-icon-color;
+        font-size: $quick-launchpad-item-icon-font-size;
+        text-align: center;
+
+        background: $dashboard-launchpad-icon-bg;
+
+        border-radius: $quick-launchpad-item-icon-size / 2;
+    }
+
+    &__label {
+        max-width: 100%;
+        padding: $quick-launchpad-item-label-padding;
+
+        color: $dashboard-launchpad-label-color;
+        text-align: center;
+
+        display: inline-block;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__list {
+        margin-#{$start}: $quick-launchpad-item-start-padding + $quick-launchpad-item-title-width;
+        margin-bottom: 0;
+        list-style: none;
+    }
+
+    &__list-item {
+        padding: $quick-launchpad-item-list-item-padding;
+    }
+
+    &__list-item:not(:last-child) {
+        border-bottom: $quick-launchpad-item-list-item-border-bottom;
+    }
+}
+
+.launchpad-container {
+    padding-bottom: $quick-launchpad-container-padding-bottom;
+
+    @include clearfix();
+
+    .launchpad-first-column,
+    .launchpad-second-column {
+        @include clearfix();
+
+        float: #{$start};
+        width: 50%;
+    }
+
+    .launchpad-first-column {
+        > .launchpad-widget-content {
+            float: #{$end};
+            clear: #{$end};
+        }
+    }
+}

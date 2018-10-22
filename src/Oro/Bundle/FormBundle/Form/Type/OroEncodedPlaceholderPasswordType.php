@@ -12,6 +12,12 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * This class provides ability to encrypt/decrypt form fields
+ *
+ * This form type supports placeholder for entered password.
+ * Placeholder("*") will be used to indicate that password has been entered
+ */
 class OroEncodedPlaceholderPasswordType extends AbstractType
 {
     /** @internal */

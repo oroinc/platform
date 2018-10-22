@@ -5,6 +5,9 @@ namespace Oro\Bundle\LocaleBundle\Formatter;
 use NumberFormatter as IntlNumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
+/**
+ * Used to format numbers, currencies, percents etc according to locale and additional parameters
+ */
 class NumberFormatter
 {
     /**
@@ -279,13 +282,15 @@ class NumberFormatter
      * @param int|string $attribute Numeric attribute constant of \NumberFormatter or it's string name
      * @param int|string $style Constant of \NumberFormatter (DECIMAL, CURRENCY, PERCENT, etc) or string name
      * @param string|null $locale
+     * @param array $attributes
      * @return bool|int
      */
-    public function getAttribute($attribute, $style = null, $locale = null)
+    public function getAttribute($attribute, $style = null, $locale = null, $attributes = [])
     {
         return $this->getFormatter(
             $locale,
-            $this->parseStyle($style)
+            $this->parseStyle($style),
+            $attributes
         )->getAttribute($this->parseConstantValue($attribute));
     }
 

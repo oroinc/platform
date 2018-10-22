@@ -335,7 +335,7 @@ class DecorateClassNameIdPair implements ProcessorInterface
              - { name: text_representation.processor, action: get_text_representation, group: format, priority: -20 }
 ```
 
-This was just an example how the Oro ChainProcessor component may be used. The next section provides a list of key classes that may help you to investigate this component. Also you can find advanced usage of it in Oro Platform.
+This was just an example how the Oro ChainProcessor component may be used. The next section provides a list of key classes that may help you to investigate this component. Also you can find advanced usage of it in OroPlatform.
 
 ## Context
 

@@ -65,14 +65,17 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
         $value = new StubEnumValue('id', 'name', 100);
 
         $this->assertEquals(
-            'id',
+            [$this->attribute->getFieldName() . '_' . $value->getId() => 1],
             $this->getAttributeType()->getFilterableValue($this->attribute, $value, $this->localization)
         );
     }
 
     public function testGetFilterableValueForNull()
     {
-        $this->assertNull($this->getAttributeType()->getFilterableValue($this->attribute, null, $this->localization));
+        $this->assertSame(
+            [],
+            $this->getAttributeType()->getFilterableValue($this->attribute, null, $this->localization)
+        );
     }
 
     /**

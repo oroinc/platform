@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var AttributeGroupTabsComponent;
+    var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var BaseCollection = require('oroui/js/app/models/base/collection');
@@ -19,7 +20,11 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            this.groups = new BaseCollection(options.data);
+            var data = _.each(options.data, function(item) {
+                item.uniqueId = _.uniqueId(item.id);
+            });
+
+            this.groups = new BaseCollection(data);
 
             var first = this.groups.first();
             first.set('active', true);

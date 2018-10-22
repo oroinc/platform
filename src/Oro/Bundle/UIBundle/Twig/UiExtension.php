@@ -17,6 +17,11 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * The extension adds:
+ *  - common php functions as twig filters (uniqid, ceil, floor)
+ *  - isMobileVersion and isDesktopVersion functions
+ *  - series of processors for HTML (oro_form_process, oro_widget_render and other)
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class UiExtension extends \Twig_Extension
@@ -102,6 +107,8 @@ class UiExtension extends \Twig_Extension
                 'merge_recursive',
                 ['Oro\Component\PhpUtils\ArrayUtil', 'arrayMergeRecursiveDistinct']
             ),
+            new \Twig_SimpleFilter('uniqid', 'uniqid'),
+            new \Twig_SimpleFilter('floor', 'floor'),
             new \Twig_SimpleFilter('ceil', 'ceil'),
             new \Twig_SimpleFilter('oro_preg_replace', [$this, 'pregReplace']),
             new \Twig_SimpleFilter('oro_sort_by', [$this, 'sortBy'])

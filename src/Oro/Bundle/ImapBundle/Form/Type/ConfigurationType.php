@@ -9,7 +9,7 @@ use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -34,7 +34,7 @@ class ConfigurationType extends AbstractType
 {
     const NAME = 'oro_imap_configuration';
 
-    /** @var Mcrypt */
+    /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
     /** @var TokenAccessorInterface */
@@ -44,12 +44,12 @@ class ConfigurationType extends AbstractType
     protected $translator;
 
     /**
-     * @param Mcrypt                 $encryptor
+     * @param SymmetricCrypterInterface $encryptor
      * @param TokenAccessorInterface $tokenAccessor
      * @param TranslatorInterface    $translator
      */
     public function __construct(
-        Mcrypt $encryptor,
+        SymmetricCrypterInterface $encryptor,
         TokenAccessorInterface $tokenAccessor,
         TranslatorInterface $translator
     ) {

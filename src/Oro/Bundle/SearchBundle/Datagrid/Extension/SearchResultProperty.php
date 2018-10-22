@@ -8,23 +8,13 @@ use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+/**
+ * Property formatter for datagrid based on search mapping configuration
+ */
 class SearchResultProperty extends TwigTemplateProperty
 {
     /**  @var SearchMappingProvider */
     protected $mappingProvider;
-
-    /**
-     * @var array
-     * @deprecated since 1.8 Please use mappingProvider for mapping config
-     */
-    protected $entitiesConfig;
-
-    public function __construct(\Twig_Environment $environment, $config)
-    {
-        parent::__construct($environment);
-
-        $this->entitiesConfig = $config;
-    }
 
     /**
      * @param SearchMappingProvider $mappingProvider
@@ -60,13 +50,5 @@ class SearchResultProperty extends TwigTemplateProperty
                 'entity'       => $record->getValue('entity'),
             ]
         );
-    }
-
-    /**
-     * @param array $configArray
-     */
-    public function setEntitiesConfig(array $configArray)
-    {
-        $this->entitiesConfig = $configArray;
     }
 }

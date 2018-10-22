@@ -1,23 +1,26 @@
 /* @theme: admin.oro; */
 
 html& {
-  overflow-x: hidden;
-  overflow-y: auto;
-  &.lock-page-scroll {
-    overflow: hidden;
-  }
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    &.lock-page-scroll,
+    &.modal-dropdown-shown {
+        overflow: hidden;
+    }
 }
+
 & {
-  min-width: inherit;
-  font-size: $baseFontSize;
+    min-width: inherit;
+    font-size: $base-font-size;
 }
 
 .app-page.hidden-page {
-  display: none;
+    display: none;
 }
 
 .btn-group > .dropdown-menu li a {
-  font-size: $baseFontSize;
+    font-size: $base-font-size;
 }
 
 .container,
@@ -25,37 +28,43 @@ html& {
 .navbar-fixed-top .container,
 .navbar-fixed-bottom .container,
 .popup-box-errors {
-  width: auto;
+    width: auto;
 }
 
-.dot-menu, #bookmark-buttons, #breadcrumb {
-  display: none !important;
+.dot-menu,
+#bookmark-buttons,
+#breadcrumb {
+    display: none !important;
 }
 
-.scrollspy-nav, .scrollspy-nav-target {
-  display: none;
+.scrollspy-nav,
+.scrollspy-nav-target {
+    display: none;
 }
 
 &.error-page {
-  #container {
-    position: inherit;
-    .popup-frame {
-      position: inherit;
+    #container {
+        position: inherit;
+
+        .popup-frame {
+            position: inherit;
+        }
+
+        .popup-holder {
+            position: inherit;
+            margin: 0;
+        }
     }
-    .popup-holder {
-      position: inherit;
-      margin: 0;
-    }
-  }
 }
 
 #progressbar {
-  width: 200px
+    width: 200px;
 }
 
 #footer {
-  display: none;
+    display: none;
 }
+
 fieldset {
-  min-width: 100%;
+    min-width: 100%;
 }
