@@ -85,6 +85,10 @@ oro_behat_extension:
       selector: 'div.datagrid-settings > .dropdown-menu .close'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    GridColumnManagerTabTitle:
+      selector: 'div.datagrid-settings__wrapper .nav-link:contains("Grid")'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
     GridFilterManagerButton:
       selector: 'div.datagrid-settings__wrapper .nav-link:contains("Filters")'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
@@ -94,7 +98,7 @@ oro_behat_extension:
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterManager
 
     GridColumnManagerTable:
-      selector: '.dropdown-menu.show [id*="datagrid-settings-grid"] div.datagrid-settings-table'
+      selector: '.dropdown-menu.show [id*="datagrid-settings-grid"] div.datagrid-settings-table > div.table-wrapper > table'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Table
 
     GridFilterManagerTab:
@@ -129,7 +133,7 @@ oro_behat_extension:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridToolbarActionReset:
-        selector: 'div.toolbar div.actions-panel .refresh-action'
+        selector: 'div.toolbar div.actions-panel .reset-action'
         class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridToolBarTools:
