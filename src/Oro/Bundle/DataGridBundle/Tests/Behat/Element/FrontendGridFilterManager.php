@@ -21,7 +21,7 @@ class FrontendGridFilterManager extends Element
         }
 
         $filterItem->getParent()->click();
-        $this->getSession()->getDriver()->waitForAjax();
+        $this->getDriver()->waitForAjax();
 
         self::assertTrue(
             $filterItem->isChecked(),
@@ -57,6 +57,8 @@ class FrontendGridFilterManager extends Element
         }
 
         $visibilityCheckbox->getParent()->click();
+
+        $this->getDriver()->waitForAjax();
 
         self::assertFalse(
             $visibilityCheckbox->isChecked(),
