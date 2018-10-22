@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow;
 
 class GridColumnManager extends Element
 {
@@ -35,6 +36,16 @@ class GridColumnManager extends Element
 
         $visibilityCheckbox = $this->getVisibilityCheckbox($title);
 
+        $this->uncheckVisibility($visibilityCheckbox);
+    }
+
+    /**
+     * @param NodeElement $visibilityCheckbox
+     */
+    private function uncheckVisibility(NodeElement $visibilityCheckbox)
+    {
+        $this->ensureManagerVisible();
+
         if (!$visibilityCheckbox->isChecked()) {
             return;
         }
@@ -43,7 +54,7 @@ class GridColumnManager extends Element
 
         self::assertFalse(
             $visibilityCheckbox->isChecked(),
-            'Can not uncheck visibility checbox for ' . $title . ' column'
+            'Can not uncheck visibility checkbox'
         );
     }
 
@@ -65,7 +76,7 @@ class GridColumnManager extends Element
                 continue;
             }
 
-            $this->uncheckColumnVisibility($name);
+            $this->uncheckVisibility($this->getVisibilityCheckboxFromRow($row));
         }
     }
 
@@ -101,6 +112,9 @@ class GridColumnManager extends Element
         $button = $this->elementFactory->createElement('GridColumnManagerButton');
         $button->click();
 
+        $tabTitle = $this->elementFactory->createElement('GridColumnManagerTabTitle');
+        $tabTitle->click();
+
         self::assertTrue($this->isVisible(), 'Can not open grid column manager dropdown');
     }
 
@@ -113,9 +127,21 @@ class GridColumnManager extends Element
         $columnManagerTable = $this->getColumnManagerTable();
         $tableRow = $columnManagerTable->getRowByContent($title);
 
-        $visibilityCheckbox = $tableRow->find('css', '.visibility-cell input[type=checkbox]');
+        $visibilityCheckbox = $this->getVisibilityCheckboxFromRow($tableRow);
 
         self::assertNotNull($visibilityCheckbox, 'Can not find visibility cell for ' . $title);
+
+        return $visibilityCheckbox;
+    }
+
+    /**
+     * @param TableRow $tableRow
+     *
+     * @return NodeElement|null
+     */
+    private function getVisibilityCheckboxFromRow(TableRow $tableRow): ?NodeElement
+    {
+        $visibilityCheckbox = $tableRow->find('css', '.visibility-cell input[type=checkbox]');
 
         return $visibilityCheckbox;
     }
