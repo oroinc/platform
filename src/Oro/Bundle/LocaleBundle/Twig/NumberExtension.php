@@ -39,6 +39,11 @@ class NumberExtension extends \Twig_Extension
                 ['is_safe' => ['html']]
             ),
             new \Twig_SimpleFunction(
+                'oro_locale_number_attribute_with_options',
+                [$this, 'getAttributeWithOptions'],
+                ['is_safe' => ['html']]
+            ),
+            new \Twig_SimpleFunction(
                 'oro_locale_number_text_attribute',
                 [$this, 'getTextAttribute'],
                 ['is_safe' => ['html']]
@@ -112,6 +117,19 @@ class NumberExtension extends \Twig_Extension
     public function getAttribute($attribute, $style = null, $locale = null)
     {
         return $this->getNumberFormatter()->getAttribute($attribute, $style, $locale);
+    }
+
+    /**
+     * @param string|int  $attribute
+     * @param string|null $style
+     * @param string|null $locale
+     * @param array $options
+     *
+     * @return int
+     */
+    public function getAttributeWithOptions($attribute, $style = null, $locale = null, $options = [])
+    {
+        return $this->getNumberFormatter()->getAttributeWithOptions($attribute, $style, $locale, $options);
     }
 
     /**

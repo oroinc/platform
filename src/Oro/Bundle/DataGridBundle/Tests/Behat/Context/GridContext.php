@@ -1917,4 +1917,34 @@ TEXT;
             sprintf('Grid row with "%s" content has mass action checkbox in it', $content)
         );
     }
+
+    /**
+     * Example: I should see next options in "Some select element":
+     *   | Please select |
+     *   | Option A      |
+     *   | Option B      |
+     *
+     * @Then /^(?:|I )should see next options in "(?P<selectElementName>[\w\s]+)"/
+     * @param TableNode $expectedTableNode
+     * @param string $selectElementName
+     */
+    public function iShouldSeeNextOptionsInSelect(TableNode $expectedTableNode, $selectElementName)
+    {
+        $selectElement = $this->createElement($selectElementName);
+        /** @var Element[] $optionElements */
+        $optionElements = $selectElement->findAll('css', 'option');
+        $optionValues = [];
+
+        foreach ($optionElements as $optionElement) {
+            $optionValues[] = trim($optionElement->getText()); //Removes spaces at the beginning
+        }
+        $expectedRows = $expectedTableNode->getRows();
+        foreach ($expectedRows as $rowKey => $expectedRow) {
+            self::assertContains(
+                $expectedRow[0],
+                $optionValues,
+                sprintf('There is no such sorting option: "%s"', $expectedRow[0])
+            );
+        }
+    }
 }
