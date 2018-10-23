@@ -14,7 +14,7 @@ class CountryTranslationRepository extends AbstractTranslationRepository impleme
     /**
      * {@inheritdoc}
      */
-    public function updateTranslations(array $data, string $locale = null)
+    public function updateTranslations(array $data, string $locale)
     {
         $this->doUpdateTranslations(Country::class, 'name', $data, $locale);
     }

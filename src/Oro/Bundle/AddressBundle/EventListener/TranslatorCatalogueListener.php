@@ -7,9 +7,7 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
-use Oro\Bundle\AddressBundle\Entity\Repository\CountryTranslationRepository;
 use Oro\Bundle\AddressBundle\Entity\Repository\IdentityAwareTranslationRepositoryInterface;
-use Oro\Bundle\AddressBundle\Entity\Repository\RegionTranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepositoryInterface;
 use Oro\Bundle\TranslationBundle\Event\AfterCatalogueDump;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
@@ -84,9 +82,11 @@ class TranslatorCatalogueListener
                     )
                 );
             }
-        }
 
-        $repository->updateTranslations($data, $catalogue->getLocale());
+            $repository->updateTranslations($data, $catalogue->getLocale());
+        } else {
+            $repository->updateTranslations($data);
+        }
     }
 
     /**

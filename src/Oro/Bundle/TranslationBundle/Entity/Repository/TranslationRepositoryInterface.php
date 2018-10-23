@@ -8,5 +8,5 @@ interface TranslationRepositoryInterface
      * @param array $data
      * @param string $locale
      */
-    public function updateTranslations(array $data, string $locale = null);
+    public function updateTranslations(array $data, string $locale);
 }
