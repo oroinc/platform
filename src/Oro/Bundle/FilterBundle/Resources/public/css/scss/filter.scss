@@ -53,14 +53,6 @@
             margin: $filter-separator-offset;
         }
 
-        input[type="text"],
-        input[type="datetime"],
-        input[type="date"] {
-            & + .dropdown-menu-calendar {
-                margin-top: $dropdown-menu-calendar-offset-top;
-            }
-        }
-
         .input-append,
         .input-prepend {
             input,
@@ -705,4 +697,8 @@
     .filter-separator {
         position: $number-range-filter-filter-separator-position;
     }
+}
+
+.datefilter {
+    display: inline-block;
 }

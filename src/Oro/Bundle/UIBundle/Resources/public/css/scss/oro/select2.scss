@@ -417,6 +417,8 @@
         margin: $select2-breadcrumbs-offset;
         padding: $select2-breadcrumbs-inner-offset;
 
+        list-style: none;
+
         &:empty {
             padding: $select2-breadcrumbs-empty-inner-offset;
         }
