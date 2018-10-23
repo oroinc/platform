@@ -38,33 +38,6 @@
     .pull-left-extra {
         margin-left: 0;
     }
-
-    .grid-views {
-        margin-left: 0;
-
-        .oro-subtitle {
-            display: inline-block;
-        }
-
-        .views-group {
-            vertical-align: baseline;
-
-            & > .dropdown-toggle {
-                height: auto;
-                vertical-align: baseline;
-            }
-        }
-
-        .actions-group {
-            margin-left: 0;
-            vertical-align: baseline;
-        }
-
-        .edited-label,
-        .actions-group .dropdown-toggle {
-            vertical-align: baseline;
-        }
-    }
 }
 
 .page-title {

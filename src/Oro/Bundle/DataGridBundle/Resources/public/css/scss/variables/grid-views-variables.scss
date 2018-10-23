@@ -7,4 +7,12 @@ $oro-datagrid-grid-views-font-size: $base-font-size - 1px !default;
 $oro-datagrid-grid-views-icon-close: $fa-var-caret-down !default;
 $oro-datagrid-grid-views-icon-show: $fa-var-caret-up !default;
 $oro-datagrid-grid-views-icon-offset: side-values(0 10px 0 6px) !default;
+$oro-datagrid-grid-views-title-width: 500px !default;
+
 $oro-datagrid-grid-views-dropdown-width: 300px !default;
+
+// Mobile
+
+$oro-datagrid-grid-views-mobile-title-width: 260px !default;
+
+$oro-datagrid-grid-views-mobile-small-title-width: 160px !default;

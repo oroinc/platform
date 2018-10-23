@@ -44,8 +44,18 @@
         }
     }
 
+    .grid-views-choice-icon {
+        float: #{$start};
+
+        line-height: inherit;;
+    }
+
     .grid-views-dropdown {
         max-width: $oro-datagrid-grid-views-dropdown-width;
+    }
+
+    .grid-views-item {
+        @include clearfix();
     }
 
     .grid-views-choice {
@@ -73,20 +83,6 @@
     }
 
     .oro-subtitle {
-        @include text-line-truncate(600px, true);
-    }
-}
-
-.views-group {
-    &__btn {
-        color: $primary-100;
-        padding: 0;
-    }
-}
-
-.actions-group {
-    &__btn {
-        text-transform: none;
-        padding: 0;
+        @include text-line-truncate($oro-datagrid-grid-views-title-width, true);
     }
 }
