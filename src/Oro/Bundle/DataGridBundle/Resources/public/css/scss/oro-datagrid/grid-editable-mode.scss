@@ -113,13 +113,6 @@
         bottom: auto;
     }
 
-    &__action-item {
-        padding: $oro-datagrid-editable-action-item-offset;
-
-        font-size: $oro-datagrid-action-font-size;
-        line-height: 1;
-    }
-
     &__fields {
         input[type="text"] {
             height: $oro-datagrid-editable-action-item-size;
@@ -137,6 +130,14 @@
     }
 
     &-wrapper {
+        &:not(.tags-select-editor) {
+            .inline-editor__action-item {
+                padding: $oro-datagrid-editable-action-item-offset;
+                font-size: $oro-datagrid-action-font-size;
+                line-height: 1;
+            }
+        }
+
         &.select-editor {
             min-width: $oro-datagrid-select-width;
         }
