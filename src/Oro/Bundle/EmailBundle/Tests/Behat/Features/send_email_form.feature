@@ -41,11 +41,11 @@ Feature: Send email form
       | Apply template | test_user_template       |
     And I click "Yes, Proceed"
     And "Email Form" must contains values:
-      | Subject | Test Template Subject     |
-      | Body    | <p>Test Template Body</p> |
+      | Subject | Test Template Subject |
+      | Body    | Test Template Body    |
     And click "Send"
     Then I should see "The email was sent" flash message
-    Then I should see following grid:
+    And I should see following grid:
       | CONTACT       | SUBJECT                                  |
       | Charlie Sheen | Test Template Subject Test Template Body |
 
@@ -53,23 +53,23 @@ Feature: Send email form
     Given I go to System/ Emails/ Templates
     When I click "Create Email Template"
     And fill form with:
-      | Template Name | test_error_template_no_entity         |
-      | Type          | Html                                  |
-      | Subject       | Test Template Subject                 |
-      | Content       | Test {{ test.nonExisting }} Body      |
+      | Template Name | test_error_template_no_entity    |
+      | Type          | Html                             |
+      | Subject       | Test Template Subject            |
+      | Content       | Test {{ test.nonExisting }} Body |
     And I save and close form
     Then I should see "Template saved" flash message
 
   Scenario: Create email template with error with entity
     Given I go to System/ Emails/ Templates
-    When I click "Create Email Template"
+    And I click "Create Email Template"
     And fill form with:
-      | Template Name | test_error_template_entity            |
-      | Type          | Html                                  |
-      | Entity Name   | User                                  |
-      | Subject       | Test Template Subject                 |
-      | Content       | Test {{ entity.nonExisting }} Body    |
-    And I save and close form
+      | Template Name | test_error_template_entity         |
+      | Type          | Html                               |
+      | Entity Name   | User                               |
+      | Subject       | Test Template Subject              |
+      | Content       | Test {{ entity.nonExisting }} Body |
+    When I save and close form
     Then I should see "Template saved" flash message
 
   Scenario: Check if email templates can be used
@@ -81,11 +81,11 @@ Feature: Send email form
       | Subject        | Behat test                            |
     When I select "test_error_template_entity" from "Apply template"
     And I click "Yes, Proceed"
-    And "Email Form" must contains values:
+    Then "Email Form" must contains values:
       | Subject | Test Template Subject |
-      | Body    | <p>Test N/A Body</p>  |
+      | Body    | Test N/A Body         |
     When I select "test_error_template_no_entity" from "Apply template"
     And I click "Yes, Proceed"
     Then I should see "This email template can't be used"
-    And click "Send"
-    And I should see "The email was sent" flash message
+    When click "Send"
+    Then I should see "The email was sent" flash message
