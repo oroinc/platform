@@ -14,7 +14,7 @@ class AddressTypeTranslationRepository extends AbstractTranslationRepository imp
     /**
      * {@inheritdoc}
      */
-    public function updateTranslations(array $data, string $locale = null)
+    public function updateTranslations(array $data, string $locale)
     {
         $this->doUpdateTranslations(AddressType::class, 'label', $data, $locale);
     }

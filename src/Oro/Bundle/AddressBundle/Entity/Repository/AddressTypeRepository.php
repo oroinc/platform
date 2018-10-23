@@ -3,14 +3,15 @@
 namespace Oro\Bundle\AddressBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query;
-use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
+use Oro\Bundle\EntityBundle\ORM\Repository\BatchIteratorTrait;
 
 /**
  * Entity repository for AddressType dictionary.
  */
 class AddressTypeRepository extends EntityRepository implements IdentityAwareTranslationRepositoryInterface
 {
+    use BatchIteratorTrait;
+
     /**
      * @return array
      */
@@ -27,7 +28,7 @@ class AddressTypeRepository extends EntityRepository implements IdentityAwareTra
     /**
      * {@inheritdoc}
      */
-    public function updateTranslations(array $data, string $locale = null)
+    public function updateTranslations(array $data)
     {
         if (!$data) {
             return;
@@ -50,8 +51,8 @@ class AddressTypeRepository extends EntityRepository implements IdentityAwareTra
                 if ($type['label'] !== $value) {
                     $connection->update(
                         $this->getClassMetadata()->getTableName(),
-                        ['name' => $type['name']],
-                        ['label' => $value]
+                        ['label' => $value],
+                        ['name' => $type['name']]
                     );
                 }
             }

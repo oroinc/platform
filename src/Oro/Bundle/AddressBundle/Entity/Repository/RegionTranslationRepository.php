@@ -14,7 +14,7 @@ class RegionTranslationRepository extends AbstractTranslationRepository  impleme
     /**
      * {@inheritdoc}
      */
-    public function updateTranslations(array $data, string $locale = null)
+    public function updateTranslations(array $data, string $locale)
     {
         $this->doUpdateTranslations(Region::class, 'name', $data, $locale);
     }

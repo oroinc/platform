@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\AddressBundle\Entity\Repository;
 
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepositoryInterface;
-
-interface IdentityAwareTranslationRepositoryInterface extends TranslationRepositoryInterface
+interface IdentityAwareTranslationRepositoryInterface
 {
     /**
      * @return array
      */
     public function getAllIdentities();
+
+    /**
+     * @param array $data
+     */
+    public function updateTranslations(array $data);
 }

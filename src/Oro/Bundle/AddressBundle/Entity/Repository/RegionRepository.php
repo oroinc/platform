@@ -61,7 +61,7 @@ class RegionRepository extends EntityRepository implements IdentityAwareTranslat
     /**
      * {@inheritdoc}
      */
-    public function updateTranslations(array $data, string $locale = null)
+    public function updateTranslations(array $data)
     {
         if (!$data) {
             return;
