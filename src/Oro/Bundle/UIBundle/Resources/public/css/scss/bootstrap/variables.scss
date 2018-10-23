@@ -88,7 +88,7 @@ $dropdown-border-width: 0;
 
 $dropdown-item-padding-x: 16px;
 $dropdown-item-padding-y: 3px;
-$dropdown-item-icon-fa-offset: 0 6px 0 0;
+$dropdown-item-icon-fa-offset: side-values(0 6px 0 0);
 $dropdown-link-color: $primary-300;
 $dropdown-link-hover-color: $primary-300;
 $dropdown-link-hover-bg: $primary-900;
@@ -99,7 +99,7 @@ $dropdown-link-active-bg: $primary-900;
 $modal-backdrop-bg: $primary-inverse;
 $modal-backdrop-opacity: .9;
 $modal-header-bg: $primary-300;
-$modal-header-padding: 18px;
+$modal-header-padding: side-values(16px 18px 14px 20px);
 $modal-header-color: $primary-inverse;
 $modal-header-close-padding: 0;
 $modal-header-close-margin: 0;

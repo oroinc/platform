@@ -12,7 +12,6 @@
     &-title {
         font-size: $modal-title-font-size;
         font-weight: $modal-title-font-weight;
-        line-height: $modal-title-font-size;
         text-align: #{$start};
     }
 
@@ -37,8 +36,6 @@
     }
 
     &-body {
-        padding: $modal-content-inner-offset;
-
         text-align: $modal-content-align;
     }
 
@@ -47,7 +44,6 @@
 
         text-align: #{$end};
 
-        background-color: $primary-900;
         border-radius: 0 0 $modal-border-radius $modal-border-radius;
         border: $modal-footer-border;
     }
