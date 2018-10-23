@@ -17,7 +17,7 @@ define(function(require) {
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
-    var ColumnManagerPlugin = require('orodatagrid/js/app/plugins/grid/column-manager-plugin');
+    var DatagridSettingsPlugin = require('orodatagrid/js/app/plugins/grid/datagrid-settings-plugin');
     var ToolbarMassActionPlugin = require('orodatagrid/js/app/plugins/grid/toolbar-mass-action-plugin');
     var MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
     var DataGridThemeOptionsManager = require('orodatagrid/js/datagrid-theme-options-manager');
@@ -434,8 +434,8 @@ define(function(require) {
                 }
             }
 
-            if (metadata.options.toolbarOptions.addColumnManager) {
-                plugins.push(ColumnManagerPlugin);
+            if (metadata.options.toolbarOptions.addDatagridSettingsManager) {
+                plugins.push(DatagridSettingsPlugin);
             }
 
             if (this.themeOptions.showMassActionOnToolbar) {
@@ -465,7 +465,7 @@ define(function(require) {
                     break;
                 default:
                     metadata.options.toolbarOptions.addAppearanceSwitcher = true;
-                    metadata.options.toolbarOptions.availableApperances = appearances.map(function(item) {
+                    metadata.options.toolbarOptions.availableAppearances = appearances.map(function(item) {
                         return {
                             key: item.type,
                             id: item.id || 'by_type',

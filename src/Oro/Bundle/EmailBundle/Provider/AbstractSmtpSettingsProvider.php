@@ -6,8 +6,11 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 use Oro\Bundle\EmailBundle\DependencyInjection\Configuration as Config;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
+/**
+ * This abstract class provides basic implementation of retrieving SMTP configuration from ORO config
+ */
 abstract class AbstractSmtpSettingsProvider implements SmtpSettingsAwareInterface
 {
     /** @var ConfigManager */
@@ -16,7 +19,7 @@ abstract class AbstractSmtpSettingsProvider implements SmtpSettingsAwareInterfac
     /** @var GlobalScopeManager */
     protected $globalScopeManager;
 
-    /** @var Mcrypt */
+    /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
     /**
@@ -24,12 +27,12 @@ abstract class AbstractSmtpSettingsProvider implements SmtpSettingsAwareInterfac
      *
      * @param ConfigManager      $configManager
      * @param GlobalScopeManager $globalScopeManager
-     * @param Mcrypt             $encryptor
+     * @param SymmetricCrypterInterface $encryptor
      */
     public function __construct(
         ConfigManager $configManager,
         GlobalScopeManager $globalScopeManager,
-        Mcrypt $encryptor
+        SymmetricCrypterInterface $encryptor
     ) {
         $this->configManager = $configManager;
         $this->globalScopeManager = $globalScopeManager;

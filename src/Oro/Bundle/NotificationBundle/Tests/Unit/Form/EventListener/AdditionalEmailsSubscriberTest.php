@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TagBundle\Tests\Unit\Form\EventListener;
+namespace Oro\Bundle\NotificationBundle\Tests\Unit\Form\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;

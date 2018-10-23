@@ -11,6 +11,9 @@ use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
+/**
+ * Registry that returns the Registry.
+ */
 class OperationRegistry
 {
     /** @var ConfigurationProviderInterface */
@@ -38,7 +41,7 @@ class OperationRegistry
     private $entityNames = [];
 
     /** @var OperationRegistryFilterInterface[] */
-    private $filters;
+    private $filters = [];
 
     /**
      * @param ConfigurationProviderInterface $configurationProvider

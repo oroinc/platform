@@ -558,7 +558,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iPressNextPageButton($gridName = null)
     {
         $grid = $this->getGrid($gridName);
-        $this->getGridPaginator($grid)->clickLink('Next');
+        $this->getGridPaginator($grid)->pressButton('Next');
     }
 
     /**
@@ -618,6 +618,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @When /^(?:|when )(?:|I )sort grid by (?P<field>(?:|[\w\s]*(?<!again)))(?:| again)$/
      * @When /^(?:|when )(?:|I )sort "(?P<gridName>[\w\s]+)" by (?P<field>(?:|[\w\s]*(?<!again)))(?:| again)$/
+     * @When /^(?:|I )sort "(?P<gridName>[\w\s]+)" by "(?P<field>.*)"(?:| again)$/
      * @When /^(?:|I )sort grid by "(?P<field>.*)"(?:| again)$/
      */
     public function sortGridBy($field, $gridName = null)
@@ -750,8 +751,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Then Zyta Zywiec must be first record
      * Example: And John Doe must be first record
      *
-     * @Then /^(?P<content>[\w\s]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record$/
-     * @Then /^(?P<content>[\w\s]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record in "(?P<gridName>[\w\s]+)"$/
+     * @Then /^(?P<content>[\w\d\s]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record$/
+     * @Then /^(?P<content>[\w\d\s]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record in "(?P<gridName>[\w\s]+)"$/
      */
     public function assertRowContent($content, $rowNumber, $gridName = null)
     {
@@ -825,17 +826,26 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I )filter "(?P<filterName>.+)" as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)"$/
      * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)"$/
      * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid$/
+     * @When /^(?:|I )filter (?P<filterName>.+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid ?(?P<strictly>strictly)$/
      *
      * @param string $filterName
      * @param string $type
      * @param string $value
      * @param string $filterGridName
+     * @param string $strictly
      */
     //@codingStandardsIgnoreEnd
-    public function applyStringFilter($filterName, $type, $value = null, $filterGridName = 'Grid')
-    {
+    public function applyStringFilter(
+        $filterName,
+        $type,
+        $value = null,
+        $filterGridName = 'Grid',
+        string $strictly = ''
+    ) {
         /** @var GridFilterStringItem $filterItem */
-        $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('GridFilterStringItem', $filterName);
+        $filterItem = $this
+            ->getGridFilters($filterGridName)
+            ->getFilterItem('GridFilterStringItem', $filterName, $strictly === 'strictly');
 
         $filterItem->open();
         $filterItem->selectType($type);
@@ -846,12 +856,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     //@codingStandardsIgnoreStart
     /**
      * Filter grid by choice filter
-     * Example: When I filter Status as Is Any Of "Option 1"
-     * Example: And filter Step as Is not Any Of "Option 2"
+     * Example: When I choose filter for Status as Is Any Of "Option 1"
+     * Example: And I choose filter for Step as Is not Any Of "Option 2"
      *
-     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of)) "(?P<value>[\w\s\,\.\_\%]+)"$/
-     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of)) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)"$/
-     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of)) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid$/
+     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of|is any of|is not any of)) "(?P<value>[\w\s\,\.\_\%]+)"$/
+     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of|is any of|is not any of)) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of|is any of|is not any of)) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid$/
      *
      * @param string $filterName
      * @param string $type
@@ -982,9 +992,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Reset filter
      * Example: And I reset Activity Type filter
      *
-     * @When /^(?:|I )reset (?P<filterName>[\w\s]+) filter$/
-     * @When /^(?:|I )reset "(?P<filterName>[\w\s]+)" filter in grid$/
-     * @When /^(?:|I )reset "(?P<filterName>[\w\s]+)" filter in "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )reset (?P<filterName>[\w\s\:\(\)\#]+) filter$/
+     * @When /^(?:|I )reset "(?P<filterName>[^"]+)" filter in grid$/
+     * @When /^(?:|I )reset "(?P<filterName>[^"]+)" filter in "(?P<filterGridName>[\w\s]+)"$/
      *
      * @param string $filterName
      * @param string $filterGridName
@@ -996,8 +1006,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @When /^(?:|I )reset "(?P<filterName>[\w\s\:\(\)]+)" filter$/
-     * @When /^(?:|I )reset "(?P<filterName>[\w\s\:\(\)]+)" filter on grid "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )reset "(?P<filterName>[\w\s\:\(\)\#\/]+)" filter$/
+     * @When /^(?:|I )reset "(?P<filterName>[\w\s\:\(\)\#\/]+)" filter on grid "(?P<filterGridName>[\w\s]+)"$/
      *
      * @param string $filterName
      * @param string $filterGridName
@@ -1583,7 +1593,7 @@ TEXT;
     public function recordsInGridShouldBe($count, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
-        $gridRows = $grid->findAll('css', 'tbody tr');
+        $gridRows = $grid->findAll('css', 'table.grid > tbody > tr');
 
         self::assertCount((int)$count, $gridRows);
     }
@@ -1633,18 +1643,27 @@ TEXT;
             $grid->getElement($filtersButton)->open();
         }
 
+        $gridSettingsButton = $grid->getElement($grid->getMappedChildElementName('GridColumnManagerButton'));
+        $gridSettingsButton->click();
+
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
+        // Actually element "GridFilterManager" points to all filter dropdowns, so we have to find out
+        // which one is the actual filter manager dropdown.
+        $filterDropdowns = $grid->getElements($grid->getMappedChildElementName('GridFilterManager'));
+        $filterDropdowns = array_filter($filterDropdowns, function (Element $element) {
+            return $element->isVisible();
+        });
+
+        $filterManager =  array_shift($filterDropdowns);
+        self::assertNotNull($filterManager, 'Filter manager dropdown was not found');
+
         /** @var GridFilterManager $filterManager */
-        $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->checkColumnFilter($filter);
 
-        try {
-            $filterManager->close();
-        } catch (\Exception $e) {
-            $filterButton->click();
-        }
+        $gridSettingsClose = $grid->getElement($grid->getMappedChildElementName('GridSettingsManagerClose'));
+        $gridSettingsClose->click();
     }
 
     /**
@@ -1664,6 +1683,9 @@ TEXT;
             $grid->getElement($filtersButton)->open();
         }
 
+        $gridSettingsButton = $grid->getElement($grid->getMappedChildElementName('GridColumnManagerButton'));
+        $gridSettingsButton->click();
+
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
@@ -1671,11 +1693,8 @@ TEXT;
         $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->uncheckColumnFilter($filter);
 
-        try {
-            $filterManager->close();
-        } catch (\Exception $e) {
-            $filterButton->click();
-        }
+        $gridSettingsClose = $grid->getElement($grid->getMappedChildElementName('GridSettingsManagerClose'));
+        $gridSettingsClose->click();
     }
 
     /**
@@ -1849,10 +1868,10 @@ TEXT;
     }
 
     /**
-     * @param string $lnk
+     * @param string $button
      * @param string|null $gridName
      */
-    private function pressPaginationControlButton($lnk, $gridName = null)
+    private function pressPaginationControlButton($button, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
 
@@ -1865,7 +1884,7 @@ TEXT;
         );
 
         $gridPaginator = $this->elementFactory->createElement('GridToolbarPaginator', $gridPaginatorContainer);
-        $gridPaginator->clickLink($lnk);
+        $gridPaginator->pressButton($button);
     }
 
     /**
@@ -1948,5 +1967,37 @@ TEXT;
             $this->getGrid($gridName)->getRowByContent($content)->hasMassActionCheckbox(),
             sprintf('Grid row with "%s" content has mass action checkbox in it', $content)
         );
+    }
+
+    /**
+     * Example: I should see next options in "Some select element":
+     *   | Please select |
+     *   | Option A      |
+     *   | Option B      |
+     *
+     * @Then /^(?:|I )should see next options in "(?P<selectElementName>[\w\s]+)"/
+     * @param TableNode $expectedTableNode
+     * @param string $selectElementName
+     */
+    public function iShouldSeeNextOptionsInSelect(TableNode $expectedTableNode, $selectElementName)
+    {
+        $selectElement = $this->createElement($selectElementName);
+        /** @var Element[] $optionElements */
+        $optionElements = $selectElement->findAll('css', 'option');
+
+        $optionValues = [];
+        foreach ($optionElements as $optionElement) {
+            $optionValues[] = trim($optionElement->getText()); //Removes spaces at the beginning
+        }
+
+        $expectedRows = $expectedTableNode->getRows();
+
+        foreach ($expectedRows as $rowKey => $expectedRow) {
+            self::assertContains(
+                $expectedRow[0],
+                $optionValues,
+                sprintf('There is no such sorting option: "%s"', $expectedRow[0])
+            );
+        }
     }
 }

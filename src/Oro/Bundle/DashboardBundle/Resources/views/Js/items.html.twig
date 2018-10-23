@@ -17,7 +17,7 @@
             <input data-name="order" type="hidden" class="order" name="<%= namePrefix %>[order]" value="<%= order %>">
             <input class="hide" data-name="show" type="checkbox" name="<%= namePrefix %>[show]" <%= show ? 'checked' : '' %>>
             <% if (_.isMobile()) { %>
-            <span class="btn delete-button" data-collection-action="delete" title="{{ 'oro.dashboard.datagrid.actions.move_column_up.label'|trans }}">
+            <span class="btn btn-icon delete-button" data-collection-action="delete" title="{{ 'oro.dashboard.datagrid.actions.move_column_up.label'|trans }}">
                 <i class="fa-trash-o hide-text"></i>
             </span>
             <span class="btn move-up<% if (isFirst) { %> disabled<% } %>" data-collection-action="moveUp" title="{{ 'oro.dashboard.datagrid.actions.move_column_up.label'|trans }}">
@@ -27,7 +27,7 @@
                 <i class="fa-chevron-down"></i>
             </span>
             <% } else { %>
-            <a href="javascript: void(0);" class="action no-hash delete-button"
+            <a href="javascript: void(0);" class="action no-hash delete-button btn btn-icon"
                title="{{ 'oro.dashboard.datagrid.actions.delete.label'|trans }}"
                data-collection-action="delete">
                 <i class="fa-trash-o hide-text"></i>

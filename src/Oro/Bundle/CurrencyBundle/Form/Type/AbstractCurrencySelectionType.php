@@ -19,6 +19,9 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Base class for form types that work with currencies.
+ */
 abstract class AbstractCurrencySelectionType extends AbstractType
 {
     /**
@@ -70,7 +73,7 @@ abstract class AbstractCurrencySelectionType extends AbstractType
                 }
 
                 $currencies = $options['currencies_list'];
-                if (!count($currencies)) {
+                if (empty($currencies)) {
                     $currencies = $this->getCurrencies();
                 }
 

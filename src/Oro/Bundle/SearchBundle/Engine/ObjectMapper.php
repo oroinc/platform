@@ -191,6 +191,14 @@ class ObjectMapper extends AbstractMapper
                 $value = array_shift($value);
             }
 
+            if (is_numeric($value)) {
+                if ($type === Query::TYPE_INTEGER) {
+                    $value = (int)$value;
+                } elseif ($type === Query::TYPE_DECIMAL) {
+                    $value = (float)$value;
+                }
+            }
+
             $result[$dataField] = $value;
         }
 

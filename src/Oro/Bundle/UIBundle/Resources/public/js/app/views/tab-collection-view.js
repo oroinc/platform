@@ -34,7 +34,7 @@ define(function(require) {
         },
 
         template: function() {
-            return '<ul class="' + config.templateClassName + '" data-name="tabs-list"></ul>';
+            return '<ul class="' + config.templateClassName + '" role="tabpanel" data-name="tabs-list"></ul>';
         },
 
         /**

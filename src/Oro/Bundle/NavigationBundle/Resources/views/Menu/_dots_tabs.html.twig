@@ -9,14 +9,7 @@
     {% set displayable = item.extras.isAllowed or showNonAuthorized %}
     {% if item.displayed and displayable %}
         {# displaying the item #}
-        {% import _self as oro_menu %}
-        {%- set linkAttributes = item.linkAttributes %}
-        {%- set labelAttributes = item.labelAttributes %}
-        {% set class = [''] %}
-        {% if item.extras.active_if_first_is_empty is defined and item.extras.active_if_first_is_empty %}
-            {% set class = class|merge(['active']) %}
-        {% endif %}
-        <li id="{{- item.name|replace({' ': '_', '#': '_'})|lower|trim -}}-tab" class="{{ class|join(' ') }}">
+        <li>
             {{ block('linkElement') }}
         </li>
     {% endif %}
@@ -24,7 +17,25 @@
 
 {% block linkElement %}
     {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
-    {% set linkAttributes = linkAttributes|merge({'data-toggle': 'tab'}) %}
-    {% set itemLink = '#' ~ item.name|replace({' ': '_', '#': '_'})|lower|trim ~ '-content' %}
-    <a href="{{ itemLink }}"{{ oro_menu.attributes(linkAttributes) }}>{{ block('label') }}</a>
+    {% set class = [''] %}
+    {% set linkAttributes = item.linkAttributes %}
+    {% if item.extras.active_if_first_is_empty is defined and item.extras.active_if_first_is_empty %}
+        {% set linkAttributes = linkAttributes|merge({
+            'aria-selected': 'true'
+        }) %}
+        {% set class = class|merge(['active']) %}
+    {% else %}
+        {% set linkAttributes = linkAttributes|merge({
+            'aria-selected': 'false'
+        }) %}
+    {% endif %}
+    {% set linkAttributes = linkAttributes|merge({
+        'id': item.name|replace({' ': '_', '#': '_'})|lower|trim ~ '-tab',
+        'href': '#' ~ item.name|replace({' ': '_', '#': '_'})|lower|trim ~ '-content',
+        'class': class|join(' '),
+        'role': 'tab',
+        'data-toggle': 'tab',
+        'aria-controls': item.name|replace({' ': '_', '#': '_'})|lower|trim ~ '-content'
+    }) %}
+    <a {{ oro_menu.attributes(linkAttributes) }}>{{ block('label') }}</a>
 {% endblock %}

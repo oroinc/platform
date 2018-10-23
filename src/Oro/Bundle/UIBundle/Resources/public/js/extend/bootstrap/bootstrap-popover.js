@@ -3,44 +3,57 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    require('bootstrap');
+    var layout = require('oroui/js/layout');
+
+    require('bootstrap-popover');
     require('./bootstrap-tooltip');
 
     var Tooltip = $.fn.tooltip.Constructor;
     var Popover = $.fn.popover.Constructor;
 
-    _.extend(Popover.prototype, _.pick(Tooltip.prototype,
-        ['show', 'hide', 'applyPlacement', 'correctPlacement', 'replaceArrow', 'destroy']));
+    _.extend(Popover.prototype, _.pick(Tooltip.prototype, 'show', 'hide', 'dispose'));
 
-    Popover.prototype.arrow = function() {
-        this.$arrow = this.$arrow || this.tip().find('.arrow');
-        return this.$arrow;
+    Popover.prototype.getContent = function() {
+        return $('<div/>').append(this._getContent()).html();
     };
 
-    Popover.prototype.tip = function() {
-        if (!this.$tip) {
-            this.$tip = $(this.options.template);
-            var addClass = this.$element.data('class');
-            if (addClass && !this.$tip.hasClass(addClass)) {
-                this.$tip.addClass(addClass);
-            }
+    Popover.prototype.applyPlacement = function(offset, placement) {
+        var isOpen = this.isOpen();
+
+        _.extend(this.config, {offset: offset, placement: placement});
+        this.update();
+        this.hide();
+
+        if (isOpen) {
+            this.show();
         }
-        return this.$tip;
     };
 
     Popover.prototype.updateContent = function(content) {
-        this.options.content = content;
+        this.element.setAttribute('data-content', content);
+        this.config.content = content;
         if (this.isOpen()) {
             this.show();
         }
     };
 
     Popover.prototype.isOpen = function() {
-        return Boolean(this.$tip && this.$tip.is(':visible'));
+        return $(this.getTipElement()).is(':visible');
     };
 
-    Popover.prototype.hide = _.wrap(Popover.prototype.hide, function(func) {
-        clearInterval(this.trackPositionInterval);
-        return func.apply(this, _.rest(arguments));
-    });
+    $(document)
+        .on('initLayout', function(e) {
+            layout.initPopover($(e.target));
+        })
+        .on('disposeLayout', function(e) {
+            $(e.target).find('[data-toggle="popover"]').each(function() {
+                var $el = $(this);
+
+                if ($el.data(Popover.DATA_KEY)) {
+                    $el.popover('dispose');
+                }
+            });
+        });
+
+    return Popover;
 });

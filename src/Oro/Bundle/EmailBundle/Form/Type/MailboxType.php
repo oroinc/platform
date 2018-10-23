@@ -10,7 +10,7 @@ use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\UserBundle\Form\Type\RoleMultiSelectType;
 use Oro\Bundle\UserBundle\Form\Type\UserMultiSelectType;
 use Symfony\Component\Form\AbstractType;
@@ -25,6 +25,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotNull;
 
+/**
+ * Form type for mailbox configuration
+ */
 class MailboxType extends AbstractType
 {
     const RELOAD_MARKER = '_reloadForm';
@@ -32,7 +35,7 @@ class MailboxType extends AbstractType
     /** @var MailboxProcessStorage */
     private $storage;
 
-    /** @var Mcrypt */
+    /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
     /** ConfigManager */
@@ -40,12 +43,12 @@ class MailboxType extends AbstractType
 
     /**
      * @param MailboxProcessStorage $storage
-     * @param Mcrypt $encryptor
+     * @param SymmetricCrypterInterface $encryptor
      * @param ConfigManager $userConfigManager
      */
     public function __construct(
         MailboxProcessStorage $storage,
-        Mcrypt $encryptor,
+        SymmetricCrypterInterface $encryptor,
         ConfigManager $userConfigManager
     ) {
         $this->storage = $storage;

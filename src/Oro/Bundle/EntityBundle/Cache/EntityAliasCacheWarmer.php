@@ -5,10 +5,13 @@ namespace Oro\Bundle\EntityBundle\Cache;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
+/**
+ * Warms up entity aliases cache.
+ */
 class EntityAliasCacheWarmer implements CacheWarmerInterface
 {
     /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
+    private $entityAliasResolver;
 
     /**
      * @param EntityAliasResolver $entityAliasResolver
@@ -31,6 +34,7 @@ class EntityAliasCacheWarmer implements CacheWarmerInterface
      */
     public function isOptional()
     {
-        return true;
+        // this warmer is mandatory because we want to detect duplicated entity aliases as early as possible
+        return false;
     }
 }

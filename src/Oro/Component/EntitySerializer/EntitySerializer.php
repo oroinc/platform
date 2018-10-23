@@ -12,7 +12,7 @@ use Oro\Component\EntitySerializer\Filter\EntityAwareFilterInterface;
 /**
  * Serializer Implementation.
  *
- * @todo: This is draft implementation of the entity serializer.
+ * This is draft implementation of the entity serializer.
  *       It is expected that the full implementation will be done when new API component is implemented.
  * What need to do:
  *  * by default the value of identifier field should be used
@@ -686,7 +686,8 @@ class EntitySerializer
         }
         reset($fields);
         /** @var FieldConfig $field */
-        list($fieldName, $field) = each($fields);
+        $fieldName = key($fields);
+        $field = current($fields);
         if ($this->doctrineHelper->getEntityIdFieldName($entityClass) !== $field->getPropertyPath($fieldName)) {
             return null;
         }

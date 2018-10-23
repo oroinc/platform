@@ -11,7 +11,7 @@ Feature: Navigation bar position
 
   Scenario Outline: Navigation through the minimized main menu with "Left" navigation bar position
     When I go to <menu>
-    Then I should see <breadcrumb>
+    Then I should see <breadcrumb> in breadcrumbs
 
     Examples:
       | menu                               | breadcrumb                           |
@@ -24,7 +24,7 @@ Feature: Navigation bar position
     And I fill in "MenuSearch" with "To"
     Then I should see "Total Forecast"
     When I go to Reports & Segments/ Reports/ Opportunities/ Total Forecast
-    Then I should see "Reports & Segments/ Reports/ Opportunities/ Total Forecast"
+    Then I should see "Reports & Segments/ Reports/ Opportunities/ Total Forecast" in breadcrumbs
 
   Scenario: Create new menu item with empty url
     When I go to System/Menus
@@ -117,7 +117,7 @@ Feature: Navigation bar position
 
   Scenario Outline: Navigation through the expanded main menu with "Left" navigation bar position
     When I go to <menu>
-    Then I should see <breadcrumb>
+    Then I should see <breadcrumb> in breadcrumbs
 
     Examples:
       | menu                                | breadcrumb                            |
@@ -130,7 +130,7 @@ Feature: Navigation bar position
                     of minimized/expanded mode on each step
     When I click "Main Menu Toggler"
     And go to <menu>
-    Then I should see <breadcrumb>
+    Then I should see <breadcrumb> in breadcrumbs
 
     Examples:
       | menu                                | breadcrumb                            |
@@ -141,6 +141,7 @@ Feature: Navigation bar position
       | System/ Configuration               | "System/ Configuration" |
 
   Scenario: Change navigation bar position from "Left" to "Top"
+    Given I login as administrator
     When I go to System/ Configuration
     And follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And uncheck "Use default" for "Position" field
@@ -173,7 +174,7 @@ Feature: Navigation bar position
 
   Scenario Outline: Navigation through the main menu with "Top" navigation bar position
     When I go to <menu>
-    Then I should see <breadcrumb>
+    Then I should see <breadcrumb> in breadcrumbs
 
     Examples:
       | menu                               | breadcrumb                           |

@@ -1,25 +1,22 @@
 {% if widgetAcl is defined and is_granted(widgetAcl) %}
     <div class="widget-content launchpad-widget-content{% if widgetClass is defined and widgetClass %} {{ widgetClass }}-widget-content{% endif %}">
-        <div class="clearfix">
-            <div class="image-wrap pull-left">
-                <p class="text-center">
-                    {{ widgetLabel|trans }}
-                </p>
-                {% if widgetIcon is defined and widgetIcon %}
-                    <a href="javascript:void(0);" class="fa-{{ widgetIcon }} widget-image"></a>
-                {% endif %}
-            </div>
-            <div class="list-wrap pull-left">
-                <ul class="nav nav-list">
-                    {% for item in items %}
-                        {% if is_granted(item.acl) %}
-                            <li class="{{ loop.last ? 'last' : '' }}">
-                                <a href="{{ path(item.route, item.route_parameters|default({})) }}">{{ item.label|trans }}</a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
+        <div class="launchpad-widget-content__title"
+             title="{{ item.label|trans }}">
+            {% if widgetIcon is defined and widgetIcon %}
+                <span class="fa-{{ widgetIcon }} launchpad-widget-content__icon" aria-hidden="true"></span>
+            {% endif %}
+            <div class="launchpad-widget-content__label-wrapper">
+                <span class="launchpad-widget-content__label">{{ widgetLabel|trans }}</span>
             </div>
         </div>
+        <ul class="launchpad-widget-content__list">
+            {% for item in items %}
+                {% if is_granted(item.acl) %}
+                    <li class="launchpad-widget-content__list-item">
+                        <a href="{{ path(item.route, item.route_parameters|default({})) }}"  class="launchpad-widget-content__link">{{ item.label|trans }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
     </div>
 {% endif %}

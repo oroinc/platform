@@ -14,7 +14,7 @@ Feature: Language management
       | Status | Enabled |
     When I click "Add Language"
     And I select "German (Germany) - de_DE" from "Language"
-    And I click "Add Language"
+    And I click "Add Language" in modal window
     Then I should see "Language has been added" flash message
     And I should see "German (Germany)" in grid with following data:
       | Status  | Disabled         |

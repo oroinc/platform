@@ -88,7 +88,7 @@ lazy_services:
 
 ## Add application configuration settings from any bundle
 
-Sometime you need to add some settings to the application configuration from your bundle. For instance a bundle can implement new data type for Doctrine. The more native way to register it is to change _config.yml_. But it is the better way to achieve the same result if your bundle is used in ORO Platform. In this case you just need to add _app.yml_ in _Resources/config/oro_ directory of your bundle and the platform will add all setting from this file to the application configuration. The format of _app.yml_ is the same as _config.yml_.
+Sometime you need to add some settings to the application configuration from your bundle. For instance a bundle can implement new data type for Doctrine. The more native way to register it is to change _config.yml_. But it is the better way to achieve the same result if your bundle is used in OroPlatform. In this case you just need to add _app.yml_ in _Resources/config/oro_ directory of your bundle and the platform will add all setting from this file to the application configuration. The format of _app.yml_ is the same as _config.yml_.
 The following example shows how `money` data type can be registered:
 
 ``` yaml
@@ -130,7 +130,7 @@ performance of each request, because all of these services need to be fetched fr
 To solve this issue the Symfony provides an ability to mark the listeners as lazily loaded. For details see
 [Lazy loading for Event Listeners](https://symfony.com/doc/current/doctrine/event_listeners_subscribers.html#lazy-loading-for-event-listeners).
 But it is easy to forget about this, especially in a big project with a lot of listeners. This is the reason why in
-the Oro Platform all the listeners are marked as lazily loaded. But if needed, you can remove the lazy loading
+OroPlatform all the listeners are marked as lazily loaded. But if needed, you can remove the lazy loading
 for your listeners by adding `lazy: false` to `doctrine.event_listener` or `doctrine.orm.entity_listener` tags. E.g.:
 
 ```yaml
