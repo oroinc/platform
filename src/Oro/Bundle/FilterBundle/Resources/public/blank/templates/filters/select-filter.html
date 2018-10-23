@@ -5,7 +5,7 @@
             <% _.each(options, function (option) { %>
             <option value="<%= option.value %>" title="<%- option.label %>"
                 <% if (option.value == selected.value) { %> selected="selected"<% } %>>
-            <%- option.label %>
+            <%- option.label %> <% if (option.count !== undefined) { %>(<%- option.count %>)<% } %>
             </option>
             <% }); %>
         </select>
