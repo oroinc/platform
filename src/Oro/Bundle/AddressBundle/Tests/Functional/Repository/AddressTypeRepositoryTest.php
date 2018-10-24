@@ -37,16 +37,14 @@ class AddressTypeRepositoryTest extends WebTestCase
 
     public function testGetAllIdentities(): void
     {
-        $expectedIdentities = [
-            AddressType::TYPE_BILLING,
-            AddressType::TYPE_SHIPPING,
-            LoadAddressTypeData::TYPE_HOME,
-            LoadAddressTypeData::TYPE_WORK,
-            LoadAddressTypeData::TYPE_SECRET
+        $identities = $this->getRepository()->getAllIdentities();
 
-        ];
-
-        self::assertEquals($expectedIdentities, $this->getRepository()->getAllIdentities());
+        self::assertCount(5, $identities);
+        self::assertContains(AddressType::TYPE_BILLING, $identities);
+        self::assertContains(AddressType::TYPE_SHIPPING, $identities);
+        self::assertContains(LoadAddressTypeData::TYPE_HOME, $identities);
+        self::assertContains(LoadAddressTypeData::TYPE_WORK, $identities);
+        self::assertContains(LoadAddressTypeData::TYPE_SECRET, $identities);
     }
 
     public function testUpdateTranslations(): void
