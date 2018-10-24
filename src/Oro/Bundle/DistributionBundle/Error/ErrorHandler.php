@@ -4,6 +4,11 @@ namespace Oro\Bundle\DistributionBundle\Error;
 
 use Symfony\Component\Debug\ErrorHandler as BaseErrorHandler;
 
+/**
+ * Handles php errors for next purposes:
+ *  1. Don't show warning for php_network_getaddresses error due to BAP-3979
+ *  2. Throw \ErrorException instead of fatal errors
+ */
 class ErrorHandler extends BaseErrorHandler
 {
     /**
@@ -86,15 +91,5 @@ class ErrorHandler extends BaseErrorHandler
         }
 
         return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated Use handleErrors() instead, to prevent confusion with Symfony\Component\Debug\ErrorHandler::handle
-     */
-    public function handle($level, $message, $file = 'unknown', $line = 0, $context = [])
-    {
-        return $this->handleErrors($level, $message, $file, $line);
     }
 }
