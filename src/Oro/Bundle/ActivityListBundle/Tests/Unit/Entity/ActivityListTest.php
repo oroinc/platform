@@ -56,7 +56,7 @@ class ActivityListTest extends \PHPUnit\Framework\TestCase
             ['updatedAt', new \DateTime('now')],
             ['createdAt', new \DateTime('now')],
             ['owner', new User()],
-            ['editor', new User()],
+            ['updatedBy', new User()],
             ['organization', new Organization()]
         ];
     }

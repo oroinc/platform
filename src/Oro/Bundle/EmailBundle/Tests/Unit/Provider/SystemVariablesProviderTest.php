@@ -44,6 +44,7 @@ class SystemVariablesProviderTest extends \PHPUnit\Framework\TestCase
         $result = $this->provider->getVariableDefinitions();
         $this->assertEquals(
             [
+                'currentDateTime' => ['type' => 'string', 'label' => 'oro.email.emailtemplate.current_datetime'],
                 'currentDate'  => ['type' => 'string', 'label' => 'oro.email.emailtemplate.current_date'],
                 'currentTime'  => ['type' => 'string', 'label' => 'oro.email.emailtemplate.current_time'],
                 'appURL'       => ['type' => 'string', 'label' => 'oro.email.emailtemplate.app_url'],
@@ -66,6 +67,10 @@ class SystemVariablesProviderTest extends \PHPUnit\Framework\TestCase
                 )
             );
         $this->dateTimeFormatter->expects($this->once())
+            ->method('format')
+            ->with($this->isInstanceOf('\DateTime'))
+            ->will($this->returnValue('datetime'));
+        $this->dateTimeFormatter->expects($this->once())
             ->method('formatDate')
             ->with($this->isInstanceOf('\DateTime'))
             ->will($this->returnValue('date'));
@@ -77,9 +82,8 @@ class SystemVariablesProviderTest extends \PHPUnit\Framework\TestCase
         $result = $this->provider->getVariableValues();
         $this->assertEquals(
             [
-                'appShortName' => '',
-                'appFullName'  => '',
                 'appURL'       => 'http://localhost',
+                'currentDateTime'  => 'datetime',
                 'currentDate'  => 'date',
                 'currentTime'  => 'time',
             ],
