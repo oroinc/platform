@@ -5,24 +5,6 @@
     background: $secondary-200;
 }
 
-.job-progress {
-    background-image: linear-gradient($progress-bar-gradient-start, $progress-bar-gradient-end) !important;
-    position: relative;
-
-    .label {
-        height: 100%;
-
-        span {
-            width: 100%;
-            text-align: center;
-            z-index: 2;
-            display: block;
-            position: absolute;
-            top: 3px;
-        }
-    }
-}
-
 .widget-content > .label-info:first-child {
     margin-bottom: 10px;
 }
@@ -185,29 +167,6 @@ footer {
 
 .list-group > .list-group-item:first-child {
     border: 0;
-}
-
-.badge-enabled,
-.badge-tentatively,
-.badge-disabled {
-    padding: side-values(3px 10px 3px 5px);
-    font-size: 12px;
-    font-weight: normal;
-}
-
-.badge-enabled {
-    background-color: #dff2d4;
-    color: #4c7940;
-}
-
-.badge-tentatively {
-    background-color: #faf2cc;
-    color: #a7a50a;
-}
-
-.badge-disabled {
-    color: #aaa;
-    background-color: #f2f2f2;
 }
 
 .status-disabled,

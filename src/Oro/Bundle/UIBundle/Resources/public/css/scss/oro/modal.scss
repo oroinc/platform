@@ -46,6 +46,10 @@
 
         border-radius: 0 0 $modal-border-radius $modal-border-radius;
         border: $modal-footer-border;
+
+        &:empty {
+            display: none;
+        }
     }
 }
 
@@ -83,5 +87,6 @@
 
     .modal-body {
         color: $info-ultra-dark;
+        background-color: $info-lighten;
     }
 }

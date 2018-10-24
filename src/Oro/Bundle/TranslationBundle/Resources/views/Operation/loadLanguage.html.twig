@@ -5,23 +5,23 @@
 
     <div>
         <div class="pull-left">
-            <i class="fa-info-circle tooltip-icon"
+            <span class="fa-info-circle tooltip-icon"
                data-toggle="popover"
                data-content="<div class='oro-popover-content'>{{ 'oro.translation.form.tooltip.translation_completeness'|trans }}</div>"
-            ></i>
+            ></span>
             {{ 'oro.translation.action.translation_completeness.label'|trans }}&nbsp;</div>
-        <div class="">
+        <div class="pull-right">
             {% if translationCompleteness is not null %}
                 <div class="oro-translation-languages">
                     <div class="translation-completeness">
                         <div class="progress">
-                            <div class="bar bar-success" style="width: {{ translationCompleteness }}%;"></div>
+                            <div class="progress-bar success" style="width: {{ translationCompleteness }}%;"></div>
                         </div>
-                        <b>{{ (translationCompleteness / 100)|oro_format_percent }}</b>
+                        <b class="progress-label">{{ (translationCompleteness / 100)|oro_format_percent }}</b>
                     </div>
                 </div>
             {% else %}
-                {{ 'N/A'|trans }}
+                <span class="badge badge-disabled">{{ 'N/A'|trans }}</span>
             {% endif %}
         </div>
     </div>

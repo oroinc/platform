@@ -116,6 +116,17 @@ $modal-dialog-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
 $modal-footer-bg: $primary-900;
 $modal-footer-padding: 14px 24px;
 
+
+// Progress bars
+
+$progress-height: 22px;
+$progress-font-size: 22px;
+$progress-bg: $primary-860;
+$progress-border-radius: 0;
+$progress-box-shadow: null;
+$progress-bar-color: $additional-dark;
+$progress-bar-bg: $primary-600;
+
 $popover-z-index: 991;
 $popover-border-width: 0px; /* stylelint-disable-line length-zero-no-unit */
 $popover-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);

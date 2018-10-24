@@ -58,6 +58,8 @@
 
     white-space: nowrap;
 
+    @include list-unstyled();
+
     .action {
         display: block;
         min-width: $oro-datagrid-action-size;
