@@ -11,6 +11,7 @@ oro_behat_extension:
         - OroUserBundle::FeatureContext
         - OroActivityListBundle::ActivityContext
         - OroConfigBundle::FeatureContext
+        - OroSecurityBundle::ACLContext
       paths:
         - '@OroEmailBundle/Tests/Behat/Features'
   elements:
