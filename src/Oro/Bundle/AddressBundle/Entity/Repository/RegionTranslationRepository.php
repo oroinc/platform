@@ -9,7 +9,7 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepositoryInterfac
 /**
  * Gedmo translation repository for Region dictionary.
  */
-class RegionTranslationRepository extends AbstractTranslationRepository  implements TranslationRepositoryInterface
+class RegionTranslationRepository extends AbstractTranslationRepository implements TranslationRepositoryInterface
 {
     /**
      * {@inheritdoc}
