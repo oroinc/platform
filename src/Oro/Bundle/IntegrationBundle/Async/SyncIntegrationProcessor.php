@@ -1,9 +1,11 @@
 <?php
+
 namespace Oro\Bundle\IntegrationBundle\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\IntegrationBundle\Authentication\Token\IntegrationTokenAwareTrait;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\IntegrationBundle\Provider\LoggerStrategyAwareInterface;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -17,6 +19,9 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * Async processor to run integration processor
+ */
 class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAwareInterface, TopicSubscriberInterface
 {
     use ContainerAwareTrait;
@@ -123,7 +128,9 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
 
         $result = $this->jobRunner->runUnique($ownerId, $jobName, function () use ($integration, $body) {
             $processor = $this->syncProcessorRegistry->getProcessorForIntegration($integration);
-            $processor->getLoggerStrategy()->setLogger($this->logger);
+            if ($processor instanceof LoggerStrategyAwareInterface) {
+                $processor->getLoggerStrategy()->setLogger($this->logger);
+            }
 
             return $processor->process(
                 $integration,
