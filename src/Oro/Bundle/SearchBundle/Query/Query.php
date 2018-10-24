@@ -8,8 +8,6 @@ use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 /**
  * Encapsulates query to search engine using SQL based format
  *
- * @TODO: In platform 2.0 this class should be extended from the Doctrine\Common\Collections\Criteria.
- *        We should refactor this class only from platform v2.0 because it will break backward compatibility.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Query
@@ -778,5 +776,10 @@ class Query
         }
 
         return $field;
+    }
+
+    public function __clone()
+    {
+        $this->criteria = clone $this->criteria;
     }
 }

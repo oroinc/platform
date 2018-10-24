@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Entity\Manager;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Parameter;
@@ -208,38 +206,6 @@ class StaticSegmentManager
                     $segment->getOrganization()->getId()
                 )
             );
-        }
-    }
-
-    /**
-     * Bind parameters to statement
-     *
-     * @param Statement       $stmt
-     * @param ArrayCollection $parameters
-     *
-     * @deprecated Deprecated since version 2.2
-     */
-    public function bindParameters(Statement $stmt, ArrayCollection $parameters)
-    {
-        $values = [];
-        $types  = [];
-        foreach ($parameters as $parameter) {
-            /* @var $parameter Parameter */
-            $values[] = $parameter->getValue();
-            $types[]  = $parameter->getType();
-        }
-        $typeOffset = array_key_exists(0, $types) ? -1 : 0;
-        $bindIndex  = 1;
-
-        foreach ($values as $value) {
-            $typeIndex = $bindIndex + $typeOffset;
-            if (isset($types[$typeIndex])) {
-                $type = $types[$typeIndex];
-                $stmt->bindValue($bindIndex, $value, $type);
-            } else {
-                $stmt->bindValue($bindIndex, $value);
-            }
-            ++$bindIndex;
         }
     }
 }
