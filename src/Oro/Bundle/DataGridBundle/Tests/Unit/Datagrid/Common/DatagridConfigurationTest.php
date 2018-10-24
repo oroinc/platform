@@ -223,19 +223,22 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $configArray);
     }
 
-    public function testExceptions()
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage DatagridConfiguration::addColumn: name should not be empty
+     */
+    public function testAddColumnWithoutName()
     {
-        $this->expectException('BadMethodCallException');
-        $this->expectExceptionMessage('DatagridConfiguration::addColumn: name should not be empty');
         $this->configuration->addColumn(null, []);
+    }
 
-        $this->expectException('BadMethodCallException');
-        $this->expectExceptionMessage('DatagridConfiguration::updateLabel: name should not be empty');
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage DatagridConfiguration::updateLabel: name should not be empty
+     */
+    public function testUpdateLabelWithoutName()
+    {
         $this->configuration->updateLabel(null, []);
-
-        $this->expectException('BadMethodCallException');
-        $this->expectExceptionMessage('DatagridConfiguration::addSelect: select should not be empty');
-        $this->configuration->addSelect(null);
     }
 
     public function testUpdateLabel()
@@ -275,7 +278,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testAddSelect()
     {
-        $this->configuration->addSelect('testColumn');
+        $this->configuration->getOrmQuery()->addSelect('testColumn');
 
         $configArray = $this->configuration->toArray();
         $this->assertEquals(
@@ -290,13 +293,13 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testJoinTable()
     {
-        $this->configuration->joinTable('left', ['param' => 'value']);
+        $this->configuration->getOrmQuery()->addLeftJoin('rootAlias.association', 'joinAlias');
 
         $configArray = $this->configuration->toArray();
         $this->assertEquals(
             [
                 'source' => [
-                    'query' => ['join' => ['left' => [['param' => 'value']]]],
+                    'query' => ['join' => ['left' => [['join' => 'rootAlias.association', 'alias' => 'joinAlias']]]],
                 ]
             ],
             $configArray
