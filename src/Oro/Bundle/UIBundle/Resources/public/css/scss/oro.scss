@@ -159,16 +159,6 @@ footer {
     box-sizing: border-box;
 }
 
-.list-group > .list-group-item:after {
-    content: '';
-    clear: both;
-    display: block;
-}
-
-.list-group > .list-group-item:first-child {
-    border: 0;
-}
-
 .status-disabled,
 .status-unknown {
     color: #aaa;
