@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
+use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
+use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
-use Symfony\Component\VarDumper\VarDumper;
 
 class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
 {
@@ -58,13 +59,13 @@ class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
             ->method('getReadCount')
             ->will($this->returnValue(1));
 
-        $jobInstance = self::createMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
+        $jobInstance = $this->createMock(JobInstance::class);
         $jobInstance
             ->expects(self::exactly(2))
             ->method('getRawConfiguration')
             ->willReturnOnConsecutiveCalls(['incremented_read' => false], ['incremented_read' => true]);
 
-        $jobExecution = self::createMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
+        $jobExecution = $this->createMock(JobExecution::class);
         $jobExecution
             ->expects(self::exactly(2))
             ->method('getJobInstance')
