@@ -37,25 +37,6 @@ class UserTest extends AbstractUserTest
         $this->assertEquals($mail, $user->getEmail());
     }
 
-    public function testSetRolesCollection()
-    {
-        $user = $this->getUser();
-        $role = new Role(User::ROLE_DEFAULT);
-        $roles = new ArrayCollection([$role]);
-        $user->setRolesCollection($roles);
-        $this->assertSame($roles, $user->getRolesCollection());
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $collection must be an instance of Doctrine\Common\Collections\Collection
-     */
-    public function testSetRolesCollectionThrowsException()
-    {
-        $user = $this->getUser();
-        $user->setRolesCollection([]);
-    }
-
     public function testGroups()
     {
         $user = $this->getUser();

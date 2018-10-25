@@ -79,10 +79,11 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
 
     /**
      * @var User
-     * @deprecated 1.8.0:1.10.0 Will be renamed to updatedBy
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_editor_id", referencedColumnName="id", onDelete="SET NULL")
+     *
+     * This field should be renamed to updatedBy as a part of BAP-9004
      */
     protected $editor;
 
@@ -393,32 +394,6 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     }
 
     /**
-     * @param User $editor
-     * @deprecated 1.8.0:1.10.0 Use $this->setUpdatedBy() instead
-     *
-     * @return self
-     */
-    public function setEditor(User $editor = null)
-    {
-        if ($editor !== null) {
-            $this->updatedBySet = true;
-        }
-
-        $this->editor = $editor;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since 1.8. Use $this->getUpdatedBy() instead
-     * @return User
-     */
-    public function getEditor()
-    {
-        return $this->editor;
-    }
-
-    /**
      * @param User|null $updatedBy
      *
      * @return self
@@ -430,9 +405,6 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
             $this->updatedBySet = true;
         }
 
-        /**
-         * @TODO will be renamed after BAP-9004
-         */
         $this->editor = $updatedBy;
 
         return $this;
