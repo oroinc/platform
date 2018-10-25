@@ -122,13 +122,31 @@ define(function(require) {
                 mediator.execute('showLoading');
                 this.templatesProvider.create(templateId, this.model.get('email').get('relatedEntityId'))
                     .always(_.bind(mediator.execute, mediator, 'hideLoading'))
+                    .fail(_.bind(this.showTemplateErrorMessage, this))
                     .done(_.bind(this.fillForm, this));
             }, this));
             confirm.open();
         },
 
+        showTemplateErrorMessage: function(jqXHR) {
+            var reason = jqXHR && jqXHR.responseJSON ? jqXHR.responseJSON.reason : '';
+            var $errorContainer = this._getErrorContainer();
+
+            $errorContainer.find('.alert-error').remove();
+
+            mediator.execute(
+                'showMessage',
+                'error',
+                reason ? reason : __('oro.email.emailtemplate.load_failed'),
+                {container: $errorContainer}
+            );
+        },
+
         fillForm: function(emailData) {
             var editorView = this.getBodyEditorView();
+            var $errorContainer = this._getErrorContainer();
+
+            $errorContainer.find('.alert-error').remove();
 
             if (!this.model.get('parentEmailId') || !this.domCache.subject.val()) {
                 this.domCache.subject.val(emailData.subject);
@@ -233,6 +251,10 @@ define(function(require) {
                 body += this.model.get('bodyFooter') + '</body>';
             }
             return body;
+        },
+
+        _getErrorContainer: function() {
+            return this.$('[name$="[template]"]').parent();
         }
     });
 

@@ -16,6 +16,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Adds extended fields to the form based on the configuration for the entity/field.
+ */
 class DynamicFieldsExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
@@ -129,19 +132,8 @@ class DynamicFieldsExtension extends AbstractTypeExtension
 
             $extendConfig = $extendConfigProvider->getConfig($className, $fieldName);
 
-            $this->addInitialElements($view, $form, $extendConfig);
+            $this->dynamicFieldsHelper->addInitialElements($view, $form, $extendConfig);
         }
-    }
-
-    /**
-     * @param FormView        $view
-     * @param FormInterface   $form
-     * @param ConfigInterface $extendConfig
-     * @deprecated please use \Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper::addInitialElements()
-     */
-    protected function addInitialElements(FormView $view, FormInterface $form, ConfigInterface $extendConfig)
-    {
-        $this->dynamicFieldsHelper->addInitialElements($view, $form, $extendConfig);
     }
 
     /**
@@ -188,31 +180,5 @@ class DynamicFieldsExtension extends AbstractTypeExtension
     protected function isApplicableField(ConfigInterface $extendConfig, ConfigProvider $extendConfigProvider)
     {
         return $this->dynamicFieldsHelper->isApplicableField($extendConfig, $extendConfigProvider);
-    }
-
-    /**
-     * @deprecated This method will be removed. Use DynamicFieldsHelper::getInitialElements() instead
-     *
-     * @param object[]        $entities
-     * @param object|null     $defaultEntity
-     * @param ConfigInterface $extendConfig
-     *
-     * @return array
-     * @deprecated please use \Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper::getInitialElements()
-     */
-    protected function getInitialElements($entities, $defaultEntity, ConfigInterface $extendConfig)
-    {
-        return $this->dynamicFieldsHelper->getInitialElements($entities, $defaultEntity, $extendConfig);
-    }
-
-    /**
-     * @param string $className
-     *
-     * @return string
-     * @deprecated please use \Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper::getIdColumnName()
-     */
-    protected function getIdColumnName($className)
-    {
-        return $this->dynamicFieldsHelper->getIdColumnName($className);
     }
 }

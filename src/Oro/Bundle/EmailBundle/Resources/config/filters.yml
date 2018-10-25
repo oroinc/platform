@@ -19,3 +19,12 @@ services:
             - '@oro_email.email.owner.provider.storage'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: multiselect-messagetype }
+
+    oro_email_filter.filter_email_string:
+        class: 'Oro\Bundle\EmailBundle\Filter\EmailStringFilter'
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@oro_email.email.owner.provider.storage'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: email-string }
