@@ -6,6 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Exception\NotFoundSupportedOwnershipDecisionMakerException;
 
+/**
+ * Chain on entity ownership decision makers
+ */
 class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionMakerInterface
 {
     /**
@@ -50,60 +53,6 @@ class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionM
         }
 
         return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated since 2.3. Use isOrganization instead
-     */
-    public function isGlobalLevelEntity($domainObject)
-    {
-        return $this->isOrganization($domainObject);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated since 2.3. Use isBusinessUnit instead
-     */
-    public function isLocalLevelEntity($domainObject)
-    {
-        return $this->isBusinessUnit($domainObject);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated since 2.3. Use isUser instead
-     */
-    public function isBasicLevelEntity($domainObject)
-    {
-        return $this->isUser($domainObject);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated since 2.3. Use isAssociatedWithOrganization instead
-     */
-    public function isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization = null)
-    {
-        return $this->isAssociatedWithOrganization($user, $domainObject, $organization);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated since 2.3. Use isAssociatedWithBusinessUnit instead
-     */
-    public function isAssociatedWithLocalLevelEntity($user, $domainObject, $deep = false, $organization = null)
-    {
-        return $this->isAssociatedWithBusinessUnit($user, $domainObject, $deep, $organization);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated since 2.3. Use isAssociatedWithUser instead
-     */
-    public function isAssociatedWithBasicLevelEntity($user, $domainObject, $organization = null)
-    {
-        return $this->isAssociatedWithUser($user, $domainObject, $organization);
     }
 
     /**
