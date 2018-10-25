@@ -20,14 +20,14 @@
             <span class="btn btn-icon delete-button" data-collection-action="delete" title="{{ 'oro.dashboard.datagrid.actions.move_column_up.label'|trans }}">
                 <i class="fa-trash-o hide-text"></i>
             </span>
-            <span class="btn move-up<% if (isFirst) { %> disabled<% } %>" data-collection-action="moveUp" title="{{ 'oro.dashboard.datagrid.actions.move_column_up.label'|trans }}">
+            <span class="btn btn-icon move-up<% if (isFirst) { %> disabled<% } %>" data-collection-action="moveUp" title="{{ 'oro.dashboard.datagrid.actions.move_column_up.label'|trans }}">
                 <i class="fa-chevron-up"></i>
             </span>
-            <span class="btn move-down<% if (isLast) { %> disabled<% } %>" data-collection-action="moveDown" title="{{ 'oro.dashboard.datagrid.actions.move_column_down.label'|trans }}">
+            <span class="btn btn-icon move-down<% if (isLast) { %> disabled<% } %>" data-collection-action="moveDown" title="{{ 'oro.dashboard.datagrid.actions.move_column_down.label'|trans }}">
                 <i class="fa-chevron-down"></i>
             </span>
             <% } else { %>
-            <a href="javascript: void(0);" class="action no-hash delete-button btn btn-icon"
+            <a href="javascript: void(0);" class="action no-hash delete-button"
                title="{{ 'oro.dashboard.datagrid.actions.delete.label'|trans }}"
                data-collection-action="delete">
                 <i class="fa-trash-o hide-text"></i>

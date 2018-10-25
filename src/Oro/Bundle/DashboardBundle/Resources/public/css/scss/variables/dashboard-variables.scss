@@ -16,6 +16,9 @@ $dashboard-widget-placeholder-background: $primary-860 !default;
 $dashboard-widget-placeholder-border: 2px dashed $primary-700 !default;
 $dashboard-widget-placeholder-color: $primary-600 !default;
 $dashboard-widget-configuration-border: 1px solid $primary-750 !default;
+$dashboard-widget-configuration-collapsed-margin-top: 10px !default;
+$dashboard-widget-configuration-items-table-container-margin: side-values(8px 0 8px 213px) !default;
+$dashboard-widget-configuration-buttons-space: 8px !default;
 
 $dashboard-big-numbers-separator-color: $primary-830 !default;
 $dashboard-big-numbers-positive-color: $success-dark !default;

@@ -64,3 +64,17 @@
 .dashboard-widgets-add {
     margin-left: 0;
 }
+
+.dashboard-widget-items {
+    .controls {
+        width: auto;
+
+        @include clearfix();
+    }
+
+    .action-column {
+        width: $dashboard-mobile-action-column-width;
+
+        text-align: center;
+    }
+}
