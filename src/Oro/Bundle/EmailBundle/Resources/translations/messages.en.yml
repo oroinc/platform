@@ -175,6 +175,9 @@ oro:
             current_time:        Current time
             siganture:           Signature (|oro_tag_filter should be removed to allow usage of it's html view)
 
+            # errors
+            failed_to_compile: This email template can't be used
+
         attachment:
             copy_to_record: Copy to Record
             save: Download
