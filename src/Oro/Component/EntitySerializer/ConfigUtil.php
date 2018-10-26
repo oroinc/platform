@@ -201,20 +201,6 @@ class ConfigUtil
     }
 
     /**
-     * Checks whether a property path represents some metadata property like '__class__' or '__discriminator__'
-     *
-     * @param string $propertyPath
-     *
-     * @return bool
-     *
-     * @deprecated since 2.0. Use Oro\Component\EntitySerializer\FieldAccessor::isMetadataProperty instead
-     */
-    public static function isMetadataProperty($propertyPath)
-    {
-        return \strpos($propertyPath, '__') === 0;
-    }
-
-    /**
      * Splits a property path to parts
      *
      * @param string $propertyPath
