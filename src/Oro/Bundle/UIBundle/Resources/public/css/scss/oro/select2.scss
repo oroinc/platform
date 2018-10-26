@@ -90,6 +90,7 @@
             margin-right: $select2-choice-image-offset-right;
             display: $select2-choice-image-display;
             float: $select2-choice-image-float;
+            border-radius: $select2-choice-image-border-radius;
         }
 
         span {
@@ -249,10 +250,6 @@
         white-space: $select2-search-white-space;
     }
 
-    &-input {
-        width: $select2-search-input-width;
-    }
-
     &-drop {
         width: $select2-drop-width;
         margin-top: $select2-drop-offset-top;
@@ -294,6 +291,10 @@
             border-radius: $select2-drop-above-border-radius;
             box-shadow: $select2-drop-above-box-shadow;
         }
+
+        .select2-input {
+            width: $select2-search-input-width;
+        }
     }
 
     /* results */
@@ -320,6 +321,10 @@
                     }
                 }
             }
+        }
+
+        img {
+            border-radius: $select2-results-image-border-radius;
         }
 
         .select2-no-results,

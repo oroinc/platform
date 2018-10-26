@@ -267,3 +267,9 @@
     padding-top: $section-content-inner-offset-top;
     padding-bottom: $section-content-inner-offset-bottom;
 }
+
+.responsive-form-inner {
+    .float-holder {
+        margin-right: 4px;
+    }
+}

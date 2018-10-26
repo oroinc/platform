@@ -4,8 +4,6 @@ $field-size: 32px !default;
 $field-width: 294px !default;
 
 $input-field-border-radius: 2px !default;
-$input-border-width: 2px !default;
-$input-border-color: $primary-750 !default;
 $input-background-color: $primary-inverse !default;
 $input-inner-offset: 4px 6px !default;
 $input-box-shadow: none !default;
@@ -101,7 +99,7 @@ $add-on-border: 2px solid $primary-750 !default;
 $add-on-background-color: $primary-inverse !default;
 $add-on-height: $field-size !default;
 $add-on-line-height: $field-size - 4px !default;
-$add-on-inner-offset: 0 5px !default;
+$add-on-inner-offset: 0 6px !default;
 
 $add-on-input-outer-offset-top: -1px !default;
 $add-on-last-child-border-radius: 0 2px 2px 0 !default;

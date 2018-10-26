@@ -517,16 +517,6 @@ ul.inline-extra {
     clear: both;
 }
 
-.btn-action {
-    color: $primary-700 !important;
-    font-size: 20px;
-    padding: 0 5px !important;
-
-    &:hover {
-        text-decoration: none !important;
-    }
-}
-
 .row-oro {
     width: 100%;
     margin: 0;
@@ -692,8 +682,8 @@ textarea {
 h5.user-fieldset {
     font-weight: bold;
     font-size: 20px;
-    line-height: 20px;
-    margin: side-values(20px 10px 16px 0);
+    line-height: 1.5;
+    margin: side-values(0 0 16px);
 }
 
 .page-size .dropdown-menu {
@@ -809,41 +799,9 @@ label.radio.error {
     .add-list-item {
         margin-#{$start}: 183px;
     }
-    //
-    //.removeRow {
-    //    font-size: 0;
-    //    line-height: 0;
-    //    margin: 0;
-    //
-    //    &:after {
-    //        display: inline-block;
-    //        font: 14px/1em FontAwesome;
-    //        content: '\f00d';
-    //        text-indent: 0;
-    //    }
-    //}
-
-    .addAfterRow {
-        text-indent: -999;
-        font-size: 0;
-        line-height: 0;
-        margin: 0;
-
-        &:after {
-            display: inline-block;
-            font: 14px/1em FontAwesome;
-            color: $primary-860;
-            content: '\f067';
-            text-indent: 0;
-        }
-
-        &:hover:after {
-            color: $primary-600;
-        }
-    }
 
     .row-oro.oro-multiselect-holder {
-        margin: 0 0 5px;
+        margin: 0 0 8px;
     }
 
     .enum-value-collection & {
@@ -869,7 +827,7 @@ label.radio.error {
 .oro-address-collection.oro-item-collection {
     & > div {
         position: relative;
-        padding: 16px;
+        padding: 16px 0;
         margin: 0 0 20px;
         border: 1px solid $primary-860;
         background: $primary-900;
@@ -883,8 +841,8 @@ label.radio.error {
     .removeRow {
         position: absolute;
         width: 28px;
-        top: 4px;
-        #{$end}: 4px;
+        top: 6px;
+        #{$end}: 6px;
         text-decoration: none;
 
         &:after {
@@ -1048,7 +1006,7 @@ span.validation-failed {
 
 .tooltip-icon {
     color: $primary-700;
-    font-size: 13px;
+    font-size: 14px;
     cursor: pointer;
 }
 

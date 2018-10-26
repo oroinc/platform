@@ -352,10 +352,14 @@
         <div class="row-oro oro-multiselect-holder{% if not allow_delete %} not-removable{% endif %}">
             {{ form_widget(form, {disabled: disabled}) }}
             {% if allow_delete %}
-            <button class="removeRow btn btn-action btn-link" type="button" data-related="{{ name }}">×</button>
+            <button class="removeRow btn btn-icon btn-square-light" type="button" data-related="{{ name }}">
+                <span class="fa-close"></span>
+            </button>
             {% endif %}
             {% if allow_add_after %}
-            <button class="addAfterRow btn btn-action btn-link" type="button" data-related="{{ name }}">+</button>
+            <button class="addAfterRow btn btn-icon btn-square-light" type="button" data-related="{{ name }}">
+                <span class="fa-plus"></span>
+            </button>
             {% endif %}
         </div>
     </div>
@@ -383,7 +387,7 @@
                 {% endif %}
             </div>
             {% if allow_add %}
-            <a class="btn add-list-item" href="javascript: void(0);"><i class="fa-plus"></i>{{ form.vars.add_label|default('oro.form.collection.add')|trans }}</a>
+            <a class="btn add-list-item" href="javascript: void(0);">{{ form.vars.add_label|default('oro.form.collection.add')|trans }}</a>
             {% endif %}
         </div>
         {% if handle_primary and (prototype is not defined or prototype.primary is defined) %}

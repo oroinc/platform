@@ -38,7 +38,6 @@ $filter-default-value-display: none !default;
 
 $filter-box-item-offset-right: 8px !default;
 $filter-box-item-offset-bottom: 8px !default;
-$filter-box-item-position: relative !default;
 $filter-box-item-display: inline-block !default;
 $filter-box-item-vertical-align: middle !default;
 $filter-box-item-white-space: nowrap !default;
@@ -219,6 +218,7 @@ $filter-item-btn-hover-background-color: $primary-830 !default;
 
 $filter-item-dropdown-toggle-vertical-align: top !default;
 $filter-item-dropdown-toggle-line-height: 28px !default;
+$filter-item-dropdown-toggle-position: relative !default;
 
 $filter-item-fa-close-color: #aaa !default;
 $filter-item-fa-close-font-size: 14px !default;

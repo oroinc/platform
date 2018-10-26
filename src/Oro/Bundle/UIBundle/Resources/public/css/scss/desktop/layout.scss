@@ -92,6 +92,28 @@ body:not(.login-page) {
     }
 }
 
+.container-fluid {
+    > .responsive-section {
+        &:not(.responsive-small) {
+            .responsive-cell {
+                &:first-child {
+                    .user-fieldset {
+                        margin-left: 16px;
+                    }
+                }
+            }
+        }
+
+        &.responsive-small {
+            .responsive-cell {
+                .user-fieldset {
+                    margin-left: 16px;
+                }
+            }
+        }
+    }
+}
+
 //  Update offset on create / update pages
 form > .layout-content {
     padding-#{$start}: $content-padding;

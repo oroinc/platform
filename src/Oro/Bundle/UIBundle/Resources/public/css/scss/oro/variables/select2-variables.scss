@@ -63,6 +63,7 @@ $select2-choice-image-offset-left: -2px !default;
 $select2-choice-image-offset-right: 2px !default;
 $select2-choice-image-display: block !default;
 $select2-choice-image-float: left !default;
+$select2-choice-image-border-radius: $select2-choice-image-max-width !default;
 
 $select2-choice-span-display: block !default;
 $select2-choice-span-overflow: hidden !default;
@@ -165,7 +166,8 @@ $select2-search-position: relative !default;
 $select2-search-z-index: 10000 !default;
 $select2-search-white-space: nowrap !default;
 
-$select2-search-input-width: 100% !default;
+// !important for override default input width
+$select2-search-input-width: 100% !important !default;
 
 $select2-results-max-height: 300px !default;
 $select2-results-inner-offset: 8px !default;
@@ -173,6 +175,8 @@ $select2-results-offset: 0 !default;
 $select2-results-position: relative !default;
 $select2-results-overflow-x: hidden !default;
 $select2-results-overflow-y: auto !default;
+
+$select2-results-image-border-radius: 16px !default;
 
 $select2-results-sub-offset: 0 !default;
 $select2-results-sub-inner-offset-left: 0 !default;

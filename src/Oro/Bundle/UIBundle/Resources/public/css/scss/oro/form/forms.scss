@@ -23,10 +23,10 @@
         display: flex;
 
         > .control-label {
-            width: 200px;
-            min-width: 150px;
+            width: 182px;
             font-weight: normal;
             text-align: #{$end};
+            flex-shrink: 0;
         }
 
         label.control-label {
@@ -42,26 +42,40 @@
             padding-top: 6px;
             line-height: 20px;
 
-            .desktop-version & + .controls {
-                padding-top: 6px;
-            }
-
             .tooltip-icon {
-                margin-right: 5px;
+                margin-right: 8px;
             }
 
             label {
                 display: inline;
+                position: relative;
+
+                &.required {
+                    em {
+                        color: $danger-dark;
+                        font-size: 21px;
+                        font-style: normal;
+                        position: absolute;
+                        top: 6px;
+                        #{$end}: -16px;
+                    }
+                }
+
+                &:not(.required) {
+                    em {
+                        display: none;
+                    }
+                }
             }
         }
 
         .controls {
-            margin-#{$start}: 13px;
-
+            margin-#{$start}: 24px;
             text-align: #{$start};
+            flex-grow: 1;
 
             &:first-child {
-                margin-#{$start}: 169px;
+                margin-#{$start}: 206px;
             }
 
             &.autocomplete-box {
@@ -106,6 +120,18 @@
                 }
             }
         }
+
+        &.control-group-checkbox {
+            .controls {
+                padding-top: 6px;
+            }
+        }
+
+        &.control-group-choice {
+            .choice-widget-expanded {
+                padding-top: 6px;
+            }
+        }
     }
 }
 
@@ -117,6 +143,14 @@
         label.control-label {
             width: 230px;
             text-align: right;
+        }
+    }
+}
+
+.choice-widget-expanded {
+    &__item {
+        &:not(:last-child) {
+            margin-bottom: 4px;
         }
     }
 }

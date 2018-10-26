@@ -4,6 +4,10 @@
     display: flex;
     align-items: center;
 
+    .inner-grid & {
+        margin: $oro-datagrid-inner-grid-views-offset;
+    }
+
     .grid-views-toogler {
         display: flex;
         align-items: center;
@@ -13,6 +17,8 @@
         margin: $oro-datagrid-grid-views-title-offset;
 
         font-size: $oro-datagrid-grid-views-title-font-size;
+        font-weight: $oro-datagrid-grid-views-title-font-weight;
+        line-height: $oro-datagrid-grid-views-title-line-height;
     }
 
     .edited-label {
@@ -47,7 +53,7 @@
     .grid-views-choice-icon {
         float: #{$start};
 
-        line-height: inherit;;
+        line-height: inherit;
     }
 
     .grid-views-dropdown {

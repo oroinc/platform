@@ -59,6 +59,7 @@
         height: $input-append-add-on-height;
         width: $input-append-add-on-width;
         font-size: $input-append-add-on-font-size;
+        line-height: $input-append-add-on-line-height;
     }
 }
 
@@ -77,12 +78,13 @@
 
     .control-group {
         max-width: $form-horizontal-control-group-max-width;
-        margin: $form-horizontal-control-group-offset;
         display: $form-horizontal-control-group-display;
 
         .control-label {
             width: $form-horizontal-control-label-width;
+            padding-top: $form-horizontal-control-label-inner-offset-top;
             padding-bottom: $form-horizontal-control-label-inner-offset-bottom;
+            line-height: $form-horizontal-control-label-inner-line-height;
             text-align: #{$start};
         }
 
@@ -106,6 +108,7 @@
         }
 
         .controls {
+            padding-top: $control-group-checkbox-controls-padding-top;
             position: $control-group-checkbox-controls-position;
             top: $control-group-checkbox-controls-top;
             right: $control-group-checkbox-controls-right;
@@ -119,6 +122,7 @@
 }
 
 h5.user-fieldset {
+    line-height: $user-fieldset-line-height;
     margin: $user-fieldset-offset;
 }
 

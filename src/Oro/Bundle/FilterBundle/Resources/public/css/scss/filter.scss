@@ -173,7 +173,6 @@
     .filter-item {
         margin-right: $filter-box-item-offset-right;
         margin-bottom: $filter-box-item-offset-bottom;
-        position: $filter-box-item-position;
         display: $filter-box-item-display;
         vertical-align: $filter-box-item-vertical-align;
         white-space: $filter-box-item-white-space;
@@ -348,6 +347,7 @@
         .dropdown-toggle {
             vertical-align: $filter-item-dropdown-toggle-vertical-align;
             line-height: $filter-item-dropdown-toggle-line-height;
+            position: $filter-item-dropdown-toggle-position;
         }
 
         & > .btn {

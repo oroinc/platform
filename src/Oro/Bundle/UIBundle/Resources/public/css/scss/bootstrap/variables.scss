@@ -17,6 +17,8 @@ $margin-bottom-box: $content-padding;
 $border-radius: 4px;
 $btn-border-radius: 16px;
 $btn-border-width: 0;
+$btn-square-border-radius: 2px;
+$btn-square-border-width: 2px;
 $font-family-sans-serif: Helvetica, Arial, sans-serif;
 $font-size-base: 14px;
 $line-height-base: 1.57;
@@ -29,6 +31,9 @@ $btn-text-transform: uppercase;
 //
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
 $border-width: 2px;
+
+$input-border-width: 2px;
+$input-border-color: $primary-750;
 
 $input-btn-padding-y: 0;
 $input-btn-padding-x: 16px;

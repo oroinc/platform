@@ -20,6 +20,7 @@
     &:focus {
         box-shadow: $input-focus-box-shadow;
         border-color: $input-focus-border-color;
+        z-index: 1;
 
         &:invalid {
             &:focus {
@@ -224,8 +225,10 @@ input[type="color"],
         height: $add-on-height;
         width: $add-on-height;
         line-height: $add-on-line-height;
+        text-align: center;
         padding: $add-on-inner-offset;
         display: inline-block;
+        flex-shrink: 0;
 
         input[type='checkbox'],
         input[type='radio'] {
@@ -273,6 +276,15 @@ input[type="color"],
     }
 }
 
+.input-append,
+.input-prepend {
+    &.collection-element-primary {
+        .add-on {
+            background: $primary-900;
+        }
+    }
+}
+
 .btn-group {
     .input-append &,
     .input-prepend & {
@@ -308,8 +320,12 @@ input[type="color"],
     max-width: 800px;
 }
 
-.form-container .control-group {
-    margin: 0 0 10px;
+.form-container {
+    .control-group {
+        &:not(:last-child) {
+            margin: 0 0 16px;
+        }
+    }
 }
 
 /* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
