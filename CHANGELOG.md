@@ -41,6 +41,8 @@
 #### SecurityBundle
 * `Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper::apply` method logic was changed to support Access rules.
 * `oro_security.encoder.mcrypt` service was changed to `oro_security.encoder.default`.
+#### MessageQueue Component
+* In case when message processor specified in message not found this message will be rejected and exception will be thrown. 
 
 ## 3.0.0 (2018-07-27)
 [Show detailed list of changes](incompatibilities-3-0.md)
