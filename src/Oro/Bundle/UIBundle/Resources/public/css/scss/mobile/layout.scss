@@ -14,6 +14,12 @@ body {
     }
 }
 
+.page-toolbar {
+    min-height: 0;
+    justify-content: center;
+    background-color: $mobile-page-toolbar-background-color;
+}
+
 .mobile-hide {
     display: none;
     width: 0;
