@@ -2,7 +2,8 @@
 
 .entity-pagination {
     display: flex;
-    height: $entity-pagination-height;
+    align-items: baseline;
+    line-height: $entity-pagination-line-height;
 
     .pagination .page-link {
         padding: $entity-pagination-page-link-padding;
@@ -30,18 +31,5 @@
         margin-#{$start}: $entity-pagination-total-margin-start;
         color: $entity-pagination-total-color;
         font-size: $entity-pagination-total-font-size;
-        line-height: $entity-pagination-total-line-height;
-    }
-}
-
-.mobile-version {
-    .page-current {
-        width: $mobile-entity-pagination-page-current-width;
-    }
-
-    .entity-pagination {
-        &_total {
-            line-height: $mobile-entity-pagination-total-line-height;
-        }
     }
 }
