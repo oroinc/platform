@@ -475,7 +475,12 @@
             }
 
             li {
+                font-size: $select-filter-widget-li-font-size;
                 padding: $select-filter-widget-li-inner-offset;
+
+                &:last-child {
+                    padding-bottom: $select-filter-widget-checkboxes-list-offset-vertical;
+                }
 
                 &:after {
                     content: $select-filter-widget-li-after-content;
@@ -515,6 +520,7 @@
         }
 
         .ui-multiselect-header {
+            min-height: $select-filter-widget-checkboxes-list-offset-vertical;
             padding: $select-filter-widget-header-inner-offset;
             margin: $select-filter-widget-header-offset;
 

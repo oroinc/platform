@@ -154,17 +154,19 @@ $filters-state-popover-max-width: 100% !default;
 
 $filter-select-offset-top: 2px !default;
 
-$select-filter-widget-inner-offset: 0 0 2px 0 !default;
+$select-filter-widget-inner-offset: side-values(0 0 2px 0) !default;
 $select-filter-widget-max-height: 170px !default;
+$select-filter-widget-checkboxes-list-offset-vertical: 10px !default;
 $select-filter-widget-close-display: none !default;
 
 $select-filter-widget-checkboxes-label-white-space: nowrap !default;
 $select-filter-widget-checkboxes-label-offset: 0 !default;
-$select-filter-widget-checkboxes-label-inner-offset: 3px 4px !default;
+$select-filter-widget-checkboxes-label-inner-offset: side-values(2px 15px 1px) !important;
 $select-filter-widget-checkboxes-label-float: left !default;
 
 $select-filter-widget-checkboxes-offset: 0 6px 5px 5px !default;
 $select-filter-widget-li-inner-offset: 0 !default;
+$select-filter-widget-li-font-size: inherit !default;
 
 $select-filter-widget-li-after-content: '' !default;
 $select-filter-widget-li-after-display: block !default;
