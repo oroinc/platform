@@ -3,8 +3,12 @@
 namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Exception\MessageProcessorNotFoundException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Registry of all registered message queue processors
+ */
 class ContainerAwareMessageProcessorRegistry implements MessageProcessorRegistryInterface
 {
     /** @var MessageProcessorInterface[] */
@@ -38,7 +42,7 @@ class ContainerAwareMessageProcessorRegistry implements MessageProcessorRegistry
     public function get($processorName)
     {
         if (!isset($this->processors[$processorName])) {
-            throw new \LogicException(sprintf('MessageProcessor was not found. processorName: "%s"', $processorName));
+            throw MessageProcessorNotFoundException::create($processorName);
         }
 
         $processor = $this->container->get($this->processors[$processorName]);
