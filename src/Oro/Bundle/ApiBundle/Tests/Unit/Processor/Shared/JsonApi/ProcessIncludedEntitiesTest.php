@@ -62,7 +62,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         );
 
         $expectedError = Error::createValidationError('some error')
-            ->setSource(ErrorSource::createByPropertyPath('/included/0'));
+            ->setSource(ErrorSource::createByPointer('/included/0'));
 
         $actionContext = new CreateContext($this->configProvider, $this->metadataProvider);
         $actionContext->setMetadata(new EntityMetadata());

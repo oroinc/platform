@@ -31,6 +31,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validation;
@@ -103,7 +104,11 @@ class MapPrimaryFieldTest extends TypeTestCase
                 }
             );
 
-        $this->formValidationHandler = new FormValidationHandler($this->validator, $this->customizationHandler);
+        $this->formValidationHandler = new FormValidationHandler(
+            $this->validator,
+            $this->customizationHandler,
+            new PropertyAccessor()
+        );
     }
 
     protected function getExtensions()

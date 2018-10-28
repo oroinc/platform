@@ -706,6 +706,18 @@ The context class: [CustomizeFormDataContext](../../Processor/CustomizeFormData/
 
 The main processor class: [CustomizeFormDataProcessor](../../Processor/CustomizeFormDataProcessor.php).
 
+This action is executed when the following [events](../../Processor/CustomizeFormData/CustomizeFormDataContext.php) are dispatched:
+
+| Event Name | Description |
+| --- | --- |
+| pre_submit | This event is dispatched at the beginning of the Form::submit() method. |
+| submit | This event is dispatched just before the Form::submit() method. |
+| post_submit | This event is dispatched after the Form::submit() method. |
+| pre_validate | This event is dispatched at the end of the form submitting process, just before data validation. It can be used to final form data correcting after all listeners, except data validation listener, are executed and all relationships between submitted data are set. |
+| post_validate | This event is dispatched at the end of the form submitting process, just after data validation. It can be used to finalize the form after all listeners, including data validation listener, are executed. E.g. it can be used to correct form validation result. |
+
+Please note the all these events use the same context, so it can be used to share data between events.
+
 As example of a processor used to modify the loaded data: [MapPrimaryField](../../Processor/CustomizeFormData/MapPrimaryField.php). Also you can run `php bin/console oro:api:debug customize_form_data` to display other processors registered in this action.
 
 ## get_config Action
