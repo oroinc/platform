@@ -37,6 +37,11 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
 
         $primaryObject = $requestData[JsonApiDoc::DATA];
         $includedData = $requestData[JsonApiDoc::INCLUDED];
+        if (!is_array($primaryObject) || !is_array($includedData)) {
+            // invalid primary data or included data in the request
+            return;
+        }
+
         $checked = [];
         $toCheck = [];
 
@@ -144,8 +149,11 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
         }
 
         foreach ($object[JsonApiDoc::RELATIONSHIPS] as $relationship) {
+            if (!array_key_exists(JsonApiDoc::DATA, $relationship)) {
+                continue;
+            }
             $data = $relationship[JsonApiDoc::DATA];
-            if (empty($data)) {
+            if (!is_array($data) || empty($data)) {
                 continue;
             }
             if (!ArrayUtil::isAssoc($data)) {

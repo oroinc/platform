@@ -33,6 +33,7 @@
 ### Changed
 #### ApiBundle
 * By default processors for `customize_loaded_data` action are executed only for primary and included entities. Use `identifier_only: true` tag attribute if your processor should be executed for relationships.
+* `finish_submit` event for `customize_form_data` action was renamed to `post_validate` and new `pre_validate` event was added.
 #### UIBundle
 * Changed all UI of backoffice 
 * Updated version of bootstrap from 2.3.0 to 4.1.1
