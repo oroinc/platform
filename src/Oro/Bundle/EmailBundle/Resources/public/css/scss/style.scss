@@ -150,12 +150,12 @@
 
 .emailtemplate-translatation {
     .tab-content {
-        padding: 20px 16px 10px 0;
+        padding: 20px 0 10px;
         overflow-x: hidden;
 
         .mce-tinymce {
             width: 100%;
-            max-width: 542px;
+            max-width: 516px;
         }
 
         .tab-pane {
@@ -209,8 +209,9 @@
         }
 
         .nav {
-            padding-left: 15px;
-            padding-right: 15px;
+            display: block;
+            padding-left: $content-padding-medium;
+            padding-right: $content-padding-medium;
 
             & > li > a {
                 display: inline-block;
