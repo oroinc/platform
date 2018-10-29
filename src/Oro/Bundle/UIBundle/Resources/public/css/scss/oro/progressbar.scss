@@ -1,9 +1,11 @@
 /* @theme: admin.oro; */
 
 #progressbar {
+    position: absolute;
     top: 50%;
+    #{$start}: 50%;
 
-    transform: translateY(-50%);
+    transform: translate(-50%);
 }
 
 .progress-bar-container {
