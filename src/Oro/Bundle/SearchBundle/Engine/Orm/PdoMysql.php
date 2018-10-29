@@ -161,32 +161,6 @@ class PdoMysql extends BaseDriver
     }
 
     /**
-     * @deprecated
-     * Get array of words retrieved from $value string
-     *
-     * @param  string $value
-     * @param  string $searchCondition
-     *
-     * @return array
-     */
-    protected function getWords($value, $searchCondition)
-    {
-        $results = array_filter(explode(' ', $value), 'strlen');
-        $results = array_map(
-            function ($word) use ($searchCondition) {
-                if ($searchCondition === Query::OPERATOR_CONTAINS && filter_var($word, FILTER_VALIDATE_EMAIL)) {
-                    $word = sprintf('"%s"', $word);
-                }
-
-                return $word;
-            },
-            $results
-        );
-
-        return $results;
-    }
-
-    /**
      * Get words that have length less than $this->fullTextMinWordLength
      *
      * @param  array $words

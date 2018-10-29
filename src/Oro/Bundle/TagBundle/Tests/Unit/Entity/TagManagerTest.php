@@ -275,13 +275,12 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
         $this->router->expects($this->once())
             ->method('generate');
 
-        $repo = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\Repository\TagRepository')
-            ->disableOriginalConstructor()->getMock();
-        $repo->expects($this->never())->method('getTagging');
-
         $this->manager->getPreparedArray($resource, $this->tagForPreparing());
     }
 
+    /**
+     * @return ArrayCollection|Tag[]
+     */
     protected function tagForPreparing()
     {
         $tag1 = $this->createMock('Oro\Bundle\TagBundle\Entity\Tag');

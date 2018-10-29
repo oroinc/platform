@@ -10,6 +10,9 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 
+/**
+ * Doctrine repository for Channel entity
+ */
 class ChannelRepository extends EntityRepository
 {
     const BUFFER_SIZE = 100;
@@ -127,19 +130,6 @@ class ChannelRepository extends EntityRepository
         $unitOfWork->markReadOnly($integration);
 
         return $integration;
-    }
-
-    /**
-     * Adds status to integration, manual persist of newly created statuses and do flush.
-     *
-     * @deprecated 1.9.0:1.11.0 Use $this->addStatusAndFlush() instead
-     *
-     * @param Integration $integration
-     * @param Status      $status
-     */
-    public function addStatus(Integration $integration, Status $status)
-    {
-        $this->addStatusAndFlush($integration, $status);
     }
 
     /**

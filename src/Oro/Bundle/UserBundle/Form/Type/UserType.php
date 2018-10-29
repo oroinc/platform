@@ -25,6 +25,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Form type of User entity
+ */
 class UserType extends AbstractType
 {
     /** @var AuthorizationCheckerInterface */
@@ -85,7 +88,6 @@ class UserType extends AbstractType
                 'roles',
                 EntityType::class,
                 [
-                    'property_path' => 'rolesCollection',
                     'label'         => 'oro.user.roles.label',
                     'class'         => 'OroUserBundle:Role',
                     'choice_label'      => 'label',

@@ -702,40 +702,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * Returns the true Collection of Roles.
-     *
-     * @deprecated since 1.8
-     *
-     * @return Collection
-     */
-    public function getRolesCollection()
-    {
-        return $this->roles;
-    }
-
-    /**
-     * Directly set the Collection of Roles.
-     *
-     * @deprecated since 1.8
-     *
-     * @param Collection $collection
-     *
-     * @return User
-     * @throws \InvalidArgumentException
-     */
-    public function setRolesCollection($collection)
-    {
-        if (!$collection instanceof Collection) {
-            throw new \InvalidArgumentException(
-                '$collection must be an instance of Doctrine\Common\Collections\Collection'
-            );
-        }
-        $this->roles = $collection;
-
-        return $this;
-    }
-
-    /**
      * Pre persist event listener
      *
      * @ORM\PrePersist
