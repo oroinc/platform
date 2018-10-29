@@ -199,9 +199,12 @@ class EmailType extends AbstractType
             $event->setData($data);
         }
 
-        $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
         $form = $event->getForm();
+        if (!$form->has('template')) {
+            return;
+        }
 
+        $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
         FormUtils::replaceField(
             $form,
             'template',
