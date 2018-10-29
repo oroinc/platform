@@ -1,7 +1,7 @@
 /* @theme: admin.oro; */
 
 // Main variables
-$content-sidebar-header-height: 60px !default;
+$content-sidebar-header-height: 55px !default;
 $content-sidebar-horizontal-padding: $content-padding !default;
 $content-sidebar-width: 320px !default;
 $content-sidebar-minimized-width: 48px !default;
@@ -44,7 +44,7 @@ $content-sidebar-display: flex !default;
 $content-sidebar-justify-content: space-between !default;
 $content-sidebar-align-items: center !default;
 $content-sidebar-height: $content-sidebar-header-height !default;
-$content-sidebar-offset-inner: 5px 26px 4px !default;
+$content-sidebar-offset-inner: 14px 26px 4px !default;
 
 $content-sidebar-minimized-offset-inner: 5px 18px 4px !default;
 
