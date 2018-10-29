@@ -12,10 +12,10 @@ class AddressTypeRepositoryTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-        $this->loadFixtures(['Oro\Bundle\AddressBundle\Tests\Functional\DataFixtures\LoadAddressTypeData']);
+        $this->loadFixtures([LoadAddressTypeData::class]);
     }
 
-    public function testGetBatchIterator()
+    public function testGetBatchIterator(): void
     {
         $expectedNames = [
             AddressType::TYPE_BILLING,
@@ -35,13 +35,41 @@ class AddressTypeRepositoryTest extends WebTestCase
         $this->assertEquals($expectedNames, $addressTypeNames);
     }
 
+    public function testGetAllIdentities(): void
+    {
+        $identities = $this->getRepository()->getAllIdentities();
+
+        self::assertCount(5, $identities);
+        self::assertContains(AddressType::TYPE_BILLING, $identities);
+        self::assertContains(AddressType::TYPE_SHIPPING, $identities);
+        self::assertContains(LoadAddressTypeData::TYPE_HOME, $identities);
+        self::assertContains(LoadAddressTypeData::TYPE_WORK, $identities);
+        self::assertContains(LoadAddressTypeData::TYPE_SECRET, $identities);
+    }
+
+    public function testUpdateTranslations(): void
+    {
+        $this->getRepository()->updateTranslations(
+            [
+                'billing' => 'Rechnung',
+                'shipping' => 'Versand'
+            ]
+        );
+
+        $this->getRepository()->clear();
+
+        $shippingTranslation = $this->getRepository()->findOneBy(['name' => 'shipping']);
+        $billingTranslation = $this->getRepository()->findOneBy(['name' => 'billing']);
+
+        self::assertEquals('Versand', $shippingTranslation->getLabel());
+        self::assertEquals('Rechnung', $billingTranslation->getLabel());
+    }
+
     /**
      * @return AddressTypeRepository
      */
-    protected function getRepository()
+    protected function getRepository(): AddressTypeRepository
     {
-        return $this->getContainer()->get('doctrine')->getRepository(
-            'Oro\Bundle\AddressBundle\Entity\AddressType'
-        );
+        return static::getContainer()->get('doctrine')->getRepository(AddressType::class);
     }
 }
