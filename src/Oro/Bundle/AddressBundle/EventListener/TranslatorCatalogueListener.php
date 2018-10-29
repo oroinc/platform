@@ -4,12 +4,11 @@ namespace Oro\Bundle\AddressBundle\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
-use Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository;
-use Oro\Bundle\AddressBundle\Entity\Repository\CountryTranslationRepository;
-use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
-use Oro\Bundle\AddressBundle\Entity\Repository\RegionTranslationRepository;
+use Oro\Bundle\AddressBundle\Entity\Repository\IdentityAwareTranslationRepositoryInterface;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepositoryInterface;
 use Oro\Bundle\TranslationBundle\Event\AfterCatalogueDump;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Translation\MessageCatalogueInterface;
@@ -37,6 +36,7 @@ class TranslatorCatalogueListener
     {
         $catalogue = $event->getCatalogue();
 
+        $this->updateTranslations($catalogue, AddressType::class, 'address_type.');
         $this->updateTranslations($catalogue, Country::class, 'country.');
         $this->updateTranslations($catalogue, Region::class, 'region.');
     }
@@ -48,8 +48,16 @@ class TranslatorCatalogueListener
      */
     private function updateTranslations(MessageCatalogueInterface $catalogue, string $className, string $prefix)
     {
-        /** @var CountryRepository|RegionRepository $repository */
         $repository = $this->getRepository($className);
+        if (!$repository instanceof IdentityAwareTranslationRepositoryInterface) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Expected repository of type "%s", "%s" given',
+                    IdentityAwareTranslationRepositoryInterface::class,
+                    is_object($repository) ? get_class($repository) : gettype($repository)
+                )
+            );
+        }
 
         $ids = $repository->getAllIdentities();
 
@@ -57,18 +65,28 @@ class TranslatorCatalogueListener
             $ids,
             array_map(
                 function (string $id) use ($catalogue, $prefix) {
-                    return $catalogue->get($prefix . $id, 'entities');
+                    return $catalogue->get($prefix.$id, 'entities');
                 },
                 $ids
             )
         );
 
         if ($catalogue->getLocale() !== Translator::DEFAULT_LOCALE) {
-            /** @var CountryTranslationRepository|RegionTranslationRepository $repository */
-            $repository = $this->getRepository($className . 'Translation');
-        }
+            $repository = $this->getRepository($className.'Translation');
+            if (!$repository instanceof TranslationRepositoryInterface) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Expected repository of type "%s", "%s" given',
+                        TranslationRepositoryInterface::class,
+                        is_object($repository) ? get_class($repository) : gettype($repository)
+                    )
+                );
+            }
 
-        $repository->updateTranslations($data, $catalogue->getLocale());
+            $repository->updateTranslations($data, $catalogue->getLocale());
+        } else {
+            $repository->updateTranslations($data);
+        }
     }
 
     /**
