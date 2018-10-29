@@ -79,6 +79,8 @@
 
     &__label,
     &__link {
+        line-height: $oro-datagrid-label-line-height;
+
         color: $oro-datagrid-label-color;
     }
 
