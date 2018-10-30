@@ -856,6 +856,24 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
+     * @param Response $response
+     * @param string   $includeId
+     *
+     * @return string
+     */
+    protected static function getNewResourceIdFromIncludedSection(Response $response, string $includeId): string
+    {
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('included', $responseContent);
+        foreach ($responseContent['included'] as $item) {
+            if (isset($item['meta']['includeId']) && $item['meta']['includeId'] === $includeId) {
+                return $item['id'];
+            }
+        }
+        self::fail(sprintf('New resource "%s" was not found.', $includeId));
+    }
+
+    /**
      * Extracts the list of errors from JSON.API response.
      *
      * @param Response $response
