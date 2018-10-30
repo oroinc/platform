@@ -27,6 +27,10 @@ $btn-font-weight: bold;
 $btn-font-size: 12px;
 $btn-text-transform: uppercase;
 
+$btn-mobile-font-size: 14px;
+$btn-mobile-border-radius: 20px;
+$btn-icon-mobile-fa-icon-font-size: 18px;
+
 // Buttons + Forms
 //
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
@@ -41,11 +45,18 @@ $input-box-shadow: none;
 $input-focus-box-shadow: none;
 $input-focus-border-color: $secondary;
 
+$input-btn-mobile-padding-y: 0;
+$input-btn-mobile-padding-x: 16px;
+
 $btn-padding-y-mini: 0;
 $btn-padding-x-mini: 16px;
 $btn-line-height: 32px;
 $btn-line-height-mini: 20px;
 $btn-border-radius-mini: $btn-border-radius;
+
+$btn-mobile-line-height: 40px;
+$btn-mobile-padding-y: $input-btn-mobile-padding-y;
+$btn-mobile-padding-x: $input-btn-mobile-padding-x;
 
 $btn-group-divider-width: 1px;
 $btn-group-divider-color: rgba($primary-inverse, .4);
@@ -53,7 +64,6 @@ $btn-group-divider-color: rgba($primary-inverse, .4);
 // Navbar
 
 $nav-tabs-link-hover-border-color: $primary-750;
-
 
 // Pagination
 

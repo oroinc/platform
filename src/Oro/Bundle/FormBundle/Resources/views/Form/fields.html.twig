@@ -616,10 +616,14 @@
             {{ form_widget(form) }}
 
             {% if isButtonsEnabled %}
-                <button class="add-on btn entity-select-btn"><i class="fa-bars"></i></button>
+                <button class="add-on btn btn-icon btn-square-default entity-select-btn">
+                    <span class="fa-bars"></span>
+                </button>
 
                 {% if form.vars.create_enabled %}
-                    <button class="btn entity-create-btn"><i class="fa-plus"></i></button>
+                    <button class="btn btn-icon btn-square-default entity-create-btn">
+                        <span class="fa-plus"></span>
+                    </button>
                 {% endif %}
             {% endif %}
         </div>

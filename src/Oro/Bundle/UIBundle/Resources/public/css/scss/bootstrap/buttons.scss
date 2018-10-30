@@ -267,3 +267,28 @@ input[type="button"] {
         width: 100%;
     }
 }
+
+.mobile-version {
+    .btn {
+        @include button-size(
+            $btn-mobile-padding-y,
+            $btn-mobile-padding-x,
+            $btn-mobile-font-size,
+            $btn-mobile-line-height,
+            $btn-mobile-border-radius
+        );
+    }
+
+    .btn-icon {
+        width: $btn-icon-mobile-width;
+        height: $btn-icon-mobile-height;
+        padding: $btn-icon-inner-offset;
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            &:before {
+                font-size: $btn-icon-mobile-fa-icon-font-size;
+            }
+        }
+    }
+}

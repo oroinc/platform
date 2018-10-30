@@ -164,7 +164,7 @@ define(function(require) {
             mediator.execute('showLoading');
 
             this.dialogWidget = new DatagridSettingsDialogWidget({
-                title: 'Grid Manage',
+                title: 'Grid Settings',
                 View: this.componentConstructor,
                 viewOptions: this.componentOptions,
                 stateEnabled: false,
