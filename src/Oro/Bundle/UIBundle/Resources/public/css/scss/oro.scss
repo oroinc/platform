@@ -114,13 +114,6 @@ footer {
     }
 }
 
-
-.page-title h1 {
-    min-height: 28px;
-    font-size: $base-font-size--xxl;
-    line-height: 1.2em;
-}
-
 .fa-google {
     margin: 0 5px;
 }
@@ -229,20 +222,6 @@ footer {
     position: relative;
 }
 
-.user-info-state {
-    clear: #{$end};
-
-    .inline-decorate-container {
-        margin-bottom: -10px;
-        font-size: $base-font-size--s;
-        color: $primary-700;
-
-        .inline-decorate {
-            margin-bottom: 10px;
-        }
-    }
-}
-
 .user-profile-cols .label {
     display: block;
     background: none;
@@ -343,169 +322,6 @@ footer {
         border: none;
         color: $body-color;
     }
-}
-
-.sub-title a {
-    color: $primary-600;
-}
-
-.customer-info {
-    padding-top: 4px;
-    padding-#{$start}: 60px;
-    padding-bottom: 0;
-    line-height: 18px;
-
-    &.customer-simple {
-        padding: side-values(0 4px 0 0);
-    }
-
-    .top-row {
-        &:after {
-            clear: both;
-            display: block;
-            content: '';
-        }
-    }
-
-    .sub-title {
-        font-size: $base-font-size--xl;
-        color: $primary-200;
-        display: inline-block;
-        margin-bottom: 3px;
-    }
-
-    .separator {
-        padding: 0 3px;
-        color: $primary-200;
-        font-size: 18px;
-    }
-
-    .user-name {
-        margin: side-values(0 10px 3px 0);
-        min-height: 15px;
-        display: inline-block;
-        float: none !important;
-        font-size: $base-font-size--xl;
-        line-height: $line-height-base;
-        font-weight: normal;
-    }
-
-    .dropdown.show .caret,
-    .user-name .caret,
-    .user-name:hover .caret {
-        border-top-color: $primary-100 !important;
-        border-bottom-color: $primary-100 !important;
-    }
-
-    .visual {
-        border-radius: 3px;
-        float: #{$start};
-        position: relative;
-        width: 60px;
-        margin: side-values(0 0 0 -60px);
-
-        img {
-            margin-top: -4px;
-            border-radius: 3px;
-            width: 45px;
-        }
-    }
-
-    .nav {
-        margin: 0;
-    }
-
-    ul.inline {
-        margin: 0;
-        padding: 0;
-        color: $primary-700;
-        list-style: none;
-
-        li {
-            padding: 0 10px;
-            margin-bottom: 4px;
-            border-#{$start}: 1px solid $primary-860;
-            font-size: 11px;
-            line-height: 14px;
-            display: inline-block;
-
-            &:first-child {
-                padding: side-values(0 10px 0 0);
-                border: 0;
-            }
-        }
-    }
-}
-
-ul.inline-decorate {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-ul.inline-decorate > li {
-    padding-#{$start}: 10px;
-    margin-#{$start}: 8px;
-    display: inline;
-    border-#{$start}: 1px solid $primary-860;
-}
-
-ul.inline-decorate > li:first-child {
-    padding: 0;
-    border: 0;
-    margin: 0;
-}
-
-ul.inline-extra:after {
-    content: ".";
-    display: block;
-    clear: both;
-    height: 0;
-    visibility: hidden;
-}
-
-ul.inline-extra {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    font-size: 12px;
-    color: #666;
-    width: 100%;
-
-    span.cb {
-        font-size: 10px;
-        line-height: 12px;
-        text-transform: uppercase;
-        color: #aaa;
-    }
-
-    & > li {
-        float: #{$start};
-        padding: 0 10px;
-
-        &:first-child {
-            padding: side-values(0 10px 0 0);
-        }
-    }
-}
-
-.customer-info-actions {
-    background-color: $primary-860;
-    border-bottom: 1px solid $additional-ultra-light;
-
-    .alert {
-        margin-bottom: 0;
-    }
-}
-
-.customer-info-top-actions .btn .caret {
-    margin-top: 10px;
-}
-
-.customer-info-top-actions .btn-group > .disable-filter {
-    height: 21px;
-    line-height: 21px;
-    padding: 3px 2px 0;
 }
 
 .cb {
@@ -1204,18 +1020,5 @@ label .popover-body {
     &.overflows .toggle-more,
     &.overflows .toggle-collapse {
         display: block;
-    }
-}
-
-.customer-content {
-    .grid-views {
-        .edited-label {
-            vertical-align: top;
-            line-height: 21px;
-        }
-
-        .btn-link {
-            line-height: 21px;
-        }
     }
 }

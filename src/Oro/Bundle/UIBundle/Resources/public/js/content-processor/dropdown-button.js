@@ -67,6 +67,15 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
         },
 
         /**
+         * Checks if the button processor has grouped buttons
+         *
+         * @return {boolean}
+         */
+        isGrouped: function() {
+            return Boolean(this.group);
+        },
+
+        /**
          * Collects all buttons of the container
          *
          * @param {jQuery|null} $element
@@ -112,7 +121,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
                     'data-placement': 'bottom-end',
                     'data-inherit-parent-width': 'loosely'
                 }, this.options.moreButtonAttrs))
-                .addClass('btn dropdown-toggle')
+                .addClass('btn dropdown-toggle btn-more-actions')
                 .addClass(this.options.decoreClass || '')
                 .append(this.options.moreLabel);
 

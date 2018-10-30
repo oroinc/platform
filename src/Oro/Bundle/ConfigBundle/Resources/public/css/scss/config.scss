@@ -85,29 +85,3 @@
         font-weight: bold;
     }
 }
-
-.scrollable-container .container-fluid.configuration-header {
-    background-color: #fff;
-
-    @include clearfix();
-
-    h1 {
-        font-size: 20px;
-        margin-top: 12px;
-        line-height: 28px;
-        float: left;
-    }
-
-    > .pull-right {
-        margin: 10px 0;
-    }
-
-    > .pull-left {
-        margin: 10px 0 0;
-    }
-
-    .sub-title,
-    .separator {
-        line-height: 28px;
-    }
-}

@@ -1,5 +1,10 @@
 /* @theme: admin.oro; */
 
+.dashboard-selector-container {
+    label {
+        display: none;
+    }
+}
 .dashboard-container-wrapper {
     min-height: calc(100vh - #{$app-header-height} - 1px);
 

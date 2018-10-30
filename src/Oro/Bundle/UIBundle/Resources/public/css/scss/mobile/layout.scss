@@ -41,8 +41,6 @@ body {
 .scrollspy.container-fluid,
 .page-title + [data-bound-component*="datagrid"],
 .page-title + .product-container {
-    margin-top: -10px;
-
     .content-with-sidebar--container {
         padding: 0;
     }
