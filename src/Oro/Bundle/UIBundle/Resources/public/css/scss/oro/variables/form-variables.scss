@@ -38,12 +38,13 @@ $uploader-float: left !default;
 $uploader-white-space: nowrap !default;
 $uploader-color: $input-color !default;
 $uploader-font-family: $input-font-family !default;
+$uploader-input-inner-width: 100% !default;
 
 $uploader-action-height: $field-size - 4px !default;
 $uploader-action-line-height: $field-size - 4px !default;
 $uploader-action-display: inline-block !default;
 $uploader-action-vertical-align: top !default;
-$uploader-action-inner-offset: 0 6px !default;
+$uploader-action-inner-offset: side-values(0 6px) !default;
 $uploader-action-box-sizing: $input-box-sizing !default;
 
 $uploader-filename-width: 202px !default;

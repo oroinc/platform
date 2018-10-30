@@ -65,6 +65,10 @@
     color: $uploader-color;
     font-family: $uploader-font-family;
 
+    input {
+        width: $uploader-input-inner-width;
+    }
+
     .filename,
     .action {
         height: $uploader-action-height;
@@ -76,7 +80,7 @@
     }
 
     .filename {
-        width: $uploader-filename-width;
+        @include text-line-truncate($uploader-filename-width);
     }
 
     .action {
