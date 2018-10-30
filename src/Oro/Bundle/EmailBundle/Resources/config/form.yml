@@ -284,3 +284,10 @@ services:
             - '@oro_config.global'
         tags:
             - { name: form.type, alias: oro_email_email_address_recipients }
+
+    oro_email.form.extension.email_type_template_asscessibility_checker_extension:
+        class: Oro\Bundle\EmailBundle\Form\Extension\EmailTypeTemplateAccessibilityCheckerExtension
+        arguments:
+            - '@security.authorization_checker'
+        tags:
+            - { name: form.type_extension, extended_type: 'Oro\Bundle\EmailBundle\Form\Type\EmailType' }
