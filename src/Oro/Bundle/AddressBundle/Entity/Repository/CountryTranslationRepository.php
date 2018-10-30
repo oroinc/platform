@@ -4,15 +4,15 @@ namespace Oro\Bundle\AddressBundle\Entity\Repository;
 
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\TranslationBundle\Entity\Repository\AbstractTranslationRepository;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepositoryInterface;
 
 /**
  * Gedmo translation repository for Country dictionary.
  */
-class CountryTranslationRepository extends AbstractTranslationRepository
+class CountryTranslationRepository extends AbstractTranslationRepository implements TranslationRepositoryInterface
 {
     /**
-     * @param array $data
-     * @param string $locale
+     * {@inheritdoc}
      */
     public function updateTranslations(array $data, string $locale)
     {

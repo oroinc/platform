@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
@@ -13,6 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationPath;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
@@ -30,16 +32,22 @@ class CollectFormErrors implements ProcessorInterface
     /** @var ErrorCompleterRegistry */
     protected $errorCompleterRegistry;
 
+    /** @var PropertyAccessorInterface */
+    protected $propertyAccessor;
+
     /**
      * @param ConstraintTextExtractorInterface $constraintTextExtractor
      * @param ErrorCompleterRegistry           $errorCompleterRegistry
+     * @param PropertyAccessorInterface        $propertyAccessor
      */
     public function __construct(
         ConstraintTextExtractorInterface $constraintTextExtractor,
-        ErrorCompleterRegistry $errorCompleterRegistry
+        ErrorCompleterRegistry $errorCompleterRegistry,
+        PropertyAccessorInterface $propertyAccessor
     ) {
         $this->constraintTextExtractor = $constraintTextExtractor;
         $this->errorCompleterRegistry = $errorCompleterRegistry;
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -162,7 +170,7 @@ class CollectFormErrors implements ProcessorInterface
                     );
                     $context->addError($errorObject);
                 }
-                if ($child->getConfig()->getCompound()) {
+                if ($this->isCompoundForm($child)) {
                     $this->processChildren($child, $context);
                 }
             }
@@ -204,11 +212,7 @@ class CollectFormErrors implements ProcessorInterface
 
         $cause = $error->getCause();
         if ($cause instanceof ConstraintViolation) {
-            $path = $this->getFormFieldPath($field);
-            $causePath = $this->getConstraintViolationPath($cause);
-            if (\count($causePath) > \count($path)) {
-                $path = $causePath;
-            }
+            $path = $this->getFieldErrorPropertyPathByConstraintViolation($field, $cause);
         } else {
             $path = [$field->getName()];
             $parent = $field->getParent();
@@ -220,6 +224,88 @@ class CollectFormErrors implements ProcessorInterface
         }
 
         return \implode('.', $path);
+    }
+
+    /**
+     * Makes sure that an validation error path points to a correct element in a source collection.
+     * It may happen that the order of elements is different in a source collection
+     * and in a collection that was validated. E.g. due to the collection adder and remover methods
+     * can keep a position of existing elements without changes.
+     *
+     * @param FormInterface       $field
+     * @param ConstraintViolation $cause
+     *
+     * @return string[]
+     */
+    protected function getFieldErrorPropertyPathByConstraintViolation(
+        FormInterface $field,
+        ConstraintViolation $cause
+    ): array {
+        $path = $this->getConstraintViolationPath($cause);
+
+        $fieldPath = $this->getFormFieldPath($field);
+        if (\count($fieldPath) >= \count($path)) {
+            return $fieldPath;
+        }
+
+        // check if the path represents a property of an item in a collection, e.g. collection.1.field
+        if (\count($path) <= 2 || !\is_numeric($path[1])) {
+            return $path;
+        }
+
+        $sourceData = $field->getData();
+        if (!$sourceData instanceof Collection) {
+            return $path;
+        }
+
+        $parentForm = $field->getParent();
+        if (null === $parentForm || $this->isCompoundForm($field)) {
+            return $path;
+        }
+
+        $validatedData = $this->getPropertyValueFromFormData($parentForm, $path[0]);
+        if (!$validatedData instanceof Collection) {
+            return $path;
+        }
+
+        $path[1] = $this->resolveCollectionKey($path[1], $validatedData, $sourceData);
+
+        return $path;
+    }
+
+    /**
+     * @param string     $key
+     * @param Collection $source
+     * @param Collection $target
+     *
+     * @return string
+     */
+    protected function resolveCollectionKey(string $key, Collection $source, Collection $target): string
+    {
+        if ($source->containsKey($key)) {
+            $indexInTarget = $target->indexOf($source->get($key));
+            if (false !== $indexInTarget) {
+                $key = (string)$indexInTarget;
+            }
+        }
+
+        return $key;
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param string        $propertyName
+     *
+     * @return mixed
+     */
+    protected function getPropertyValueFromFormData(FormInterface $form, string $propertyName)
+    {
+        $parentData = $form->getData();
+        if (!\is_object($parentData) || !$this->propertyAccessor->isReadable($parentData, $propertyName)) {
+            return null;
+        }
+
+        return $this->propertyAccessor->getValue($parentData, $propertyName);
     }
 
     /**
@@ -267,6 +353,16 @@ class CollectFormErrors implements ProcessorInterface
         }
 
         return \array_reverse($path);
+    }
+
+    /**
+     * @param FormInterface $field
+     *
+     * @return bool
+     */
+    protected function isCompoundForm(FormInterface $field)
+    {
+        return $field->getConfig()->getCompound();
     }
 
     /**

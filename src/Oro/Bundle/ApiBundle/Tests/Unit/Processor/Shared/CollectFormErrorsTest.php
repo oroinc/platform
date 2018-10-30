@@ -14,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -33,7 +34,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
 
         $this->processor = new CollectFormErrors(
             new ConstraintTextExtractor(),
-            $this->errorCompleterRegistry
+            $this->errorCompleterRegistry,
+            PropertyAccess::createPropertyAccessor()
         );
     }
 

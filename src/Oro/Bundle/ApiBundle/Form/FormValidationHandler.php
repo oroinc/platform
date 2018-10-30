@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -22,14 +23,22 @@ class FormValidationHandler
     /** @var CustomizeFormDataHandler */
     private $customizationHandler;
 
+    /** @var PropertyAccessorInterface */
+    private $propertyAccessor;
+
     /**
-     * @param ValidatorInterface       $validator
-     * @param CustomizeFormDataHandler $customizationHandler
+     * @param ValidatorInterface        $validator
+     * @param CustomizeFormDataHandler  $customizationHandler
+     * @param PropertyAccessorInterface $propertyAccessor
      */
-    public function __construct(ValidatorInterface $validator, CustomizeFormDataHandler $customizationHandler)
-    {
+    public function __construct(
+        ValidatorInterface $validator,
+        CustomizeFormDataHandler $customizationHandler,
+        PropertyAccessorInterface $propertyAccessor
+    ) {
         $this->validator = $validator;
         $this->customizationHandler = $customizationHandler;
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -46,6 +55,13 @@ class FormValidationHandler
         }
         if (!$form->isSubmitted()) {
             throw new \InvalidArgumentException('The submitted form is expected.');
+        }
+
+        $event = $this->createFormEvent($form);
+
+        $this->dispatchPreValidateEventForChildren($form);
+        if ($this->hasApiEventContext($form)) {
+            $this->dispatchPreValidateEvent($event);
         }
 
         /**
@@ -65,15 +81,13 @@ class FormValidationHandler
          * @see \Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
          */
         if ($form->getConfig()->getOption(ValidationExtension::ENABLE_FULL_VALIDATION)) {
-            ReflectionUtil::markFormChildrenAsSubmitted($form);
+            ReflectionUtil::markFormChildrenAsSubmitted($form, $this->propertyAccessor);
         }
+        $this->getValidationListener()->validateForm($event);
 
-        $validationListener = $this->getValidationListener();
-        $event = $this->createFormEvent($form);
-        $validationListener->validateForm($event);
-        $this->dispatchFinishSubmitEventForChildren($form);
-        if ($this->isFinishSubmitEventSupported($form)) {
-            $this->dispatchFinishSubmitEvent($event);
+        $this->dispatchPostValidateEventForChildren($form);
+        if ($this->hasApiEventContext($form)) {
+            $this->dispatchPostValidateEvent($event);
         }
     }
 
@@ -103,30 +117,55 @@ class FormValidationHandler
      *
      * @return bool
      */
-    private function isFinishSubmitEventSupported(FormInterface $form): bool
+    private function hasApiEventContext(FormInterface $form): bool
     {
         return $form->getConfig()->hasAttribute(CustomizeFormDataHandler::API_EVENT_CONTEXT);
     }
+
     /**
      * @param FormEvent $event
      */
-    private function dispatchFinishSubmitEvent(FormEvent $event): void
+    private function dispatchPreValidateEvent(FormEvent $event): void
     {
-        $this->customizationHandler->handleFormEvent(CustomizeFormDataContext::EVENT_FINISH_SUBMIT, $event);
+        $this->customizationHandler->handleFormEvent(CustomizeFormDataContext::EVENT_PRE_VALIDATE, $event);
     }
 
     /**
      * @param FormInterface $form
      */
-    private function dispatchFinishSubmitEventForChildren(FormInterface $form): void
+    private function dispatchPreValidateEventForChildren(FormInterface $form): void
     {
         /** @var FormInterface $child */
         foreach ($form as $child) {
             if ($child->count() > 0) {
-                $this->dispatchFinishSubmitEventForChildren($child);
+                $this->dispatchPreValidateEventForChildren($child);
             }
-            if ($this->isFinishSubmitEventSupported($child)) {
-                $this->dispatchFinishSubmitEvent($this->createFormEvent($child));
+            if ($this->hasApiEventContext($child)) {
+                $this->dispatchPreValidateEvent($this->createFormEvent($child));
+            }
+        }
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    private function dispatchPostValidateEvent(FormEvent $event): void
+    {
+        $this->customizationHandler->handleFormEvent(CustomizeFormDataContext::EVENT_POST_VALIDATE, $event);
+    }
+
+    /**
+     * @param FormInterface $form
+     */
+    private function dispatchPostValidateEventForChildren(FormInterface $form): void
+    {
+        /** @var FormInterface $child */
+        foreach ($form as $child) {
+            if ($child->count() > 0) {
+                $this->dispatchPostValidateEventForChildren($child);
+            }
+            if ($this->hasApiEventContext($child)) {
+                $this->dispatchPostValidateEvent($this->createFormEvent($child));
             }
         }
     }
