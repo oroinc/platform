@@ -7,7 +7,7 @@
 
 .entities.list-group {
     .list-group-item {
-        width: $entities-list-mobile-group-item-width;
+        width: calc(#{$entities-list-mobile-group-item-width} - #{$entities-list-group-item-offset-start});
     }
 }
 
