@@ -145,6 +145,7 @@
 
     .selector {
         width: $filter-box-selector-width;
+
     }
 
     .filter-update {
@@ -152,12 +153,10 @@
     }
 
     .filter-select-oro {
-        height: $filter-select-oro-height;
         line-height: $filter-select-oro-line-height;
         width: $filter-select-oro-width; /* need for flexible width at filter grid */
 
         &-wrapper {
-            width: $filter-select-oro-wrapper-width;
             margin-bottom: $filter-select-oro-wrapper-offset-bottom;
 
             .selector {
@@ -665,6 +664,14 @@
 .filter-date-range {
     .filter-separator {
         display: $filter-date-range-filter-separator-display;
+    }
+
+    .fields-row {
+        display: flex;
+
+        .datefilter {
+            flex-grow: 1;
+        }
     }
 }
 
