@@ -51,60 +51,6 @@ abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwners
 
     /**
      * {@inheritdoc}
-     * @deprecated since 2.3. Use isOrganization instead
-     */
-    public function isGlobalLevelEntity($domainObject)
-    {
-        return $this->isOrganization($domainObject);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @deprecated since 2.3. Use isBusinessUnit instead
-     */
-    public function isLocalLevelEntity($domainObject)
-    {
-        return $this->isBusinessUnit($domainObject);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @deprecated since 2.3. Use isUser instead
-     */
-    public function isBasicLevelEntity($domainObject)
-    {
-        return $this->isUser($domainObject);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @deprecated since 2.3. Use isAssociatedWithOrganization instead
-     */
-    public function isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization = null)
-    {
-        return $this->isAssociatedWithOrganization($user, $domainObject, $organization);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @deprecated since 2.3. Use isAssociatedWithBusinessUnit instead
-     */
-    public function isAssociatedWithLocalLevelEntity($user, $domainObject, $deep = false, $organization = null)
-    {
-        return $this->isAssociatedWithBusinessUnit($user, $domainObject, $deep, $organization);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @deprecated since 2.3. Use isAssociatedWithUser instead
-     */
-    public function isAssociatedWithBasicLevelEntity($user, $domainObject, $organization = null)
-    {
-        return $this->isAssociatedWithUser($user, $domainObject, $organization);
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function isOrganization($domainObject)
     {

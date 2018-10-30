@@ -31,24 +31,22 @@ class EmailConfigurationConfigurator
      */
     public function configure(FormBuilderInterface $builder, $options)
     {
-        $encryptor = $this->encryptor;
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($encryptor) {
-            $data = (array) $event->getData();
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             $passwordKey = Config::getConfigKeyByName(
                 Config::KEY_SMTP_SETTINGS_PASS,
                 ConfigManager::SECTION_VIEW_SEPARATOR
             );
 
-            if (!isset($data[$passwordKey]['value'])
-                || (
-                    isset($data[$passwordKey]['value'])
-                    && empty($data[$passwordKey]['value'])
-                    && $event->getForm()->has($passwordKey)
-                )
-            ) {
+            if (!$event->getForm()->has($passwordKey)) {
+                return;
+            }
+
+            $data = (array) $event->getData();
+
+            if (empty($data[$passwordKey]['value'])) {
                 $data[$passwordKey]['value'] = $event->getForm()->get($passwordKey)->getData()['value'];
             } else {
-                $data[$passwordKey]['value'] = $encryptor->encryptData($data[$passwordKey]['value']);
+                $data[$passwordKey]['value'] = $this->encryptor->encryptData($data[$passwordKey]['value']);
             }
 
             $event->setData($data);

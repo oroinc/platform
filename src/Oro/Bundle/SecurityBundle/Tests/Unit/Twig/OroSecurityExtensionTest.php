@@ -58,7 +58,6 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('isGranted')
             ->with($this->equalTo('test_acl'))
             ->will($this->returnValue(true));
-
         $this->assertTrue(
             self::callTwigFunction($this->extension, 'resource_granted', ['test_acl'])
         );

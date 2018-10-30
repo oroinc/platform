@@ -274,28 +274,10 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
 
     /**
      * {@inheritdoc}
-     * @deprecated since 2.3. Use addBusinessUnit instead
-     */
-    public function addLocalEntity($localLevelEntityId, $globalLevelEntityId = null)
-    {
-        $this->addBusinessUnit($localLevelEntityId, $globalLevelEntityId);
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function addBusinessUnitRelation($businessUnitId, $parentBusinessUnitId)
     {
         $this->subordinateBusinessUnitIds[$businessUnitId] = $parentBusinessUnitId;
-    }
-
-    /**
-     * {@inheritdoc}
-     * @deprecated since 2.3. Use addBusinessUnitRelation instead
-     */
-    public function addDeepEntity($localLevelEntityId, $deepLevelEntityId)
-    {
-        $this->addBusinessUnitRelation($localLevelEntityId, $deepLevelEntityId);
     }
 
     /**
@@ -397,15 +379,6 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
 
     /**
      * {@inheritdoc}
-     * @deprecated since 2.3. Use addUser instead
-     */
-    public function addBasicEntity($basicLevelEntityId, $localLevelEntityId = null)
-    {
-        $this->addUser($basicLevelEntityId, $localLevelEntityId);
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function addUserBusinessUnit($userId, $organizationId, $businessUnitId = null)
     {
@@ -418,28 +391,10 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
 
     /**
      * {@inheritdoc}
-     * @deprecated since 2.3. Use addUserBusinessUnit instead
-     */
-    public function addLocalEntityToBasic($basicLevelEntityId, $localLevelEntityId, $globalLevelEntityId)
-    {
-        $this->addUserBusinessUnit($basicLevelEntityId, $globalLevelEntityId, $localLevelEntityId);
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function addUserOrganization($userId, $organizationId)
     {
         $this->userOrganizationIds[$userId][] = $organizationId;
-    }
-
-    /**
-     * {@inheritdoc}
-     * @deprecated since 2.3. Use addUser instead
-     */
-    public function addGlobalEntity($basicLevelEntityId, $globalLevelEntityId)
-    {
-        $this->addUserOrganization($basicLevelEntityId, $globalLevelEntityId);
     }
 
     /**
