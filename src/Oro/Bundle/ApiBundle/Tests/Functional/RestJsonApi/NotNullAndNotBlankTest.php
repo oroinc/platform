@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @dbIsolationPerTest
@@ -20,7 +19,7 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendCreateRequest($data, Response::HTTP_BAD_REQUEST);
+        $response = $this->sendCreateRequest($data, false);
 
         $this->assertResponseValidationError(
             [
@@ -59,7 +58,7 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendCreateRequest($data, Response::HTTP_BAD_REQUEST);
+        $response = $this->sendCreateRequest($data, false);
 
         $this->assertResponseValidationError(
             [
@@ -85,7 +84,7 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendUpdateRequest($entity->id, $data, Response::HTTP_BAD_REQUEST);
+        $response = $this->sendUpdateRequest($entity->id, $data, false);
 
         $this->assertResponseValidationError(
             [
@@ -109,7 +108,7 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendCreateRequest($data, Response::HTTP_BAD_REQUEST);
+        $response = $this->sendCreateRequest($data, false);
 
         $this->assertResponseValidationError(
             [
@@ -134,7 +133,7 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendUpdateRequest($entity->id, $data, Response::HTTP_BAD_REQUEST);
+        $response = $this->sendUpdateRequest($entity->id, $data, false);
 
         $this->assertResponseValidationError(
             [
@@ -156,7 +155,7 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendCreateRequest($data, Response::HTTP_BAD_REQUEST);
+        $response = $this->sendCreateRequest($data, false);
 
         $this->assertResponseValidationError(
             [
@@ -195,7 +194,7 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendCreateRequest($data, Response::HTTP_BAD_REQUEST);
+        $response = $this->sendCreateRequest($data, false);
 
         $this->assertResponseValidationError(
             [
@@ -221,7 +220,7 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendUpdateRequest($entity->id, $data, Response::HTTP_BAD_REQUEST);
+        $response = $this->sendUpdateRequest($entity->id, $data, false);
 
         $this->assertResponseValidationError(
             [
@@ -245,7 +244,7 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendCreateRequest($data, Response::HTTP_BAD_REQUEST);
+        $response = $this->sendCreateRequest($data, false);
 
         $this->assertResponseValidationError(
             [
@@ -270,7 +269,7 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendUpdateRequest($entity->id, $data, Response::HTTP_BAD_REQUEST);
+        $response = $this->sendUpdateRequest($entity->id, $data, false);
 
         $this->assertResponseValidationError(
             [

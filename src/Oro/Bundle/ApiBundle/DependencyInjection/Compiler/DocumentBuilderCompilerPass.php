@@ -31,7 +31,7 @@ class DocumentBuilderCompilerPass implements CompilerPassInterface
             foreach ($attributes as $tagAttributes) {
                 $documentBuilders[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     $id,
-                    DependencyInjectionUtil::getAttribute($tagAttributes, 'requestType', null)
+                    DependencyInjectionUtil::getRequestType($tagAttributes)
                 ];
             }
         }

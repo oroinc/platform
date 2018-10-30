@@ -12,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -59,6 +60,11 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
     protected $workflowManagerRegistry;
 
     /**
+     * @var DatagridStateProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $filtersStateProvider;
+
+    /**
      * @var WorkflowStepColumnListener
      */
     protected $listener;
@@ -85,22 +91,14 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->filtersStateProvider = $this->createMock(DatagridStateProviderInterface::class);
+
         $this->listener = new WorkflowStepColumnListener(
             $this->doctrineHelper,
             $this->entityClassResolver,
             $this->configProvider,
-            $this->workflowManagerRegistry
-        );
-    }
-
-    protected function tearDown()
-    {
-        unset(
-            $this->listener,
-            $this->doctrineHelper,
-            $this->configProvider,
-            $this->workflowManager,
-            $this->workflowManagerRegistry
+            $this->workflowManagerRegistry,
+            $this->filtersStateProvider
         );
     }
 
@@ -359,7 +357,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
                                 'label' => 'oro.workflow.workflowdefinition.entity_label'
                             ],
                             WorkflowStepColumnListener::WORKFLOW_STEP_FILTER => [
-                                'type' => 'entity',
+                                'type' => 'workflow_step',
                                 'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN . '.id',
                                 'options' => [
                                     'field_type' => WorkflowStepSelectType::class,
@@ -454,7 +452,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
                             'innerJoinField' => ['data_name' => 'b.innerJoinField'],
                             'leftJoinField' => ['data_name' => 'c.leftJoinField'],
                             WorkflowStepColumnListener::WORKFLOW_STEP_FILTER => [
-                                'type' => 'entity',
+                                'type' => 'workflow_step',
                                 'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN . '.id',
                                 'options' => [
                                     'field_type' => WorkflowStepSelectType::class,
@@ -604,6 +602,8 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
         $datagrid = $event->getDatagrid();
         $datagrid->expects($this->any())->method('getParameters')->willReturn(new ParameterBag());
 
+        $this->filtersStateProvider->expects($this->any())->method('getStateFromParameters')->willReturn([]);
+
         $this->listener->onBuildAfter($event);
     }
 
@@ -693,22 +693,16 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
             )
         );
 
-        $parameters = new ParameterBag(
-            [
-                '_filter' => [
-                    WorkflowStepColumnListener::WORKFLOW_FILTER => ['value' => 'workflow_filter_value'],
-                    WorkflowStepColumnListener::WORKFLOW_STEP_FILTER => ['value' => 'workflow_step_filter_value']
-                ]
-            ]
-        );
-
         /** @var \PHPUnit\Framework\MockObject\MockObject $datagrid */
         $datagrid = $event->getDatagrid();
-        $datagrid->expects($this->exactly(2))->method('getParameters')->willReturn($parameters);
+        $datagrid->expects($this->exactly(2))->method('getParameters')->willReturn(new ParameterBag());
+
+        $this->filtersStateProvider->expects($this->exactly(2))->method('getStateFromParameters')->willReturn([
+            WorkflowStepColumnListener::WORKFLOW_FILTER => ['value' => 'workflow_filter_value'],
+            WorkflowStepColumnListener::WORKFLOW_STEP_FILTER => ['value' => 'workflow_step_filter_value']
+        ]);
 
         $this->listener->onBuildAfter($event);
-
-        $this->assertEquals([], $parameters->get('_filter'));
     }
 
     public function testOnResultAfterNoUpdate()

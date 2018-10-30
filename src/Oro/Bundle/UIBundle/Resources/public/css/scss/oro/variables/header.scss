@@ -1,0 +1,23 @@
+/* @theme: admin.oro; */
+
+$header-dropdown-menu-li-line-height:           $line-height-base !default;
+$header-dropdown-menu-link-line-height:         $line-height-base !default;
+$header-search-dropdown-min-width:              400px !default;
+$header-search-dropdown-menu-background:        $primary-inverse !default;
+$header-search-field-container-margin-end:      8px !default;
+$header-search-suggestion-list-separator-color: $primary-860 !default;
+$header-search-suggestion-list-separator-width: 1px !default;
+$header-search-suggestion-list-shadow:          1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
+$header-search-suggestion-item-description-color: $primary-200 !default;
+$header-search-suggestion-item-description-line-height: 1.5 !default;
+$header-search-suggestion-item-entity-color:    $primary-550 !default;
+$header-search-suggestion-item-h-margin:        16px !default;
+$header-search-suggestion-item-v-margin:        8px !default;
+$header-search-selected-suggestion-item-color:  $primary-inverse !default;
+$header-search-selected-suggestion-item-bg:     #3875d7 !default;
+$header-search-suggestion-loader-mask-padding:  6px !default;
+$header-search-suggestion-loader-size:          24px !default;
+$header-search-suggestion-loader-thickness:     5px !default;
+$header-search-suggestion-list-max-height:      402px !default;
+$header-search-no-result-padding:               4px 8px !default;
+$header-shortcut-dropdown-width:                330px !default;

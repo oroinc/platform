@@ -114,6 +114,7 @@ class OroMessageQueueExtension extends Extension
         $this->setJobConfigurationProvider($config, $container);
 
         if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
             $this->configureTestEnvironment($container);
         }
     }

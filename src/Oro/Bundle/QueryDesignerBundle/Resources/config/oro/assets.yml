@@ -1,5 +1,4 @@
 assets:
     css:
         'oroquerydesigner':
-            - 'bundles/oroquerydesigner/css/scss/condition-builder.scss'
-            - 'bundles/oroquerydesigner/css/query-designer.css'
+            - 'bundles/oroquerydesigner/css/scss/main.scss'

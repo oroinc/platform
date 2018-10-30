@@ -47,6 +47,8 @@ class PercentToLocalizedStringTransformer extends BaseTransformer
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
         if (null !== $this->scale) {
             $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->scale);
+            $formatter->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, 0);
+            $formatter->setAttribute(\NumberFormatter::MAX_FRACTION_DIGITS, $this->scale);
         }
 
         return $formatter;

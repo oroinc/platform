@@ -4,11 +4,15 @@ namespace Oro\Bundle\QueryDesignerBundle\Validator;
 
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupingConstraint;
-use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+/**
+ * Validates AbstractQueryDesigner::definition
+ * Check if column names of definition.columns which have no ['func'] value
+ * appear in definition.grouping_columns
+ */
 class GroupingValidator extends ConstraintValidator
 {
     /**
@@ -54,11 +58,11 @@ class GroupingValidator extends ConstraintValidator
             $groupingColumns = $definition['grouping_columns'];
         }
 
-        $groupingColumnNames = ArrayUtil::arrayColumn($groupingColumns, 'name');
-        $columnNames         = ArrayUtil::arrayColumn($columns, 'name');
+        $groupingColumnNames = \array_column($groupingColumns, 'name');
+        $columnNames         = \array_column($columns, 'name');
         $columnNamesToCheck  = array_diff(
             $columnNames,
-            ArrayUtil::arrayColumn($aggregateColumns, 'name')
+            \array_column($aggregateColumns, 'name')
         );
         $columnsToGroup      = array_diff($columnNamesToCheck, $groupingColumnNames);
 

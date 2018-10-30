@@ -20,7 +20,7 @@ define([
         tagName: 'div',
 
         attributes: {
-            'class': 'list-item map-item'
+            'class': 'map-item'
         },
 
         confirmRemoveComponent: deleteConfirmation,

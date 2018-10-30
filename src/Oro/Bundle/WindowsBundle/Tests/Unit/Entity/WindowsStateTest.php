@@ -54,11 +54,10 @@ class WindowsStateTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetJsonData()
+    public function testGetData()
     {
         $data = ['test' => true];
         $this->windowState->setData($data);
         $this->assertEquals($data, $this->windowState->getData());
-        $this->assertEquals(json_encode($data), $this->windowState->getJsonData());
     }
 }

@@ -15,21 +15,19 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ConfigurationProvider implements ConfigurationProviderInterface
 {
-    const COMPILER_PASS_NAME = 'oro_datagrid';
-    const CACHE_POSTFIX      = 'data';
-    const ROOT_PARAMETER     = 'datagrids';
-    const LOADED_FLAG        = 'loaded';
+    private const ROOT_PARAMETER   = 'datagrids';
+    private const MIXINS_PARAMETER = 'mixins';
 
     /** @var array */
-    protected $rawConfiguration = [];
+    private $rawConfiguration = [];
 
     /** @var SystemAwareResolver */
-    protected $resolver;
+    private $resolver;
 
     /** @var array */
-    protected $processedConfiguration = [];
+    private $processedConfiguration = [];
 
-    /** @var CacheProvider  */
+    /** @var CacheProvider */
     private $cache;
 
     /**
@@ -40,8 +38,8 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      */
     public function __construct(SystemAwareResolver $resolver, CacheProvider $cache)
     {
-        $this->resolver         = $resolver;
-        $this->cache            = $cache;
+        $this->resolver = $resolver;
+        $this->cache = $cache;
     }
 
     /**
@@ -50,6 +48,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     public function isApplicable($gridName)
     {
         $this->ensureConfigurationLoaded($gridName);
+
         return isset($this->rawConfiguration[$gridName]);
     }
 
@@ -84,19 +83,17 @@ class ConfigurationProvider implements ConfigurationProviderInterface
 
     /**
      * Make sure that configuration saved to cache
+     *
      * @param string $gridName
      */
-    protected function ensureConfigurationLoaded($gridName)
+    private function ensureConfigurationLoaded($gridName)
     {
         if (!isset($this->rawConfiguration[$gridName])) {
-            if (!$this->cache->contains(self::LOADED_FLAG)
-                || !$this->cache->fetch(self::LOADED_FLAG)
-                || !$this->cache->contains($gridName.'_'.self::CACHE_POSTFIX)
-            ) {
+            $data = $this->cache->fetch($gridName);
+            if (false === $data) {
                 $this->loadConfiguration();
+                $data = $this->cache->fetch($gridName);
             }
-
-            $data = $this->cache->fetch($gridName.'_'.self::CACHE_POSTFIX);
             if ($data) {
                 $this->rawConfiguration = array_merge($this->rawConfiguration, $data);
             }
@@ -113,14 +110,14 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     public function loadConfiguration(ContainerBuilder $container = null)
     {
         $config = [];
-        $configLoader = self::getDatagridConfigurationLoader();
-        $resources    = $configLoader->load($container);
+        $configLoader = $this->getDatagridConfigurationLoader();
+        $resources = $configLoader->load($container);
         foreach ($resources as $resource) {
-            if (isset($resource->data[self::ROOT_PARAMETER])
-                && is_array($resource->data[self::ROOT_PARAMETER])
-                && $this->cache
-            ) {
-                $config = ArrayUtil::arrayMergeRecursiveDistinct($config, $resource->data[self::ROOT_PARAMETER]);
+            if (isset($resource->data[self::ROOT_PARAMETER])) {
+                $grids = $resource->data[self::ROOT_PARAMETER];
+                if (is_array($grids)) {
+                    $config = ArrayUtil::arrayMergeRecursiveDistinct($config, $grids);
+                }
             }
         }
 
@@ -131,13 +128,13 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     /**
      * Group grid config with their mixins and save to cache
      */
-    protected function aggregateGridCacheConfig()
+    private function aggregateGridCacheConfig()
     {
         foreach ($this->rawConfiguration as $gridName => $gridConfig) {
             $aggregatedConfig = [];
             $aggregatedConfig[$gridName] = $gridConfig;
-            if (isset($gridConfig['mixins'])) {
-                $mixins = $gridConfig['mixins'];
+            if (isset($gridConfig[self::MIXINS_PARAMETER])) {
+                $mixins = $gridConfig[self::MIXINS_PARAMETER];
                 if (is_array($mixins)) {
                     foreach ($mixins as $mixin) {
                         $aggregatedConfig[$mixin] = $this->rawConfiguration[$mixin];
@@ -146,19 +143,17 @@ class ConfigurationProvider implements ConfigurationProviderInterface
                     $aggregatedConfig[$mixins] = $this->rawConfiguration[$mixins];
                 }
             }
-            $this->cache->save($gridName.'_'.self::CACHE_POSTFIX, $aggregatedConfig);
+            $this->cache->save($gridName, $aggregatedConfig);
         }
-
-        $this->cache->save(self::LOADED_FLAG, true);
     }
 
     /**
      * @return CumulativeConfigLoader
      */
-    public static function getDatagridConfigurationLoader()
+    private function getDatagridConfigurationLoader()
     {
         return new CumulativeConfigLoader(
-            self::COMPILER_PASS_NAME,
+            'oro_datagrid',
             new YamlCumulativeFileLoader('Resources/config/oro/datagrids.yml')
         );
     }

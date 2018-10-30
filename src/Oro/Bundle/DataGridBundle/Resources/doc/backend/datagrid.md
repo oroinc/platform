@@ -124,9 +124,9 @@ Configuration format is different depending on column type, but there are list o
 - `editable` - is column editable on frontend (`false` - by default)
 - `data_name` - data identifier (column name suggested by default)
 - `renderable` - should column be rendered (`true` - by default)
-- `order` - number of column's position, allows to change order of the columns over [Column Manager](../frontend/column_manager.md) and save it in [Grid View](./extensions/grid_views.md) (by default is not defined and the columns are rendered in the order in which they are declared in the configuration)
-- `required` - if it is `true` the column can not be hidden over [Column Manager](../frontend/column_manager.md) (by default is `false`)
-- `manageable` - if it is `false` the column does not appear in [Column Manager](../frontend/column_manager.md) (by default is `true`)
+- `order` - number of column's position, allows to change order of the columns over [Datagrid Settings](../frontend/datagrid_settings.md) and save it in [Grid View](./extensions/grid_views.md) (by default is not defined and the columns are rendered in the order in which they are declared in the configuration)
+- `required` - if it is `true` the column can not be hidden over [Datagrid Settings](../frontend/datagrid_settings.md) (by default is `false`)
+- `manageable` - if it is `false` the column does not appear in [Datagrid Settings](../frontend/datagrid_settings.md) (by default is `true`)
 - `shortenableLabel` - could column label be abbreviated or shortened with ellipsis (`true` - by default)
 
 For detailed explanation [see](./extensions/formatter.md).

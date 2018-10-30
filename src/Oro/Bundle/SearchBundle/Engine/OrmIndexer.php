@@ -8,6 +8,7 @@ use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
+use Oro\Bundle\SearchBundle\Query\Query;
 
 /**
  * Performs search indexation (save and delete) for ORM engine at standard search index
@@ -137,6 +138,13 @@ class OrmIndexer extends AbstractIndexer
                 $item->setEntity($class)
                     ->setRecordId($id)
                     ->setAlias($alias);
+            }
+
+            if (isset($data[Query::TYPE_DECIMAL][self::WEIGHT_FIELD])) {
+                $item->setWeight($data[Query::TYPE_DECIMAL][self::WEIGHT_FIELD]);
+                unset($data[Query::TYPE_DECIMAL][self::WEIGHT_FIELD]);
+            } else {
+                $item->setWeight(1);
             }
 
             $item->setTitle($this->getEntityTitle($entity))

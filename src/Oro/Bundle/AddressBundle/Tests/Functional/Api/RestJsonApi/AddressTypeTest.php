@@ -42,9 +42,7 @@ class AddressTypeTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        self::assertResponseStatusCodeEquals($response, 405);
-        self::assertEquals('GET', $response->headers->get('Allow'));
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 
     public function testTryToUpdate()
@@ -55,9 +53,7 @@ class AddressTypeTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        self::assertResponseStatusCodeEquals($response, 405);
-        self::assertEquals('GET', $response->headers->get('Allow'));
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 
     public function testTryToDelete()
@@ -68,9 +64,7 @@ class AddressTypeTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        self::assertResponseStatusCodeEquals($response, 405);
-        self::assertEquals('GET', $response->headers->get('Allow'));
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 
     public function testTryToDeleteList()
@@ -81,8 +75,6 @@ class AddressTypeTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        self::assertResponseStatusCodeEquals($response, 405);
-        self::assertEquals('GET', $response->headers->get('Allow'));
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 }

@@ -225,7 +225,6 @@ services:
             - '@oro_locale.formatter.date_time'
             - '@oro_filter.expression.date.compiler'
             - '@translator'
-            - '@oro_dashboard.datetime.helper'
         tags:
             - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeType }
 

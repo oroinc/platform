@@ -4,7 +4,7 @@ Content providers
 Overview
 --------
 
-**Oro platform** is hybrid application that supports JS navigation, but it still renders a lot on server side. Usually
+**OroPlatform** is a hybrid application that supports JS navigation, but it still renders a lot on server side. Usually
  when user change current page, application reloads only content part, so there are parts that not required to be 
  rendered on sever side for each request. In order to allow developer including partial content in *hash navigation* response 
  **content providers** were introduced. 

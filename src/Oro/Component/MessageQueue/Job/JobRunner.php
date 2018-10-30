@@ -3,7 +3,9 @@
 namespace Oro\Component\MessageQueue\Job;
 
 use Oro\Component\MessageQueue\Exception\JobNotFoundException;
+use Oro\Component\MessageQueue\Exception\JobRuntimeException;
 use Oro\Component\MessageQueue\Exception\StaleJobRuntimeException;
+use Oro\Component\MessageQueue\Job\Extension\ExtensionInterface;
 
 /**
  * Provides possibility to run unique or delayed jobs
@@ -50,19 +52,20 @@ class JobRunner
 
         if ($rootJob->isInterrupted()) {
             $this->jobProcessor->cancelAllActiveChildJobs($rootJob);
+            $this->jobExtension->onCancel($childJob);
 
             return null;
         }
-
-        $this->jobExtension->onPreRunUnique($childJob);
 
         if ($this->isReadyForStart($childJob)) {
             $this->jobProcessor->startChildJob($childJob);
         }
 
+        $this->jobExtension->onPreRunUnique($childJob);
+
         $result = $this->callbackResult($runCallback, $childJob);
 
-        if (!$childJob->getStoppedAt()) {
+        if ($this->isReadyForStop($childJob)) {
             $result
                 ? $this->jobProcessor->successChildJob($childJob)
                 : $this->jobProcessor->failChildJob($childJob);
@@ -86,7 +89,18 @@ class JobRunner
         $this->jobExtension->onPreCreateDelayed($childJob);
 
         $jobRunner = $this->getJobRunnerForChildJob($this->rootJob);
-        $createResult = call_user_func($startCallback, $jobRunner, $childJob);
+
+        try {
+            $createResult = call_user_func($startCallback, $jobRunner, $childJob);
+        } catch (\Throwable $e) {
+            $this->jobProcessor->failChildJob($childJob);
+            $this->jobExtension->onError($childJob);
+
+            throw new JobRuntimeException(sprintf(
+                'An error occurred while created job, id: %d',
+                $childJob->getId()
+            ), 0, $e);
+        }
 
         $this->jobExtension->onPostCreateDelayed($childJob, $createResult);
 
@@ -110,22 +124,21 @@ class JobRunner
         $this->throwIfJobIsStale($job);
 
         if ($job->getRootJob()->isInterrupted()) {
-            if (! $job->getStoppedAt()) {
-                $this->jobProcessor->cancelChildJob($job);
-            }
+            $this->jobProcessor->cancelAllActiveChildJobs($job->getRootJob());
+            $this->jobExtension->onCancel($job);
 
             return null;
         }
-
-        $this->jobExtension->onPreRunDelayed($job);
 
         if ($this->isReadyForStart($job)) {
             $this->jobProcessor->startChildJob($job);
         }
 
+        $this->jobExtension->onPreRunDelayed($job);
+
         $result = $this->callbackResult($runCallback, $job);
 
-        if (! $job->getStoppedAt()) {
+        if ($this->isReadyForStop($job)) {
             $result
                 ? $this->jobProcessor->successChildJob($job)
                 : $this->jobProcessor->failChildJob($job);
@@ -170,6 +183,16 @@ class JobRunner
     }
 
     /**
+     * @param Job $job
+     *
+     * @return bool
+     */
+    private function isReadyForStop(Job $job)
+    {
+        return !$job->getStoppedAt() || $job->getStatus() === Job::STATUS_FAILED_REDELIVERED;
+    }
+
+    /**
      * @param \Closure $runCallback
      * @param Job $job
      *
@@ -182,10 +205,14 @@ class JobRunner
         $jobRunner = $this->getJobRunnerForChildJob($job->getRootJob());
         try {
             $result = call_user_func($runCallback, $jobRunner, $job);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->jobProcessor->failAndRedeliveryChildJob($job);
+            $this->jobExtension->onError($job);
 
-            throw $e;
+            throw new JobRuntimeException(sprintf(
+                'An error occurred while running job, id: %d',
+                $job->getId()
+            ), 0, $e);
         }
 
         return $result;

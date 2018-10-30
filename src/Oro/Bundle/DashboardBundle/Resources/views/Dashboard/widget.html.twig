@@ -28,6 +28,7 @@
                     {% else %}
                         {% set label = configName %}
                     {% endif %}
+                    {% set value = null %}
                     {% if config.options is defined and config.options.choices is defined %}
                         {% for choiceLabel, choiceValue in config.options.choices %}
                             {% if config.value == choiceValue %}
@@ -35,7 +36,7 @@
                             {% endif %}
                         {% endfor %}
                     {% endif %}
-                    {% if value is not defined %}
+                    {% if value is null %}
                         {% set value = config.value %}
                     {% endif %}
                     <div class="widget-config-data"><stong>{{ label|trans }}</stong>: {{ value }}</div>

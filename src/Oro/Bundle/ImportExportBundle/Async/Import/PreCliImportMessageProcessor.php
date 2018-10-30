@@ -8,6 +8,10 @@ use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 
+/**
+ * Responsible for splitting import process triggered from CLI into a set of independent jobs each processing its own
+ * chunk of data to be run in parallel. Notifies user by email if import error occurs.
+ */
 class PreCliImportMessageProcessor extends PreImportMessageProcessorAbstract
 {
     /**
@@ -108,9 +112,9 @@ class PreCliImportMessageProcessor extends PreImportMessageProcessorAbstract
         $this->logger->critical($errorMessage);
 
         if (isset($body['notifyEmail'])) {
+            $sender = $this->notificationSettings->getSender();
             $this->producer->send(NotificationTopics::SEND_NOTIFICATION_EMAIL, [
-                'fromEmail' => $this->configManager->get('oro_notification.email_notification_sender_email'),
-                'fromName' => $this->configManager->get('oro_notification.email_notification_sender_name'),
+                'sender' => $sender->toArray(),
                 'toEmail' => $body['notifyEmail'],
                 'template' => 'import_error',
                 'body' => [

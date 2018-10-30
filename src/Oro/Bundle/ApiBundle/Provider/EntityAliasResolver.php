@@ -15,22 +15,26 @@ class EntityAliasResolver extends BaseEntityAliasResolver
     /** @var EntityOverrideProviderInterface */
     private $entityOverrideProvider;
 
+    /** @var string[] */
+    private $configFiles;
+
     /**
      * @param EntityAliasLoader               $loader
      * @param EntityOverrideProviderInterface $entityOverrideProvider
      * @param Cache                           $cache
      * @param LoggerInterface                 $logger
-     * @param bool                            $debug
+     * @param string[]                        $configFiles
      */
     public function __construct(
         EntityAliasLoader $loader,
         EntityOverrideProviderInterface $entityOverrideProvider,
         Cache $cache,
         LoggerInterface $logger,
-        $debug
+        array $configFiles
     ) {
-        parent::__construct($loader, $cache, $logger, $debug);
+        parent::__construct($loader, $cache, $logger);
         $this->entityOverrideProvider = $entityOverrideProvider;
+        $this->configFiles = $configFiles;
     }
 
     /**
@@ -55,6 +59,14 @@ class EntityAliasResolver extends BaseEntityAliasResolver
     public function getPluralAlias($entityClass)
     {
         return parent::getPluralAlias($this->resolveEntityClass($entityClass));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function createStorage()
+    {
+        return new EntityAliasStorage($this->configFiles);
     }
 
     /**

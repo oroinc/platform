@@ -21,6 +21,7 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Psr\Log\LoggerInterface;
 
 /**
  * The builder that simplifies creation of the email related entities.
@@ -52,17 +53,20 @@ class EmailEntityBuilder
      * @param EmailAddressManager       $emailAddressManager
      * @param EmailAddressHelper        $emailAddressHelper
      * @param ManagerRegistry           $doctrine
+     * @param LoggerInterface           $logger
      */
     public function __construct(
         EmailEntityBatchProcessor $batch,
         EmailAddressManager $emailAddressManager,
         EmailAddressHelper $emailAddressHelper,
-        ManagerRegistry $doctrine
+        ManagerRegistry $doctrine,
+        LoggerInterface $logger
     ) {
         $this->batch = $batch;
         $this->emailAddressManager = $emailAddressManager;
         $this->emailAddressHelper = $emailAddressHelper;
         $this->doctrine = $doctrine;
+        $this->logger = $logger;
     }
 
     /**
@@ -182,10 +186,10 @@ class EmailEntityBuilder
     {
         if (!empty($email)) {
             if (is_string($email)) {
-                $obj->addRecipient($this->recipient($type, $email));
+                $this->addRecipient($obj, $type, $email);
             } elseif (is_array($email) || $email instanceof \Traversable) {
                 foreach ($email as $e) {
-                    $obj->addRecipient($this->recipient($type, $e));
+                    $this->addRecipient($obj, $type, $e);
                 }
             }
         }
@@ -565,5 +569,28 @@ class EmailEntityBuilder
         }
 
         return $this->fieldLength[$entityClass][$fieldName];
+    }
+
+    /**
+     * Add recipient to the Email object
+     *
+     * @param Email  $object The Email object recipients is added to
+     * @param string $type   The recipient type. Can be to, cc or bcc
+     * @param string $email  The email address, for example: john@example.com or "John Smith" <john@example.com>
+     */
+    private function addRecipient(Email $object, $type, $email)
+    {
+        try {
+            $object->addRecipient($this->recipient($type, $email));
+        } catch (EmailAddressParseException $e) {
+            /**
+             * An invalid email address should be ignored as well as mailing groups,
+             * such as "<undisclosed-recipients:;>" or "<nobody:;>"
+             */
+            $this->logger->warning(
+                'An invalid recipient address has been ignored',
+                ['exception' => $e->getMessage()]
+            );
+        }
     }
 }

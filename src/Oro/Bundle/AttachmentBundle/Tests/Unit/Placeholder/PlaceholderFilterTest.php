@@ -52,7 +52,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->attachmentAssociationHelper
             ->expects(is_object($entity) && !$isNewRecord ? $this->once() : $this->never())
             ->method('isAttachmentAssociationEnabled')
-            ->with(get_class($entity))
+            ->with(is_object($entity) ? get_class($entity) : null)
             ->willReturn($attachmentAssociationHelperReturn);
 
         $this->doctrineHelper->expects(is_object($entity) && $isManaged ? $this->once() : $this->never())

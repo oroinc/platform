@@ -165,6 +165,7 @@ class ControllersTest extends WebTestCase
             Topics::PRE_EXPORT,
             [
                 'format' => 'csv',
+                'notificationTemplate' => 'datagrid_export_result',
                 'parameters' => [
                     'gridName' => sprintf('oro_report_table_%s', $id),
                     'gridParameters' => [],

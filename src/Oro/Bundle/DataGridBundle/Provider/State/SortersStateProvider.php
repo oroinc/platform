@@ -42,7 +42,7 @@ class SortersStateProvider extends AbstractStateProvider
     public function getState(DatagridConfiguration $datagridConfiguration, ParameterBag $datagridParameters): array
     {
         // Fetch state from datagrid parameters.
-        $state = $this->getStateFromParameters($datagridParameters);
+        $state = $this->getFromParameters($datagridParameters);
 
         // Try to fetch state from grid view.
         if (!$state) {
@@ -54,23 +54,50 @@ class SortersStateProvider extends AbstractStateProvider
 
         // Fallback to default sorters.
         if (!$state) {
-            $state = $this->getDefaultSortersState($datagridConfiguration);
+            $state = $this->getDefaultSorters($datagridConfiguration);
         }
 
-        return $this->sanitizeState($state, $datagridConfiguration);
+        return $this->sanitizeState($state, $this->getSortersConfig($datagridConfiguration));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStateFromParameters(
+        DatagridConfiguration $datagridConfiguration,
+        ParameterBag $datagridParameters
+    ): array {
+        // Fetch state from datagrid parameters.
+        $state = $this->getFromParameters($datagridParameters);
+
+        // Fallback to default sorters.
+        if (!$state) {
+            $state = $this->getDefaultSorters($datagridConfiguration);
+        }
+
+        return $this->sanitizeState($state, $this->getSortersConfig($datagridConfiguration));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultState(DatagridConfiguration $datagridConfiguration): array
+    {
+        $state = $this->getDefaultSorters($datagridConfiguration);
+
+        return $this->sanitizeState($state, $this->getSortersConfig($datagridConfiguration));
     }
 
     /**
      * @param array $state
-     * @param DatagridConfiguration $datagridConfiguration
+     * @param array $sortersConfig
      *
      * @return array
      */
-    private function sanitizeState(array $state, DatagridConfiguration $datagridConfiguration): array
+    private function sanitizeState(array $state, array $sortersConfig): array
     {
         // Remove sorters which are not in datagrid configuration.
-        $sorters = $this->getSorters($datagridConfiguration);
-        $state = array_intersect_key($state, $sorters);
+        $state = array_intersect_key($state, $sortersConfig);
 
         array_walk($state, [$this, 'normalizeDirection']);
 
@@ -80,7 +107,7 @@ class SortersStateProvider extends AbstractStateProvider
     /**
      * {@inheritdoc}
      */
-    private function getStateFromParameters(ParameterBag $datagridParameters): array
+    private function getFromParameters(ParameterBag $datagridParameters): array
     {
         $sortersState = $this->datagridParametersHelper
             ->getFromParameters($datagridParameters, AbstractSorterExtension::SORTERS_ROOT_PARAM);
@@ -99,7 +126,7 @@ class SortersStateProvider extends AbstractStateProvider
      *
      * @return array
      */
-    private function getSorters(DatagridConfiguration $datagridConfiguration): array
+    private function getSortersConfig(DatagridConfiguration $datagridConfiguration): array
     {
         return array_filter(
             $datagridConfiguration->offsetGetByPath(SorterConfiguration::COLUMNS_PATH, []),
@@ -133,7 +160,7 @@ class SortersStateProvider extends AbstractStateProvider
      *
      * @return array
      */
-    private function getDefaultSortersState(DatagridConfiguration $datagridConfiguration): array
+    private function getDefaultSorters(DatagridConfiguration $datagridConfiguration): array
     {
         return $datagridConfiguration->offsetGetByPath(SorterConfiguration::DISABLE_DEFAULT_SORTING_PATH, false)
             ? []

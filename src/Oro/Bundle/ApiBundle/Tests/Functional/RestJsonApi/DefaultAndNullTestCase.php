@@ -11,11 +11,11 @@ class DefaultAndNullTestCase extends RestJsonApiTestCase
 {
     /**
      * @param array $data
-     * @param int   $expectedStatusCode
+     * @param bool  $assertValid
      *
      * @return Response
      */
-    protected function sendCreateRequest(array $data, $expectedStatusCode = Response::HTTP_CREATED)
+    protected function sendCreateRequest(array $data, $assertValid = true)
     {
         $entityType = $this->getEntityType(TestDefaultAndNull::class);
 
@@ -25,10 +25,8 @@ class DefaultAndNullTestCase extends RestJsonApiTestCase
             ['entity' => $entityType],
             $data,
             [],
-            false
+            $assertValid
         );
-
-        self::assertResponseStatusCodeEquals($response, $expectedStatusCode);
 
         return $response;
     }
@@ -36,11 +34,11 @@ class DefaultAndNullTestCase extends RestJsonApiTestCase
     /**
      * @param int   $entityId
      * @param array $data
-     * @param int   $expectedStatusCode
+     * @param bool  $assertValid
      *
      * @return Response
      */
-    protected function sendUpdateRequest($entityId, array $data, $expectedStatusCode = Response::HTTP_OK)
+    protected function sendUpdateRequest($entityId, array $data, $assertValid = true)
     {
         $entityType = $this->getEntityType(TestDefaultAndNull::class);
 
@@ -51,10 +49,8 @@ class DefaultAndNullTestCase extends RestJsonApiTestCase
             ['entity' => $entityType, 'id' => (string)$entityId],
             $data,
             [],
-            false
+            $assertValid
         );
-
-        self::assertResponseStatusCodeEquals($response, $expectedStatusCode);
 
         return $response;
     }

@@ -15,13 +15,6 @@ define(function(require) {
             DataAuditConditionView.__super__.constructor.apply(this, arguments);
         },
 
-        getDefaultOptions: function() {
-            var defaultOptions = DataAuditConditionView.__super__.getDefaultOptions.call(this);
-            return _.extend({}, defaultOptions, {
-                changeStateTpl: _.template($('#template-audit-condition-type-select').html())
-            });
-        },
-
         _ensureAuditFilter: function(auditFilterConfig) {
             if (!this.auditFilter) {
                 this._renderAuditFilter(auditFilterConfig);

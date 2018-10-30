@@ -1,0 +1,80 @@
+/* @theme: admin.oro; */
+
+.with-floating-header {
+    .grid-header-cell__link,
+    .grid-header-cell__label-container {
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+    .grid-header-cell__label {
+        text-overflow: ellipsis;
+        display: block;
+        overflow: hidden;
+    }
+}
+
+.floatThead {
+    .thead-sizing {
+        display: none;
+    }
+
+    .dropdown-menu {
+        z-index: $zindex-dropdown - 112;
+    }
+
+    .grid-header:first-child {
+        position: absolute;
+        z-index: 3;
+
+        width: auto;
+    }
+
+    .other-scroll-container {
+        overflow: hidden;
+
+        clear: both;
+    }
+
+    .other-scroll {
+        position: absolute;
+        z-index: 3;
+
+        overflow-x: hidden;
+        overflow-y: scroll;
+
+        > div {
+            width: 1px;
+        }
+    }
+
+    &.floatThead-relative {
+        .grid-scrollable-container {
+            position: relative;
+        }
+
+        .grid-header:last-child {
+            display: table-header-group;
+        }
+    }
+
+    &.floatThead-fixed {
+        .grid-header:first-child {
+            position: fixed;
+
+            display: block;
+
+            overflow: hidden;
+
+            .grid-header-row {
+                display: block;
+            }
+        }
+
+        .thead-sizing {
+            display: table-header-group;
+
+            visibility: hidden; // Should check why we have double headers for datagrid
+        }
+    }
+}

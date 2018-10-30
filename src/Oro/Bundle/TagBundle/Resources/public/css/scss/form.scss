@@ -1,0 +1,71 @@
+/* @theme: admin.oro; */
+
+.tags-column-editor {
+    width: auto !important; // ignore cell width
+
+    .select2-choices {
+        max-width: 20vw;
+    }
+}
+
+.tags-select-editor {
+    min-width: 180px; // ignore min-width
+
+    .select2-container {
+        border-radius: 0;
+        height: auto;
+    }
+
+    .select2-choices {
+        max-height: 40vh;
+        min-width: 180px;
+        overflow: auto;
+        background: $primary-inverse;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+
+        &:before {
+            content: '';
+            float: #{$end};
+            width: 74px;
+            height: 26px;
+        }
+
+        &.select2-search-resize {
+            padding-#{$end}: 48px;// to fill area required for actions buttons
+        }
+
+        .select2-search-field input {
+            height: 26px;
+            padding: 1px 5px;
+        }
+
+        .select2-search-choice {
+            font-size: $base-font-size--s;
+            line-height: $base-font-size--s;
+            padding: side-values(5px 20px 5px 8px);
+            color: $tag-item-color;
+            background: $tag-item-background;
+            border: 0 none;
+            border-radius: 10px;
+            box-shadow: none;
+            margin-#{$start}: 4px;
+            margin-bottom: 0;
+
+            .select2-search-choice-close {
+                top: 4px;
+
+                &:before {
+                    color: $tag-item-color;
+                }
+            }
+
+            &.select2-locked {
+                padding: side-values(4px 5px 3px 6px) !important;
+            }
+        }
+    }
+
+    &.inline-view-editor .select2-choices {
+        width: 100% !important;
+    }
+}

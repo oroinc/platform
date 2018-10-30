@@ -11,7 +11,7 @@ Feature: Create Report with Enum field
     And I go to System/ Entities/ Entity Management
     And filter Name as is equal to "User"
     And I click view User in grid
-    And press "Create field"
+    And click "Create field"
     And I fill form with:
       | Field Name   | CustomEnum  |
       | Storage Type | Table column  |
@@ -35,7 +35,7 @@ Feature: Create Report with Enum field
     Then I should see "User saved" flash message
 
     When I go to Reports & Segments / Manage Custom Reports
-    And I press "Create Report"
+    And I click "Create Report"
     And I fill "Report Form" with:
       | Name        | Test Enum field in Report |
       | Entity      | Opportunity               |

@@ -245,44 +245,6 @@ class DatagridConfiguration extends ConfigObject
     }
 
     /**
-     * @param string $select
-     *
-     * @return self
-     * @deprecated since 2.0. Use config->getOrmQuery()->addSelect() instead
-     */
-    public function addSelect($select)
-    {
-        if (empty($select)) {
-            throw new \BadMethodCallException('DatagridConfiguration::addSelect: select should not be empty');
-        }
-
-        $this->offsetAddToArrayByPath(
-            '[source][query][select]',
-            [$select]
-        );
-
-        return $this;
-    }
-
-    /**
-     * @param string $type
-     * @param array  $definition
-     *
-     * @return self
-     * @deprecated since 2.0. Use config->getOrmQuery()->addInnerJoin() or config->getOrmQuery()->addLeftJoin() instead
-     */
-    public function joinTable($type, array $definition)
-    {
-        $this
-            ->offsetAddToArrayByPath(
-                sprintf('[source][query][join][%s]', $type),
-                [$definition]
-            );
-
-        return $this;
-    }
-
-    /**
      * @param string $name
      * @param array  $definition
      *

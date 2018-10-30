@@ -26,7 +26,7 @@ class ErrorCompleterCompilerPass implements CompilerPassInterface
             foreach ($attributes as $tagAttributes) {
                 $errorCompleters[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     $id,
-                    DependencyInjectionUtil::getAttribute($tagAttributes, 'requestType', null)
+                    DependencyInjectionUtil::getRequestType($tagAttributes)
                 ];
             }
         }

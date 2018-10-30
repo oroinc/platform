@@ -9,7 +9,7 @@ Feature: Manage dashboards
     Given I login as administrator
     And I go to Dashboards/Manage Dashboards
     And number of records should be 1
-    And I press "Create Dashboard"
+    And I click "Create Dashboard"
     And I fill form with:
       | Label      | My own custom dashboard |
       | Clone From | Blank Dashboard         |

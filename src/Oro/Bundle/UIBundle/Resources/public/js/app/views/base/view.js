@@ -89,6 +89,12 @@ define([
                 }
             }
             return $el;
+        },
+
+        render: function() {
+            BaseView.__super__.render.call(this);
+            this.initControls();
+            return this;
         }
     }, {
         /**

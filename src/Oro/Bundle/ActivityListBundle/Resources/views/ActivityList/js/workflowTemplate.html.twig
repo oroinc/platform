@@ -4,7 +4,7 @@
             <li role="separator" class="divider">&nbsp;</li>
             <% _.each(workflow.transitionsData, function(transition) { %>
                 <li>
-                    <a href="<%- transition.transitionUrl %>" class="transition-item"
+                    <a href="<%- transition.transitionUrl %>" class="dropdown-item transition-item"
                        id="transition-<%- workflow.name %>-<%- transition.name %>"
                        data-transition-url="<%- transition.transitionUrl %>"
                        data-transition-label="<%- transition.label %>"

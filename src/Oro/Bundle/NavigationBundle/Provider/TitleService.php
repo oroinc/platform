@@ -9,6 +9,8 @@ use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
 use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
+ * Navigation title helper.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class TitleService implements TitleServiceInterface
@@ -461,7 +463,7 @@ class TitleService implements TitleServiceInterface
         $breadcrumbLabels = $this->getBreadcrumbLabels($route, $menuName);
         if (count($breadcrumbLabels)) {
             $breadcrumbs = $this->getBreadcrumbs($menuName, false, $route);
-            if (count($breadcrumbs)) {
+            if (!empty($breadcrumbs)) {
                 /** @var ItemInterface $menuItem */
                 $menuItem = $breadcrumbs[0]['item'];
                 $routes = $menuItem->getExtra('routes', []);

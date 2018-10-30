@@ -7,6 +7,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
+use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
@@ -44,6 +45,10 @@ abstract class AbstractStateProvider implements DatagridStateProviderInterface
         DatagridConfiguration $datagridConfiguration,
         ParameterBag $datagridParameters
     ): ?ViewInterface {
+        if ($this->gridViewsDisabled($datagridParameters)) {
+            return null;
+        }
+
         $gridName = $datagridConfiguration->getName();
 
         return $this->getCurrentGridView($datagridParameters, $gridName) ?: $this->getDefaultGridView($gridName);
@@ -67,7 +72,7 @@ abstract class AbstractStateProvider implements DatagridStateProviderInterface
      * @param ParameterBag $datagridParameters
      * @param $gridName
      *
-     * @return AbstractGridView|null
+     * @return View|null
      */
     private function getCurrentGridView(ParameterBag $datagridParameters, $gridName)
     {
@@ -97,5 +102,17 @@ abstract class AbstractStateProvider implements DatagridStateProviderInterface
         }
 
         return $this->defaultGridView[$gridName];
+    }
+
+    /**
+     * @param ParameterBag $datagridParameters
+     *
+     * @return bool
+     */
+    private function gridViewsDisabled(ParameterBag $datagridParameters): bool
+    {
+        $parameters = $datagridParameters->get(GridViewsExtension::GRID_VIEW_ROOT_PARAM, []);
+
+        return !empty($parameters[GridViewsExtension::DISABLED_PARAM]);
     }
 }

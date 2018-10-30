@@ -1,10 +1,9 @@
-define([
-    'underscore',
-    './../base/page-region-view'
-], function(_, PageRegionView) {
+define(function(require) {
     'use strict';
 
     var PageBreadcrumbView;
+    var _ = require('underscore');
+    var PageRegionView = require('./../base/page-region-view');
 
     PageBreadcrumbView = PageRegionView.extend({
         listen: {
@@ -17,13 +16,10 @@ define([
         },
 
         breadcrumbsTemplate: _.template('<ul class="breadcrumb">' +
-            '<% for (var i =0; i < breadcrumbs.length; i++) { %>' +
-                '<li>' +
-                    '<%- breadcrumbs[i] %>' +
-                    '<%if (i+1 != breadcrumbs.length) { %><span class="divider">/&nbsp;</span><% } %>' +
-                '</li>' +
-            '<% } %>' +
-            '</ul>'),
+        '<% for (var i = 0; i < breadcrumbs.length; i++) { %>' +
+        '<li class="breadcrumb-item<%= (i + 1 === breadcrumbs.length) ? " active": "" %>"><%- breadcrumbs[i] %></li>' +
+        '<% } %>' +
+        '</ul>'),
 
         data: null,
 

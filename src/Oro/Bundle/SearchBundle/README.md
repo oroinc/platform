@@ -13,3 +13,4 @@ The bundle provides the ability for developers to use different search engines, 
  - [API advanced search](Resources/doc/advanced_search.md)
  - [Query builder](Resources/doc/query_builder.md)
  - [ORM search engine](Resources/doc/orm_search_engine.md)
+ - [Search Relevance Weight](Resources/doc/relevance_weight.md)

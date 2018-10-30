@@ -13,7 +13,7 @@ use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
- * @package Oro\Bundle\IntegrationBundle
+ * Base class for interacting with 3rd party system using SOAP
  */
 abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
 {

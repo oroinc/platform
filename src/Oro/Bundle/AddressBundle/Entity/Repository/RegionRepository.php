@@ -7,12 +7,15 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
+use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 
 /**
  * Entity repository for Region dictionary.
  */
-class RegionRepository extends EntityRepository
+class RegionRepository extends EntityRepository implements IdentityAwareTranslationRepositoryInterface
 {
+    use TranslatableQueryTrait;
+
     /**
      * @param Country $country
      * @return QueryBuilder
@@ -36,6 +39,7 @@ class RegionRepository extends EntityRepository
             Query::HINT_CUSTOM_OUTPUT_WALKER,
             'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
         );
+        $this->addTranslatableLocaleHint($query, $this->getEntityManager());
 
         return $query->execute();
     }
@@ -55,7 +59,7 @@ class RegionRepository extends EntityRepository
 
 
     /**
-     * @param array $data
+     * {@inheritdoc}
      */
     public function updateTranslations(array $data)
     {

@@ -1,15 +1,15 @@
 oro_behat_extension:
   elements:
-    TypeSelectButton:
-      selector: '#search-bar-button'
+    TypeSelectElement:
+      selector: '.select2-choice'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
-    TypeSelector:
-      selector: '#search-bar-dropdown'
+    TypeSelectList:
+      selector: '.select2-results'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
-    SearchSuggestionsDropdown:
-      selector: '#search-dropdown ul'
+    SearchSuggestionList:
+      selector: '.search-suggestion-list'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Search Form:
@@ -18,6 +18,12 @@ oro_behat_extension:
       options:
         mapping:
           Query: 'search'
+
+    Search Submit:
+      selector:
+         type: xpath
+         locator: '//button[@type="submit"][text()="Search"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Theme Form:
       selector: 'form[name="theme"]'

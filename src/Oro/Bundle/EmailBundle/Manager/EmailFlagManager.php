@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderSelector;
@@ -10,8 +11,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
 /**
- * Class EmailFlagManager
- * @package Oro\Bundle\EmailBundle\Manager
+ * Responsible for setting flags SEEN|UNSEEN
  */
 class EmailFlagManager implements LoggerAwareInterface
 {
@@ -97,12 +97,15 @@ class EmailFlagManager implements LoggerAwareInterface
      *
      * @param EmailUser $emailUser - EmailUser
      *
-     * @return EmailFlagManagerInterface
+     * @return EmailFlagManagerInterface|null
      */
     protected function selectEmailFlagManager(EmailUser $emailUser)
     {
         $folder = $emailUser->getFolders()->first();
-        $origin = $emailUser->getOrigin();
+        if (!$folder instanceof EmailFolder) {
+            return null;
+        }
+        $origin = $folder->getOrigin();
         if (!$origin || !$origin->isActive()) {
             return null;
         }

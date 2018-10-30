@@ -1,0 +1,86 @@
+/* @theme: admin.oro; */
+
+.card-view {
+    position: relative;
+    z-index: 0;
+
+    margin-top: $oro-datagrid-base-offset;
+    padding: $oro-datagrid-placeholder-offset;
+
+    background: $oro-datagrid-card-background;
+    border: $oro-datagrid-card-border-color;
+    border-radius: $oro-datagrid-radius;
+    box-shadow: $oro-datagrid-card-box-shadow;
+    color: $oro-datagrid-card-color;
+
+    transition: all 350ms linear;
+
+    &:hover {
+        z-index: 1;
+
+        border-color: $oro-datagrid-card-border-color-hover;
+        box-shadow: $oro-datagrid-card-box-shadow-hover;
+    }
+
+    &.ui-sortable-helper {
+        border-color: $oro-datagrid-card-sortable-helper-border-color;
+        box-shadow: $oro-datagrid-card-sortable-helper-box-shadow;
+    }
+
+    &[data-transition-status="error"] {
+        background: $oro-datagrid-card-transition-status-error-background;
+        box-shadow: $oro-datagrid-card-transition-status-box-shadow;
+    }
+
+    &[data-transition-status="success"].transition-status-just-changed {
+        background: $oro-datagrid-card-transition-status-success-background;
+        box-shadow: $oro-datagrid-card-transition-status-box-shadow;
+    }
+
+    &[data-transition-status="in_progress"] {
+        background: $oro-datagrid-card-transition-status-in-progress-background;
+        box-shadow: $oro-datagrid-card-transition-status-box-shadow;
+    }
+
+    @at-root .drag-over .card-view {
+        border-color: $oro-datagrid-card-drag-over-border-color;
+    }
+}
+
+.card-title {
+    @include text-line-truncate(calc(100% - 15px));
+
+    margin-bottom: $oro-datagrid-base-offset;
+}
+
+.card-actions {
+    position: absolute;
+    top: 0;
+    #{$end}: 5px;
+}
+
+.card-amount {
+    @include text-line-truncate();
+
+    font-size: $oro-datagrid-card-card-amount-font-size;
+    font-weight: $oro-datagrid-card-card-amount-font-weight;
+}
+
+.card-additional {
+    margin: $oro-datagrid-base-offset 0;
+
+    font-size: $oro-datagrid-card-card-additional-font-size;
+    line-height: $oro-datagrid-card-card-amount-line-height;
+}
+
+.card-additional-line {
+    @include text-line-truncate();
+}
+
+.card-date {
+    font-size: $oro-datagrid-card-card-date-font-size;
+
+    color: $oro-datagrid-card-card-date-color;
+
+    @include text-line-truncate();
+}

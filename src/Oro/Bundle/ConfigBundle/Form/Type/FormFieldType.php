@@ -14,6 +14,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for global fields of system configuration.
+ */
 class FormFieldType extends AbstractType
 {
     /**
@@ -42,7 +45,7 @@ class FormFieldType extends AbstractType
                 $attr['class'] = '';
             }
 
-            $attr['class'] = sprintf('%s, control-group-%s', $attr['class'], $options['target_field_alias']);
+            $attr['class'] = sprintf('%s control-group-%s', $attr['class'], $options['target_field_alias']);
 
             return $attr;
         });

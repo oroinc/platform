@@ -7,7 +7,7 @@ Feature: Notify assigned Sales Representatives
   Scenario: Create email template
     Given I login as administrator
     And go to System/ Emails/ Templates
-    And press "Create Email Template"
+    And click "Create Email Template"
     And fill form with:
       |Owner         |John Doe       |
       |Template Name |Test Template  |
@@ -19,7 +19,7 @@ Feature: Notify assigned Sales Representatives
 
   Scenario: Create notification rule
     Given go to System/ Emails/ Notification Rules
-    And press "Create Notification Rule"
+    And click "Create Notification Rule"
     And fill form with:
       |Entity Name |Contact Request |
     And I save and close form
@@ -38,7 +38,7 @@ Feature: Notify assigned Sales Representatives
   @skip
   Scenario: Create contact request
     Given go to Activities/ Contact Requests
-    And press "Create Contact Request"
+    And click "Create Contact Request"
     And fill form with:
       |First Name              | Test         |
       |Last Name               | Testerson    |

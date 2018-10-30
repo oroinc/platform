@@ -100,6 +100,10 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(0)
         );
         self::assertEquals(
+            ['api.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.default')->getArgument(4)
+        );
+        self::assertEquals(
             [
                 ['oro_api.entity_alias_resolver.default', '']
             ],
@@ -229,6 +233,18 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.chain_entity_exclusion_provider.default', '']
             ],
             $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(0)
+        );
+        self::assertEquals(
+            ['api_first.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.first')->getArgument(4)
+        );
+        self::assertEquals(
+            ['api_second.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.second')->getArgument(4)
+        );
+        self::assertEquals(
+            ['api.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.default')->getArgument(4)
         );
         self::assertEquals(
             [
@@ -415,6 +431,22 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(0)
         );
         self::assertEquals(
+            ['api_several_request_types.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.several_request_types')->getArgument(4)
+        );
+        self::assertEquals(
+            ['api_test.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.test')->getArgument(4)
+        );
+        self::assertEquals(
+            ['api_another.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.another')->getArgument(4)
+        );
+        self::assertEquals(
+            ['api.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.default')->getArgument(4)
+        );
+        self::assertEquals(
             [
                 ['oro_api.entity_alias_resolver.several_request_types', 'test1&test2'],
                 ['oro_api.entity_alias_resolver.test', 'test'],
@@ -512,6 +544,18 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.chain_entity_exclusion_provider.default', '']
             ],
             $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(0)
+        );
+        self::assertEquals(
+            ['api_first.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.first')->getArgument(4)
+        );
+        self::assertEquals(
+            ['api_second.yml', 'api_first.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.second')->getArgument(4)
+        );
+        self::assertEquals(
+            ['api.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.default')->getArgument(4)
         );
         self::assertEquals(
             [
@@ -717,5 +761,166 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
         $extension = new OroApiExtension();
         $extension->load([$config], $container);
+    }
+
+    public function testRegisterConfigParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('kernel.environment', 'prod');
+        $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
+
+        $config = [
+            'config_max_nesting_level' => 2,
+            'config_files'             => [
+                'first'  => [
+                    'file_name'    => 'api_first.yml',
+                    'request_type' => ['first']
+                ],
+                'second' => [
+                    'file_name'    => ['api_second.yml', 'api_first.yml'],
+                    'request_type' => ['second']
+                ]
+            ],
+            'api_doc_views'            => [
+                'view_1'       => [
+                    'label'        => 'View 1',
+                    'request_type' => ['first', 'rest']
+                ],
+                'default_view' => [
+                    'label'   => 'Default View',
+                    'default' => true
+                ]
+            ]
+        ];
+
+        $extension = new OroApiExtension();
+        $extension->load([$config], $container);
+
+        self::assertEquals(
+            ['view_1', 'default_view'],
+            $container->getParameter('oro_api.api_doc.views')
+        );
+        self::assertEquals(
+            'default_view',
+            $container->getParameter('oro_api.api_doc.default_view')
+        );
+
+        self::assertServiceExists($container, 'oro_api.config_extension_registry');
+        self::assertEquals(
+            2,
+            $container->getDefinition('oro_api.config_extension_registry')->getArgument(0)
+        );
+
+        self::assertServiceExists($container, 'oro_api.config_cache_warmer');
+        self::assertEquals(
+            [
+                'first'   => ['api_first.yml'],
+                'second'  => ['api_second.yml', 'api_first.yml'],
+                'default' => ['api.yml']
+            ],
+            $container->getDefinition('oro_api.config_cache_warmer')->getArgument(0)
+        );
+
+        self::assertServiceExists($container, 'oro_api.cache_manager');
+        self::assertEquals(
+            [
+                'first'   => ['first'],
+                'second'  => ['second'],
+                'default' => []
+            ],
+            $container->getDefinition('oro_api.cache_manager')->getArgument(0)
+        );
+        self::assertEquals(
+            [
+                'view_1'       => ['first', 'rest'],
+                'default_view' => []
+            ],
+            $container->getDefinition('oro_api.cache_manager')->getArgument(1)
+        );
+    }
+
+    public function testConfigurationForEmptyCors()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('kernel.environment', false);
+        $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
+
+        $config = [];
+
+        $extension = new OroApiExtension();
+        $extension->load([$config], $container);
+
+        self::assertSame(
+            600,
+            $container->getDefinition('oro_api.options.rest.set_cache_control')->getArgument(0)
+        );
+        self::assertSame(
+            600,
+            $container->getDefinition('oro_api.options.rest.cors.set_max_age')->getArgument(0)
+        );
+        self::assertSame(
+            [],
+            $container->getDefinition('oro_api.rest.cors.set_allow_origin')->getArgument(0)
+        );
+        self::assertSame(
+            [],
+            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(0)
+        );
+        self::assertSame(
+            [],
+            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(1)
+        );
+        self::assertSame(
+            false,
+            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(2)
+        );
+    }
+
+    public function testConfigurationForCors()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('kernel.environment', false);
+        $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
+
+        $config = [
+            'cors' => [
+                'preflight_max_age' => 123,
+                'allow_origins'     => ['https://foo.com'],
+                'allow_headers'     => ['AllowHeader1'],
+                'expose_headers'    => ['ExposeHeader1'],
+                'allow_credentials' => true
+            ]
+        ];
+
+        $extension = new OroApiExtension();
+        $extension->load([$config], $container);
+
+        self::assertSame(
+            $config['cors']['preflight_max_age'],
+            $container->getDefinition('oro_api.options.rest.set_cache_control')->getArgument(0)
+        );
+        self::assertSame(
+            $config['cors']['preflight_max_age'],
+            $container->getDefinition('oro_api.options.rest.cors.set_max_age')->getArgument(0)
+        );
+        self::assertSame(
+            $config['cors']['allow_origins'],
+            $container->getDefinition('oro_api.rest.cors.set_allow_origin')->getArgument(0)
+        );
+        self::assertSame(
+            $config['cors']['allow_headers'],
+            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(0)
+        );
+        self::assertSame(
+            $config['cors']['expose_headers'],
+            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(1)
+        );
+        self::assertSame(
+            $config['cors']['allow_credentials'],
+            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(2)
+        );
     }
 }

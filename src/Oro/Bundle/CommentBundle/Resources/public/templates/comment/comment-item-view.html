@@ -10,12 +10,12 @@
     <div class="comment-author-info">
         <% if (owner_id) {  %>
             <%= _.__('oro.comment.item.added',{
-                user: '<a class="user nowrap" href="' + owner_url + '">' +  _.escape(owner) + '</a>',
-                time: '<i class="date nowrap">' + createdTime + '</i>'
+                user: '<a class="user" href="' + owner_url + '">' +  _.escape(owner) + '</a>',
+                time: '<span class="date">' + createdTime + '</span>'
             }) %><% } %><% if (editor_id) { %>,
             <%= _.__('oro.comment.item.update',{
-                user: '<a class="user nowrap" href="' + editor_url + '">' +  _.escape(editor) + '</a>',
-                time: '<i class="date nowrap">' + updatedTime + '</i>'
+                user: '<a class="user" href="' + editor_url + '">' +  _.escape(editor) + '</a>',
+                time: '<span class="date">' + updatedTime + '</span>'
             }) %>
         <% } %>
     </div>
@@ -33,16 +33,20 @@
             <% } %>
             </div>
             <div class="dropdown link-to-record">
-                <a class="no-hash dropdown-toggle file-menu" href="javascript: void(0);" data-toggle="dropdown">
-                    <i class="fa <%- attachmentIcon %>"></i> <%- attachmentFileName %>
+                <% var attachmentTogglerId = _.uniqueId('dropdown-') %>
+                <a class="no-hash dropdown-toggle dropdown-toggle--no-caret file-menu" id="<%- attachmentTogglerId %>" href="#" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="fa <%- attachmentIcon %>" aria-hidden="true"></span> <%- attachmentFileName %>
                 </a>
-                <ul class="dropdown-menu file-menu" role="menu" aria-labelledby="dropdownMenu">
-                    <a class="no-hash" tabindex="-1" href="<%- attachmentURL %>">
+                <ul class="dropdown-menu file-menu" role="menu" aria-labelledby="<%- attachmentTogglerId %>">
+                    <li>
+                    <a class="dropdown-item no-hash" tabindex="-1" href="<%- attachmentURL %>">
                         <%= _.__('oro.comment.attachment.download') %><span>(<%- attachmentSize %>)</span>
                     </a>
                     <% if (attachmentThumbnail) { %>
-                        <a class="view-image no-hash" tabindex="-1" data-gallery="comment-view-<%- relationId %>" href="<%- attachmentURL %>"><%= _.__('oro.comment.attachment.view') %></a>
+                        <a class="dropdown-item view-image no-hash" tabindex="-1" data-gallery="comment-view-<%- relationId %>" href="<%- attachmentURL %>"><%= _.__('oro.comment.attachment.view') %></a>
                     <% } %>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -53,22 +57,25 @@
 <div class="comment-actions">
     <% if (hasActions) { %>
     <div class="more-bar-holder">
-        <div class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">...</a>
-            <ul class="dropdown-menu pull-right launchers-dropdown-menu">
+        <% var actionsTogglerId = _.uniqueId('dropdown-') %>
+        <div class="dropdown"><button data-toggle="dropdown" class="btn btn-light dropdown-toggle dropdown-toggle--no-caret" id="<%- actionsTogglerId %>"
+                                 data-placement="left-start" aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('oro.comment.actions_label') %>">
+            <span class="fa fa-ellipsis-h" aria-hidden="true"></span></button>
+            <ul class="dropdown-menu launchers-dropdown-menu" role="menu" aria-labelledby="<%- actionsTogglerId %>">
                 <li>
-                    <ul class="nav nav-pills icons-holder launchers-list">
+                    <ul class="launchers-list">
                         <% if (editable) { %>
-                        <li class="launcher-item">
-                            <a href="#" class="action item-edit-button" title="<%= _.__('oro.comment.action.update') %>">
-                                <i class="fa-pencil-square-o hide-text"><%= _.__('oro.comment.action.update') %></i>
-                            </a>
+                        <li class="launcher-item mode-icon-only">
+                            <button class="btn btn-icon btn-light action mode-icon-only item-edit-button" title="<%= _.__('oro.comment.action.update') %>">
+                                <span class="fa-pencil-square-o hide-text" aria-hidden="true"><%= _.__('oro.comment.action.update') %></span>
+                            </button>
                         </li>
                         <% } %>
                         <% if (removable) { %>
-                        <li class="launcher-item">
-                            <a href="#" class="action item-remove-button" title="<%= _.__('oro.comment.action.delete') %>">
-                                <i class="fa-trash-o hide-text"><%= _.__('oro.comment.action.delete') %></i>
-                            </a>
+                        <li class="launcher-item mode-icon-only">
+                            <button class="btn btn-icon btn-light action mode-icon-only item-remove-button" title="<%= _.__('oro.comment.action.delete') %>">
+                                <span class="fa-trash-o hide-text" aria-hidden="true"><%= _.__('oro.comment.action.delete') %></span>
+                            </button>
                         </li>
                         <% } %>
                     </ul>

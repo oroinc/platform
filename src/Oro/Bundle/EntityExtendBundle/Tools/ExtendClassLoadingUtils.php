@@ -4,6 +4,9 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Oro\Component\PhpUtils\ClassLoader;
 
+/**
+ * A set of reusable static methods related to extended entity proxy classes registration.
+ */
 class ExtendClassLoadingUtils
 {
     /**
@@ -47,6 +50,17 @@ class ExtendClassLoadingUtils
     public static function getAliasesPath($cacheDir)
     {
         return self::getEntityCacheDir($cacheDir) . DIRECTORY_SEPARATOR . 'alias.data';
+    }
+
+    /**
+     * Checks if a configuration file contains class aliases for extended entities exists.
+     *
+     * @param string $cacheDir
+     * @return bool
+     */
+    public static function aliasesExist($cacheDir)
+    {
+        return file_exists(self::getAliasesPath($cacheDir));
     }
 
     /**

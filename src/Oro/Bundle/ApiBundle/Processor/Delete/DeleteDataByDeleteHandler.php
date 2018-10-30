@@ -17,12 +17,10 @@ class DeleteDataByDeleteHandler extends BaseProcessor
     protected function processDelete($data, DeleteHandler $handler, EntityManagerInterface $em)
     {
         if (!\is_object($data)) {
-            throw new \RuntimeException(
-                \sprintf(
-                    'The result property of the context should be an object, "%s" given.',
-                    \is_object($data) ? \get_class($data) : \gettype($data)
-                )
-            );
+            throw new \RuntimeException(\sprintf(
+                'The result property of the context should be an object, "%s" given.',
+                \is_object($data) ? \get_class($data) : \gettype($data)
+            ));
         }
 
         $handler->processDelete($data, $em);

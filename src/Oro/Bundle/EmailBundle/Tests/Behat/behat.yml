@@ -12,6 +12,7 @@ oro_behat_extension:
         - OroUserBundle::FeatureContext
         - OroActivityListBundle::ActivityContext
         - OroConfigBundle::FeatureContext
+        - OroSecurityBundle::ACLContext
       paths:
         - '@OroEmailBundle/Tests/Behat/Features'
   elements:
@@ -28,6 +29,18 @@ oro_behat_extension:
             type: 'named'
             locator: ['field', 'From']
             element: Select2Offscreen
+
+    Email Template Form:
+      selector: "form[id^='oro_email_emailtemplate']"
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Subject:
+            type: 'css'
+            locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__subject"]'
+          Content:
+            type: 'css'
+            locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__content"]'
 
     EmailNotificationLink:
       selector: 'a.email-notification-icon'

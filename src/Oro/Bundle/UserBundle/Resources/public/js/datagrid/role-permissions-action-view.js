@@ -7,16 +7,13 @@ define(function(require) {
     var DropdownMenuCollectionView = require('oroui/js/app/views/dropdown-menu-collection-view');
 
     RolePermissionsActionView = BaseView.extend({
-        className: 'dropdown',
+        className: 'dropleft',
 
         icon: '',
 
         autoRender: true,
 
-        template: function() {
-            return '<a data-toggle="dropdown" ' +
-                'class="dropdown-toggle role-permissions-action-launcher" href="javascript:void(0);">...</a>';
-        },
+        template: require('tpl!orouser/templates/datagrid/role-permissions-action-view.html'),
 
         /**
          * @type {AccessLevelsCollection}
@@ -32,7 +29,7 @@ define(function(require) {
             'shown.bs.dropdown': 'onDropdownOpen',
             'click': '_showDropdown',
             'mouseover .dropdown-toggle': '_showDropdown',
-            'mouseleave .dropdown-menu, .dropdown-menu__placeholder': '_hideDropdown'
+            'mouseleave': '_hideDropdown'
         },
 
         /**
@@ -59,14 +56,22 @@ define(function(require) {
             RolePermissionsActionView.__super__.dispose.call(this);
         },
 
+        delegateListeners: function() {
+            RolePermissionsActionView.__super__.delegateListeners.call(this);
+            this.listenTo(this.accessLevels, 'sync', function() {
+                this.$('[data-toggle="dropdown"]').dropdown('update');
+            });
+        },
+
         render: function() {
             var dropdown = this.subview('dropdown');
             if (dropdown) {
+                this.$('[data-toggle="dropdown"]').dropdown('dispose');
                 dropdown.$el.detach();
             }
             RolePermissionsActionView.__super__.render.call(this);
             if (dropdown) {
-                this.$el.append(dropdown.$el);
+                this.$('.dropdown-menu').replaceWith(dropdown.$el);
             }
         },
 
@@ -75,25 +80,15 @@ define(function(require) {
             var accessLevels = this.accessLevels;
             if (!dropdown) {
                 dropdown = new DropdownMenuCollectionView({
-                    className: [
-                        'dropdown-menu',
-                        'dropdown-menu-collection',
-                        'dropdown-menu__action-cell',
-                        'dropdown-menu__role-permissions-action'
-                    ].join(' '),
+                    el: this.$('.dropdown-menu'),
                     collection: accessLevels,
                     keysMap: {
                         id: 'access_level',
                         text: 'access_level_label'
-                    },
-                    dropdownMenuOptions: {
-                        align: 'right',
-                        container: true
                     }
                 });
                 this.listenTo(dropdown, 'selected', this.onAccessLevelSelect);
                 this.subview('dropdown', dropdown);
-                this.$el.append(dropdown.$el);
             }
             if (!accessLevels.length) {
                 accessLevels.fetch();
@@ -102,20 +97,20 @@ define(function(require) {
 
         onAccessLevelSelect: function(patch) {
             this.trigger('row-access-level-change', patch);
-            if (this.$('.dropdown-toggle').parent().hasClass('open')) {
-                this.$('.dropdown-toggle').dropdown('toggle');
+            if (this.$('[data-toggle="dropdown"]').parent().hasClass('show')) {
+                this.$('[data-toggle="dropdown"]').dropdown('toggle');
             }
         },
 
         _showDropdown: function(e) {
-            if (!this.$('.dropdown-toggle').parent().hasClass('open')) {
-                this.$('.dropdown-toggle').dropdown('toggle');
+            if (!this.$('[data-toggle="dropdown"]').parent().hasClass('show')) {
+                this.$('[data-toggle="dropdown"]').dropdown('toggle');
             }
         },
 
         _hideDropdown: function(e) {
-            if (this.$('.dropdown-toggle').parent().hasClass('open')) {
-                this.$('.dropdown-toggle').dropdown('toggle');
+            if (this.$('[data-toggle="dropdown"]').parent().hasClass('show')) {
+                this.$('[data-toggle="dropdown"]').dropdown('toggle');
             }
             e.stopPropagation();
         }
