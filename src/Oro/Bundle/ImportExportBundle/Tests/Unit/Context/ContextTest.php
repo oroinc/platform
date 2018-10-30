@@ -32,6 +32,17 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         ], $context->getPostponedRows());
     }
 
+    public function testIncrementRead()
+    {
+        $context = new Context(['incremented_read' => false]);
+        $context->incrementReadCount(1);
+        self::assertNull($context->getReadCount());
+
+        $context->removeOption('incremented_read');
+        $context->incrementReadCount(1);
+        self::assertEquals(1, $context->getReadCount());
+    }
+
     public function testExceptions()
     {
         $context = new Context([]);
