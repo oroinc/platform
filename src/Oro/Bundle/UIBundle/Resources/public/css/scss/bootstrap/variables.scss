@@ -13,6 +13,14 @@ $top-padding: $content-padding;
 $bottom-padding: $content-padding;
 $margin-bottom-box: $content-padding;
 
+$base-font-size:                        14px;
+$base-font-size--xxl:                   32px;
+$base-font-size--xl:                    24px;
+$base-font-size--l:                     18px;
+$base-font-size--m:                     16px;
+$base-font-size--s:                     12px;
+$base-font-size--xs:                    11px;
+
 // Your variable overrides
 $border-radius: 4px;
 $btn-border-radius: 16px;
@@ -51,12 +59,9 @@ $btn-group-divider-width: 1px;
 $btn-group-divider-color: rgba($primary-inverse, .4);
 
 // Navbar
-
 $nav-tabs-link-hover-border-color: $primary-750;
 
-
 // Pagination
-
 $pagination-padding-x: 12px;
 $pagination-padding-y: 5.5px;
 $pagination-mini-padding-x: 4px;
@@ -121,9 +126,7 @@ $modal-dialog-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
 $modal-footer-bg: $primary-900;
 $modal-footer-padding: 14px 24px;
 
-
 // Progress bars
-
 $progress-height: 22px;
 $progress-font-size: 22px;
 $progress-bg: $primary-860;
@@ -132,24 +135,28 @@ $progress-box-shadow: null;
 $progress-bar-color: $additional-dark;
 $progress-bar-bg: $primary-600;
 
-$popover-z-index: 991;
-$popover-border-width: 0px; /* stylelint-disable-line length-zero-no-unit */
+// Popover
+$popover-font-size: 14px;
+$popover-max-width: 250px;
 $popover-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
-$popover-body-bg: #fff;
-$popover-body-padding-y: 10px;
-$popover-body-padding-x: 12px;
-$popover-body-offset-right: 28px;
-$popover-body-offset-right-no-close: 12px;
-
-$popover-max-width: 310px;
+$popover-border-width: 0px; /* stylelint-disable-line length-zero-no-unit */
 $popover-border-radius: 2px;
 $popover-border: none;
+$zindex-popover: 991;
+
+$popover-body-padding-y: 10px;
+$popover-body-padding-x: 12px;
+$popover-body-bg: #fff;
+$popover-body-offset-right: 28px;
+
+$popover-body-offset-right-no-close: 12px;
 
 $popover-close-position: absolute;
 $popover-close-position-x: 7px;
 $popover-close-position-y: 7px;
 $popover-close-cursor: pointer;
 $popover-close-color: $primary-700;
+$popover-close-before-font-size: $base-font-size--m;
 
 $popover-arrow-color: #fff;
 $popover-arrow-size: 12px;
@@ -204,14 +211,6 @@ $progress-bar-gradient-end:             #d3d3d3;
 $page-border-color:                     #ccc;
 $navigation-background-color:           $primary-900;
 $page-sidebar-background-color:         $navigation-background-color;
-
-$base-font-size:                        14px;
-$base-font-size--xxl:                   32px;
-$base-font-size--xl:                    24px;
-$base-font-size--l:                     18px;
-$base-font-size--m:                     16px;
-$base-font-size--s:                     12px;
-$base-font-size--xs:                    11px;
 
 $input-border-radius:                   3px;
 $window-border-radius:                  3px;
