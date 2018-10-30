@@ -23,7 +23,7 @@ class DateFilterSubsriberTest extends \PHPUnit\Framework\TestCase
     /** @var DateFilterModifier|\PHPUnit\Framework\MockObject\MockObject */
     protected $modifier;
 
-    private const TIMEZONE = 'Europe/Moscow';
+    private const TIMEZONE = 'Europe/Kiev';
 
     protected function setUp()
     {

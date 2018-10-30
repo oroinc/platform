@@ -57,7 +57,7 @@ class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
         $date = new \DateTime("now", $tz);
         $trans = $tz->getTransitions();
         foreach ($trans as $k => $t) {
-            if ($t["ts"] > $date->format('U')) {
+            if ($t["ts"] >= $date->format('U')) {
                 return $trans[$k-1]['isdst'];
             }
         }
