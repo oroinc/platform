@@ -6,6 +6,7 @@ use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
 use Oro\Bundle\DistributionBundle\Script\Runner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\TempDirExtension;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -13,6 +14,8 @@ use Psr\Log\LoggerInterface;
  */
 class RunnerTest extends WebTestCase
 {
+    use TempDirExtension;
+
     /**
      * @var string
      */
@@ -231,11 +234,7 @@ class RunnerTest extends WebTestCase
 
     public function testShouldRemoveCachedFiles()
     {
-        $tempDir = sys_get_temp_dir() . '/platform-app-tmp';
-        if (is_dir($tempDir)) {
-            rmdir($tempDir);
-        }
-        mkdir($tempDir);
+        $tempDir = $this->getTempDir('platform-app-tmp');
 
         $bundlesFileName = $tempDir . '/bundles.php';
         $containerFileName = $tempDir . '/' . uniqid() . 'ProjectContainer.php';

@@ -72,20 +72,12 @@ abstract class WebTestCase extends BaseWebTestCase
     private static $clientInstance;
 
     /**
-     * @var Client
-     */
-    private static $soapClientInstance;
-
-    /**
      * @var array
      */
     protected static $loadedFixtures = [];
 
     /** @var Client */
     protected $client;
-
-    /** @var Client */
-    protected $soapClient;
 
     /** @var callable */
     private static $resetCallback;
@@ -122,7 +114,6 @@ abstract class WebTestCase extends BaseWebTestCase
             $self = $this;
             self::$resetCallback = function () use ($self) {
                 $self->client = null;
-                $self->soapClient = null;
             };
         }
     }
@@ -314,10 +305,6 @@ abstract class WebTestCase extends BaseWebTestCase
             self::$clientInstance = null;
         }
 
-        if (self::$soapClientInstance) {
-            self::$soapClientInstance = null;
-        }
-
         static::ensureKernelShutdown();
     }
 
@@ -442,55 +429,6 @@ abstract class WebTestCase extends BaseWebTestCase
     {
         $annotations = \PHPUnit\Util\Test::parseTestMethodAnnotations($className);
         return isset($annotations['class'][$annotationName]);
-    }
-
-    /**
-     * @param string $wsdl
-     * @param array $options
-     * @param bool $force
-     *
-     * @return SoapClient
-     * @throws \Exception
-     */
-    protected function initSoapClient($wsdl = null, array $options = [], $force = false)
-    {
-        if (!self::$soapClientInstance || $force) {
-            if ($wsdl === null) {
-                $wsdl = "http://localhost/api/soap";
-            }
-
-            $options = array_merge(
-                [
-                    'location' => $wsdl,
-                    'soap_version' => SOAP_1_2
-                ],
-                $options
-            );
-
-            $client = $this->getClientInstance();
-            if ($options['soap_version'] == SOAP_1_2) {
-                $contentType = 'application/soap+xml';
-            } else {
-                $contentType = 'text/xml';
-            }
-            $client->request('GET', $wsdl, [], [], ['CONTENT_TYPE' => $contentType]);
-            $status = $client->getResponse()->getStatusCode();
-            $wsdl = $client->getResponse()->getContent();
-            if ($status >= 400) {
-                throw new \Exception($wsdl, $status);
-            }
-            //save to file
-            $file = tempnam(sys_get_temp_dir(), date("Ymd") . '_') . '.xml';
-            $fl = fopen($file, 'bw');
-            fwrite($fl, $wsdl);
-            fclose($fl);
-
-            self::$soapClientInstance = new SoapClient($file, $options, $client);
-
-            unlink($file);
-        }
-
-        return $this->soapClient = self::$soapClientInstance;
     }
 
     /**
@@ -1133,18 +1071,6 @@ abstract class WebTestCase extends BaseWebTestCase
     protected function getClient()
     {
         return self::getClientInstance();
-    }
-
-    /**
-     * @return Client
-     */
-    protected function getSoapClient()
-    {
-        if (!self::$soapClientInstance) {
-            throw new \LogicException('Client is not initialized, call "initSoapClient" method first');
-        }
-
-        return self::$soapClientInstance;
     }
 
     /**

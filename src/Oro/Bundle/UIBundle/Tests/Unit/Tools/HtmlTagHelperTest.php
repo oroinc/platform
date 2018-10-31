@@ -4,10 +4,13 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Filesystem\Filesystem;
 
 class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var HtmlTagHelper */
     protected $helper;
 
@@ -19,8 +22,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->cachePath = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . 'cache_test_data';
-        mkdir($this->cachePath);
+        $this->cachePath = $this->getTempDir('cache_test_data');
         $this->htmlTagProvider = $this->createMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
         $this->helper = new HtmlTagHelper($this->htmlTagProvider, $this->cachePath);
     }
