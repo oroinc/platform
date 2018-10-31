@@ -498,6 +498,13 @@ h5.user-fieldset {
     margin: side-values(0 0 16px);
 }
 
+.widget-title {
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 1.5;
+    display: block;
+}
+
 .page-size .dropdown-menu {
     min-width: 100%;
 }
@@ -667,10 +674,7 @@ label.radio.error {
     background-color: $primary-inverse;
 
     .title {
-        padding-bottom: $content-padding / 2;
-
-        font-size: 20px;
-        font-weight: bold;
+        padding-bottom: $content-padding-medium;
     }
 
     .box-content {
@@ -758,11 +762,7 @@ span.validation-failed {
 
 .responsive-cell .box-type1 {
     .title {
-        overflow: hidden;
-
-        .widget-title {
-            line-height: 21px;
-        }
+        @include clearfix();
     }
 }
 

@@ -54,7 +54,7 @@ $btn-theme-light: (
     'active-border': transparent,
     'active-color': $primary-500,
     'active-box-shadow': none,
-    'disabled-color': $primary-400
+    'disabled-opacity': .25
 ) !default;
 
 $btn-theme-lighter: (
@@ -68,7 +68,7 @@ $btn-theme-lighter: (
     'active-border': transparent,
     'active-color': $primary-500,
     'active-box-shadow': none,
-    'disabled-color': $primary-700
+    'disabled-opacity': .25
 ) !default;
 
 $btn-theme-primary: (
@@ -127,7 +127,7 @@ $btn-theme-square-default: (
     'active-border': $primary-750,
     'active-color': $primary-500,
     'active-box-shadow': inset 0 2px 3px 2px rgba(0, 0, 0, .21),
-    'disabled-color': $primary-200
+    'disabled-opacity': .25
 ) !default;
 
 $btn-theme-square-keys: () !default;

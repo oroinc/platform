@@ -122,6 +122,7 @@
         &.responsive-medium {
             &:not(.responsive-section-no-blocks) {
                 .responsive-cell {
+                    padding-#{$start}: 0;
                     padding-#{$end}: 0;
                 }
             }

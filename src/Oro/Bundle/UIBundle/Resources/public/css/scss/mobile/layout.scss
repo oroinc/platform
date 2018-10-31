@@ -78,12 +78,8 @@ body {
                 }
 
                 &:first-child {
-                    padding-left: $content-padding * 2;
+                    padding-left: $content-padding;
                     padding-right: 24px;
-
-                    .user-fieldset {
-                        margin-left: -($content-padding * 2);
-                    }
                 }
 
                 &:last-child {
@@ -92,14 +88,14 @@ body {
                 }
 
                 &:only-child {
-                    padding-left: $content-padding * 2;
+                    padding-left: $content-padding;
                 }
 
                 .inner-grid {
-                    margin-#{$start}: -32px;
+                    margin-#{$start}: -$content-padding;
 
                     .grid-views {
-                        margin-#{$start}: 32px;
+                        margin-#{$start}: $content-padding;
                     }
                 }
             }
@@ -161,7 +157,7 @@ body {
     border-radius: 3px;
 
     .title {
-        padding-bottom: $content-padding;
+        padding-bottom: 10px;
     }
 
     .calendar-container {
@@ -170,7 +166,7 @@ body {
 }
 
 .responsive-cell {
-    margin-bottom: 16px;
+    margin-bottom: $content-padding;
 
     .tab-content {
         .box-type1 {
@@ -318,12 +314,8 @@ form > .layout-content {
                     }
 
                     &:first-child {
-                        padding-left: $content-padding * 2;
+                        padding-left: $content-padding;
                         padding-right: 24px;
-
-                        .user-fieldset {
-                            margin-left: -($content-padding * 2);
-                        }
                     }
 
                     &:last-child {
@@ -332,14 +324,14 @@ form > .layout-content {
                     }
 
                     &:only-child {
-                        padding-left: $content-padding * 2;
+                        padding-left: $content-padding;
                     }
 
                     .inner-grid {
-                        margin-#{$start}: -32px;
+                        margin-#{$start}: -$content-padding;
 
                         .grid-views {
-                            margin-#{$start}: 32px;
+                            margin-#{$start}: $content-padding;
                         }
                     }
                 }

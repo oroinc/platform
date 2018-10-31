@@ -11,6 +11,7 @@ $filter-box-criteria-visibility: hidden !default;
 $filter-box-criteria-z-index: $zindex-dropdown - 100 !default;
 $filter-box-criteria-offset-top: 8px !default;
 $filter-box-criteria-top: auto !default;
+$filter-box-criteria-offset-left: -9999px !default;
 $filter-box-criteria-focus-outline: none !default;
 
 $filter-box-criteria-btn-group-offset-left: 0 !default;
@@ -38,6 +39,7 @@ $filter-default-value-display: none !default;
 
 $filter-box-item-offset-right: 8px !default;
 $filter-box-item-offset-bottom: 8px !default;
+$filter-box-item-position: relative !default;
 $filter-box-item-display: inline-block !default;
 $filter-box-item-vertical-align: middle !default;
 $filter-box-item-white-space: nowrap !default;

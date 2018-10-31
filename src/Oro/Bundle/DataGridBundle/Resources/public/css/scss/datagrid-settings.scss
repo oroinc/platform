@@ -182,6 +182,11 @@
             overflow-x: hidden;
             margin: 0;
 
+            .thead-sizing {
+                display: table-header-group;
+                visibility: hidden;
+            }
+
             .table {
                 margin-top: -1px;
 
