@@ -1137,13 +1137,11 @@
         {% endif %}
         {% if url is not empty %}
             <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="{{ class }}"
-                {% if (not oro_is_url_local(url)) %} target="_blank"{% endif %}
+            {% if (not oro_is_url_local(url)) %} target="_blank"{% endif %}
             {% for name,value in attributes|default({}) %}
                 {{ name }}="{{ value }}"
             {% endfor %}
-            >
-                {{ text }}
-            </a>
+            >{{ text }}</a>
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
