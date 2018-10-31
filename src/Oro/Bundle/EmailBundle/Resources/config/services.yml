@@ -233,6 +233,7 @@ services:
             - '@oro_email.email.address.manager'
             - '@oro_email.email.address.helper'
             - '@doctrine'
+            - '@logger'
 
     oro_email.email.model.builder:
         class: '%oro_email.email.model.builder.class%'
