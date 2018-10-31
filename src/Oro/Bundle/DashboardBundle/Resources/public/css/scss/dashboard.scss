@@ -1,9 +1,12 @@
 /* @theme: admin.oro; */
 
 .dashboard-selector-container {
+    text-align: $start !important;
+
     label {
-        padding-top: 4px;
+        padding-top: 6px;
         padding-#{$end}: 10px;
+        margin-bottom: 0;
     }
 
     select {
