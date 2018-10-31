@@ -6,9 +6,12 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Liuggio\ExcelBundle\Factory;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\XlsxFileWriter;
+use Oro\Component\Testing\TempDirExtension;
 
 class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var XlsxFileWriter */
     protected $writer;
 
@@ -33,8 +36,7 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
 
         $this->excel = new Factory();
 
-        $this->tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'XlsxFileWriterTest';
-        @\mkdir($this->tmpDir);
+        $this->tmpDir = $this->getTempDir('XlsxFileWriterTest');
 
         $this->filePath = $this->tmpDir . '/new_file.xlsx';
         $this->writer = new XlsxFileWriter($this->contextRegistry, $this->excel);
@@ -42,10 +44,7 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
 
     protected function tearDown()
     {
-        if (is_file($this->filePath)) {
-            unlink($this->filePath);
-        }
-        @\rmdir($this->tmpDir);
+        $this->writer->close();
     }
 
     /**
@@ -108,7 +107,7 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
 
     public function optionsDataProvider()
     {
-        $filePath = sys_get_temp_dir() . '/XlsxFileWriterTest/new_file.xlsx';
+        $filePath = $this->getTempDir('XlsxFileWriterTest', null) . DIRECTORY_SEPARATOR . 'new_file.xlsx';
 
         return [
             'first_item_header' => [
