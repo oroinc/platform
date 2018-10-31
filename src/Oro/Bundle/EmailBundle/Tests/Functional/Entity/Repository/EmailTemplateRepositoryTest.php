@@ -49,7 +49,7 @@ class EmailTemplateRepositoryTest extends WebTestCase
         $owner = $this->getReference(LoadEmailTemplateData::OWNER_USER_REFERENCE);
 
         $actualResult = $this->getRepository()->getTemplateByEntityName(
-            'Entity\Name',
+            LoadEmailTemplateData::ENTITY_NAME,
             $owner->getOrganization(),
             true,
             true
@@ -67,7 +67,8 @@ class EmailTemplateRepositoryTest extends WebTestCase
             $this->getMainEmailTemplateByName('sync_wrong_credentials_system_box')->getId(),
             $this->getMainEmailTemplateByName('sync_wrong_credentials_user_box')->getId(),
             $this->getReference(LoadEmailTemplateData::SYSTEM_WITH_ENTITY_TEMPLATE_REFERENCE)->getId(),
-            $this->getMainEmailTemplateByName('system_maintenance')->getId()
+            $this->getReference(LoadEmailTemplateData::SYSTEM_FAIL_TO_COMPILE)->getId(),
+            $this->getMainEmailTemplateByName('system_maintenance')->getId(),
         ];
 
         self::assertEquals($expectedIds, $this->getEntitiesIds($actualResult));

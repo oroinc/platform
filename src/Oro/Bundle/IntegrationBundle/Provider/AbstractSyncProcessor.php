@@ -19,7 +19,10 @@ use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
-abstract class AbstractSyncProcessor implements SyncProcessorInterface, LoggerAwareInterface
+abstract class AbstractSyncProcessor implements
+    SyncProcessorInterface,
+    LoggerAwareInterface,
+    LoggerStrategyAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -57,9 +60,7 @@ abstract class AbstractSyncProcessor implements SyncProcessorInterface, LoggerAw
     }
 
     /**
-     * Get logger strategy
-     *
-     * @return LoggerStrategy
+     * {@inheritdoc}
      */
     public function getLoggerStrategy()
     {
