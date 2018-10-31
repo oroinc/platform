@@ -23,7 +23,7 @@
         display: flex;
 
         > .control-label {
-            width: 182px;
+            width: $form-horizontal-control-label-width;
             font-weight: normal;
             text-align: #{$end};
             flex-shrink: 0;
@@ -70,7 +70,7 @@
         }
 
         .controls {
-            margin-#{$start}: 24px;
+            margin-#{$start}: $form-horizontal-control-margin-start;
             text-align: #{$start};
             flex-grow: 1;
 

@@ -327,7 +327,7 @@ input[type="color"],
 .form-container {
     .control-group {
         &:not(:last-child) {
-            margin: 0 0 16px;
+            margin: 0 0 $form-container-control-row-space;
         }
     }
 }

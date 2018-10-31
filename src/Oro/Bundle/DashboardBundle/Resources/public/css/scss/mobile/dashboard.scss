@@ -82,4 +82,31 @@
 
         text-align: center;
     }
+
+    .action-cell {
+        font-size: 0;
+
+        .btn-icon {
+            width: $dashboard-mobile-items-btn-size;
+            height: $dashboard-mobile-items-btn-size;
+
+            & + .btn-icon {
+                margin-#{$start}: $dashboard-mobile-items-btn-space;
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: $small-devices-media-breakpoint) {
+    .dashboard-widget-items {
+        .items-selector-widget {
+            width: 100%;
+            margin-#{$end}: 0;
+            margin-bottom: $content-padding-medium;
+
+            & + .btn-group + .btn-group {
+                float: $end;
+            }
+        }
+    }
 }

@@ -423,12 +423,28 @@
     flex-wrap: wrap;
 
     .controls.items-table-container {
-        margin: $dashboard-widget-configuration-items-table-container-margin;
+        margin-#{$start}: $dashboard-configuration-items-table-margin-start;
+        margin-top: $dashboard-configuration-items-table-margin-top;
         flex-basis: 100%;
     }
 
     .btn-group + .btn-group {
         margin-#{$start}: $dashboard-widget-configuration-buttons-space;
+    }
+
+    .widget-items-item-row .action-cell {
+        @include clearfix();
+
+        .btn-icon:not(.btn) {
+            display: block;
+            color: $dashboard-configuration-items-btn-color;
+            float: $start;
+
+            &:active,
+            &:hover {
+                color: $dashboard-configuration-items-btn-active-color;
+            }
+        }
     }
 }
 
