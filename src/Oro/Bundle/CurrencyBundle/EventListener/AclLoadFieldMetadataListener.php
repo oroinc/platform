@@ -29,18 +29,13 @@ class AclLoadFieldMetadataListener
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /**
      * @param ConfigManager       $configManager
-     * @param TranslatorInterface $translator
      */
-    public function __construct(ConfigManager $configManager, TranslatorInterface $translator)
+    public function __construct(ConfigManager $configManager)
     {
         $this->multicurrencyConfigProvider = $configManager->getProvider('multicurrency');
         $this->entityConfigProvider = $configManager->getProvider('entity');
-        $this->translator = $translator;
     }
 
     /**
@@ -86,9 +81,7 @@ class AclLoadFieldMetadataListener
             ) {
                 $fieldsToAdd[$target] = new FieldSecurityMetadata(
                     $target,
-                    $this->translator->trans(
-                        $this->entityConfigProvider->getConfig($className, $fieldName)->get('label')
-                    ),
+                    $this->entityConfigProvider->getConfig($className, $fieldName)->get('label'),
                     ['VIEW', 'CREATE', 'EDIT']
                 );
             }
