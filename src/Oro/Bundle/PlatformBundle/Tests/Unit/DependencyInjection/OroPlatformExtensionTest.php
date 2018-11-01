@@ -145,6 +145,7 @@ class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
         $platformExtension->prepend($container);
 
         self::assertEquals($doctrineConfig, $container->getExtensionConfig('doctrine'));
+        self::assertEquals('utf8', $container->getParameter('database_charset'));
     }
 
     public function testDbalConfigWithCommonConfig()
@@ -243,5 +244,188 @@ class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
             $doctrineConfig[2]
         ];
         self::assertEquals($expectedDoctrineConfig, $container->getExtensionConfig('doctrine'));
+        self::assertEquals('utf8mb4', $container->getParameter('database_charset'));
+    }
+
+    public function testDatabaseCharsetShouldBeSetToUtf8IfItDoesNotSpecified()
+    {
+        $container = new ExtendedContainerBuilder();
+        $container->setParameter('database_driver', 'pdo_mysql');
+
+        $platformExtension = new OroPlatformExtension();
+        $platformExtension->prepend($container);
+
+        self::assertEquals('utf8', $container->getParameter('database_charset'));
+    }
+
+    public function testDatabaseCharsetShouldNotBeChangedIfItIsSpecified()
+    {
+        $charset = 'utf8mb4';
+        $container = new ExtendedContainerBuilder();
+        $container->setParameter('database_driver', 'pdo_mysql');
+        $container->setParameter('database_charset', $charset);
+
+        $platformExtension = new OroPlatformExtension();
+        $platformExtension->prepend($container);
+
+        self::assertEquals($charset, $container->getParameter('database_charset'));
+    }
+
+    public function testDatabaseCharsetShouldBeExtractedFromDefaultConnection()
+    {
+        $doctrineConfig = [
+            [
+                'dbal' => [
+                    'default_connection' => 'default',
+                    'connections'        => [
+                        'default' => [
+                            'driver'  => 'pdo_mysql',
+                            'dbname'  => 'test',
+                            'host'    => 'localhost',
+                            'port'    => '3306',
+                            'charset' => 'utf8mb4'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'dbal' => [
+                    'connections' => [
+                        'default' => [
+                            'charset' => 'ansii'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $container = new ExtendedContainerBuilder();
+        $container->setParameter('database_driver', 'pdo_mysql');
+        $container->setExtensionConfig('doctrine', $doctrineConfig);
+
+        $platformExtension = new OroPlatformExtension();
+        $platformExtension->prepend($container);
+
+        self::assertEquals('ansii', $container->getParameter('database_charset'));
+    }
+
+    public function testDatabaseCharsetShouldBeSetToUtf8IfDefaultConnectionCharsetIsParameter()
+    {
+        $doctrineConfig = [
+            [
+                'dbal' => [
+                    'default_connection' => 'default',
+                    'connections'        => [
+                        'default' => [
+                            'driver'  => 'pdo_mysql',
+                            'dbname'  => 'test',
+                            'host'    => 'localhost',
+                            'port'    => '3306',
+                            'charset' => 'utf8mb4'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'dbal' => [
+                    'connections' => [
+                        'default' => [
+                            'charset' => '%database_charset%'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $container = new ExtendedContainerBuilder();
+        $container->setParameter('database_driver', 'pdo_mysql');
+        $container->setExtensionConfig('doctrine', $doctrineConfig);
+
+        $platformExtension = new OroPlatformExtension();
+        $platformExtension->prepend($container);
+
+        self::assertEquals('utf8', $container->getParameter('database_charset'));
+    }
+
+    public function testDatabaseCharsetShouldBeExtractedFromDefaultConnectionCharsetIfCommonConfigCharsetIsParameter()
+    {
+        $doctrineConfig = [
+            [
+                'dbal' => [
+                    'default_connection' => 'connection1',
+                    'connections'        => [
+                        'connection1' => [
+                            'driver' => 'pdo_mysql',
+                            'dbname' => 'test',
+                            'host'   => 'localhost',
+                            'port'   => '3306'
+                        ],
+                        'connection2' => [
+                            'driver'  => 'pdo_mysql',
+                            'dbname'  => 'test',
+                            'host'    => 'localhost',
+                            'port'    => '3306',
+                            'charset' => 'utf8mb4'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'dbal' => [
+                    'default_connection' => 'connection2',
+                    'charset'            => '%database_charset%'
+                ]
+            ]
+        ];
+
+        $container = new ExtendedContainerBuilder();
+        $container->setParameter('database_driver', 'pdo_mysql');
+        $container->setExtensionConfig('doctrine', $doctrineConfig);
+
+        $platformExtension = new OroPlatformExtension();
+        $platformExtension->prepend($container);
+
+        self::assertEquals('utf8mb4', $container->getParameter('database_charset'));
+    }
+
+    public function testDatabaseCharsetShouldBeExtractedFromCommonConfig()
+    {
+        $doctrineConfig = [
+            [
+                'dbal' => [
+                    'default_connection' => 'connection1',
+                    'connections'        => [
+                        'connection1' => [
+                            'driver' => 'pdo_mysql',
+                            'dbname' => 'test',
+                            'host'   => 'localhost',
+                            'port'   => '3306'
+                        ],
+                        'connection2' => [
+                            'driver'  => 'pdo_mysql',
+                            'dbname'  => 'test',
+                            'host'    => 'localhost',
+                            'port'    => '3306',
+                            'charset' => 'utf8mb4'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'dbal' => [
+                    'default_connection' => 'connection2',
+                    'charset'            => 'ansii'
+                ]
+            ]
+        ];
+
+        $container = new ExtendedContainerBuilder();
+        $container->setParameter('database_driver', 'pdo_mysql');
+        $container->setExtensionConfig('doctrine', $doctrineConfig);
+
+        $platformExtension = new OroPlatformExtension();
+        $platformExtension->prepend($container);
+
+        self::assertEquals('ansii', $container->getParameter('database_charset'));
     }
 }
