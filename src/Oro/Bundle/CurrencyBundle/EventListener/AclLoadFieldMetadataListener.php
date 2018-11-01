@@ -29,13 +29,18 @@ class AclLoadFieldMetadataListener
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
      * @param ConfigManager       $configManager
+     * @param TranslatorInterface $translator
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, TranslatorInterface $translator)
     {
         $this->multicurrencyConfigProvider = $configManager->getProvider('multicurrency');
         $this->entityConfigProvider = $configManager->getProvider('entity');
+        $this->translator = $translator;
     }
 
     /**
