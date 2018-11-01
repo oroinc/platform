@@ -17,6 +17,7 @@ oro:
             NONE: None
         organization:
             access_denied: You don't have access to organization "%organization_name%"
+            switch: Organization switch
         permissions: Action Permissions
         field_acl:
             is_enabled:

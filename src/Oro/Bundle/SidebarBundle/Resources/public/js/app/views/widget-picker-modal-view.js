@@ -16,7 +16,7 @@ define(function(require) {
 
     WidgetPickerModalView = ModalView.extend({
         /** @property {String} */
-        className: 'modal oro-modal-normal widget-picker-modal',
+        className: 'modal oro-modal-normal widget-picker__modal',
 
         component: null,
 

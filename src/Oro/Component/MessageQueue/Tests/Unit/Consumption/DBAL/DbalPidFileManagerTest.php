@@ -2,10 +2,13 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\DBAL;
 
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
+use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Filesystem\Filesystem;
 
 class DbalPidFileManagerTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /**
      * @var string
      */
@@ -15,10 +18,7 @@ class DbalPidFileManagerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->pidDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'test-mq-dbal';
-
-        $fs = new Filesystem();
-        $fs->remove($this->pidDir);
+        $this->pidDir = $this->getTempDir('test-mq-dbal', false);
     }
 
     public function testCouldCreatePidFile()

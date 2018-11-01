@@ -17,6 +17,10 @@ define(function(require) {
     var LoadMoreCollection;
 
     LoadMoreCollection = RoutingCollection.extend(/** @lends LoadMoreCollection.prototype */{
+        limitPropertyName: 'limit',
+
+        initialLimit: 0,
+
         routeDefaults: {
             /**
              * Initial quantity of items to load
@@ -41,8 +45,17 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function LoadMoreCollection() {
+        constructor: function LoadMoreCollection(models, options) {
             LoadMoreCollection.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        initialize: function(models, options) {
+            LoadMoreCollection.__super__.initialize.call(this, models, options);
+
+            this.initialLimit = this._route.get(this.limitPropertyName) || this.initialLimit;
         },
 
         /**
@@ -61,9 +74,9 @@ define(function(require) {
          */
         loadMore: function() {
             var loadDeferred;
-            this._route.set({
-                limit: this._route.get('limit') + this._state.get('loadMoreItemsQuantity')
-            });
+            var limit = this._route.get(this.limitPropertyName) + this._state.get('loadMoreItemsQuantity');
+
+            this._route.set(this.limitPropertyName, limit);
             loadDeferred = $.Deferred();
             if (this.isSyncing()) {
                 this.once('sync', function() {
@@ -76,6 +89,26 @@ define(function(require) {
         },
 
         /**
+         * Checks if more unloaded items are available
+         *
+         * @returns {boolean}
+         */
+        hasMore: function() {
+            var total = this._state.get('totalItemsQuantity');
+
+            return total === void 0 || this.length < total;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        reset: function() {
+            this._route.set(this.limitPropertyName, this.initialLimit, {silent: true});
+
+            return LoadMoreCollection.__super__.reset.apply(this, arguments);
+        },
+
+        /**
          * @inheritDoc
          */
         _onAdd: function() {
@@ -83,9 +116,7 @@ define(function(require) {
             if (this.isSyncing()) {
                 return;
             }
-            this._route.set({
-                limit: this._route.get('limit') + 1
-            }, {silent: true});
+            this._route.set(this.limitPropertyName, this._route.get(this.limitPropertyName) + 1, {silent: true});
             this._state.set({
                 totalItemsQuantity: this._state.get('totalItemsQuantity') + 1
             });
@@ -99,9 +130,7 @@ define(function(require) {
             if (this.isSyncing()) {
                 return;
             }
-            this._route.set({
-                limit: this._route.get('limit') - 1
-            }, {silent: true});
+            this._route.set(this.limitPropertyName, this._route.get(this.limitPropertyName) - 1, {silent: true});
             this._state.set({
                 totalItemsQuantity: this._state.get('totalItemsQuantity') - 1
             });

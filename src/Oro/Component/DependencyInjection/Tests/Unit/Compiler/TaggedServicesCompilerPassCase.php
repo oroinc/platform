@@ -49,7 +49,7 @@ abstract class TaggedServicesCompilerPassCase extends \PHPUnit\Framework\TestCas
         /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $containerBuilder */
         $containerBuilder = $this->createMock(ContainerBuilder::class);
         $this->assertHasDefinitionCall($containerBuilder, $serviceId, true);
-        $this->assertFindTaggedServiceIds($containerBuilder, $tagName, null);
+        $this->assertFindTaggedServiceIds($containerBuilder, $tagName, []);
 
         $containerBuilder->expects($this->never())
             ->method('getDefinition')

@@ -1,0 +1,6 @@
+{% extends 'OroNavigationBundle:Menu:dropdown.html.twig' %}
+
+{% block children %}
+    <li class="nav-header nav-header-title">{{ app.user|oro_format_name|default('') }}</li>
+    {{ parent() }}
+{% endblock %}

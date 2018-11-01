@@ -64,7 +64,8 @@
 
 {% macro activity_context_link(hideText) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}"
+    <a href="#" role="button" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}"
+       class="dropdown-item"
        data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': relatedActivityClass }) %>"
         {{ UI.renderWidgetDataAttributes({
             'type' : 'dialog',
@@ -84,7 +85,7 @@
                 }
             }
         }) }}>
-        <i class="fa-link hide-text">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</i>
+        <span class="fa-link hide-text" aria-hidden="true">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</span>
         {{ hideText ? '' : 'oro.activity.contexts.placeholder'|trans|raw }}
     </a>
 {% endmacro %}

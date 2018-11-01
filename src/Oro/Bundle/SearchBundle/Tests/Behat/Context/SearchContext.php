@@ -13,7 +13,7 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
     use PageObjectDictionary;
 
     /**
-     * Assert entity tipes and result count on search results page
+     * Assert entity types and result count on search results page
      * Example: And I should see following search entity types:
      *            | Type            | N | isSelected |
      *            | All             | 3 | yes        |
@@ -114,7 +114,7 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * Select search type of entity in search type
-     * Example: Given I follow "Search"
+     * Example: Given I click "Search"
      *          And I select "Business Unit" from search types
      *          And I type "Some kind of Business Unit" in "search"
      *
@@ -122,21 +122,41 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iSelectFromSearchTypes($type)
     {
-        $typeSelectButton = $this->createElement('TypeSelectButton');
-        self::assertTrue($typeSelectButton->isValid());
+        $typeSelectElement = $this->createElement('TypeSelectElement');
+        self::assertTrue($typeSelectElement->isValid());
 
-        $typeSelectButton->press();
+        $typeSelectElement->press();
 
-        $selector = $this->createElement('TypeSelector');
-        $typeLink = $selector->find('css', "li a:contains('$type')");
-        self::assertTrue($typeLink->isValid(), "Type '$type' not found in select entities type");
+        $list = $this->createElement('TypeSelectList');
+        $option = $list->find('xpath', "//li[./*[text()='$type']]");
+        self::assertTrue($option->isValid(), "Type '$type' not found in select entities type");
 
-        $typeLink->click();
+        $option->click();
+    }
+
+    /**
+     * Clear value of search type of entity in search type
+     * Example: Given I click "Search"
+     *          And I clear search type select
+     *          And I type "Some query" in "search"
+     *
+     * @Given /^(?:|I )clear search type select$/
+     */
+    public function iClearSearchTypes()
+    {
+        $typeSelectElement = $this->createElement('TypeSelectElement');
+        self::assertTrue($typeSelectElement->isValid());
+
+        $clearIcon = $typeSelectElement->find('css', ".select2-search-choice-close");
+
+        self::assertTrue($clearIcon->isValid(), "Clear icon is not found in entities select element");
+
+        $clearIcon->click();
     }
 
     /**
      * Assert number of suggestion in entity search after typing in search input area
-     * Example: Given I follow "Search"
+     * Example: Given I click "Search"
      *          And type "Common" in "search"
      *          And I should see 3 search suggestions
      *
@@ -144,14 +164,19 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iShouldSeeSearchSuggestion($number)
     {
-        $suggestions = $this->createElement('SearchSuggestionsDropdown');
+        $suggestions = $this->createElement('SearchSuggestionList');
         $this->spin(function () use ($suggestions) {
             return $suggestions->isVisible();
         });
         self::assertTrue($suggestions->isValid(), 'Search suggestions not found');
+
+        // wait for search delay on user input and getting data from API
+        usleep(300000);
+        $this->waitForAjax();
+
         self::assertCount(
             (int) $number,
-            $suggestions->findAll('css', 'li')
+            $suggestions->findAll('css', 'li:not(.loading)')
         );
     }
 }

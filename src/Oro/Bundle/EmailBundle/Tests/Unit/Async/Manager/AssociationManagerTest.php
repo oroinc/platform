@@ -113,7 +113,7 @@ class AssociationManagerTest extends \PHPUnit\Framework\TestCase
                 'addAssociation' => false
             ],
             [
-                'ids' => null,
+                'ids' => [],
                 'targetClass' => 'TestClass',
                 'targetId' => 1,
                 'expectedCountAssociation' => 0,

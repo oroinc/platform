@@ -17,8 +17,6 @@ define(function(require) {
             this.makeUnique($container);
         }
 
-        $('.scrollspy .responsive-section:nth-of-type(1) .scrollspy-title').css('display', 'none');
-
         $container.find('[data-spy="scroll"]').each(function() {
             var $spy = $(this);
             $spy.scrollspy($spy.data());
@@ -50,14 +48,11 @@ define(function(require) {
             var suffix = _.uniqueId('-');
             var $spy = $(this);
             var href = $spy.attr('href');
-            if (href) {
-                href = href.replace(/.*(?=#[^\s]+$)/, ''); // strip for ie7
-            }
             var menuSelector = $spy.data('target') || href || '';
             // make target to be container related
             $spy.data('target', '#' + containerId + ' ' + menuSelector);
 
-            container.find(menuSelector + ' .nav li > a').each(function() {
+            container.find(menuSelector + ' .nav > a').each(function() {
                 var $target;
                 var $link = $(this);
                 var target = $link.data('target') || $link.attr('href');
@@ -78,24 +73,38 @@ define(function(require) {
             $spy.removeAttr('data-spy').addClass('accordion');
 
             $spy.find('.scrollspy-title').each(function(i) {
+                // first is opened, rest are closed
+                var collapsed = i > 0;
                 var $header = $(this);
-                var targetSelector = '#' + $header.next().attr('id') + '+';
-                var $target = $(targetSelector);
+                var $target = $header.next().next();
+                var targetId = _.uniqueId('collapse-');
+                var headerId = targetId + '-trigger';
+
                 $header
                     .removeClass('scrollspy-title')
                     .addClass('accordion-toggle')
+                    .toggleClass('collapsed', collapsed)
                     .attr({
+                        'id': headerId,
+                        'role': 'button',
                         'data-toggle': 'collapse',
-                        'data-target': targetSelector
+                        'data-target': '#' + targetId,
+                        'aria-controls': targetId,
+                        'aria-expanded': !collapsed
+                    })
+                    .parent().addClass('accordion-group');
+                $header.wrap('<div class="accordion-heading"/>');
+
+                $target.addClass('accordion-body collapse')
+                    .toggleClass('show', !collapsed)
+                    .attr({
+                        'id': targetId,
+                        'role': 'region',
+                        'aria-labelledby': headerId
                     });
-                $header.parent().addClass('accordion-group');
-                $target.addClass('accordion-body collapse');
-                $header.wrap('<div class="accordion-heading"></div>');
-                // first is opened, rest are closed
-                if (i > 0) {
-                    $header.addClass('collapsed');
-                } else {
-                    $target.addClass('in').data('toggle', false);
+
+                if (!collapsed) {
+                    $target.data('toggle', false);
                 }
                 $target.on('focusin', function() {
                     $target.collapse('show');
@@ -125,30 +134,9 @@ define(function(require) {
                 }
             });
 
-            if ($spy.data('scrollspy')) {
-                $spy.scrollspy('refresh').scrollspy('process');
+            if ($spy.data('bs.scrollspy')) {
+                $spy.scrollspy('refresh').scrollspy('_process');
             }
-        });
-    };
-
-    scrollspy.top = function() {
-        if (tools.isMobile()) {
-            return;
-        }
-
-        $('[data-spy="scroll"]').each(function() {
-            var $spy = $(this);
-            var targetSelector = $spy.data('target');
-            var target = $(targetSelector);
-
-            target.each(function() {
-                var $target = $(this);
-                var firstItemHref = $target.find('li.active:first a').attr('href');
-                var $firstItem = $(firstItemHref);
-                var top = $firstItem.position().top;
-
-                $spy.scrollTop(top);
-            });
         });
     };
 

@@ -31,7 +31,7 @@ define([
                     modal: true,
                     resizable: false,
                     maximizedHeightDecreaseBy: 'minimize-bar',
-                    width: 550
+                    width: 635
                 }
             }
         },

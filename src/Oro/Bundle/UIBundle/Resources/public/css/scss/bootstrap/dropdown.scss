@@ -1,0 +1,93 @@
+/* @theme: admin.oro; */
+
+@import "bowerassets/bootstrap/scss/dropdown";
+
+.dropdown-menu {
+    box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
+
+    .dropdown--with-arrow & {
+        .arrow {
+            border: 0 none;
+            background: inherit;
+            width: 11px;
+            height: 10px;
+            position: absolute;
+            transform: rotate(53deg) skewX(15deg);
+            box-shadow: -1px -1px 9px 3px rgba(0, 0, 0, .05);
+            z-index: -1;
+        }
+
+        &:after {
+            content: '';
+            border: 0 none;
+            background: inherit;
+            position: absolute;
+            top: 0;
+            #{$start}: 0;
+            #{$end}: 0;
+            bottom: 0;
+            border-radius: inherit;
+            z-index: -1;
+        }
+
+        &--top {
+            margin-bottom: 8px;
+
+            .arrow {
+                bottom: -5px;
+            }
+        }
+
+        &--bottom {
+            margin-top: 8px;
+
+            .arrow {
+                top: -5px;
+            }
+        }
+
+        &--left {
+            margin-right: 8px;
+
+            .arrow {
+                right: -5px;
+                transform: rotate(145deg) skewX(15deg);
+            }
+        }
+
+        &--right {
+            margin-left: 8px;
+
+            .arrow {
+                left: -5px;
+                transform: rotate(145deg) skewX(15deg);
+            }
+        }
+    }
+
+    // Support of old markup
+    > li > a {
+        @extend .dropdown-item;
+    }
+}
+
+.dropdown-toggle {
+    &--no-caret {
+        &:after {
+            content: none;
+        }
+    }
+}
+
+.dropleft > .dropdown-toggle--no-caret {
+    &:before {
+        content: none;
+    }
+}
+
+.dropdown-item {
+    [class^="fa-"],
+    [class*=" fa-"] {
+        margin: $dropdown-item-icon-fa-offset;
+    }
+}

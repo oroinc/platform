@@ -1,0 +1,32 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/variables";
+@import "oroui/css/scss/colors";
+
+$sidebar-minimized-width:                   32px !default;
+$sidebar-maximized-width:                   252px !default;
+$sidebar-bg-color:                          $primary-830 !default;
+$sidebar-color:                             $primary-400 !default;
+$sidebar-active-color:                      $secondary-200 !default;
+$sidebar-resize-border-color-hover:         $secondary !default;
+
+$sidebar-scroll-bar-background-color:       rgba($primary-400, 0.2) !default;
+$sidebar-scroll-bar-background-color-hover: rgba($primary-400, 0.7) !default;
+
+$sidebar-widget-header-bg-color:            $sidebar-bg-color !default;
+$sidebar-widget-header-active-bg-color:     $sidebar-active-color !default;
+$sidebar-widget-title-color:                $primary-200 !default;
+$sidebar-widget-actions-color:              $primary-700 !default;
+$sidebar-widget-content-bg-color:           $primary-900 !default;
+
+$sidebar-right-popup-corner-transform:      if-ltr(135deg, -45deg) !default;
+$sidebar-left-popup-corner-transform:       if-ltr(-45deg, 45deg) !default;
+
+$sidebar-icon-actions-widget:               $fa-var-ellipsis-h !default;
+$sidebar-icon-add-widget:                   $fa-var-plus !default;
+$sidebar-icon-toggle:                       if-ltr($fa-var-angle-right, $fa-var-angle-left) !default;
+$sidebar-icon-toggle-expanded:              $fa-var-angle-down !default;
+$sidebar-icon-loading:                      $fa-var-refresh !default;
+$sidebar-icon-right:                        if-ltr($fa-var-arrow-right, $fa-var-arrow-left) !default;
+$sidebar-icon-left:                         if-ltr($fa-var-arrow-left, $fa-var-arrow-right) !default;
+$sidebar-icon-highlight-color:              $extra !default;

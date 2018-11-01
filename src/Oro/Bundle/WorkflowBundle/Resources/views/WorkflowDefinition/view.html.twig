@@ -122,15 +122,15 @@
 
     <div class="pull-left">
         {% if entity.system %}
-            <div class="badge badge-tentatively status-tentatively"><i class="icon-status-tentatively fa-circle"></i>{{ 'oro.workflow.status.system.label'|trans }}</div>
+            <div class="badge badge-pill badge-tentatively status-tentatively"><i class="icon-status-tentatively fa-circle"></i>{{ 'oro.workflow.status.system.label'|trans }}</div>
         {% endif %}
         {% if not edit_allowed %}
-            <div class="badge badge-tentatively status-tentatively"><i class="icon-status-tentatively fa-circle"></i>{{ 'oro.workflow.status.readonly.label'|trans }}</div>
+            <div class="badge badge-pill badge-tentatively status-tentatively"><i class="icon-status-tentatively fa-circle"></i>{{ 'oro.workflow.status.readonly.label'|trans }}</div>
         {% endif %}
         {% if isActive %}
-            <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled fa-circle"></i>{{ 'Active'|trans }}</div>
+            <div class="badge badge-pill badge-enabled status-enabled"><i class="icon-status-enabled fa-circle"></i>{{ 'Active'|trans }}</div>
         {% else %}
-            <div class="badge badge-disabled status-disabled"><i class="icon-status-disabled fa-circle"></i>{{ 'Inactive'|trans }}</div>
+            <div class="badge badge-pill badge-disabled status-disabled"><i class="icon-status-disabled fa-circle"></i>{{ 'Inactive'|trans }}</div>
         {% endif %}
     </div>
 {% endblock breadcrumbs %}
@@ -321,7 +321,6 @@
     {% set dataBlocks = [
         {
             'title': 'oro.workflow.block.title.general_information'|trans,
-            'class': 'active',
             'subblocks': [
                 {'data' : [workflowDefinitionInfo] },
             ]

@@ -8,6 +8,9 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Installs the assets for installer bundle, bower and npm dependencies
+ */
 class ScriptHandler extends SensioScriptHandler
 {
     /**

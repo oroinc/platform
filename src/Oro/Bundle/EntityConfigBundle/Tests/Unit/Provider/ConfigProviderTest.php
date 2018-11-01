@@ -11,9 +11,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\ConnectionMock;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\DriverMock;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
+use Oro\Component\TestUtils\ORM\Mocks\ConnectionMock;
+use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
+use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 
 class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 {

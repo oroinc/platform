@@ -22,7 +22,7 @@ class ActivityListItem extends Element
      */
     public function getActionLink($linkTitle)
     {
-        $this->find('css', 'div.activity-actions a.dropdown-toggle')->mouseOver();
+        $this->find('css', 'div.activity-actions .dropdown-toggle')->mouseOver();
         $links = $this->findAll('css', 'li.activity-action a');
 
         /** @var NodeElement $link */
@@ -143,7 +143,7 @@ class ActivityListItem extends Element
      */
     public function getTitle()
     {
-        $titleElement = $this->find('css', '.message-item.message strong');
+        $titleElement = $this->find('css', '.message-item.message .message-subject');
         self::assertNotNull($titleElement, 'Not found item title element');
 
         return $titleElement->getText();

@@ -214,7 +214,7 @@ class ActivityListManager
 
         $editorName = '';
         $editorId   = '';
-        $editor     = $entity->getEditor();
+        $editor     = $entity->getUpdatedBy();
         if ($editor) {
             $editorName = $this->entityNameResolver->getName($editor);
             if ($this->authorizationChecker->isGranted('VIEW', $editor)) {

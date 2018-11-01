@@ -22,7 +22,7 @@ class GridFilters extends Element
         if ($strict) {
             $filterItems = $this->elementFactory->findAllElements($name, $this);
             foreach ($filterItems as $item) {
-                if ($item->getText() === $text) {
+                if (strcasecmp($item->getText(), $text) === 0) {
                     $filterItem = $item;
                     break;
                 }

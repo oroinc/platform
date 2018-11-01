@@ -1,14 +1,16 @@
+/* @theme: admin.oro; */
+
 .oro-item-collection {
     &input[type="email"],
     &input[type="text"] {
-        width: 261px;
+        width: $form-item-collection-field-width;
     }
 
     .input-append,
     .input-prepend {
         input[type="email"],
         input[type="text"] {
-            width: 235px;
+            width: $form-item-collection-field-append-width;
         }
     }
 
@@ -16,53 +18,27 @@
     .input-prepend-sortable {
         input[type="email"],
         input[type="text"] {
-            width: 204px;
+            width: $form-item-collection-field-append-sortable-width;
         }
     }
 
     .collection-element-other {
-        margin-bottom: 5px;
+        margin-bottom: $form-item-collection-element-offset-bottom;
 
         input[type='email'],
         input[type='text'],
         textarea {
-            width: 259px;
+            width: $form-item-collection-element-width;
         }
 
         select,
         .selector {
-            width: 262px;
-            margin-left: 0;
+            width: $form-item-collection-selector-width;
+            margin-left: $form-item-collection-selector-offset-left;
         }
 
         .select2-container {
-            width: 271px;
-        }
-    }
-}
-
-.select2-container {
-    .select2-choice {
-        .select2-arrow {
-            top: 6px;
-        }
-
-        .select2-search-choice-close {
-            width: 15px;
-            height: 15px;
-
-            &:before {
-                content: "\f00d";
-                font: normal 11px FontAwesome;
-                right: 3px;
-                top: 2px;
-                color: #444;
-                line-height: 1em;
-            }
-
-            &:hover:before {
-                color: #666;
-            }
+            width: $form-item-collection-select2-width;
         }
     }
 }
@@ -70,14 +46,14 @@
 .oro-item-collection.not-removable {
     input[type="email"],
     input[type="text"] {
-        width: 280px;
+        width: $form-item-collection-removable-field-width;
     }
 
     .input-append,
     .input-prepend {
         input[type="email"],
         input[type="text"] {
-            width: 257px;
+            width: $form-item-collection-removable-append-field-width;
         }
     }
 
@@ -85,18 +61,57 @@
     .input-prepend-sortable {
         input[type="email"],
         input[type="text"] {
-            width: 226px;
+            width: $form-item-collection-removable-append-sortable-field-width;
         }
     }
 }
 
-.oro-address-collection.oro-item-collection {
-    input[type="email"],
-    input[type="text"] {
-        width: 280px;
-    }
+input[type="text"].hasDatepicker {
+    min-width: $form-item-collection-datepicker-field-min-width;
 }
 
-input[type=text].hasDatepicker {
-    min-width: 95px;
+.form-horizontal {
+    .controls {
+        padding-top: 7px;
+
+        .controls {
+            padding-top: 0;
+        }
+
+        >,
+        .oro-clearfix,
+        .fallback-container {
+            input:not([type=checkbox]):not([type=radio]),
+            textarea,
+            .selector,
+            .select2-container,
+            .input-append {
+                margin-top: -7px; //  input padding + border
+
+                + .fallback-status,
+                + .btn:not(.add-on),
+                > .btn:not(.add-on) {
+                    margin-top: -7px;
+                }
+
+            }
+
+            .selector,
+            .select2-container,
+            .input-append,
+            td {
+                input:not([type=checkbox]):not([type=radio]),
+                textarea,
+                .selector,
+                .select2-container {
+                    margin-top: 0;
+                }
+            }
+        }
+
+        .jstree-wrapper {
+            padding-top: 0;
+            min-width: $field-width;
+        }
+    }
 }

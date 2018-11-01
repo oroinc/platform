@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Job\Topics;
@@ -16,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 /**
  * Send calculate root job status message to fix jobs that stuck in Running or New statuses
  */
-class RecalculateRootJobStatuses extends AbstractFixture implements ContainerAwareInterface
+class RecalculateRootJobStatuses extends AbstractFixture implements ContainerAwareInterface, VersionedFixtureInterface
 {
     use ContainerAwareTrait;
 
@@ -44,5 +45,13 @@ class RecalculateRootJobStatuses extends AbstractFixture implements ContainerAwa
                 'calculateProgress' => true,
             ], MessagePriority::HIGH));
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVersion()
+    {
+        return '1.1';
     }
 }

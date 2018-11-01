@@ -1,12 +1,14 @@
+<% var togglerId = _.uniqueId('dropdown-') %>
 <div class="choice-filter number-range-filter">
     <div class="btn-group btn-block">
-        <button class="btn dropdown-toggle" data-toggle="dropdown">
-            <%- selectedChoiceLabel %><span class="caret"></span>
+        <button id="<%- togglerId %>" class="btn dropdown-toggle" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('Filter criteria') %>">
+            <%- selectedChoiceLabel %>
         </button>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu" role="menu" aria-labelledby="<%- togglerId %>">
             <% _.each(choices, function (option) { %>
             <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
-            <a class="dropdown-item choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+                <a class="dropdown-item choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
             </li>
             <% }); %>
         </ul>
