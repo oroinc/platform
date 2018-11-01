@@ -826,6 +826,12 @@ label .popover-body {
     text-transform: none;
 }
 
+.list-widget.box-type1 {
+    .title {
+        padding-bottom: 0;
+    }
+}
+
 .list-widget .widget-actions-section {
     a.btn {
         height: auto;
@@ -833,9 +839,10 @@ label .popover-body {
         box-shadow: none;
         padding: side-values(0 2px 0 8px);
 
-        [class^="fa-"] {
+        .action-button-icon {
+            line-height: initial;
+
             &:before {
-                opacity: .6;
                 font-size: 15px;
             }
 
@@ -851,7 +858,7 @@ label .popover-body {
     a.btn[disabled] {
         cursor: not-allowed;
 
-        [class^="fa-"] {
+        .action-button-icon {
             &:before {
                 opacity: .3;
             }
@@ -865,16 +872,18 @@ label .popover-body {
     }
 
     .action-wrapper {
+        vertical-align: middle;
+
         &:not(:first-of-type) .btn {
-            margin-#{$start}: 4px;
+            margin-#{$start}: 5px;
         }
 
         .btn-mini {
             margin-#{$start}: 0;
             border-radius: 0;
             font-weight: normal;
-            font-size: $btn-font-size;
-            padding: 0 7px;
+            font-size: $font-size-base;
+            padding: side-values(0 8px 0 6px);
         }
     }
 
@@ -907,7 +916,7 @@ label .popover-body {
                 box-shadow: none;
                 padding: 0;
 
-                [class^="fa-"] {
+                .action-button-icon {
                     &:before {
                         opacity: .6;
                         font-size: 15px;
@@ -925,7 +934,7 @@ label .popover-body {
             .btn[disabled] {
                 cursor: not-allowed;
 
-                [class^="fa-"] {
+                .action-button-icon {
                     &:before {
                         opacity: .3;
                     }

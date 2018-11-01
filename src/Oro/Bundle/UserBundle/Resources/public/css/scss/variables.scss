@@ -3,16 +3,16 @@
 $capabilities-offset: 8px !default;
 
 $role-capability-color: $primary-860 !default;
-$role-capability-offset: side-values(0 0 10px 16px) !default;
+$role-capability-offset: side-values(0 0 28px 16px) !default;
 
 $role-capability-item-width: 100% / 3 !default;
-$role-capability-item-offset: side-values(0 68px 18px 0) !default;
+$role-capability-item-offset: side-values(18px 68px 0 0) !default;
 
 $role-capability-label-line-height: 1.5;
 $role-capability-label-offset: 24px !default;
 $role-collapse-label-width: 500px !default;
 
-$role-capability-group-title-offset: 30px 0 18px !default;
+$role-capability-group-title-offset: 30px 0 0 !default;
 $role-capability-group-title-font-size: 18px !default;
 $role-capability-group-title-weight: bold !default;
 
