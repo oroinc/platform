@@ -68,4 +68,19 @@ class EntitySecurityMetadataTest extends \PHPUnit\Framework\TestCase
             $fields['second']
         );
     }
+
+    public function testSetters()
+    {
+        $label = 'SomeAnotherLabel';
+        $this->entity->setLabel($label);
+        static::assertEquals($label, $this->entity->getLabel());
+
+        $description = 'SomeAnotherDescription';
+        $this->entity->setDescription($description);
+        static::assertEquals($description, $this->entity->getDescription());
+
+        $fields = [new FieldSecurityMetadata('anotherField', 'AnotherFieldLabel')];
+        $this->entity->setFields($fields);
+        static::assertEquals($fields, $this->entity->getFields());
+    }
 }
