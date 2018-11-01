@@ -326,7 +326,7 @@ input[type="color"],
 
 .form-container {
     .control-group {
-        &:not(:last-child) {
+        &:not(:last-of-type) {
             margin: 0 0 $form-container-control-row-space;
         }
     }
@@ -338,6 +338,7 @@ input[type="color"],
         width: $select-width;
     }
 }
+
 // Need refactor
 // ie, chrome, safari
 input[type=number]::-webkit-inner-spin-button,

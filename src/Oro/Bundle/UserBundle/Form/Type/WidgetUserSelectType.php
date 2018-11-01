@@ -22,7 +22,6 @@ class WidgetUserSelectType extends WidgetEntityJquerySelect2HiddenType
                 'autocomplete_alias' => 'widget_owner_users',
                 'configs'            => [
                     'multiple'                => true,
-                    'width'                   => '400px',
                     'placeholder'             => 'oro.user.form.choose_user',
                     'allowClear'              => true,
                     'result_template_twig'    => 'OroUserBundle:User:Autocomplete/Widget/result.html.twig',

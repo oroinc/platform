@@ -25,6 +25,13 @@ $dashboard-configuration-items-btn-color: $primary-700 !default;
 $dashboard-configuration-items-btn-active-color: $primary-400 !default;
 $dashboard-widget-configuration-buttons-space: 8px !default;
 
+$dashboard-widget-title-widget-width: 150px !default;
+$dashboard-widget-configuration-control-label-width: 140px !default;
+$dashboard-widget-title-widget-control-label-width: auto !default;
+$dashboard-widget-title-widget-control-label-min-width: 0 !default;
+$dashboard-widget-title-widget-controls-offset-start: $content-padding-small !default;
+$dashboard-widget-title-input-width: 100% !default;
+
 $dashboard-big-numbers-separator-color: $primary-830 !default;
 $dashboard-big-numbers-positive-color: $success-dark !default;
 $dashboard-big-numbers-negative-color: $danger-dark !default;

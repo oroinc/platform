@@ -13,11 +13,13 @@
 }
 
 .selector {
+    min-width: $selector-min-width;
     padding: $selector-inner-offset;
 
     span {
         padding: $selector-span-inner-offset;
         line-height: $selector-span-line-height;
+        min-width: $selector-span-min-width;
         height: $selector-span-height;
 
         &:after {
@@ -90,6 +92,14 @@
 
         .controls {
             margin-left: $form-horizontal-controls-offset-left;
+
+            .control-group-checkbox {
+                margin-top: $form-horizontal-controls-control-group-checkbox-offset-top;
+
+                > .control-label {
+                    padding-bottom: $form-horizontal-controls-control-group-checkbox-label-inner-offset-bottom;
+                }
+            }
         }
     }
 

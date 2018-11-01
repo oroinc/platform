@@ -19,6 +19,24 @@
 }
 
 .form-horizontal {
+    // Need refactor when form grids will be improved
+    .modal-body & {
+        .control-group {
+            > .control-label {
+                width: $modal-form-horizontal-control-label-width;
+                min-width: $modal-form-horizontal-control-label-width;
+            }
+
+            .controls {
+                .input,
+                input[type="text"] {
+                    width: $modal-form-horizontal-controls-input-width;
+                    max-width: $modal-form-horizontal-controls-input-width;
+                }
+            }
+        }
+    }
+
     .control-group {
         display: flex;
 

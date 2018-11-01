@@ -22,7 +22,6 @@ class WidgetBusinessUnitSelectType extends WidgetEntityJquerySelect2HiddenType
                 'autocomplete_alias' => 'widget_owner_business_units',
                 'configs'            => [
                     'multiple'    => true,
-                    'width'       => '400px',
                     'placeholder' => 'oro.dashboard.form.choose_business_unit',
                     'allowClear'              => true,
                     'result_template_twig'    => 'OroOrganizationBundle:BusinessUnit:Autocomplete/result.html.twig',

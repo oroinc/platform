@@ -22,7 +22,6 @@ class WidgetRoleSelectType extends AbstractType
                 'autocomplete_alias' => 'widget_owner_roles',
                 'configs'            => [
                     'multiple'    => true,
-                    'width'       => '400px',
                     'placeholder' => 'oro.user.form.choose_role',
                     'allowClear'  => true,
                 ]
