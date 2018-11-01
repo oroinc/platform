@@ -25,12 +25,9 @@ class DependencyVoterTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->featureConfigManager = $this->getMockBuilder(ConfigurationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
+        $this->featureConfigManager = $this->createMock(ConfigurationManager::class);
+
         $this->dependencyVoter = new DependencyVoter($this->featureChecker, $this->featureConfigManager);
     }
 
