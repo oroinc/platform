@@ -3,6 +3,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 
 use Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract;
 
+use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
@@ -20,6 +21,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
 {
+    private const USER_ID = 54;
+
     public function testMustImplementMessageProcessorAndTopicSubscriberInterfaces()
     {
         $processor = $this->createMock(PreExportMessageProcessorAbstract::class);
@@ -403,19 +406,24 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
         $user = $this->createUserStub();
         $user
             ->expects($this->once())
+            ->method('getId')
+            ->willReturn(self::USER_ID)
+        ;
+        $user
+            ->expects($this->once())
             ->method('getEmail')
         ;
 
         $token = $this->createTokenMock();
         $token
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getUser')
             ->willReturn($user)
         ;
 
         $tokenStorage = $this->createTokenStorageMock();
         $tokenStorage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getToken')
             ->willReturn($token)
         ;
@@ -424,6 +432,12 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
         $dependentJobContext
             ->expects($this->once())
             ->method('addDependentJob')
+            ->with(
+                Topics::POST_EXPORT,
+                $this->callback(function ($message) {
+                    return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
+                })
+            )
         ;
 
         $dependentJob = $this->createDependentJobMock();
@@ -522,19 +536,25 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
         $user = $this->createUserStub();
         $user
             ->expects($this->once())
+            ->method('getId')
+            ->willReturn(self::USER_ID)
+        ;
+
+        $user
+            ->expects($this->once())
             ->method('getEmail')
         ;
 
         $token = $this->createTokenMock();
         $token
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getUser')
             ->willReturn($user)
         ;
 
         $tokenStorage = $this->createTokenStorageMock();
         $tokenStorage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getToken')
             ->willReturn($token)
         ;
@@ -543,6 +563,12 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
         $dependentJobContext
             ->expects($this->once())
             ->method('addDependentJob')
+            ->with(
+                Topics::POST_EXPORT,
+                $this->callback(function ($message) {
+                    return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
+                })
+            )
         ;
 
         $dependentJob = $this->createDependentJobMock();

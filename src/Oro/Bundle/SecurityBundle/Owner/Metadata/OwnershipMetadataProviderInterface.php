@@ -12,7 +12,7 @@ interface OwnershipMetadataProviderInterface
     /**
      * Get the ownership related metadata for the given entity
      *
-     * @param string $className
+     * @param string|null $className
      *
      * @return OwnershipMetadataInterface
      */

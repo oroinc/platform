@@ -52,7 +52,10 @@ class LocalizedFallbackValueCollectionType extends AbstractType
         $builder->add(
             self::FIELD_VALUES,
             LocalizedPropertyType::NAME,
-            ['type' => $options['type'], 'options' => $options['options']]
+            [
+                'type' => $options['type'],
+                'options' => $options['options'],
+                'exclude_parent_localization' => $options['exclude_parent_localization']]
         )->add(
             self::FIELD_IDS,
             'collection',
@@ -73,6 +76,7 @@ class LocalizedFallbackValueCollectionType extends AbstractType
             'field'   => 'string', // field used to store data - string or text
             'type'    => 'text',   // value form type
             'options' => [],       // value form options
+            'exclude_parent_localization' => false
         ]);
     }
 }

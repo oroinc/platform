@@ -15,6 +15,9 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
 
+/**
+ * Block type for showing rest attributes group.
+ */
 class AttributeGroupRestType extends AbstractContainerType
 {
     const NAME = 'attribute_group_rest';
@@ -81,29 +84,6 @@ class AttributeGroupRestType extends AbstractContainerType
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         BlockUtils::setViewVarsFromOptions($view, $options, ['options']);
-
-        $view->vars['tabsOptions'] = $this->getTabsOptions($options['attribute_family']);
-    }
-
-    /**
-     * @param AttributeFamily $attributeFamily
-     *
-     * @return array
-     */
-    private function getTabsOptions(AttributeFamily $attributeFamily)
-    {
-        $groups = $this->attributeRenderRegistry->getNotRenderedGroups($attributeFamily);
-        $tabListOptions = array_map(
-            function (AttributeGroup $group) {
-                return [
-                    'id' => $group->getCode(),
-                    'label' => (string)$this->localizationHelper->getLocalizedValue($group->getLabels())
-                ];
-            },
-            $groups->toArray()
-        );
-
-        return array_values($tabListOptions);
     }
 
     /**

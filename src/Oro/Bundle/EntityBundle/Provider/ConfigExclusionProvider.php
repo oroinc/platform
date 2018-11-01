@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Provider;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 /**
- * Provide exclude logic to filter entities and fields based on exclude rules
+ * Provides exclude logic to filter entities and fields based on exclude rules.
  */
 class ConfigExclusionProvider implements ExclusionProviderInterface
 {
@@ -28,7 +28,7 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      */
     public function isIgnoredEntity($className)
     {
-        return $this->matcher->isMatched($this->getEntityProperties($className));
+        return $this->matcher->isMatched($className);
     }
 
     /**
@@ -36,7 +36,7 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      */
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
-        return $this->matcher->isMatched($this->getFieldProperties($metadata, $fieldName));
+        return $this->matcher->isFieldMatched($metadata->name, $fieldName, $metadata->getTypeOfField($fieldName));
     }
 
     /**
@@ -44,7 +44,7 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      */
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
-        return $this->matcher->isMatched($this->getFieldProperties($metadata, $associationName));
+        return $this->matcher->isFieldMatched($metadata->name, $associationName);
     }
 
     /**
@@ -52,6 +52,7 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      *
      * @param string $className
      * @return array
+     * @deprecated will be removed in 3.0
      */
     protected function getEntityProperties($className)
     {
@@ -66,6 +67,7 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      * @param ClassMetadata $metadata
      * @param string        $fieldName
      * @return array
+     * @deprecated will be removed in 3.0
      */
     protected function getFieldProperties(ClassMetadata $metadata, $fieldName)
     {

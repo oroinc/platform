@@ -45,7 +45,7 @@ layout:
                 theme_icon:
                     blockType: external_resource
                     options:
-                        href: '=data["theme"].getIcon()'
+                        href: '=data["theme"].getIcon("first_theme")'
                         rel: shortcut icon
                 head_style:
                     blockType: container

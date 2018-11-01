@@ -15,6 +15,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+/**
+ * Runs synchronization for integration
+ */
 class SyncCommand extends Command implements CronCommandInterface, ContainerAwareInterface
 {
     use ContainerAwareTrait;
@@ -107,7 +110,7 @@ class SyncCommand extends Command implements CronCommandInterface, ContainerAwar
             // check if the integration job with `new` or `in progress` status already exists.
             // @todo: Temporary solution. should be refacored during BAP-14803.
             $jobName = 'oro_integration:sync_integration:'.$integration->getId();
-            $existingJob = $jobProcessor->findRootJobByJobNameAndStatuses(
+            $existingJob = $jobProcessor->findNotStaleRootJobyJobNameAndStatuses(
                 $jobName,
                 [Job::STATUS_NEW, Job::STATUS_RUNNING]
             );

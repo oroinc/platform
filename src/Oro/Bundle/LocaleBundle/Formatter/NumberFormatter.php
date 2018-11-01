@@ -290,6 +290,22 @@ class NumberFormatter
     }
 
     /**
+     * @param int|string $attribute Numeric attribute constant of \NumberFormatter or it's string name
+     * @param int|string $style Constant of \NumberFormatter (DECIMAL, CURRENCY, PERCENT, etc) or string name
+     * @param string|null $locale
+     * @param array $options
+     * @return bool|int
+     */
+    public function getAttributeWithOptions($attribute, $style = null, $locale = null, $options = [])
+    {
+        return $this->getFormatter(
+            $locale,
+            $this->parseStyle($style),
+            $options
+        )->getAttribute($this->parseConstantValue($attribute));
+    }
+
+    /**
      * Gets value of text attribute of \NumberFormatter
      *
      * Supported text attribute constants of \NumberFormatter are:

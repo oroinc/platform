@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 use Doctrine\Common\Collections\Expr\Comparison;
-use Doctrine\Common\Collections\Expr\CompositeExpression;
 
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
@@ -67,9 +66,9 @@ class ExtendedAssociationFilter extends AssociationFilter
 
         $fieldName = $this->getFieldName(substr($path, strlen($field) + 1));
         if (RelationType::MANY_TO_MANY === $this->associationType) {
-            $expr = new Comparison($fieldName, 'MEMBER OF', $value);
+            $expr = $this->buildComparisonExpression($fieldName, 'MEMBER OF', $value);
             if (self::NEQ === $operator) {
-                $expr = new CompositeExpression('NOT', [$expr]);
+                $expr = $this->buildNotExpression($expr);
             }
 
             return $expr;

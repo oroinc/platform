@@ -16,6 +16,15 @@ class NameOrOrganization extends Constraint
     public $organizationMessage = 'oro.address.validation.invalid_organization_field';
 
     /**
+     * Form name parent form (which also has parent). This helps to distinguish between different addresses in one form
+     * for js validation.
+     * @see Resources/public/js/validator/name-or-organization.js
+     *
+     * @var string
+     */
+    public $parentFormName;
+
+    /**
      * {@inheritdoc}
      */
     public function getTargets()

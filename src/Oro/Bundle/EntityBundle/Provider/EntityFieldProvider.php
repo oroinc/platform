@@ -19,8 +19,8 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
+ * Provides detailed information about fields for a specific entity.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- * TODO: passing parameter $applyExclusions into getFields method should be refactored
  */
 class EntityFieldProvider
 {
@@ -58,7 +58,16 @@ class EntityFieldProvider
     protected $hiddenFields;
 
     /** @var string|null The locale or null to use the default */
-    protected $locale = null;
+    protected $locale;
+
+    /** @var bool */
+    private $isCachingEnabled;
+
+    /** @var ClassMetadata[] */
+    private $metadata;
+
+    /** @var ClassMetadata[] */
+    private $metadataForEntitiesWithAssociations;
 
     /**
      * Constructor
@@ -128,11 +137,25 @@ class EntityFieldProvider
     }
 
     /**
+     * Allows this provider to store results of some time-consuming operations in a memory.
+     * Enabling the caching can significantly improve performance of this provider
+     * if it is used to get fields for a lot of entities.
+     *
+     * @param bool $enable
+     */
+    public function enableCaching($enable = true)
+    {
+        $this->isCachingEnabled = $enable;
+        $this->metadata = null;
+        $this->metadataForEntitiesWithAssociations = null;
+    }
+
+    /**
      * Returns relations for the given entity
      *
      * @param string $entityName         Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool   $applyExclusions    Indicates whether exclusion logic should be applied.
      * @param bool   $withEntityDetails  Indicates whether details of related entity should be returned as well.
+     * @param bool   $applyExclusions    Indicates whether exclusion logic should be applied.
      * @param bool   $translate          Flag means that label, plural label should be translated
      *                                   .       'name'          - field name
      *                                   .       'type'          - field type
@@ -523,20 +546,9 @@ class EntityFieldProvider
     {
         $relations = [];
 
-        $entityConfigs = $this->extendConfigProvider->getConfigs();
-        foreach ($entityConfigs as $entityConfig) {
-            if (!ExtendHelper::isEntityAccessible($entityConfig)) {
-                continue;
-            }
-            $metadata = $this->getMetadataFor($entityConfig->getId()->getClassName());
-            if ($this->isIgnoredEntity($metadata)) {
-                continue;
-            }
+        $entities = $this->getMetadataForEntitiesWithAssociations();
+        foreach ($entities as $metadata) {
             $targetMappings = $metadata->getAssociationMappings();
-            if (empty($targetMappings)) {
-                continue;
-            }
-
             foreach ($targetMappings as $mapping) {
                 if ($mapping['isOwningSide']
                     && empty($mapping['inversedBy'])
@@ -548,6 +560,40 @@ class EntityFieldProvider
         }
 
         return $relations;
+    }
+
+    /**
+     * Return metadata for accessible and not ignored entities that have at least one association
+     *
+     * @return ClassMetadata[]
+     */
+    protected function getMetadataForEntitiesWithAssociations()
+    {
+        if (null !== $this->metadataForEntitiesWithAssociations) {
+            return $this->metadataForEntitiesWithAssociations;
+        }
+
+        $metadataForEntitiesWithAssociations = [];
+        $entityConfigs = $this->extendConfigProvider->getConfigs();
+        foreach ($entityConfigs as $entityConfig) {
+            if (!ExtendHelper::isEntityAccessible($entityConfig)) {
+                continue;
+            }
+            $metadata = $this->getMetadataFor($entityConfig->getId()->getClassName());
+            if ($this->isIgnoredEntity($metadata)) {
+                continue;
+            }
+            $associations = $metadata->getAssociationMappings();
+            if (empty($associations)) {
+                continue;
+            }
+            $metadataForEntitiesWithAssociations[] = $metadata;
+        }
+        if ($this->isCachingEnabled) {
+            $this->metadataForEntitiesWithAssociations = $metadataForEntitiesWithAssociations;
+        }
+
+        return $metadataForEntitiesWithAssociations;
     }
 
     /**
@@ -664,7 +710,6 @@ class EntityFieldProvider
      */
     protected function isIgnoredField(ClassMetadataInterface $metadata, $fieldName)
     {
-        // @todo: use of $this->hiddenFields is a temporary solution (https://magecore.atlassian.net/browse/BAP-4142)
         if (isset($this->hiddenFields[$metadata->getName()][$fieldName])) {
             return true;
         }
@@ -712,7 +757,16 @@ class EntityFieldProvider
      */
     protected function getMetadataFor($className)
     {
-        return $this->getManagerForClass($className)->getMetadataFactory()->getMetadataFor($className);
+        if (isset($this->metadata[$className])) {
+            return $this->metadata[$className];
+        }
+
+        $metadata = $this->getManagerForClass($className)->getMetadataFactory()->getMetadataFor($className);
+        if ($this->isCachingEnabled) {
+            $this->metadata[$className] = $metadata;
+        }
+
+        return $metadata;
     }
 
     /**

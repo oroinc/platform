@@ -40,7 +40,7 @@ Feature: Actions applicability in grid
 
   Scenario: Sales Rep should see actions for created email template
     Given I go to System/Emails/Templates
-    And I press "Create Email Template"
+    And I click "Create Email Template"
     When I fill form with:
       | Template Name | new_template |
     And I save and close form

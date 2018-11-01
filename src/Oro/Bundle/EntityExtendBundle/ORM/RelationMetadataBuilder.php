@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\ORM;
 
+use Doctrine\Common\Inflector\Inflector;
 use Doctrine\ORM\Mapping\Builder\AssociationBuilder;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
@@ -103,6 +104,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             $this->getOnDeleteOption($relation)
         );
         $this->setCascadeOptions($builder, $cascade);
+        $this->setFetchOption($builder, $this->getFetchOption($relation));
         $builder->build();
     }
 
@@ -127,6 +129,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             $builder->mappedBy($relation['target_field_id']->getFieldName());
         }
         $this->setCascadeOptions($builder, $cascade);
+        $this->setFetchOption($builder, $this->getFetchOption($relation));
         $builder->build();
 
         if (!$relation['owner']
@@ -209,6 +212,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         $builder->addJoinColumn($selfJoinTableColumnName, $selfIdColumn, false, false, 'CASCADE');
         $builder->addInverseJoinColumn($targetJoinTableColumnName, $targetIdColumn, false, false, 'CASCADE');
         $this->setCascadeOptions($builder, $this->getCascadeOption($relation));
+        $this->setFetchOption($builder, $this->getFetchOption($relation));
         $builder->build();
     }
 
@@ -227,6 +231,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         $builder = $metadataBuilder->createManyToMany($fieldId->getFieldName(), $targetEntity);
         $builder->mappedBy($relation['target_field_id']->getFieldName());
         $this->setCascadeOptions($builder, $this->getCascadeOption($relation));
+        $this->setFetchOption($builder, $this->getFetchOption($relation));
         $builder->build();
     }
 
@@ -375,6 +380,20 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
     }
 
     /**
+     * @param array $relation
+     *
+     * @return string
+     */
+    private function getFetchOption(array $relation)
+    {
+        if (empty($relation['fetch'])) {
+            return '';
+        }
+
+        return $relation['fetch'];
+    }
+
+    /**
      * @param AssociationBuilder $builder
      * @param string[]           $cascades
      */
@@ -382,6 +401,19 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
     {
         foreach ($cascades as $cascade) {
             $builder->{'cascade' . ucfirst($cascade)}();
+        }
+    }
+
+    /**
+     * @param AssociationBuilder $builder
+     * @param string             $fetch
+     */
+    private function setFetchOption(AssociationBuilder $builder, string $fetch)
+    {
+        $method = Inflector::camelize('fetch_' . $fetch);
+
+        if (method_exists($builder, $method)) {
+            $builder->$method();
         }
     }
 }

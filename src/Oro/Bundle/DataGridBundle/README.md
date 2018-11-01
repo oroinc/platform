@@ -23,6 +23,8 @@ OroDataGridBundle allows to define YAML configuration of data collection present
         - [Totals](./Resources/doc/backend/extensions/totals.md)
         - [Mode](./Resources/doc/backend/extensions/mode.md)
     - [References in YAML configuration](./Resources/doc/backend/references_in_configuration.md)
+    - [State Providers](./Resources/doc/backend/extensions/state_providers.md)
+    - [Selected Fields Providers](./Resources/doc/backend/extensions/selected_fields.md)
 - Frontend
     - [Datagrid](./Resources/doc/frontend/datagrid.md)
     - [Datagrid Render](./Resources/doc/frontend/datagrid_render.md)

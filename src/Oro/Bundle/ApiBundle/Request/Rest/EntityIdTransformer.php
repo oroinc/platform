@@ -50,13 +50,28 @@ class EntityIdTransformer implements EntityIdTransformerInterface
         if (count($idFieldNames) === 1) {
             $value = $this->reverseTransformSingleId(
                 $value,
-                $metadata->getProperty(reset($idFieldNames))->getDataType()
+                $this->getSingleIdDataType($metadata)
             );
         } else {
             $value = $this->reverseTransformCompositeEntityId($value, $metadata);
         }
 
         return $value;
+    }
+
+    /**
+     * @param EntityMetadata $metadata
+     *
+     * @return string
+     */
+    protected function getSingleIdDataType(EntityMetadata $metadata)
+    {
+        $idFieldNames = $metadata->getIdentifierFieldNames();
+        $idField = $metadata->getProperty(\reset($idFieldNames));
+
+        return null !== $idField
+            ? $idField->getDataType()
+            : DataType::STRING;
     }
 
     /**

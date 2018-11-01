@@ -14,12 +14,21 @@ define(function(require) {
         events: {
             'click [data-role="column-manager-select-all"]': 'onSelectAll',
             'click [data-role="column-manager-unselect-all"]': 'onunselectAll',
-            'click [data-role="column-manager-reset"]': 'reset'
+            'click [data-role="column-manager-reset"]': 'reset',
+            'dropdown-launcher:show': 'onShow',
+            'dropdown-launcher:hide': 'onHide'
         },
 
         listen: {
             'change:renderable collection': 'onRenderableChange',
             'layout:reposition mediator': 'adjustListHeight'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ColumnManagerView() {
+            ColumnManagerView.__super__.constructor.apply(this, arguments);
         },
 
         initialize: function(options) {
@@ -99,6 +108,14 @@ define(function(require) {
             return _.filter(this.collection.filter(this.filterer), function(model) {
                 return !model.get('disabledVisibilityChange');
             });
+        },
+
+        onShow: function() {
+            this.trigger('column-manager:show');
+        },
+
+        onHide: function() {
+            this.trigger('column-manager:hide');
         }
     });
 

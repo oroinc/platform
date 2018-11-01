@@ -126,6 +126,12 @@ services:
     oro_translation.empty_array.loader:
         class: %oro_translation.empty_array.loader.class%
 
+    oro_translation.selector:
+        class: Oro\Bundle\TranslationBundle\Translation\MessageSelector
+        decorates: translator.selector
+        arguments:
+            - '@logger'
+
     oro_translation.cache:
         parent: oro.cache.abstract
         calls:
@@ -245,6 +251,11 @@ services:
             - '@oro_translation.provider.language'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-translations-grid, method: onBuildBefore }
+
+    oro_translation.listener.datagrid.translatable:
+        class: 'Oro\Bundle\TranslationBundle\EventListener\Datagrid\TranslatableListener'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.before, method: onResultBefore }
 
     oro_translation.repository.language:
         class: 'Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository'

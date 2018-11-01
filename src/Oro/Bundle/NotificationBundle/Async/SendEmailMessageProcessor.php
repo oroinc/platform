@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NotificationBundle\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\EmailBundle\Async\TemplateEmailMessageSender;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -31,6 +32,11 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
 
     /** @var LoggerInterface */
     private $logger;
+
+    /**
+     * @var TemplateEmailMessageSender
+     */
+    private $templateEmailMessageSender;
 
     /**
      * @param DirectMailer    $mailer
@@ -79,29 +85,49 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
             return self::REJECT;
         }
 
-        if (isset($data['template'])) {
-            list($data['subject'], $data['body']) = $this->renderTemplate($data['template'], $data['body']);
+        $failedRecipients = [];
+        if ($this->templateEmailMessageSender && $this->templateEmailMessageSender->isTranslatable($data)) {
+            $result = $this->templateEmailMessageSender->sendTranslatedMessage($data, $failedRecipients);
+        } else {
+            if (isset($data['template'])) {
+                list($data['subject'], $data['body']) = $this->renderTemplate($data['template'], $data['body']);
+            }
+
+            $emailMessage = new \Swift_Message(
+                $data['subject'],
+                $data['body'],
+                $data['contentType']
+            );
+            $emailMessage->setFrom($data['fromEmail'], $data['fromName']);
+            $emailMessage->setTo($data['toEmail']);
+
+            $this->mailerProcessor->processEmbeddedImages($emailMessage);
+
+            //toDo: can possibly send duplicate replies. See BAP-12503
+            $result = $this->mailer->send($emailMessage);
         }
 
-        $emailMessage = new \Swift_Message(
-            $data['subject'],
-            $data['body'],
-            $data['contentType']
-        );
-        $emailMessage->setFrom($data['fromEmail'], $data['fromName']);
-        $emailMessage->setTo($data['toEmail']);
-
-        $this->mailerProcessor->processEmbeddedImages($emailMessage);
-
-        //toDo: can possibly send duplicate replies. See BAP-12503
-        $result = $this->mailer->send($emailMessage);
         if (!$result) {
-            $this->logger->error('Cannot send message');
+            if (!empty($failedRecipients)) {
+                $this->logger->error(
+                    sprintf('Cannot send message to the following recipients: %s', print_r($failedRecipients, true))
+                );
+            } else {
+                $this->logger->error('Cannot send message');
+            }
 
             return self::REJECT;
         }
 
         return self::ACK;
+    }
+
+    /**
+     * @param TemplateEmailMessageSender $templateEmailMessageSender
+     */
+    public function setTemplateEmailMessageSender(TemplateEmailMessageSender $templateEmailMessageSender)
+    {
+        $this->templateEmailMessageSender = $templateEmailMessageSender;
     }
 
     /**

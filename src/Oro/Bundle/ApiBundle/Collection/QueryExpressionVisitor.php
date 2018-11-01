@@ -18,7 +18,7 @@ use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\CompositeExpressionIn
  */
 class QueryExpressionVisitor extends ExpressionVisitor
 {
-    /** @var array */
+    /** @var string[] */
     private $queryAliases;
 
     /** @var Parameter[] */
@@ -44,7 +44,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
     }
 
     /**
-     * @param array $queryAliases
+     * @param string[] $queryAliases
      */
     public function setQueryAliases(array $queryAliases)
     {
@@ -93,7 +93,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
     /**
      * Builds placeholder string for given parameter name.
      *
-     * @param $parameterName
+     * @param string $parameterName
      *
      * @return string
      */
@@ -123,7 +123,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
     {
         $expressionType = $expr->getType();
         if (!isset($this->compositeExpressions[$expressionType])) {
-            throw new QueryException('Unknown composite ' . $expr->getType());
+            throw new QueryException(sprintf('Unknown composite %s.', $expr->getType()));
         }
 
         $processedExpressions = [];
@@ -156,9 +156,11 @@ class QueryExpressionVisitor extends ExpressionVisitor
             $fieldName = sprintf('LOWER(%s)', $fieldName);
             $comparison = new Comparison($comparison->getField(), $operator, $comparison->getValue());
         } elseif ($modifier) {
-            throw new QueryException(
-                sprintf('Unknown modifier "%s" for comparison operator "%s".', $modifier, $operator)
-            );
+            throw new QueryException(sprintf(
+                'Unknown modifier "%s" for comparison operator "%s".',
+                $modifier,
+                $operator
+            ));
         }
 
         return $this->comparisonExpressions[$operator]

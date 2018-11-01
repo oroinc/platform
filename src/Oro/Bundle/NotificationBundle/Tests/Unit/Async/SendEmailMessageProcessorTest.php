@@ -5,6 +5,7 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Async;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerInterface;
+use Oro\Bundle\EmailBundle\Async\TemplateEmailMessageSender;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
@@ -15,9 +16,14 @@ use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
+    private const USER_ID = 24;
+
     public function testShouldConstructWithRequiredArguments()
     {
         new SendEmailMessageProcessor(
@@ -313,6 +319,108 @@ class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ]));
 
         $processor->process($message, $this->createSessionMock());
+    }
+
+    public function testProcessWhenMessageIsTranslatableAndMessageSent()
+    {
+        $processor = new SendEmailMessageProcessor(
+            $this->createMailerMock(),
+            $this->createEmailProcessorMock(),
+            $this->createManagerRegistryMock(),
+            $this->createEmailRendererMock(),
+            $this->createLoggerMock()
+        );
+
+        $messageBody = [
+            'toEmail'   => 'to@email.com',
+            'fromEmail' => 'from@email.com',
+            'template'  => 'template_name',
+            'body'      => ['body_parameter' => 'value'],
+            'userId'    => self::USER_ID
+        ];
+
+        $message = new NullMessage;
+        $message->setBody(json_encode($messageBody));
+
+        /** @var TemplateEmailMessageSender|\PHPUnit_Framework_MockObject_MockObject $templateEmailMessageSender */
+        $templateEmailMessageSender = $this->createMock(TemplateEmailMessageSender::class);
+
+        $templateEmailMessageSender
+            ->expects($this->any())
+            ->method('isTranslatable')
+            ->with($this->callback(function ($message) use ($messageBody) {
+                return $message == array_replace_recursive($message, $messageBody);
+            }))
+            ->willReturn(true);
+
+        $templateEmailMessageSender
+            ->expects($this->any())
+            ->method('sendTranslatedMessage')
+            ->with($this->callback(function ($message) use ($messageBody) {
+                return $message == array_replace_recursive($message, $messageBody);
+            }))
+            ->willReturn(1);
+
+        $processor->setTemplateEmailMessageSender($templateEmailMessageSender);
+
+        self::assertEquals(MessageProcessorInterface::ACK, $processor->process($message, $this->createSessionMock()));
+    }
+
+    public function testProcessWhenMessageIsTranslatableAndMessageNotSent()
+    {
+        $messageBody = [
+            'toEmail'   => 'to@email.com',
+            'fromEmail' => 'from@email.com',
+            'template'  => 'template_name',
+            'body'      => ['body_parameter' => 'value'],
+            'userId'    => self::USER_ID,
+        ];
+        $message = new NullMessage;
+        $message->setBody(json_encode($messageBody));
+
+        $logger = $this->createLoggerMock();
+        $processor = new SendEmailMessageProcessor(
+            $this->createMailerMock(),
+            $this->createEmailProcessorMock(),
+            $this->createManagerRegistryMock(),
+            $this->createEmailRendererMock(),
+            $logger
+        );
+
+        /** @var TemplateEmailMessageSender|\PHPUnit_Framework_MockObject_MockObject $templateEmailMessageSender */
+        $templateEmailMessageSender = $this->createMock(TemplateEmailMessageSender::class);
+
+        $templateEmailMessageSender
+            ->expects($this->once())
+            ->method('isTranslatable')
+            ->with($this->callback(function ($message) use ($messageBody) {
+                return $message == array_replace_recursive($message, $messageBody);
+            }))
+            ->willReturn(true);
+
+        $templateEmailMessageSender
+            ->expects($this->any())
+            ->method('sendTranslatedMessage')
+            ->with($this->callback(function ($message) use ($messageBody) {
+                return $message == array_replace_recursive($message, $messageBody);
+            }))
+            ->willReturnCallback(function ($message, &$failedRecipients) {
+                $failedRecipients = ['to@email.com'];
+
+                return 0;
+            });
+
+        $processor->setTemplateEmailMessageSender($templateEmailMessageSender);
+
+        $logger
+            ->expects($this->once())
+            ->method('error')
+            ->with("Cannot send message to the following recipients: Array\n(\n    [0] => to@email.com\n)\n");
+
+        self::assertEquals(
+            MessageProcessorInterface::REJECT,
+            $processor->process($message, $this->createSessionMock())
+        );
     }
 
     /**

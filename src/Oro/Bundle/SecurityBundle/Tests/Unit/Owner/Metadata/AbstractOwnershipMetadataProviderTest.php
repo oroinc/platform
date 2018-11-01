@@ -4,7 +4,6 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\Proxy;
-
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -96,6 +95,18 @@ class AbstractOwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
             new OwnershipMetadata(),
             $this->provider->getMetadata('\\' . Proxy::MARKER . '\\' . self::SOME_CLASS)
         );
+    }
+
+    public function testGetMetadataForNull()
+    {
+        $this->configManager->expects($this->never())
+            ->method($this->anything());
+
+        $this->cache->expects($this->never())
+            ->method($this->anything());
+
+        $metadata = new OwnershipMetadata();
+        $this->assertEquals($metadata, $this->provider->getMetadata(null));
     }
 
     public function testGetMetadataUndefinedClassWithCache()

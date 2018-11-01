@@ -9,6 +9,7 @@ use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PriceTypeTest extends FormIntegrationTestCase
 {
@@ -171,5 +172,34 @@ class PriceTypeTest extends FormIntegrationTestCase
     public function testGetName()
     {
         $this->assertEquals(PriceType::NAME, $this->formType->getName());
+    }
+
+    public function testConfigureOptions()
+    {
+        /** @var $optionsResolverMock OptionsResolver|\PHPUnit_Framework_MockObject_MockObject */
+        $optionsResolverMock = $this->getMockBuilder(OptionsResolver::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->formType->setDataClass(\stdClass::class);
+
+        $optionsResolverMock->expects($this->once())
+            ->method('setDefaults')
+            ->with(
+                [
+                    'data_class' => \stdClass::class,
+                    'hide_currency' => false,
+                    'additional_currencies' => null,
+                    'currencies_list' => null,
+                    'default_currency' => null,
+                    'full_currency_list' => false,
+                    'currency_empty_value' => 'oro.currency.currency.form.choose',
+                    'compact' => false,
+                    'validation_groups'=> ['Default'],
+                    'match_price_on_null' => true
+                ]
+            );
+
+        $this->formType->configureOptions($optionsResolverMock);
     }
 }

@@ -64,10 +64,14 @@ class ThemeResourceProvider implements ResourceProviderInterface
     public function getResources()
     {
         if (!$this->resources) {
-            if ($this->cache instanceof Cache && $this->cache->contains(self::CACHE_KEY)) {
-                $this->resources = $this->cache->fetch(self::CACHE_KEY);
-            } else {
+            $resources = false;
+            if (null !== $this->cache) {
+                $resources = $this->cache->fetch(self::CACHE_KEY);
+            }
+            if (false === $resources) {
                 $this->loadResources();
+            } else {
+                $this->resources = $resources;
             }
         }
 

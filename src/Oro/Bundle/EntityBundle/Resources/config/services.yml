@@ -282,7 +282,7 @@ services:
         lazy: true
 
     oro_entity.entity_alias_cache:
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         public: false
         calls:
             - [ setNamespace, [ 'oro_entity_aliases' ] ]
@@ -336,6 +336,16 @@ services:
             - '@oro_entity_config.provider.extend'
         tags:
             - { name: oro_entity.name_provider, priority: -90 }
+
+    oro_entity.entity_name_provider.dictionary:
+        class: Oro\Bundle\EntityBundle\Provider\DictionaryEntityNameProvider
+        public: false
+        arguments:
+            - '@oro_entity_config.config_manager'
+            - '@doctrine'
+            - '@property_accessor'
+        tags:
+            - { name: oro_entity.name_provider, priority: -85 }
 
     oro_entity.entity_name_provider.fallback:
         class: Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider
@@ -500,6 +510,7 @@ services:
 
     oro_entity.provider.structure_data:
         class: 'Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider'
+        public: false
         arguments:
             - '@event_dispatcher'
             - '@oro_entity.entity_field_list_provider'

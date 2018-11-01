@@ -14,12 +14,12 @@ Feature: Unidirectional entity relations created via UI
     And I go to System/ Entities/ Entity Management
     And filter Name as is equal to "User"
     And I click view User in grid
-    And press "Create field"
+    And click "Create field"
     And I fill form with:
       |Field name  |State_m2m   |
       |Storage type|Table column|
       |Type        |Many to many|
-    And press "Continue"
+    And click "Continue"
     When I fill form with:
       |Target entity             |Language|
     Then "Bidirectional" was set to "No" and is not editable
@@ -34,12 +34,12 @@ Feature: Unidirectional entity relations created via UI
     And I go to System/ Entities/ Entity Management
     And filter Name as is equal to "User"
     And I click view User in grid
-    And press "Create field"
+    And click "Create field"
     And I fill form with:
       |Field name  |Related_product_o2m|
       |Storage type|Table column       |
       |Type        |One to many        |
-    And press "Continue"
+    And click "Continue"
     Then I should not see "Language" entity for "Target Entity" select
     When I fill form with:
       |Target entity             |Business Unit|
@@ -55,12 +55,12 @@ Feature: Unidirectional entity relations created via UI
     And I go to System/ Entities/ Entity Management
     And filter Name as is equal to "User"
     And I click view User in grid
-    And press "Create field"
+    And click "Create field"
     And I fill form with:
       |Field name  |Compatible_product_m2o|
       |Storage type|Table column          |
       |Type        |Many to one           |
-    And press "Continue"
+    And click "Continue"
     When I fill form with:
       |Target entity|Organization|
       |Bidirectional|Yes         |
@@ -72,12 +72,12 @@ Feature: Unidirectional entity relations created via UI
     And I go to System/ Entities/ Entity Management
     And filter Name as is equal to "User"
     And I click view User in grid
-    And press "Create field"
+    And click "Create field"
     And I fill form with:
       |Field name  |not_extended_m2o|
       |Storage type|Table column    |
       |Type        |Many to one     |
-    And press "Continue"
+    And click "Continue"
     When I fill form with:
       |Target entity|Language|
     Then "Bidirectional" was set to "No" and is not editable
@@ -90,12 +90,12 @@ Feature: Unidirectional entity relations created via UI
     And I go to System/ Entities/ Entity Management
     And filter Name as is equal to "User"
     And I click view User in grid
-    And press "Create field"
+    And click "Create field"
     And I fill form with:
       |Field name  |extended_m2m|
       |Storage type|Table column|
       |Type        |Many to many|
-    And press "Continue"
+    And click "Continue"
     When I fill form with:
       |Target entity             |Organization|
       |Bidirectional             |Yes         |

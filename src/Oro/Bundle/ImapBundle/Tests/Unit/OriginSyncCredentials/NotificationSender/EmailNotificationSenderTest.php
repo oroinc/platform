@@ -5,10 +5,12 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\OriginSyncCredentials\NotificationSen
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\EmailNotificationSender;
@@ -19,16 +21,16 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
     /** @var EmailNotificationSender */
     private $sender;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject configManager */
     private $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailRenderer|\PHPUnit_Framework_MockObject_MockObject emailRenderer */
     private $emailRenderer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
     private $doctrine;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \Swift_Mailer|\PHPUnit_Framework_MockObject_MockObject */
     private $mailer;
 
     protected function setUp()
@@ -167,6 +169,46 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
 
                 return 1;
             });
+
+        $this->sender->sendNotification($origin);
+    }
+
+    public function testTemplateEmailManagerSendNotification()
+    {
+        /** @var TemplateEmailManager|\PHPUnit_Framework_MockObject_MockObject $templateEmailManager */
+        $templateEmailManager = $this->createMock(TemplateEmailManager::class);
+        $this->sender->setTemplateEmailManager($templateEmailManager);
+
+        $origin = new UserEmailOrigin();
+        $origin->setUser('test@example.com');
+        $origin->setImapHost('example.com');
+        $mailbox = new Mailbox();
+        $mailbox->setEmail('test@example.com');
+        $origin->setMailbox($mailbox);
+
+        $this->configManager->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['oro_notification.email_notification_sender_email', false, false, null, 'sender@test.com'],
+                    ['oro_notification.email_notification_sender_name', false, false, null, 'sender name']
+                ]
+            );
+
+        $this->mailer->expects($this->never())
+            ->method('send');
+
+        $templateEmailManager->expects($this->once())
+            ->method('sendTemplateEmail')
+            ->with(
+                From::emailAddress('sender@test.com', 'sender name'),
+                [$mailbox],
+                new EmailTemplateCriteria('sync_wrong_credentials_system_box'),
+                [
+                    'username' => 'test@example.com',
+                    'host' => 'example.com'
+                ]
+            );
 
         $this->sender->sendNotification($origin);
     }

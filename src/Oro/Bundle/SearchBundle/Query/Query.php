@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
-use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 
@@ -775,5 +773,10 @@ class Query
         }
 
         return $field;
+    }
+
+    public function __clone()
+    {
+        $this->criteria = clone $this->criteria;
     }
 }

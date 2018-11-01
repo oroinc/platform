@@ -1,10 +1,24 @@
 services:
     doctrine.metadata.cache:
-        parent: oro.cache.abstract
+        public: false
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [ setNamespace, [ 'doctrine_metadata' ] ]
 
-    doctrine.metadata.cache.config:
+    doctrine.query.cache:
+        public: false
         parent: oro.cache.abstract
         calls:
+            - [ setNamespace, [ 'doctrine_query' ] ]
+
+    doctrine.metadata.cache.config:
+        public: false
+        parent: oro.cache.abstract.without_memory_cache
+        calls:
             - [ setNamespace, [ 'doctrine_metadata_config' ] ]
+
+    doctrine.query.cache.config:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'doctrine_query_config' ] ]

@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
 use Oro\Bundle\DataAuditBundle\Service\EntityToEntityChangeArrayConverter;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\EntityAdditionalFields;
 
@@ -21,6 +20,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider entityConversionDataProvider
      * @param array $changeSet
+     * @param array $expectedChangeSet
      */
     public function testEntityConversionToArray(array $changeSet, array $expectedChangeSet)
     {
@@ -79,10 +79,20 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit_Framework_TestCase
     public function additionalFieldsDataProvider()
     {
         $dateTime = new \DateTime('2017-11-10 10:00:00', new \DateTimeZone('Europe/London'));
+        $resource = fopen(__FILE__, 'rb');
+        if (false === $resource) {
+            $this->fail('Unable to open resource');
+        }
 
         return [
-            [['scalar' => 123], ['scalar' => 123]],
+            [['integer' => 123], ['integer' => 123]],
+            [['float' => 1.1], ['float' => 1.1]],
+            [['boolean' => true], ['boolean' => true]],
+            [['null' => null], ['null' => null]],
+            [['string' => 'string'], ['string' => 'string']],
             [['array' => ['value' => 123]], ['array' => ['value' => 123]]],
+            [['object' => new \stdClass()], ['object' => null]],
+            [['resource' => $resource], ['resource' => null]],
             [['date' => $dateTime], ['date' => '2017-11-10T10:00:00+0000']],
         ];
     }
@@ -93,10 +103,20 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit_Framework_TestCase
     public function entityConversionDataProvider()
     {
         $dateTime = new \DateTime('2017-11-10 10:00:00', new \DateTimeZone('Europe/London'));
+        $resource = fopen(__FILE__, 'rb');
+        if (false === $resource) {
+            $this->fail('Unable to open resource');
+        }
 
         return [
-            [['scalar' => [null, 123]], ['scalar' => [null, 123]]],
+            [['integer' => [null, 123]], ['integer' => [null, 123]]],
+            [['float' => [null, 1.1]], ['float' => [null, 1.1]]],
+            [['boolean' => [null, true]], ['boolean' => [null, true]]],
+            [['null' => [123, null]], ['null' => [123, null]]],
+            [['string' => [null, 'string']], ['string' => [null, 'string']]],
             [['array' => [null, [123]]], ['array' => [null, [123]]]],
+            [['object' => [null, new \stdClass()]], []],
+            [['resource' => [null, $resource]], []],
             [['date' => [$dateTime, null]], ['date' => ['2017-11-10T10:00:00+0000', null]]],
         ];
     }
@@ -120,6 +140,9 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit_Framework_TestCase
         $em->expects($this->once())
             ->method('getClassMetadata')
             ->willReturn($classMetadata);
+        $em->expects($this->any())
+            ->method('contains')
+            ->willReturn(false);
 
         return $em;
     }

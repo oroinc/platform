@@ -72,9 +72,31 @@ services:
         public: false
         calls:
             - [setDoctrineHelper,  ['@oro_api.doctrine_helper']]
+            - [setRequireJoinsFieldVisitorFactory,  ['@oro_api.query.require_joins_field_visitor_factory']]
+            - [setOptimizeJoinsFieldVisitorFactory,  ['@oro_api.query.optimize_joins_field_visitor_factory']]
 
     oro_api.criteria_placeholders_resolver:
         class: Oro\Bundle\ApiBundle\Util\CriteriaPlaceholdersResolver
+        public: false
+
+    oro_api.query.require_joins_field_visitor_factory:
+        class: Oro\Bundle\ApiBundle\Util\RequireJoinsFieldVisitorFactory
+        public: false
+        arguments:
+            - '@oro_api.query.require_joins_decision_maker'
+
+    oro_api.query.require_joins_decision_maker:
+        class: Oro\Bundle\ApiBundle\Util\RequireJoinsDecisionMaker
+        public: false
+
+    oro_api.query.optimize_joins_field_visitor_factory:
+        class: Oro\Bundle\ApiBundle\Util\OptimizeJoinsFieldVisitorFactory
+        public: false
+        arguments:
+            - '@oro_api.query.optimize_joins_decision_maker'
+
+    oro_api.query.optimize_joins_decision_maker:
+        class: Oro\Bundle\ApiBundle\Util\OptimizeJoinsDecisionMaker
         public: false
 
     oro_api.doctrine_helper:
@@ -203,7 +225,7 @@ services:
 
     oro_api.resources_cache.impl:
         public: false
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [ setNamespace, [ 'oro_api_resources' ] ]
 
@@ -285,7 +307,7 @@ services:
         lazy: true
 
     oro_api.entity_alias_cache:
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         public: false
         calls:
             - [ setNamespace, [ 'oro_entity_aliases_api' ] ]

@@ -43,6 +43,7 @@ parameters:
 
 services:
     oro_menu.cache:
+        deprecated: The "%service_id%" service is never used and will be removed in 3.1
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_menu' ] ]
@@ -244,6 +245,8 @@ services:
             - [ setHistoryItemEntityFQCN, [ %oro_navigation.entity.navigation_history_item.class% ]]
             - [ setUserEntityFQCN, [ %oro_user.entity.class% ]]
             - [ setNavigationHistoryItemType, ['history']]
+            - [ addExcludedRoute, ['oro_default']]
+            - [ addExcludedRoute, ['nelmio_api_doc_index']]
 
     oro_navigation.event.master_request_route_listener:
         class: Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener

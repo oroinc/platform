@@ -153,17 +153,4 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext, Or
             )
         );
     }
-
-    /**
-     * Click on element on page
-     * Example: When I click on "Get help"
-     *
-     * @param string $element
-     *
-     * @When /^(?:|I )click on "(?P<element>[\w\s]+)"$/
-     */
-    public function iClickOn($element)
-    {
-        $this->createElement($element)->click();
-    }
 }

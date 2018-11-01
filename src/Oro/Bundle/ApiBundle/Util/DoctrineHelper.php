@@ -141,13 +141,10 @@ class DoctrineHelper extends BaseHelper
         $relations = [];
         $fieldNames = $metadata->getAssociationNames();
         foreach ($fieldNames as $fieldName) {
-            $mapping = $metadata->getAssociationMapping($fieldName);
-            if ($mapping['type'] & ClassMetadata::TO_ONE) {
-                $targetMetadata = $this->getEntityMetadataForClass($mapping['targetEntity']);
-                $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
-                if (count($targetIdFieldNames) === 1) {
-                    $relations[$fieldName] = $targetMetadata->getTypeOfField(reset($targetIdFieldNames));
-                }
+            $targetMetadata = $this->getEntityMetadataForClass($metadata->getAssociationTargetClass($fieldName));
+            $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
+            if (count($targetIdFieldNames) === 1) {
+                $relations[$fieldName] = $targetMetadata->getTypeOfField(reset($targetIdFieldNames));
             }
         }
 

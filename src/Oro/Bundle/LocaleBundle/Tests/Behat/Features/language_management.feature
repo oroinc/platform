@@ -12,9 +12,9 @@ Feature: Language management
     When I go to System/Localization/Languages
     Then I should see English in grid with following data:
       | Status | Enabled |
-    When I press "Add Language"
+    When I click "Add Language"
     And I select "German (Germany) - de_DE" from "Language"
-    And I press "Add Language"
+    And I click "Add Language"
     Then I should see "Language has been added" flash message
     And I should see "German (Germany)" in grid with following data:
       | Status  | Disabled         |
@@ -35,7 +35,7 @@ Feature: Language management
       | Title    | Install "German (Germany)" language |
       | okButton | Install                             |
 
-    When I press "Install"
+    When I click "Install"
     Then I should see "German (Germany)" in grid with following data:
       | Status  | Enabled    |
       | Updates | Up to date |
@@ -52,7 +52,7 @@ Feature: Language management
 
   Scenario: Create localization with German language
     Given I go to System/Localization/Localizations
-    When I press "Create Localization"
+    When I click "Create Localization"
     And I fill "Localization Form" with:
       | Name       | German Localization Name  |
       | Title      | German Localization Title |

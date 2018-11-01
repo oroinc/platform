@@ -13,7 +13,7 @@ Feature: My emails 
       | Body    | This is very simple test mail |
       | To      | Charlie Sheen                 |
       | Subject | Behat test                    |
-      And press "Send"
+      And click "Send"
     Then I should see "The email was sent" flash message
 
   Scenario: Filter emails

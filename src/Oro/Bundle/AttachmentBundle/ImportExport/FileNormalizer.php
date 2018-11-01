@@ -9,7 +9,13 @@ use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
+/**
+ * The normalizer for attached files.
+ */
 class FileNormalizer implements DenormalizerInterface, NormalizerInterface
 {
     /** @var AttachmentManager */
@@ -20,6 +26,9 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
 
     /** @var ConfigFileValidator */
     protected $validator;
+
+    /** @var LoggerInterface */
+    protected $logger;
 
     /**
      * @param AttachmentManager $manager
@@ -46,11 +55,19 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
     }
 
     /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
-        return $type == 'Oro\Bundle\AttachmentBundle\Entity\File';
+        return File::class === $type;
     }
 
     /**
@@ -67,14 +84,24 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         $result = null;
-        $entity = $this->fileManager->createFileEntity($data);
+        $entity = $this->createFileEntity($data);
         if ($entity) {
             $violations = $this->validator->validate(
                 $entity->getFile(),
                 $context['entityName'],
                 $context['fieldName']
             );
-            if (!$violations->count()) {
+            if ($violations->count()) {
+                /** @var ConstraintViolationInterface $violation */
+                foreach ($violations as $violation) {
+                    $this->logger->error(sprintf(
+                        '%s. File: %s. Original File: %s.',
+                        $violation->getMessage(),
+                        $entity->getFile()->getPath(),
+                        $data
+                    ));
+                }
+            } else {
                 $result = $entity;
             }
         }
@@ -95,5 +122,21 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
             'download',
             true
         );
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return File|null
+     */
+    private function createFileEntity($path)
+    {
+        try {
+            return $this->fileManager->createFileEntity($path);
+        } catch (IOException $e) {
+            $this->logger->error($e->getMessage());
+        }
+
+        return null;
     }
 }

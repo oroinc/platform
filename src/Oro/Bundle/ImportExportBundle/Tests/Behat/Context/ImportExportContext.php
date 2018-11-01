@@ -422,6 +422,23 @@ class ImportExportContext extends OroFeatureContext implements
     }
 
     /**
+     * Example: When I validate file
+     *
+     * @When /^(?:|I )validate file$/
+     */
+    public function iValidateFile()
+    {
+        $importSubmitButton = $this->openImportModalAndReturnValidateButton();
+        $this->createElement('ActiveImportFileField')->attachFile($this->importFile);
+
+        $importSubmitButton->press();
+        $this->waitForAjax();
+
+        $flashMessage = 'Validation started successfully. You will receive an email notification upon completion.';
+        $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
+    }
+
+    /**
      * @When /^I import exported file$/
      */
     public function iImportExportedFile()
@@ -496,6 +513,23 @@ class ImportExportContext extends OroFeatureContext implements
         }
 
         return $importSubmitButton;
+    }
+
+    /**
+     * @return OroElement
+     */
+    protected function openImportModalAndReturnValidateButton()
+    {
+        $validateFileButton = $this->createElement('Validate File Button');
+
+        if (false === $validateFileButton->isIsset()) {
+            $mainImportButton = $this->createElement('MainImportFileButton');
+            self::assertNotNull($mainImportButton, 'Main import button was not found');
+            $mainImportButton->click();
+            $this->waitForAjax();
+        }
+
+        return $validateFileButton;
     }
 
     /**

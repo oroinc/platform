@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\UserBundle\Handler;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Model\EmailNotification;
+use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Psr\Log\LoggerInterface;
 
 /**
  * Responsible for resetting user's password, setting auth_status to expired and sending reset token to the user
@@ -81,15 +80,15 @@ class ResetPasswordHandler
 
     /**
      * @param User $user
-     *
      * @return EmailNotification
      */
     protected function getNotification(User $user)
     {
         if (null === $this->template) {
-            $this->template = $this->registry->getRepository(EmailTemplate::class)->findOneByName(self::TEMPLATE_NAME);
+            $this->template = $this->registry->getRepository(EmailTemplate::class)
+                ->findOneBy(['name' => self::TEMPLATE_NAME, 'entityName' => User::class]);
         }
 
-        return new EmailNotification($this->template, [$user->getEmail()]);
+        return new TemplateEmailNotification($this->template, [$user]);
     }
 }

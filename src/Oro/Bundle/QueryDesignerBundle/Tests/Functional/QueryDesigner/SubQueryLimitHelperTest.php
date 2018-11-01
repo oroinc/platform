@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Functional\QueryDesigner;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
-
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
@@ -35,5 +35,26 @@ class SubQueryLimitHelperTest extends WebTestCase
             SqlWalker::WALKER_HOOK_LIMIT_KEY,
             $testQb->getQuery()->getHint(SqlWalker::WALKER_HOOK_LIMIT_KEY)
         );
+    }
+
+    public function testDeleteAfterSetLimit()
+    {
+        $this->loadFixtures(['@OroQueryDesignerBundle/Tests/Functional/DataFixtures/workflows.yml']);
+        /** @var EntityManager $em */
+        $em = $this->getContainer()->get('doctrine')->getManagerForClass(WorkflowAwareEntity::class);
+        $repo = $em->getRepository(WorkflowAwareEntity::class);
+
+        $subSelectQb = $repo->createQueryBuilder('sub_we');
+        $subSelectQb = $this->helper->setLimit($subSelectQb, 4, 'id');
+
+        $selectQb = $repo->createQueryBuilder('we');
+        $selectQb->where($selectQb->expr()->in('we.id', $subSelectQb->getDQL()));
+
+        $this->assertCount(4, $selectQb->getQuery()->getResult());
+
+        $deleteQb = $em->createQueryBuilder()->delete(WorkflowAwareEntity::class, 'we');
+        $deleteQb->getQuery()->execute();
+
+        $this->assertCount(0, $repo->findAll());
     }
 }

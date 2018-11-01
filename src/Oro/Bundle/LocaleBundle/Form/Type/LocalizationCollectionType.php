@@ -79,7 +79,8 @@ class LocalizationCollectionType extends AbstractType
             'fallback_type'         => FallbackPropertyType::NAME,
             'enabled_fallbacks'     => [],
             'value_type'            => FallbackValueType::NAME,
-            'group_fallback_fields' => null
+            'group_fallback_fields' => null,
+            'exclude_parent_localization' => false
         ]);
     }
 
@@ -91,8 +92,9 @@ class LocalizationCollectionType extends AbstractType
         foreach ($this->getLocalizations() as $localization) {
             // calculate enabled fallbacks for the specific localization
             $enabledFallbacks = $options['enabled_fallbacks'];
+            $excludeParentLocalization = $options['exclude_parent_localization'];
             $parent = null;
-            if ($localization->getParentLocalization()) {
+            if (!$excludeParentLocalization && $localization->getParentLocalization()) {
                 $enabledFallbacks = array_merge($enabledFallbacks, [FallbackType::PARENT_LOCALIZATION]);
                 $parent = $localization->getParentLocalization()->getName();
             }
@@ -108,7 +110,8 @@ class LocalizationCollectionType extends AbstractType
                     'fallback_type_localization' => $localization->getName(),
                     'fallback_type_parent_localization' => $parent,
                     'enabled_fallbacks' => $enabledFallbacks,
-                    'group_fallback_fields' => $options['group_fallback_fields']
+                    'group_fallback_fields' => $options['group_fallback_fields'],
+                    'exclude_parent_localization' => $excludeParentLocalization
                 ]
             );
         }

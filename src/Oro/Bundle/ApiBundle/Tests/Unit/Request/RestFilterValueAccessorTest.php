@@ -18,7 +18,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $filterValueAccessor = new RestFilterValueAccessor($request);
         $filterValueAccessor->setOperatorPattern(
-            '(!|<|>|%21|%3C|%3E)?=|<>|%3C%3E|<|>|\*|%3C|%3E|%2A|(!|%21)?(~|\^|\$|%7E|%5E|%24)'
+            '(!|<|>|%21|%3C|%3E)?(=|%3D)|<>|%3C%3E|<|>|\*|%3C|%3E|%2A|(!|%21)?(~|\^|\$|%7E|%5E|%24)'
         );
         $filterValueAccessor->setOperatorNameMap([
             'eq'              => '=',
@@ -77,6 +77,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
             'prm_13=%3Cval13%3E'                 => ['prm_13', '=', '<val13>', 'prm_13', 'prm_13'],
             'prm14!=val14'                       => ['prm14', '!=', 'val14', 'prm14', 'prm14'],
             'prm15%21=val15'                     => ['prm15', '!=', 'val15', 'prm15', 'prm15'],
+            'prm16%3Dval16'                      => ['prm16', '=', 'val16', 'prm16', 'prm16'],
             'page[number]=123'                   => ['page[number]', '=', '123', 'number', 'page[number]'],
             'page%5Bsize%5D=456'                 => ['page[size]', '=', '456', 'size', 'page[size]'],
             'filter[address.country]=US'         => [
@@ -239,6 +240,24 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
                 'filter[field4]' => $this->getFilterValue('field4', 'val4', '<=', 'filter[field4]'),
                 'filter[field5]' => $this->getFilterValue('field5', 'val5', '>', 'filter[field5]'),
                 'filter[field6]' => $this->getFilterValue('field6', 'val6', '>=', 'filter[field6]'),
+            ],
+            $accessor->getGroup('filter')
+        );
+    }
+
+    public function testParseUrlEncodedQueryStringWithAlternativeSyntaxOfFilters()
+    {
+        $queryStringValues = [
+            'filter%5Bfield1%5D%5Beq%5D%3Dval1'  => ['filter[field1]', 'eq', 'val1', 'field1', 'filter[field1]']
+        ];
+        $request = Request::create(
+            'http://test.com?' . implode('&', array_keys($queryStringValues))
+        );
+        $accessor = $this->getRestFilterValueAccessor($request);
+        self::assertCount(count($queryStringValues), $accessor->getAll(), 'getAll');
+        self::assertEquals(
+            [
+                'filter[field1]' => $this->getFilterValue('field1', 'val1', '=', 'filter[field1]')
             ],
             $accessor->getGroup('filter')
         );

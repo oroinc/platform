@@ -12,6 +12,8 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 /**
+ * Provides a set of reusable utility methods for dashboard widgets
+ * to simplify a work with time periods by which the widget's data is filtered.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DateHelper
@@ -368,7 +370,7 @@ class DateHelper
         $start->setTime(0, 0, 0);
 
         $end = $this->getCurrentDateTime();
-        $end->setTime(23, 59, 59);
+        $end->setTime(0, 0, 0)->modify('1 day');
 
         $start = $start->sub(new \DateInterval($interval));
 
@@ -382,6 +384,7 @@ class DateHelper
      * @param \DateTime $to
      *
      * @return array
+     * @deprecated will be removed in 3.0
      */
     public function getPreviousDateTimeInterval(\DateTime $from, \DateTime $to)
     {

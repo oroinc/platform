@@ -603,10 +603,14 @@ class RestJsonApiTestCase extends RestApiTestCase
      *
      * @param array    $expectedError
      * @param Response $response
+     * @param int      $statusCode
      */
-    protected function assertResponseValidationError($expectedError, Response $response)
-    {
-        $this->assertResponseValidationErrors([$expectedError], $response);
+    protected function assertResponseValidationError(
+        $expectedError,
+        Response $response,
+        $statusCode = Response::HTTP_BAD_REQUEST
+    ) {
+        $this->assertResponseValidationErrors([$expectedError], $response, $statusCode);
     }
 
     /**
@@ -614,10 +618,14 @@ class RestJsonApiTestCase extends RestApiTestCase
      *
      * @param array    $expectedErrors
      * @param Response $response
+     * @param int      $statusCode
      */
-    protected function assertResponseValidationErrors($expectedErrors, Response $response)
-    {
-        static::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
+    protected function assertResponseValidationErrors(
+        $expectedErrors,
+        Response $response,
+        $statusCode = Response::HTTP_BAD_REQUEST
+    ) {
+        static::assertResponseStatusCodeEquals($response, $statusCode);
 
         $content = json_decode($response->getContent(), true);
         try {

@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\ORMInvalidArgumentException;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
+use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -34,7 +37,7 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
     protected $om;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|UserRepository
      */
     protected $repository;
 
@@ -50,15 +53,13 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!interface_exists('Doctrine\Common\Persistence\ObjectManager')) {
-            $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');
-        }
+        $this->ef = $this->createMock(EncoderFactoryInterface::class);
+        $class = $this->createMock(ClassMetadata::class);
+        $this->em = $this->createMock(EntityManager::class);
+        $this->repository = $this->createMock(UserRepository::class);
 
-        $this->ef = $this->createMock('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface');
-        $class = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
-
-        $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
+        $this->om = $this->createMock(ObjectManager::class);
+        $this->repository = $this->createMock(UserRepository::class);
 
         $this->om
             ->expects($this->any())
@@ -172,21 +173,12 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFindUserByEmail()
     {
-        $crit = ['username' => self::TEST_EMAIL];
+        $user = $this->getUser();
 
-        $this->repository
-            ->expects($this->at(0))
-            ->method('findOneBy')
-            ->with($this->equalTo($crit))
-            ->will($this->returnValue([]));
-
-        $crit = ['email' => self::TEST_EMAIL];
-
-        $this->repository
-            ->expects($this->at(1))
-            ->method('findOneBy')
-            ->with($this->equalTo($crit))
-            ->will($this->returnValue([]));
+        $this->repository->expects(self::once())
+            ->method('findUserByEmail')
+            ->with(self::TEST_EMAIL, false)
+            ->willReturn($user);
 
         $this->userManager->findUserByUsernameOrEmail(self::TEST_EMAIL);
     }

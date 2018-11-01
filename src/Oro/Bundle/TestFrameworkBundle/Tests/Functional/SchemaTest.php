@@ -80,7 +80,11 @@ class SchemaTest extends WebTestCase
                 'CREATE INDEX mageorder_created_idx ON orocrm_magento_order (created_at, id)',
                 'CREATE INDEX magecustomer_rev_name_idx ON orocrm_magento_customer (last_name, first_name, id)',
                 'CREATE INDEX magecart_updated_idx ON orocrm_magento_cart (updatedAt, id)',
+                'ALTER TABLE orocrm_contactus_contact_rsn DROP `label`'
             ],
+            DatabasePlatformInterface::DATABASE_POSTGRESQL => [
+                'ALTER TABLE orocrm_contactus_contact_rsn DROP label' // Have left this field for BC purposes only
+            ]
         ];
 
         /** @var EntityManager $em */

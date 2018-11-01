@@ -59,6 +59,8 @@ services:
             - '@doctrine'
             - '@security.encoder_factory'
             - '@oro_entity_extend.enum_value_provider'
+        calls:
+            - ['setConfigManager', ['@oro_config.manager']]
 
     oro_user.manager.api:
         class: %oro_user.manager.api.class%
@@ -96,6 +98,7 @@ services:
             - { name: kernel.event_listener, event: security.interactive_login, method: onLogin }
 
     oro_user.cache:
+        deprecated: The "%service_id%" service is never used and will be removed in 3.1
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_user' ] ]
@@ -345,6 +348,8 @@ services:
 
     oro_user.mailer.processor:
         class: %oro_user.mailer.processor.class%
+        calls:
+            - [setTemplateEmailManager, ['@oro_email.manager.template_email']]
         arguments:
             - '@doctrine'
             - '@oro_config.global'
@@ -444,6 +449,22 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_user.validator.password_complexity }
 
+    oro_user.validator.email_case_insensitive_option:
+        class: Oro\Bundle\UserBundle\Validator\EmailCaseInsensitiveOptionValidator
+        arguments:
+            - '@oro_user.manager'
+            - '@translator'
+            - '@oro_datagrid.helper.route'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_user.validator.email_case_insensitive_option }
+
+    oro_user.validator.unique_user_email_validator:
+        class: Oro\Bundle\UserBundle\Validator\UniqueUserEmailValidator
+        arguments:
+            - '@oro_user.manager'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_user.validator.unique_user_email }
+
     oro_user.provider.password_complexity_config_provider:
         class: Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider
         arguments:
@@ -542,3 +563,20 @@ services:
             - '@security.token_storage'
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+    oro_user.event_listener.authentication_failure:
+        class: Oro\Bundle\UserBundle\EventListener\AuthenticationFailureListener
+        arguments:
+            - 'main'
+            - 'oro_user.login.errors.bad_credentials'
+        tags:
+            - { name: kernel.event_listener, event: security.authentication.failure, method: onAuthenticationFailure, priority: -255 }
+
+    oro_user.provider.user_preferred_language_provider:
+        class: Oro\Bundle\UserBundle\Provider\UserPreferredLanguageProvider
+        public: false
+        arguments:
+            - '@oro_config.user'
+            - '@oro_locale.settings'
+        tags:
+            - { name: oro_locale.preferred_language_provider }

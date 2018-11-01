@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query\QueryException;
 
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
@@ -86,16 +85,10 @@ class CriteriaConnector
      *
      * @param QueryBuilder $qb
      * @param Criteria     $criteria
-     *
-     * @throws QueryException
      */
     protected function addCriteria(QueryBuilder $qb, Criteria $criteria)
     {
         $aliases = $qb->getAllAliases();
-        if (!isset($aliases[0])) {
-            throw new QueryException('No aliases are set before invoking addCriteria().');
-        }
-
         $this->processWhere($qb, $criteria, $aliases);
         $this->processOrderings($qb, $criteria, $aliases);
 
@@ -117,11 +110,10 @@ class CriteriaConnector
      */
     private function processWhere(QueryBuilder $qb, Criteria $criteria, array $aliases)
     {
-        $expressionVisitor = $this->expressionVisitorFactory->createExpressionVisitor();
-        $expressionVisitor->setQueryAliases($aliases);
-
         $whereExpression = $criteria->getWhereExpression();
         if (null !== $whereExpression) {
+            $expressionVisitor = $this->expressionVisitorFactory->createExpressionVisitor();
+            $expressionVisitor->setQueryAliases($aliases);
             $qb->andWhere($expressionVisitor->dispatch($whereExpression));
             $parameters = $expressionVisitor->getParameters();
             foreach ($parameters as $parameter) {

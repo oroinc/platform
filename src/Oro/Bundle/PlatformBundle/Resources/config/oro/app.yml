@@ -46,9 +46,15 @@ doctrine:
                 metadata_cache_driver:
                     type: service
                     id:   doctrine.metadata.cache
+                query_cache_driver:
+                    type: service
+                    id:   doctrine.query.cache
             config:
                 connection: config
                 mappings: ~
                 metadata_cache_driver:
                     type: service
                     id:   doctrine.metadata.cache.config
+                query_cache_driver:
+                    type: service
+                    id:   doctrine.query.cache.config

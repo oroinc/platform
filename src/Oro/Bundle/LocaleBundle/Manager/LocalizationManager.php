@@ -10,6 +10,9 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 
+/**
+ * Provides localization entities by passed ids.
+ */
 class LocalizationManager
 {
     const CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
@@ -72,7 +75,7 @@ class LocalizationManager
         }
 
         /** @var Localization $cache */
-        $cache = $this->getRepository()->findOneBy(['id' => $id]);
+        $cache = $this->getRepository()->find($id);
 
         if ($cache === null) {
             return null;

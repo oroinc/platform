@@ -3,8 +3,11 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
+use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Entity\User as RealUserEntity;
 use Oro\Bundle\UserBundle\Form\Handler\UserHandler;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Psr\Log\LoggerInterface;
@@ -219,5 +222,66 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('send');
 
         $this->assertTrue($this->handler->process($user));
+    }
+
+    public function testProcessWithTemplateEmailManager()
+    {
+        $user = new User();
+        $user->setEmail('test@example.com');
+
+        $this->request->expects($this->once())->method('getMethod')->willReturn(Request::METHOD_POST);
+        $this->form->expects($this->once())->method('isValid')->willReturn(true);
+
+        $fromEmail = 'admin@example.com';
+        $fromName = 'John Doe';
+        $this->userConfigManager->expects($this->exactly(3))
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['oro_user.send_password_in_invitation_email', false, false, null, true],
+                    ['oro_notification.email_notification_sender_email', false, false, null, $fromEmail],
+                    ['oro_notification.email_notification_sender_name', false, false, null, $fromName],
+                ]
+            );
+        $this->form->expects($this->exactly(2))
+            ->method('has')
+            ->willReturnMap(
+                [
+                    ['passwordGenerate', true],
+                    ['inviteUser', true],
+                ]
+            );
+
+        $childForm = $this->createMock(FormInterface::class);
+        $childForm->expects($this->once())->method('getData')->willReturn(true);
+        $childForm->expects($this->once())->method('getViewData')->willReturn(true);
+        $this->form->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['passwordGenerate', $childForm],
+                    ['inviteUser', $childForm],
+                ]
+            );
+
+        $plainPassword = 'Qwerty!123%$';
+        $this->manager->expects($this->once())->method('generatePassword')->with(10)->willReturn($plainPassword);
+        $this->templating->expects($this->never())->method('render');
+        $this->mailer->expects($this->never())->method('send');
+
+        /** @var TemplateEmailManager|\PHPUnit_Framework_MockObject_MockObject $templateEmailManager */
+        $templateEmailManager = $this->createMock(TemplateEmailManager::class);
+        $templateEmailManager->expects($this->once())
+            ->method('sendTemplateEmail')
+            ->with(
+                From::emailAddress($fromEmail, $fromName),
+                [$user],
+                new EmailTemplateCriteria(UserHandler::INVITE_USER_TEMPLATE, RealUserEntity::class),
+                ['user' => $user, 'password' => $plainPassword]
+            );
+
+        $this->handler->setTemplateEmailManager($templateEmailManager);
+        $result = $this->handler->process($user);
+        $this->assertTrue($result);
     }
 }

@@ -111,9 +111,11 @@ class HelpLinkProvider
      */
     public function getHelpLinkUrl()
     {
-        if ($this->cache && $this->requestRoute && $this->cache->contains($this->requestRoute)) {
+        $helpLink = false;
+        if ($this->cache && $this->requestRoute) {
             $helpLink = $this->cache->fetch($this->requestRoute);
-        } else {
+        }
+        if (false === $helpLink) {
             $helpLink = $this->constructedHelpLinkUrl();
 
             if ($this->cache && $this->requestRoute) {

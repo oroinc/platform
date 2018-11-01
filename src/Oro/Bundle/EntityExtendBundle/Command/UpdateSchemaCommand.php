@@ -102,6 +102,10 @@ class UpdateSchemaCommand extends ContainerAwareCommand
             ->get('oro_entity_config.provider.extend_entity_config_provider');
 
         if ($input->getOption('attributes-only')) {
+            @trigger_error(
+                'attributes-only option is deprecated since version 2.6 and will be removed in 3.1.',
+                E_USER_DEPRECATED
+            );
             $extendEntityConfigProvider->enableAttributesOnly();
         }
 

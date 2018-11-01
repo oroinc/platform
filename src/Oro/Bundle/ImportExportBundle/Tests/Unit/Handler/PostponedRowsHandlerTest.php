@@ -128,4 +128,31 @@ class PostponedRowsHandlerTest extends \PHPUnit_Framework_TestCase
             );
         $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
     }
+
+    public function testPostponeWithIncrementedReadOption()
+    {
+        $this->jobProcessor
+            ->method('findOrCreateChildJob')
+            ->willReturn($this->currentJob);
+
+        $expectedMessage = new Message();
+        $expectedMessage->setBody([
+            'jobId' => 1,
+            'attempts' => 1,
+            'fileName' => '',
+            'options' => ['incremented_read' => false]
+        ]);
+        $expectedMessage->setDelay(PostponedRowsHandler::DELAY_SECONDS);
+        $this->messageProducer->expects($this->once())
+            ->method('send')
+            ->with(
+                Topics::HTTP_IMPORT,
+                $expectedMessage
+            );
+
+        $result = [];
+        $body = ['attempts' => 0, 'options' => []];
+
+        $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
+    }
 }

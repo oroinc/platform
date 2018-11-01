@@ -38,6 +38,7 @@ class LocalizedPropertyType extends AbstractType
     {
         $formType    = $options['type'];
         $formOptions = $options['options'];
+        $excludeParentLocalization = $options['exclude_parent_localization'];
 
         $builder
             ->add(
@@ -45,9 +46,15 @@ class LocalizedPropertyType extends AbstractType
                 $formType,
                 array_merge($formOptions, ['label' => 'oro.locale.fallback.value.default'])
             )
-            ->add(self::FIELD_LOCALIZATIONS, LocalizationCollectionType::NAME, [
-                'type' => $formType, 'options' => $formOptions
-            ]);
+            ->add(
+                self::FIELD_LOCALIZATIONS,
+                LocalizationCollectionType::NAME,
+                [
+                    'type' => $formType,
+                    'options' => $formOptions,
+                    'exclude_parent_localization' => $excludeParentLocalization
+                ]
+            );
 
         $builder->addViewTransformer(new MultipleValueTransformer(self::FIELD_DEFAULT, self::FIELD_LOCALIZATIONS));
     }
@@ -63,6 +70,7 @@ class LocalizedPropertyType extends AbstractType
 
         $resolver->setDefaults([
             'options' => [],
+            'exclude_parent_localization' => false
         ]);
     }
 }

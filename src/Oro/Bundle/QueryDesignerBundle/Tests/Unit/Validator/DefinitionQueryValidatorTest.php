@@ -5,6 +5,8 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Validator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\DefinitionQueryConstraint;
@@ -13,12 +15,12 @@ use Oro\Bundle\QueryDesignerBundle\Validator\DefinitionQueryValidator;
 class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var DefinitionQueryValidator
+     * @var DefinitionQueryValidator|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $validator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var EntityWithFieldsProvider|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $fieldsProvider;
 
@@ -32,12 +34,28 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
      */
     protected $context;
 
+    /**
+     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $entityConfigProvider;
+
+    /**
+     * @var EntityFieldProvider|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $fieldProvider;
+
     protected function setUp()
     {
         $this->fieldsProvider = $this->createMock(EntityWithFieldsProvider::class);
         $this->context = $this->createMock(ExecutionContextInterface::class);
         $this->constraint = new DefinitionQueryConstraint();
+
+        $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->fieldProvider = $this->createMock(EntityFieldProvider::class);
+
         $this->validator = new DefinitionQueryValidator($this->fieldsProvider);
+        $this->validator->setEntityConfigProvider($this->entityConfigProvider);
+        $this->validator->setFieldProvider($this->fieldProvider);
         $this->validator->initialize($this->context);
     }
 
@@ -53,20 +71,14 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateEmptyQueryWithNonSupportedRootClass()
     {
         $query = new QueryDesignerModel();
-        $query->setEntity('Acme\NonSupportedEntity');
+        $entity = 'Acme\NonSupportedEntity';
+        $query->setEntity($entity);
         $query->setDefinition('');
 
-        $this->fieldsProvider->expects($this->once())
-            ->method('getFields')
-            ->willReturn(
-                [
-                    'Acme\SupportedEntity' => [
-                        'fields' => [
-                            ['name' => 'id']
-                        ]
-                    ]
-                ]
-            );
+        $this->entityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($entity)
+            ->willReturn(false);
 
         $violation = $this->createMock(ConstraintViolationBuilder::class);
 
@@ -85,20 +97,14 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateEmptyQueryWitSupportedRootClass()
     {
         $query = new QueryDesignerModel();
-        $query->setEntity('Acme\SupportedEntity');
+        $entity = 'Acme\SupportedEntity';
+        $query->setEntity($entity);
         $query->setDefinition('[]');
 
-        $this->fieldsProvider->expects($this->once())
-            ->method('getFields')
-            ->willReturn(
-                [
-                    'Acme\SupportedEntity' => [
-                        'fields' => [
-                            ['name' => 'id']
-                        ]
-                    ]
-                ]
-            );
+        $this->entityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($entity)
+            ->willReturn(true);
 
         $this->context->expects($this->never())
             ->method('buildViolation');
@@ -109,19 +115,13 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateNullQueryWitSupportedRootClass()
     {
         $query = new QueryDesignerModel();
-        $query->setEntity('Acme\SupportedEntity');
+        $entity = 'Acme\SupportedEntity';
+        $query->setEntity($entity);
 
-        $this->fieldsProvider->expects($this->once())
-            ->method('getFields')
-            ->willReturn(
-                [
-                    'Acme\SupportedEntity' => [
-                        'fields' => [
-                            ['name' => 'id']
-                        ]
-                    ]
-                ]
-            );
+        $this->entityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($entity)
+            ->willReturn(true);
 
         $this->context->expects($this->never())
             ->method('buildViolation');
@@ -132,7 +132,8 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateWitNonSupportedSimpleColumn()
     {
         $query = new QueryDesignerModel();
-        $query->setEntity('Acme\SupportedEntity');
+        $entity = 'Acme\SupportedEntity';
+        $query->setEntity($entity);
         $query->setDefinition(json_encode(
             [
                 'columns'          => [
@@ -151,18 +152,26 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
             ]
         ));
 
-        $this->fieldsProvider->expects($this->once())
+        $this->entityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($entity)
+            ->willReturn(true);
+
+        $this->fieldProvider->expects($this->exactly(3))
             ->method('getFields')
-            ->willReturn(
+            ->with($entity, true, true)
+            ->willReturn([
                 [
-                    'Acme\SupportedEntity' => [
-                        'fields' => [
-                            ['name' => 'id'],
-                            ['name' => 'name']
-                        ]
-                    ]
+                    'name' => 'id',
+                    'type' => 'integer',
+                    'label' => 'Id'
+                ],
+                [
+                    'name' => 'name',
+                    'type' => 'string',
+                    'label' => 'Name'
                 ]
-            );
+            ]);
 
         $violation = $this->createMock(ConstraintViolationBuilder::class);
 
@@ -184,7 +193,8 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateWitSupportedIdentifierColumn()
     {
         $query = new QueryDesignerModel();
-        $query->setEntity('Acme\SupportedEntity');
+        $entity = 'Acme\SupportedEntity';
+        $query->setEntity($entity);
         $query->setDefinition(json_encode(
             [
                 'columns' => [
@@ -193,23 +203,37 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
             ]
         ));
 
-        $this->fieldsProvider->expects($this->once())
+        $this->entityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($entity)
+            ->willReturn(true);
+
+        $this->fieldProvider->expects($this->at(0))
             ->method('getFields')
-            ->willReturn(
+            ->with($entity, true, true)
+            ->willReturn([
                 [
-                    'Acme\SupportedEntity' => [
-                        'fields' => [
-                            ['name' => 'id'],
-                            ['name' => 'parent']
-                        ]
-                    ],
-                    'Acme\ParentEntity'    => [
-                        'fields' => [
-                            ['name' => 'id']
-                        ]
-                    ]
+                    'name' => 'id',
+                    'type' => 'integer',
+                    'label' => 'Id'
+                ],
+                [
+                    'name' => 'parent',
+                    'type' => 'integer',
+                    'label' => 'Parent'
                 ]
-            );
+            ]);
+
+        $this->fieldProvider->expects($this->at(1))
+            ->method('getFields')
+            ->with('Acme\ParentEntity', true, true)
+            ->willReturn([
+                [
+                    'name' => 'id',
+                    'type' => 'integer',
+                    'label' => 'Id'
+                ]
+            ]);
 
         $this->context->expects($this->never())
             ->method('buildViolation');
@@ -220,7 +244,8 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateWitNonSupportedJoinIdentifierColumn()
     {
         $query = new QueryDesignerModel();
-        $query->setEntity('Acme\SupportedEntity');
+        $entity = 'Acme\SupportedEntity';
+        $query->setEntity($entity);
         $query->setDefinition(json_encode(
             [
                 'columns' => [
@@ -229,18 +254,31 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
             ]
         ));
 
-        $this->fieldsProvider->expects($this->once())
+        $this->entityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($entity)
+            ->willReturn(true);
+
+        $this->fieldProvider->expects($this->at(0))
             ->method('getFields')
-            ->willReturn(
+            ->with($entity, true, true)
+            ->willReturn([
                 [
-                    'Acme\SupportedEntity' => [
-                        'fields' => [
-                            ['name' => 'id'],
-                            ['name' => 'parent']
-                        ]
-                    ]
+                    'name' => 'id',
+                    'type' => 'integer',
+                    'label' => 'Id'
+                ],
+                [
+                    'name' => 'parent',
+                    'type' => 'integer',
+                    'label' => 'Parent'
                 ]
-            );
+            ]);
+
+        $this->fieldProvider->expects($this->at(1))
+            ->method('getFields')
+            ->with('Acme\ParentNonSupportedEntity', true, true)
+            ->willReturn([]);
 
         $violation = $this->createMock(ConstraintViolationBuilder::class);
 
@@ -259,7 +297,8 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateWitNonSupportedRootColumnInIdentifierColumn()
     {
         $query = new QueryDesignerModel();
-        $query->setEntity('Acme\SupportedEntity');
+        $entity = 'Acme\SupportedEntity';
+        $query->setEntity($entity);
         $query->setDefinition(json_encode(
             [
                 'columns' => [
@@ -268,22 +307,32 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
             ]
         ));
 
-        $this->fieldsProvider->expects($this->once())
+        $this->entityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($entity)
+            ->willReturn(true);
+
+        $this->fieldProvider->expects($this->at(0))
             ->method('getFields')
-            ->willReturn(
+            ->with($entity, true, true)
+            ->willReturn([
                 [
-                    'Acme\SupportedEntity' => [
-                        'fields' => [
-                            ['name' => 'id']
-                        ]
-                    ],
-                    'Acme\ParentEntity'    => [
-                        'fields' => [
-                            ['name' => 'id']
-                        ]
-                    ]
+                    'name' => 'id',
+                    'type' => 'integer',
+                    'label' => 'Id'
                 ]
-            );
+            ]);
+
+        $this->fieldProvider->expects($this->at(1))
+            ->method('getFields')
+            ->with('Acme\ParentEntity', true, true)
+            ->willReturn([
+                [
+                    'name' => 'id',
+                    'type' => 'integer',
+                    'label' => 'Id'
+                ]
+            ]);
 
         $violation = $this->createMock(ConstraintViolationBuilder::class);
 
@@ -304,7 +353,8 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateWitNonSupportedJoinColumnInIdentifierColumn()
     {
         $query = new QueryDesignerModel();
-        $query->setEntity('Acme\SupportedEntity');
+        $entity = 'Acme\SupportedEntity';
+        $query->setEntity($entity);
         $query->setDefinition(json_encode(
             [
                 'columns' => [
@@ -313,23 +363,37 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
             ]
         ));
 
-        $this->fieldsProvider->expects($this->once())
+        $this->entityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($entity)
+            ->willReturn(true);
+
+        $this->fieldProvider->expects($this->at(0))
             ->method('getFields')
-            ->willReturn(
+            ->with($entity, true, true)
+            ->willReturn([
                 [
-                    'Acme\SupportedEntity' => [
-                        'fields' => [
-                            ['name' => 'id'],
-                            ['name' => 'parent']
-                        ]
-                    ],
-                    'Acme\ParentEntity'    => [
-                        'fields' => [
-                            ['name' => 'id']
-                        ]
-                    ]
+                    'name' => 'id',
+                    'type' => 'integer',
+                    'label' => 'Id'
+                ],
+                [
+                    'name' => 'parent',
+                    'type' => 'integer',
+                    'label' => 'Parent'
                 ]
-            );
+            ]);
+
+        $this->fieldProvider->expects($this->at(1))
+            ->method('getFields')
+            ->with('Acme\ParentEntity', true, true)
+            ->willReturn([
+                [
+                    'name' => 'id',
+                    'type' => 'integer',
+                    'label' => 'Id'
+                ]
+            ]);
 
         $violation = $this->createMock(ConstraintViolationBuilder::class);
 

@@ -6,29 +6,26 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
+/**
+ * Provides detailed information about entities.
+ */
 class EntityProvider
 {
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $extendConfigProvider;
 
-    /**
-     * @var EntityClassResolver
-     */
+    /** @var EntityClassResolver */
     protected $entityClassResolver;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /** @var ExclusionProviderInterface */
@@ -55,9 +52,9 @@ class EntityProvider
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;
-        $this->entityClassResolver  = $entityClassResolver;
-        $this->translator           = $translator;
-        $this->featureChecker       = $featureChecker;
+        $this->entityClassResolver = $entityClassResolver;
+        $this->translator = $translator;
+        $this->featureChecker = $featureChecker;
     }
 
     /**
@@ -71,11 +68,12 @@ class EntityProvider
     }
 
     /**
-     * Returns entities
+     * Returns enabled entities
      *
      * @param bool $sortByPluralLabel If true entities will be sorted by 'plural_label'; otherwise, by 'label'
      * @param bool $applyExclusions   Indicates whether exclusion logic should be applied.
      * @param bool $translate         Flag means that label, plural label should be translated
+     *
      * @return array of entities sorted by entity label
      *                                .    'name'          - entity full class name
      *                                .    'label'         - entity label
@@ -87,7 +85,7 @@ class EntityProvider
         $applyExclusions = true,
         $translate = true
     ) {
-        $result = array();
+        $result = [];
         $this->addEntities($result, $applyExclusions, $translate);
         $this->sortEntities($result, $sortByPluralLabel ? 'plural_label' : 'label');
 
@@ -95,10 +93,11 @@ class EntityProvider
     }
 
     /**
-     * Returns entity
+     * Returns an entity even if it is disabled
      *
      * @param string $entityName Entity name. Can be full class name or short form: Bundle:Entity.
      * @param bool   $translate  Flag means that label, plural label should be translated
+     *
      * @return array contains entity details:
      *                           .    'name'          - entity full class name
      *                           .    'label'         - entity label
@@ -108,8 +107,42 @@ class EntityProvider
     public function getEntity($entityName, $translate = true)
     {
         $className = $this->entityClassResolver->getEntityClass($entityName);
-        $config    = $this->entityConfigProvider->getConfig($className);
-        $result    = array();
+        $config = $this->entityConfigProvider->getConfig($className);
+        $result = [];
+        $this->addEntity(
+            $result,
+            $config->getId()->getClassName(),
+            $config->get('label'),
+            $config->get('plural_label'),
+            $config->get('icon'),
+            $translate
+        );
+
+        return reset($result);
+    }
+
+    /**
+     * Returns an entity if it is enabled
+     *
+     * @param string $entityName      Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool   $applyExclusions Indicates whether exclusion logic should be applied.
+     * @param bool   $translate       Flag means that label, plural label should be translated
+     *
+     * @return array contains entity details:
+     *                                .    'name'          - entity full class name
+     *                                .    'label'         - entity label
+     *                                .    'plural_label'  - entity plural label
+     *                                .    'icon'          - an icon associated with an entity
+     */
+    public function getEnabledEntity($entityName, $applyExclusions = true, $translate = true)
+    {
+        $className = $this->entityClassResolver->getEntityClass($entityName);
+        $config = $this->entityConfigProvider->getConfig($className);
+        if (!$this->isEntityEnabled($config, $applyExclusions)) {
+            throw new RuntimeException(sprintf('Entity "%s" is not enabled', $className));
+        }
+
+        $result = [];
         $this->addEntity(
             $result,
             $config->getId()->getClassName(),
@@ -135,30 +168,13 @@ class EntityProvider
         $entityConfigs = $this->entityConfigProvider->getConfigs();
 
         foreach ($entityConfigs as $entityConfig) {
-            $entityConfigId = $entityConfig->getId();
-
-            $isStateCorrect = $this->extendConfigProvider
-                ->getConfigById($entityConfigId)
-                ->in(
-                    'state',
-                    [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
-                );
-            if (false == $isStateCorrect) {
-                continue;
-            }
-
-            $className = $entityConfigId->getClassName();
-            if ($applyExclusions && $this->isIgnoredEntity($className)) {
-                continue;
-            }
-
-            if (!$this->featureChecker->isResourceEnabled($className, 'entities')) {
+            if (!$this->isEntityEnabled($entityConfig, $applyExclusions)) {
                 continue;
             }
 
             $this->addEntity(
                 $result,
-                $className,
+                $entityConfig->getId()->getClassName(),
                 $entityConfig->get('label'),
                 $entityConfig->get('plural_label'),
                 $entityConfig->get('icon'),
@@ -168,13 +184,38 @@ class EntityProvider
     }
 
     /**
+     * @param ConfigInterface $entityConfig
+     * @param bool            $applyExclusions
+     *
+     * @return bool
+     */
+    protected function isEntityEnabled(ConfigInterface $entityConfig, $applyExclusions)
+    {
+        $entityConfigId = $entityConfig->getId();
+
+        $isStateCorrect = $this->extendConfigProvider
+            ->getConfigById($entityConfigId)
+            ->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]);
+        if (!$isStateCorrect) {
+            return false;
+        }
+
+        $className = $entityConfigId->getClassName();
+        if ($applyExclusions && $this->isIgnoredEntity($className)) {
+            return false;
+        }
+
+        return $this->featureChecker->isResourceEnabled($className, 'entities');
+    }
+
+    /**
      * Checks if the given entity should be ignored
      *
      * @param string $className
      *
      * @return bool
      */
-    protected function isIgnoredEntity($className)
+    public function isIgnoredEntity($className)
     {
         return $this->exclusionProvider->isIgnoredEntity($className);
     }
@@ -191,12 +232,12 @@ class EntityProvider
      */
     protected function addEntity(array &$result, $name, $label, $pluralLabel, $icon, $translate)
     {
-        $result[] = array(
+        $result[] = [
             'name'         => $name,
             'label'        => $translate ? $this->translator->trans($label) : $label,
             'plural_label' => $translate ? $this->translator->trans($pluralLabel) : $pluralLabel,
             'icon'         => $icon
-        );
+        ];
     }
 
     /**

@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\ImportExportBundle\Context\Context;
+use Oro\Component\Testing\Unit\EntityTrait;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -38,6 +39,9 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
  */
 class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+    private const USER_ID = 32;
+
     public function testImportProcessCanBeConstructedWithRequiredAttributes()
     {
         $chunkHttpImportMessageProcessor = new PreHttpImportMessageProcessor(
@@ -368,6 +372,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
                         'error' => 'The import file could not be imported due to a fatal error. ' .
                                    'Please check its integrity and try again!',
                     ],
+                    'recipientUserId' => self::USER_ID,
                     'contentType' => 'text/html',
                 ]
             );
@@ -389,8 +394,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             100
         );
 
-        $user = new User();
-        $user->setEmail('useremail@example.com');
+        $user = $this->getEntity(User::class, ['id' => self::USER_ID, 'email' => 'useremail@example.com']);
 
         $userRepository = $this->createMock(UserRepository::class);
         $userRepository

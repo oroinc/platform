@@ -322,6 +322,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('groups.name');
+        $expectedFilter->setSupportedOperators(['=']);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('filter[groups.name]', $expectedFilter);
 
