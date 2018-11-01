@@ -18,7 +18,7 @@ use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 /**
- * Provides an interface for base execution context for Data API processors.
+ * Represents an execution context for Data API processors.
  */
 interface ContextInterface extends ComponentContextInterface
 {
@@ -230,8 +230,8 @@ interface ContextInterface extends ComponentContextInterface
      * Marks a work as already done.
      * In the most cases this method is useless because it is easy to determine
      * when a work is already done just checking a state of a context.
-     * But in case if a processor does a complex work, it might be required
-     * to mark a work as already done directly.
+     * But if a processor does a complex work, it might be required
+     * to directly mark the work as already done.
      *
      * @param string $operationName The name of an operation that represents some work
      */
@@ -429,6 +429,15 @@ interface ContextInterface extends ComponentContextInterface
      * @return bool
      */
     public function hasMetadataExtra($extraName);
+
+    /**
+     * Gets a request for some additional metadata info by its name.
+     *
+     * @param string $extraName
+     *
+     * @return MetadataExtraInterface|null
+     */
+    public function getMetadataExtra($extraName);
 
     /**
      * Adds a request for some additional metadata info.

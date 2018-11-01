@@ -6,28 +6,19 @@ use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\Loader\Driver\PhpDriver;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
-use Symfony\Component\Filesystem\Filesystem;
+use Oro\Component\Testing\TempDirExtension;
 
 class PhpDriverTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     protected $cacheDir;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->cacheDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'layouts';
-
-        $fs = new Filesystem();
-        $fs->remove($this->cacheDir);
-    }
-
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        $fs = new Filesystem();
-        $fs->remove($this->cacheDir);
+        $this->cacheDir = $this->getTempDir('layouts', false);
     }
 
     /**

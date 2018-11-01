@@ -6,12 +6,12 @@ use Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeletedCountHeader;
 
 class SetDeletedCountHeaderTest extends DeleteListProcessorTestCase
 {
-    const REQUEST_INCLUDE_HEADER_NAME        = 'X-Include';
-    const REQUEST_DELETED_COUNT_HEADER_VALUE = 'deletedCount';
-    const RESPONSE_DELETED_COUNT_HEADER_NAME = 'X-Include-Deleted-Count';
+    private const REQUEST_INCLUDE_HEADER_NAME        = 'X-Include';
+    private const REQUEST_DELETED_COUNT_HEADER_VALUE = 'deletedCount';
+    private const RESPONSE_DELETED_COUNT_HEADER_NAME = 'X-Include-Deleted-Count';
 
     /** @var SetDeletedCountHeader */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -23,7 +23,7 @@ class SetDeletedCountHeaderTest extends DeleteListProcessorTestCase
     public function testProcessWithoutRequestHeader()
     {
         $this->processor->process($this->context);
-        $this->assertFalse($this->context->getResponseHeaders()->has(self::RESPONSE_DELETED_COUNT_HEADER_NAME));
+        self::assertFalse($this->context->getResponseHeaders()->has(self::RESPONSE_DELETED_COUNT_HEADER_NAME));
     }
 
     public function testProcessOnExistingHeader()
@@ -33,7 +33,7 @@ class SetDeletedCountHeaderTest extends DeleteListProcessorTestCase
         $this->context->getResponseHeaders()->set(self::RESPONSE_DELETED_COUNT_HEADER_NAME, $testCount);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             $testCount,
             $this->context->getResponseHeaders()->get(self::RESPONSE_DELETED_COUNT_HEADER_NAME)
         );
@@ -51,7 +51,7 @@ class SetDeletedCountHeaderTest extends DeleteListProcessorTestCase
         );
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             $testCount,
             $this->context->getResponseHeaders()->get(self::RESPONSE_DELETED_COUNT_HEADER_NAME)
         );
@@ -65,7 +65,7 @@ class SetDeletedCountHeaderTest extends DeleteListProcessorTestCase
         $this->context->setResult($result);
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->getResponseHeaders()->has(self::RESPONSE_DELETED_COUNT_HEADER_NAME));
+        self::assertFalse($this->context->getResponseHeaders()->has(self::RESPONSE_DELETED_COUNT_HEADER_NAME));
     }
 
     public function testProcessWhenEntitiesToBeDeletedDoNotExist()
@@ -76,6 +76,6 @@ class SetDeletedCountHeaderTest extends DeleteListProcessorTestCase
         );
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->getResponseHeaders()->has(self::RESPONSE_DELETED_COUNT_HEADER_NAME));
+        self::assertFalse($this->context->getResponseHeaders()->has(self::RESPONSE_DELETED_COUNT_HEADER_NAME));
     }
 }

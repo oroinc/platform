@@ -10,11 +10,11 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceCollection;
 
 class AddExcludedActionsForNotAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $actionProcessorBag;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
+    private $actionProcessorBag;
 
     /** @var AddExcludedActionsForNotAccessibleResources */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

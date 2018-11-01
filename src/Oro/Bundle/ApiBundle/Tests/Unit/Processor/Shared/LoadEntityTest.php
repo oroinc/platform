@@ -22,7 +22,7 @@ class LoadEntityTest extends GetProcessorTestCase
     /** @var LoadEntity */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

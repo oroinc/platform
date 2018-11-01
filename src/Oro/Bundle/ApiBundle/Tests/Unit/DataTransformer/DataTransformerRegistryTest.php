@@ -10,16 +10,16 @@ use Oro\Component\EntitySerializer\DataTransformerInterface;
 class DataTransformerRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
-    protected $transformer1;
+    private $transformer1;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
-    protected $transformer2;
+    private $transformer2;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
-    protected $transformer3;
+    private $transformer3;
 
     /** @var DataTransformerRegistry */
-    protected $registry;
+    private $registry;
 
     protected function setUp()
     {
@@ -35,7 +35,7 @@ class DataTransformerRegistryTest extends \PHPUnit\Framework\TestCase
                 ],
                 'dataType2' => [
                     [$this->transformer3, 'rest']
-                ],
+                ]
             ],
             new RequestExpressionMatcher()
         );

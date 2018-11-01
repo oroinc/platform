@@ -107,7 +107,7 @@ class ValidateRequestDataTest extends UpdateProcessorTestCase
         $metadata = new EntityMetadata();
         $metadata->setIdentifierFieldNames(['id']);
 
-        $this->valueNormalizer->expects($this->any())
+        $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->with('products')
             ->willReturn(Product::class);

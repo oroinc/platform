@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\EventManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
@@ -10,9 +11,12 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Gedmo\Translatable\TranslatableListener;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type\Stub\TestEntity;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -57,7 +61,7 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
     protected $queryBuilder;
 
     /**
-     * @var Query
+     * @var Query|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $query;
 
@@ -70,6 +74,9 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
      * @var array
      */
     protected $testChoices = array('one', 'two', 'three');
+
+    /** @var MockObject */
+    private $aclHelper;
 
     protected function setUp()
     {
@@ -94,10 +101,25 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
             ->setMethods(array('addCustomHydrationMode'))
             ->getMock();
 
+        $locale = 'de_DE';
+
+        $translatableListener = $this->createMock(TranslatableListener::class);
+        $translatableListener->expects($this->any())
+            ->method('getListenerLocale')
+            ->willReturn($locale);
+
+        $eventManager = $this->createMock(EventManager::class);
+        $eventManager->expects($this->any())
+            ->method('getListeners')
+            ->willReturn([[$translatableListener]]);
+
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
-            ->setMethods(array('getClassMetadata', 'getConfiguration'))
+            ->setMethods(['getClassMetadata', 'getConfiguration', 'getEventManager'])
             ->getMock();
+        $this->entityManager->expects($this->any())
+            ->method('getEventManager')
+            ->willReturn($eventManager);
         $this->entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->with(self::TEST_CLASS)
@@ -118,7 +140,9 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
             ->with(self::TEST_CLASS)
             ->will($this->returnValue($this->getEntityRepository()));
 
-        $this->type = new TranslatableEntityType($this->registry, new DefaultChoiceListFactory());
+        $this->aclHelper = $this->createMock(AclHelper::class);
+
+        $this->type = new TranslatableEntityType($this->registry, new DefaultChoiceListFactory(), $this->aclHelper);
 
         parent::setUp();
     }

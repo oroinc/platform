@@ -21,7 +21,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
     /** @var SetHttpAllowHeaderForSubresource */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -116,7 +116,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('GET, PATCH, POST, DELETE', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, GET, PATCH, POST, DELETE', $this->context->getResponseHeaders()->get('Allow'));
     }
 
     public function testProcessWhenOnlyGetSubresourceEnabled()
@@ -139,7 +139,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('GET', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, GET', $this->context->getResponseHeaders()->get('Allow'));
     }
 
     public function testProcessWhenOnlyUpdateSubresourceEnabled()
@@ -162,7 +162,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('PATCH', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, PATCH', $this->context->getResponseHeaders()->get('Allow'));
     }
 
     public function testProcessWhenEntityDoesNotHaveIdentifierFields()
@@ -184,7 +184,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('GET', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, GET', $this->context->getResponseHeaders()->get('Allow'));
     }
 
     public function testProcessWhenActionDisabledForParticularAssociation()
@@ -212,6 +212,6 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('GET', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, GET', $this->context->getResponseHeaders()->get('Allow'));
     }
 }

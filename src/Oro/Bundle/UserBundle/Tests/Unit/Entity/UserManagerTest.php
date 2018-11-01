@@ -5,8 +5,10 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\Repository\AbstractUserRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -43,6 +45,11 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $metadata;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager
+     */
+    protected $configManager;
+
     protected function setUp()
     {
         if (!interface_exists('Doctrine\Common\Persistence\ObjectManager')) {
@@ -72,7 +79,15 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
             }
         );
 
-        $this->userManager = new UserManager(User::class, $this->registry, $this->ef, $enumValueProvider);
+        $this->configManager = $this->createMock(ConfigManager::class);
+
+        $this->userManager = new UserManager(
+            User::class,
+            $this->registry,
+            $this->ef,
+            $enumValueProvider,
+            $this->configManager
+        );
     }
 
     protected function tearDown()
@@ -225,5 +240,33 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($password);
         $this->assertRegExp('/\w+/', $password);
         $this->assertLessThanOrEqual(30, strlen($password));
+    }
+
+    public function testFindUserByEmail()
+    {
+        $user = new User();
+        $email = 'Test@test.com';
+
+        $this->om
+            ->expects(self::once())
+            ->method('getRepository')
+            ->with($this->userManager->getClass())
+            ->willReturn($repository = $this->createMock(AbstractUserRepository::class));
+
+        $repository
+            ->expects(self::once())
+            ->method('findUserByEmail')
+            ->with($email, true)
+            ->willReturn($user);
+
+        $this->configManager
+            ->expects(self::once())
+            ->method('get')
+            ->with('oro_user.case_insensitive_email_addresses_enabled')
+            ->willReturn(true);
+
+        $foundUser = $this->userManager->findUserByEmail($email);
+
+        self::assertSame($user, $foundUser);
     }
 }

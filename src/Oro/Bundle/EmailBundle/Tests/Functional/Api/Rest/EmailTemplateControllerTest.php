@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Api\Rest;
 
+use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailTemplateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailTemplateControllerTest extends WebTestCase
@@ -10,11 +11,7 @@ class EmailTemplateControllerTest extends WebTestCase
     {
         $this->initClient([], $this->generateWsseAuthHeader());
 
-        $this->loadFixtures(
-            [
-                'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailTemplateData'
-            ]
-        );
+        $this->loadFixtures([LoadEmailTemplateData::class]);
     }
 
     public function testGetWithoutParams()
@@ -108,7 +105,7 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertCount(12, $result);
+        $this->assertCount(13, $result);
     }
 
     /**
@@ -190,5 +187,25 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $this->assertInternalType('array', $data);
         $this->assertArrayHasKey('message', $data);
+    }
+
+    /**
+     * Check that server returns 422 HTTP error when failed to compile email template
+     */
+    public function testGetCompiledEmailCompileFailed()
+    {
+        $emailTemplate = $this->getReference(LoadEmailTemplateData::SYSTEM_FAIL_TO_COMPILE);
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_api_get_emailtemplate_compiled',
+                ['id' => $emailTemplate->getId(), 'entityId' => 1]
+            )
+        );
+
+        $data = $this->getJsonResponseContent($this->client->getResponse(), 422);
+
+        $this->assertInternalType('array', $data);
+        $this->assertArrayHasKey('reason', $data);
     }
 }

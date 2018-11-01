@@ -1,0 +1,14 @@
+oro_behat_extension:
+  elements:
+    Additional Associations Section:
+      selector: "div[id^='emailnotification_recipientList_additionalEmailAssociations']"
+      class: Oro\Bundle\NotificationBundle\Tests\Behat\Element\AdditionalAssociationsSection
+
+  suites:
+    OroNotificationBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroFormBundle::FormContext
+        - OroSecurityBundle::ACLContext
+      paths:
+        - '@OroNotificationBundle/Tests/Behat/Features'

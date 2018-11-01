@@ -6,11 +6,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Event\AfterRemoveFieldEvent;
-use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -31,9 +28,6 @@ class RemoveRestoreConfigFieldHandler
     /** @var Session */
     private $session;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
     /** @var ManagerRegistry */
     private $registry;
 
@@ -42,7 +36,6 @@ class RemoveRestoreConfigFieldHandler
      * @param FieldNameValidationHelper $validationHelper
      * @param ConfigHelper $configHelper
      * @param Session $session
-     * @param EventDispatcherInterface $eventDispatcher
      * @param ManagerRegistry $registry
      */
     public function __construct(
@@ -50,14 +43,12 @@ class RemoveRestoreConfigFieldHandler
         FieldNameValidationHelper $validationHelper,
         ConfigHelper $configHelper,
         Session $session,
-        EventDispatcherInterface $eventDispatcher,
         ManagerRegistry $registry
     ) {
         $this->configManager = $configManager;
         $this->validationHelper = $validationHelper;
         $this->configHelper = $configHelper;
         $this->session = $session;
-        $this->eventDispatcher = $eventDispatcher;
         $this->registry = $registry;
     }
 
@@ -93,9 +84,6 @@ class RemoveRestoreConfigFieldHandler
         $this->configManager->persist($fieldConfig);
         $this->configManager->persist($entityConfig);
         $this->configManager->flush();
-
-        $afterRemoveEvent = new AfterRemoveFieldEvent($field);
-        $this->eventDispatcher->dispatch(Events::AFTER_REMOVE_FIELD, $afterRemoveEvent);
 
         $this->session->getFlashBag()->add('success', $successMessage);
 

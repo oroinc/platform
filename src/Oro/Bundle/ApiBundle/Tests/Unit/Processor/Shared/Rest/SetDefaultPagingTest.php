@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\Rest;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
@@ -11,7 +12,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 class SetDefaultPagingTest extends GetListProcessorTestCase
 {
     /** @var SetDefaultPaging */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -22,14 +23,12 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
 
     public function testProcessWhenQueryIsAlreadyExist()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
 
         $this->context->setQuery($qb);
         $this->processor->process($this->context);
 
-        $this->assertSame($qb, $this->context->getQuery());
+        self::assertSame($qb, $this->context->getQuery());
     }
 
     public function testProcessWithDefaultPaging()
@@ -38,16 +37,16 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
-        $this->assertCount(2, $filters);
+        self::assertCount(2, $filters);
         /** @var PageSizeFilter $pageSizeFilter */
         $pageSizeFilter = $filters->get('limit');
-        $this->assertEquals(10, $pageSizeFilter->getDefaultValue());
+        self::assertEquals(10, $pageSizeFilter->getDefaultValue());
         /** @var PageNumberFilter $pageNumberFilter */
         $pageNumberFilter = $filters->get('page');
-        $this->assertEquals(1, $pageNumberFilter->getDefaultValue());
+        self::assertEquals(1, $pageNumberFilter->getDefaultValue());
 
         // check that filters are added in correct order
-        $this->assertEquals(['limit', 'page'], array_keys($filters->all()));
+        self::assertEquals(['limit', 'page'], array_keys($filters->all()));
     }
 
     public function testProcessWhenPageSizeExistsInConfig()
@@ -59,16 +58,16 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
-        $this->assertCount(2, $filters);
+        self::assertCount(2, $filters);
         /** @var PageSizeFilter $pageSizeFilter */
         $pageSizeFilter = $filters->get('limit');
-        $this->assertEquals(123, $pageSizeFilter->getDefaultValue());
+        self::assertEquals(123, $pageSizeFilter->getDefaultValue());
         /** @var PageNumberFilter $pageNumberFilter */
         $pageNumberFilter = $filters->get('page');
-        $this->assertEquals(1, $pageNumberFilter->getDefaultValue());
+        self::assertEquals(1, $pageNumberFilter->getDefaultValue());
 
         // check that filters are added in correct order
-        $this->assertEquals(['limit', 'page'], array_keys($filters->all()));
+        self::assertEquals(['limit', 'page'], array_keys($filters->all()));
     }
 
     public function testProcessWhenPagingIsDisabled()
@@ -80,6 +79,6 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
-        $this->assertCount(0, $filters);
+        self::assertCount(0, $filters);
     }
 }

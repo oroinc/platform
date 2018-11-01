@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 class EnsureInitializedTest extends ConfigProcessorTestCase
 {
     /** @var EnsureInitialized */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -40,7 +40,7 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
             [],
             $this->context->get('test_section')
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->context->has('test')
         );
     }
@@ -69,7 +69,7 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
             ],
             $this->context->get('test_section')
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->context->has('test')
         );
     }

@@ -6,12 +6,13 @@ use Knp\Menu\Factory\ExtensionInterface;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
+/**
+ * Disallows menu items that related to routes disabled by a feature.
+ */
 class FeatureAwareMenuFactoryExtension implements ExtensionInterface
 {
-    /**
-     * @var FeatureChecker
-     */
-    protected $featureChecker;
+    /** @var FeatureChecker */
+    private $featureChecker;
 
     /**
      * @param FeatureChecker $featureChecker
@@ -26,9 +27,11 @@ class FeatureAwareMenuFactoryExtension implements ExtensionInterface
      */
     public function buildOptions(array $options = [])
     {
-        if (!$this->alreadyDenied($options) && !empty($options['route'])) {
-            $options['extras']['isAllowed'] = $this->featureChecker
-                ->isResourceEnabled($options['route'], 'routes');
+        if (!empty($options['route'])
+            && !$this->alreadyDenied($options)
+            && !$this->featureChecker->isResourceEnabled($options['route'], 'routes')
+        ) {
+            $options['extras']['isAllowed'] = false;
         }
 
         return $options;
@@ -45,9 +48,11 @@ class FeatureAwareMenuFactoryExtension implements ExtensionInterface
      * @param array $options
      * @return bool
      */
-    protected function alreadyDenied(array $options)
+    private function alreadyDenied(array $options)
     {
-        return array_key_exists('extras', $options) && array_key_exists('isAllowed', $options['extras']) &&
-        ($options['extras']['isAllowed'] === false);
+        return
+            array_key_exists('extras', $options)
+            && array_key_exists('isAllowed', $options['extras'])
+            && false === $options['extras']['isAllowed'];
     }
 }

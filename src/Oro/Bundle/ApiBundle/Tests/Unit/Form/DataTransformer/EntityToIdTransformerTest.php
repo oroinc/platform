@@ -72,7 +72,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         return [
             [null, null],
             ['', null],
-            [[], null],
+            [[], null]
         ];
     }
 

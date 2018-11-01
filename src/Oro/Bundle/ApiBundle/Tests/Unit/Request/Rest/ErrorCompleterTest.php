@@ -11,14 +11,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExceptionTextExtractorInterface */
     private $exceptionTextExtractor;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadata */
+    private $metadata;
 
     /** @var RequestType */
     private $requestType;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $metadata;
 
     /** @var ErrorCompleter */
     private $errorCompleter;

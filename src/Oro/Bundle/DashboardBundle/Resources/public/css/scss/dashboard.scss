@@ -1,10 +1,9 @@
-@import "oroui/css/scss/mixins";
-$dashboardBackgroundColor:  #f1f1f1;
+/* @theme: admin.oro; */
 
 .dashboard-selector-container {
     label {
         padding-top: 4px;
-        padding-right: 10px;
+        padding-#{$end}: 10px;
     }
 
     select {
@@ -14,14 +13,14 @@ $dashboardBackgroundColor:  #f1f1f1;
     label,
     select,
     .selector {
-        float: left;
+        float: #{$start};
     }
 }
 
 .ui-dialog .form-horizontal {
     .widget-sort-by {
         .control-group .controls {
-            margin-left: 0;
+            margin-#{$start}: 0;
 
             select {
                 max-width: 280px;
@@ -31,50 +30,46 @@ $dashboardBackgroundColor:  #f1f1f1;
 
     .widget-query-filter .collapse-action {
         padding-top: 4px;
+
         display: inline-block;
     }
 }
 
 .dashboard-container-wrapper {
+    background-color: $dashboard-wrapper-bg;
+
     .page-title {
-        border-bottom: 1px solid #f2f2f2;
+        background-color: $dashboard-container-title-background-color;
+        border-bottom: $dashboard-container-border;
+    }
+
+    .responsive-section:not(.responsive-small) {
+        .dashboard-column {
+            &:first-child {
+                padding-#{$end}: $content-padding-small;
+            }
+
+            &:last-child {
+                padding-#{$start}: $content-padding-small;
+            }
+        }
     }
 
     .responsive-section {
-        background: $dashboardBackgroundColor;
-        padding-top: 13px;
-        padding-left: 13px;
+        padding-top: $content-padding;
+
+        background: $dashboard-wrapper-bg;
 
         .responsive-cell > div {
-            padding-right: 13px;
-            padding-bottom: 13px;
+            padding-bottom: $content-padding-medium;
         }
     }
 
     .scrollable-container {
-        background: $dashboardBackgroundColor;
+        background: $dashboard-wrapper-bg;
 
-        @include safe-area-offset(padding, 0);
-    }
-
-    .oro-subtitle {
-        word-break: break-all;
-    }
-
-    .launchpad-container {
-        .box-type1 {
-            border: 0;
-            background-color: $dashboardBackgroundColor;
-        }
-
-        .oro-subtitle {
-            margin: 10px 10px 10px 0;
-        }
-
-        .title-buttons-container {
-            margin-top: 10px;
-            margin-right: 13px;
-        }
+        @include safe-area-property-left(padding-left, $content-padding, false);
+        @include safe-area-property-right(padding-right, $content-padding, false);
     }
 
     .dashboard-widget.editable {
@@ -85,74 +80,36 @@ $dashboardBackgroundColor:  #f1f1f1;
         .default-actions-container {
             display: block;
         }
-
-        .widget-actions-container .widget-actions-section {
-            .action-wrapper {
-                &:last-child {
-                    border-right: 1px solid #ddd;
-                }
-            }
-        }
     }
 
     .dashboard-widget {
-        border-radius: 3px;
         position: relative;
 
+        border-radius: 1px;
+        box-shadow: $dashboard-widget-box-shadow;
+
         .widget-header {
+            min-height: 44px;
+            padding: 3px 0 2px;
+
             display: flex;
-            min-height: 38px;
+
+            .dropdown-menu {
+                min-width: 100px;
+            }
         }
 
         .actions-container {
-            margin-top: 10px;
-
-            .collapse-expand-action-container {
-                margin-top: -1px;
-            }
+            margin-top: 4px;
 
             .collapse-action {
-                color: #727272;
-                font-size: 13px;
-                font-family: Helvetica, Arial, sans-serif;
-                font-weight: bold;
-
-                &:before {
-                    content: '−';
-                    display: inline-block;
-                    width: 13px;
-                    height: 13px;
-                    font-weight: normal;
-                    border: 1px solid #c3c3c3;
-                    margin-right: 8px;
-                    font-size: 12px;
-                    line-height: 12px;
-                    padding: 1px 0 0 0;
-                    text-align: center;
-                    color: #727272;
-                    background: linear-gradient(#fcfcfc, #e9e9e9);
+                .collapse-action-icon {
+                    @include fa-icon($dashboard-action-icon);
                 }
 
-                &.collapsed:before {
-                    content: '+';
+                &.collapsed .collapse-action-icon {
+                    @include fa-icon($dashboard-action-icon-collapsed);
                 }
-            }
-        }
-
-        .pull-left.actions-container {
-            float: none;
-            order: 1;
-        }
-
-        .pull-right {
-            &.widget-actions-container {
-                float: none;
-                order: 80;
-            }
-
-            &.actions-container {
-                float: none;
-                order: 99;
             }
         }
 
@@ -163,11 +120,6 @@ $dashboardBackgroundColor:  #f1f1f1;
         .widget-actions-container,
         .default-actions-container {
             white-space: nowrap;
-
-            .action-wrapper {
-                border-right: 1px solid #ddd;
-                padding: 3px 13px;
-            }
         }
 
         .default-actions-container {
@@ -180,18 +132,13 @@ $dashboardBackgroundColor:  #f1f1f1;
             }
         }
 
-        .widget-actions-container .widget-actions-section {
-            .action-wrapper:last-child {
-                border-right: none;
-            }
-        }
-
         .widget-actions-container {
-            margin: 10px -1px 8px 0;
-        }
+            margin: side-values(10px 0 8px 0);
 
-        .dashboard-btn {
-            margin-top: -3px;
+            .action-wrapper {
+                padding: 0 2px;
+                margin-#{$start}: 14px;
+            }
         }
 
         .move-action {
@@ -200,68 +147,72 @@ $dashboardBackgroundColor:  #f1f1f1;
 
         .default-actions-container {
             .action-wrapper:last-child {
-                border-right: none;
+                border-#{$end}: none;
             }
         }
 
         .widget-title {
-            padding-left: 0;
-            padding-right: 0;
-            padding-bottom: 3px;
-            order: 50;
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
+            padding: 6px 0 0;
+
+            color: $dashboard-widget-title-color;
+            font-size: 18px;
             text-overflow: ellipsis;
+            white-space: nowrap;
+
+            flex: 1;
+            overflow: hidden;
 
             &:before {
+                min-height: 40px;
+
                 content: '';
                 display: inline;
-                min-height: 40px;
             }
         }
 
         .row-fluid {
-            border-top: 1px solid #ddd;
+            padding: 22px 24px;
+
+            border-top: $dashboard-container-border;
         }
 
         .dashboard-widget-content {
             margin-top: 0;
 
             .other-scroll-container {
-                margin: 10px;
-            }
-
-            > .tab-container {
-                padding-top: 0;
-                margin: -1px 0 0 -1px;
+                margin: 10px 0;
             }
         }
 
         .widget-config-data {
-            margin-left: 10px;
-            margin-bottom: 5px;
-            color: #9d9d9d;
+            margin-#{$end}: 10px;
+
+            font-size: $base-font-size - 1px;
+
+            color: $dashboard-widget-config-data-color;
         }
     }
 
     .hidden-empty-text {
         height: 0 !important;
-        visibility: hidden;
         padding: 0 !important;
         margin: 0 !important;
+
         overflow: hidden !important;
+        visibility: hidden;
     }
 
     .widget-placeholder {
-        background: #f5f5f5;
-        border: 2px dashed #ccc;
-        border-radius: 3px;
-        color: #aaa;
-        font-size: 24px;
         min-height: 200px;
         padding: 20px;
+
+        background: $dashboard-widget-placeholder-background;
+        border: $dashboard-widget-placeholder-border;
+        color: $dashboard-widget-placeholder-color;
+        font-size: 24px;
         text-align: center;
+
+        border-radius: 3px;
     }
 
     .dashboard-widget.collapsed {
@@ -273,158 +224,7 @@ $dashboardBackgroundColor:  #f1f1f1;
     }
 
     .collapse-expand-action-container {
-        padding: 0 2px 0 10px;
-    }
-}
-
-.dashboard-container {
-    .responsive-cell {
-        .box-type1 {
-            border: 1px solid #ccc;
-
-            .calendar-events {
-                margin: 0 0 10px 10px;
-            }
-        }
-    }
-}
-
-.responsive-cell .box-type1 {
-    .dashboard-widget-content {
-        .tab-content {
-            .no-data {
-                background-color: #f9f9f9;
-            }
-        }
-    }
-}
-
-.launchpad-widget-content > div {
-    height: 190px;
-    border: 1px solid #b6b6b6;
-    overflow: hidden;
-    border-radius: 5px;
-    box-shadow: 1px 1px 5px rgba(50, 50, 50, .2);
-}
-
-.launchpad-widget-content {
-    max-width: 600px;
-    margin: 0 auto;
-
-    .image-wrap {
-        background: #fff;
-        display: block;
-        width: 40%;
-        height: 100%;
-
-        .widget-image {
-            display: block !important;
-            font-size: 64px;
-            width: 64px;
-            color: #cecece;
-            cursor: default;
-            margin: 0 auto;
-
-            &:hover {
-                color: #8baed9;
-            }
-        }
-
-        p {
-            padding: 35px 0 10px;
-            font-size: 17px;
-            color: #555;
-        }
-    }
-
-    .list-wrap {
-        background: $dashboardBackgroundColor;
-        border-left: 1px solid #e5e5e5;
-        width: 60%;
-        margin-left: -1px;
-        height: 100%;
-
-        ul {
-            margin: 5px 0;
-
-            li {
-                > a {
-                    border-bottom: 1px solid #e5e5e5;
-                    font-size: 14px;
-                }
-
-                &.last {
-                    > a {
-                        border: none;
-                    }
-                }
-            }
-        }
-    }
-}
-
-.quick-launchpad-toolbar {
-    width: 100%;
-    margin: 0;
-    list-style: none;
-    display: table;
-    table-layout: fixed;
-
-    & > li {
-        border-left: 1px solid #eaeaea;
-        display: table-cell;
-        position: relative;
-        vertical-align: middle;
-        text-align: center;
-        padding-bottom: 60px;
-
-        /* width: 20%; calculated on backend and depends on a number of items */
-        background: linear-gradient(#fff, #f1f1f1);
-
-        a {
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-        }
-
-        &:first-child {
-            border: 0;
-        }
-
-        &:hover {
-            background: linear-gradient(#f1f1f1, #fff);
-        }
-
-        .title-box {
-            margin-top: 15px;
-            margin-bottom: 19px;
-            display: block;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            width: 100%;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .list-content {
-            display: block;
-            position: absolute;
-            bottom: 25px;
-            left: 0;
-            width: 100%;
-
-            i {
-                font-size: 35px;
-                color: #444;
-            }
-        }
-
-        a {
-            color: #444;
-        }
+        padding: side-values(0 2px 0 6px);
     }
 }
 
@@ -434,8 +234,10 @@ $dashboardBackgroundColor:  #f1f1f1;
 
 .chart-container {
     position: relative;
-    overflow-x: visible;
+
     margin-top: 5px;
+
+    overflow-x: visible;
 
     &.wrapped-chart-legend {
         margin: 0 auto;
@@ -446,8 +248,9 @@ $dashboardBackgroundColor:  #f1f1f1;
 
         .chart-legend {
             position: relative;
-            min-width: 250px; // to wrap legend event if it's empty yet
+
             height: auto !important;
+            min-width: 250px; // to wrap legend event if it's empty yet
             padding-bottom: 20px;
 
             table {
@@ -456,7 +259,8 @@ $dashboardBackgroundColor:  #f1f1f1;
                 left: 0;
                 bottom: 0;
                 right: 0;
-                margin: auto 0 auto 30px;
+
+                margin: side-values(auto 0 auto 30px);
                 width: 90%;
                 height: auto;
 
@@ -472,13 +276,15 @@ $dashboardBackgroundColor:  #f1f1f1;
 
         .funnel-label {
             position: absolute;
+
             padding-bottom: .5em;
         }
 
         .flotr-grid-label-x {
             line-height: 14px;
-            overflow-x: hidden;
             text-overflow: ellipsis;
+
+            overflow-x: hidden;
         }
     }
 }
@@ -486,30 +292,29 @@ $dashboardBackgroundColor:  #f1f1f1;
 .chart-legend table {
     font-size: 13px !important;
 
-    .flotr-legend-color-box {
+    .flotr-legend-color-box > div {
+        border: 0 !important;
+
         & > div {
             border: 0 !important;
-
-            & > div {
-                border: 0 !important;
-            }
         }
     }
 
     .flotr-legend-label {
-        padding-left: 10px;
+        padding-#{$start}: 10px;
     }
 }
 
 .flotr-mouse-value {
     z-index: 1;
+
     cursor: default;
 }
 
 .funnel-data {
     h5 {
         margin-bottom: 5px;
-        margin-left: 25px;
+        margin-#{$start}: 25px;
 
         &:first-letter {
             text-transform: uppercase;
@@ -521,63 +326,19 @@ $dashboardBackgroundColor:  #f1f1f1;
     }
 }
 
-.dashboard-widget-content {
-    .tab-container {
-        position: relative;
-
-        .nav-tabs {
-            & > li {
-                & > a {
-                    color: #555;
-                    background-color: #fafafa;
-                    border: 1px solid #ddd;
-                    margin-left: -1px;
-                    border-radius: 0;
-                    margin-right: 0;
-                    padding: 8px 12px;
-                    line-height: 20px;
-                    height: 38px;
-
-                    &:focus {
-                        outline: none;
-                    }
-                }
-
-                &.active > a,
-                &.active > a:hover,
-                &.active > a:focus {
-                    border: 1px solid #ddd;
-                    border-bottom-color: #fff;
-                    box-shadow: none;
-                    color: #444;
-                    background: #fff;
-                    text-decoration: none;
-                }
-
-                &:first-child > a,
-                &:first-child > a:hover,
-                &:first-child > a:focus {
-                    border-left: 1px solid #ccc;
-                }
-            }
-        }
-    }
-}
-
-.navigation {
-    .dashboard-widgets-add {
-        margin: 0 0 0 11px;
-    }
+.dashboard-widgets-add {
+    margin-left: 10px;
 }
 
 .widget-configuration {
     .items-selector-widget {
-        margin-right: 20px;
+        margin-#{$end}: 20px;
     }
 
     .widget-title-widget {
-        float: left;
-        margin-right: 20px;
+        margin-#{$end}: 20px;
+
+        float: #{$start};
     }
 
     .date-range-filter {
@@ -591,8 +352,9 @@ $dashboardBackgroundColor:  #f1f1f1;
 
         .filter-select-oro {
             height: 20px;
-            line-height: 20px;
             width: 120px;
+
+            line-height: 20px;
         }
 
         .control-group .horizontal:last-of-type .selector {
@@ -620,26 +382,29 @@ $dashboardBackgroundColor:  #f1f1f1;
 
         &.scrollable {
             tbody {
-                display: block;
                 height: 120px;
-                border-left: 1px solid #ddd;
+
+                border-#{$start}: $dashboard-widget-configuration-border;
+
+                display: block;
             }
 
             thead,
             tbody tr {
-                display: table;
                 width: 100%;
+
+                display: table;
                 table-layout: fixed;
             }
 
             &.table-bordered td:first-child {
-                border-left: none;
+                border-#{$start}: none;
             }
         }
     }
 
     .widget-date-widget {
-        margin: 4px 0 10px;
+        margin: side-values(4px 0 10px);
     }
 
     .widget-date-input-widget {
@@ -651,7 +416,7 @@ $dashboardBackgroundColor:  #f1f1f1;
 
 .widget-content.widget-configuration {
     .table input[type="checkbox"] {
-        margin: 0 0 1px 0;
+        margin: side-values(0 0 1px 0);
     }
 }
 
@@ -669,6 +434,7 @@ $dashboardBackgroundColor:  #f1f1f1;
 
         .action-column {
             width: 116px;
+
             text-align: center;
         }
 
@@ -678,24 +444,6 @@ $dashboardBackgroundColor:  #f1f1f1;
     }
 }
 
-#dashboard_selector,
-#uniform-dashboard_selector {
-    height: 28px;
-
-    &.selector {
-        line-height: 28px;
-
-        span {
-            height: 28px;
-            line-height: 28px;
-
-            &:after {
-                margin: 1px 2px 0 0;
-            }
-        }
-    }
-}
-
 .ui-dialog .form-horizontal .control-group .conditions-group .controls {
-    margin-left: 0;
+    margin-#{$start}: 0;
 }

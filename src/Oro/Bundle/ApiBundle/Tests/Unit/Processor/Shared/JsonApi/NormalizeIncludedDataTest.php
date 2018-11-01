@@ -43,7 +43,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
     /** @var NormalizeIncludedData */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

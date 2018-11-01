@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Provider;
 
 /**
- * An interface for classes that can provide substitututions for entity class names.
+ * An interface for classes that can provide substitutions for entity class names.
  */
 interface EntityOverrideProviderInterface
 {
@@ -13,7 +13,7 @@ interface EntityOverrideProviderInterface
      * @param string $entityClass
      *
      * @return string|null The class name that substitute the given class name
-     *                     or NULL if there is no substitutution
+     *                     or NULL if there is no substitution
      */
     public function getSubstituteEntityClass(string $entityClass): ?string;
 }

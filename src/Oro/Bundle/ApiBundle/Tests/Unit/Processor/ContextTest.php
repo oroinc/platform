@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
+use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -9,6 +10,8 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Filter\FilterInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -53,51 +56,51 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $value1 = 'value1';
         $value2 = 'value2';
 
-        $this->assertFalse($headers->has($key1));
-        $this->assertFalse(isset($headers[$key1]));
-        $this->assertNull($headers->get($key1));
-        $this->assertNull($headers[$key1]);
+        self::assertFalse($headers->has($key1));
+        self::assertFalse(isset($headers[$key1]));
+        self::assertNull($headers->get($key1));
+        self::assertNull($headers[$key1]);
 
         $headers->set($key1, $value1);
-        $this->assertTrue($headers->has($key1));
-        $this->assertTrue(isset($headers[$key1]));
-        $this->assertEquals($value1, $headers->get($key1));
-        $this->assertEquals($value1, $headers[$key1]);
+        self::assertTrue($headers->has($key1));
+        self::assertTrue(isset($headers[$key1]));
+        self::assertEquals($value1, $headers->get($key1));
+        self::assertEquals($value1, $headers[$key1]);
 
-        $this->assertTrue($headers->has(strtoupper($key1)));
-        $this->assertTrue(isset($headers[strtoupper($key1)]));
-        $this->assertEquals($value1, $headers->get(strtoupper($key1)));
-        $this->assertEquals($value1, $headers[strtoupper($key1)]);
+        self::assertTrue($headers->has(strtoupper($key1)));
+        self::assertTrue(isset($headers[strtoupper($key1)]));
+        self::assertEquals($value1, $headers->get(strtoupper($key1)));
+        self::assertEquals($value1, $headers[strtoupper($key1)]);
 
         $headers->remove(strtoupper($key1));
-        $this->assertFalse($headers->has($key1));
-        $this->assertFalse(isset($headers[$key1]));
-        $this->assertNull($headers->get($key1));
-        $this->assertNull($headers[$key1]);
+        self::assertFalse($headers->has($key1));
+        self::assertFalse(isset($headers[$key1]));
+        self::assertNull($headers->get($key1));
+        self::assertNull($headers[$key1]);
 
         $headers[strtoupper($key2)] = $value2;
-        $this->assertTrue($headers->has($key2));
-        $this->assertTrue(isset($headers[$key2]));
-        $this->assertEquals($value2, $headers->get($key2));
-        $this->assertEquals($value2, $headers[$key2]);
+        self::assertTrue($headers->has($key2));
+        self::assertTrue(isset($headers[$key2]));
+        self::assertEquals($value2, $headers->get($key2));
+        self::assertEquals($value2, $headers[$key2]);
 
         unset($headers[$key2]);
-        $this->assertFalse($headers->has(strtoupper($key2)));
-        $this->assertFalse(isset($headers[strtoupper($key2)]));
-        $this->assertNull($headers->get(strtoupper($key2)));
-        $this->assertNull($headers[strtoupper($key2)]);
+        self::assertFalse($headers->has(strtoupper($key2)));
+        self::assertFalse(isset($headers[strtoupper($key2)]));
+        self::assertNull($headers->get(strtoupper($key2)));
+        self::assertNull($headers[strtoupper($key2)]);
 
         $headers->set(strtoupper($key1), null);
-        $this->assertTrue($headers->has($key1));
-        $this->assertTrue(isset($headers[$key1]));
-        $this->assertNull($headers->get($key1));
-        $this->assertNull($headers[$key1]);
+        self::assertTrue($headers->has($key1));
+        self::assertTrue(isset($headers[$key1]));
+        self::assertNull($headers->get($key1));
+        self::assertNull($headers[$key1]);
 
-        $this->assertCount(1, $headers);
-        $this->assertEquals([$key1 => null], $headers->toArray());
+        self::assertCount(1, $headers);
+        self::assertEquals([$key1 => null], $headers->toArray());
 
         $headers->clear();
-        $this->assertCount(0, $headers);
+        self::assertCount(0, $headers);
     }
 
     /**
@@ -112,100 +115,100 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $value1 = 'value1';
         $value2 = 'value2';
 
-        $this->assertFalse($headers->has($key1));
-        $this->assertFalse(isset($headers[$key1]));
-        $this->assertNull($headers->get($key1));
-        $this->assertNull($headers[$key1]);
+        self::assertFalse($headers->has($key1));
+        self::assertFalse(isset($headers[$key1]));
+        self::assertNull($headers->get($key1));
+        self::assertNull($headers[$key1]);
 
         $headers->set($key1, $value1);
-        $this->assertTrue($headers->has($key1));
-        $this->assertTrue(isset($headers[$key1]));
-        $this->assertEquals($value1, $headers->get($key1));
-        $this->assertEquals($value1, $headers[$key1]);
+        self::assertTrue($headers->has($key1));
+        self::assertTrue(isset($headers[$key1]));
+        self::assertEquals($value1, $headers->get($key1));
+        self::assertEquals($value1, $headers[$key1]);
 
-        $this->assertFalse($headers->has(strtoupper($key1)));
-        $this->assertFalse(isset($headers[strtoupper($key1)]));
-        $this->assertNull($headers->get(strtoupper($key1)));
-        $this->assertNull($headers[strtoupper($key1)]);
+        self::assertFalse($headers->has(strtoupper($key1)));
+        self::assertFalse(isset($headers[strtoupper($key1)]));
+        self::assertNull($headers->get(strtoupper($key1)));
+        self::assertNull($headers[strtoupper($key1)]);
         $headers->remove(strtoupper($key1));
-        $this->assertTrue($headers->has($key1));
+        self::assertTrue($headers->has($key1));
         unset($headers[strtoupper($key1)]);
-        $this->assertTrue($headers->has($key1));
+        self::assertTrue($headers->has($key1));
 
         $headers->remove($key1);
-        $this->assertFalse($headers->has($key1));
-        $this->assertFalse(isset($headers[$key1]));
-        $this->assertNull($headers->get($key1));
-        $this->assertNull($headers[$key1]);
+        self::assertFalse($headers->has($key1));
+        self::assertFalse(isset($headers[$key1]));
+        self::assertNull($headers->get($key1));
+        self::assertNull($headers[$key1]);
 
         $headers[$key2] = $value2;
-        $this->assertTrue($headers->has($key2));
-        $this->assertTrue(isset($headers[$key2]));
-        $this->assertEquals($value2, $headers->get($key2));
-        $this->assertEquals($value2, $headers[$key2]);
+        self::assertTrue($headers->has($key2));
+        self::assertTrue(isset($headers[$key2]));
+        self::assertEquals($value2, $headers->get($key2));
+        self::assertEquals($value2, $headers[$key2]);
 
         unset($headers[$key2]);
-        $this->assertFalse($headers->has($key2));
-        $this->assertFalse(isset($headers[$key2]));
-        $this->assertNull($headers->get($key2));
-        $this->assertNull($headers[$key2]);
+        self::assertFalse($headers->has($key2));
+        self::assertFalse(isset($headers[$key2]));
+        self::assertNull($headers->get($key2));
+        self::assertNull($headers[$key2]);
 
         $headers->set($key1, null);
-        $this->assertTrue($headers->has($key1));
-        $this->assertTrue(isset($headers[$key1]));
-        $this->assertNull($headers->get($key1));
-        $this->assertNull($headers[$key1]);
+        self::assertTrue($headers->has($key1));
+        self::assertTrue(isset($headers[$key1]));
+        self::assertNull($headers->get($key1));
+        self::assertNull($headers[$key1]);
 
-        $this->assertCount(1, $headers);
-        $this->assertEquals([$key1 => null], $headers->toArray());
+        self::assertCount(1, $headers);
+        self::assertEquals([$key1 => null], $headers->toArray());
 
         $headers->clear();
-        $this->assertCount(0, $headers);
+        self::assertCount(0, $headers);
     }
 
     public function testResponseStatusCode()
     {
-        $this->assertNull($this->context->getResponseStatusCode());
+        self::assertNull($this->context->getResponseStatusCode());
 
         $this->context->setResponseStatusCode(500);
-        $this->assertEquals(500, $this->context->getResponseStatusCode());
-        $this->assertEquals(500, $this->context->get(Context::RESPONSE_STATUS_CODE));
+        self::assertEquals(500, $this->context->getResponseStatusCode());
+        self::assertEquals(500, $this->context->get(Context::RESPONSE_STATUS_CODE));
     }
 
     public function testIsSuccessResponse()
     {
-        $this->assertFalse($this->context->isSuccessResponse());
+        self::assertFalse($this->context->isSuccessResponse());
 
         $this->context->setResponseStatusCode(200);
-        $this->assertTrue($this->context->isSuccessResponse());
+        self::assertTrue($this->context->isSuccessResponse());
         $this->context->setResponseStatusCode(299);
-        $this->assertTrue($this->context->isSuccessResponse());
+        self::assertTrue($this->context->isSuccessResponse());
 
         $this->context->setResponseStatusCode(199);
-        $this->assertFalse($this->context->isSuccessResponse());
+        self::assertFalse($this->context->isSuccessResponse());
         $this->context->setResponseStatusCode(300);
-        $this->assertFalse($this->context->isSuccessResponse());
+        self::assertFalse($this->context->isSuccessResponse());
     }
 
     public function testResponseDocumentBuilder()
     {
-        $this->assertNull($this->context->getResponseDocumentBuilder());
+        self::assertNull($this->context->getResponseDocumentBuilder());
 
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
         $this->context->setResponseDocumentBuilder($documentBuilder);
-        $this->assertSame($documentBuilder, $this->context->getResponseDocumentBuilder());
+        self::assertSame($documentBuilder, $this->context->getResponseDocumentBuilder());
 
         $this->context->setResponseDocumentBuilder(null);
-        $this->assertNull($this->context->getResponseDocumentBuilder());
+        self::assertNull($this->context->getResponseDocumentBuilder());
     }
 
     public function testClassName()
     {
-        $this->assertNull($this->context->getClassName());
+        self::assertNull($this->context->getClassName());
 
         $this->context->setClassName('test');
-        $this->assertEquals('test', $this->context->getClassName());
-        $this->assertEquals('test', $this->context->get(Context::CLASS_NAME));
+        self::assertEquals('test', $this->context->getClassName());
+        self::assertEquals('test', $this->context->get(Context::CLASS_NAME));
     }
 
     public function testGetConfigSections()
@@ -218,7 +221,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setConfigExtras($configExtras);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['section1', 'section2'],
             $this->context->getConfigSections()
         );
@@ -244,7 +247,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setConfigExtras($configExtras);
         $this->context->setClassName($entityClass);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $entityClass,
@@ -262,27 +265,27 @@ class ContextTest extends \PHPUnit\Framework\TestCase
             );
 
         // test that a config is not loaded yet
-        $this->assertFalse($this->context->hasConfig());
-        $this->assertFalse($this->context->hasConfigOf('section1'));
-        $this->assertFalse($this->context->hasConfigOf('section2'));
+        self::assertFalse($this->context->hasConfig());
+        self::assertFalse($this->context->hasConfigOf('section1'));
+        self::assertFalse($this->context->hasConfigOf('section2'));
 
-        $this->assertEquals($config, $this->context->getConfig()); // load config
-        $this->assertTrue($this->context->hasConfig());
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
-        $this->assertEquals($config, $this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        self::assertEquals($config, $this->context->getConfig()); // load config
+        self::assertTrue($this->context->hasConfig());
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        self::assertEquals($config, $this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
 
-        $this->assertTrue($this->context->hasConfigOf('section1'));
-        $this->assertEquals($section1Config, $this->context->getConfigOf('section1'));
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
-        $this->assertEquals($section1Config, $this->context->get(Context::CONFIG_PREFIX . 'section1'));
+        self::assertTrue($this->context->hasConfigOf('section1'));
+        self::assertEquals($section1Config, $this->context->getConfigOf('section1'));
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        self::assertEquals($section1Config, $this->context->get(Context::CONFIG_PREFIX . 'section1'));
 
-        $this->assertTrue($this->context->hasConfigOf('section2'));
-        $this->assertNull($this->context->getConfigOf('section2'));
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
-        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
+        self::assertTrue($this->context->hasConfigOf('section2'));
+        self::assertNull($this->context->getConfigOf('section2'));
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
+        self::assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
 
         // test that a config is loaded only once
-        $this->assertEquals($config, $this->context->getConfig());
+        self::assertEquals($config, $this->context->getConfig());
     }
 
     public function testLoadConfigByGetConfigWhenExceptionOccurs()
@@ -302,7 +305,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setConfigExtras($configExtras);
         $this->context->setClassName($entityClass);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $entityClass,
@@ -313,31 +316,31 @@ class ContextTest extends \PHPUnit\Framework\TestCase
             ->willThrowException($exception);
 
         // test that a config is not loaded yet
-        $this->assertFalse($this->context->hasConfig());
-        $this->assertFalse($this->context->hasConfigOf('section1'));
-        $this->assertFalse($this->context->hasConfigOf('section2'));
+        self::assertFalse($this->context->hasConfig());
+        self::assertFalse($this->context->hasConfigOf('section1'));
+        self::assertFalse($this->context->hasConfigOf('section2'));
 
         try {
             $this->context->getConfig(); // load config
         } catch (\RuntimeException $e) {
-            $this->assertSame($exception, $e);
+            self::assertSame($exception, $e);
         }
-        $this->assertTrue($this->context->hasConfig());
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
-        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        self::assertTrue($this->context->hasConfig());
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        self::assertNull($this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
 
-        $this->assertTrue($this->context->hasConfigOf('section1'));
-        $this->assertNull($this->context->getConfigOf('section1'));
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
-        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
+        self::assertTrue($this->context->hasConfigOf('section1'));
+        self::assertNull($this->context->getConfigOf('section1'));
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        self::assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
 
-        $this->assertTrue($this->context->hasConfigOf('section2'));
-        $this->assertNull($this->context->getConfigOf('section2'));
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
-        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
+        self::assertTrue($this->context->hasConfigOf('section2'));
+        self::assertNull($this->context->getConfigOf('section2'));
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
+        self::assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
 
         // test that a config is loaded only once
-        $this->assertNull($this->context->getConfig());
+        self::assertNull($this->context->getConfig());
     }
 
     public function testLoadConfigByGetConfigOf()
@@ -359,7 +362,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setConfigExtras($configExtras);
         $this->context->setClassName($entityClass);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $entityClass,
@@ -377,27 +380,27 @@ class ContextTest extends \PHPUnit\Framework\TestCase
             );
 
         // test that a config is not loaded yet
-        $this->assertFalse($this->context->hasConfig());
-        $this->assertFalse($this->context->hasConfigOf('section1'));
-        $this->assertFalse($this->context->hasConfigOf('section2'));
+        self::assertFalse($this->context->hasConfig());
+        self::assertFalse($this->context->hasConfigOf('section1'));
+        self::assertFalse($this->context->hasConfigOf('section2'));
 
-        $this->assertEquals($section1Config, $this->context->getConfigOf('section1')); // load config
-        $this->assertTrue($this->context->hasConfigOf('section1'));
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
-        $this->assertEquals($section1Config, $this->context->get(Context::CONFIG_PREFIX . 'section1'));
+        self::assertEquals($section1Config, $this->context->getConfigOf('section1')); // load config
+        self::assertTrue($this->context->hasConfigOf('section1'));
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        self::assertEquals($section1Config, $this->context->get(Context::CONFIG_PREFIX . 'section1'));
 
-        $this->assertTrue($this->context->hasConfig());
-        $this->assertEquals($config, $this->context->getConfig());
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
-        $this->assertEquals($config, $this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        self::assertTrue($this->context->hasConfig());
+        self::assertEquals($config, $this->context->getConfig());
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        self::assertEquals($config, $this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
 
-        $this->assertTrue($this->context->hasConfigOf('section2'));
-        $this->assertNull($this->context->getConfigOf('section2'));
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
-        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
+        self::assertTrue($this->context->hasConfigOf('section2'));
+        self::assertNull($this->context->getConfigOf('section2'));
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
+        self::assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
 
         // test that a config is loaded only once
-        $this->assertEquals($config, $this->context->getConfig());
+        self::assertEquals($config, $this->context->getConfig());
     }
 
     public function testLoadConfigByGetConfigOfWhenExceptionOccurs()
@@ -416,7 +419,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setConfigExtras($configExtras);
         $this->context->setClassName($entityClass);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $entityClass,
@@ -427,31 +430,31 @@ class ContextTest extends \PHPUnit\Framework\TestCase
             ->willThrowException($exception);
 
         // test that a config is not loaded yet
-        $this->assertFalse($this->context->hasConfig());
-        $this->assertFalse($this->context->hasConfigOf('section1'));
-        $this->assertFalse($this->context->hasConfigOf('section2'));
+        self::assertFalse($this->context->hasConfig());
+        self::assertFalse($this->context->hasConfigOf('section1'));
+        self::assertFalse($this->context->hasConfigOf('section2'));
 
         try {
             $this->context->getConfigOf('section1'); // load config
         } catch (\RuntimeException $e) {
-            $this->assertSame($exception, $e);
+            self::assertSame($exception, $e);
         }
-        $this->assertTrue($this->context->hasConfigOf('section1'));
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
-        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
+        self::assertTrue($this->context->hasConfigOf('section1'));
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        self::assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
 
-        $this->assertTrue($this->context->hasConfig());
-        $this->assertNull($this->context->getConfig());
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
-        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        self::assertTrue($this->context->hasConfig());
+        self::assertNull($this->context->getConfig());
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        self::assertNull($this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
 
-        $this->assertTrue($this->context->hasConfigOf('section2'));
-        $this->assertNull($this->context->getConfigOf('section2'));
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
-        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
+        self::assertTrue($this->context->hasConfigOf('section2'));
+        self::assertNull($this->context->getConfigOf('section2'));
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
+        self::assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
 
         // test that a config is loaded only once
-        $this->assertNull($this->context->getConfig());
+        self::assertNull($this->context->getConfig());
     }
 
     /**
@@ -471,29 +474,29 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setConfigExtras([new TestConfigSection('section1')]);
         $this->context->setClassName('Test\Class');
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
         $this->context->setConfig($config);
 
-        $this->assertTrue($this->context->hasConfig());
-        $this->assertEquals($config, $this->context->getConfig());
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
-        $this->assertEquals($config, $this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        self::assertTrue($this->context->hasConfig());
+        self::assertEquals($config, $this->context->getConfig());
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        self::assertEquals($config, $this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
 
-        $this->assertTrue($this->context->hasConfigOf('section1'));
-        $this->assertNull($this->context->getConfigOf('section1'));
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
-        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
+        self::assertTrue($this->context->hasConfigOf('section1'));
+        self::assertNull($this->context->getConfigOf('section1'));
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        self::assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
 
         // test remove config
         $this->context->setConfig(null);
-        $this->assertTrue($this->context->hasConfig());
-        $this->assertNull($this->context->getConfig());
-        $this->assertTrue($this->context->hasConfigOf('section1'));
-        $this->assertNull($this->context->getConfigOf('section1'));
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
-        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
+        self::assertTrue($this->context->hasConfig());
+        self::assertNull($this->context->getConfig());
+        self::assertTrue($this->context->hasConfigOf('section1'));
+        self::assertNull($this->context->getConfigOf('section1'));
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        self::assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
     }
 
     public function testConfigWhenItIsSetExplicitlyForSection()
@@ -508,25 +511,25 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setConfigExtras($configExtras);
         $this->context->setClassName('Test\Class');
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
         $this->context->setConfigOf('section1', $section1Config);
 
-        $this->assertTrue($this->context->hasConfigOf('section1'));
-        $this->assertEquals($section1Config, $this->context->getConfigOf('section1'));
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
-        $this->assertEquals($section1Config, $this->context->get(Context::CONFIG_PREFIX . 'section1'));
+        self::assertTrue($this->context->hasConfigOf('section1'));
+        self::assertEquals($section1Config, $this->context->getConfigOf('section1'));
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        self::assertEquals($section1Config, $this->context->get(Context::CONFIG_PREFIX . 'section1'));
 
-        $this->assertTrue($this->context->hasConfigOf('section2'));
-        $this->assertNull($this->context->getConfigOf('section2'));
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
-        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
+        self::assertTrue($this->context->hasConfigOf('section2'));
+        self::assertNull($this->context->getConfigOf('section2'));
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
+        self::assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
 
-        $this->assertTrue($this->context->hasConfig());
-        $this->assertNull($this->context->getConfig());
-        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
-        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        self::assertTrue($this->context->hasConfig());
+        self::assertNull($this->context->getConfig());
+        self::assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        self::assertNull($this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
     }
 
     public function testHasConfigOfUndefinedSection()
@@ -534,10 +537,10 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setConfigExtras([new TestConfigSection('section1')]);
         $this->context->setClassName('Test\Class');
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
-        $this->assertFalse($this->context->hasConfigOf('undefined'));
+        self::assertFalse($this->context->hasConfigOf('undefined'));
     }
 
     public function testGetConfigOfUndefinedSection()
@@ -545,10 +548,10 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setConfigExtras([new TestConfigSection('section1')]);
         $this->context->setClassName('Test\Class');
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
-        $this->assertNull($this->context->getConfigOf('undefined'));
+        self::assertNull($this->context->getConfigOf('undefined'));
     }
 
     /**
@@ -559,7 +562,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setConfigExtras([new TestConfigSection('section1')]);
         $this->context->setClassName('Test\Class');
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
         $this->context->setConfigOf('undefined', []);
@@ -589,29 +592,29 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         // set "known" sections
         $this->context->setConfigExtras([new FiltersConfigExtra(), new SortersConfigExtra()]);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->willReturn($config);
 
         // test that a config is not loaded yet
-        $this->assertFalse($this->context->hasConfig());
+        self::assertFalse($this->context->hasConfig());
         foreach ($this->context->getConfigExtras() as $configExtra) {
             if ($configExtra instanceof ConfigExtraSectionInterface) {
-                $this->assertFalse($this->context->{'hasConfigOf' . lcfirst($configExtra->getName())}());
+                self::assertFalse($this->context->{'hasConfigOf' . lcfirst($configExtra->getName())}());
             }
         }
 
         $suffix = lcfirst($configSection);
-        $this->assertEquals($sectionConfig, $this->context->{'getConfigOf' . $suffix}()); // load config
-        $this->assertTrue($this->context->{'hasConfigOf' . $suffix}());
+        self::assertEquals($sectionConfig, $this->context->{'getConfigOf' . $suffix}()); // load config
+        self::assertTrue($this->context->{'hasConfigOf' . $suffix}());
 
-        $this->assertTrue($this->context->hasConfig());
-        $this->assertEquals($mainConfig, $this->context->getConfig());
+        self::assertTrue($this->context->hasConfig());
+        self::assertEquals($mainConfig, $this->context->getConfig());
 
         foreach ($this->context->getConfigExtras() as $configExtra) {
             if ($configExtra instanceof ConfigExtraSectionInterface && $configExtra->getName() !== $configSection) {
-                $this->assertTrue($this->context->{'hasConfigOf' . lcfirst($configExtra->getName())}());
-                $this->assertNull($this->context->{'getConfigOf' . lcfirst($configExtra->getName())}());
+                self::assertTrue($this->context->{'hasConfigOf' . lcfirst($configExtra->getName())}());
+                self::assertNull($this->context->{'getConfigOf' . lcfirst($configExtra->getName())}());
             }
         }
     }
@@ -625,24 +628,24 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         // set "known" sections
         $this->context->setConfigExtras([new FiltersConfigExtra(), new SortersConfigExtra()]);
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
         $suffix = lcfirst($configSection);
         $this->context->{'setConfigOf' . $suffix}($sectionConfig);
 
-        $this->assertTrue($this->context->{'hasConfigOf' . $suffix}());
-        $this->assertEquals($sectionConfig, $this->context->{'getConfigOf' . $suffix}());
+        self::assertTrue($this->context->{'hasConfigOf' . $suffix}());
+        self::assertEquals($sectionConfig, $this->context->{'getConfigOf' . $suffix}());
 
         foreach ($this->context->getConfigExtras() as $configExtra) {
             if ($configExtra instanceof ConfigExtraSectionInterface && $configExtra->getName() !== $configSection) {
-                $this->assertTrue($this->context->{'hasConfigOf' . lcfirst($configExtra->getName())}());
-                $this->assertNull($this->context->{'getConfigOf' . lcfirst($configExtra->getName())}());
+                self::assertTrue($this->context->{'hasConfigOf' . lcfirst($configExtra->getName())}());
+                self::assertNull($this->context->{'getConfigOf' . lcfirst($configExtra->getName())}());
             }
         }
 
-        $this->assertTrue($this->context->hasConfig());
-        $this->assertNull($this->context->getConfig());
+        self::assertTrue($this->context->hasConfig());
+        self::assertNull($this->context->getConfig());
     }
 
     public function configSectionProvider()
@@ -655,66 +658,70 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testFilters()
     {
-        $testFilter = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
+        $testFilter = $this->createMock(FilterInterface::class);
 
-        $this->assertNotNull($this->context->getFilters());
+        self::assertNotNull($this->context->getFilters());
 
         $this->context->getFilters()->set('test', $testFilter);
-        $this->assertSame($testFilter, $this->context->getFilters()->get('test'));
+        self::assertSame($testFilter, $this->context->getFilters()->get('test'));
     }
 
     public function testDefaultAccessorForFilterValues()
     {
-        $this->assertNotNull($this->context->getFilterValues());
-        $this->assertFalse($this->context->getFilterValues()->has('test'));
-        $this->assertNull($this->context->getFilterValues()->get('test'));
+        self::assertNotNull($this->context->getFilterValues());
+        self::assertFalse($this->context->getFilterValues()->has('test'));
+        self::assertNull($this->context->getFilterValues()->get('test'));
     }
 
     public function testFilterValues()
     {
-        $accessor = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface');
+        $accessor = $this->createMock(FilterValueAccessorInterface::class);
         $this->context->setFilterValues($accessor);
 
-        $this->assertSame($accessor, $this->context->getFilterValues());
+        self::assertSame($accessor, $this->context->getFilterValues());
+    }
+
+    public function testCors()
+    {
+        self::assertFalse($this->context->isCorsRequest());
+        self::assertFalse($this->context->get('cors'));
+
+        $this->context->setCorsRequest(true);
+        self::assertTrue($this->context->isCorsRequest());
+        self::assertTrue($this->context->get('cors'));
     }
 
     public function testConfigExtras()
     {
-        $this->assertSame([], $this->context->getConfigExtras());
-        $this->assertNull($this->context->get(Context::CONFIG_EXTRAS));
+        self::assertSame([], $this->context->getConfigExtras());
 
         $configExtra = new TestConfigExtra('test');
 
         $configExtras = [$configExtra];
         $this->context->setConfigExtras($configExtras);
-        $this->assertEquals($configExtras, $this->context->getConfigExtras());
-        $this->assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
+        self::assertEquals($configExtras, $this->context->getConfigExtras());
 
-        $this->assertTrue($this->context->hasConfigExtra('test'));
-        $this->assertSame($configExtra, $this->context->getConfigExtra('test'));
-        $this->assertFalse($this->context->hasConfigExtra('another'));
-        $this->assertNull($this->context->getConfigExtra('another'));
+        self::assertTrue($this->context->hasConfigExtra('test'));
+        self::assertSame($configExtra, $this->context->getConfigExtra('test'));
+        self::assertFalse($this->context->hasConfigExtra('another'));
+        self::assertNull($this->context->getConfigExtra('another'));
 
         $anotherConfigExtra = new TestConfigExtra('another');
         $configExtras[]     = $anotherConfigExtra;
         $this->context->addConfigExtra($anotherConfigExtra);
-        $this->assertEquals($configExtras, $this->context->getConfigExtras());
-        $this->assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
+        self::assertEquals($configExtras, $this->context->getConfigExtras());
 
         unset($configExtras[0]);
         $configExtras = array_values($configExtras);
         $this->context->removeConfigExtra('test');
-        $this->assertEquals($configExtras, $this->context->getConfigExtras());
-        $this->assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
+        self::assertEquals($configExtras, $this->context->getConfigExtras());
 
         // test remove of non existing extra
         $this->context->removeConfigExtra('test');
-        $this->assertEquals($configExtras, $this->context->getConfigExtras());
-        $this->assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
+        self::assertEquals($configExtras, $this->context->getConfigExtras());
 
         $this->context->setConfigExtras([]);
-        $this->assertSame([], $this->context->getConfigExtras());
-        $this->assertNull($this->context->get(Context::CONFIG_EXTRAS));
+        self::assertSame([], $this->context->getConfigExtras());
     }
 
     /**
@@ -758,7 +765,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setMetadataExtras($metadataExtras);
         $this->context->setClassName($entityClass);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $entityClass,
@@ -767,7 +774,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
                 $configExtras
             )
             ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $entityClass,
@@ -779,26 +786,26 @@ class ContextTest extends \PHPUnit\Framework\TestCase
             ->willReturn($metadata);
 
         // test that metadata are not loaded yet
-        $this->assertFalse($this->context->hasMetadata());
+        self::assertFalse($this->context->hasMetadata());
 
-        $this->assertSame($metadata, $this->context->getMetadata()); // load metadata
-        $this->assertTrue($this->context->hasMetadata());
-        $this->assertTrue($this->context->has(Context::METADATA));
-        $this->assertSame($metadata, $this->context->get(Context::METADATA));
+        self::assertSame($metadata, $this->context->getMetadata()); // load metadata
+        self::assertTrue($this->context->hasMetadata());
+        self::assertTrue($this->context->has(Context::METADATA));
+        self::assertSame($metadata, $this->context->get(Context::METADATA));
 
-        $this->assertEquals($config, $this->context->getConfig());
+        self::assertEquals($config, $this->context->getConfig());
 
         // test that metadata are loaded only once
-        $this->assertSame($metadata, $this->context->getMetadata());
+        self::assertSame($metadata, $this->context->getMetadata());
     }
 
     public function testLoadMetadataNoClassName()
     {
-        $this->metadataProvider->expects($this->never())
+        $this->metadataProvider->expects(self::never())
             ->method('getMetadata');
 
-        $this->assertNull($this->context->getMetadata());
-        $this->assertTrue($this->context->hasMetadata());
+        self::assertNull($this->context->getMetadata());
+        self::assertTrue($this->context->hasMetadata());
     }
 
     public function testLoadMetadataWhenExceptionOccurs()
@@ -821,7 +828,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setMetadataExtras($metadataExtras);
         $this->context->setClassName($entityClass);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $entityClass,
@@ -830,7 +837,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
                 $configExtras
             )
             ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $entityClass,
@@ -842,21 +849,21 @@ class ContextTest extends \PHPUnit\Framework\TestCase
             ->willThrowException($exception);
 
         // test that metadata are not loaded yet
-        $this->assertFalse($this->context->hasMetadata());
+        self::assertFalse($this->context->hasMetadata());
 
         try {
             $this->context->getMetadata(); // load metadata
         } catch (\RuntimeException $e) {
-            $this->assertSame($exception, $e);
+            self::assertSame($exception, $e);
         }
-        $this->assertTrue($this->context->hasMetadata());
-        $this->assertTrue($this->context->has(Context::METADATA));
-        $this->assertNull($this->context->get(Context::METADATA));
+        self::assertTrue($this->context->hasMetadata());
+        self::assertTrue($this->context->has(Context::METADATA));
+        self::assertNull($this->context->get(Context::METADATA));
 
-        $this->assertEquals($config, $this->context->getConfig());
+        self::assertEquals($config, $this->context->getConfig());
 
         // test that metadata are loaded only once
-        $this->assertNull($this->context->getMetadata());
+        self::assertNull($this->context->getMetadata());
     }
 
     public function testLoadMetadataWhenExceptionOccursInLoadConfig()
@@ -878,7 +885,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setMetadataExtras($metadataExtras);
         $this->context->setClassName($entityClass);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $entityClass,
@@ -887,27 +894,27 @@ class ContextTest extends \PHPUnit\Framework\TestCase
                 $configExtras
             )
             ->willThrowException($exception);
-        $this->metadataProvider->expects($this->never())
+        $this->metadataProvider->expects(self::never())
             ->method('getMetadata');
 
         try {
             $this->context->getConfig(); // load config
         } catch (\RuntimeException $e) {
-            $this->assertSame($exception, $e);
+            self::assertSame($exception, $e);
         }
 
         // test that metadata are not loaded yet
-        $this->assertFalse($this->context->hasMetadata());
+        self::assertFalse($this->context->hasMetadata());
 
         // load metadata
-        $this->assertNull($this->context->getMetadata());
+        self::assertNull($this->context->getMetadata());
 
-        $this->assertTrue($this->context->hasMetadata());
-        $this->assertTrue($this->context->has(Context::METADATA));
-        $this->assertNull($this->context->get(Context::METADATA));
+        self::assertTrue($this->context->hasMetadata());
+        self::assertTrue($this->context->has(Context::METADATA));
+        self::assertNull($this->context->get(Context::METADATA));
 
         // test that metadata are loaded only once
-        $this->assertNull($this->context->getMetadata());
+        self::assertNull($this->context->getMetadata());
     }
 
     public function testMetadataWhenItIsSetExplicitly()
@@ -916,56 +923,53 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setClassName('Test\Class');
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
-        $this->metadataProvider->expects($this->never())
+        $this->metadataProvider->expects(self::never())
             ->method('getMetadata');
 
         $this->context->setMetadata($metadata);
 
-        $this->assertTrue($this->context->hasMetadata());
-        $this->assertSame($metadata, $this->context->getMetadata());
-        $this->assertTrue($this->context->has(Context::METADATA));
-        $this->assertSame($metadata, $this->context->get(Context::METADATA));
+        self::assertTrue($this->context->hasMetadata());
+        self::assertSame($metadata, $this->context->getMetadata());
+        self::assertTrue($this->context->has(Context::METADATA));
+        self::assertSame($metadata, $this->context->get(Context::METADATA));
 
         // test remove metadata
         $this->context->setMetadata(null);
-        $this->assertFalse($this->context->hasMetadata());
+        self::assertFalse($this->context->hasMetadata());
     }
 
     public function testMetadataExtras()
     {
-        $this->assertSame([], $this->context->getMetadataExtras());
-        $this->assertNull($this->context->get(Context::METADATA_EXTRAS));
+        self::assertSame([], $this->context->getMetadataExtras());
 
         $metadataExtras = [new TestMetadataExtra('test')];
         $this->context->setMetadataExtras($metadataExtras);
-        $this->assertEquals($metadataExtras, $this->context->getMetadataExtras());
-        $this->assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
+        self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
 
-        $this->assertTrue($this->context->hasMetadataExtra('test'));
-        $this->assertFalse($this->context->hasMetadataExtra('another'));
+        self::assertTrue($this->context->hasMetadataExtra('test'));
+        self::assertFalse($this->context->hasMetadataExtra('another'));
+
+        self::assertSame($metadataExtras[0], $this->context->getMetadataExtra('test'));
+        self::assertNull($this->context->getMetadataExtra('another'));
 
         $anotherMetadataExtra = new TestMetadataExtra('another');
-        $metadataExtras[]     = $anotherMetadataExtra;
+        $metadataExtras[] = $anotherMetadataExtra;
         $this->context->addMetadataExtra($anotherMetadataExtra);
-        $this->assertEquals($metadataExtras, $this->context->getMetadataExtras());
-        $this->assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
+        self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
 
         unset($metadataExtras[0]);
         $metadataExtras = array_values($metadataExtras);
         $this->context->removeMetadataExtra('test');
-        $this->assertEquals($metadataExtras, $this->context->getMetadataExtras());
-        $this->assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
+        self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
 
         // test remove of non existing extra
         $this->context->removeMetadataExtra('test');
-        $this->assertEquals($metadataExtras, $this->context->getMetadataExtras());
-        $this->assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
+        self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
 
         $this->context->setMetadataExtras([]);
-        $this->assertSame([], $this->context->getMetadataExtras());
-        $this->assertNull($this->context->get(Context::METADATA_EXTRAS));
+        self::assertSame([], $this->context->getMetadataExtras());
     }
 
     public function testMetadataExtrasWhenActionExistsInContext()
@@ -973,19 +977,13 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $action = 'test_action';
         $this->context->setAction($action);
 
-        $this->assertNull($this->context->get(Context::METADATA_EXTRAS));
-
-        $this->assertEquals(
+        self::assertEquals(
             [new ActionMetadataExtra($action)],
             $this->context->getMetadataExtras()
         );
-        $this->assertEquals(
-            [new ActionMetadataExtra($action)],
-            $this->context->get(Context::METADATA_EXTRAS)
-        );
 
         // test that ActionMetadataExtra is not added twice
-        $this->assertEquals(
+        self::assertEquals(
             [new ActionMetadataExtra($action)],
             $this->context->getMetadataExtras()
         );
@@ -1072,30 +1070,28 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     {
         $query = new \stdClass();
 
-        $this->assertFalse($this->context->hasQuery());
-        $this->assertNull($this->context->getQuery());
+        self::assertFalse($this->context->hasQuery());
+        self::assertNull($this->context->getQuery());
 
         $this->context->setQuery($query);
-        $this->assertTrue($this->context->hasQuery());
-        $this->assertSame($query, $this->context->getQuery());
-        $this->assertSame($query, $this->context->get(Context::QUERY));
+        self::assertTrue($this->context->hasQuery());
+        self::assertSame($query, $this->context->getQuery());
+        self::assertSame($query, $this->context->get(Context::QUERY));
 
         $this->context->setQuery(null);
-        $this->assertFalse($this->context->hasQuery());
-        $this->assertNull($this->context->getQuery());
+        self::assertFalse($this->context->hasQuery());
+        self::assertNull($this->context->getQuery());
     }
 
     public function testCriteria()
     {
-        $this->assertNull($this->context->getCriteria());
+        self::assertNull($this->context->getCriteria());
 
-        $criteria = $this->getMockBuilder('Oro\Bundle\ApiBundle\Collection\Criteria')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $criteria = $this->createMock(Criteria::class);
 
         $this->context->setCriteria($criteria);
-        $this->assertSame($criteria, $this->context->getCriteria());
-        $this->assertSame($criteria, $this->context->get(Context::CRITERIA));
+        self::assertSame($criteria, $this->context->getCriteria());
+        self::assertSame($criteria, $this->context->get(Context::CRITERIA));
     }
 
     /**

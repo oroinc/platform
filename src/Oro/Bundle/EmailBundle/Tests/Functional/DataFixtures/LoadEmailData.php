@@ -7,6 +7,8 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -116,7 +118,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
                 "bcc{$index}@example.com"
             );
 
-            $emailUser->addFolder($origin->getFolder(FolderType::SENT));
+            $emailUser->addFolder($this->getFolder($origin));
             $emailUser->getEmail()->addActivityTarget($owner);
             $emailUser->getEmail()->addActivityTarget($simpleUser2);
             $emailUser->getEmail()->setHead(true);
@@ -162,5 +164,14 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
     protected function getEmailOwner(ObjectManager $om)
     {
         return $this->getReference('simple_user');
+    }
+
+    /**
+     * @param EmailOrigin $origin
+     * @return EmailFolder
+     */
+    protected function getFolder($origin)
+    {
+        return $origin->getFolder(FolderType::SENT);
     }
 }

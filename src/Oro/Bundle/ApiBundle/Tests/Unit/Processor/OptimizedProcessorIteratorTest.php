@@ -20,7 +20,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
      *
      * @return OptimizedProcessorIterator
      */
-    protected function getOptimizedProcessorIterator(
+    private function getOptimizedProcessorIterator(
         array $processors,
         array $groups,
         Context $context,
@@ -41,9 +41,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return ProcessorFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject|ProcessorFactoryInterface
      */
-    protected function getProcessorFactory()
+    private function getProcessorFactory()
     {
         $factory = $this->createMock(ProcessorFactoryInterface::class);
         $factory->expects(self::any())
@@ -61,7 +61,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
      * @param string[]  $expectedProcessorIds
      * @param \Iterator $processors
      */
-    protected function assertProcessors(array $expectedProcessorIds, \Iterator $processors)
+    private function assertProcessors(array $expectedProcessorIds, \Iterator $processors)
     {
         $processorIds = [];
         /** @var ProcessorMock $processor */

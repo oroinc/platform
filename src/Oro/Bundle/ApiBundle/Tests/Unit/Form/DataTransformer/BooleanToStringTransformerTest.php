@@ -12,7 +12,7 @@ class BooleanToStringTransformerTest extends \PHPUnit\Framework\TestCase
     public function testTransform($value, $expected)
     {
         $transformer = new BooleanToStringTransformer();
-        $this->assertEquals($expected, $transformer->transform($value));
+        self::assertEquals($expected, $transformer->transform($value));
     }
 
     public function transformDataProvider()
@@ -20,7 +20,7 @@ class BooleanToStringTransformerTest extends \PHPUnit\Framework\TestCase
         return [
             [null, ''],
             [true, 'true'],
-            [false, 'false'],
+            [false, 'false']
         ];
     }
 
@@ -39,7 +39,7 @@ class BooleanToStringTransformerTest extends \PHPUnit\Framework\TestCase
     public function testReverseTransform($value, $expected)
     {
         $transformer = new BooleanToStringTransformer();
-        $this->assertEquals($expected, $transformer->reverseTransform($value));
+        self::assertEquals($expected, $transformer->reverseTransform($value));
     }
 
     public function reverseTransformDataProvider()
@@ -51,7 +51,7 @@ class BooleanToStringTransformerTest extends \PHPUnit\Framework\TestCase
             ['1', true],
             ['false', false],
             ['no', false],
-            ['0', false],
+            ['0', false]
         ];
     }
 

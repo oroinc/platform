@@ -14,19 +14,20 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    private $configProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $metadataProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
+    private $metadataProvider;
 
     /** @var SubresourceContext */
-    protected $context;
+    private $context;
 
     protected function setUp()
     {
@@ -41,7 +42,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
      *
      * @return Config
      */
-    protected function getConfig(array $data = [])
+    private function getConfig(array $data = [])
     {
         $result = new Config();
         foreach ($data as $sectionName => $config) {
@@ -117,8 +118,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setAssociationName($associationName);
 
-        self::assertNull($this->context->get(SubresourceContext::PARENT_CONFIG_EXTRAS));
-
         $expectedParentConfigExtras = [
             new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
             new CustomizeLoadedDataConfigExtra(),
@@ -131,10 +130,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
             $expectedParentConfigExtras,
             $this->context->getParentConfigExtras()
         );
-        self::assertEquals(
-            $expectedParentConfigExtras,
-            $this->context->get(SubresourceContext::PARENT_CONFIG_EXTRAS)
-        );
     }
 
     public function testSetParentConfigExtras()
@@ -143,10 +138,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [new EntityDefinitionConfigExtra('get_list')],
             $this->context->getParentConfigExtras()
-        );
-        self::assertEquals(
-            [new EntityDefinitionConfigExtra('get_list')],
-            $this->context->get(SubresourceContext::PARENT_CONFIG_EXTRAS)
         );
     }
 
@@ -163,7 +154,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setAssociationName($associationName);
 
         $this->context->setParentConfigExtras([]);
-        self::assertNull($this->context->get(SubresourceContext::PARENT_CONFIG_EXTRAS));
 
         $expectedParentConfigExtras = [
             new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
@@ -177,10 +167,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
             $expectedParentConfigExtras,
             $this->context->getParentConfigExtras()
         );
-        self::assertEquals(
-            $expectedParentConfigExtras,
-            $this->context->get(SubresourceContext::PARENT_CONFIG_EXTRAS)
-        );
     }
 
     /**
@@ -190,6 +176,98 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
     public function testSetInvalidParentConfigExtras()
     {
         $this->context->setParentConfigExtras(['test']);
+    }
+
+    public function testHasParentConfigExtra()
+    {
+        $action = 'update_relationship';
+        $isCollection = true;
+        $parentEntityClass = 'Test\Class';
+        $associationName = 'test';
+
+        $this->context->setAction($action);
+        $this->context->setIsCollection($isCollection);
+        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setAssociationName($associationName);
+
+        self::assertTrue($this->context->hasParentConfigExtra(EntityDefinitionConfigExtra::NAME));
+        self::assertTrue($this->context->hasParentConfigExtra(CustomizeLoadedDataConfigExtra::NAME));
+        self::assertTrue($this->context->hasParentConfigExtra(DataTransformersConfigExtra::NAME));
+        self::assertTrue($this->context->hasParentConfigExtra(FilterFieldsConfigExtra::NAME));
+        self::assertFalse($this->context->hasParentConfigExtra('another'));
+    }
+
+    public function testGetParentConfigExtra()
+    {
+        $action = 'update_relationship';
+        $isCollection = true;
+        $parentEntityClass = 'Test\Class';
+        $associationName = 'test';
+
+        $this->context->setAction($action);
+        $this->context->setIsCollection($isCollection);
+        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setAssociationName($associationName);
+
+        self::assertInstanceOf(
+            EntityDefinitionConfigExtra::class,
+            $this->context->getParentConfigExtra(EntityDefinitionConfigExtra::NAME)
+        );
+        self::assertInstanceOf(
+            CustomizeLoadedDataConfigExtra::class,
+            $this->context->getParentConfigExtra(CustomizeLoadedDataConfigExtra::NAME)
+        );
+        self::assertInstanceOf(
+            DataTransformersConfigExtra::class,
+            $this->context->getParentConfigExtra(DataTransformersConfigExtra::NAME)
+        );
+        self::assertInstanceOf(
+            FilterFieldsConfigExtra::class,
+            $this->context->getParentConfigExtra(FilterFieldsConfigExtra::NAME)
+        );
+        self::assertNull($this->context->getParentConfigExtra('another'));
+    }
+
+    public function testAddParentConfigExtra()
+    {
+        $action = 'update_relationship';
+        $isCollection = true;
+        $parentEntityClass = 'Test\Class';
+        $associationName = 'test';
+
+        $this->context->setAction($action);
+        $this->context->setIsCollection($isCollection);
+        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setAssociationName($associationName);
+
+        $extra = new TestConfigExtra('another');
+        $this->context->addParentConfigExtra($extra);
+
+        self::assertTrue($this->context->hasParentConfigExtra(EntityDefinitionConfigExtra::NAME));
+        self::assertTrue($this->context->hasParentConfigExtra(CustomizeLoadedDataConfigExtra::NAME));
+        self::assertTrue($this->context->hasParentConfigExtra(DataTransformersConfigExtra::NAME));
+        self::assertTrue($this->context->hasParentConfigExtra(FilterFieldsConfigExtra::NAME));
+        self::assertSame($extra, $this->context->getParentConfigExtra($extra->getName()));
+    }
+
+    public function testRemoveParentConfigExtra()
+    {
+        $action = 'update_relationship';
+        $isCollection = true;
+        $parentEntityClass = 'Test\Class';
+        $associationName = 'test';
+
+        $this->context->setAction($action);
+        $this->context->setIsCollection($isCollection);
+        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setAssociationName($associationName);
+
+        $this->context->removeParentConfigExtra(CustomizeLoadedDataConfigExtra::NAME);
+
+        self::assertTrue($this->context->hasParentConfigExtra(EntityDefinitionConfigExtra::NAME));
+        self::assertFalse($this->context->hasParentConfigExtra(CustomizeLoadedDataConfigExtra::NAME));
+        self::assertTrue($this->context->hasParentConfigExtra(DataTransformersConfigExtra::NAME));
+        self::assertTrue($this->context->hasParentConfigExtra(FilterFieldsConfigExtra::NAME));
     }
 
     public function testLoadParentConfig()
@@ -329,15 +407,9 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
     public function testGetParentMetadataExtras()
     {
-        self::assertNull($this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS));
-
         self::assertEquals(
             [],
             $this->context->getParentMetadataExtras()
-        );
-        self::assertEquals(
-            [],
-            $this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS)
         );
     }
 
@@ -346,15 +418,9 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $action = 'test_action';
         $this->context->setAction($action);
 
-        self::assertNull($this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS));
-
         self::assertEquals(
             [new ActionMetadataExtra($action)],
             $this->context->getParentMetadataExtras()
-        );
-        self::assertEquals(
-            [new ActionMetadataExtra($action)],
-            $this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS)
         );
     }
 
@@ -365,23 +431,14 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
             [new TestMetadataExtra('test')],
             $this->context->getParentMetadataExtras()
         );
-        self::assertEquals(
-            [new TestMetadataExtra('test')],
-            $this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS)
-        );
     }
 
     public function testRemoveParentMetadataExtras()
     {
         $this->context->setParentMetadataExtras([]);
-        self::assertNull($this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS));
         self::assertEquals(
             [],
             $this->context->getParentMetadataExtras()
-        );
-        self::assertEquals(
-            [],
-            $this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS)
         );
     }
 

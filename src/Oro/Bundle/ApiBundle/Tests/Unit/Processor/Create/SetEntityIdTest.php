@@ -9,11 +9,11 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 
 class SetEntityIdTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityIdHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdHelper */
+    private $entityIdHelper;
 
     /** @var SetEntityId */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -26,7 +26,7 @@ class SetEntityIdTest extends FormProcessorTestCase
 
     public function testProcessWhenEntityIdDoesNotExistInContext()
     {
-        $this->entityIdHelper->expects($this->never())
+        $this->entityIdHelper->expects(self::never())
             ->method('setEntityIdentifier');
 
         $this->context->setResult(new \stdClass());
@@ -35,7 +35,7 @@ class SetEntityIdTest extends FormProcessorTestCase
 
     public function testProcessWhenEntityDoesNotExistInContext()
     {
-        $this->entityIdHelper->expects($this->never())
+        $this->entityIdHelper->expects(self::never())
             ->method('setEntityIdentifier');
 
         $this->context->setId(123);
@@ -44,7 +44,7 @@ class SetEntityIdTest extends FormProcessorTestCase
 
     public function testProcessForUnsupportedEntity()
     {
-        $this->entityIdHelper->expects($this->never())
+        $this->entityIdHelper->expects(self::never())
             ->method('setEntityIdentifier');
 
         $this->context->setId(123);
@@ -58,7 +58,7 @@ class SetEntityIdTest extends FormProcessorTestCase
         $metadata = new EntityMetadata();
         $metadata->setHasIdentifierGenerator(true);
 
-        $this->entityIdHelper->expects($this->never())
+        $this->entityIdHelper->expects(self::never())
             ->method('setEntityIdentifier');
 
         $this->context->setId(123);
@@ -74,9 +74,9 @@ class SetEntityIdTest extends FormProcessorTestCase
         $entity = new \stdClass();
         $metadata = new EntityMetadata();
 
-        $this->entityIdHelper->expects($this->once())
+        $this->entityIdHelper->expects(self::once())
             ->method('setEntityIdentifier')
-            ->with($this->identicalTo($entity), $entityId, $this->identicalTo($metadata));
+            ->with(self::identicalTo($entity), $entityId, self::identicalTo($metadata));
 
         $this->context->setId($entityId);
         $this->context->setClassName(get_class($entity));

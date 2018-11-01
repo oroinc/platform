@@ -15,7 +15,7 @@ class MultipleChoice extends AbstractGridFilterItem
         // Wait for open widget
         $this->getDriver()->waitForAjax();
         $widget = $this->getWidget();
-        $inputs = $widget->findAll('css', 'li label');
+        $inputs = $widget->findAll('css', 'li > label');
 
         foreach ($values as $value) {
             $item = $this->findElementByText($inputs, $value);
@@ -87,7 +87,7 @@ class MultipleChoice extends AbstractGridFilterItem
         if ($dropDownMask && $dropDownMask->isVisible()) {
             $dropDownMask->click();
         } elseif ($this->isOpen()) {
-            $this->find('css', '.filter-criteria-selector span.caret')->click();
+            $this->find('css', '.filter-item.open-filter')->click();
         }
     }
 }

@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Writes logs using the logging level is stored in user configuration.
- * Also provide a possibility to change the logging level for a certain amount of time.
+ * Also provides a possibility to change the logging level for a certain amount of time.
  */
 class DetailedLogsHandler extends AbstractProcessingHandler implements ContainerAwareInterface
 {

@@ -97,6 +97,18 @@ class AbstractOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetMetadataForNull()
+    {
+        $this->configManager->expects($this->never())
+            ->method($this->anything());
+
+        $this->cache->expects($this->never())
+            ->method($this->anything());
+
+        $metadata = new OwnershipMetadata();
+        $this->assertEquals($metadata, $this->provider->getMetadata(null));
+    }
+
     public function testGetMetadataUndefinedClassWithCache()
     {
         $this->configManager->expects($this->once())

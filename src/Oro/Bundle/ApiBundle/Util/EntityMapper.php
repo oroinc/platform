@@ -8,8 +8,8 @@ use Doctrine\Common\Persistence\Proxy;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Provider\ChainEntityOverrideProvider;
-use Oro\Bundle\ApiBundle\Provider\EntityOverrideProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
+use Oro\Bundle\ApiBundle\Provider\MutableEntityOverrideProvider;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
@@ -27,8 +27,8 @@ class EntityMapper
     /** @var EntityOverrideProviderInterface */
     private $entityOverrideProvider;
 
-    /** @var EntityOverrideProvider|null */
-    private $additinalEntityOverrideProvider;
+    /** @var MutableEntityOverrideProvider|null */
+    private $additionalEntityOverrideProvider;
 
     /** @var \SplObjectStorage */
     private $entityMap;
@@ -126,13 +126,13 @@ class EntityMapper
      */
     public function mapEntity(string $entityClass, string $modelClass): void
     {
-        if (null === $this->additinalEntityOverrideProvider) {
-            $this->additinalEntityOverrideProvider = new EntityOverrideProvider([]);
+        if (null === $this->additionalEntityOverrideProvider) {
+            $this->additionalEntityOverrideProvider = new MutableEntityOverrideProvider();
             $this->entityOverrideProvider = new ChainEntityOverrideProvider(
-                [$this->additinalEntityOverrideProvider, $this->entityOverrideProvider]
+                [$this->additionalEntityOverrideProvider, $this->entityOverrideProvider]
             );
         }
-        $this->additinalEntityOverrideProvider->addSubstitution($entityClass, $modelClass);
+        $this->additionalEntityOverrideProvider->addSubstitution($entityClass, $modelClass);
     }
 
     /**

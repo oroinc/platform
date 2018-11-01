@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeDataContext;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * The context for the "customize_form_data" action.
+ * The execution context for processors for "customize_form_data" action.
  */
 class CustomizeFormDataContext extends CustomizeDataContext
 {
@@ -23,19 +23,28 @@ class CustomizeFormDataContext extends CustomizeDataContext
     public const EVENT_SUBMIT = 'submit';
 
     /**
-     * This event is dispatched after the Form::submit() method, but before FormEvents::POST_SUBMIT.
+     * This event is dispatched after the Form::submit() method.
      * @see \Symfony\Component\Form\FormEvents::POST_SUBMIT
      */
     public const EVENT_POST_SUBMIT = 'post_submit';
 
     /**
-     * This event is dispatched at the end of the form submitting process.
+     * This event is dispatched at the end of the form submitting process, just before data validation.
+     * It can be used to final form data correcting after all listeners, except data validation listener,
+     * are executed and all relationships between submitted data are set.
+     * @see \Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
+     * @see \Oro\Bundle\ApiBundle\Form\FormValidationHandler
+     */
+    public const EVENT_PRE_VALIDATE = 'pre_validate';
+
+    /**
+     * This event is dispatched at the end of the form submitting process, just after data validation.
      * It can be used to finalize the form after all listeners, including data validation listener,
      * are executed. E.g. it can be used to correct form validation result.
      * @see \Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
      * @see \Oro\Bundle\ApiBundle\Form\FormValidationHandler
      */
-    public const EVENT_FINISH_SUBMIT = 'finish_submit';
+    public const EVENT_POST_VALIDATE = 'post_validate';
 
     /** the form event name */
     private const EVENT = 'event';
@@ -52,7 +61,7 @@ class CustomizeFormDataContext extends CustomizeDataContext
     /**
      * Gets the form event name.
      *
-     * @return string One of "pre_submit", "submit", "post_submit" and "finish_submit"
+     * @return string One of "pre_submit", "submit", "post_submit", "pre_validate" or "post_validate"
      */
     public function getEvent(): string
     {
@@ -62,7 +71,7 @@ class CustomizeFormDataContext extends CustomizeDataContext
     /**
      * Gets the form event name.
      *
-     * @param string $event One of "pre_submit", "submit", "post_submit" and "finish_submit"
+     * @param string $event One of "pre_submit", "submit", "post_submit", "pre_validate" or "post_validate"
      */
     public function setEvent(string $event): void
     {
@@ -117,7 +126,7 @@ class CustomizeFormDataContext extends CustomizeDataContext
      * Gets the data associated with the form event.
      * For "pre_submit" event it is the submitted data.
      * For "submit" event it is the norm data.
-     * For "post_submit" and "finish_submit" events it is the view data.
+     * For "post_submit", "pre_validate" and "post_validate" events it is the view data.
      *
      * @return mixed
      */

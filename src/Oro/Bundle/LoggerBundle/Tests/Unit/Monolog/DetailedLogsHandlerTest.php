@@ -59,6 +59,12 @@ class DetailedLogsHandlerTest extends \PHPUnit\Framework\TestCase
     {
         /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cacheProvider */
         $cacheProvider = $this->getMockBuilder(CacheProvider::class)->getMock();
+
+        $cacheProvider->expects($this->once())
+            ->method('fetch')
+            ->with(Configuration::LOGS_LEVEL_KEY)
+            ->willReturn(false);
+
         $this->container
             ->expects($this->once())
             ->method('get')

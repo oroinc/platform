@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\Get\AssertHasResult;
 class AssertHasResultTest extends GetProcessorTestCase
 {
     /** @var AssertHasResult */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

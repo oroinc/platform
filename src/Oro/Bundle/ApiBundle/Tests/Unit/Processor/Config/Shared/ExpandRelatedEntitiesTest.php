@@ -91,7 +91,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                 ],
                 'association3' => [
                     'target_class' => 'Test\Association3Target'
-                ],
+                ]
             ]
         ];
 
@@ -531,17 +531,8 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForManageableEntityWithAssocciationToOverriddenEntity()
+    public function testProcessForManageableEntityWithAssociationToOverriddenEntity()
     {
-        $config = [
-            'fields' => [
-                'association2' => null,
-                'association3' => [
-                    'property_path' => 'realAssociation3'
-                ]
-            ]
-        ];
-
         $this->context->setExtras([new ExpandRelatedEntitiesConfigExtra(['association1'])]);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);

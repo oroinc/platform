@@ -90,7 +90,7 @@
     {% endset %}
 
     {% set getCodeInline %}
-        <div class="alert alert-warning">{{ 'oro.embeddedform.tabs.inline.description'|trans|raw }}</div>
+        <div class="alert alert-warning" role="alert">{{ 'oro.embeddedform.tabs.inline.description'|trans|raw }}</div>
         <textarea id="oro_embeddedform_inline" cols="60" rows="10" class="fill-tab" style="height: 300px">
 {%- autoescape %}
 <div id="embedded-form-container-{{ entity.id }}"></div>

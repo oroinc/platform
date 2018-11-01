@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class RemoveResponseErrorsTest extends GetListProcessorTestCase
 {
     /** @var RemoveResponseErrors */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

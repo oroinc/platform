@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints\Blank;
 class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConstraintTextExtractor */
-    protected $constraintTextExtractor;
+    private $constraintTextExtractor;
 
     protected function setUp()
     {
@@ -23,7 +23,7 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetConstraintStatusCode(Constraint $constraint, $expectedStatusCode)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expectedStatusCode,
             $this->constraintTextExtractor->getConstraintStatusCode($constraint)
         );
@@ -34,13 +34,13 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
         return [
             [new Blank(), 400],
             [new HasAdderAndRemover(['class' => 'Test\Class', 'property' => 'test']), 501],
-            [new FieldAccessGranted(), 403],
+            [new FieldAccessGranted(), 403]
         ];
     }
 
     public function testGetConstraintCode()
     {
-        $this->assertNull($this->constraintTextExtractor->getConstraintCode(new Blank()));
+        self::assertNull($this->constraintTextExtractor->getConstraintCode(new Blank()));
     }
 
     /**
@@ -48,7 +48,7 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
      */
     public function testConstraintType(Constraint $constraint, $expectedType)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expectedType,
             $this->constraintTextExtractor->getConstraintType($constraint)
         );
@@ -61,7 +61,7 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
             [
                 new HasAdderAndRemover(['class' => 'Test\Class', 'property' => 'test']),
                 'has adder and remover constraint'
-            ],
+            ]
         ];
     }
 }

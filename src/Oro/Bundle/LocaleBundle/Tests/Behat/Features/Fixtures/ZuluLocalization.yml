@@ -1,0 +1,13 @@
+include:
+    - '@OroTranslationBundle:ZuluLanguage.yml'
+
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+    title_localization_zulu:
+        string: 'Zulu'
+
+Oro\Bundle\LocaleBundle\Entity\Localization:
+    localization_zulu:
+        name: 'Zulu_Loc'
+        language: '@zulu_lang'
+        formattingCode: 'zu'
+        titles: ['@title_localization_zulu']

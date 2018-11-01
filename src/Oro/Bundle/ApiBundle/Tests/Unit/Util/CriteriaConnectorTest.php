@@ -2,16 +2,21 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
+use Doctrine\Common\Collections\Expr\Comparison;
+use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
-use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EqComparisonExpression;
-use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\OrCompositeExpression;
+use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression as Expression;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
 use Oro\Bundle\ApiBundle\Util\CriteriaNormalizer;
 use Oro\Bundle\ApiBundle\Util\CriteriaPlaceholdersResolver;
+use Oro\Bundle\ApiBundle\Util\OptimizeJoinsDecisionMaker;
+use Oro\Bundle\ApiBundle\Util\OptimizeJoinsFieldVisitorFactory;
+use Oro\Bundle\ApiBundle\Util\RequireJoinsDecisionMaker;
+use Oro\Bundle\ApiBundle\Util\RequireJoinsFieldVisitorFactory;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class CriteriaConnectorTest extends OrmRelatedTestCase
@@ -34,11 +39,29 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $entityClassResolver = new EntityClassResolver($this->doctrine);
         $this->criteria = new Criteria($entityClassResolver);
         $this->expressionVisitorFactory = new QueryExpressionVisitorFactory(
-            ['OR' => new OrCompositeExpression()],
-            ['=' => new EqComparisonExpression()]
+            [
+                'NOT' => new Expression\NotCompositeExpression(),
+                'AND' => new Expression\AndCompositeExpression(),
+                'OR'  => new Expression\OrCompositeExpression()
+            ],
+            [
+                '='             => new Expression\EqComparisonExpression(),
+                '<>'            => new Expression\NeqComparisonExpression(),
+                'IN'            => new Expression\InComparisonExpression(),
+                'NEQ_OR_NULL'   => new Expression\NeqOrNullComparisonExpression(),
+                'NEQ_OR_EMPTY'  => new Expression\NeqOrEmptyComparisonExpression(),
+                'EXISTS'        => new Expression\ExistsComparisonExpression(),
+                'EMPTY'         => new Expression\EmptyComparisonExpression(),
+                'ALL_MEMBER_OF' => new Expression\AllMemberOfComparisonExpression()
+            ],
+            $entityClassResolver
         );
         $this->criteriaConnector = new CriteriaConnector(
-            new CriteriaNormalizer($this->doctrineHelper),
+            new CriteriaNormalizer(
+                $this->doctrineHelper,
+                new RequireJoinsFieldVisitorFactory(new RequireJoinsDecisionMaker()),
+                new OptimizeJoinsFieldVisitorFactory(new OptimizeJoinsDecisionMaker())
+            ),
             new CriteriaPlaceholdersResolver(),
             $this->expressionVisitorFactory,
             $entityClassResolver
@@ -46,7 +69,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     }
 
     /**
-     * @param $expectedDql
+     * @param string $expectedDql
      */
     private function assertQuery($expectedDql)
     {
@@ -61,6 +84,18 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             $expectedDql,
             str_replace(self::ENTITY_NAMESPACE, 'Test:', $qb->getDQL())
         );
+    }
+
+    /**
+     * @param string $field
+     * @param string $operator
+     * @param mixed  $value
+     *
+     * @return Comparison
+     */
+    private static function comparison($field, $operator, $value)
+    {
+        return new Comparison($field, $operator, $value);
     }
 
     public function testOrderBy()
@@ -86,7 +121,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     public function testWhere()
     {
         $this->criteria->andWhere(
-            $this->criteria::expr()->orX(
+            $this->criteria::expr()->andX(
                 $this->criteria::expr()->eq('category.name', 'test_category'),
                 $this->criteria::expr()->eq('groups.name', 'test_group')
             )
@@ -96,14 +131,14 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             'SELECT e FROM Test:User e'
             . ' INNER JOIN e.category category'
             . ' INNER JOIN e.groups groups'
-            . ' WHERE category.name = :category_name OR groups.name = :groups_name'
+            . ' WHERE category.name = :category_name AND groups.name = :groups_name'
         );
     }
 
     public function testWhereByAssociation()
     {
         $this->criteria->andWhere(
-            $this->criteria::expr()->orX(
+            $this->criteria::expr()->andX(
                 $this->criteria::expr()->eq('category', 'test_category'),
                 $this->criteria::expr()->eq('groups', 'test_group')
             )
@@ -113,7 +148,235 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             'SELECT e FROM Test:User e'
             . ' INNER JOIN e.category category'
             . ' INNER JOIN e.groups groups'
-            . ' WHERE e.category = :category OR e.groups = :groups'
+            . ' WHERE e.category = :category AND e.groups = :groups'
+        );
+    }
+
+    public function testShouldOptimizeJoinForExists()
+    {
+        $this->criteria->andWhere(
+            $this->criteria::expr()->andX(
+                self::comparison('category.name', 'EXISTS', true),
+                $this->criteria::expr()->eq('groups.name', 'test_group')
+            )
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' INNER JOIN e.category category'
+            . ' INNER JOIN e.groups groups'
+            . ' WHERE category.name IS NOT NULL AND groups.name = :groups_name'
+        );
+    }
+
+    public function testShouldNotOptimizeJoinForNotExists()
+    {
+        $this->criteria->andWhere(
+            $this->criteria::expr()->andX(
+                self::comparison('category.name', 'EXISTS', false),
+                $this->criteria::expr()->eq('groups.name', 'test_group')
+            )
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' LEFT JOIN e.category category'
+            . ' INNER JOIN e.groups groups'
+            . ' WHERE category.name IS NULL AND groups.name = :groups_name'
+        );
+    }
+
+    public function testShouldNotOptimizeJoinForNeqOrNull()
+    {
+        $this->criteria->andWhere(
+            $this->criteria::expr()->andX(
+                self::comparison('category.name', 'NEQ_OR_NULL', new Value('test_category')),
+                $this->criteria::expr()->eq('groups.name', 'test_group')
+            )
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' LEFT JOIN e.category category'
+            . ' INNER JOIN e.groups groups'
+            . ' WHERE (category.name NOT IN(:category_name) OR category.name IS NULL) AND groups.name = :groups_name'
+        );
+    }
+
+    public function testShouldNotOptimizeJoinForNeqOrEmpty()
+    {
+        $this->criteria->andWhere(
+            $this->criteria::expr()->andX(
+                $this->criteria::expr()->eq('category', 'test_category'),
+                $this->criteria::expr()->in('groups', [123]),
+                self::comparison('groups', 'NEQ_OR_EMPTY', 234)
+            )
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' INNER JOIN e.category category'
+            . ' LEFT JOIN e.groups groups'
+            . ' WHERE e.category = :category'
+            . ' AND e.groups IN(:groups)'
+            . ' AND (NOT(EXISTS('
+            . 'SELECT groups_subquery1'
+            . ' FROM Test:Group groups_subquery1'
+            . ' WHERE groups_subquery1 = groups AND groups_subquery1 IN(:groups_2))))'
+        );
+    }
+
+    public function testShouldNotOptimizeJoinForEmpty()
+    {
+        $this->criteria->andWhere(
+            $this->criteria::expr()->andX(
+                $this->criteria::expr()->eq('category', 'test_category'),
+                $this->criteria::expr()->in('groups', [123]),
+                self::comparison('groups', 'EMPTY', true)
+            )
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' INNER JOIN e.category category'
+            . ' LEFT JOIN e.groups groups'
+            . ' WHERE e.category = :category'
+            . ' AND e.groups IN(:groups)'
+            . ' AND NOT(EXISTS('
+            . 'SELECT groups_subquery1'
+            . ' FROM Test:Group groups_subquery1'
+            . ' WHERE groups_subquery1 = groups))'
+        );
+    }
+
+    public function testShouldOptimizeJoinForNotEmpty()
+    {
+        $this->criteria->andWhere(
+            $this->criteria::expr()->andX(
+                $this->criteria::expr()->eq('category', 'test_category'),
+                $this->criteria::expr()->in('groups', [123]),
+                self::comparison('groups', 'EMPTY', false)
+            )
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' INNER JOIN e.category category'
+            . ' INNER JOIN e.groups groups'
+            . ' WHERE e.category = :category'
+            . ' AND e.groups IN(:groups)'
+            . ' AND EXISTS('
+            . 'SELECT groups_subquery1'
+            . ' FROM Test:Group groups_subquery1'
+            . ' WHERE groups_subquery1 = groups)'
+        );
+    }
+
+    public function testShouldNotOptimizeJoinForAllMemberOf()
+    {
+        $this->criteria->andWhere(
+            $this->criteria::expr()->andX(
+                $this->criteria::expr()->eq('category', 'test_category'),
+                $this->criteria::expr()->in('groups', [123]),
+                self::comparison('groups', 'ALL_MEMBER_OF', 234)
+            )
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' INNER JOIN e.category category'
+            . ' LEFT JOIN e.groups groups'
+            . ' WHERE e.category = :category'
+            . ' AND e.groups IN(:groups)'
+            . ' AND (:groups_2_expected = ('
+            . 'SELECT COUNT(groups_subquery1)'
+            . ' FROM Test:Group groups_subquery1'
+            . ' WHERE groups_subquery1 MEMBER OF e.groups AND groups_subquery1 IN(:groups_2)))'
+        );
+    }
+
+    public function testShouldNotRequireJoinForEmpty()
+    {
+        $this->criteria->andWhere(
+            $this->criteria::expr()->andX(
+                $this->criteria::expr()->eq('category', 'test_category'),
+                self::comparison('groups', 'EMPTY', true)
+            )
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' INNER JOIN e.category category'
+            . ' WHERE e.category = :category'
+            . ' AND NOT(EXISTS('
+            . 'SELECT groups_subquery1'
+            . ' FROM Test:Group groups_subquery1'
+            . ' WHERE groups_subquery1 MEMBER OF e.groups))'
+        );
+    }
+
+    public function testShouldRequireJoinForNotEmpty()
+    {
+        $this->criteria->andWhere(
+            $this->criteria::expr()->andX(
+                $this->criteria::expr()->eq('category', 'test_category'),
+                self::comparison('groups', 'EMPTY', false)
+            )
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' INNER JOIN e.category category'
+            . ' WHERE e.category = :category'
+            . ' AND EXISTS('
+            . 'SELECT groups_subquery1'
+            . ' FROM Test:Group groups_subquery1'
+            . ' WHERE groups_subquery1 MEMBER OF e.groups)'
+        );
+    }
+
+    public function testShouldNotRequireAnyJoinWhenOnlyEmpty()
+    {
+        $this->criteria->andWhere(
+            self::comparison('groups', 'EMPTY', true)
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' WHERE NOT(EXISTS('
+            . 'SELECT groups_subquery1'
+            . ' FROM Test:Group groups_subquery1'
+            . ' WHERE groups_subquery1 MEMBER OF e.groups))'
+        );
+    }
+
+    public function testShouldRequireAnyJoinsWhenOnlyNotEmpty()
+    {
+        $this->criteria->andWhere(
+            self::comparison('groups', 'EMPTY', false)
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' WHERE EXISTS('
+            . 'SELECT groups_subquery1'
+            . ' FROM Test:Group groups_subquery1'
+            . ' WHERE groups_subquery1 MEMBER OF e.groups)'
+        );
+    }
+
+    public function testShouldRequireAnyJoinsWhenOnlyAllMemberOf()
+    {
+        $this->criteria->andWhere(
+            self::comparison('groups', 'ALL_MEMBER_OF', 234)
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' WHERE :groups_expected = ('
+            . 'SELECT COUNT(groups_subquery1)'
+            . ' FROM Test:Group groups_subquery1'
+            . ' WHERE groups_subquery1 MEMBER OF e.groups AND groups_subquery1 IN(:groups))'
         );
     }
 
@@ -243,7 +506,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $this->criteria->addLeftJoin('products', '{root}.products');
         $this->criteria->addLeftJoin('products.category', '{products}.category');
         $this->criteria->andWhere(
-            $this->criteria::expr()->orX(
+            $this->criteria::expr()->andX(
                 $this->criteria::expr()->eq('{root}.name', 'test_user'),
                 $this->criteria::expr()->eq('{category}.name', 'test_category'),
                 $this->criteria::expr()->eq('{products.category}.name', 'test_category')
@@ -255,7 +518,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             . ' LEFT JOIN e.category alias1'
             . ' LEFT JOIN e.products alias2'
             . ' LEFT JOIN alias2.category alias3'
-            . ' WHERE e.name = :e_name OR alias1.name = :alias1_name OR alias3.name = :alias3_name'
+            . ' WHERE e.name = :e_name AND alias1.name = :alias1_name AND alias3.name = :alias3_name'
         );
     }
 

@@ -8,7 +8,7 @@
         }) %}
         {% set toolbarOptions = grid_render_parameters.toolbarOptions|default({}) %}
         {% set toolbarOptions = layout_attr_defaults(toolbarOptions, {
-            'columnManager': {'addSorting': false}
+            'datagridSettings': {'addSorting': false}
         }) %}
         {% set grid_render_parameters = grid_render_parameters|merge({
             'themeOptions': themeOptions,

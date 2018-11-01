@@ -1,0 +1,12 @@
+<div class="datagrid-settings__wrapper">
+    <span class="close fa-close"></span>
+    <h3 class="datagrid-settings__title"><%- title %></h3>
+
+    <div class="datagrid-settings__tabs" data-tabs-nav></div>
+
+    <div class="datagrid-settings__tabs-content" data-tabs-content>
+        <% _.each(views, function(view) { %>
+            <div id="<%- view.id %>" <% if (!view.active) { %> style="display: none;"<% } %> data-tab-content="<%- view.id %>"></div>
+        <% }); %>
+    </div>
+</div>

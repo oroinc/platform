@@ -1,0 +1,22 @@
+/* @theme: admin.oro; */
+
+.oro-datagrid {
+    margin: $oro-datagrid-offset;
+
+    @import "grid";
+    @import "grid-no-data";
+    @import "grid-action-columns";
+    @import "board-view/board";
+    @import "board-view/card";
+
+    .loader-mask {
+        z-index: $zindex-dropdown - 101; // to show under grid's filter
+    }
+}
+
+.grid-editable {
+    @import "grid-editable-mode";
+}
+
+@import "grid-with-floating-header";
+@import "grid-without-header";

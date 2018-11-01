@@ -9,17 +9,17 @@ Feature: Transition Destination Page for Workflow
   Scenario: Create a workflow with Transition Destination Page via UI
     Given I login as administrator
     When I go to System/Workflows
-    And I press "Create Workflow"
+    And I click "Create Workflow"
     And I fill "Workflow Edit Form" with:
       | Name                  | User Workflow Test |
       | Related Entity        | User               |
 # Add design for Entity View Page
-    And I press "Add step"
+    And I click "Add step"
     And I fill "Workflow Step Edit Form" with:
       | Name     | Step Entity View Page |
       | Position | 10                    |
-    And I press "Apply"
-    And I press "Add transition"
+    And I click "Apply"
+    And I click "Add transition"
     And I fill "Workflow Transition Edit Info Form" with:
       | Name             | Transition Entity View Page |
       | From step        | (Start)                     |
@@ -31,15 +31,15 @@ Feature: Transition Destination Page for Workflow
     And I fill "Workflow Transition Edit Attributes Form" with:
       | Entity field | First name    |
       | Label        | Change a name |
-    And I press "Add"
-    And I press "Apply"
+    And I click "Add"
+    And I click "Apply"
 # Add design for Entity Index Page
-    And I press "Add step"
+    And I click "Add step"
     And I fill "Workflow Step Edit Form" with:
       | Name     | Step Entity Index Page |
       | Position | 20                     |
-    And I press "Apply"
-    And I press "Add transition"
+    And I click "Apply"
+    And I click "Add transition"
     And I fill "Workflow Transition Edit Info Form" with:
       | Name             | Transition Entity Index Page |
       | From step        | Step Entity View Page        |
@@ -51,15 +51,15 @@ Feature: Transition Destination Page for Workflow
     And I fill "Workflow Transition Edit Attributes Form" with:
       | Entity field | First name    |
       | Label        | Change a name |
-    And I press "Add"
-    And I press "Apply"
+    And I click "Add"
+    And I click "Apply"
 # Add design for Original Page
-    And I press "Add step"
+    And I click "Add step"
     And I fill "Workflow Step Edit Form" with:
       | Name     | Step Original Page |
       | Position | 30                 |
-    And I press "Apply"
-    And I press "Add transition"
+    And I click "Apply"
+    And I click "Add transition"
     And I fill "Workflow Transition Edit Info Form" with:
       | Name             | Transition Original Page |
       | From step        | Step Entity Index Page   |
@@ -71,16 +71,16 @@ Feature: Transition Destination Page for Workflow
     And I fill "Workflow Transition Edit Attributes Form" with:
       | Entity field | First name    |
       | Label        | Change a name |
-    And I press "Add"
-    And I press "Apply"
+    And I click "Add"
+    And I click "Apply"
     And I save and close form
-    And I press "Activate"
+    And I click "Activate"
 # press Activate button in popup
-    And I press "Activate"
+    And I click "Activate"
     Then I should see "Deactivate"
 # Update cache
     When I go to System/Localization/Translations
-    And I press "Update Cache"
+    And I click "Update Cache"
     Then I should see "Translation Cache has been updated" flash message
     And I click Logout in user menu
 

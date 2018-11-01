@@ -7,11 +7,16 @@ use Oro\Bundle\ApiBundle\DataTransformer\DateToStringTransformer;
 class DateToStringTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DateToStringTransformer */
-    protected $transformer;
+    private $transformer;
 
     protected function setUp()
     {
         $this->transformer = new DateToStringTransformer();
+    }
+
+    public function testTransformNull()
+    {
+        self::assertNull($this->transformer->transform(null));
     }
 
     /**
@@ -19,18 +24,13 @@ class DateToStringTransformerTest extends \PHPUnit\Framework\TestCase
      */
     public function testTransform($output, $input)
     {
-        if (null === $input) {
-            $this->assertNull($output, $this->transformer->transform($input));
-        } else {
-            $this->assertEquals($output, $this->transformer->transform(new \DateTime($input)));
-        }
+        self::assertEquals($output, $this->transformer->transform(new \DateTime($input)));
     }
 
     public function transformDataProvider()
     {
         return [
-            [null, null],
-            ['1970-01-01', '1970-01-01 16:05:06 UTC'],
+            ['1970-01-01', '1970-01-01 16:05:06 UTC']
         ];
     }
 }

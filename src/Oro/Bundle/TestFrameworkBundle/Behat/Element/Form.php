@@ -50,6 +50,41 @@ class Form extends Element
     }
 
     /**
+     * @param string $label
+     * @param string $value
+     * @throws ElementNotFoundException
+     */
+    public function typeInField($label, $value)
+    {
+        $field = null;
+        if (isset($this->options['mapping'][$label])) {
+            $field = $this->findField($this->options['mapping'][$label]);
+        }
+
+        if (null === $field) {
+            $field = $this->getPage()->find('named', ['field', $label]);
+        }
+
+        if (null === $field && $this->elementFactory->hasElement($label)) {
+            // try to find field among defined elements
+            $field = $this->elementFactory->createElement($label);
+        }
+
+        if (null === $field) {
+            throw new ElementNotFoundException(
+                $this->getDriver(),
+                'form field',
+                'id|name|label|value|placeholder',
+                $label
+            );
+        }
+
+        self::assertTrue($field->isVisible(), "Field with '$label' was found, but it not visible");
+
+        $this->getDriver()->typeIntoInput($field->getXpath(), $value);
+    }
+
+    /**
      * @param TableNode $table
      */
     public function assertFields(TableNode $table)
@@ -225,9 +260,13 @@ class Form extends Element
                 return $sndParent->find('css', 'input[type=checkbox]');
             } elseif (in_array('control-group-choice', $classes, true)) {
                 return $this->elementFactory->wrapElement('GroupChoiceField', $sndParent->find('css', '.controls'));
-            } elseif ($field = $sndParent->find('css', '#'.$label->getAttribute('for'))) {
+            } elseif ($label->getAttribute('for')
+                && $field = $sndParent->find('css', '#'.$label->getAttribute('for'))
+            ) {
                 return $field;
-            } elseif ($field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))) {
+            } elseif ($label->getAttribute('for')
+                && $field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))
+            ) {
                 return $field;
             } else {
                 self::fail(sprintf('Find label "%s", but can\'t determine field type', $locator));

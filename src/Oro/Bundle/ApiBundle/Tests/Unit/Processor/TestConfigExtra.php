@@ -8,10 +8,10 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 class TestConfigExtra implements ConfigExtraInterface
 {
     /** @var string */
-    protected $name;
+    private $name;
 
     /** @var array */
-    protected $contextAttributes;
+    private $contextAttributes;
 
     /**
      * @param string $name
@@ -19,7 +19,7 @@ class TestConfigExtra implements ConfigExtraInterface
      */
     public function __construct($name, array $contextAttributes = [])
     {
-        $this->name              = $name;
+        $this->name = $name;
         $this->contextAttributes = $contextAttributes;
     }
 

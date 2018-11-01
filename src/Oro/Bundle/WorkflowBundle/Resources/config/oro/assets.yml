@@ -1,5 +1,4 @@
 assets:
     css:
       'oroworkflow':
-          - 'bundles/oroworkflow/css/scss/workflow.scss'
-          - 'bundles/oroworkflow/css/scss/permissions-grid.scss'
+          - 'bundles/oroworkflow/css/scss/main.scss'

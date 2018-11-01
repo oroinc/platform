@@ -18,14 +18,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ObjectNormalizer */
-    protected $objectNormalizer;
+    private $objectNormalizer;
 
     protected function setUp()
     {
-        $doctrine = $this->getMockBuilder(ManagerRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrine->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->willReturn(null);
 
@@ -54,7 +52,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->objectNormalizer->normalizeObject($object);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'   => 123,
                 'name' => 'test_name'
@@ -71,7 +69,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->objectNormalizer->normalizeObject($product);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'            => 123,
                 'name'          => 'product_name',
@@ -80,7 +78,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
                 'owner'         => null,
                 'price'         => null,
                 'priceValue'    => null,
-                'priceCurrency' => null,
+                'priceCurrency' => null
             ],
             $result
         );
@@ -92,7 +90,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             $this->createProductObject()
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'            => 123,
                 'name'          => 'product_name',
@@ -101,7 +99,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
                 'owner'         => 'user_name',
                 'price'         => null,
                 'priceValue'    => null,
-                'priceCurrency' => null,
+                'priceCurrency' => null
             ],
             $result
         );
@@ -115,7 +113,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->objectNormalizer->normalizeObject($user);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'       => 123,
                 'name'     => 'user_name',
@@ -134,7 +132,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             $this->createProductObject()->getOwner()
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'       => 456,
                 'name'     => 'user_name',

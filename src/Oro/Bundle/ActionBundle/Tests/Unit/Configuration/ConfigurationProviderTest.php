@@ -40,10 +40,6 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $config = ['test' => 'config'];
 
         $this->cacheProvider->expects($this->once())
-            ->method('contains')
-            ->with(self::ROOT_NODE_NAME)
-            ->willReturn(true);
-        $this->cacheProvider->expects($this->once())
             ->method('fetch')
             ->with(self::ROOT_NODE_NAME)
             ->willReturn($config);
@@ -146,7 +142,6 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->cacheProvider->expects($this->never())->method('contains');
         $this->cacheProvider->expects($this->never())->method('fetch');
         $this->cacheProvider->expects($this->never())->method('save');
 
@@ -182,7 +177,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetActionConfigurationWithoutCache(array $rawConfig, array $expected)
     {
         $this->cacheProvider->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(self::ROOT_NODE_NAME)
             ->willReturn(false);
 
@@ -285,13 +280,6 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function assertConfigurationCacheBuilt()
     {
-        $this->cacheProvider->expects($this->never())
-            ->method('fetch')
-            ->with(self::ROOT_NODE_NAME);
-        $this->cacheProvider->expects($this->once())
-            ->method('delete')
-            ->with(self::ROOT_NODE_NAME)
-            ->willReturn(true);
         $this->cacheProvider->expects($this->once())
             ->method('save')
             ->with(self::ROOT_NODE_NAME)

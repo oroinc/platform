@@ -1,0 +1,13 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/variables";
+@import "oroui/css/scss/mixins";
+
+@import "./styles";
+@import "./acl-table";
+@import "./security-row";
+@import "./field-acl";
+
+@import "./desktop/main";
+
+@import "./mobile/main";

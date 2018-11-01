@@ -18,7 +18,7 @@ class EntityTypeSecurityCheckTest extends GetListProcessorOrmRelatedTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
     private $aclGroupProvider;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

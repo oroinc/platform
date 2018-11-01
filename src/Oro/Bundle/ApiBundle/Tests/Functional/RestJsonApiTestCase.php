@@ -16,7 +16,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class RestJsonApiTestCase extends RestApiTestCase
 {
-    const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
+    protected const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
 
     /**
      * {@inheritdoc}
@@ -36,16 +36,9 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
-     * Sends REST API request.
-     *
-     * @param string $method
-     * @param string $uri
-     * @param array  $parameters
-     * @param array  $server
-     *
-     * @return Response
+     * {@inheritdoc}
      */
-    protected function request($method, $uri, array $parameters = [], array $server = [])
+    protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
         if (!empty($parameters['filter'])) {
             foreach ($parameters['filter'] as $key => $filter) {
@@ -76,8 +69,10 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             unset($parameters['filters']);
         }
 
-        if (!isset($server['HTTP_X-WSSE'])) {
+        if (!array_key_exists('HTTP_X-WSSE', $server)) {
             $server = array_replace($server, $this->getWsseAuthHeader());
+        } elseif (!$server['HTTP_X-WSSE']) {
+            unset($server['HTTP_X-WSSE']);
         }
 
         $this->client->request(
@@ -85,7 +80,8 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $uri,
             $parameters,
             [],
-            array_replace($server, ['CONTENT_TYPE' => self::JSON_API_CONTENT_TYPE])
+            array_replace($server, ['CONTENT_TYPE' => self::JSON_API_CONTENT_TYPE]),
+            $content
         );
 
         // make sure that REST API call does not start the session
@@ -857,6 +853,24 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         self::assertArrayHasKey(JsonApiDoc::ID, $content[JsonApiDoc::DATA]);
 
         return $content[JsonApiDoc::DATA][JsonApiDoc::ID];
+    }
+
+    /**
+     * @param Response $response
+     * @param string   $includeId
+     *
+     * @return string
+     */
+    protected static function getNewResourceIdFromIncludedSection(Response $response, string $includeId): string
+    {
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('included', $responseContent);
+        foreach ($responseContent['included'] as $item) {
+            if (isset($item['meta']['includeId']) && $item['meta']['includeId'] === $includeId) {
+                return $item['id'];
+            }
+        }
+        self::fail(sprintf('New resource "%s" was not found.', $includeId));
     }
 
     /**

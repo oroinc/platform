@@ -76,7 +76,7 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
         $result = $this->converter->getConvertedValue([], null, ['options' => ['value_types' => true]]);
 
         $this->assertEquals('2016-01-01 00:00:00', $result['start']->format('Y-m-d H:i:s'));
-        $this->assertEquals('2016-01-31 23:59:59', $result['end']->format('Y-m-d H:i:s'));
+        $this->assertEquals('2016-02-01 00:00:00', $result['end']->format('Y-m-d H:i:s'));
     }
 
     public function testGetConvertedValueBetween()
@@ -115,6 +115,9 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
         );
 
         $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
+        // fix expected date for the last day of a month
+        $currentDate->setTime(0, 0, 0)->modify('1 day');
+
         $this->assertEquals($currentDate->format('M'), $result['end']->format('M'));
         $this->assertEquals($value, $result['start']);
     }

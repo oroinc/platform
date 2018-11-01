@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
+use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Tests\Functional\Fixtures\LoadUserWithBUAndOrganization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
@@ -17,9 +18,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class DateTimeRangeFilterTest extends WebTestCase
 {
-    /** @var DateTimeRangeFilter */
-    protected $filter;
-
     /**
      * {@inheritdoc}
      */
@@ -27,22 +25,13 @@ class DateTimeRangeFilterTest extends WebTestCase
     {
         $this->initClient();
         $this->loadFixtures([LoadUserWithBUAndOrganization::class]);
-        $this->filter = $this->getContainer()->get('oro_filter.datetime_range_filter');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->filter);
     }
 
     /**
      * @dataProvider filterProvider
      *
      * @param callable $filterFormData
-     * @param array $expectedResult
+     * @param array    $expectedResult
      */
     public function testFilter(callable $filterFormData, array $expectedResult)
     {
@@ -54,12 +43,13 @@ class DateTimeRangeFilterTest extends WebTestCase
 
         $ds = new OrmFilterDatasourceAdapter($qb);
 
-        $filterForm = $this->filter->getForm();
+        $filter = $this->getFilter();
+        $filterForm = $filter->getForm();
         $filterForm->submit($filterFormData());
 
-        $this->assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isValid());
 
-        $this->filter->init(
+        $filter->init(
             'createdAt',
             [
                 'data_name' => 'u.createdAt',
@@ -71,40 +61,165 @@ class DateTimeRangeFilterTest extends WebTestCase
         /**
          * Fix timezone for filter datetime field
          */
-        $index = $formData['type'] === DateTimeRangeFilterType::TYPE_EQUAL ? 'start' : 'end';
-        /** @var \DateTime $dateTimeValue */
-        $dateTimeValue = $formData['value'][$index];
-        $timeString = $dateTimeValue->format('Y-m-d H:i');
-        $time = new \DateTime($timeString, new \DateTimeZone('UTC'));
-        $formData['value'][$index] = $time;
+        $formData['value']['start'] = $this->fixTimeZone($formData['value']['start']);
+        $formData['value']['end'] = $this->fixTimeZone($formData['value']['end']);
 
-        $this->filter->apply($ds, $formData);
+        $filter->apply($ds, $formData);
 
         $result = $ds->getQueryBuilder()->getQuery()->getResult();
-        $this->assertSame($expectedResult, $result);
+        self::assertSame($expectedResult, $result);
     }
 
     /**
      * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function filterProvider()
     {
         return [
-            'Filter "equal' => [
-                'filterFormData' => $this->getFilterFormEqualCallback(),
+            'equals'            => [
+                'filterFormData' => function () {
+                    return [
+                        'type'  => DateTimeRangeFilterType::TYPE_EQUAL,
+                        'value' => [
+                            'start' => $this->getUser()->getCreatedAt()->format('Y-m-d H:i'),
+                            'end'   => ''
+                        ]
+                    ];
+                },
                 'expectedResult' => [
-                    ['username' => 'admin'],
-                ],
+                    ['username' => 'admin']
+                ]
             ],
-            'Filter "not equal"' => [
-                'filterFormData' => $this->getFilterFormNotEqualCallback(),
+            'not equals'        => [
+                'filterFormData' => function () {
+                    return [
+                        'type'  => DateTimeRangeFilterType::TYPE_NOT_EQUAL,
+                        'value' => [
+                            'start' => '',
+                            'end'   => $this->getUser()->getCreatedAt()->format('Y-m-d H:i')
+                        ]
+                    ];
+                },
                 'expectedResult' => [
                     ['username' => 'u1'],
                     ['username' => 'u2'],
-                    ['username' => 'u3'],
-                ],
+                    ['username' => 'u3']
+                ]
+            ],
+            'between'           => [
+                'filterFormData' => function () {
+                    return [
+                        'type'  => DateTimeRangeFilterType::TYPE_BETWEEN,
+                        'value' => [
+                            'start' => $this->getUser()->getCreatedAt()->format('Y-m-d H:i'),
+                            'end'   => $this->getUser()->getCreatedAt()->format('Y-m-d H:i')
+                        ]
+                    ];
+                },
+                'expectedResult' => [
+                    ['username' => 'admin']
+                ]
+            ],
+            'not between'       => [
+                'filterFormData' => function () {
+                    return [
+                        'type'  => DateTimeRangeFilterType::TYPE_NOT_BETWEEN,
+                        'value' => [
+                            'start' => $this->getUser()->getCreatedAt()->format('Y-m-d H:i'),
+                            'end'   => $this->getUser()->getCreatedAt()->format('Y-m-d H:i')
+                        ]
+                    ];
+                },
+                'expectedResult' => [
+                    ['username' => 'u1'],
+                    ['username' => 'u2'],
+                    ['username' => 'u3']
+                ]
+            ],
+            'equals today'      => [
+                'filterFormData' => function () {
+                    return [
+                        'type'  => DateTimeRangeFilterType::TYPE_EQUAL,
+                        'value' => [
+                            'start' => sprintf('{{%s}}', DateModifierInterface::VAR_TODAY),
+                            'end'   => ''
+                        ]
+                    ];
+                },
+                'expectedResult' => [
+                    ['username' => 'u1'],
+                    ['username' => 'u2'],
+                    ['username' => 'u3']
+                ]
+            ],
+            'not equals today'  => [
+                'filterFormData' => function () {
+                    return [
+                        'type'  => DateTimeRangeFilterType::TYPE_NOT_EQUAL,
+                        'value' => [
+                            'start' => '',
+                            'end'   => sprintf('{{%s}}', DateModifierInterface::VAR_TODAY)
+                        ]
+                    ];
+                },
+                'expectedResult' => [
+                    ['username' => 'admin']
+                ]
+            ],
+            'between today'     => [
+                'filterFormData' => function () {
+                    return [
+                        'type'  => DateTimeRangeFilterType::TYPE_BETWEEN,
+                        'value' => [
+                            'start' => sprintf('{{%s}}', DateModifierInterface::VAR_TODAY),
+                            'end'   => sprintf('{{%s}}', DateModifierInterface::VAR_TODAY)
+                        ]
+                    ];
+                },
+                'expectedResult' => [
+                    ['username' => 'u1'],
+                    ['username' => 'u2'],
+                    ['username' => 'u3']
+                ]
+            ],
+            'not between today' => [
+                'filterFormData' => function () {
+                    return [
+                        'type'  => DateTimeRangeFilterType::TYPE_NOT_BETWEEN,
+                        'value' => [
+                            'start' => sprintf('{{%s}}', DateModifierInterface::VAR_TODAY),
+                            'end'   => sprintf('{{%s}}', DateModifierInterface::VAR_TODAY)
+                        ]
+                    ];
+                },
+                'expectedResult' => [
+                    ['username' => 'admin']
+                ]
             ]
         ];
+    }
+
+    /**
+     * @return DateTimeRangeFilter
+     */
+    private function getFilter()
+    {
+        return self::getContainer()->get('oro_filter.datetime_range_filter');
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    private function fixTimeZone($value)
+    {
+        if ($value instanceof \DateTime) {
+            $value = new \DateTime($value->format('Y-m-d H:i'), new \DateTimeZone('UTC'));
+        }
+
+        return $value;
     }
 
     private function updateUserCreatedAt()
@@ -115,40 +230,6 @@ class DateTimeRangeFilterTest extends WebTestCase
         $user->setCreatedAt($dateFilter->modify('-1 day'));
         $em->persist($user);
         $em->flush($user);
-    }
-
-    /**
-     * @return \Closure
-     */
-    private function getFilterFormEqualCallback()
-    {
-        return function () {
-            $createdAt = $this->getUser()->getCreatedAt();
-            return [
-                'type' => DateTimeRangeFilterType::TYPE_EQUAL,
-                'value' => [
-                    'start' => $createdAt->format('Y-m-d H:i'),
-                    'end'   => ""
-                ],
-            ];
-        };
-    }
-
-    /**
-     * @return \Closure
-     */
-    private function getFilterFormNotEqualCallback()
-    {
-        return function () {
-            $createdAt = $this->getUser()->getCreatedAt();
-            return [
-                'type' => DateTimeRangeFilterType::TYPE_NOT_EQUAL,
-                'value' => [
-                    'start' => "",
-                    'end'   => $createdAt->format('Y-m-d H:i')
-                ],
-            ];
-        };
     }
 
     /**
@@ -164,10 +245,7 @@ class DateTimeRangeFilterTest extends WebTestCase
      */
     private function getUserEntityManager()
     {
-        $doctrine = $this->getContainer()->get('doctrine');
-        $manager = $doctrine->getManagerForClass(User::class);
-
-        return $manager;
+        return self::getContainer()->get('doctrine')->getManagerForClass(User::class);
     }
 
 
@@ -176,10 +254,7 @@ class DateTimeRangeFilterTest extends WebTestCase
      */
     private function getUser()
     {
-        /** @var User $user */
-        $user = $this->getUserRepository()->findOneBy(['username' => 'admin']);
-
-        return $user;
+        return $this->getUserRepository()->findOneBy(['username' => 'admin']);
     }
 
     /**

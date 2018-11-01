@@ -5,22 +5,21 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\NormalizeSorters;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class NormalizeSortersTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var NormalizeSorters */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->processor = new NormalizeSorters($this->doctrineHelper);
     }
@@ -57,7 +56,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
      */
     public function testProcessForNotManageableEntity($definition, $sorters, $expectedSorters)
     {
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(false);
@@ -65,7 +64,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
         $this->context->setResult($this->createConfigObject($definition));
         $this->context->setSorters($this->createConfigObject($sorters, ConfigUtil::SORTERS));
         $this->processor->process($this->context);
-        $this->assertEquals($expectedSorters, $this->context->getSorters()->toArray());
+        self::assertEquals($expectedSorters, $this->context->getSorters()->toArray());
     }
 
     /**
@@ -77,7 +76,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
             'empty'                                                          => [
                 'definition'      => [],
                 'sorters'         => [],
-                'expectedSorters' => [],
+                'expectedSorters' => []
             ],
             'no child sorters'                                               => [
                 'definition'      => [
@@ -92,7 +91,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                     'fields' => [
                         'field1' => null
                     ]
-                ],
+                ]
             ],
             'child sorters'                                                  => [
                 'definition'      => [
@@ -141,13 +140,13 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                             'property_path' => 'realField3',
                             'fields'        => [
                                 'field31' => [
-                                    'property_path' => 'realField31',
+                                    'property_path' => 'realField31'
                                 ],
                                 'field32' => [
                                     'property_path' => 'realField32',
                                     'fields'        => [
                                         'field321' => [
-                                            'property_path' => 'realField321',
+                                            'property_path' => 'realField321'
                                         ]
                                     ],
                                     'sorters'       => [
@@ -197,7 +196,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                             'property_path' => 'realField2',
                             'fields'        => [
                                 'field21' => [
-                                    'property_path' => 'realField21',
+                                    'property_path' => 'realField21'
                                 ]
                             ],
                             'sorters'       => [
@@ -227,7 +226,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                         ]
                     ]
                 ]
-            ],
+            ]
         ];
     }
 
@@ -238,71 +237,71 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
     {
         $rootMetadata = $this->getClassMetadataMock();
         $toOne1Metadata = $this->getClassMetadataMock();
-        $toOne1Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toOne1_id']);
+        $toOne1Metadata->expects(self::any())->method('getIdentifierFieldNames')->willReturn(['toOne1_id']);
         $toOne1toOne11Metadata = $this->getClassMetadataMock();
-        $toOne1toOne11Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toOne11_id']);
+        $toOne1toOne11Metadata->expects(self::any())->method('getIdentifierFieldNames')->willReturn(['toOne11_id']);
         $toOne1toMany11Metadata = $this->getClassMetadataMock();
-        $toOne1toMany11Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toMany11_id']);
+        $toOne1toMany11Metadata->expects(self::any())->method('getIdentifierFieldNames')->willReturn(['toMany11_id']);
         $toMany1Metadata = $this->getClassMetadataMock();
-        $toMany1Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toMany1_id']);
+        $toMany1Metadata->expects(self::any())->method('getIdentifierFieldNames')->willReturn(['toMany1_id']);
 
-        $rootMetadata->expects($this->any())
+        $rootMetadata->expects(self::any())
             ->method('hasAssociation')
             ->willReturnMap(
                 [
                     ['toOne1', true],
-                    ['toMany1', true],
+                    ['toMany1', true]
                 ]
             );
-        $rootMetadata->expects($this->any())
+        $rootMetadata->expects(self::any())
             ->method('isCollectionValuedAssociation')
             ->willReturnMap(
                 [
                     ['toOne1', false],
-                    ['toMany1', true],
+                    ['toMany1', true]
                 ]
             );
 
-        $toOne1Metadata->expects($this->any())
+        $toOne1Metadata->expects(self::any())
             ->method('hasAssociation')
             ->willReturnMap(
                 [
                     ['toOne1_toOne11', true],
-                    ['toOne1_toMany11', true],
+                    ['toOne1_toMany11', true]
                 ]
             );
-        $toOne1Metadata->expects($this->any())
+        $toOne1Metadata->expects(self::any())
             ->method('isCollectionValuedAssociation')
             ->willReturnMap(
                 [
                     ['toOne1_toOne11', false],
-                    ['toOne1_toMany11', true],
+                    ['toOne1_toMany11', true]
                 ]
             );
 
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootMetadata);
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('findEntityMetadataByPath')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, ['toOne1'], $toOne1Metadata],
                     [self::TEST_CLASS_NAME, ['toOne1', 'toOne1_toOne11'], $toOne1toOne11Metadata],
                     [self::TEST_CLASS_NAME, ['toOne1', 'toOne1_toMany11'], $toOne1toMany11Metadata],
-                    [self::TEST_CLASS_NAME, ['toMany1'], $toMany1Metadata],
+                    [self::TEST_CLASS_NAME, ['toMany1'], $toMany1Metadata]
                 ]
             );
 
         $this->context->setResult($this->createConfigObject($definition));
         $this->context->setSorters($this->createConfigObject($sorters, ConfigUtil::SORTERS));
         $this->processor->process($this->context);
-        $this->assertEquals($expectedSorters, $this->context->getSorters()->toArray());
+        self::assertEquals($expectedSorters, $this->context->getSorters()->toArray());
     }
 
     /**
@@ -331,7 +330,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                                             'toOne1_toMany11_field111' => null
                                         ]
                                     ]
-                                ],
+                                ]
                             ],
                             'sorters' => [
                                 'fields' => [
@@ -349,7 +348,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                                     'toMany1_field1' => null
                                 ]
                             ]
-                        ],
+                        ]
                     ]
                 ],
                 'sorters'         => [
@@ -362,14 +361,14 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                         'field1'                                        => null,
                         'toOne1.toOne1_field1'                          => null,
                         'toOne1.toOne1_toOne11'                         => null,
-                        'toOne1.toOne1_toOne11.toOne1_toOne11_field111' => null,
+                        'toOne1.toOne1_toOne11.toOne1_toOne11_field111' => null
                     ]
                 ]
-            ],
+            ]
         ];
     }
 
-    public function testSortersByRenamedIdField()
+    public function testSortersByRenamedField()
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -381,12 +380,15 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                 'renamedIdField' => [
                     'property_path' => 'field2'
                 ],
+                'renamedField'   => [
+                    'property_path' => 'field3'
+                ],
                 'field10'        => [
                     'property_path' => 'realField10'
                 ],
                 'anotherField11' => [
                     'property_path' => 'field11'
-                ],
+                ]
             ]
         ];
         $sorters = [
@@ -394,12 +396,13 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
             'fields'           => [
                 'field1'  => null,
                 'field2'  => null,
+                'field3'  => null,
                 'field10' => [
                     'property_path' => 'sorterField10'
                 ],
                 'field11' => [
                     'property_path' => 'sorterField11'
-                ],
+                ]
             ]
         ];
 
@@ -417,12 +420,15 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                     'renamedIdField' => [
                         'property_path' => 'field2'
                     ],
+                    'renamedField'   => [
+                        'property_path' => 'field3'
+                    ],
                     'field10'        => [
                         'property_path' => 'sorterField10'
                     ],
                     'field11'        => [
                         'property_path' => 'sorterField11'
-                    ],
+                    ]
                 ]
             ],
             $this->context->getSorters()

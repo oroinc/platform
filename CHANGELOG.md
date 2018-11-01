@@ -1,15 +1,52 @@
 ## 3.1.0
 ### Added
+#### ApiBundle
+* Enable filters for to-many associations. The following operators are implemented: `=` (`eq`), `!=` (`neq`), `*` (`exists`), `!*` (`neq_or_null`), `~` (`contains`) and `!~` (`not_contains`).
+* Added [documentation about filters](./src/Oro/Bundle/ApiBundle/Resources/doc/filters.md).
+* Added data flow diagrams for public actions. See [Actions](./src/Oro/Bundle/ApiBundle/Resources/doc/actions.md).
+* Added `rest_api_prefix` and `rest_api_pattern` configuration options and `oro_api.rest.prefix` and `oro_api.rest.pattern` DIC parameters to be able to reconfigure REST API base path.
+* Added trigger `disposeLayout` on DOM element in `layout`
+#### DatagridBundle
+* Added [Datagrid Settings](./src/Oro/Bundle/DataGridBundle/Resources/doc/frontend/datagrid_settings.md) functionality for flexible managing of filters and grid columns
+
+#### CacheBundle
+* Added `oro.cache.abstract.without_memory_cache` that is the same as `oro.cache.abstract` but without using additional in-memory caching, it can be used to avoid unnecessary memory usage and performance penalties if in-memory caching is not needed, e.g. you implemented some more efficient in-memory caching strategy around your cache service.
+
+#### SecurityBundle
+* Added `Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension` trait that can be used in functional tests where you need to change permissions for security roles.
+
 #### UIBundle
 * Added the `addBeforeActionPromise` static method of `BaseController` in JS which enables to postpone route action if the required async process is in progress.
 
 ### Removed
+#### EntityConfigBundle
+* Removed `oro.entity_config.field.after_remove` event. Use `oro.entity_config.post_flush` event and `ConfigManager::getFieldConfigChangeSet('extend', $className, $fieldName)` method to check if a field was removed. If the change set has `is_deleted` attribute and its value is changed from `false` to `true` than a field was removed.
 #### UIBundle
 * Removed the `loadBeforeAction` and `addToReuse` static methods of `BaseController` in JS. Global Views and Components can now be defined in the HTML over data attributes, the same way as an ordinary [Page Component](./src/Oro/Bundle/UIBundle/Resources/doc/reference/page-component.md).
+#### SecurityBundle
+* Removed `oro_security.acl_helper.process_select.after` event, create [Access Rule](./src/Oro/Bundle/SecurityBundle/Resources/doc/access-rules.md) instead.
+* Removed `Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionInterface`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage` and `Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionalFactorBuilder` classes because now ACL restrictions applies with Access Rules by `Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker`.
+* Removed `Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper::applyAclToCriteria` method. Please use `apply` method with Doctrine Query or Query builder instead.
+#### DatagridBundle
+* Removed all logic related with column manager. The logic of column manager was transformed and expanded in [Datagrid Settings](./src/Oro/Bundle/DataGridBundle/Resources/doc/frontend/datagrid_settings.md)
 
 ### Changed
+#### ApiBundle
+* By default processors for `customize_loaded_data` action are executed only for primary and included entities. Use `identifier_only: true` tag attribute if your processor should be executed for relationships.
+* `finish_submit` event for `customize_form_data` action was renamed to `post_validate` and new `pre_validate` event was added.
 #### UIBundle
+* Changed all UI of backoffice 
+* Updated version of bootstrap from 2.3.0 to 4.1.1
 * All global JS Views and Components are defined in the HTML through data attributes.
+* Change target and name of a layout event. Now `layout` triggers `initLayout` event on DOM element instead `layoutInit` on `mediator`
+#### SecurityBundle
+* `Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper::apply` method logic was changed to support Access rules.
+* `oro_security.encoder.mcrypt` service was changed to `oro_security.encoder.default`.
+#### MessageQueue Component
+* In case when message processor specified in message not found this message will be rejected and exception will be thrown. 
+
+## 3.0.0 (2018-07-27)
+[Show detailed list of changes](incompatibilities-3-0.md)
 
 ## 3.0.0-rc (2018-05-31)
 [Show detailed list of changes](incompatibilities-3-0-rc.md)
@@ -137,6 +174,30 @@
 
 * Handling of `percent` data type in POST and PATCH requests was fixed. Before the fix, the percent value in GET and POST/PATCH requests was inconsistent; in POST/PATCH requests it was divided by 100, but GET request returned it as is. In this fix, the division by 100 was removed.
 * For string filters the default value of the `allow_array` option was changed from `true` to `false`. This was done to allow filter data if a string field contains a comma.
+#### DataGridBundle
+* Parameter `count_hints` will have value of `hints` unless otherwise specified.
+If other words from now
+```yaml
+datagrids:
+    grid-name:
+       ...
+       source:
+           ...
+           hints:
+               - SOME_QUERY_HINT
+```
+equivalent
+```yaml
+datagrids:
+    grid-name:
+       ...
+       source:
+           ...
+           hints:
+               - SOME_QUERY_HINT
+           count_hints:
+               - SOME_QUERY_HINT
+```
 #### SegmentBundle
 * Refactored the `SegmentComponent` js-component to use `EntityStructureDataProvider`.
 #### SidebarBundle
@@ -1187,7 +1248,7 @@ This changelog references the relevant changes (new features, changes and bugs) 
 It is now possible to invite other Oro users to events, send them email notifications about this invitation and receive feedback about their responses or lack thereof.
 To invite a user to your event, simply open its edit form and choose guests in a respectively named selector control. After you save the event with invitees, they will receive email notifications about the invitation with a link to their copy of the event in OroCRM. On the view page of that event they will be able to respond to an invitation with three options: Attend, Tentatively attend, and Not attend. Response status (including no response yet) will be displayed on the event tile in the calendar view, and next to the guest's name in the event view. An invitee will be able to change his response after the initial choice, i.e. choose to not attend a previously agreed event. For every response to an invitation, or a change in plans, you (i.e. the organizer of the event) will receive an email notification.
  * System calendars.
-This feature allows developers to add so-called System calendars to Oro Platform. Use cases for such calendars include company-wide holiday calendar; organization-wide calendar of conferences and conventions, and so on. (Note that organization calendars will only be available in Enterprise Edition 1.7.0).
+This feature allows developers to add so-called System calendars to OroPlatform. Use cases for such calendars include company-wide holiday calendar; organization-wide calendar of conferences and conventions, and so on. (Note that organization calendars will only be available in Enterprise Edition 1.7.0).
 These calendars and their events will be automatically added to Calendar views of all users in the entire system. Events of these calendars can be managed on their view forms that are available under System > System Calendars. The permission to add or modify events might be assigned to as many people as needed—e.g. the HR and the office manager.
  * Task calendar.
 Task calendar is a special kind of system calendar that displays tasks assigned to the user on the calendar view in addition to calendar events. For now, there is no way to add tasks via the calendar view, but it is possible to edit or delete existing tasks. It is not possible to view other users' task calendars either—only the personal task calendar is available.

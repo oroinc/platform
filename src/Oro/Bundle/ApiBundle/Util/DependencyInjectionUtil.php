@@ -12,9 +12,15 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class DependencyInjectionUtil
 {
+    /** the name of DIC tag for Data API processors */
+    public const PROCESSOR_TAG = 'oro.api.processor';
+
+    /** the attribute to specify the request type for "oro.api.processor" DIC tag */
+    public const REQUEST_TYPE = 'requestType';
+
     /**
      * @internal never use this constant outside of ApiBundle,
-     *           to recive and update the configuration use getConfig and setConfig methods.
+     *           to receive and update the configuration use getConfig and setConfig methods.
      */
     public const API_BUNDLE_CONFIG_PARAMETER_NAME = 'oro_api.bundle_config';
 
@@ -86,7 +92,7 @@ class DependencyInjectionUtil
      *
      * @return mixed
      *
-     * @throws LogicException is the reuested attribute does not exist in $attributes array
+     * @throws LogicException is the requested attribute does not exist in $attributes array
      */
     public static function getRequiredAttribute(array $attributes, $attributeName, $serviceId, $tagName)
     {
@@ -113,6 +119,18 @@ class DependencyInjectionUtil
     public static function getPriority(array $attributes)
     {
         return self::getAttribute($attributes, 'priority', 0);
+    }
+
+    /**
+     * Gets a value of the "requestType" attribute.
+     *
+     * @param array $attributes
+     *
+     * @return string|null
+     */
+    public static function getRequestType(array $attributes)
+    {
+        return self::getAttribute($attributes, self::REQUEST_TYPE, null);
     }
 
     /**
@@ -182,16 +200,16 @@ class DependencyInjectionUtil
         string $requestType
     ) {
         $processorDef = $container->getDefinition($processorServiceId);
-        $tags = $processorDef->getTag('oro.api.processor');
-        $processorDef->clearTag('oro.api.processor');
+        $tags = $processorDef->getTag(self::PROCESSOR_TAG);
+        $processorDef->clearTag(self::PROCESSOR_TAG);
 
         foreach ($tags as $tag) {
-            if (empty($tag['requestType'])) {
-                $tag['requestType'] = '!' . $requestType;
+            if (empty($tag[self::REQUEST_TYPE])) {
+                $tag[self::REQUEST_TYPE] = '!' . $requestType;
             } else {
-                $tag['requestType'] .= '&!' . $requestType;
+                $tag[self::REQUEST_TYPE] = sprintf('!%s&%s', $requestType, $tag[self::REQUEST_TYPE]);
             }
-            $processorDef->addTag('oro.api.processor', $tag);
+            $processorDef->addTag(self::PROCESSOR_TAG, $tag);
         }
     }
 }

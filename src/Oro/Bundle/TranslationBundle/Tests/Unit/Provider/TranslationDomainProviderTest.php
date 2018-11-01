@@ -57,13 +57,12 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($domains);
 
         $this->cache->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(TranslationDomainProvider::AVAILABLE_DOMAINS_NODE)
             ->willReturn(false);
         $this->cache->expects($this->once())
             ->method('save')
             ->with(TranslationDomainProvider::AVAILABLE_DOMAINS_NODE, $domains);
-        $this->cache->expects($this->never())->method('fetch');
 
         $this->assertEquals($domains, $this->provider->getAvailableDomains());
 
@@ -77,10 +76,6 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->repository->expects($this->never())->method($this->anything());
 
-        $this->cache->expects($this->once())
-            ->method('contains')
-            ->with(TranslationDomainProvider::AVAILABLE_DOMAINS_NODE)
-            ->willReturn(true);
         $this->cache->expects($this->never())->method('delete');
         $this->cache->expects($this->never())->method('save');
         $this->cache->expects($this->once())
@@ -99,7 +94,6 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
         $domains = ['domain1' => 'domain1', 'domain2' => 'domain2'];
         $locales = ['locale1', 'locale2'];
 
-        $this->cache->expects($this->once())->method('contains')->willReturn(true);
         $this->cache->expects($this->once())->method('fetch')->willReturn($domains);
 
         $this->assertEquals(

@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var Modal = require('oroui/js/modal');
     var contentTemplate = require('tpl!orodatagrid/templates/datagrid/view-name-modal.html');
@@ -15,10 +14,20 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        events: {
+            'keydown [data-role="grid-view-input"]': 'onKeyDown'
+        },
+
+        /**
+         * @inheritDoc
+         */
         constructor: function ViewNameModal() {
             ViewNameModal.__super__.constructor.apply(this, arguments);
         },
 
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             options = options || {};
 
@@ -32,8 +41,6 @@ define(function(require) {
             options.okText = __('oro.datagrid.gridView.save_name');
 
             ViewNameModal.__super__.initialize.call(this, options);
-
-            this.events = _.extend({}, this.events, {'keydown #gridViewName': _.bind(this.onKeyDown, this)});
         },
 
         onKeyDown: function(e) {
@@ -50,7 +57,7 @@ define(function(require) {
                 error = this.nameErrorTemplate({
                     error: error
                 });
-                this.$('#gridViewName').after(error);
+                this.$('[data-role="grid-view-input"]').after(error);
             }
         }
     });

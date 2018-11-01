@@ -16,7 +16,7 @@ class SetHttpAllowHeaderForSingleItemTest extends GetProcessorTestCase
     /** @var SetHttpAllowHeaderForSingleItem */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -73,7 +73,7 @@ class SetHttpAllowHeaderForSingleItemTest extends GetProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('GET, PATCH', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, GET, PATCH', $this->context->getResponseHeaders()->get('Allow'));
     }
 
     public function testProcessWhenNoAllowedHttpMethods()
@@ -109,6 +109,6 @@ class SetHttpAllowHeaderForSingleItemTest extends GetProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('GET, PATCH, POST, DELETE', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, GET, PATCH, POST, DELETE', $this->context->getResponseHeaders()->get('Allow'));
     }
 }

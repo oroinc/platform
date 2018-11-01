@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 class EntityIdHelperTest extends OrmRelatedTestCase
 {
     /** @var EntityIdHelper */
-    protected $entityIdHelper;
+    private $entityIdHelper;
 
     protected function setUp()
     {
@@ -46,7 +46,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $entityMetadata->addField(new FieldMetadata('id'));
 
         $this->entityIdHelper->setEntityIdentifier($entity, $entityId, $entityMetadata);
-        $this->assertEquals($entityId, $entity->id);
+        self::assertEquals($entityId, $entity->id);
     }
 
     public function testSetIdentifierForEntityWithCompositeId()
@@ -80,8 +80,8 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $entityMetadata->addField(new FieldMetadata('renamedTitle'))->setPropertyPath('title');
 
         $this->entityIdHelper->setEntityIdentifier($entity, $entityId, $entityMetadata);
-        $this->assertEquals($entityId['renamedId'], $entity->getId());
-        $this->assertEquals($entityId['renamedTitle'], $entity->getTitle());
+        self::assertEquals($entityId['renamedId'], $entity->getId());
+        self::assertEquals($entityId['renamedTitle'], $entity->getTitle());
     }
 
     public function testSetInvalidIdentifierForEntityWithCompositeId()
@@ -94,7 +94,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
 
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             sprintf(
                 'Unexpected identifier value "%s" for composite identifier of the entity "%s".',
@@ -116,7 +116,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
 
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             sprintf(
                 'The entity "%s" does not have metadata for the "title1" property.',
@@ -137,7 +137,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title1'));
 
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             sprintf(
                 'The entity "%s" does not have the "title1" property.',
@@ -168,8 +168,8 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         );
         /** @var Parameter $parameter */
         $parameter = $qb->getParameters()->first();
-        $this->assertEquals('id', $parameter->getName());
-        $this->assertEquals($entityId, $parameter->getValue());
+        self::assertEquals('id', $parameter->getName());
+        self::assertEquals($entityId, $parameter->getValue());
     }
 
     public function testApplyEntityIdentifierRestrictionForSingleIdEntityWithRenamedIdentifierField()
@@ -192,8 +192,8 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         );
         /** @var Parameter $parameter */
         $parameter = $qb->getParameters()->first();
-        $this->assertEquals('id', $parameter->getName());
-        $this->assertEquals($entityId, $parameter->getValue());
+        self::assertEquals('id', $parameter->getName());
+        self::assertEquals($entityId, $parameter->getValue());
     }
 
     // @codingStandardsIgnoreStart
@@ -232,21 +232,21 @@ class EntityIdHelperTest extends OrmRelatedTestCase
 
         $this->entityIdHelper->applyEntityIdentifierRestriction($qb, $entityId, $entityMetadata);
 
-        $this->assertEquals(
+        self::assertEquals(
             sprintf('SELECT e FROM %s e WHERE e.id = :id1 AND e.title = :id2', $entityClass),
             $qb->getDQL()
         );
         /** @var Parameter $parameter */
         $parameters = $qb->getParameters();
         $idParameter = $parameters[0];
-        $this->assertEquals('id1', $idParameter->getName());
-        $this->assertEquals($entityId['id'], $idParameter->getValue());
+        self::assertEquals('id1', $idParameter->getName());
+        self::assertEquals($entityId['id'], $idParameter->getValue());
         $titleParameter = $parameters[1];
-        $this->assertEquals('id2', $titleParameter->getName());
-        $this->assertEquals($entityId['title'], $titleParameter->getValue());
+        self::assertEquals('id2', $titleParameter->getName());
+        self::assertEquals($entityId['title'], $titleParameter->getValue());
     }
 
-    public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithRenamedidentifierFields()
+    public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithRenamedIdentifierFields()
     {
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = ['renamedId' => 123, 'renamedTitle' => 'test'];
@@ -261,18 +261,18 @@ class EntityIdHelperTest extends OrmRelatedTestCase
 
         $this->entityIdHelper->applyEntityIdentifierRestriction($qb, $entityId, $entityMetadata);
 
-        $this->assertEquals(
+        self::assertEquals(
             sprintf('SELECT e FROM %s e WHERE e.id = :id1 AND e.title = :id2', $entityClass),
             $qb->getDQL()
         );
         /** @var Parameter $parameter */
         $parameters = $qb->getParameters();
         $idParameter = $parameters[0];
-        $this->assertEquals('id1', $idParameter->getName());
-        $this->assertEquals($entityId['renamedId'], $idParameter->getValue());
+        self::assertEquals('id1', $idParameter->getName());
+        self::assertEquals($entityId['renamedId'], $idParameter->getValue());
         $titleParameter = $parameters[1];
-        $this->assertEquals('id2', $titleParameter->getName());
-        $this->assertEquals($entityId['renamedTitle'], $titleParameter->getValue());
+        self::assertEquals('id2', $titleParameter->getName());
+        self::assertEquals($entityId['renamedTitle'], $titleParameter->getValue());
     }
 
     // @codingStandardsIgnoreStart

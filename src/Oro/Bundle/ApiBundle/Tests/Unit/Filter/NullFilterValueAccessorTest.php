@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
 class NullFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var NullFilterValueAccessor */
-    protected $nullFilterValueAccessor;
+    private $nullFilterValueAccessor;
 
     /**
      * {@inheritdoc}

@@ -3,12 +3,13 @@
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -21,11 +22,7 @@ class UserHandler extends AbstractUserHandler
 {
     use RequestHandlerTrait;
 
-    /** @var DelegatingEngine */
-    protected $templating;
-
-    /** @var \Swift_Mailer */
-    protected $mailer;
+    public const INVITE_USER_TEMPLATE = 'invite_user';
 
     /** @var FlashBagInterface */
     protected $flashBag;
@@ -36,19 +33,18 @@ class UserHandler extends AbstractUserHandler
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var BusinessUnitManager */
-    protected $businessUnitManager;
-
     /** @var ConfigManager */
     protected $userConfigManager;
+
+    /** @var TemplateEmailManager */
+    private $templateEmailManager;
 
     /**
      * @param FormInterface $form
      * @param RequestStack $requestStack
      * @param UserManager $manager
+     * @param TemplateEmailManager|null $templateEmailManager
      * @param ConfigManager $userConfigManager
-     * @param DelegatingEngine $templating
-     * @param \Swift_Mailer $mailer
      * @param FlashBagInterface $flashBag
      * @param TranslatorInterface $translator
      * @param LoggerInterface $logger
@@ -57,18 +53,16 @@ class UserHandler extends AbstractUserHandler
         FormInterface $form,
         RequestStack $requestStack,
         UserManager $manager,
+        TemplateEmailManager $templateEmailManager = null,
         ConfigManager $userConfigManager = null,
-        DelegatingEngine $templating = null,
-        \Swift_Mailer $mailer = null,
         FlashBagInterface $flashBag = null,
         TranslatorInterface $translator = null,
         LoggerInterface $logger = null
     ) {
         parent::__construct($form, $requestStack, $manager);
 
+        $this->templateEmailManager = $templateEmailManager;
         $this->userConfigManager = $userConfigManager;
-        $this->templating = $templating;
-        $this->mailer = $mailer;
         $this->flashBag = $flashBag;
         $this->translator = $translator;
         $this->logger = $logger;
@@ -101,14 +95,6 @@ class UserHandler extends AbstractUserHandler
         }
 
         return $isUpdated;
-    }
-
-    /**
-     * @param BusinessUnitManager $businessUnitManager
-     */
-    public function setBusinessUnitManager(BusinessUnitManager $businessUnitManager)
-    {
-        $this->businessUnitManager = $businessUnitManager;
     }
 
     /**
@@ -172,23 +158,17 @@ class UserHandler extends AbstractUserHandler
      */
     protected function sendInviteMail(User $user, $plainPassword)
     {
-        if (in_array(null, [$this->userConfigManager, $this->mailer, $this->templating], true)) {
+        if (in_array(null, [$this->userConfigManager, $this->templateEmailManager], true)) {
             throw new \RuntimeException('Unable to send invitation email, unmet dependencies detected.');
         }
         $senderEmail = $this->userConfigManager->get('oro_notification.email_notification_sender_email');
         $senderName = $this->userConfigManager->get('oro_notification.email_notification_sender_name');
 
-        $message = \Swift_Message::newInstance()
-            ->setSubject('Invite user')
-            ->setFrom($senderEmail, $senderName)
-            ->setTo($user->getEmail())
-            ->setBody(
-                $this->templating->render(
-                    'OroUserBundle:Mail:invite.html.twig',
-                    ['user' => $user, 'password' => $plainPassword]
-                ),
-                'text/html'
-            );
-        $this->mailer->send($message);
+        $this->templateEmailManager->sendTemplateEmail(
+            From::emailAddress($senderEmail, $senderName),
+            [$user],
+            new EmailTemplateCriteria(self::INVITE_USER_TEMPLATE, User::class),
+            ['user' => $user, 'password' => $plainPassword]
+        );
     }
 }

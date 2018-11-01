@@ -3,9 +3,12 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter;
+use Oro\Component\Testing\TempDirExtension;
 
 class CrowdinAdapterTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var CrowdinAdapter */
     protected $adapter;
 
@@ -151,7 +154,7 @@ class CrowdinAdapterTest extends \PHPUnit\Framework\TestCase
     public function testDownload()
     {
         $locale = 'en';
-        $path =  sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'oro-trans' . DIRECTORY_SEPARATOR . 'target.zip';
+        $path = $this->getTempDir('trans', false) . DIRECTORY_SEPARATOR . 'target.zip';
 
         $this->client->expects($this->once())
             ->method('createRequest')

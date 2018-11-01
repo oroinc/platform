@@ -45,7 +45,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         $this->context->setClassName('Test\Class');
         $this->context->setId(123);
 
-        $this->entityIdTransformer->expects($this->never())
+        $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
 
         $this->processor->process($this->context);
@@ -60,7 +60,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         $this->context->setId('123');
         $this->context->setMetadata($metadata);
 
-        $this->entityIdTransformer->expects($this->never())
+        $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
 
         $this->processor->process($this->context);
@@ -75,14 +75,14 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         $this->context->setId('123');
         $this->context->setMetadata($metadata);
 
-        $this->entityIdTransformer->expects($this->once())
+        $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
             ->with($this->context->getId(), self::identicalTo($metadata))
             ->willReturn(123);
 
         $this->processor->process($this->context);
 
-        $this->assertSame(123, $this->context->getId());
+        self::assertSame(123, $this->context->getId());
     }
 
     public function testProcessForInvalidId()
@@ -94,15 +94,15 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         $this->context->setId('123');
         $this->context->setMetadata($metadata);
 
-        $this->entityIdTransformer->expects($this->once())
+        $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
             ->with($this->context->getId(), self::identicalTo($metadata))
             ->willThrowException(new \Exception('some error'));
 
         $this->processor->process($this->context);
 
-        $this->assertSame('123', $this->context->getId());
-        $this->assertEquals(
+        self::assertSame('123', $this->context->getId());
+        self::assertEquals(
             [
                 Error::createValidationError('entity identifier constraint')
                     ->setInnerException(new \Exception('some error'))

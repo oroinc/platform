@@ -18,6 +18,7 @@ To simplify creation of the functional test for REST API resources that conform 
 | Method | Description |
 | --- | --- |
 | request | Sends a REST API request. |
+| options | Sends the OPTIONS request. See [options](./actions.md#options-action). |
 | cget | Sends the GET request for a list of entities. See [get_list action](./actions.md#get_list-action). |
 | get | Sends the GET request for a single entity. See [get action](./actions.md#get-action). |
 | post | Sends the POST request for an entity resource. See [create action](./actions.md#create-action). If the second parameter is a file name, the file should be located in the `requests` directory next to the PHP file that contains the test. |
@@ -32,15 +33,17 @@ To simplify creation of the functional test for REST API resources that conform 
 | postRelationship | Sends the POST request for a relationship of a single entity. See [add_relationship action](./actions.md#add_relationship-action). |
 | patchRelationship | Sends the PATCH request for a relationship of a single entity. See [update_relationship action](./actions.md#update_relationship-action). |
 | deleteRelationship | Sends the DELETE request for a relationship of a single entity. See [delete_relationship action](./actions.md#delete_relationship-action). |
-| updateResponseContent | Replaces all values in the given expected response content with correxponding value from the actual response content when the key of an element is equal to the given key and the value of this element is equal to the given placeholder. If the first parameter is a file name, the file should be located in the `responses` directory next to the PHP file that contains the test. |
+| updateResponseContent | Replaces all values in the given expected response content with corresponding value from the actual response content when the key of an element is equal to the given key and the value of this element is equal to the given placeholder. If the first parameter is a file name, the file should be located in the `responses` directory next to the PHP file that contains the test. |
 | assertResponseContains | Asserts that the response content contains the given data. If the first parameter is a file name, the file should be located in the `responses` directory next to the PHP file that contains the test. |
 | assertResponseCount | Asserts that the response contains the given number of data items. |
 | assertResponseNotEmpty | Asserts that the response data are not empty. |
 | assertResponseValidationError | Asserts that the response content contains the given validation error. |
 | assertResponseValidationErrors | Asserts that the response content contains the given validation errors. |
+| assertAllowResponseHeader | Asserts "Allow" response header equals to the expected value. |
 | assertMethodNotAllowedResponse | Asserts response status code equals to 405 (Method Not Allowed) and "Allow" response header equals to the expected value. |
 | dumpYmlTemplate | Saves a response content to a YAML file. If the first parameter is a file name, the file is saved into the `responses` directory next to the PHP file that contains the test. |
 | getResourceId | Extracts the JSON.API resource identifier from the response. For details, see [JSON.API Specification](http://jsonapi.org/format/#document-resource-objects). |
+| getNewResourceIdFromIncludedSection | Extracts the JSON.API resource identifier from the "included" section of the response. For details, see [Create and Update Related Resources Together with a Primary API Resource](https://oroinc.com/orocrm/doc/current/dev-guide/web-api#create-and-update-related-resources-together-with-a-primary-api-resource). |
 | getRequestData | Converts the given request to an array that can be sent to the server. The given request can be a path to a file that contains the request data or an array with the request data. If the request is a file name, the file should be located in the `requests` directory next to the PHP file that contains the test. |
 | getResponseErrors | Extracts the list of errors from the JSON.API response. For details, see [JSON.API Specification](http://jsonapi.org/format/#errors). |
 | appendEntityConfig | Appends a configuration of an entity. This method is helpful when you create a general functionality and need to test it for different configurations without creating a test entity for each of them. Please note that the configuration is restored after each test and thus, you do not need to do it manually. |

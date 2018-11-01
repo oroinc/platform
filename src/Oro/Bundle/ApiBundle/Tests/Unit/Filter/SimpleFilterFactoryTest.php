@@ -10,7 +10,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SimpleFilterFactory */
-    protected $filterFactory;
+    private $filterFactory;
 
     /**
      * {@inheritdoc}

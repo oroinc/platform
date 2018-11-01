@@ -36,7 +36,7 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
     {
         $this->doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
-            ->setMethods(['fetch', 'contains', 'save', 'delete'])->getMockForAbstractClass();
+            ->setMethods(['fetch', 'save', 'delete'])->getMockForAbstractClass();
         $this->strategy = new LocalizationFallbackStrategy($this->doctrine, $this->cache);
         $this->strategy->setEntityClass('Oro\Bundle\LocaleBundle\Entity\Localization');
     }
@@ -55,7 +55,7 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
     public function testGetLocaleFallbacks($entities, array $localizations)
     {
         $this->cache->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(LocalizationFallbackStrategy::CACHE_KEY)
             ->willReturn(false);
         /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $em */
@@ -78,8 +78,6 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
             ->method('save')
             ->with(LocalizationFallbackStrategy::CACHE_KEY, $localizations)
             ->willReturn((bool)$entities);
-        $this->cache->expects($this->never())
-            ->method('fetch');
         $this->assertEquals($localizations, $this->strategy->getLocaleFallbacks());
     }
 
@@ -149,10 +147,6 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetLocaleFallbacksCache(array $localizations)
     {
-        $this->cache->expects($this->once())
-            ->method('contains')
-            ->with(LocalizationFallbackStrategy::CACHE_KEY)
-            ->willReturn(true);
         $this->doctrine->expects($this->never())
             ->method('getManagerForClass');
         $this->cache->expects($this->once())

@@ -12,7 +12,7 @@ class NumberToStringTransformerTest extends \PHPUnit\Framework\TestCase
     public function testTransform($value, $expected)
     {
         $transformer = new NumberToStringTransformer();
-        $this->assertSame($expected, $transformer->transform($value));
+        self::assertSame($expected, $transformer->transform($value));
     }
 
     public function transformDataProvider()
@@ -20,7 +20,7 @@ class NumberToStringTransformerTest extends \PHPUnit\Framework\TestCase
         return [
             [null, ''],
             ['123', '123'],
-            [123, '123'],
+            [123, '123']
         ];
     }
 
@@ -39,7 +39,7 @@ class NumberToStringTransformerTest extends \PHPUnit\Framework\TestCase
     public function testReverseTransform($scale, $value, $expected)
     {
         $transformer = new NumberToStringTransformer($scale);
-        $this->assertSame($expected, $transformer->reverseTransform($value));
+        self::assertSame($expected, $transformer->reverseTransform($value));
     }
 
     public function reverseTransformDataProvider()
@@ -59,7 +59,7 @@ class NumberToStringTransformerTest extends \PHPUnit\Framework\TestCase
             [3, '1.234', '1.234'],
             [3, '-1.234', '-1.234'],
             [3, '.234', '0.234'],
-            [3, '-.234', '-0.234'],
+            [3, '-.234', '-0.234']
         ];
     }
 
@@ -88,7 +88,7 @@ class NumberToStringTransformerTest extends \PHPUnit\Framework\TestCase
             [null, 'test'],
             [0, 'test'],
             [3, 'test'],
-            [0, '1.2'],
+            [0, '1.2']
         ];
     }
 }

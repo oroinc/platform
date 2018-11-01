@@ -19,9 +19,6 @@ use Symfony\Component\Validator\Constraint;
  */
 class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInterface
 {
-    /** @var bool|null */
-    protected $exclude;
-
     /** @var string|null */
     protected $dataType;
 
@@ -31,9 +28,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     public function toArray($excludeTargetEntity = false)
     {
         $result = parent::toArray($excludeTargetEntity);
-        if (true === $this->exclude) {
-            $result[ConfigUtil::EXCLUDE] = $this->exclude;
-        }
         if (null !== $this->dataType) {
             $result[ConfigUtil::DATA_TYPE] = $this->dataType;
         }
@@ -222,7 +216,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
-     * Indicates whetner the request data can contain this field.
+     * Indicates whether the request data can contain this field.
      *
      * @return bool
      */
@@ -240,7 +234,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
-     * Indicates whetner the response data can contain this field.
+     * Indicates whether the response data can contain this field.
      *
      * @return bool
      */
@@ -310,7 +304,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     /**
      * Indicates whether the path of the field value exists.
      *
-     * @return string
+     * @return bool
      */
     public function hasPropertyPath()
     {
@@ -406,7 +400,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
-     * Whether at least one data transformer exists.
+     * Indicates whether at least one data transformer exists.
      *
      * @return bool
      */

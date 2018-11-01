@@ -196,13 +196,13 @@ entity_config:
                     page_component_options:  { redirectRoute: 'oro_entityconfig_index', route: 'oro_entityextend_update' }
                 -
                     name:                   oro.entity_extend.entity_config.extend.field.layout_action.update_schema
-                    route:                  'oro_entityextend_attribute_schema_update'
+                    route:                  'oro_entityextend_update'
                     aCss:                   'btn-danger entity-extend-apply'
                     void:                   true
                     filter:                  { upgradeable: true, state: ['New', 'Requires update', 'Deleted', 'Restored'] }
                     display_only:           'attribute'
                     page_component_module:   'oroentityextend/js/schema-update-action-component'
-                    page_component_options:  { route: 'oro_entityextend_attribute_schema_update' }
+                    page_component_options:  { route: 'oro_entityextend_update' }
 
             items:
                 owner:
@@ -397,6 +397,12 @@ entity_config:
                 # and this cannot be changed through the config
                 # this attribute is applicable to any type of relations
                 cascade: # array of strings
+                    options:
+                        auditable:          false
+
+                # the type of fetch mode for the relation.
+                # the set of possible values are: 'lazy', 'extra_lazy' and 'eager'
+                fetch: # string
                     options:
                         auditable:          false
 

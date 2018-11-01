@@ -1134,7 +1134,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     'association1' => [
                         'data_type'    => 'some_custom_association',
                         'target_class' => 'Test\Association1Target',
-                        'target_type'  => 'to-one',
+                        'target_type'  => 'to-one'
                     ]
                 ]
             ],

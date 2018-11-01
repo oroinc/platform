@@ -22,11 +22,9 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
- * Registers all allowed dynamic filters and
- * in case if the filter group is specified, encloses filters keys
+ * Registers all allowed nested filters and
+ * if the filter group is specified, encloses filters keys
  * by the "{filter group}[%s]" pattern, e.g. "filter[%s]".
- *
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class RegisterDynamicFilters extends RegisterFilters
 {
@@ -240,17 +238,9 @@ class RegisterDynamicFilters extends RegisterFilters
             return null;
         }
 
-        list($filterConfig, $propertyPath, $isCollection) = $filterInfo;
-        $filter = $this->createFilter($filterConfig, $propertyPath, $context);
-        if (null !== $filter) {
-            // @todo BAP-11881. Update this code when NEQ operator for to-many collection
-            // will be implemented in Oro\Bundle\ApiBundle\Filter\ComparisonFilter
-            if ($isCollection) {
-                $filter->setSupportedOperators([StandaloneFilter::EQ]);
-            }
-        }
+        list($filterConfig, $propertyPath) = $filterInfo;
 
-        return $filter;
+        return $this->createFilter($filterConfig, $propertyPath, $context);
     }
 
     /**
@@ -258,20 +248,19 @@ class RegisterDynamicFilters extends RegisterFilters
      * @param ClassMetadata $metadata
      * @param Context       $context
      *
-     * @return array|null [filter config, property path, is collection]
+     * @return array|null [filter config, property path]
      */
     private function getFilterInfo(string $propertyPath, ClassMetadata $metadata, Context $context): ?array
     {
         $filtersConfig = null;
         $associationPropertyPath = null;
-        $isCollection = false;
 
         $path = \explode('.', $propertyPath);
         if (\count($path) > 1) {
             $fieldName = \array_pop($path);
             $associationInfo = $this->getAssociationInfo($path, $context, $metadata);
             if (null !== $associationInfo) {
-                list($filtersConfig, $associationPropertyPath, $isCollection) = $associationInfo;
+                list($filtersConfig, $associationPropertyPath) = $associationInfo;
             }
         } else {
             $fieldName = $propertyPath;
@@ -286,7 +275,7 @@ class RegisterDynamicFilters extends RegisterFilters
                 if ($associationPropertyPath) {
                     $propertyPath = $associationPropertyPath . '.' . $propertyPath;
                 }
-                $result = [$filterConfig, $propertyPath, $isCollection];
+                $result = [$filterConfig, $propertyPath];
             }
         }
 
@@ -298,7 +287,7 @@ class RegisterDynamicFilters extends RegisterFilters
      * @param Context       $context
      * @param ClassMetadata $metadata
      *
-     * @return array|null [filters config, association property path, is collection]
+     * @return array|null [filters config, association property path]
      */
     private function getAssociationInfo(array $path, Context $context, ClassMetadata $metadata): ?array
     {
@@ -310,7 +299,6 @@ class RegisterDynamicFilters extends RegisterFilters
         $config = $context->getConfig();
         $filters = null;
         $associationPath = [];
-        $isCollection = false;
 
         foreach ($path as $fieldName) {
             $field = $config->getField($fieldName);
@@ -334,16 +322,12 @@ class RegisterDynamicFilters extends RegisterFilters
                 return null;
             }
 
-            if ($metadata->isCollectionValuedAssociation($associationPropertyPath)) {
-                $isCollection = true;
-            }
-
             $metadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
             $config = $targetConfig->getDefinition();
             $filters = $targetConfig->getFilters();
             $associationPath[] = $associationPropertyPath;
         }
 
-        return [$filters, \implode('.', $associationPath), $isCollection];
+        return [$filters, \implode('.', $associationPath)];
     }
 }

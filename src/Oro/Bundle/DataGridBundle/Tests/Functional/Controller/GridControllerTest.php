@@ -39,6 +39,7 @@ class GridControllerTest extends WebTestCase
                 FormatterProvider::FORMAT_TYPE => 'excel',
                 'pageSize' => 499
             ],
+            'notificationTemplate' => 'datagrid_export_result'
         ]);
     }
 
@@ -67,6 +68,7 @@ class GridControllerTest extends WebTestCase
 
         $this->assertMessageSent(Topics::PRE_EXPORT, [
             'format' => 'csv',
+            'notificationTemplate' => 'datagrid_export_result',
             'parameters' => [
                 'gridName' => 'audit-grid',
                 'gridParameters' => [

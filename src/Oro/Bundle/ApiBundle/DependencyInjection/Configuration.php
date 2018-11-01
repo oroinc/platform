@@ -19,7 +19,7 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('oro_api');
 
         $node = $rootNode->children();
-        $this->appendConfigOptions($node);
+        $this->appendOptions($node);
         $this->appendConfigFilesNode($node);
         $this->appendApiDocViewsNode($node);
         $this->appendConfigExtensionsNode($node);
@@ -30,6 +30,7 @@ class Configuration implements ConfigurationInterface
         $this->appendFormTypeExtensionsNode($node);
         $this->appendFormTypeGuessersNode($node);
         $this->appendFormTypeGuessesNode($node);
+        $this->appendCorsNode($node);
 
         return $treeBuilder;
     }
@@ -37,9 +38,19 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
-    private function appendConfigOptions(NodeBuilder $node)
+    private function appendOptions(NodeBuilder $node)
     {
         $node
+            ->scalarNode('rest_api_prefix')
+                ->info('The prefix of REST API URLs.')
+                ->cannotBeEmpty()
+                ->defaultValue('/api/')
+            ->end()
+            ->scalarNode('rest_api_pattern')
+                ->info('The regular expression pattern to which REST API URLs are matched.')
+                ->cannotBeEmpty()
+                ->defaultValue('^/api/(?!(rest|doc)($|/.*))')
+            ->end()
             ->integerNode('config_max_nesting_level')
                 ->info(
                     'The maximum number of nesting target entities'
@@ -422,6 +433,44 @@ class Configuration implements ConfigurationInterface
                             ->useAttributeAsKey('name')
                             ->prototype('variable')->end()
                         ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    /**
+     * @param NodeBuilder $node
+     */
+    private function appendCorsNode(NodeBuilder $node)
+    {
+        $node
+            ->arrayNode('cors')
+                ->info('The configuration of CORS requests')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->integerNode('preflight_max_age')
+                        ->info('The amount of seconds the user agent is allowed to cache CORS preflight requests')
+                        ->defaultValue(600)
+                        ->min(0)
+                    ->end()
+                    ->arrayNode('allow_origins')
+                        ->info('The list of origins that are allowed to send CORS requests')
+                        ->example(['https://foo.com', 'https://bar.com'])
+                        ->prototype('scalar')->cannotBeEmpty()->end()
+                    ->end()
+                    ->booleanNode('allow_credentials')
+                        ->info('Indicates whether CORS request can include user credentials')
+                        ->defaultValue(false)
+                    ->end()
+                    ->arrayNode('allow_headers')
+                        ->info('The list of headers that are allowed to send by CORS requests')
+                        ->example(['X-Foo', 'X-Bar'])
+                        ->prototype('scalar')->cannotBeEmpty()->end()
+                    ->end()
+                    ->arrayNode('expose_headers')
+                        ->info('The list of headers that can be exposed by CORS responses')
+                        ->example(['X-Foo', 'X-Bar'])
+                        ->prototype('scalar')->cannotBeEmpty()->end()
                     ->end()
                 ->end()
             ->end();

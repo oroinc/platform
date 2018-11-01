@@ -165,7 +165,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        if (1 === preg_match('/[\S]*\/user\/(login|two-factor-auth)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
+        if (1 === preg_match('/[\S]*\/user\/(login|two-factor-auth|reset-request)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;
@@ -204,7 +204,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        if (1 === preg_match('/[\S]*\/user\/(login|two-factor-auth)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
+        if (1 === preg_match('/[\S]*\/user\/(login|two-factor-auth|reset-request)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;
@@ -254,6 +254,36 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: I follow "My Configuration" link within flash message
+     *
+     * @Then /^(?:|I )follow "(?P<title>[^"]+)" link within flash message "(?P<message>([^"\\]|\\.)*)"$/
+     *
+     * @param string $title
+     * @param string $message
+     */
+    public function iFollowLinkWithinFlashMessage($title, $message)
+    {
+        $flashMessage = $this->getFlashMessage($message);
+
+        self::assertNotNull($flashMessage, sprintf(
+            'Expected "%s" message didn\'t appear',
+            $title
+        ));
+
+        if ($flashMessage) {
+            $link = $flashMessage->findElementContains('Link', $title);
+
+            self::assertNotNull(
+                $link,
+                sprintf('Could not find link "%s" within flash message "%s"', $title, $message)
+            );
+
+            $link->focus();
+            $link->click();
+        }
+    }
+
+    /**
      * Example: Then I should see "Attachment created successfully" flash message
      * Example: Then I should see "The email was sent" flash message
      *
@@ -262,18 +292,68 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
     {
-        $actualFlashMessages = [];
-        /** @var Element|null $flashMessage */
-        $flashMessage = $this->spin(
-            function (OroMainContext $context) use ($title, &$actualFlashMessages, $flashMessageElement) {
+        $flashMessage = $this->getFlashMessage($title, $flashMessageElement, $timeLimit);
+
+        self::assertNotNull($flashMessage, sprintf(
+            'Expected "%s" message didn\'t appear',
+            $title
+        ));
+    }
+
+    /**
+     * Example: Then I should not see "Attachment created successfully" flash message
+     * Example: Then I should not see "The email was sent" flash message
+     *
+     * @Then /^(?:|I )should not see "(?P<title>[^"]+)" flash message$/
+     * @Then /^(?:|I )should not see '(?P<title>[^']+)' flash message$/
+     */
+    public function iShouldNotSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
+    {
+        $flashMessage = $this->getFlashMessage($title, $flashMessageElement, $timeLimit);
+
+        self::assertNull($flashMessage, sprintf(
+            'Expected that message "%s" won\'t appear',
+            $title
+        ));
+    }
+
+    /**
+     * Example: Then I should see "Attachment created successfully" flash message and I close it
+     * Example: Then I should see "The email was sent" flash message and I close it
+     *
+     * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message and I close it$/
+     * @Then /^(?:|I )should see '(?P<title>[^']+)' flash message and I close it$/
+     */
+    public function iShouldSeeFlashMessageAndCloseIt($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
+    {
+        $flashMessage = $this->getFlashMessage($title, $flashMessageElement, $timeLimit);
+
+        self::assertNotNull($flashMessage, sprintf(
+            'Expected "%s" message didn\'t appear',
+            $title
+        ));
+
+        /** @var NodeElement $closeButton */
+        $closeButton = $flashMessage->find('css', '[data-dismiss="alert"]');
+        $closeButton->press();
+    }
+
+    /**
+     * @param string $title
+     * @param string $flashMessageElement
+     * @param string $timeLimit
+     * @return Element|null
+     */
+    protected function getFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
+    {
+        return $this->spin(
+            function (OroMainContext $context) use ($title, $flashMessageElement) {
                 $flashMessages = $context->findAllElements($flashMessageElement);
 
                 foreach ($flashMessages as $flashMessage) {
                     if ($flashMessage->isValid() && $flashMessage->isVisible()) {
-                        $actualFlashMessageText = $flashMessage->getText();
-                        $actualFlashMessages[$actualFlashMessageText] = $flashMessage;
-
-                        if (false !== stripos($actualFlashMessageText, $title)) {
+                        $text = $flashMessage->getText();
+                        if (false !== stripos($text, $title) || false !== stripos($text, stripslashes($title))) {
                             return $flashMessage;
                         }
                     }
@@ -283,23 +363,6 @@ class OroMainContext extends MinkContext implements
             },
             $timeLimit
         );
-
-        self::assertNotCount(0, $actualFlashMessages, 'No flash messages founded on page');
-        self::assertNotNull($flashMessage, sprintf(
-            'Expected "%s" message but got "%s" messages',
-            $title,
-            implode(',', array_keys($actualFlashMessages))
-        ));
-
-        try {
-            /** @var NodeElement $closeButton */
-            $closeButton = $flashMessage->find('css', 'button.close');
-            $closeButton->press();
-        } catch (\Throwable $e) {
-            //No worries, flash message can disappeared till time next call
-        } catch (\Exception $e) {
-            //No worries, flash message can disappeared till time next call
-        }
     }
 
     /**
@@ -477,6 +540,37 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Assert alert with text is present
+     * Example: Then I should see alert with message "You have unsaved changes"
+     *
+     * @Then /^(?:|I )should see alert with message "(?P<expectedMessage>[^"]+)"$/
+     */
+    public function iShouldSeeAlert(string $expectedMessage)
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $session = $driver->getWebDriverSession();
+
+        try {
+            $alertMessage = $session->getAlert_text();
+
+            self::assertEquals(
+                $expectedMessage,
+                $alertMessage,
+                sprintf(
+                    'Expected to see alert with message "%s" but alert with "%s" found instead',
+                    $expectedMessage,
+                    $alertMessage
+                )
+            );
+        } catch (NoAlertOpenError $e) {
+            self::fail('Expected to see alert, but it was not found');
+
+            return;
+        }
+    }
+
+    /**
      * Assert that no malicious scripts present on page
      * Example: Then I should not see malicious scripts
      *
@@ -607,6 +701,29 @@ class OroMainContext extends MinkContext implements
         self::assertTrue($userMenu->isValid());
         $userMenu->open();
         $userMenu->clickLink($needle);
+    }
+
+    /**
+     * Example: Given I click "Configure" in "Leads List" widget
+     *
+     * @Given /^(?:|I )click "(?P<needle>[\w\s]+)" in "(?P<widget>[\w\s]+)" widget$/
+     */
+    public function iClickLinkInDashboardWidget($needle, $widget)
+    {
+        $userMenu = $this->createElement($widget);
+        self::assertTrue($userMenu->isValid());
+        $userMenu->clickLink($needle);
+    }
+
+    /**
+     * Example: I should see "Leads list" widget on dashboard
+     *
+     * @Given /^(?:|I )should see "(?P<widget>[\w\s]+)" widget on dashboard$/
+     */
+    public function iShouldSeeDashboardWidget($widget)
+    {
+        $widget = $this->createElement($widget);
+        self::assertTrue($widget->isValid());
     }
 
     /**
@@ -918,7 +1035,13 @@ class OroMainContext extends MinkContext implements
     {
         $elementObject = $this->createElement($element);
         self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
-        self::assertContains($text, $elementObject->getText());
+
+        $actual = $elementObject->getText();
+        $regex = '/'.preg_quote($text, '/').'/ui';
+
+        $message = sprintf('Failed asserting that "%s" contains "%s"', $text, $actual);
+
+        self::assertTrue((bool) preg_match($regex, $actual), $message, $element);
     }
 
     /**
@@ -928,7 +1051,13 @@ class OroMainContext extends MinkContext implements
     {
         $elementObject = $this->createElement($element);
         self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
-        self::assertNotContains($text, $elementObject->getText());
+
+        $actual = $elementObject->getText();
+        $regex = '/'.preg_quote($text, '/').'/ui';
+
+        $message = sprintf('Failed asserting that "%s" does not contain "%s"', $text, $actual);
+
+        self::assertTrue(!preg_match($regex, $actual), $message, $element);
     }
 
     /**
@@ -1309,8 +1438,25 @@ class OroMainContext extends MinkContext implements
      */
     public function buttonIsDisabled($button)
     {
-        $button = $this->getSession()->getPage()->findButton($button);
-        self::assertTrue($button->hasClass('disabled'));
+        $element = $this->getSession()->getPage()->findButton($button);
+        //Try to find link element with such name if no button found
+        if ($element === null) {
+            $element = $this->getSession()->getPage()->findLink($button);
+        }
+        self::assertTrue($element->hasClass('disabled'));
+    }
+
+    /**
+     * @Then /^"([^"]*)" button is not disabled$/
+     */
+    public function buttonIsNotDisabled($button)
+    {
+        $element = $this->getSession()->getPage()->findButton($button);
+        //Try to find link element with such name if no button found
+        if ($element === null) {
+            $element = $this->getSession()->getPage()->findLink($button);
+        }
+        self::assertFalse($element->hasClass('disabled'));
     }
 
     /**
@@ -1791,6 +1937,41 @@ JS;
     }
 
     /**
+     * Example: Then I should see "Map container" element inside "Default Addresses" iframe
+     *
+     * @Then I should see :childElementName element inside :iframeName iframe
+     * @param string $iframeName
+     * @param string $childElementName
+     */
+    public function iShouldSeeElementInsideIframe($childElementName, $iframeName)
+    {
+        $iframeElement = $this->createElement($iframeName);
+        self::assertTrue($iframeElement->isIsset() && $iframeElement->isVisible(), sprintf(
+            'Iframe element "%s" not found on page',
+            $iframeName
+        ));
+
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $driver->switchToIFrameByElement($iframeElement);
+
+        $iframeBody = $this->getSession()->getPage()->find('css', 'body');
+        $childElement = $this->elementFactory->createElement($childElementName, $iframeBody);
+        self::assertTrue($childElement->isIsset(), sprintf(
+            'Element "%s" not found inside iframe',
+            $childElementName,
+            $iframeName
+        ));
+        self::assertTrue($childElement->isVisible(), sprintf(
+            'Element "%s" found inside iframe, but it\'s not visible',
+            $childElementName,
+            $iframeName
+        ));
+
+        $driver->switchToWindow();
+    }
+
+    /**
      * Example: Then I should see "Map container" element with text "Address" inside "Default Addresses" element
      *
      * @Then I should see :childElementName element with text :text inside :parentElementName element
@@ -1987,5 +2168,32 @@ JS;
     {
         $element = $this->createElement($elementName);
         self::assertFalse($element->isChecked());
+    }
+
+    /**
+     * Checks, that form field specified by the element has specified value
+     * Example: Then the "username" field element should contain "bwayne"
+     * Example: And the "username" field element should contain "bwayne"
+     *
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field element should contain "(?P<value>(?:[^"]|\\")*)"$/
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field element should contain:$/
+     */
+    public function assertFieldElementContains($fieldName, $value)
+    {
+        $fieldName = $this->fixStepArgument($fieldName);
+        $value = $this->fixStepArgument($value);
+
+        $field = $this->createElement($fieldName);
+        self::assertTrue($field->isIsset(), sprintf(
+            'Element "%s" not found on page',
+            $fieldName
+        ));
+
+        $actual = $field->getValue();
+        $regex = '/^'.preg_quote($value, '/').'$/ui';
+
+        $message = sprintf('The field "%s" value is "%s", but "%s" expected.', $fieldName, $actual, $value);
+
+        self::assertTrue((bool) preg_match($regex, $actual), $message);
     }
 }

@@ -11,6 +11,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Manage collection of localized localized fields.
+ */
 class LocalizedFallbackValueCollectionType extends AbstractType
 {
     const NAME = 'oro_locale_localized_fallback_value_collection';
@@ -55,7 +58,10 @@ class LocalizedFallbackValueCollectionType extends AbstractType
         $builder->add(
             self::FIELD_VALUES,
             LocalizedPropertyType::class,
-            ['entry_type' => $options['entry_type'], 'entry_options' => $options['entry_options']]
+            [
+                'entry_type' => $options['entry_type'],
+                'entry_options' => $options['entry_options'],
+                'exclude_parent_localization' => $options['exclude_parent_localization']]
         )->add(
             self::FIELD_IDS,
             CollectionType::class,
@@ -76,6 +82,7 @@ class LocalizedFallbackValueCollectionType extends AbstractType
             'field' => 'string', // field used to store data - string or text
             'entry_type' => TextType::class,   // value form type
             'entry_options' => [],       // value form options
+            'exclude_parent_localization' => false
         ]);
     }
 }

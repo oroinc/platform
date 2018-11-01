@@ -11,7 +11,7 @@ class ExceptionUtilTest extends \PHPUnit\Framework\TestCase
     {
         $exception = new \InvalidArgumentException();
 
-        $this->assertSame(
+        self::assertSame(
             $exception,
             ExceptionUtil::getProcessorUnderlyingException($exception)
         );
@@ -25,7 +25,7 @@ class ExceptionUtilTest extends \PHPUnit\Framework\TestCase
             new \InvalidArgumentException()
         );
 
-        $this->assertSame(
+        self::assertSame(
             $exception,
             ExceptionUtil::getProcessorUnderlyingException($exception)
         );
@@ -41,7 +41,7 @@ class ExceptionUtilTest extends \PHPUnit\Framework\TestCase
             $innerException
         );
 
-        $this->assertSame(
+        self::assertSame(
             $innerException,
             ExceptionUtil::getProcessorUnderlyingException($exception)
         );
@@ -62,7 +62,7 @@ class ExceptionUtilTest extends \PHPUnit\Framework\TestCase
             $executionFailedException
         );
 
-        $this->assertSame(
+        self::assertSame(
             $exception,
             ExceptionUtil::getProcessorUnderlyingException($exception)
         );

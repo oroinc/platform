@@ -34,7 +34,7 @@ define(function(require) {
             return _.extend({}, defaultOptions, {
                 listOptions: {},
                 filters: {},
-                entitySelector: null,
+                rootEntity: null,
                 filterContainer: '<span class="active-filter">',
                 activityChoiceContainerSelector: '.activity-choice-container',
                 typeChoiceContainerSelector: '.type-choice-container'
@@ -182,7 +182,7 @@ define(function(require) {
                     filterType: this.activityFilter.getType(),
                     activityType: this.typeFilter.getValue(),
                     filter: filter,
-                    entityClassName: $(this.options.entitySelector).val(),
+                    entityClassName: this.options.rootEntity,
                     activityFieldName: this.getColumnName()
                 }
             };

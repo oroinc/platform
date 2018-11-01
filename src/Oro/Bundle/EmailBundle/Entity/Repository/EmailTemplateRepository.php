@@ -3,10 +3,19 @@
 namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\QueryBuilder;
+use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
+use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
+/**
+ * Provides methods for querying email templates related information such as getting localized email template or
+ * getting system only email templates.
+ */
 class EmailTemplateRepository extends EntityRepository
 {
     /**
@@ -24,26 +33,33 @@ class EmailTemplateRepository extends EntityRepository
     /**
      * Load templates by entity name
      *
-     * @param string       $entityName
+     * @param AclHelper $aclHelper
+     * @param string $entityName
      * @param Organization $organization
-     * @param bool         $includeNonEntity
-     * @param bool         $includeSystemTemplates
+     * @param bool $includeNonEntity
+     * @param bool $includeSystemTemplates
      *
      * @return EmailTemplate[]
      */
     public function getTemplateByEntityName(
+        AclHelper $aclHelper,
         $entityName,
         Organization $organization,
         $includeNonEntity = false,
         $includeSystemTemplates = true
     ) {
-        return $this->getEntityTemplatesQueryBuilder(
+        $qb = $this->getEntityTemplatesQueryBuilder(
             $entityName,
             $organization,
             $includeNonEntity,
             $includeSystemTemplates
-        )
-            ->getQuery()->getResult();
+        );
+
+        if ($aclHelper === null) {
+            return $qb->getQuery()->getResult();
+        }
+
+        return $aclHelper->apply($qb)->getResult();
     }
 
     /**
@@ -113,5 +129,54 @@ class EmailTemplateRepository extends EntityRepository
             ->where('e.entityName IS NULL');
 
         return $qb;
+    }
+
+    /**
+     * @param EmailTemplateCriteria $criteria
+     * @param string $language
+     * @return EmailTemplate|null
+     * @throws NonUniqueResultException
+     */
+    public function findOneLocalized(EmailTemplateCriteria $criteria, string $language): ?EmailTemplate
+    {
+        $queryBuilder = $this->createQueryBuilder('t')->select('t');
+        $this->resolveEmailTemplateCriteria($queryBuilder, $criteria);
+
+        $query = $queryBuilder->getQuery();
+        $query
+            ->setHint(
+                \Doctrine\ORM\Query::HINT_CUSTOM_OUTPUT_WALKER,
+                TranslationWalker::class
+            )
+            ->setHint(TranslatableListener::HINT_TRANSLATABLE_LOCALE, $language)
+            ->useQueryCache(false); // due to bug https://github.com/Atlantic18/DoctrineExtensions/issues/1021
+
+        return $query->getOneOrNullResult();
+    }
+
+    /**
+     * @param EmailTemplateCriteria $criteria
+     * @return bool
+     */
+    public function isExist(EmailTemplateCriteria $criteria): bool
+    {
+        $queryBuilder = $this->createQueryBuilder('t')->select('1');
+        $this->resolveEmailTemplateCriteria($queryBuilder, $criteria);
+
+        return (bool) $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param EmailTemplateCriteria $criteria
+     */
+    private function resolveEmailTemplateCriteria(QueryBuilder $queryBuilder, EmailTemplateCriteria $criteria): void
+    {
+        $queryBuilder->andWhere($queryBuilder->expr()->eq('t.name', ':name'));
+        $queryBuilder->setParameter('name', $criteria->getName());
+        if ($criteria->getEntityName()) {
+            $queryBuilder->andWhere($queryBuilder->expr()->eq('t.entityName', ':entityName'));
+            $queryBuilder->setParameter('entityName', $criteria->getEntityName());
+        }
     }
 }

@@ -7,13 +7,10 @@ use Oro\Bundle\ApiBundle\Request\Version;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
- * Warms up Data API resourses and sub-resources caches.
+ * Warms up Data API resources and sub-resources caches.
  */
 class ResourcesCacheWarmer implements CacheWarmerInterface
 {
-    /** @var EntityAliasResolverRegistry */
-    private $entityAliasResolverRegistry;
-
     /** @var ResourcesProvider */
     private $resourcesProvider;
 
@@ -24,18 +21,15 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
     private $requestTypes;
 
     /**
-     * @param EntityAliasResolverRegistry $entityAliasResolverRegistry
-     * @param ResourcesProvider           $resourcesProvider
-     * @param SubresourcesProvider        $subresourcesProvider
-     * @param array                       $requestTypes
+     * @param ResourcesProvider    $resourcesProvider
+     * @param SubresourcesProvider $subresourcesProvider
+     * @param array                $requestTypes
      */
     public function __construct(
-        EntityAliasResolverRegistry $entityAliasResolverRegistry,
         ResourcesProvider $resourcesProvider,
         SubresourcesProvider $subresourcesProvider,
         array $requestTypes
     ) {
-        $this->entityAliasResolverRegistry = $entityAliasResolverRegistry;
         $this->resourcesProvider = $resourcesProvider;
         $this->subresourcesProvider = $subresourcesProvider;
         $this->requestTypes = $requestTypes;
@@ -46,19 +40,7 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        $this->entityAliasResolverRegistry->warmUpCache();
-
-        foreach ($this->requestTypes as $requestType) {
-            $requestType = new RequestType($requestType);
-            $resources = $this->resourcesProvider->getResources(Version::LATEST, $requestType);
-            foreach ($resources as $resource) {
-                $this->subresourcesProvider->getSubresources(
-                    $resource->getEntityClass(),
-                    Version::LATEST,
-                    $requestType
-                );
-            }
-        }
+        $this->warmUpCache();
     }
 
     /**
@@ -67,5 +49,28 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
     public function isOptional()
     {
         return true;
+    }
+
+    /**
+     * Clears the cache.
+     */
+    public function clearCache()
+    {
+        $this->resourcesProvider->clearCache();
+    }
+
+    /**
+     * Warms up the cache.
+     */
+    public function warmUpCache()
+    {
+        foreach ($this->requestTypes as $aspects) {
+            $version = Version::LATEST;
+            $requestType = new RequestType($aspects);
+            $resources = $this->resourcesProvider->getResources($version, $requestType);
+            foreach ($resources as $resource) {
+                $this->subresourcesProvider->getSubresources($resource->getEntityClass(), $version, $requestType);
+            }
+        }
     }
 }

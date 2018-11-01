@@ -18,7 +18,7 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorOrmRelate
     /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
     private $aclGroupProvider;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

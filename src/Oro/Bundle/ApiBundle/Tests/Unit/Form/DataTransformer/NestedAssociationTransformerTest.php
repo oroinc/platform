@@ -63,7 +63,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         return [
             [null, null],
             ['', null],
-            [[], null],
+            [[], null]
         ];
     }
 

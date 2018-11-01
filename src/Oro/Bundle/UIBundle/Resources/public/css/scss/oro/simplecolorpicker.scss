@@ -1,0 +1,147 @@
+/* @theme: admin.oro; */
+
+.simplecolorpicker {
+    &.icon {
+        &[data-color=''],
+        &[data-color='#FFFFFF'],
+        &[data-color='#ffffff'] {
+            border: 1px solid rgba(0, 0, 0, .2);
+        }
+
+        &[data-color='']:hover,
+        &[data-color='#FFFFFF']:hover,
+        &[data-color='#ffffff']:hover {
+            border: 1px solid rgba(0, 0, 0, .2) !important;
+        }
+    }
+
+    span.color {
+        &[data-color=''],
+        &[data-color='#FFFFFF'],
+        &[data-color='#ffffff'] {
+            border: 1px solid rgba(0, 0, 0, .2);
+        }
+
+        &[data-color='']:hover,
+        &[data-color='#FFFFFF']:hover,
+        &[data-color='#ffffff']:hover {
+            border: 1px solid rgba(0, 0, 0, .2) !important;
+        }
+
+        &[data-selected]:after {
+            color: inherit !important;
+        }
+    }
+}
+
+i.color {
+    display: block;
+    border: 1px solid rgba(0, 0, 0, .2);
+    width: 18px;
+    height: 18px;
+    margin-top: -3px;
+}
+
+.context-menu,
+.controls {
+    .simplecolorpicker.icon,
+    .simplecolorpicker span.color {
+        width: 18px;
+        height: 18px;
+        margin: 0 3px 3px 0;
+    }
+
+    .simplecolorpicker.icon {
+        margin-top: 3px;
+    }
+
+    .simplecolorpicker span.vr {
+        margin: 0 5px 0 2px;
+        padding: 3px 0 0 0;
+    }
+
+    .simplecolorpicker.fontawesome {
+        span.color {
+            position: relative;
+            margin: 0 3px -3px 0;
+        }
+
+        span.color[data-selected]:after {
+            margin: 0;
+            display: block;
+            position: absolute;
+            top: -2px;
+            left: 2px;
+        }
+    }
+
+    .simplecolorpicker.inline {
+        padding-top: 3px;
+        padding-bottom: 0;
+        margin-bottom: -3px;
+        max-width: 263px;
+    }
+
+    .simplecolorpicker.inline.with-empty-color,
+    .simplecolorpicker.inline.with-custom-color {
+        max-width: 294px;
+    }
+
+    .simplecolorpicker {
+        .minicolors-swatch {
+            position: relative;
+            vertical-align: top;
+            background-position: -62px -1px;
+        }
+    }
+
+    .minicolors {
+        .minicolors-panel {
+            padding: 5px;
+            border: 1px solid rgba(0, 0, 0, .2);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+
+            .minicolors-grid {
+                top: 6px;
+                left: 6px;
+            }
+
+            .minicolors-slider {
+                top: 6px;
+                left: 157px;
+            }
+        }
+
+        .form-actions {
+            position: absolute;
+            top: 162px;
+            left: 0;
+            width: 183px;
+            padding: 5px;
+            margin: 0;
+            background-color: #fff;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+
+            .btn {
+                margin-left: 5px;
+            }
+        }
+    }
+}
+
+.context-menu {
+    .minicolors-swatch {
+        cursor: pointer;
+        position: relative;
+        vertical-align: top;
+        background-position: -62px -1px;
+        width: 18px;
+        height: 18px;
+        margin-right: 5px;
+        border: 1px solid rgba(0, 0, 0, .2);
+    }
+
+    .minicolors-swatch:hover {
+        border: 1px solid #222; /* $gray-dark */
+    }
+}

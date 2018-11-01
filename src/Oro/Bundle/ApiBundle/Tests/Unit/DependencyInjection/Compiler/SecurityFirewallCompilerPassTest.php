@@ -101,7 +101,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
             [
                 new IteratorArgument(
                     [
-                        new Reference('security.access_listener'),
+                        new Reference('security.access_listener')
                     ]
                 ),
                 $exceptionListener

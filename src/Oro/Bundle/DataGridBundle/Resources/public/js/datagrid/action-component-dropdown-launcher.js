@@ -3,8 +3,14 @@ define(function(require) {
 
     var ActionComponentDropdownLauncher;
     var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
     var ActionLauncher = require('orodatagrid/js/datagrid/action-launcher');
+    var DatagridSettingsDialogWidget = require('./datagrid-settings-dialog-widget');
 
+    /**
+     * @class ActionComponentDropdownLauncher
+     * @extends ActionLauncher
+     */
     ActionComponentDropdownLauncher = ActionLauncher.extend({
         template: require('tpl!orodatagrid/templates/datagrid/action-component-dropdown-launcher.html'),
 
@@ -28,8 +34,14 @@ define(function(require) {
 
         events: {
             'click .dropdown-menu': 'onDropdownMenuClick',
-            'shown.bs.dropdown': 'onOpen'
+            'show.bs.dropdown': 'onBeforeOpen',
+            'shown.bs.dropdown': 'onOpen',
+            'hide.bs.dropdown': 'onHide'
         },
+
+        dialogWidget: null,
+
+        allowDialog: true,
 
         /**
          * @inheritDoc
@@ -42,12 +54,15 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
+            _.extend(this, _.pick(options, ['allowDialog']));
             this.componentOptions = _.omit(options, ['action', 'componentConstructor']);
             this.componentConstructor = options.componentConstructor;
             this.componentOptions.grid = options.action.datagrid;
             if (options.wrapperClassName) {
                 this.wrapperClassName = options.wrapperClassName;
             }
+            mediator.on('layout:reposition', this._updateDropdown, this);
+
             ActionComponentDropdownLauncher.__super__.initialize.call(this, options);
         },
 
@@ -65,6 +80,10 @@ define(function(require) {
          */
         render: function() {
             ActionComponentDropdownLauncher.__super__.render.call(this);
+            if (_.isMobile() && this.allowDialog) {
+                this.$('.dropdown-toggle').dropdown('dispose');
+                this.$('.dropdown-toggle').on('click' + this.eventNamespace(), _.bind(this.openDialogWidget, this));
+            }
             this.componentOptions._sourceElement = this.$('.dropdown-menu');
             var Component = this.componentConstructor;
             this.component = new Component(this.componentOptions);
@@ -78,6 +97,9 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
+
+            this.$('.dropdown-toggle').off(this.eventNamespace());
+
             if (this.component) {
                 this.component.dispose();
             }
@@ -98,6 +120,17 @@ define(function(require) {
         },
 
         /**
+         * Handles bootstrap dropdown show event
+         *
+         * @param {jQuery.Event} showEvent
+         */
+        onBeforeOpen: function(showEvent) {
+            if (_.isFunction(this.component.beforeOpen)) {
+                this.component.beforeOpen(showEvent);
+            }
+        },
+
+        /**
          * Handles dropdown menu open and sets max-width for the element
          */
         onOpen: function() {
@@ -110,17 +143,43 @@ define(function(require) {
                 $dropdownMenu.css({
                     maxWidth: rect.right + 'px'
                 });
+
+                // focus input after Bootstrap opened dropdown menu
+                $dropdownMenu.focusFirstInput();
             }
-            var $elem = this.$('.dropdown-menu');
-            // focus input after Bootstrap opened dropdown menu
-            $elem.focusFirstInput();
+            mediator.trigger('dropdown-launcher:show');
+        },
+
+        /**
+         * Handles dropdown menu hide
+         */
+        onHide: function() {
+            mediator.trigger('dropdown-launcher:hide');
+        },
+
+        /**
+         * Create component view in scope of DialogWidget instance
+         */
+        openDialogWidget: function() {
+            mediator.execute('showLoading');
+
+            this.dialogWidget = new DatagridSettingsDialogWidget({
+                title: 'Grid Manage',
+                View: this.componentConstructor,
+                viewOptions: this.componentOptions,
+                stateEnabled: false,
+                incrementalPosition: true,
+                resize: false
+            });
+
+            this.dialogWidget.render();
         },
 
         /**
          * @inheritDoc
          */
         disable: function() {
-            this.$('.dropdown-toggle').addClass('disabled');
+            this.$('[data-toggle="dropdown"]').addClass('disabled');
             return ActionComponentDropdownLauncher.__super__.disable.call(this);
         },
 
@@ -128,8 +187,16 @@ define(function(require) {
          * @inheritDoc
          */
         enable: function() {
-            this.$('.dropdown-toggle').removeClass('disabled');
+            this.$('[data-toggle="dropdown"]').removeClass('disabled');
             return ActionComponentDropdownLauncher.__super__.enable.call(this);
+        },
+
+        /**
+         * Triggering dropdown update
+         * @private
+         */
+        _updateDropdown: function() {
+            this.$('[data-toggle="dropdown"]').dropdown('update');
         }
     });
 

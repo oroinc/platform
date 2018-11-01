@@ -4,6 +4,9 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
+/**
+ * Provides methods to generate column/table/index names of extend entities
+ */
 class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
 {
     const CUSTOM_TABLE_PREFIX              = 'oro_ext_';
@@ -73,38 +76,6 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
             '%s%s',
             ExtendHelper::buildToManyRelationTargetFieldName($entityClassName, $associationName),
             $suffix
-        );
-    }
-
-    /**
-     * Builds a column name for a many-to-many relation
-     *
-     * @param string $entityClassName
-     * @return string
-     * @deprecated since 1.9. Use generateManyToManyJoinTableColumnName instead
-     */
-    public function generateManyToManyRelationColumnName($entityClassName)
-    {
-        return sprintf(
-            '%s%s',
-            strtolower(ExtendHelper::getShortClassName($entityClassName)),
-            self::RELATION_COLUMN_SUFFIX
-        );
-    }
-
-    /**
-     * Builds a column name for a many-to-one relation
-     *
-     * @param string $associationName
-     * @return string
-     * @deprecated since 1.9. Use generateRelationColumnName instead
-     */
-    public function generateManyToOneRelationColumnName($associationName)
-    {
-        return sprintf(
-            '%s%s',
-            $associationName,
-            self::RELATION_COLUMN_SUFFIX
         );
     }
 
