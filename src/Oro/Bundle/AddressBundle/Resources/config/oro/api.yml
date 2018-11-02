@@ -2,6 +2,14 @@ api:
     entities:
         Oro\Bundle\AddressBundle\Entity\Address:
             documentation_resource: '@OroAddressBundle/Resources/doc/api/address.md'
+            fields:
+                createdAt:
+                    property_path: created
+                updatedAt:
+                    property_path: updated
+                customRegion:
+                    exclude: false # set manually because this field is marked as excluded in entity.yml
+                    property_path: regionText
 
         Oro\Bundle\AddressBundle\Entity\AddressType:
             documentation_resource: '@OroAddressBundle/Resources/doc/api/address.md'
