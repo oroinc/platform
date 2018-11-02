@@ -105,6 +105,10 @@
 }
 
 .dropdown-toggle {
+    &:after {
+        vertical-align: $caret-width / 2;
+    }
+
     &--no-caret {
         &:after {
             content: none;
