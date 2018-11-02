@@ -3,10 +3,13 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
+use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Translation\Reader\TranslationReader;
 
 class TranslationServiceProviderTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $adapter;
 
@@ -34,9 +37,7 @@ class TranslationServiceProviderTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->testPath = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '/oro_trans_dir';
-        $this->removeTestDir($this->testPath);
-        mkdir($this->testPath);
+        $this->testPath = $this->getTempDir('trans');
         $this->service = new TranslationServiceProvider(
             $this->adapter,
             $this->dumper,
@@ -44,35 +45,6 @@ class TranslationServiceProviderTest extends \PHPUnit\Framework\TestCase
             $this->databasePersister,
             $this->testPath
         );
-    }
-
-    /**
-     * @param string $dir
-     */
-    protected function removeTestDir($dir)
-    {
-        if (is_dir($dir)) {
-            $files = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-                \RecursiveIteratorIterator::CHILD_FIRST
-            );
-
-            foreach ($files as $fileInfo) {
-                if ($fileInfo->isDir()) {
-                    rmdir($fileInfo->getRealPath());
-                } else {
-                    unlink($fileInfo->getRealPath());
-                }
-            }
-
-            rmdir($dir);
-        }
-    }
-
-    protected function tearDown()
-    {
-        unset($this->adapter, $this->dumper, $this->service);
-        $this->removeTestDir($this->testPath);
     }
 
     /**

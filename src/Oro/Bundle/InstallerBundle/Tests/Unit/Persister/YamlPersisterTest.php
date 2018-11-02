@@ -1,34 +1,22 @@
 <?php
 
-namespace Oro\Bundle\InstallerBundle\Tests\Unit;
+namespace Oro\Bundle\InstallerBundle\Tests\Unit\Persister;
 
 use Oro\Bundle\InstallerBundle\Persister\YamlPersister;
+use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
 class YamlPersisterTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var string */
     protected $temporaryDir;
 
     protected function setUp()
     {
-        $this->temporaryDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'YamlPersisterTest';
-        @\mkdir($this->temporaryDir);
-    }
-
-    protected function tearDown()
-    {
-        $fs = new Filesystem();
-        $finder = new Finder();
-
-        if (is_dir($this->temporaryDir)) {
-            $fs->remove($finder->files()->in($this->temporaryDir));
-        }
-        @\rmdir($this->temporaryDir);
-
-        self::assertDirectoryNotExists($this->temporaryDir);
+        $this->temporaryDir = $this->getTempDir('YamlPersisterTest');
     }
 
     public function testDoNotDropExistingData()

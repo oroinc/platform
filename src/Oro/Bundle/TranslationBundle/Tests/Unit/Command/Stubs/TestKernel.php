@@ -10,18 +10,17 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class TestKernel extends Kernel
 {
-    public function __construct()
+    /**
+     * @param string $rootDir
+     */
+    public function __construct(string $rootDir)
     {
+        $this->rootDir = $rootDir;
         parent::__construct('test_stub_env', true);
     }
 
     public function init()
     {
-    }
-
-    public function getRootDir()
-    {
-        return sys_get_temp_dir() . '/translation-test-stub-cache';
     }
 
     public function registerBundles()
