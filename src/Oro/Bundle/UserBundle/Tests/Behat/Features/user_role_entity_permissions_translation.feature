@@ -1,6 +1,6 @@
 @ticket-BAP-17661
 @fixture-OroLocaleBundle:LocalizationFixture.yml
-Feature: User role entity permissions translations
+Feature: User role entity permissions translation
   In order to see role permissions on view page
   As an Administrator
   I want to be able to see entity labels in current language
