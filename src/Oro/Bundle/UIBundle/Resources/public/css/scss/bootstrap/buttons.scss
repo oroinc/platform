@@ -111,6 +111,7 @@ fieldset:disabled a.btn {
     [class*=" fa-"] {
         margin: $btn-icon-fa-offset;
         text-indent: $btn-icon-fa-text-indent;
+        line-height: $btn-icon-fa-line-height;
         position: $btn-icon-fa-position;
         top: $btn-icon-fa-top;
         #{$start}: $btn-icon-fa-left;
@@ -265,5 +266,30 @@ input[type="reset"],
 input[type="button"] {
     &.btn-block {
         width: 100%;
+    }
+}
+
+.mobile-version {
+    .btn {
+        @include button-size(
+            $btn-mobile-padding-y,
+            $btn-mobile-padding-x,
+            $btn-mobile-font-size,
+            $btn-mobile-line-height,
+            $btn-mobile-border-radius
+        );
+    }
+
+    .btn-icon {
+        width: $btn-icon-mobile-width;
+        height: $btn-icon-mobile-height;
+        padding: $btn-icon-inner-offset;
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            &:before {
+                font-size: $btn-icon-mobile-fa-icon-font-size;
+            }
+        }
     }
 }

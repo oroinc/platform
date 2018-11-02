@@ -26,6 +26,8 @@
     font-size: $oro-datagrid-header-font-size;
 
     .caret {
+        position: relative;
+
         display: none;
         height: $oro-datagrid-caret-size * 2;
         margin-#{$start}: $oro-datagrid-caret-size;
@@ -38,7 +40,7 @@
     .ascending {
         .caret {
             display: inline-block;
-            margin-top: -$oro-datagrid-caret-offset;
+            top: $oro-datagrid-caret-ascending-offset;
 
             border-top: $oro-datagrid-caret-size solid transparent;
             border-bottom: $oro-datagrid-caret-size solid transparent;
@@ -49,7 +51,7 @@
     .descending {
         .caret {
             display: inline-block;
-            margin-top: ($oro-datagrid-caret-offset / 2);
+            top: $oro-datagrid-caret-descending-offset;
 
             border-bottom: $oro-datagrid-caret-size solid transparent;
             border-top: $oro-datagrid-caret-size solid transparent;
@@ -82,6 +84,8 @@
         line-height: $oro-datagrid-label-line-height;
 
         color: $oro-datagrid-label-color;
+
+        vertical-align: $oro-datagrid-label-align;
     }
 
     &:first-child {

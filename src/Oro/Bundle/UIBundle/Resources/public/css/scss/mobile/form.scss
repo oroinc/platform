@@ -136,6 +136,10 @@ h5.user-fieldset {
     margin: $user-fieldset-offset;
 }
 
+.widget-title {
+    line-height: $user-fieldset-line-height;
+}
+
 .well {
     margin-bottom: $well-offset-bottom;
 

@@ -7,6 +7,8 @@
     border-bottom: 1px solid $role-capability-color;
 
     &:last-child {
+        padding-bottom: 0;
+
         border-bottom: none;
     }
 

@@ -71,7 +71,6 @@ body:not(.login-page) {
     }
 }
 
-
 .layout-content {
     > .scrollable-container {
         padding-#{$start}: $content-padding;
@@ -97,8 +96,20 @@ body:not(.login-page) {
         &:not(.responsive-small) {
             .responsive-cell {
                 &:first-child {
-                    .user-fieldset {
-                        margin-left: 16px;
+                    .user-fieldset,
+                    .widget-title {
+                        margin-left: $content-padding-medium;
+                    }
+                }
+            }
+        }
+
+        &.responsive-medium {
+            &:not(.responsive-section-no-blocks) {
+                .responsive-cell {
+                    .user-fieldset,
+                    .widget-title {
+                        margin-left: $content-padding-medium;
                     }
                 }
             }
@@ -106,8 +117,9 @@ body:not(.login-page) {
 
         &.responsive-small {
             .responsive-cell {
-                .user-fieldset {
-                    margin-left: 16px;
+                .user-fieldset,
+                .widget-title {
+                    margin-left: $content-padding-medium;
                 }
             }
         }

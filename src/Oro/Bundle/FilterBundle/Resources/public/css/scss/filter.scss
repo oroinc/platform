@@ -14,6 +14,7 @@
         visibility: $filter-box-criteria-visibility;
         z-index: $filter-box-criteria-z-index;
         margin-top: $filter-box-criteria-offset-top;
+        margin-left: $filter-box-criteria-offset-left;
         top: $filter-box-criteria-top;
 
         .btn-group {
@@ -172,6 +173,7 @@
     .filter-item {
         margin-right: $filter-box-item-offset-right;
         margin-bottom: $filter-box-item-offset-bottom;
+        position: $filter-box-item-position;
         display: $filter-box-item-display;
         vertical-align: $filter-box-item-vertical-align;
         white-space: $filter-box-item-white-space;
