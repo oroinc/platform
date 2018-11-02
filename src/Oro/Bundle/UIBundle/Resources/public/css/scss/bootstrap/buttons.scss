@@ -111,6 +111,7 @@ fieldset:disabled a.btn {
     [class*=" fa-"] {
         margin: $btn-icon-fa-offset;
         text-indent: $btn-icon-fa-text-indent;
+        line-height: $btn-icon-fa-line-height;
         position: $btn-icon-fa-position;
         top: $btn-icon-fa-top;
         #{$start}: $btn-icon-fa-left;

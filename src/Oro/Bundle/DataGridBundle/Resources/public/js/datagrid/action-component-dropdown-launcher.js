@@ -164,7 +164,7 @@ define(function(require) {
             mediator.execute('showLoading');
 
             this.dialogWidget = new DatagridSettingsDialogWidget({
-                title: 'Grid Settings',
+                title: _.__('oro.datagrid.settings.title'),
                 View: this.componentConstructor,
                 viewOptions: this.componentOptions,
                 stateEnabled: false,
