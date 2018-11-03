@@ -681,7 +681,17 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($accessor, $this->context->getFilterValues());
     }
 
-    public function testCors()
+    public function testMasterRequest()
+    {
+        self::assertFalse($this->context->isMasterRequest());
+        self::assertFalse($this->context->get('masterRequest'));
+
+        $this->context->setMasterRequest(true);
+        self::assertTrue($this->context->isMasterRequest());
+        self::assertTrue($this->context->get('masterRequest'));
+    }
+
+    public function testCorsRequest()
     {
         self::assertFalse($this->context->isCorsRequest());
         self::assertFalse($this->context->get('cors'));
