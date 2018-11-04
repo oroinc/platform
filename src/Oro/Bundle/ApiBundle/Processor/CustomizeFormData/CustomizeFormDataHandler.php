@@ -56,7 +56,7 @@ class CustomizeFormDataHandler
     {
         /** @var CustomizeFormDataContext $context */
         $context = $form->getConfig()->getAttribute(self::API_EVENT_CONTEXT);
-        if ($context->has(CustomizeFormDataContext::CLASS_NAME)) {
+        if ($context->isInitialized()) {
             // already initialized
             return $context;
         }
@@ -69,12 +69,12 @@ class CustomizeFormDataHandler
 
         /** @var FormContext $formContext */
         $formContext = $rootFormConfig->getAttribute(self::API_CONTEXT);
-        $config = $formContext->getConfig();
         $context->setVersion($formContext->getVersion());
         $context->getRequestType()->set($formContext->getRequestType());
         $context->setClassName($form->getConfig()->getDataClass());
         $context->setParentAction($formContext->getAction());
         $context->setForm($form);
+        $config = $formContext->getConfig();
         if (null === $form->getParent()) {
             $context->setConfig($config);
         } else {
@@ -85,6 +85,10 @@ class CustomizeFormDataHandler
             if (null !== $config) {
                 $context->setConfig($this->getAssociationConfig($config, $propertyPath));
             }
+        }
+        $includedEntities = $formContext->getIncludedEntities();
+        if (null !== $includedEntities) {
+            $context->setIncludedEntities($includedEntities);
         }
 
         return $context;
