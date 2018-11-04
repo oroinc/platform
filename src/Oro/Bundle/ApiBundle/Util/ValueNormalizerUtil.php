@@ -6,6 +6,12 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
+/**
+ * Provides a set of static methods that can be used to simplify converting
+ * an entity class name to API entity type and vise versa.
+ * In additional this class can be used to transform any class, usually an exception
+ * or a validation constraint, to a human-readable representation.
+ */
 class ValueNormalizerUtil
 {
     /**
@@ -26,17 +32,24 @@ class ValueNormalizerUtil
         if (false !== $delimiter) {
             $className = substr($className, $delimiter + 1);
         }
-        // remove $classSuffix if $className already has it
-        if ($classSuffix && substr($className, -strlen($classSuffix)) === $classSuffix) {
-            $classSuffix = null;
-        }
         // divide class name into words
         $result = strtolower(preg_replace('/(?<=\\w)([A-Z\\\\])/', ' $1', $className));
+        // remove "_" characters, fix abbreviations and remove redundant whitespaces
+        $result = preg_replace(
+            '/(?<!\w{2}) (?!\w{2})/',
+            '',
+            preg_replace('/\W+/', ' ', str_replace('_', ' ', $result))
+        );
+        // add suffix
         if ($classSuffix) {
-            $result .= ' ' . strtolower($classSuffix);
+            $suffix = strtolower($classSuffix);
+            if ($result !== $suffix) {
+                $suffix = ' ' . $suffix;
+                if (substr($result, -strlen($suffix)) !== $suffix) {
+                    $result .= $suffix;
+                }
+            }
         }
-        // remove redundant "_" characters and fix abbreviations
-        $result = preg_replace('/(?<!\w{2}) (?!\w{2})/', '', str_replace('_ ', ' ', $result));
 
         return $result;
     }

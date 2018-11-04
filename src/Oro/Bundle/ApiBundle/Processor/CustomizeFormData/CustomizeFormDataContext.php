@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Processor\CustomizeDataContext;
 use Symfony\Component\Form\FormInterface;
 
@@ -57,6 +58,19 @@ class CustomizeFormDataContext extends CustomizeDataContext
 
     /** @var mixed */
     private $data;
+
+    /** @var IncludedEntityCollection|null */
+    private $includedEntities;
+
+    /**
+     * Checks if the context is already initialized.
+     *
+     * @return bool
+     */
+    public function isInitialized(): bool
+    {
+        return null !== $this->form;
+    }
 
     /**
      * Gets the form event name.
@@ -143,6 +157,26 @@ class CustomizeFormDataContext extends CustomizeDataContext
     public function setData($data): void
     {
         $this->data = $data;
+    }
+
+    /**
+     * Returns a collection contains additional entities included into the request.
+     *
+     * @return IncludedEntityCollection|null
+     */
+    public function getIncludedEntities(): ?IncludedEntityCollection
+    {
+        return $this->includedEntities;
+    }
+
+    /**
+     * Sets a collection contains additional entities included into the request.
+     *
+     * @param IncludedEntityCollection $includedEntities
+     */
+    public function setIncludedEntities(IncludedEntityCollection $includedEntities): void
+    {
+        $this->includedEntities = $includedEntities;
     }
 
     /**
