@@ -5,24 +5,6 @@
     background: $secondary-200;
 }
 
-.job-progress {
-    background-image: linear-gradient($progress-bar-gradient-start, $progress-bar-gradient-end) !important;
-    position: relative;
-
-    .label {
-        height: 100%;
-
-        span {
-            width: 100%;
-            text-align: center;
-            z-index: 2;
-            display: block;
-            position: absolute;
-            top: 3px;
-        }
-    }
-}
-
 .widget-content > .label-info:first-child {
     margin-bottom: 10px;
 }
@@ -55,10 +37,6 @@ footer {
 
 .small-text.checkbox {
     margin-top: 0 !important;
-}
-
-.top-frame {
-    padding-top: $top-padding/2;
 }
 
 .popup-box {
@@ -136,13 +114,6 @@ footer {
     }
 }
 
-
-.page-title h1 {
-    min-height: 28px;
-    font-size: $base-font-size--xxl;
-    line-height: 1.2em;
-}
-
 .fa-google {
     margin: 0 5px;
 }
@@ -175,39 +146,6 @@ footer {
     border-top: 1px solid $primary-860;
     width: 100%;
     box-sizing: border-box;
-}
-
-.list-group > .list-group-item:after {
-    content: '';
-    clear: both;
-    display: block;
-}
-
-.list-group > .list-group-item:first-child {
-    border: 0;
-}
-
-.badge-enabled,
-.badge-tentatively,
-.badge-disabled {
-    padding: side-values(3px 10px 3px 5px);
-    font-size: 12px;
-    font-weight: normal;
-}
-
-.badge-enabled {
-    background-color: #dff2d4;
-    color: #4c7940;
-}
-
-.badge-tentatively {
-    background-color: #faf2cc;
-    color: #a7a50a;
-}
-
-.badge-disabled {
-    color: #aaa;
-    background-color: #f2f2f2;
 }
 
 .status-disabled,
@@ -282,20 +220,6 @@ footer {
 
 .scroll-holder {
     position: relative;
-}
-
-.user-info-state {
-    clear: #{$end};
-
-    .inline-decorate-container {
-        margin-bottom: -10px;
-        font-size: $base-font-size--s;
-        color: $primary-700;
-
-        .inline-decorate {
-            margin-bottom: 10px;
-        }
-    }
 }
 
 .user-profile-cols .label {
@@ -400,182 +324,9 @@ footer {
     }
 }
 
-.sub-title a {
-    color: $primary-600;
-}
-
-.customer-info {
-    padding-top: 4px;
-    padding-#{$start}: 60px;
-    padding-bottom: 0;
-    line-height: 18px;
-
-    &.customer-simple {
-        padding: side-values(0 4px 0 0);
-    }
-
-    .top-row {
-        &:after {
-            clear: both;
-            display: block;
-            content: '';
-        }
-    }
-
-    .sub-title {
-        font-size: $base-font-size--xl;
-        color: $primary-200;
-        display: inline-block;
-        margin-bottom: 3px;
-    }
-
-    .separator {
-        padding: 0 3px;
-        color: $primary-200;
-        font-size: 18px;
-    }
-
-    .user-name {
-        margin: side-values(0 10px 3px 0);
-        min-height: 15px;
-        display: inline-block;
-        float: none !important;
-        font-size: $base-font-size--xl;
-        line-height: $line-height-base;
-        font-weight: normal;
-    }
-
-    .dropdown.show .caret,
-    .user-name .caret,
-    .user-name:hover .caret {
-        border-top-color: $primary-100 !important;
-        border-bottom-color: $primary-100 !important;
-    }
-
-    .visual {
-        border-radius: 3px;
-        float: #{$start};
-        position: relative;
-        width: 60px;
-        margin: side-values(0 0 0 -60px);
-
-        img {
-            margin-top: -4px;
-            border-radius: 3px;
-            width: 45px;
-        }
-    }
-
-    .nav {
-        margin: 0;
-    }
-
-    ul.inline {
-        margin: 0;
-        padding: 0;
-        color: $primary-700;
-        list-style: none;
-
-        li {
-            padding: 0 10px;
-            margin-bottom: 4px;
-            border-#{$start}: 1px solid $primary-860;
-            font-size: 11px;
-            line-height: 14px;
-            display: inline-block;
-
-            &:first-child {
-                padding: side-values(0 10px 0 0);
-                border: 0;
-            }
-        }
-    }
-}
-
-ul.inline-decorate {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-ul.inline-decorate > li {
-    padding-#{$start}: 10px;
-    margin-#{$start}: 8px;
-    display: inline;
-    border-#{$start}: 1px solid $primary-860;
-}
-
-ul.inline-decorate > li:first-child {
-    padding: 0;
-    border: 0;
-    margin: 0;
-}
-
-ul.inline-extra:after {
-    content: ".";
-    display: block;
-    clear: both;
-    height: 0;
-    visibility: hidden;
-}
-
-ul.inline-extra {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    font-size: 12px;
-    color: #666;
-    width: 100%;
-
-    span.cb {
-        font-size: 10px;
-        line-height: 12px;
-        text-transform: uppercase;
-        color: #aaa;
-    }
-
-    & > li {
-        float: #{$start};
-        padding: 0 10px;
-
-        &:first-child {
-            padding: side-values(0 10px 0 0);
-        }
-    }
-}
-
-.customer-info-actions {
-    background-color: $primary-860;
-    border-bottom: 1px solid $additional-ultra-light;
-
-    .alert {
-        margin-bottom: 0;
-    }
-}
-
-.customer-info-top-actions .btn .caret {
-    margin-top: 10px;
-}
-
-.customer-info-top-actions .btn-group > .disable-filter {
-    height: 21px;
-    line-height: 21px;
-    padding: 3px 2px 0;
-}
-
 .cb {
     display: block;
     clear: both;
-}
-
-.btn-action {
-    color: $primary-700 !important;
-    font-size: 20px;
-    padding: 0 5px !important;
-
-    &:hover {
-        text-decoration: none !important;
-    }
 }
 
 .row-oro {
@@ -597,13 +348,19 @@ ul.inline-extra {
     line-height: 0;
 }
 
+label.required,
+.form-horizontal label.required {
+    position: relative;
+}
+
 label.required em,
 .form-horizontal label.required em {
     color: $danger-dark;
     font-size: 21px;
     font-style: normal;
     margin-#{$start}: 3px;
-    line-height: 1px;
+    position: absolute;
+    top: 0;
 }
 
 body .mce-tinymce {
@@ -741,10 +498,18 @@ textarea {
 }
 
 h5.user-fieldset {
-    font-weight: bold;
-    font-size: 20px;
-    line-height: 20px;
-    margin: side-values(20px 10px 16px 0);
+    font-weight: $content-title-font-weight;
+    font-size: $content-title-font-size;
+    line-height: $content-title-line-height;
+    margin: side-values(0 0 16px);
+    text-align: $start;
+}
+
+.widget-title {
+    font-weight: $content-title-font-weight;
+    font-size: $content-title-font-size;
+    line-height: $content-title-line-height;
+    display: block;
 }
 
 .page-size .dropdown-menu {
@@ -860,41 +625,9 @@ label.radio.error {
     .add-list-item {
         margin-#{$start}: 183px;
     }
-    //
-    //.removeRow {
-    //    font-size: 0;
-    //    line-height: 0;
-    //    margin: 0;
-    //
-    //    &:after {
-    //        display: inline-block;
-    //        font: 14px/1em FontAwesome;
-    //        content: '\f00d';
-    //        text-indent: 0;
-    //    }
-    //}
-
-    .addAfterRow {
-        text-indent: -999;
-        font-size: 0;
-        line-height: 0;
-        margin: 0;
-
-        &:after {
-            display: inline-block;
-            font: 14px/1em FontAwesome;
-            color: $primary-860;
-            content: '\f067';
-            text-indent: 0;
-        }
-
-        &:hover:after {
-            color: $primary-600;
-        }
-    }
 
     .row-oro.oro-multiselect-holder {
-        margin: 0 0 5px;
+        margin: 0 0 8px;
     }
 
     .enum-value-collection & {
@@ -920,7 +653,7 @@ label.radio.error {
 .oro-address-collection.oro-item-collection {
     & > div {
         position: relative;
-        padding: 16px;
+        padding: 16px 0;
         margin: 0 0 20px;
         border: 1px solid $primary-860;
         background: $primary-900;
@@ -934,8 +667,8 @@ label.radio.error {
     .removeRow {
         position: absolute;
         width: 28px;
-        top: 4px;
-        #{$end}: 4px;
+        top: 6px;
+        #{$end}: 6px;
         text-decoration: none;
 
         &:after {
@@ -948,10 +681,7 @@ label.radio.error {
     background-color: $primary-inverse;
 
     .title {
-        padding-bottom: $content-padding / 2;
-
-        font-size: 20px;
-        font-weight: bold;
+        padding-bottom: $content-padding-medium;
     }
 
     .box-content {
@@ -1039,20 +769,12 @@ span.validation-failed {
 
 .responsive-cell .box-type1 {
     .title {
-        overflow: hidden;
-
-        .widget-title {
-            line-height: 21px;
-        }
+        @include clearfix();
     }
+}
 
-    .tab-container {
-        .nav-tabs > .active > a,
-        .nav-tabs > .active > a:hover,
-        .nav-tabs > .active > a:focus {
-            background: $primary-inverse;
-        }
-    }
+.control-group {
+    @include clearfix();
 }
 
 .control-group.create-select-entity {
@@ -1107,12 +829,18 @@ span.validation-failed {
 
 .tooltip-icon {
     color: $primary-700;
-    font-size: 13px;
+    font-size: $base-font-size;
     cursor: pointer;
 }
 
 label .popover-body {
     text-transform: none;
+}
+
+.list-widget.box-type1 {
+    .title {
+        padding-bottom: 0;
+    }
 }
 
 .list-widget .widget-actions-section {
@@ -1122,9 +850,10 @@ label .popover-body {
         box-shadow: none;
         padding: side-values(0 2px 0 8px);
 
-        [class^="fa-"] {
+        .action-button-icon {
+            line-height: initial;
+
             &:before {
-                opacity: .6;
                 font-size: 15px;
             }
 
@@ -1140,7 +869,7 @@ label .popover-body {
     a.btn[disabled] {
         cursor: not-allowed;
 
-        [class^="fa-"] {
+        .action-button-icon {
             &:before {
                 opacity: .3;
             }
@@ -1154,16 +883,18 @@ label .popover-body {
     }
 
     .action-wrapper {
+        vertical-align: middle;
+
         &:not(:first-of-type) .btn {
-            margin-#{$start}: 4px;
+            margin-#{$start}: 5px;
         }
 
         .btn-mini {
             margin-#{$start}: 0;
             border-radius: 0;
             font-weight: normal;
-            font-size: $btn-font-size;
-            padding: 0 7px;
+            font-size: $font-size-base;
+            padding: side-values(0 8px 0 6px);
         }
     }
 
@@ -1196,7 +927,7 @@ label .popover-body {
                 box-shadow: none;
                 padding: 0;
 
-                [class^="fa-"] {
+                .action-button-icon {
                     &:before {
                         opacity: .6;
                         font-size: 15px;
@@ -1214,7 +945,7 @@ label .popover-body {
             .btn[disabled] {
                 cursor: not-allowed;
 
-                [class^="fa-"] {
+                .action-button-icon {
                     &:before {
                         opacity: .3;
                     }
@@ -1309,18 +1040,5 @@ label .popover-body {
     &.overflows .toggle-more,
     &.overflows .toggle-collapse {
         display: block;
-    }
-}
-
-.customer-content {
-    .grid-views {
-        .edited-label {
-            vertical-align: top;
-            line-height: 21px;
-        }
-
-        .btn-link {
-            line-height: 21px;
-        }
     }
 }

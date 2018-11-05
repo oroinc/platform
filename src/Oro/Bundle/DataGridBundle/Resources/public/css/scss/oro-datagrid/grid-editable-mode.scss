@@ -113,15 +113,8 @@
         bottom: auto;
     }
 
-    &__action-item {
-        padding: $oro-datagrid-editable-action-item-offset;
-
-        font-size: $oro-datagrid-action-font-size;
-        line-height: 1;
-    }
-
     &__fields {
-        input[type="text"] {
+        input {
             height: $oro-datagrid-editable-action-item-size;
             line-height: $oro-datagrid-editable-action-item-size;
             padding: $oro-datagrid-editable-action-input-offset;
@@ -137,16 +130,26 @@
     }
 
     &-wrapper {
+        &:not(.tags-select-editor) {
+            .inline-editor__action-item {
+                padding: $oro-datagrid-editable-action-item-offset;
+                font-size: $oro-datagrid-action-font-size;
+                line-height: 1;
+            }
+
+            .select2-container {
+                min-height: $oro-datagrid-editable-action-item-size;
+            }
+
+        }
+
         &.select-editor {
             min-width: $oro-datagrid-select-width;
         }
 
-        .select2-container {
-            min-height: $oro-datagrid-editable-action-item-size;
-        }
-
         .select2-chosen {
             min-height: $oro-datagrid-editable-action-item-size;
+            line-height: $oro-datagrid-editable-action-item-line-height;
             padding: $oro-datagrid-select-offset;
         }
 

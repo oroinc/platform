@@ -41,6 +41,10 @@
             width: $form-item-collection-select2-width;
         }
     }
+
+    .action-cell {
+        text-align: center;
+    }
 }
 
 .oro-item-collection.not-removable {
@@ -68,50 +72,4 @@
 
 input[type="text"].hasDatepicker {
     min-width: $form-item-collection-datepicker-field-min-width;
-}
-
-.form-horizontal {
-    .controls {
-        padding-top: 7px;
-
-        .controls {
-            padding-top: 0;
-        }
-
-        >,
-        .oro-clearfix,
-        .fallback-container {
-            input:not([type=checkbox]):not([type=radio]),
-            textarea,
-            .selector,
-            .select2-container,
-            .input-append {
-                margin-top: -7px; //  input padding + border
-
-                + .fallback-status,
-                + .btn:not(.add-on),
-                > .btn:not(.add-on) {
-                    margin-top: -7px;
-                }
-
-            }
-
-            .selector,
-            .select2-container,
-            .input-append,
-            td {
-                input:not([type=checkbox]):not([type=radio]),
-                textarea,
-                .selector,
-                .select2-container {
-                    margin-top: 0;
-                }
-            }
-        }
-
-        .jstree-wrapper {
-            padding-top: 0;
-            min-width: $field-width;
-        }
-    }
 }
