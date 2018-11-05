@@ -7,10 +7,6 @@ use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class WidgetBusinessUnitSelectType
- *
- * @package Oro\Bundle\OrganizationBundle\Form\Type
- *
  * Provide business unit select
  * create select field
  */

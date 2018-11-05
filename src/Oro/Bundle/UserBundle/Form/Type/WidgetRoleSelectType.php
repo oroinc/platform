@@ -7,10 +7,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class WidgetRoleSelectType
- *
- * @package Oro\Bundle\UserBundle\Form\Type
- *
  * Provide select role
  * create select field
  */

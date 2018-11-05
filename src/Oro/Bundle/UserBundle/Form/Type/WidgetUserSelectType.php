@@ -7,10 +7,6 @@ use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class WidgetUserSelectType
- *
- * @package Oro\Bundle\UserBundle\Form\Type
- *
  * Provide select user list
  * create select field
  */
