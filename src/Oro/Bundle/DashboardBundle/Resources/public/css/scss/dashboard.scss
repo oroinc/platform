@@ -326,14 +326,45 @@
 }
 
 .widget-configuration {
+    .form-horizontal {
+        .control-group {
+            > .control-label {
+                width: $dashboard-widget-configuration-control-label-width;
+                min-width: $dashboard-widget-configuration-control-label-width;
+            }
+        }
+    }
+
     .items-selector-widget {
-        margin-#{$end}: 20px;
+        margin-#{$end}: $content-padding;
+    }
+
+    .widget-title-container {
+        display: flex;
+
+        .control-group {
+            &.control-group-checkbox {
+                > .control-label {
+                    width: $dashboard-widget-title-widget-control-label-width;
+                    min-width: $dashboard-widget-title-widget-control-label-min-width;
+                }
+
+                > .controls {
+                    margin-#{$start}: $dashboard-widget-title-widget-controls-offset-start;
+                }
+            }
+        }
     }
 
     .widget-title-widget {
-        margin-#{$end}: 20px;
+        width: $dashboard-widget-title-widget-width;
+        margin-#{$end}: $content-padding;
+        flex-grow: 1;
+        flex-shrink: 1;
+    }
 
-        float: #{$start};
+    .widget-title-input {
+        width: $dashboard-widget-title-input-width;
     }
 
     .date-range-filter {
