@@ -6,6 +6,14 @@ use Oro\Bundle\DashboardBundle\Form\Type\WidgetEntityJquerySelect2HiddenType;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Class WidgetUserSelectType
+ *
+ * @package Oro\Bundle\UserBundle\Form\Type
+ *
+ * Provide select user list
+ * create select field
+ */
 class WidgetUserSelectType extends WidgetEntityJquerySelect2HiddenType
 {
     const NAME = 'oro_type_widget_user_select';
