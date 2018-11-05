@@ -257,6 +257,7 @@ $info-close:                            $info-dark;
 $tag-item-color:                        $secondary;
 $tag-item-background:                   $secondary-300;
 $tag-my-item-background:                $secondary;
+$tag-item-offset:                       side-values(0 2px 1px 0) !default;
 
 $error-message-balloon-background:      lighten($error-text, 20%);
 

@@ -79,10 +79,6 @@
 
     padding: $entity-permission-container-offset 0;
 
-    &.readonly {
-        padding: ($entity-permission-container-offset + $entity-permission-container-offset) 0;
-    }
-
     .action-permissions {
         flex-grow: 1;
         flex-wrap: wrap;
@@ -146,6 +142,11 @@
         white-space: nowrap;
 
         vertical-align: middle;
+
+        &.readonly {
+            padding-top: $entity-permission-container-offset;
+            padding-bottom: $entity-permission-container-offset;
+        }
     }
 
     &__item-wrapper--no-access {
@@ -163,6 +164,7 @@
         @include text-line-truncate($action-permissions-label-trim-width, true);
     }
 
+    &__value,
     &__dropdown-toggle {
         display: inline-block;
         vertical-align: middle;

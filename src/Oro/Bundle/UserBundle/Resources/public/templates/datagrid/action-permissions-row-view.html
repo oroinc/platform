@@ -1,7 +1,7 @@
 <% var labelId = _.uniqueId('label-') %>
 <% var regionId = _.uniqueId('collapse-region-') %>
 <td class="grid-body-cell" colspan="3">
-    <div class="entity-permission-container readonly<% if (fields.length === 0) {%> field-less<% } %>">
+    <div class="entity-permission-container <% if (fields.length === 0) {%> field-less<% } %>">
         <div class="collapse-expand-action-container">
             <a href="#" class="collapse-action collapsed" role="button" title="<%- _.__('Expand') %>"
                 data-collapsed-title="<%- _.__('Expand') %>" data-expanded-title="<%- _.__('Collapse') %>"

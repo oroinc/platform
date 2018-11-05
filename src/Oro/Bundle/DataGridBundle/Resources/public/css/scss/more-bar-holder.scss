@@ -49,6 +49,10 @@
         // Override bootstrap margin
         margin: 0;
     }
+
+    .launchers-list {
+        padding: $launchers-list-at-dropdown-offset;
+    }
 }
 
 .launchers-list {

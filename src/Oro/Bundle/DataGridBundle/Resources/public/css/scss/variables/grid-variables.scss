@@ -1,7 +1,6 @@
 /* @theme: admin.oro; */
 
 $oro-datagrid-offset: null !default;
-$oro-datagrid-background: $primary-600 !default;
 $oro-datagrid-body-color: $primary-200 !default;
 $oro-datagrid-radius: 2px !default;
 $oro-datagrid-base-offset: 4px !default;
@@ -22,14 +21,21 @@ $oro-datagrid-label-align: middle !default;
 $oro-datagrid-cell-border-color: $primary-830 !default;
 $oro-datagrid-cell-background-hover: $primary-900 !default;
 
+$oro-datagrid-header-background: $primary-600 !default;
 $oro-datagrid-header-cell-highlight: $extra-dark !default;
 $oro-datagrid-header-cell-inner-offset: 11px 8px !default;
 $oro-datagrid-header-cell-radius: 2px !default;
 
 $oro-datagrid-body-cell-inner-offset: 10px 8px 9px 8px !default;
 $oro-datagrid-body-cell-border: 1px solid $oro-datagrid-cell-border-color !default;
+$oro-datagrid-body-cell-line-height: 1.6 !default;
 
-$oro-datagrid-footer-cell-inner-offset: 7px 8px !default;
+$oro-datagrid-footer-cell-font-weight: bold !default;
+$oro-datagrid-footer-cell-numeric-font-size: $base-font-size !default;
+$oro-datagrid-footer-cell-background-color: $primary-830 !default;
+$oro-datagrid-footer-cell-color: $primary-200 !default;
+$oro-datagrid-footer-cell-inner-offset: 0 8px !default;
+$oro-datagrid-footer-cell-outer-inner-offset: 8px !default;
 
 $oro-datagrid-row-selected: $extra-300 !default;
 
