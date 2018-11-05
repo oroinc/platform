@@ -348,13 +348,19 @@ footer {
     line-height: 0;
 }
 
+label.required,
+.form-horizontal label.required {
+    position: relative;
+}
+
 label.required em,
 .form-horizontal label.required em {
     color: $danger-dark;
     font-size: 21px;
     font-style: normal;
     margin-#{$start}: 3px;
-    line-height: 1px;
+    position: absolute;
+    top: 0;
 }
 
 body .mce-tinymce {
@@ -496,6 +502,7 @@ h5.user-fieldset {
     font-size: $content-title-font-size;
     line-height: $content-title-line-height;
     margin: side-values(0 0 16px);
+    text-align: $start;
 }
 
 .widget-title {
@@ -821,7 +828,7 @@ span.validation-failed {
 }
 
 .tooltip-icon {
-    color: $primary-550;
+    color: $primary-700;
     font-size: $base-font-size;
     cursor: pointer;
 }

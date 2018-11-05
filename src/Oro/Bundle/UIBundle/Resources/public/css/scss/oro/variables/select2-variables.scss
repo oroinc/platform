@@ -88,10 +88,10 @@ $select2-search-choice-inner-offset-horizontal: 8px !default;
 $select2-search-choice-offset: 3px !default;
 $select2-search-choice-position: relative !default;
 $select2-search-choice-box-sizing: border-box !default;
-$select2-search-choice-float: left !default;
+$select2-search-choice-float: $start !default;
 $select2-search-choice-list-style: none !default;
 
-$select2-search-choice-select2-locked-inner-offset: 4px 8px !default;
+$select2-search-choice-select2-locked-inner-offset: 5px 8px !default;
 
 $select2-search-choice-img-offset-top: -2px !default;
 $select2-search-choice-img-offset-bottom: -2px !default;
@@ -107,6 +107,7 @@ $select2-search-field-background-color: transparent !default;
 $select2-search-field-offset-bottom: 0 !default;
 $select2-search-field-inner-offset: 0 !default;
 $select2-search-field-border: none !default;
+$select2-search-field-top-offset: -3px !default;
 
 $select2-search-field-offset: 0 !default;
 $select2-search-field-inner-offset: 0 !default;
@@ -135,7 +136,7 @@ $select2-search-multi-choice-close-display: block !default;
 $select2-search-multi-choice-close-width: 12px !default;
 $select2-search-multi-choice-close-height: 12px !default;
 $select2-search-multi-choice-close-right: 3px !default;
-$select2-search-multi-choice-close-top: 1px !default;
+$select2-search-multi-choice-close-top: 2px !default;
 
 $select2-search-choice-close-icon: "\f00d" !default;
 $select2-search-choice-close-icon-font-size: $base-font-size--m !default;

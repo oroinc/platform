@@ -22,7 +22,7 @@ $btn-icon-fa-line-height: 1 !default;
 $btn-icon-fa-position: absolute !default;
 $btn-icon-fa-top: 50% !default;
 $btn-icon-fa-left: 50% !default;
-$btn-icon-fa-transform: translate(-50%, -50%) !default;
+$btn-icon-fa-transform: translate(if-ltr(-50%, 50%), -50%) !default;
 
 $btn-icon-dropdown-toggle-width: 44px !default;
 

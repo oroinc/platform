@@ -5,7 +5,10 @@
         width: $oro-quarter-width !important;
         min-width: $oro-quarter-min-width;
         float: $oro-quarter-float;
-        margin-left: $oro-quarter-offset-left;
+
+        &:not(:last-child) {
+            margin-#{$end}: $oro-quarter-offset-right;
+        }
 
         span {
             width: $oro-quarter-span-width !important;

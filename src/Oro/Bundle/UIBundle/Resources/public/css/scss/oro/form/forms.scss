@@ -52,7 +52,7 @@
             line-height: 20px;
 
             .tooltip-icon {
-                margin-right: 8px;
+                margin-#{$end}: $content-padding-small;
             }
 
             label {
@@ -66,8 +66,8 @@
                         font-size: 21px;
                         font-style: normal;
                         position: absolute;
-                        top: 6px;
-                        #{$end}: -16px;
+                        top: -5px;
+                        #{$end}: -11px;
                     }
                 }
 
@@ -102,15 +102,15 @@
             .control-subgroup {
                 display: inline-block;
                 vertical-align: top;
-                margin-right: 8px;
+                margin-#{$end}: $content-padding-small;
 
                 .controls {
-                    margin-left: 0;
-                    float: left;
+                    margin-#{$start}: 0;
+                    float: $start;
                 }
 
                 .tooltip-icon {
-                    margin-right: 8px;
+                    margin-#{$end}: $content-padding-small;
                 }
             }
         }
@@ -141,18 +141,6 @@
             .choice-widget-expanded {
                 padding-top: 6px;
             }
-        }
-    }
-}
-
-.form-horizontal-large {
-    .control-group {
-        max-width: 100%;
-
-        div.control-label,
-        label.control-label {
-            width: 230px;
-            text-align: right;
         }
     }
 }
@@ -193,16 +181,4 @@ input[type='checkbox'] + label {
 
 .form-row {
     padding: 0 0 $margin-bottom-box/2;
-}
-
-@media only screen and (max-width: 1200px) {
-    .form-horizontal {
-        .control-group {
-            > div.control-label,
-            > label.control-label {
-                width: 150px;
-                min-width: 150px;
-            }
-        }
-    }
 }

@@ -57,6 +57,21 @@ $uploader-action-active-background: $additional-extra-light !default;
 $uploader-action-active-color: $primary-400 !default;
 $uploader-action-active-border-color: $additional-extra-light !default;
 
+$select-multiple-height: 138px !default;
+$select-multiple-inner-offset: 4px !default;
+
+$select-multiple-option-inner-offset: 4px 8px !default;
+$select-multiple-option-border-radius: $input-field-border-radius !default;
+$select-multiple-option-font-size: $base-font-size--s !default;
+$select-multiple-option-color: $primary-400 !default;
+
+$select-multiple-option-not-last-offset-bottom: 4px !default;
+
+$select-multiple-option-checked-box-shadow: 0 0 0 32px $primary-830 inset !default;
+$select-multiple-option-checked-color: $primary-400 !default;
+
+$select-multiple-option-active-box-shadow: 0 0 0 32px $input-focus-border-color inset !default;
+
 $select-width: $field-width - 15px !default;
 $selector-line-height: $field-size !default;
 $selector-height: $field-size !default;
@@ -126,3 +141,5 @@ $entity-create-btn-dropdown-toggle-border-radius: 0 2px 2px 0 !default;
 
 $controls-width: 279px !default;
 $controls-selector-width: 100% !default;
+
+$control-group-bottom-offset: $content-padding-medium !default;

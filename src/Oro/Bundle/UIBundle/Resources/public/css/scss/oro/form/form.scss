@@ -104,6 +104,13 @@
             border-color: $uploader-action-active-border-color;
         }
     }
+
+    &.disabled {
+        border-color: $input-disabled-border-color;
+        background-color: $input-disabled-background-color;
+        color: $input-disabled-color;
+        resize: $input-disabled-resize;
+    }
 }
 
 textarea,
@@ -122,8 +129,43 @@ input[type="search"],
 input[type="tel"],
 input[type="color"],
 .uneditable-input,
-.selector {
+.selector,
+select[multiple] {
     @extend .input;
+}
+
+/*
+    Select multiple
+ */
+select[multiple] {
+    height: $select-multiple-height !important;
+    padding: $select-multiple-inner-offset;
+
+    option {
+        padding: $select-multiple-option-inner-offset;
+        border-radius: $select-multiple-option-border-radius;
+        font-size: $select-multiple-option-font-size;
+        color: $select-multiple-option-color;
+
+        &:not(:last-child) {
+            margin-bottom: $select-multiple-option-not-last-offset-bottom;
+        }
+
+        &:checked {
+            box-shadow: $select-multiple-option-checked-box-shadow;
+            color: $select-multiple-option-checked-color !important;
+        }
+    }
+
+    &:focus {
+        option {
+            &:active,
+            &::selection,
+            &:checked {
+                box-shadow: $select-multiple-option-active-box-shadow;
+            }
+        }
+    }
 }
 
 /* Select */
@@ -263,19 +305,19 @@ input[type="color"],
 
     .input-append & {
         border-radius: $add-on-append-border-radius;
-        margin-left: $add-on-append-offset-left;
+        margin-#{$start}: $add-on-append-offset-left;
 
         &:not(:first-of-type) {
-            margin-left: $add-on-append-outer-offset-left;
+            margin-#{$start}: $add-on-append-outer-offset-left;
         }
     }
 
     .input-prepend & {
         border-radius: $add-on-prepend-border-radius;
-        margin-right: $add-on-prepend-offset-right;
+        margin-#{$end}: $add-on-prepend-offset-right;
 
         &:not(:last-of-type) {
-            margin-right: $add-on-prepend-outer-offset-right;
+            margin-#{$end}: $add-on-prepend-outer-offset-right;
         }
     }
 }
@@ -335,8 +377,11 @@ input[type="color"],
 
 /* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
 .controls {
-    select {
+    select:not([multiple]) {
         width: $select-width;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
     }
 }
 

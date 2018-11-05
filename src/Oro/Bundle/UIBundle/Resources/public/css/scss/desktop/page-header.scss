@@ -57,6 +57,7 @@
             > .pull-left-extra {
                 flex-grow: 1;
                 margin-#{$start}: 0;
+                text-align: $start;
             }
 
             > .pull-right {

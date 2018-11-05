@@ -34,6 +34,10 @@
                     2px 1px 0 0 $highlight-text-color,
                     -2px 1px 0 0 $highlight-text-color,
                     -2px -1px 0 0 $highlight-text-color;
+
+        &.tooltip-icon {
+            color: $primary-550;
+        }
     }
 
     &-element.selector,
