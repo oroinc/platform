@@ -2,6 +2,10 @@
 
 @import "bowerassets/bootstrap/scss/reboot";
 
+body {
+    text-align: #{$start};
+}
+
 // Bad practices, should be removed in future
 ul,
 ol {

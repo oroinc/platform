@@ -78,17 +78,17 @@ body {
                 }
 
                 &:first-child {
-                    padding-left: $content-padding;
-                    padding-right: 24px;
+                    padding-#{$start}: $content-padding;
+                    padding-#{$end}: 24px;
                 }
 
                 &:last-child {
-                    padding-left: 24px;
-                    padding-right: 0;
+                    padding-#{$start}: 24px;
+                    padding-#{$end}: 0;
                 }
 
                 &:only-child {
-                    padding-left: $content-padding;
+                    padding-#{$start}: $content-padding;
                 }
 
                 .inner-grid {
@@ -294,7 +294,7 @@ form > .layout-content {
     }
 }
 
-@media screen and (min-width: 1024px) {
+@media screen and (min-width: $tablet-devices-media-breakpoint) {
     .container-fluid {
         > .responsive-section {
             &.responsive-small {

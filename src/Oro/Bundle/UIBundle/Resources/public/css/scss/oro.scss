@@ -492,16 +492,16 @@ textarea {
 }
 
 h5.user-fieldset {
-    font-weight: bold;
-    font-size: 20px;
-    line-height: 1.5;
+    font-weight: $content-title-font-weight;
+    font-size: $content-title-font-size;
+    line-height: $content-title-line-height;
     margin: side-values(0 0 16px);
 }
 
 .widget-title {
-    font-weight: bold;
-    font-size: 20px;
-    line-height: 1.5;
+    font-weight: $content-title-font-weight;
+    font-size: $content-title-font-size;
+    line-height: $content-title-line-height;
     display: block;
 }
 

@@ -114,7 +114,7 @@ fieldset:disabled a.btn {
         line-height: $btn-icon-fa-line-height;
         position: $btn-icon-fa-position;
         top: $btn-icon-fa-top;
-        #{$start}: $btn-icon-fa-left;
+        left: $btn-icon-fa-left;
         transform: $btn-icon-fa-transform;
     }
 

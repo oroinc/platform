@@ -91,7 +91,7 @@
 
     .filter-criteria {
         width: 100%;
-        margin-left: $mobile-filter-box-criteria-offset-left;
+        margin-#{$start}: $mobile-filter-box-criteria-offset-left;
 
         .btn-group {
             display: block;

@@ -98,7 +98,7 @@ body:not(.login-page) {
                 &:first-child {
                     .user-fieldset,
                     .widget-title {
-                        margin-left: $content-padding-medium;
+                        margin-#{$start}: $content-padding-medium;
                     }
                 }
             }
@@ -109,7 +109,7 @@ body:not(.login-page) {
                 .responsive-cell {
                     .user-fieldset,
                     .widget-title {
-                        margin-left: $content-padding-medium;
+                        margin-#{$start}: $content-padding-medium;
                     }
                 }
             }
@@ -119,7 +119,7 @@ body:not(.login-page) {
             .responsive-cell {
                 .user-fieldset,
                 .widget-title {
-                    margin-left: $content-padding-medium;
+                    margin-#{$start}: $content-padding-medium;
                 }
             }
         }
