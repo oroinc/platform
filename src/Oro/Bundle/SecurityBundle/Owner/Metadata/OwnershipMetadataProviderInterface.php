@@ -43,26 +43,6 @@ interface OwnershipMetadataProviderInterface
     public function getOrganizationClass();
 
     /**
-     * @return string
-     * @deprecated since 2.3, use getUserClass instead
-     */
-    public function getBasicLevelClass();
-
-    /**
-     * @param bool $deep
-     *
-     * @return string
-     * @deprecated since 2.3, use getBusinessUnitClass instead
-     */
-    public function getLocalLevelClass($deep = false);
-
-    /**
-     * @return string
-     * @deprecated since 2.3, use getOrganizationClass instead
-     */
-    public function getGlobalLevelClass();
-
-    /**
      * @param int    $accessLevel Current object access level
      * @param string $className   Class name to test
      *

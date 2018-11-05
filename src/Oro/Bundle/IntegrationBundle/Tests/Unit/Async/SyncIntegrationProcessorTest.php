@@ -10,6 +10,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor;
+use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
@@ -185,6 +186,43 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createRegistryStub($entityManagerMock),
             $this->createTokenStorageMock(),
             $this->createSyncProcessorRegistryStub($this->createSyncProcessorMock()),
+            $jobRunner,
+            $this->createLoggerMock()
+        );
+
+        $message = new NullMessage();
+        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
+        $message->setMessageId('theMessageId');
+
+        $processor->process($message, new NullSession());
+
+        $uniqueJobs = $jobRunner->getRunUniqueJobs();
+        self::assertCount(1, $uniqueJobs);
+        self::assertEquals('oro_integration:sync_integration:theIntegrationId', $uniqueJobs[0]['jobName']);
+        self::assertEquals('theMessageId', $uniqueJobs[0]['ownerId']);
+    }
+
+    public function testShouldNotInjectLoggerForNonAbstractProcessor()
+    {
+        $integration = new Integration();
+        $integration->setEnabled(true);
+        $integration->setOrganization(new Organization());
+        $integration->setTransport($this->createTransportStub());
+
+        $entityManagerMock = $this->createEntityManagerStub();
+        $entityManagerMock
+            ->expects($this->once())
+            ->method('find')
+            ->with(Integration::class, 'theIntegrationId')
+            ->willReturn($integration);
+
+        $jobRunner = new JobRunner();
+        $syncProcessor = $this->createMock(SyncProcessorInterface::class);
+
+        $processor = new SyncIntegrationProcessor(
+            $this->createRegistryStub($entityManagerMock),
+            $this->createTokenStorageMock(),
+            $this->createSyncProcessorRegistryStub($syncProcessor),
             $jobRunner,
             $this->createLoggerMock()
         );

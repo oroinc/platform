@@ -807,7 +807,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                 $data[JsonApiDoc::ID] = sprintf('<toString(@%s->%s)>', $referenceId, $entityIdFieldName);
                 if (isset($data[JsonApiDoc::ATTRIBUTES])) {
                     $attributes = $data[JsonApiDoc::ATTRIBUTES];
-                    $dateFields = ['createdAt', 'updatedAt', 'created', 'updated'];
+                    $dateFields = ['createdAt', 'updatedAt'];
                     foreach ($dateFields as $field) {
                         if (isset($attributes[$field])) {
                             $data[JsonApiDoc::ATTRIBUTES][$field] = sprintf(
@@ -853,6 +853,24 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         self::assertArrayHasKey(JsonApiDoc::ID, $content[JsonApiDoc::DATA]);
 
         return $content[JsonApiDoc::DATA][JsonApiDoc::ID];
+    }
+
+    /**
+     * @param Response $response
+     * @param string   $includeId
+     *
+     * @return string
+     */
+    protected static function getNewResourceIdFromIncludedSection(Response $response, string $includeId): string
+    {
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('included', $responseContent);
+        foreach ($responseContent['included'] as $item) {
+            if (isset($item['meta']['includeId']) && $item['meta']['includeId'] === $includeId) {
+                return $item['id'];
+            }
+        }
+        self::fail(sprintf('New resource "%s" was not found.', $includeId));
     }
 
     /**

@@ -115,6 +115,9 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
         );
 
         $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
+        // fix expected date for the last day of a month
+        $currentDate->setTime(0, 0, 0)->modify('1 day');
+
         $this->assertEquals($currentDate->format('M'), $result['end']->format('M'));
         $this->assertEquals($value, $result['start']);
     }

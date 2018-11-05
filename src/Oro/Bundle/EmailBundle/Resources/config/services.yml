@@ -233,6 +233,7 @@ services:
             - '@oro_email.email.address.manager'
             - '@oro_email.email.address.helper'
             - '@doctrine'
+            - '@logger'
 
     oro_email.email.model.builder:
         class: '%oro_email.email.model.builder.class%'
@@ -680,8 +681,7 @@ services:
         class: '%oro_email.listener.datagrid.email.class%'
         arguments:
             - '@oro_email.datagrid_query_factory'
-            - '@oro_security.token_accessor'
-            - '@oro_datagrid.grid_view.manager'
+            - '@oro_filter.provider.state.filters'
             - '@oro_config.manager'
             - '@oro_email.email_grid_result_helper'
         tags:

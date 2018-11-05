@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
+ * The entity the represents a field that value can be a scalar, an array
+ * or it can retrieved from another source if it does not have own value.
  * @ORM\Table(name="oro_entity_fallback_value")
  * @ORM\Entity()
  * @Config()
@@ -17,10 +19,6 @@ class EntityFieldFallbackValue
     const FALLBACK_SCALAR_FIELD = 'scalarValue';
     const FALLBACK_ARRAY_FIELD = 'arrayValue';
     const FALLBACK_PARENT_FIELD = 'fallback';
-
-    const PAGE_TEMPLATE = 'pageTemplate';
-
-    public static $specialRelations = [self::PAGE_TEMPLATE];
 
     /**
      * @var integer

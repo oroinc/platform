@@ -71,27 +71,11 @@ class ErrorCompleter extends AbstractErrorCompleter
                 $error->setSource();
             } else {
                 list($normalizedPropertyPath, $path, $pointerPrefix) = $this->normalizePropertyPath($propertyPath);
-
-                $pointer = [];
-                if (\in_array($normalizedPropertyPath, $metadata->getIdentifierFieldNames(), true)) {
-                    $pointer[] = JsonApiDoc::ID;
-                } elseif (\array_key_exists($normalizedPropertyPath, $metadata->getFields())) {
-                    if ($metadata->hasIdentifierFields()) {
-                        $pointer = [JsonApiDoc::ATTRIBUTES, $normalizedPropertyPath];
-                    } else {
-                        $pointer = [$normalizedPropertyPath];
-                    }
-                } elseif (\array_key_exists($path[0], $metadata->getAssociations())) {
-                    if ($metadata->hasIdentifierFields()) {
-                        $pointer = $this->getAssociationPointer($path, $metadata->getAssociation($path[0]));
-                    } else {
-                        $pointer = [$normalizedPropertyPath];
-                    }
-                } else {
+                $pointer = $this->getPointer($metadata, $normalizedPropertyPath, $path);
+                if (empty($pointer)) {
                     $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));
                     $error->setSource();
-                }
-                if (!empty($pointer)) {
+                } else {
                     $dataSection = $metadata->hasIdentifierFields()
                         ? JsonApiDoc::DATA
                         : JsonApiDoc::META;
@@ -120,6 +104,35 @@ class ErrorCompleter extends AbstractErrorCompleter
         }
 
         return [$normalizedPropertyPath, $path, $pointerPrefix];
+    }
+
+    /**
+     * @param EntityMetadata $metadata
+     * @param string         $normalizedPropertyPath
+     * @param string[]       $path
+     *
+     * @return string[]
+     */
+    private function getPointer(EntityMetadata $metadata, $normalizedPropertyPath, array $path)
+    {
+        $pointer = [];
+        if (\in_array($normalizedPropertyPath, $metadata->getIdentifierFieldNames(), true)) {
+            $pointer[] = JsonApiDoc::ID;
+        } elseif (\array_key_exists($normalizedPropertyPath, $metadata->getFields())) {
+            if ($metadata->hasIdentifierFields()) {
+                $pointer = [JsonApiDoc::ATTRIBUTES, $normalizedPropertyPath];
+            } else {
+                $pointer = [$normalizedPropertyPath];
+            }
+        } elseif (\array_key_exists($path[0], $metadata->getAssociations())) {
+            if ($metadata->hasIdentifierFields()) {
+                $pointer = $this->getAssociationPointer($path, $metadata->getAssociation($path[0]));
+            } else {
+                $pointer = [$normalizedPropertyPath];
+            }
+        }
+
+        return $pointer;
     }
 
     /**

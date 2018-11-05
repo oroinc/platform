@@ -4,12 +4,15 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\UIBundle\Tests\Unit\Twig\Fixture\EnvironmentExtension;
 use Oro\Bundle\UIBundle\Twig\Environment;
+use Oro\Component\Testing\TempDirExtension;
 
 /**
  * Copy of Twig_Tests_EnvironmentTest. Should be removed after merging of pull-request with this service changes.
  */
 class EnvironmentTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /**
      * @expectedException        \LogicException
      * @expectedExceptionMessage You must set a loader first.
@@ -97,7 +100,11 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
 
     public function testExtensionsAreNotInitializedWhenRenderingACompiledTemplate()
     {
-        $options = array('cache' => sys_get_temp_dir().'/twig', 'auto_reload' => false, 'debug' => false);
+        $options = [
+            'cache'       => $this->getTempDir('twig'),
+            'auto_reload' => false,
+            'debug'       => false
+        ];
 
         // force compilation
         $twig = new Environment(new \Twig_Loader_String(), $options);

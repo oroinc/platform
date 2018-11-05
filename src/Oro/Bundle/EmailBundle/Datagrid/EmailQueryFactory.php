@@ -77,7 +77,7 @@ class EmailQueryFactory
     public function addFromEmailAddress(QueryBuilder $qb, $emailAddressTableAlias = 'a')
     {
         /**
-         * @todo Doctrine does not support NULL as a scalar expression
+         * Doctrine does not support NULL as a scalar expression
          * see https://github.com/doctrine/doctrine2/issues/5801
          * as result we have to use NULLIF(0, 0) and NULLIF('', '') instead of NULL
          */
@@ -335,8 +335,6 @@ class EmailQueryFactory
         if ($searchFilters) {
             $queryBuilder = clone $qb;
 
-            $parameters = $datagrid->getParameters();
-
             $datagridConfig = $datagrid->getConfig();
             $filterTypes = $datagridConfig->offsetGetByPath('[filters][columns]');
 
@@ -349,13 +347,10 @@ class EmailQueryFactory
                 $datasourceAdapter = new OrmFilterDatasourceAdapter($queryBuilder);
                 $mFilter = new EmailStringFilter($this->formFactory, $this->filterUtil);
                 $mFilter->init($columnName, $filterConfig);
-                $mFilter->apply($datasourceAdapter, $filterData);
-
-                $searchExpressions = $mFilter->getExpression();
-                $searchExpressionsParameters = $mFilter->getParameters();
-
-                unset($filters[$columnName]);
-                $parameters->set('_filter', $filters);
+                $expressionAndParameters = $mFilter->applyAndGetExpression($datasourceAdapter, $filterData);
+                if ($expressionAndParameters !== null) {
+                    [$searchExpressions, $searchExpressionsParameters] = $expressionAndParameters;
+                }
             }
         }
 
