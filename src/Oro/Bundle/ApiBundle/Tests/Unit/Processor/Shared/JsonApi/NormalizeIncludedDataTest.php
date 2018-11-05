@@ -228,7 +228,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             $this->context->getIncludedEntities()->get($normalizedType, 'testId')
         );
         self::assertAttributeSame(
-            ['Test\PrimaryClass', 'primaryId', null],
+            ['Test\PrimaryClass', 'primaryId', null, null],
             'primaryEntity',
             $this->context->getIncludedEntities()
         );

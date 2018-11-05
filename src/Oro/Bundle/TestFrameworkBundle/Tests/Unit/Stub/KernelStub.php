@@ -6,19 +6,16 @@ use Oro\Bundle\DistributionBundle\OroKernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\KernelInterface;
 
-class KernelStub extends OroKernel implements KernelInterface
+class KernelStub extends OroKernel
 {
-    protected $bundleMap;
+    /** @var string */
+    protected $logDir;
 
-    protected $container;
-
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $registeredBundles = [];
 
+    /** @var array */
     protected $parameters = [
         'database_driver' => 'pdo_mysql',
         'database_host' => '127.0.0.1',
@@ -32,15 +29,12 @@ class KernelStub extends OroKernel implements KernelInterface
     ];
 
     /**
-     * KernelStub constructor.
-     * @param array $bundleConfig In format
-     * [
-     *   [name => Bundle1, path => /var/www/app],
-     *   [name => Bundle2, parent => Bundle1]
-     * ]
+     * @param string $logDir
+     * @param array  $bundleConfig [[name => Bundle1, path => /var/www/app], ...]
      */
-    public function __construct(array $bundleConfig = [])
+    public function __construct(string $logDir, array $bundleConfig = [])
     {
+        $this->logDir = $logDir;
         $this->container = new Container();
 
         foreach ($this->parameters as $key => $value) {
@@ -160,14 +154,6 @@ class KernelStub extends OroKernel implements KernelInterface
     /**
      * {@inheritdoc}
      */
-    public function getContainer()
-    {
-        return $this->container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getStartTime()
     {
     }
@@ -184,7 +170,7 @@ class KernelStub extends OroKernel implements KernelInterface
      */
     public function getLogDir()
     {
-        return sys_get_temp_dir();
+        return $this->logDir;
     }
 
     /**

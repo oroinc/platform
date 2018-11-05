@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Symfony\Component\Form\Test\FormInterface;
@@ -14,6 +15,14 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->context = new CustomizeFormDataContext();
+    }
+
+    public function testIsInitialized()
+    {
+        self::assertFalse($this->context->isInitialized());
+
+        $this->context->setForm($this->createMock(FormInterface::class));
+        self::assertTrue($this->context->isInitialized());
     }
 
     public function testRootClassName()
@@ -65,6 +74,15 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setConfig(null);
         self::assertNull($this->context->getConfig());
+    }
+
+    public function testIncludedEntities()
+    {
+        self::assertNull($this->context->getIncludedEntities());
+
+        $includedEntities = $this->createMock(IncludedEntityCollection::class);
+        $this->context->setIncludedEntities($includedEntities);
+        self::assertSame($includedEntities, $this->context->getIncludedEntities());
     }
 
     public function testEvent()
