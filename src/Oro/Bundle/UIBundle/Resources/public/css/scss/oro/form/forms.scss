@@ -47,16 +47,7 @@
             flex-shrink: 0;
         }
 
-        label.control-label {
-            margin-bottom: 0;
-            padding-top: 9px;
-
-            .desktop-version & + .controls {
-                padding-top: 9px;
-            }
-        }
-
-        .control-label.wrap {
+        .control-label {
             padding-top: 6px;
             line-height: 20px;
 
@@ -67,6 +58,7 @@
             label {
                 display: inline;
                 position: relative;
+                margin-bottom: 0;
 
                 &.required {
                     em {
