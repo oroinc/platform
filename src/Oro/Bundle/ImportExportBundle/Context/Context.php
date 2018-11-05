@@ -136,7 +136,10 @@ class Context implements ContextInterface, BatchContextInterface
      */
     public function incrementReadCount($incrementBy = 1)
     {
-        $this->setValue('read_count', (int)$this->getValue('read_count') + $incrementBy);
+        $incrementedRead = $this->getOption('incremented_read', true);
+        if ($incrementedRead) {
+            $this->setValue('read_count', (int)$this->getValue('read_count') + $incrementBy);
+        }
     }
 
     /**
