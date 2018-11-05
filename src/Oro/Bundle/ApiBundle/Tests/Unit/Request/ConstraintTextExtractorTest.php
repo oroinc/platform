@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
+use Oro\Bundle\ApiBundle\Form\NamedValidationConstraint;
 use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemover;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Blank;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
 {
@@ -61,7 +63,25 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
             [
                 new HasAdderAndRemover(['class' => 'Test\Class', 'property' => 'test']),
                 'has adder and remover constraint'
-            ]
+            ],
+            [new NamedValidationConstraint(Constraint::class), 'constraint'],
+            [new NamedValidationConstraint(NotBlank::class), 'not blank constraint'],
+            [new NamedValidationConstraint('NotBlank'), 'not blank constraint'],
+            [new NamedValidationConstraint('NotBlankConstraint'), 'not blank constraint'],
+            [new NamedValidationConstraint('Not Blank'), 'not blank constraint'],
+            [new NamedValidationConstraint('Not Blank Constraint'), 'not blank constraint'],
+            [new NamedValidationConstraint('not blank'), 'not blank constraint'],
+            [new NamedValidationConstraint('not blank constraint'), 'not blank constraint'],
+            [new NamedValidationConstraint('not_blank'), 'not blank constraint'],
+            [new NamedValidationConstraint('not_blank_constraint'), 'not blank constraint'],
+            [new NamedValidationConstraint('not-blank'), 'not blank constraint'],
+            [new NamedValidationConstraint('not-blank-constraint'), 'not blank constraint'],
+            [new NamedValidationConstraint('not*blank'), 'not blank constraint'],
+            [new NamedValidationConstraint('not*blank~constraint'), 'not blank constraint'],
+            [new NamedValidationConstraint('IO'), 'io constraint'],
+            [new NamedValidationConstraint('IOConstraint'), 'io constraint'],
+            [new NamedValidationConstraint('PHP'), 'php constraint'],
+            [new NamedValidationConstraint('PHPConstraint'), 'php constraint']
         ];
     }
 }

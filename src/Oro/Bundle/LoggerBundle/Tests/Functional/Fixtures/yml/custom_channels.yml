@@ -1,0 +1,8 @@
+monolog:
+    channels:
+        - custom_channel
+    handlers:
+        custom_handler:
+            type:  debug
+            channels:
+                - custom_channel
