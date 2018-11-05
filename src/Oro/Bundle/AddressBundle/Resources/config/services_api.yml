@@ -1,0 +1,7 @@
+services:
+    oro_address.api.form.type.address_type:
+        class: Oro\Bundle\AddressBundle\Api\Form\Type\AddressTypeType
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.form.type, alias: Oro\Bundle\AddressBundle\Api\Form\Type\AddressTypeType }

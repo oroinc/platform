@@ -77,6 +77,8 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
+        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setCorsRequest(false);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedGetContext->setClassName($includedEntityClass);
         $expectedGetContext->setId($includedRealEntityId);
@@ -101,6 +103,8 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $this->context->setIncludedEntities($includedEntities);
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
+        $this->context->setMasterRequest(true);
+        $this->context->setCorsRequest(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
         $this->processor->process($this->context);
 
@@ -151,6 +155,8 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
+        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setCorsRequest(false);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedGetContext->setClassName($includedEntityClass);
         $expectedGetContext->setId($includedRealEntityId);
@@ -174,6 +180,8 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $this->context->setIncludedEntities($includedEntities);
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
+        $this->context->setMasterRequest(true);
+        $this->context->setCorsRequest(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
         $this->processor->process($this->context);
 

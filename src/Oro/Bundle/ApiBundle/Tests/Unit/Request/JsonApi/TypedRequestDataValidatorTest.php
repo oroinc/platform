@@ -460,6 +460,16 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
                 [
                     'data'     => ['type' => 'products'],
                     'included' => [
+                        'test'
+                    ]
+                ],
+                ['The related resource should be an object'],
+                ['/included/0']
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
                         []
                     ]
                 ],

@@ -10,8 +10,13 @@ The Symfony [Validation Component](http://symfony.com/doc/current/book/validatio
 
 ## Validation
 
-The validation rules are loaded from `Resources/config/validation.yml` and annotations as it is commonly done in Symfony applications. So, all validation rules defined for an entity apply to the data API as well.
+The validation rules are loaded from `Resources/config/validation.yml` and annotations as it is commonly done in Symfony applications. So, all validation rules defined for an entity are applied to the data API as well.
 By default, the data API uses two validation groups: **Default** and **api**. If you need to add validation constraints that should apply to the data API only, add them to the **api** validation group.
+
+In case a validation rule cannot be implemented as a regular validation constraint due to its complexity
+you can implement it as a processor for `post_validate` event of
+[customize_form_data](./actions.md#customize_form_data-action) action.
+Pay your attention on [FormUtil](../../Form/FormUtil.php) class, it contains methods that may be useful in such processor.
 
 If the input data violates validation constraints, they will be automatically converted to [validation errors](./processors.md#error-handling) that help build the correct response of the data API. The conversion is performed by the [CollectFormErrors](../../Processor/Shared/CollectFormErrors.php) processor. By default, the HTTP status code for validation errors is `400 Bad Request`. If you need to change it, you can do it in the following ways:
 

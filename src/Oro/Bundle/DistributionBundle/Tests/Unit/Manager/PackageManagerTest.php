@@ -26,6 +26,7 @@ use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
 use Oro\Bundle\PlatformBundle\Maintenance\Mode as MaintenanceMode;
 use Oro\Bundle\PlatformBundle\OroPlatformBundle;
+use Oro\Component\Testing\TempDirExtension;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -36,6 +37,7 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
 {
     use MockHelperTrait;
     use ReflectionHelperTrait;
+    use TempDirExtension;
 
     /**
      * @test
@@ -285,7 +287,7 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
         $expectedJsonData = $composerJsonData;
         $expectedJsonData['require'][$newPackageName] = $newPackageVersion;
 
-        $tempComposerJson = tempnam(sys_get_temp_dir(), 'composer.json');
+        $tempComposerJson = tempnam($this->getTempDir('package_manager'), 'composer.json');
         file_put_contents($tempComposerJson, json_encode($composerJsonData));
 
         // composer and repository
@@ -452,7 +454,7 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $tempComposerJson = tempnam(sys_get_temp_dir(), 'composer.json');
+        $tempComposerJson = tempnam($this->getTempDir('package_manager'), 'composer.json');
         file_put_contents($tempComposerJson, json_encode($composerJsonData));
 
         // composer and repository
@@ -543,7 +545,7 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $tempComposerJson = tempnam(sys_get_temp_dir(), 'composer.json');
+        $tempComposerJson = tempnam($this->getTempDir('package_manager'), 'composer.json');
         file_put_contents($tempComposerJson, json_encode($composerJsonData));
 
         // composer and repository
@@ -778,7 +780,7 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
         unset($expectedJsonData['require'][$packageNamesToBeRemoved[0]]);
         unset($expectedJsonData['require'][$packageNamesToBeRemoved[1]]);
 
-        $tempComposerJson = tempnam(sys_get_temp_dir(), 'composer.json');
+        $tempComposerJson = tempnam($this->getTempDir('package_manager'), 'composer.json');
         file_put_contents($tempComposerJson, json_encode($composerJsonData));
 
         // composer and repository
@@ -1107,7 +1109,8 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
         $logger->expects($this->never())
             ->method('error');
 
-        $pathToComposerJson = $this->getPathToComposerJson(uniqid());
+        $pathToComposerJson = $this->getTempFile('package_manager');
+        file_put_contents($pathToComposerJson, '{}');
 
         $manager = $this->createPackageManager(
             $composer,
@@ -1163,7 +1166,8 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
             ->method('error')
             ->with($bufferOutput);
 
-        $pathToComposerJson = $this->getPathToComposerJson(uniqid());
+        $pathToComposerJson = $this->getTempFile('package_manager');
+        file_put_contents($pathToComposerJson, '{}');
 
         $manager = $this->createPackageManager(
             $composer,
@@ -1379,8 +1383,10 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
             $logger = $this->createLoggerMock();
         }
         if (!$pathToComposerJson) {
-            $pathToComposerJson = $this->getPathToComposerJson();
+            $pathToComposerJson = $this->getTempFile('package_manager');
+            file_put_contents($pathToComposerJson, '{}');
         }
+
         return new PackageManager(
             $composer,
             $installer,
@@ -1502,17 +1508,5 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
         $maintenance->expects($this->once())->method('activate');
 
         return $maintenance;
-    }
-
-    /**
-     * @param   string $filename
-     * @return  string
-     */
-    protected function getPathToComposerJson($filename = 'composer.json')
-    {
-        $pathToComposerJson = tempnam(sys_get_temp_dir(), $filename);
-        file_put_contents($pathToComposerJson, '{}');
-
-        return $pathToComposerJson;
     }
 }

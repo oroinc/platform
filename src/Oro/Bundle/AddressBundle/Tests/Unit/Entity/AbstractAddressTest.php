@@ -1,11 +1,10 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Entity;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -276,70 +275,6 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($region, $address->getRegion());
         $address->setRegionText('text region');
         $this->assertEquals('text region', $address->getUniversalRegion());
-    }
-
-    public function testIsRegionValidNoCountry()
-    {
-        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
-        $context->expects($this->never())
-            ->method('buildViolation');
-
-        $address = $this->createAddress();
-        $address->isRegionValid($context);
-    }
-
-    public function testIsRegionValidNoRegion()
-    {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Country $country */
-        $country = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $country->expects($this->once())
-            ->method('hasRegions')
-            ->will($this->returnValue(false));
-
-        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
-        $context->expects($this->never())
-            ->method('buildViolation');
-
-        $address = $this->createAddress();
-        $address->setCountry($country);
-        $address->isRegionValid($context);
-    }
-
-    public function testIsRegionValid()
-    {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Country $country */
-        $country = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $country->expects($this->once())
-            ->method('hasRegions')
-            ->will($this->returnValue(true));
-        $country->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('Country'));
-
-        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
-        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $context->expects($this->once())
-            ->method('buildViolation')
-            ->with('State is required for country {{ country }}')
-            ->willReturn($builder);
-        $builder->expects($this->once())
-            ->method('atPath')
-            ->with('region')
-            ->willReturnSelf();
-        $builder->expects($this->once())
-            ->method('setParameters')
-            ->with(['{{ country }}' => 'Country'])
-            ->willReturnSelf();
-        $builder->expects($this->once())
-            ->method('addViolation');
-
-        $address = $this->createAddress();
-        $address->setCountry($country);
-        $address->isRegionValid($context);
     }
 
     public function testIsEmpty()
