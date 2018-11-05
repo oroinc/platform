@@ -21,15 +21,13 @@
     .select2-choices {
         max-height: $tag-selector-item-max-height;
         min-width: $tag-selector-item-min-width;
-        overflow: auto;
         background: $primary-inverse;
-        margin: side-values($tag-selector-item-offset-vertical 0 0 $tag-selector-item-offset-vertical);
 
         &:before {
             content: ' ';
             float: #{$end};
-            width: 74px;
-            height: $tag-selector-item-line-height + (2 * $tag-selector-item-padding-vertical);
+            width: $tag-selector-actions-width;
+            height: $tag-selector-item-line-height;
             font-size: $tag-selector-item-font-size;
             margin: side-values(0 0 $tag-selector-item-offset-vertical 0);
         }
@@ -39,31 +37,15 @@
         }
 
         .select2-search-field input {
-            height: $tag-selector-item-line-height + (2 * $tag-selector-item-padding-vertical);
-            padding: side-values($tag-selector-item-padding-vertical 0);
+            padding: $tag-selector-item-input-inner-offset;
+            height: auto;
             font-size: $tag-selector-item-font-size;
             line-height: $tag-selector-item-line-height;
+            margin-#{$end}: -$tag-selector-actions-width;
         }
 
         .select2-search-choice {
-            font-size: $tag-selector-item-font-size;
-            line-height: $tag-selector-item-line-height;
-            padding: side-values(
-                $tag-selector-item-padding-vertical
-                $tag-selector-item-close-icon-width
-                $tag-selector-item-padding-vertical
-                $tag-selector-item-padding-horizontal
-            );
-            color: $tag-selector-item-color;
-            background: $tag-selector-item-background;
-            border: 0 none;
-            border-radius: $tag-selector-item-border-radius;
             box-shadow: none;
-            margin: side-values(0 $tag-selector-item-offset-horizontal $tag-selector-item-offset-vertical 0);
-
-            display: flex;
-            height: auto;
-            align-items: center;
 
             .select2-search-choice-close {
                 top: 0;
@@ -84,6 +66,12 @@
                 padding: side-values($tag-selector-item-padding-vertical $tag-selector-item-padding-horizontal) !important;
             }
         }
+    }
+
+    .inline-editor__action-item {
+        line-height: $select2-container-min-height;
+        padding-top: 0;
+        padding-bottom: 0;
     }
 
     &.inline-view-editor .select2-choices {

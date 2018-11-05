@@ -180,22 +180,32 @@
 
         .select2-choices {
             list-style: $select2-search-multi-choices-list-style;
-            margin: $select2-search-multi-choices-offset;
+            margin: side-values($select2-search-multi-choices-offset 0 0 $select2-search-multi-choices-offset);
             padding: $select2-search-multi-choices-inner-offset;
             height: $select2-search-multi-choices-height;
             overflow: $select2-search-multi-choices-overflow;
+            width: 100% !important;
 
             .select2-search-choice {
+                display: flex;
+                align-items: center;
                 background: $select2-search-choice-background;
                 font-size: $select2-search-choice-font-size;
                 line-height: $select2-search-choice-line-height;
                 color: $select2-search-choice-color;
-                padding: $select2-search-choice-inner-offset;
-                margin: $select2-search-choice-offset;
+                padding: side-values(
+                    $select2-search-choice-inner-offset-vertical
+                    ($select2-search-choice-inner-offset-horizontal + $select2-search-multi-choice-close-width + $select2-search-multi-choice-close-right)
+                    $select2-search-choice-inner-offset-vertical
+                    $select2-search-choice-inner-offset-horizontal
+                );
+                border-radius: $select2-search-choice-border-radius;
+                margin: side-values(0 $select2-search-choice-offset $select2-search-choice-offset 0);
                 position: $select2-search-choice-position;
                 box-sizing: $select2-search-choice-box-sizing;
                 float: $select2-search-choice-float;
                 list-style: $select2-search-choice-list-style;
+                white-space: nowrap;
 
                 &.select2-locked {
                     padding: $select2-search-choice-select2-locked-inner-offset;
@@ -214,6 +224,7 @@
                 margin: $select2-search-field-offset;
                 padding: $select2-search-field-inner-offset;
                 white-space: $select2-search-field-white-space;
+                float: left;
 
                 input {
                     float: $select2-search-field-float;
@@ -222,6 +233,7 @@
                     background-color: $select2-search-field-background-color;
                     margin-bottom: $select2-search-field-offset-bottom;
                     border: $select2-search-field-border;
+                    padding: $select2-search-field-inner-offset;
                 }
             }
         }

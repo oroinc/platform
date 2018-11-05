@@ -114,7 +114,7 @@
     }
 
     &__fields {
-        input[type="text"] {
+        input {
             height: $oro-datagrid-editable-action-item-size;
             line-height: $oro-datagrid-editable-action-item-size;
             padding: $oro-datagrid-editable-action-input-offset;
@@ -136,14 +136,15 @@
                 font-size: $oro-datagrid-action-font-size;
                 line-height: 1;
             }
+
+            .select2-container {
+                min-height: $oro-datagrid-editable-action-item-size;
+            }
+
         }
 
         &.select-editor {
             min-width: $oro-datagrid-select-width;
-        }
-
-        .select2-container {
-            min-height: $oro-datagrid-editable-action-item-size;
         }
 
         .select2-chosen {
