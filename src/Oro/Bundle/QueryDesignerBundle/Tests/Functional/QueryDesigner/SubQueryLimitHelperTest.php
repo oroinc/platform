@@ -4,7 +4,6 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Functional\QueryDesigner;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
-
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
