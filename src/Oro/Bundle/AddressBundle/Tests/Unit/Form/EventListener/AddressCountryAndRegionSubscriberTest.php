@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscriber;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;

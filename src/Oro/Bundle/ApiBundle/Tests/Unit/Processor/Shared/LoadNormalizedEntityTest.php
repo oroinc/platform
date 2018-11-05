@@ -89,6 +89,9 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessWhenGetActionSuccess()
     {
         $getResult = ['key' => 'value'];
@@ -120,11 +123,15 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
+        $this->context->setMasterRequest(true);
+        $this->context->setCorsRequest(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
 
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
+        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setCorsRequest(false);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedGetContext->setClassName($this->context->getClassName());
         $expectedGetContext->setId($this->context->getId());
@@ -166,6 +173,8 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $expectedContext = new FormContextStub($this->configProvider, $this->metadataProvider);
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
+        $expectedContext->setMasterRequest(true);
+        $expectedContext->setCorsRequest(true);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedContext->setId($this->context->getId());
         $expectedContext->setClassName($this->context->getClassName());

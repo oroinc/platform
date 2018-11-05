@@ -3,8 +3,6 @@
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscriber;
-use Oro\Bundle\AddressBundle\Form\Type\CountryType;
-use Oro\Bundle\AddressBundle\Form\Type\RegionType;
 use Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -13,11 +11,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraint;
 
+/**
+ * The form type for Address entity.
+ * @see \Oro\Bundle\AddressBundle\Entity\Address
+ */
 class AddressType extends AbstractType
 {
-    const ABSTRACT_ADDRESS_GROUP = 'AbstractAddress';
     /**
      * @var AddressCountryAndRegionSubscriber
      */
@@ -113,8 +113,7 @@ class AddressType extends AbstractType
                 'data_class' => 'Oro\Bundle\AddressBundle\Entity\Address',
                 'csrf_token_id' => 'address',
                 'single_form' => true,
-                'region_route' => 'oro_api_country_get_regions',
-                'validation_groups' => [Constraint::DEFAULT_GROUP, self::ABSTRACT_ADDRESS_GROUP],
+                'region_route' => 'oro_api_country_get_regions'
             )
         );
     }

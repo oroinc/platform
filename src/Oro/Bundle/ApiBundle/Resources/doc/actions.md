@@ -885,6 +885,8 @@ General methods:
 - **getFilters()** - Retrieves a [list of filters](../../Filter/FilterCollection.php) to set additional restrictions to a query used to retrieve the entity data.
 - **getFilterValues()** - Retrieves a collection of the [FilterValue](../../Filter/FilterValue.php) objects that contains all incoming filters.
 - **setFilterValues(accessor)** - Sets an [object](../../Filter/FilterValueAccessorInterface.php) to use for accessing the incoming filters.
+- **isMasterRequest()** - Indicates whether the current action processes a master API request or it is executed as part of another action.
+- **setMasterRequest($master)** - Sets a flag indicates the current action processes a master API request or it is executed as part of another action.
 - **isCorsRequest()** - Indicates whether the current request is [CORS](https://www.w3.org/TR/cors/) request.
 - **setCorsRequest($cors)** - Sets a flag indicates whether the current request is [CORS](https://www.w3.org/TR/cors/) request.
 - **hasQuery()** - Checks whether a query used to get the result data exists.
@@ -926,6 +928,7 @@ Entity configuration related methods:
 
 Entity metadata related methods:
 
+- **hasIdentifierFields()** - Checks whether metadata of an entity has at least one identifier field.
 - **getMetadataExtras()** - Retrieves a list of [requests for additional metadata info](../../Metadata/MetadataExtraInterface.php).
 - **setMetadataExtras(extras)** - Sets a list of requests for additional metadata info.
 - **hasMetadataExtra()** - Checks whether some additional metadata info is requested.
