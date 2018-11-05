@@ -18,7 +18,12 @@
     td,
     th {
         &:first-child {
+            padding-left: $table-td-first-child-inner-offset;
             text-align: $table-td-first-child-text-align;
+        }
+
+        &:last-child {
+            padding-right: $table-td-last-child-inner-offset;
         }
 
         &.align-right {
@@ -41,6 +46,11 @@
     td {
         &:first-child {
             height: 30px;
+            padding-left: $table-td-first-child-inner-offset;
+        }
+
+        &:last-child {
+            padding-right: $table-td-last-child-inner-offset;
         }
 
         > .nowrap-ellipsis {

@@ -29,7 +29,7 @@
     {{ form_widget(form) }}
     {% if is_granted('oro_config_system') %}
     <span class="form-text">
-        <a class="btn btn-danger"
+        <a class="btn btn-block btn-danger"
            href="{{ path('oro_email_purge_emails_attachments') }}"
            data-page-component-module="{{ 'oroui/js/app/components/hidden-redirect-component' }}"
            data-page-component-options="{{ {showLoading: true}|json_encode }}"
@@ -220,7 +220,7 @@
         'parameters': app.request.attributes.get('_route_params'),
     } %}
     {% if is_granted('oro_organization_update') %}
-        <div class="row" style="margin-top: -42px;">
+        <div class="row">
             <div class="pull-right">
                 <div class="btn-group">
                     {{ UI.addButton({
@@ -323,7 +323,6 @@
            data-related="{{ locale }}"
            role="tab"
            aria-selected="{{ selected }}"
-                {{ oro_menu.attributes(linkAttributes) }}
        {% if uniqid %}
            id="{{ uniqid ~ '-tab'}}"
            aria-controls="{{ uniqid }}"

@@ -19,6 +19,7 @@
 @import "simplecolorpicker";
 @import "dialog";
 
+@import "page-header";
 @import "page-toolbar";
 @import "app-header";
 
@@ -26,6 +27,7 @@
 @import "form/form-signin";
 @import "form/forms";
 
+@import "progressbar";
 @import "footer";
 @import "fs-toolbar";
 @import "flash-messages";
@@ -36,8 +38,7 @@
 @import "error-page";
 @import "nav";
 
-@import "tab/tab";
-@import "tab/nav-tabs-content";
+@import "tab/tabs";
 @import "tab/oro-tabs";
 @import "tab/tab-collection";
 
@@ -50,9 +51,6 @@
 @import "content-sidebar";
 @import "highlight-text";
 @import "scrollspy";
-
-@import "tooltip";
 @import "widget-picker";
-
 @import "tables";
 @import "other-scroll-container";

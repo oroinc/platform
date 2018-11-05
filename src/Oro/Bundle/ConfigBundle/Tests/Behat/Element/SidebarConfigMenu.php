@@ -57,14 +57,14 @@ class SidebarConfigMenu extends Element
 
     public function expandAll()
     {
-        $expandAllLink = $this->find('css', 'a[title="Expand all"]');
+        $expandAllLink = $this->find('css', 'a[title="Expand All"]');
         self::assertNotNull($expandAllLink, 'Expand All link not found');
         $expandAllLink->click();
     }
 
     public function collapseAll()
     {
-        $collapseAllLink = $this->find('css', 'a[title="Collapse all"]');
+        $collapseAllLink = $this->find('css', 'a[title="Collapse All"]');
         self::assertNotNull($collapseAllLink, 'Collapse All link not found');
         $collapseAllLink->click();
     }

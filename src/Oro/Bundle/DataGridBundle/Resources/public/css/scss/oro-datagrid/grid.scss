@@ -26,6 +26,8 @@
     font-size: $oro-datagrid-header-font-size;
 
     .caret {
+        position: relative;
+
         display: none;
         height: $oro-datagrid-caret-size * 2;
         margin-#{$start}: $oro-datagrid-caret-size;
@@ -38,7 +40,7 @@
     .ascending {
         .caret {
             display: inline-block;
-            margin-top: -$oro-datagrid-caret-offset;
+            top: $oro-datagrid-caret-ascending-offset;
 
             border-top: $oro-datagrid-caret-size solid transparent;
             border-bottom: $oro-datagrid-caret-size solid transparent;
@@ -49,7 +51,7 @@
     .descending {
         .caret {
             display: inline-block;
-            margin-top: ($oro-datagrid-caret-offset / 2);
+            top: $oro-datagrid-caret-descending-offset;
 
             border-bottom: $oro-datagrid-caret-size solid transparent;
             border-top: $oro-datagrid-caret-size solid transparent;
@@ -79,7 +81,11 @@
 
     &__label,
     &__link {
+        line-height: $oro-datagrid-label-line-height;
+
         color: $oro-datagrid-label-color;
+
+        vertical-align: $oro-datagrid-label-align;
     }
 
     &:first-child {
@@ -96,6 +102,8 @@
 .grid-body-cell {
     padding: $oro-datagrid-body-cell-inner-offset;
 
+    line-height: $oro-datagrid-body-cell-line-height;
+
     border-bottom: $oro-datagrid-body-cell-border;
 
     vertical-align: top;
@@ -104,12 +112,27 @@
 .grid-footer-cell {
     padding: $oro-datagrid-footer-cell-inner-offset;
 
-    color: $oro-datagrid-label-color;
+    font-weight: $oro-datagrid-footer-cell-font-weight;
+
+    background-color: $oro-datagrid-footer-cell-background-color;
+    color: $oro-datagrid-footer-cell-color;
+
+    @at-root tr:first-child .grid-footer-cell {
+        padding-top: $oro-datagrid-footer-cell-outer-inner-offset;
+    }
+
+    @at-root tr:last-child .grid-footer-cell {
+        padding-bottom: $oro-datagrid-footer-cell-outer-inner-offset;
+    }
+
+    &.number-cell,
+    &.integer-cell {
+        font-size: $oro-datagrid-footer-cell-numeric-font-size;
+    }
 }
 
-.grid-header-cell,
-.grid-footer-cell {
-    background-color: $oro-datagrid-background;
+.grid-header-cell {
+    background-color: $oro-datagrid-header-background;
 }
 
 .grid-header-cell,
@@ -153,8 +176,14 @@
 .integer-cell {
     text-align: #{$end};
 
-    .grid-header-cell__label {
-        margin-#{$start}: auto;
+    &:first-child {
+        text-align: #{$start};
+    }
+
+    &:not(:first-child) {
+        .grid-header-cell__label {
+            margin-#{$start}: auto;
+        }
     }
 }
 

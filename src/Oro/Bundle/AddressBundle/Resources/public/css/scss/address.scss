@@ -8,14 +8,13 @@
 
     &__labels {
         padding: 0;
-        margin: 0;
         list-style: none;
+        margin: side-values(0 0 $address-box-item-offset-vertical);
     }
 
     &__label-container {
         padding: 0;
         list-style: none;
-        margin: 0;
         display: inline;
     }
 
@@ -25,7 +24,8 @@
         text-shadow: none;
         color: $primary-600;
         font-weight: normal;
-        font-size: $base-font-size--xs;
+        font-size: $base-font-size--s;
+        border-radius: $border-radius;
 
         &-container:last-of-type &:after {
             content: '';
@@ -38,8 +38,8 @@
         &.label-info {
             background: $info;
             color: $primary-inverse;
-            font-weight: bold;
-            padding: 2px 4px;
+            padding: side-values($address-box-item-label-info-padding-vertical $address-box-item-label-info-padding-horizontal);
+            margin: side-values(0 $address-box-item-label-info-offset-horizontal 0 0);
         }
     }
 
@@ -55,7 +55,7 @@
     &__title {
         font-size: $font-size-base;
         font-weight: bold;
-        margin-bottom: 4px;
+        margin: side-values(0 0 $address-box-item-title-offset-vertical);
     }
 }
 

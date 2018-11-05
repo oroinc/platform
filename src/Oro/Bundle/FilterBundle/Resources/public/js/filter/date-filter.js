@@ -366,6 +366,8 @@ define(function(require) {
                 }
             }, this));
 
+            this.$el.inputWidget('seekAndCreate');
+
             this._criteriaRenderd = true;
         },
 

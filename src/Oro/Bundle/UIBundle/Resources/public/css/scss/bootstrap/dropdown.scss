@@ -5,7 +5,22 @@
 .dropdown-menu {
     box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
 
+    &[x-out-of-boundaries] {
+        display: none;
+    }
+
     .dropdown--with-arrow & {
+        $placeholder: 8px;
+
+        &:before {
+            position: absolute;
+
+            height: $placeholder;
+            width: 100%;
+
+            content: '';
+        }
+
         .arrow {
             border: 0 none;
             background: inherit;
@@ -31,7 +46,11 @@
         }
 
         &--top {
-            margin-bottom: 8px;
+            margin-bottom: $placeholder;
+
+            &:before {
+                top: 100%;
+            }
 
             .arrow {
                 bottom: -5px;
@@ -39,7 +58,11 @@
         }
 
         &--bottom {
-            margin-top: 8px;
+            margin-top: $placeholder;
+
+            &:before {
+                bottom: 100%;
+            }
 
             .arrow {
                 top: -5px;
@@ -47,7 +70,14 @@
         }
 
         &--left {
-            margin-right: 8px;
+            margin-right: $placeholder;
+
+            &:before {
+                top: 0;
+                left: 100%;
+                height: 100%;
+                width: $placeholder;
+            }
 
             .arrow {
                 right: -5px;
@@ -56,7 +86,14 @@
         }
 
         &--right {
-            margin-left: 8px;
+            margin-left: $placeholder;
+
+            &:before {
+                top: 0;
+                right: 100%;
+                height: 100%;
+                width: $placeholder;
+            }
 
             .arrow {
                 left: -5px;
@@ -72,6 +109,10 @@
 }
 
 .dropdown-toggle {
+    &:after {
+        vertical-align: $caret-width / 2;
+    }
+
     &--no-caret {
         &:after {
             content: none;

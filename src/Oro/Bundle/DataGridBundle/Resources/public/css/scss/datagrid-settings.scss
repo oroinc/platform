@@ -18,14 +18,14 @@
         cursor: default;
         text-align: left;
         font-weight: normal;
-        padding: 20px;
+        padding: 22px $content-padding 25px;
         border-color: #ccc;
         min-width: 300px;
 
         .close {
             position: absolute;
-            top: 16px;
-            right: 20px;
+            top: 12px;
+            right: 15px;
         }
     }
 
@@ -33,6 +33,7 @@
         font-size: $datagrid-settings-title-font-size;
         line-height: $datagrid-settings-title-line-height;
         margin: $datagrid-settings-title-offset;
+        font-weight: 700;
     }
 
     &__tabs {
@@ -40,12 +41,20 @@
     }
 
     &__wrapper {
+        width: 262px;
+
         .ui-sortable-placeholder {
             border-top: 3px solid transparent;
         }
 
         .column-filter-match {
             text-decoration: underline;
+        }
+
+        .nav-tabs {
+            .nav-link {
+                padding-#{$end}: 9px;
+            }
         }
 
         .dropup &,
@@ -74,15 +83,27 @@
         td {
             &.title-cell {
                 white-space: nowrap;
+
+                overflow: hidden;
+                text-overflow: ellipsis;
+
+                max-width: 148px;
+
+                padding-#{$start}: 16px;
+                padding-#{$end}: 0;
             }
 
             &.visibility-cell {
-                text-align: center;
+                text-align: left;
+                padding-#{$start}: 16px;
+                padding-#{$end}: 16px;
             }
 
             &.sort-cell {
+                padding-#{$start}: 16px;
+                padding-#{$end}: 16px;
                 white-space: nowrap;
-                text-align: center;
+                text-align: left;
 
                 .btn.move-up,
                 .btn.move-down {
@@ -143,26 +164,34 @@
         .table-header-wrapper {
             border-top-left-radius: 3px;
             border-top-right-radius: 3px;
-            border: 1px solid #ddd;
-            margin: 10px 0 0;
+            margin: 9px 0 0;
+
+            .table {
+                th {
+                    padding: 4px 16px;
+                }
+            }
         }
 
         .table-wrapper {
             border-bottom-left-radius: 3px;
             border-bottom-right-radius: 3px;
-            border: 1px solid #ddd;
             border-top: none;
             max-height: 2000px;
             overflow: auto;
             overflow-x: hidden;
             margin: 0;
 
+            .thead-sizing {
+                display: table-header-group;
+                visibility: hidden;
+            }
+
             .table {
                 margin-top: -1px;
 
                 th {
-                    padding-top: 0;
-                    padding-bottom: 0;
+                    padding: 0 16px;
                     overflow: hidden;
 
                     span {
@@ -187,26 +216,35 @@
     }
 
     &-filter {
-        margin-top: 4px;
-
         .datagrid-settings-renderable-tab {
-            &:not(:last-of-type):after {
-                content: "|";
+            &:not(:last-of-type) {
+                margin-right: 3px;
+
+                &:after {
+                    content: '';
+                    width: 1px;
+                    height: 12px;
+                    margin: 0 0 0 4px;
+                    background: $primary-700;
+                    display: inline-block;
+                }
             }
+
             &.active {
                 pointer-events: none;
-                color: $primary;
+                color: $primary-200;
             }
         }
     }
 
     &-search {
-        margin: 15px 0 10px 0;
+        margin: 15px 0 12px 0;
         position: relative;
 
         input {
             margin: 0;
             width: 100%;
+            padding: 4px 8px;
         }
 
         &.empty:after {
@@ -217,7 +255,7 @@
             position: absolute;
             top: 50%;
             margin-top: -12px;
-            right: 12px;
+            right: 10px;
             z-index: 0;
         }
 

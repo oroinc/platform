@@ -55,10 +55,6 @@
     white-space: nowrap;
 }
 
-.customer-content .context-item .fa-close {
-    cursor: pointer;
-}
-
 .activity-context-activity-label {
     float: $activity-context-activity-label-float;
     margin: $activity-context-activity-label-offset;
@@ -77,6 +73,21 @@
     .activity-context-activity {
         margin-top: 5px;
         width: 720px;
+    }
+
+    @at-root .page-title {
+        .activity-context-activity-block {
+            display: block !important;
+
+            .activity-context-activity {
+                margin-top: 0;
+                width: auto;
+            }
+        }
+
+        .context-item .fa-close {
+            cursor: pointer;
+        }
     }
 }
 

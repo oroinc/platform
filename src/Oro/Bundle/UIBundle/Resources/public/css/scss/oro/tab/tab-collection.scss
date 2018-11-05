@@ -1,13 +1,7 @@
 /* @theme: admin.oro; */
 
 .tab-collection {
-    border-bottom: 1px solid #ddd;
-
     li {
-        > a {
-            padding-right: 7px;
-        }
-
         > a:after {
             visibility: hidden;
             content: '*';
