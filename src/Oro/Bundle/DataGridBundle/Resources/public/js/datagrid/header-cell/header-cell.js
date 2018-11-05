@@ -1,12 +1,10 @@
-define([
-    'underscore',
-    'jquery',
-    'backgrid',
-    'oroui/js/tools/text-util'
-], function(_, $, Backgrid, textUtil) {
+define(function(require) {
     'use strict';
 
     var HeaderCell;
+    var _ = require('underscore');
+    var Backgrid = require('backgrid');
+    var textUtil = require('oroui/js/tools/text-util');
 
     /**
      * Datagrid header cell
@@ -189,6 +187,11 @@ define([
             }
         },
 
+        /**
+         * Mouse Enter on column name to show popover
+         *
+         * @param {Event} e
+         */
         onMouseEnter: function(e) {
             var $label = this.$('.grid-header-cell__label');
 
@@ -204,13 +207,13 @@ define([
             }
 
             this.popoverAdded = true;
-
             $label.popover({
                 content: this.column.get('label'),
                 trigger: 'manual',
                 placement: 'bottom',
                 animation: false,
                 container: 'body',
+                offset: this.calcPopoverOffset(),
                 template: '<div class="popover" role="tooltip">' +
                               '<div class="arrow"></div>' +
                               '<h3 class="popover-header"></h3>' +
@@ -223,12 +226,35 @@ define([
             }, 300);
         },
 
+        /**
+         * Mouse Leave from column name to hide popover
+         *
+         * @param {Event} e
+         */
         onMouseLeave: function(e) {
             clearTimeout(this.hintTimeout);
             var $label = this.$('.grid-header-cell__label');
             $label.popover('hide');
             $label.popover('dispose');
             this.popoverAdded = false;
+        },
+
+        /**
+         * Calculation offset of column label for popover
+         *
+         * @return {String}
+         */
+        calcPopoverOffset: function() {
+            var x = 0;
+            var y = 0;
+            var $label = this.$('.grid-header-cell__label');
+
+            var elBottom = this.$el[0].getBoundingClientRect().bottom;
+            var labelBottom = $label[0].getBoundingClientRect().bottom;
+
+            y = elBottom - labelBottom;
+
+            return [x, y].join(', ');
         }
     });
 

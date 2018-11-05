@@ -39,7 +39,8 @@ use Symfony\Component\Validator\ValidatorBuilderInterface;
  * This class is mostly a copy of {@see Symfony\Component\Validator\ValidatorBuilder},
  * except additional logic with custom loaders.
  *
- * @todo: This class should be removed after https://github.com/symfony/symfony/issues/18930
+ * This class was created as a workaround for https://github.com/symfony/symfony/issues/18930
+ * Should be removed in BAP-17751
  */
 class ValidatorBuilder implements ValidatorBuilderInterface
 {
@@ -332,29 +333,6 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @deprecated since version 2.7, to be removed in 3.0.
-     */
-    public function setApiVersion($apiVersion)
-    {
-        @trigger_error(
-            'The ' . __METHOD__ . ' method is deprecated in version 2.7 and will be removed in version 3.0.',
-            E_USER_DEPRECATED
-        );
-
-        if (!in_array(
-            $apiVersion,
-            [Validation::API_VERSION_2_4, Validation::API_VERSION_2_5, Validation::API_VERSION_2_5_BC]
-        )
-        ) {
-            throw new InvalidArgumentException(sprintf('The requested API version is invalid: "%s"', $apiVersion));
-        }
-
-        return $this;
-    }
-
-    /**
      * @param LoaderInterface $loader
      */
     public function addCustomLoader(LoaderInterface $loader)
@@ -396,7 +374,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
             /**
              * Add custom loaders
-             * @todo: Should be refactored after https://github.com/symfony/symfony/issues/18930
+             * Workaround for https://github.com/symfony/symfony/issues/18930
+             * @see BAP-17751
              */
             $loaders = array_merge($loaders, $this->customLoaders);
 
