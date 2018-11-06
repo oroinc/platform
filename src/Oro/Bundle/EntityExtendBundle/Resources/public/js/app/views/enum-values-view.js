@@ -14,11 +14,6 @@ define(function(require) {
          */
         multiple: false,
 
-        /**
-         * @type {number}
-         */
-        sortableInitDelay: 500,
-
         events: {
             'click a.add-list-item': 'reindexValues',
             'click [name$="[is_default]"]': 'onIsDefaultClick',
