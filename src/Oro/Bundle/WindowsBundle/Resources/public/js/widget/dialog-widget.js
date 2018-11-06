@@ -54,7 +54,9 @@ define(function(require) {
         _isEmbedded: false,
 
         events: {
-            'content:changed': 'resetDialogPosition'
+            'content:changed': 'resetDialogPosition',
+            'shown.bs.collapse': 'resetDialogPosition',
+            'hidden.bs.collapse': 'resetDialogPosition'
         },
 
         listen: {

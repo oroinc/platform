@@ -1,8 +1,7 @@
 /* @theme: admin.oro; */
 
 .big-numbers-items {
-    width: 100%;
-    margin: 0;
+    margin: side-values(-15px -15px 0);
 
     display: flex;
     flex-wrap: wrap;
@@ -13,7 +12,7 @@
         position: relative;
 
         width: 33.3%;
-        padding: 0 15px;
+        padding: side-values(0 15px);
         margin: side-values(15px 0 15px -1px);
 
         text-align: center;
@@ -54,22 +53,30 @@
             max-width: 100%;
             padding: 0;
 
+            .mobile-version & {
+                padding: 0;
+            }
+
             font-weight: normal;
+            font-size: $base-font-size;
             text-align: #{$start};
+            color: $primary-400;
 
             display: inherit;
+            margin-bottom: 10px;
         }
 
         & > .value {
-            margin-bottom: 0;
+            margin-bottom: 15px;
 
             text-align: #{$start};
             font-weight: normal;
+            color: $primary-100;
         }
 
         & > div.deviation {
             font-size: 11px;
-
+            line-height: 1.7;
             overflow: hidden;
 
             & > .deviation {
@@ -109,7 +116,7 @@
         }
 
         li:nth-child(even):after {
-            width: calc(200% - 15px);
+            width: calc(200% - 30px);
 
             content: '';
         }

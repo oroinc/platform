@@ -179,7 +179,6 @@ define([
                 this._hideCriteria();
             }
 
-            this.$el.inputWidget('seekAndCreate');
             this._handleEmptyFilter();
         },
 

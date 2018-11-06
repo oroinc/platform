@@ -49,9 +49,15 @@
             >
         <div class="fallback-item">
             <div class="fallback-item-value fallback-item-value--first">
-                {{ form_widget(form.default) }}
-                {{ form_errors(form.default) }}
-                <span class="fallback-status"></span>
+                <div class="input-append">
+                    <div class="input-group">
+                        {{ form_widget(form.default) }}
+                        {{ form_errors(form.default) }}
+                    </div>
+                    <div class="btn-group">
+                        <span class="btn btn-icon add-on fallback-status"></span>
+                    </div>
+                </div>
             </div>
             <div class="fallback-item-label">{{ form.default.vars.label|trans }}</div>
         </div>
@@ -68,10 +74,12 @@
 {% endblock %}
 
 {% block oro_locale_localized_fallback_value_collection_widget %}
-    {{ form_widget(form.values) }}
-    {{ form_errors(form.values) }}
-    {{ form_widget(form.ids) }}
-    {{ form_errors(form.ids) }}
+    <div class="control-group">
+        {{ form_widget(form.values) }}
+        {{ form_errors(form.values) }}
+        {{ form_widget(form.ids) }}
+        {{ form_errors(form.ids) }}
+    </div>
 {% endblock %}
 
 {% block _language_settings_oro_locale___language_value_widget %}

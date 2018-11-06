@@ -101,8 +101,8 @@ oro:
             no_node_selected_error: "You didn't select any node"
             actions:
                 label: Tree actions
-                expand: 'Expand all'
-                collapse: 'Collapse all'
+                expand: 'Expand All'
+                collapse: 'Collapse All'
                 move: 'Move To'
                 subitems:
                     itemsLabel: 'Items'

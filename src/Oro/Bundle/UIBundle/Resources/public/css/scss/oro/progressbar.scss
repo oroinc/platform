@@ -1,0 +1,81 @@
+/* @theme: admin.oro; */
+
+#progressbar {
+    position: absolute;
+    top: 50%;
+    #{$start}: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+.progress-bar-container {
+    position: relative;
+    width: $progress-container-size;
+    margin-right: auto;
+    margin-left: auto;
+
+    text-align: center;
+}
+
+.progress {
+    &.infinite {
+        position: relative;
+
+        height: $progressbar-infinite-height;
+        width: 100%;
+        margin-top: $progressbar-infinite-offset;
+
+        background-color: $progressbar-infinite-background-color;
+
+        &:before {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+
+            display: block;
+            height: inherit;
+            width: $progressbar-infinite-line-point-size;
+
+            background-color: $progressbar-infinite-line-background-color;
+
+            animation: line-point 1.5s steps(40, end) infinite;
+
+            content: '';
+        }
+
+        .progress-bar {
+            display: none;
+        }
+    }
+
+    &-title {
+        font-size: $progress-font-size;
+        font-weight: 300;
+    }
+
+    &-label {
+        display: block;
+        margin-top: -$progress-height;
+
+        text-align: center;
+        line-height: $progress-height;
+    }
+}
+
+.progress-bar {
+    &.success {
+        background-color: $success-lighten;
+    }
+
+    &.inverse {
+        background-color: $extra;
+    }
+
+    &.info {
+        background-color: $info;
+    }
+
+    &.warning {
+        background-color: $warning;
+    }
+}

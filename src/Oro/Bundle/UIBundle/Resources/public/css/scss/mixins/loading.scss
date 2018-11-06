@@ -22,5 +22,5 @@
     border-left-color: transparent;
 
     border-radius: 50%;
-    animation: spin-loading .85s linear infinite;
+    animation: spin-loading .85s steps(40, end) infinite;
 }

@@ -36,8 +36,8 @@ define(function(require) {
 
             $(el).on('click', function(e) {
                 var title = __('Schema update confirmation');
-                var content = '<p>' + __('Your config changes will be applied to schema.') + '</p>' +
-                    '<p>' + __('It may take few minutes...') + '</p>';
+                var content = '<p>' + __('Your config changes will be applied to schema.') + '<br/>' +
+                    __('It may take few minutes...') + '</p>';
                 /** @type oro.Modal */
                 var confirmUpdate = new Modal({
                     className: 'modal modal-primary',
@@ -50,7 +50,12 @@ define(function(require) {
                 function execute() {
                     var url = routing.generate(self.options.route);
                     var progress = $('#progressbar').clone();
-                    progress.removeAttr('id').find('h3').remove();
+                    progress
+                        .removeAttr('id')
+                        .find('h3').remove()
+                        .end()
+                        .find('[role="progressbar"]')
+                        .attr('aria-valuetext', __('oro.entity_extend.schema_updating'));
 
                     var modal = new Modal({
                         allowCancel: false,
@@ -59,7 +64,8 @@ define(function(require) {
                         content: content
                     });
                     modal.open();
-                    modal.$el.find('.modal-footer').html(progress);
+                    modal.$el.find('.modal-body').append(progress);
+                    modal.$el.find('.modal-footer').html('');
                     progress.show();
 
                     $.post({
