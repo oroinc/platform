@@ -88,5 +88,29 @@
 }
 
 .attachment-item {
-    margin-top: 5px;
+    display: inline-block;
+    position: relative;
+    margin: 5px 16px 0 0;
+
+    span.filename-label {
+        color: #006acc;
+    }
+
+    .fa-close {
+        cursor: pointer;
+        opacity: .2;
+    }
+
+    input {
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 0 !important;
+        height: 0 !important;
+        border: none;
+        z-index: -1;
+    }
 }
