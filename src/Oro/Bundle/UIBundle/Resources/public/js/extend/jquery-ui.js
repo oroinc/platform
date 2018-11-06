@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var $ = require('jquery');
+    var _ = require('underscore');
     var mask = require('oroui/js/dropdown-mask');
     require('jquery-ui');
 
@@ -248,10 +249,12 @@ define(function(require) {
                 this._removeClass( this.element.find( ".ui-sortable-handle" ), "ui-sortable-handle" );
 
                 this._addClass(
-                    this.options.handle ?
-                        this.element.find(this.options.handle) :
-                        $(_.map(this.items, function(item) { return item.item.get(0); })),
-                    "ui-sortable-handle"
+                    this.options.handle
+                        ? this.element.find(this.options.handle)
+                        : $(_.map(this.items, function(item) {
+                            return item.item.get(0);
+                        })),
+                    'ui-sortable-handle'
                 );
             }
         }));
