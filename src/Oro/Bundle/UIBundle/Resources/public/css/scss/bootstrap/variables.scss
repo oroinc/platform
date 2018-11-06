@@ -13,10 +13,20 @@ $top-padding: $content-padding;
 $bottom-padding: $content-padding;
 $margin-bottom-box: $content-padding;
 
+$base-font-size:                        14px;
+$base-font-size--xxl:                   32px;
+$base-font-size--xl:                    24px;
+$base-font-size--l:                     18px;
+$base-font-size--m:                     16px;
+$base-font-size--s:                     12px;
+$base-font-size--xs:                    11px;
+
 // Your variable overrides
 $border-radius: 4px;
 $btn-border-radius: 16px;
 $btn-border-width: 0;
+$btn-square-border-radius: 2px;
+$btn-square-border-width: 2px;
 $font-family-sans-serif: Helvetica, Arial, sans-serif;
 $font-size-base: 14px;
 $line-height-base: 1.57;
@@ -25,10 +35,21 @@ $btn-font-weight: bold;
 $btn-font-size: 12px;
 $btn-text-transform: uppercase;
 
+$btn-mobile-font-size: 14px;
+$btn-mobile-border-radius: 20px;
+$btn-icon-mobile-fa-icon-font-size: 18px;
+
+$content-title-font-size: 20px;
+$content-title-font-weight: bold;
+$content-title-line-height: 1.5;
+
 // Buttons + Forms
 //
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
 $border-width: 2px;
+
+$input-border-width: 2px;
+$input-border-color: $primary-750;
 
 $input-btn-padding-y: 0;
 $input-btn-padding-x: 16px;
@@ -36,15 +57,26 @@ $input-box-shadow: none;
 $input-focus-box-shadow: none;
 $input-focus-border-color: $secondary;
 
+$input-btn-mobile-padding-y: 0;
+$input-btn-mobile-padding-x: 16px;
+
 $btn-padding-y-mini: 0;
 $btn-padding-x-mini: 16px;
 $btn-line-height: 32px;
 $btn-line-height-mini: 20px;
 $btn-border-radius-mini: $btn-border-radius;
 
+$btn-mobile-line-height: 40px;
+$btn-mobile-padding-y: $input-btn-mobile-padding-y;
+$btn-mobile-padding-x: $input-btn-mobile-padding-x;
+
 $btn-group-divider-width: 1px;
 $btn-group-divider-color: rgba($primary-inverse, .4);
 
+// Navbar
+$nav-tabs-link-hover-border-color: $primary-750;
+
+// Pagination
 $pagination-padding-x: 12px;
 $pagination-padding-y: 5.5px;
 $pagination-mini-padding-x: 4px;
@@ -61,6 +93,7 @@ $breadcrumb-color: $primary-550;
 $breadcrumb-divider-color: $primary-550;
 $breadcrumb-active-color: $primary-550;
 $breadcrumb-margin-bottom: 0;
+$breadcrumb-item-padding: .2em !default;
 
 $pagination-bg: transparent;
 $pagination-hover-bg: transparent;
@@ -81,7 +114,7 @@ $dropdown-border-width: 0;
 
 $dropdown-item-padding-x: 16px;
 $dropdown-item-padding-y: 3px;
-$dropdown-item-icon-fa-offset: 0 6px 0 0;
+$dropdown-item-icon-fa-offset: side-values(0 6px 0 0);
 $dropdown-link-color: $primary-300;
 $dropdown-link-hover-color: $primary-300;
 $dropdown-link-hover-bg: $primary-900;
@@ -91,41 +124,61 @@ $dropdown-link-active-bg: $primary-900;
 
 $modal-backdrop-bg: $primary-inverse;
 $modal-backdrop-opacity: .9;
+$modal-content-border-radius: 4px;
 $modal-header-bg: $primary-300;
-$modal-header-padding: 18px;
+$modal-header-padding: side-values(16px 18px 14px 20px);
 $modal-header-color: $primary-inverse;
 $modal-header-close-padding: 0;
 $modal-header-close-margin: 0;
-$modal-header-close-color: $primary-830;
+$modal-header-close-color: $primary-inverse;
 $modal-header-close-text-shadow: none;
 $modal-header-close-opacity: 1;
 $modal-header-close-hover-opacity: 1;
+$modal-header-close-size: 18px;
+$modal-header-close-font-size: $base-font-size--l;
 $modal-title-font-size: 18px;
+$modal-title-font-weight: bold;
 $modal-title-line-height: 1;
 $modal-inner-padding: 28px;
 $modal-content-border-width: 0;
 $modal-dialog-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
 $modal-footer-bg: $primary-900;
-$modal-footer-padding: 14px 24px;
+$modal-footer-padding: 8px;
 
-$popover-z-index: 991;
-$popover-border-width: 0px; /* stylelint-disable-line length-zero-no-unit */
+// Progress bars
+$progress-height: 22px;
+$progress-font-size: 22px;
+$progress-bg: $primary-860;
+$progress-border-radius: 0;
+$progress-box-shadow: null;
+$progress-bar-color: $additional-dark;
+$progress-bar-bg: $primary-600;
+
+$tooltip-arrow-width: 10px;
+$tooltip-arrow-height: 5px;
+
+// Popover
+$popover-font-size: 14px;
+$popover-max-width: 250px;
 $popover-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
-$popover-body-bg: #fff;
-$popover-body-padding-y: 10px;
-$popover-body-padding-x: 12px;
-$popover-body-offset-right: 28px;
-$popover-body-offset-right-no-close: 12px;
-
-$popover-max-width: 310px;
+$popover-border-width: 0px; /* stylelint-disable-line length-zero-no-unit */
 $popover-border-radius: 2px;
 $popover-border: none;
+$zindex-popover: 991;
+
+$popover-body-padding-y: 10px;
+$popover-body-padding-x: 12px;
+$popover-body-bg: #fff;
+$popover-body-offset-right: 28px;
+
+$popover-body-offset-right-no-close: 12px;
 
 $popover-close-position: absolute;
 $popover-close-position-x: 7px;
 $popover-close-position-y: 7px;
 $popover-close-cursor: pointer;
 $popover-close-color: $primary-700;
+$popover-close-before-font-size: $base-font-size--m;
 
 $popover-arrow-color: #fff;
 $popover-arrow-size: 12px;
@@ -181,14 +234,6 @@ $page-border-color:                     #ccc;
 $navigation-background-color:           $primary-900;
 $page-sidebar-background-color:         $navigation-background-color;
 
-$base-font-size:                        14px;
-$base-font-size--xxl:                   32px;
-$base-font-size--xl:                    24px;
-$base-font-size--l:                     18px;
-$base-font-size--m:                     16px;
-$base-font-size--s:                     12px;
-$base-font-size--xs:                    11px;
-
 $input-border-radius:                   3px;
 $window-border-radius:                  3px;
 
@@ -220,6 +265,7 @@ $info-close:                            $info-dark;
 $tag-item-color:                        $secondary;
 $tag-item-background:                   $secondary-300;
 $tag-my-item-background:                $secondary;
+$tag-item-offset:                       side-values(0 2px 1px 0) !default;
 
 $error-message-balloon-background:      lighten($error-text, 20%);
 

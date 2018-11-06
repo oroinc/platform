@@ -62,10 +62,10 @@
         }) }}></div>
     {% endif %}
     {% placeholder after_body_start %}
-    <div id="progressbar">
-        <h3>{% trans %}Loading...{% endtrans %}</h3>
-        <div class="progress progress-striped active">
-            <div class="bar" style="width: 90%;"></div>
+    <div id="progressbar" class="progress-bar-container">
+        <h3 class="progress-title">{{ 'oro.ui.loading'|trans }}</h3>
+        <div class="progress infinite">
+            <div class="progress-bar" role="progressbar" aria-valuetext="{{ 'oro.ui.page_loading'|trans }}"></div>
         </div>
     </div>
     <div id="page" style="display:none;" class="app-page">

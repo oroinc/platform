@@ -9,6 +9,8 @@ $btn-not-btn-icon-end-fa-offset: side-values(0 0 0 $content-padding-small) !defa
 
 $btn-icon-width: 32px !default;
 $btn-icon-height: 32px !default;
+$btn-icon-mobile-width: 40px !default;
+$btn-icon-mobile-height: 40px !default;
 $btn-icon-position: relative !default;
 $btn-icon-inner-offset: 0 !default;
 $btn-icon-text-indent: -9999px !default;
@@ -16,10 +18,11 @@ $btn-icon-gold-color: $warning !default;
 
 $btn-icon-fa-offset: 0 !default;
 $btn-icon-fa-text-indent: 0 !default;
+$btn-icon-fa-line-height: 1 !default;
 $btn-icon-fa-position: absolute !default;
 $btn-icon-fa-top: 50% !default;
 $btn-icon-fa-left: 50% !default;
-$btn-icon-fa-transform: translate(-50%, -50%) !default;
+$btn-icon-fa-transform: translate(if-ltr(-50%, 50%), -50%) !default;
 
 $btn-icon-dropdown-toggle-width: 44px !default;
 
@@ -44,15 +47,29 @@ $btn-theme: (
 $btn-theme-light: (
     'background': transparent,
     'border': transparent,
+    'color': $primary-400,
+    'hover-background': transparent,
+    'hover-border': transparent,
+    'hover-color': $primary-500,
+    'active-background': transparent,
+    'active-border': transparent,
+    'active-color': $primary-500,
+    'active-box-shadow': none,
+    'disabled-opacity': .25
+) !default;
+
+$btn-theme-lighter: (
+    'background': transparent,
+    'border': transparent,
     'color': $primary-700,
     'hover-background': transparent,
     'hover-border': transparent,
-    'hover-color': $primary-400,
+    'hover-color': $primary-500,
     'active-background': transparent,
     'active-border': transparent,
-    'active-color': $primary,
+    'active-color': $primary-500,
     'active-box-shadow': none,
-    'disabled-color': $primary-700
+    'disabled-opacity': .25
 ) !default;
 
 $btn-theme-primary: (
@@ -89,6 +106,7 @@ $btn-theme-keys: () !default;
 $btn-theme-keys: map-merge(
     (
         'light': $btn-theme-light,
+        'lighter': $btn-theme-lighter,
         'primary': $btn-theme-primary,
         'info': $btn-theme-info,
         'success': $btn-theme-success,
@@ -97,6 +115,30 @@ $btn-theme-keys: map-merge(
         'dark': $btn-theme-dark,
     ),
     $btn-theme-keys
+);
+
+$btn-theme-square-default: (
+    'background': $primary-inverse,
+    'border': $primary-750,
+    'color': $primary-200,
+    'hover-background': $primary-900,
+    'hover-border': $primary-750,
+    'hover-color': $primary-500,
+    'active-background': $primary-900,
+    'active-border': $primary-750,
+    'active-color': $primary-500,
+    'active-box-shadow': inset 0 2px 3px 2px rgba(0, 0, 0, .21),
+    'disabled-opacity': .25
+) !default;
+
+$btn-theme-square-keys: () !default;
+$btn-theme-square-keys: map-merge(
+    (
+        'default': $btn-theme-square-default,
+        'light': $btn-theme-light,
+        'lighter': $btn-theme-lighter,
+    ),
+    $btn-theme-square-keys
 );
 
 $btn-brand-google-base-color: #dc4e41 !default;

@@ -138,6 +138,8 @@ oro:
           toggler_label: 'Maximize/minimize menu'
           scroll_up_label: 'Scroll menu up'
           scroll_down_label: 'Scroll menu down'
+        loading: 'Loading...'
+        page_loading: 'Page loading...'
 'Click to go back': 'Click to go back'
 'Show more': 'Show more'
 'Show less': 'Show less'

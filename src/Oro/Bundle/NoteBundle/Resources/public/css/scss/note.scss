@@ -11,7 +11,7 @@
             display: inline-block;
 
             .visual {
-                margin-#{$start}: $note-message-padding - ($note-avatar-size + $note-avatar-margin);
+                margin-#{$start}: $note-message-padding - ($note-avatar-size + $note-avatar-margin-horizontal);
                 display: block;
 
                 img {
@@ -26,10 +26,18 @@
                     display: inline-block;
                     float: #{$start};
                     width: $note-avatar-size;
-                    height: $note-avatar-size;
-                    margin-#{$end}: $note-avatar-margin;
-                    margin-top: ($note-avatar-size - $font-size-base) / 2;
+                    font-size: $note-avatar-size;
+                    margin-#{$end}: $note-avatar-margin-horizontal;
+                    margin-top: $note-avatar-margin-vertical;
+                    text-align: center;
+                    line-height: $note-avatar-size;
                 }
+            }
+
+            .avatar-placeholder {
+                display: inline-block;
+
+                @include fa-icon($note-avatar-placeholder);
             }
 
             .user {
@@ -122,20 +130,20 @@
                 .accordion-toggle {
                     display: inline-block;
                     padding: 0;
-                    min-width: $note-icon-size + 1;
-                    margin-#{$end}: -($note-icon-size + 1);
+                    min-width: $note-accordion-icon-size + 1;
+                    margin-#{$end}: -($note-accordion-icon-size + 1);
                     float: #{$start};
                     position: relative;
 
-                    &:before {
-                        content: '\f147';
-                        font-family: FontAwesome;
-                        color: #727272;
+                    @include fa-icon($note-accordion-icon, before, true) {
+                        color: $primary-550;
+                        font-size: $note-accordion-icon-size;
+                        line-height: $note-accordion-line-height;
                     }
-                }
 
-                .accordion-toggle.collapsed:before {
-                    content: '\f196';
+                    &.collapsed {
+                        @include fa-icon($note-accordion-collapsed-icon);
+                    }
                 }
             }
 
