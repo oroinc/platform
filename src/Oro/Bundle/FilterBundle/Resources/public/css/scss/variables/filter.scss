@@ -1,0 +1,323 @@
+/* @theme: admin.oro; */
+
+$filter-container-position: relative !default;
+
+$filter-box-criteria-position: absolute !default;
+$filter-box-criteria-font-size: $base-font-size !default;
+$filter-box-criteria-background-color: $primary-inverse !default;
+$filter-box-criteria-inner-offset: 16px !default;
+$filter-box-criteria-display: block !default;
+$filter-box-criteria-visibility: hidden !default;
+$filter-box-criteria-z-index: $zindex-dropdown - 100 !default;
+$filter-box-criteria-offset-top: 8px !default;
+$filter-box-criteria-top: auto !default;
+$filter-box-criteria-offset-left: -9999px !default;
+$filter-box-criteria-focus-outline: none !default;
+
+$filter-box-criteria-btn-group-offset-left: 0 !default;
+
+$filter-box-criteria-value-offset-bottom: 0 !default;
+
+$filter-box-criteria-btn-group-border-radius: 2px 0 0 2px !default;
+$filter-box-criteria-btn-group-background-color: $primary-inverse !default;
+$filter-box-criteria-btn-group-border: 2px solid $primary-750 !default;
+$filter-box-criteria-btn-group-font-weight: normal !default;
+
+$filter-box-criteria-btn-group-icon-inner-offset-top: 2px !default;
+$filter-box-criteria-btn-group-icon-vertical-align: middle !default;
+
+$filter-box-criteria-btn-group-value-field-frame-offset-left: -2px !default;
+
+$filter-criteria-nav-tabs-oro-hover-background: #efefef !default;
+$filter-criteria-nav-tabs-oro-hover-color: #444 !default;
+$filter-criteria-nav-tabs-oro-active-background: #fff !default;
+$filter-criteria-nav-tabs-oro-active-color: #6d6d6d !default;
+
+$filter-criteria-tab-content-background: transparent !default;
+
+$filter-default-value-display: none !default;
+
+$filter-box-item-offset-right: 8px !default;
+$filter-box-item-offset-bottom: 8px !default;
+$filter-box-item-position: relative !default;
+$filter-box-item-display: inline-block !default;
+$filter-box-item-vertical-align: middle !default;
+$filter-box-item-white-space: nowrap !default;
+
+$filter-box-item-loader-frame-inner-offset-left: 36px !default;
+
+$filter-box-reset-offset-left: 2px !default;
+$filter-box-reset-display: inline-block !default;
+$filter-box-reset-width: 12px !default;
+$filter-box-reset-line-height: 24px !default;
+$filter-box-reset-vertical-align: top !default;
+
+$filter-box-reset-icon-vertical-align: middle !default;
+$filter-box-reset-icon-offset-top: -4px !default;
+
+$filter-box-reset-icon-hover-color: #666 !default;
+
+$input-append-offset-bottom: 0 !default;
+$input-append-btn-group-min-width: 125px !default;
+$input-append-btn-group-a-inner-offset: 1px 13px !default;
+
+$filter-update-offset-left: 8px !default;
+
+$choice-filter-display: flex !default;
+$choice-filter-align-items: center !default;
+
+$filter-box-disable-background-color: #f5f5f5 !default;
+$filter-box-disable-border-bottom-right-radius: 4px !default;
+$filter-box-disable-border-color: #ccc #ccc #b3b3b3 !default;
+$filter-box-disable-border-style: solid !default;
+$filter-box-disable-border-top-right-radius: 4px !default;
+$filter-box-disable-border-width: 1px 1px 1px 0 !default;
+$filter-box-disable-display: inline-block !default;
+$filter-box-disable-font-size: 18px !default;
+$filter-box-disable-height: 29px !default;
+$filter-box-disable-line-height: 29px !default;
+$filter-box-disable-padding: 29px !default;
+$filter-box-disable-vertical-align: top !default;
+
+$filters-state-color: #aaa !default;
+$filters-state-font-size: 13px !default;
+$filters-state-inner-offset: 0 20px !default;
+$filters-state-line-height: 31px !default;
+$filters-state-min-width: 160px !default;
+$filters-state-white-space: nowrap !default;
+$filters-state-overflow: hidden !default;
+$filters-state-text-overflow: ellipsis !default;
+$filters-state-cursor: pointer !default;
+
+$filters-state-icon-offset-right: 8px !default;
+$filters-state-icon-vertical-align: text-bottom !default;
+$filters-state-icon-color: #aaa !default;
+$filters-state-icon-font-size: 13px !default;
+
+$filters-state-under-left-block-inner-offset-left: 20px !default;
+$filters-state-under-left-block-text-align: left !default;
+
+$filter-criteria-hint-max-width: 250px !default;
+$filter-criteria-hint-display: inline-block !default;
+$filter-criteria-hint-text-overflow: ellipsis !default;
+$filter-criteria-hint-white-space: nowrap !default;
+$filter-criteria-hint-overflow: hidden !default;
+$filter-criteria-hint-vertical-align: bottom !default;
+
+$choice-tree-filter-offset-right: 0 !default;
+$choice-tree-filter-offset-bottom: 0 !default;
+$choice-tree-filter-max-width: 300px !default;
+$choice-tree-filter-min-width: 180px !default;
+
+$choice-tree-filter-select2-container-offset-bottom: 8px !default;
+$choice-tree-filter-choice-tree-filter-search-width: calc(100% - 14px) !default;
+
+$choice-tree-filter-buttons-offset-bottom: 5px !default;
+$choice-tree-filter-buttons-span-cursor: pointer !default;
+$choice-tree-filter-buttons-span-color: #006acc !default;
+$choice-tree-filter-buttons-span-active-color: rgb(68, 68, 68) !default;
+$choice-tree-filter-buttons-span-active-cursor: default !default;
+
+$filters-state-page-title-center-text-align: center !default;
+$filters-state-page-title-center-inner-offset-left: 50px !default;
+$filters-state-page-title-center-inner-offset-right: 50px !default;
+$filters-state-page-title-center-height: 31px !default;
+
+$filter-multiselect-font-weight: bold !default;
+$filter-multiselect-color: #333 !default;
+$filter-multiselect-inner-offset: 0 0 2px 0 !default;
+$filter-multiselect-background: none !default;
+$filter-multiselect-border: none !default;
+$filter-multiselect-offset-left: 0 !default;
+
+$filter-multiselect-filter-widget-display: inline-block !default;
+
+$filter-separator-offset: 0 3px !default;
+
+$filter-select-oro-wrapper-width: 113px !default;
+$filter-select-oro-wrapper-offset-bottom: 8px !default;
+$filter-select-oro-wrapper-width: 100% !default;
+$filter-select-oro-wrapper-span-width: 100% !default;
+
+$choice-filter-btn-width: auto !default;
+$choice-filter-btn-float: left !default;
+
+$choice-filter-value-field-frame-position: relative !default;
+$choice-filter-value-field-frame-vertical-align: top !default;
+$choice-filter-value-field-frame-width: auto !default;
+
+$choice-filter-input-width: 200px !default;
+$choice-filter-input-max-width: 100% !default;
+$choice-filter-input-offset-bottom: 0 !default;
+
+$choice-filter-dictionary-width: 200px !default;
+
+$filters-state-popover-max-width: 100% !default;
+
+$filter-select-offset-top: 2px !default;
+
+$select-filter-widget-inner-offset: side-values(0 0 2px 0) !default;
+$select-filter-widget-max-height: 170px !default;
+$select-filter-widget-checkboxes-list-offset-vertical: 10px !default;
+$select-filter-widget-close-display: none !default;
+
+$select-filter-widget-checkboxes-label-white-space: nowrap !default;
+$select-filter-widget-checkboxes-label-offset: 0 !default;
+$select-filter-widget-checkboxes-label-inner-offset: side-values(2px 15px 1px) !important;
+$select-filter-widget-checkboxes-label-float: left !default;
+
+$select-filter-widget-checkboxes-offset: 0 6px 5px 5px !default;
+$select-filter-widget-li-inner-offset: 0 !default;
+$select-filter-widget-li-font-size: inherit !default;
+
+$select-filter-widget-li-after-content: '' !default;
+$select-filter-widget-li-after-display: block !default;
+$select-filter-widget-label-float: none !default;
+$select-filter-widget-label-state-hover-background-image: none !default;
+$select-filter-widget-label-state-hover-background-color: #efefef !default;
+
+$select-filter-widget-label-state-active-background-image: none !default;
+$select-filter-widget-label-state-active-background-color: #efefef !default;
+$select-filter-widget-label-state-active-color: #fff !default;
+
+$select-filter-widget-search-offset: 0 !default;
+$select-filter-widget-search-width: 100% !default;
+
+$select-filter-widget-header-inner-offset: 4px 4px 0 4px !default;
+$select-filter-widget-header-offset: 0 !default;
+$select-filter-widget-header-child-inner-offset: 4px 4px 6px 4px !default;
+$select-filter-widget-header-reset-display: none !default;
+$select-filter-widget-footer-display: none !default;
+
+$select-filter-widget-li-after-clear: both !default;
+
+$select-filter-widget-li-hidden-item-height: 0 !default;
+
+$choice-tree-filter-list-max-height: 200px !default;
+$choice-tree-filter-list-overflow: auto !default;
+$choice-tree-filter-list-offset-bottom: 10px !default;
+$choice-tree-filter-list-list-style-type: none !default;
+$choice-tree-filter-list-first-offset-left: 0 !default;
+$choice-tree-filter-list-input-offset-right: 5px !default;
+$choice-tree-filter-list-input-offset-top: 0 !default;
+$choice-tree-filter-list-input-offset-left: -18px !default;
+$choice-tree-filter-list-label-inner-offset-left: 20px !default;
+$choice-tree-filter-list-search-color: #000 !default;
+$choice-tree-filter-list-search-font-weight: bold !default;
+
+$choice-tree-filter-value-field-display: none !default;
+
+$filter-items-empty-display: none !default;
+
+$filter-items-hint-inner-offset-right: 80px !default;
+$filter-items-hint-position: relative !default;
+
+$filter-item-btn-height: 24px !default;
+$filter-item-btn-font-size: 14px !default;
+$filter-item-btn-line-height: 24px !default;
+$filter-item-btn-text-transform: none !default;
+$filter-item-btn-border: none !default;
+$filter-item-btn-background-color: $primary-900 !default;
+$filter-item-btn-hover-background-color: $primary-830 !default;
+
+$filter-item-dropdown-toggle-vertical-align: top !default;
+$filter-item-dropdown-toggle-line-height: 28px !default;
+$filter-item-dropdown-toggle-position: relative !default;
+
+$filter-item-fa-close-color: #aaa !default;
+$filter-item-fa-close-font-size: 14px !default;
+
+$reset-filter-button-position: absolute !default;
+$reset-filter-button-top: 0 !default;
+$reset-filter-button-right: 0 !default;
+
+$ui-multiselect-filter-list-color: #032d67 !default;
+$ui-multiselect-filter-list-text-decoration: underline !default;
+
+$select-filter-widget-text-decoration: none !default;
+$ui-multiselect-checkboxes-label-line-height: 20px !default;$select-filter-widget-width: auto  !default;
+
+$date-visual-element-width: 95px !default;
+$ui-multiselect-checkboxes-overflow-x: visible !default;
+
+$filter-select-height: 29px !default;
+$filter-select-disable-offset-left: 3px !default;
+
+$field-condition-date-popover-display: inline-block !default;
+$field-condition-date-popover-cursor: pointer !default;
+$field-condition-date-popover-trigger-color: $secondary-dark !default;
+
+$select-field-date-popover-top: 3px !default;
+$select-field-date-popover-right: 3px !default;
+$select-field-date-popover-position: absolute !default;
+$select-field-date-popover-min-width: 350px !default;
+
+$filter-item-simple-display: inline-block !default;
+$filter-item-simple-display: none !default;
+
+$active-filter-display: inline-block !default;
+$active-filter-display: block !default;
+
+$filter-update-empty-offset-left: -2px !default;
+
+$select2-container-dictionary-filter-display: block !default;
+$select2-container-dictionary-filter-max-width: none !default;
+
+$filter-item-divider-background: none !default;
+$filter-item-divider-line-height: 40px !default;
+$filter-item-divider-font-size: 16px !default;
+$filter-item-divider-inner-offset: 0 !default;
+$filter-item-divider-offset: 0 !default;
+$filter-item-divider-position: relative !default;
+$filter-item-divider-top: -3px !default;
+
+$filter-item-filter-list-float: left !default;
+$filter-item-filter-list-offset: 0 0 0 -120px !default;
+$filter-item-filter-list-position: relative !default;
+
+$filter-box-oro-action-width: 100% !default;
+$filter-box-oro-action-offset: 0 !default;
+$filter-box-oro-action-btn-group-float: right !default;
+$filter-box-oro-action-btn-outline: none !default;
+$filter-box-oro-action-btn-position: static !default;
+
+$filter-box-selector-width: auto !default;
+
+$filter-select-oro-height: 20px !default;
+$filter-select-oro-line-height: 20px !default;
+$filter-select-oro-width: 100% !default;
+
+$filter-criteria-selector-font-weight: normal !default;
+
+$open-filter-before-content: "" !default;
+$open-filter-before-background: #fff !default;
+$open-filter-before-width: 10px !default;
+$open-filter-before-height: 10px !default;
+$open-filter-before-position: absolute !default;
+$open-filter-before-left: 15px !default;
+$open-filter-before-bottom: -13px !default;
+$open-filter-before-transform: rotate(45deg) !default;
+$open-filter-before-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
+
+$open-filter-after-border-bottom: 10px solid #fff !default;
+$open-filter-after-border-left: 10px solid transparent !default;
+$open-filter-after-border-right: 10px solid transparent !default;
+$open-filter-after-content: "" !default;
+$open-filter-after-left: 10px !default;
+$open-filter-after-position: absolute !default;
+$open-filter-after-bottom: -11px !default;
+$open-filter-after-z-index: $zindex-dropdown - 100 !default;
+
+$open-filter-filter-criteria-selector-background-color: $additional-extra-light  !default;
+$open-filter-filter-criteria-selector-box-shadow: inset 0 2px 3px 2px rgba(0, 0, 0, 0.21)  !default;
+
+$filter-date-range-datetime-visual-element-width: 113px !default;
+$filter-date-range-datetime-visual-element-offset-bottom: 8px !default;
+$filter-date-range-timepicker-input-width: 79px !default;
+$filter-date-range-timepicker-input-offset: 0 0 8px 8px !default;
+$filter-date-range-filter-separator-display: none !default;
+
+$number-range-filter-vertical-align: top !default;
+$number-range-filter-field-display: inline-block !default;
+$number-range-filter-field-width: 100px !default;
+$number-range-filter-filter-separator-position: static !default;

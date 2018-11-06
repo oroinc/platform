@@ -1,14 +1,21 @@
 <script type="text/html" id="{{ id|e('html_attr')|raw }}">
     <div class="accordion-group">
-        <div class="accordion-heading collapse<% if (!collapsed) { %> in<% } %>">
+        <div class="accordion-heading collapse<% if (!collapsed) { %> show<% } %>">
             <div class="title-item">
                 <a href="#accordion-item<%= id %>" class="no-hash accordion-toggle<% if (collapsed) { %> collapsed<% } %>"></a>
                 <span class="visual">
-                    <img src="<% if (createdBy_avatar) { %><%- createdBy_avatar %><% } else { %>{{ asset('bundles/oroui/img/avatar-xsmall.png')|e('html_attr')|raw }}<% } %>" />
+                    <% if (createdBy_avatar) { %>
+                        <span class="avatar">
+                            <img src="<%- createdBy_avatar %>" />
+                        </span>
+                    <% } else { %>
+                        <span class="avatar-placeholder fa-user-circle" aria-hidden="true"></span>
+                    <% } %>
+
                     <% if (createdBy_url) { %>
-                    <a class="user" href="<%= createdBy_url %>"><%- createdBy %></a>
+                        <a class="user" href="<%= createdBy_url %>"><%- createdBy %></a>
                     <% } else if (createdBy) { %>
-                    <span class="user"><%- createdBy %></span>
+                        <span class="user"><%- createdBy %></span>
                     <% } %>
                 </span>
                 <span class="details">

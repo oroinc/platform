@@ -299,8 +299,12 @@ define(function(require) {
          * @protected
          */
         _showCriteria: function() {
+            $(document).trigger('clearMenus'); // hides all opened dropdown menus
             this.trigger('showCriteria', this);
-            this.$(this.criteriaSelector).css('visibility', 'visible');
+            this.$(this.criteriaSelector).css({
+                marginLeft: 'auto',
+                visibility: 'visible'
+            });
             this._alignCriteria();
             this._focusCriteria();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
@@ -343,7 +347,10 @@ define(function(require) {
          * @protected
          */
         _hideCriteria: function() {
-            this.$(this.criteriaSelector).css('visibility', 'hidden');
+            this.$(this.criteriaSelector).css({
+                marginLeft: '-9999px',
+                visibility: 'hidden'
+            });
             this._setButtonPressed(this.$(this.criteriaSelector), false);
             setTimeout(_.bind(function() {
                 if (!this.disposed) {

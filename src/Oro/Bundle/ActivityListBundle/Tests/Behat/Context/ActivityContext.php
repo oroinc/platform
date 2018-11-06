@@ -136,7 +136,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
      */
     public function goToNewerOrOlderActivities($linkLocator)
     {
-        $link = $this->createElement('Activity List')->findLink(ucfirst($linkLocator));
+        $link = $this->createElement('Activity List')->findButton(ucfirst($linkLocator));
 
         if (!$link) {
             self::fail(sprintf('Can\'t find "%s" button', $linkLocator));

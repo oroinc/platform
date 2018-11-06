@@ -3,9 +3,10 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\ServiceContainer;
 
 use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
-use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroWebDriverCurlService;
 use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\KernelStub;
+use Oro\Component\Testing\TempDirExtension;
 use Psr\Log\NullLogger;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
@@ -15,24 +16,19 @@ use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    protected static $path1;
-    protected static $path2;
+    use TempDirExtension;
 
-    /**
-     * @beforeClass
-     */
-    public static function createPaths()
+    private $tempDir;
+
+    /** @var array */
+    private $sharedContexts = [OroMainContext::class];
+
+    protected function setUp()
     {
-        self::$path1 = sys_get_temp_dir().'/bundle1';
-        self::$path2 = sys_get_temp_dir().'/bundle2';
-        mkdir(self::$path1.'/Tests/Behat', 0777, true);
-        mkdir(self::$path2.'/Tests/Behat', 0777, true);
+        $this->tempDir = $this->getTempDir('behat');
+        mkdir($this->tempDir . '/bundle1/Tests/Behat', 0777, true);
+        mkdir($this->tempDir . '/bundle2/Tests/Behat', 0777, true);
     }
-
-    /**
-     * @var array
-     */
-    protected $sharedContexts = ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'];
 
     /**
      * @dataProvider processBundleAutoloadProvider
@@ -201,12 +197,12 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $configExtension = ['oro_test' => [
             'shared_contexts' => $this->sharedContexts,
         ]];
-        file_put_contents(self::$path1.'/Tests/Behat/behat.yml', Yaml::dump($config));
-        file_put_contents(self::$path2.'/Tests/Behat/behat.yml', Yaml::dump($config));
+        file_put_contents($this->tempDir . '/bundle1/Tests/Behat/behat.yml', Yaml::dump($config));
+        file_put_contents($this->tempDir . '/bundle2/Tests/Behat/behat.yml', Yaml::dump($config));
 
         $bundlesConfig = [
-            ['name' => 'OroBundle1', 'path' => self::$path1],
-            ['name' => 'OroBundle2', 'path' => self::$path2],
+            ['name' => 'OroBundle1', 'path' => $this->tempDir . '/bundle1'],
+            ['name' => 'OroBundle2', 'path' => $this->tempDir . '/bundle2']
         ];
 
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
@@ -239,12 +235,12 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $configExtension = ['oro_test' => [
             'shared_contexts' => $this->sharedContexts,
         ]];
-        file_put_contents(self::$path1.'/Tests/Behat/behat.yml', Yaml::dump($config1));
-        file_put_contents(self::$path2.'/Tests/Behat/behat.yml', Yaml::dump($config2));
+        file_put_contents($this->tempDir . '/bundle1/Tests/Behat/behat.yml', Yaml::dump($config1));
+        file_put_contents($this->tempDir . '/bundle2/Tests/Behat/behat.yml', Yaml::dump($config2));
 
         $bundlesConfig = [
-            ['name' => 'OroBundle1', 'path' => self::$path1],
-            ['name' => 'OroBundle2', 'path' => self::$path2],
+            ['name' => 'OroBundle1', 'path' => $this->tempDir . '/bundle1'],
+            ['name' => 'OroBundle2', 'path' => $this->tempDir . '/bundle2']
         ];
 
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
@@ -269,7 +265,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $containerBuilder = new ContainerBuilder();
 
-        $kernel = new KernelStub($bundlesConfig);
+        $kernel = new KernelStub($this->getTempDir('test_kernel_logs'), $bundlesConfig);
         $kernel->getContainer()->set(
             'oro_entity.entity_alias_resolver',
             $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
@@ -312,28 +308,5 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $processor = new Processor();
 
         return $processor->process($tree->buildTree(), $config);
-    }
-
-    public function __destruct()
-    {
-        self::delTree(self::$path1);
-        self::delTree(self::$path2);
-        $log = sys_get_temp_dir().DIRECTORY_SEPARATOR.OroWebDriverCurlService::LOG_FILE;
-        if (is_file($log)) {
-            unlink($log);
-        }
-    }
-
-    public static function delTree($dir)
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-
-        $files = array_diff(scandir($dir), array('.','..'));
-        foreach ($files as $file) {
-            (is_dir("$dir/$file")) ? self::delTree("$dir/$file") : unlink("$dir/$file");
-        }
-        return rmdir($dir);
     }
 }

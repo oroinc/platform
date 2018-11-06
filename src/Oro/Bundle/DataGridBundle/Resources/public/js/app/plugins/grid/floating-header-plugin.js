@@ -100,19 +100,19 @@ define(function(require) {
 
         supportDropdowns: function() {
             var debouncedHideDropdowns = _.debounce(_.bind(function() {
-                this.domCache.thead.find('.dropdown.open .dropdown-toggle').trigger('tohide.bs.dropdown');
+                this.domCache.thead.find('.show > [data-toggle="dropdown"]').trigger('tohide.bs.dropdown');
             }, this), 100, true);
             // use capture phase to scroll dropdown toggle into view before dropdown will be opened
             this.$grid[0].addEventListener('click', _.bind(function(e) {
-                var dropdownToggle = $(e.target).closest('.dropdown-toggle');
-                if (dropdownToggle.length && dropdownToggle.parent().is('thead:first .dropdown:not(.open)')) {
+                var dropdownToggle = $(e.target).closest('[data-toggle="dropdown"]');
+                if (dropdownToggle.length && dropdownToggle.parent().is('thead:first .dropdown:not(.shown)')) {
                     // this will hide dropdowns and ignore next calls to it
                     debouncedHideDropdowns();
                     this.isHeaderDropdownVisible = true;
                     scrollHelper.scrollIntoView(dropdownToggle[0], void 0, 10, 10);
                 }
             }, this), true);
-            this.$grid.on('hide.bs.dropdown', '.dropdown.open', _.bind(function() {
+            this.$grid.on('hide.bs.dropdown', '.dropdown.show', _.bind(function() {
                 this.isHeaderDropdownVisible = false;
                 this.selectMode();
             }, this));
@@ -207,7 +207,7 @@ define(function(require) {
         selectMode: function() {
             // get gridRect
             var tableRect = this.domCache.gridContainer[0].getBoundingClientRect();
-            var visibleRect = scrollHelper.getVisibleRect(this.domCache.gridContainer[0], {
+            var visibleRect = scrollHelper.getVisibleRect(this.$grid[0], {
                 top: -this.headerHeight
             }, this.currentFloatTheadMode === 'default');
             var mode = 'default';
@@ -243,7 +243,7 @@ define(function(require) {
                     // works well with dropdowns, but causes jumps while scrolling
                     if (this.currentFloatTheadMode !== mode) {
                         this.$el.removeClass('floatThead-fixed');
-                        this.$el.addClass('floatThead-relative');
+                        this.$el.addClass('floatThead-relative floatThead');
                         this._ensureTHeadSizing();
                     }
                     theadRect = this.domCache.thead[0].getBoundingClientRect();
@@ -262,7 +262,7 @@ define(function(require) {
                     // provides good scroll experience
                     if (this.currentFloatTheadMode !== mode) {
                         this.$el.removeClass('floatThead-relative');
-                        this.$el.addClass('floatThead-fixed');
+                        this.$el.addClass('floatThead-fixed floatThead');
                         this._ensureTHeadSizing();
                     }
                     this.domCache.thead.css({

@@ -10,6 +10,7 @@ use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 /**
  * Provides methods for querying email templates related information such as getting localized email template or
@@ -32,26 +33,33 @@ class EmailTemplateRepository extends EntityRepository
     /**
      * Load templates by entity name
      *
-     * @param string       $entityName
+     * @param AclHelper $aclHelper
+     * @param string $entityName
      * @param Organization $organization
-     * @param bool         $includeNonEntity
-     * @param bool         $includeSystemTemplates
+     * @param bool $includeNonEntity
+     * @param bool $includeSystemTemplates
      *
      * @return EmailTemplate[]
      */
     public function getTemplateByEntityName(
+        AclHelper $aclHelper,
         $entityName,
         Organization $organization,
         $includeNonEntity = false,
         $includeSystemTemplates = true
     ) {
-        return $this->getEntityTemplatesQueryBuilder(
+        $qb = $this->getEntityTemplatesQueryBuilder(
             $entityName,
             $organization,
             $includeNonEntity,
             $includeSystemTemplates
-        )
-            ->getQuery()->getResult();
+        );
+
+        if ($aclHelper === null) {
+            return $qb->getQuery()->getResult();
+        }
+
+        return $aclHelper->apply($qb)->getResult();
     }
 
     /**

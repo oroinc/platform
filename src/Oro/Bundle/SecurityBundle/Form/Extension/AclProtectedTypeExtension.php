@@ -47,6 +47,10 @@ class AclProtectedTypeExtension extends AbstractTypeExtension
     {
         $aclHelper = $this->aclHelper;
         $loader = function (Options $options) use ($aclHelper) {
+            if (null !== $options['choices']) {
+                return null;
+            }
+
             // create simple QB in order to prevent loading all entities from repo by EntityChoiceList
             $qb = (null !== $options['query_builder'])
                 ? $options['query_builder']

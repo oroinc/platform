@@ -20,7 +20,7 @@ trait FixErrorPathIncludedEntityTrait
     {
         $errorSource = $error->getSource();
         if (null === $errorSource) {
-            $error->setSource(ErrorSource::createByPropertyPath($entityPath));
+            $error->setSource(ErrorSource::createByPointer($entityPath));
         } else {
             $pointer = $errorSource->getPointer();
             if ($pointer && 0 === \strpos($pointer, '/' . JsonApiDoc::DATA)) {

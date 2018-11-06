@@ -6,3 +6,4 @@ dashboards:
             acl:         oro_email_email_view
             description: oro.dashboard.recent_emails.description
             icon:        bundles/oroemail/img/recent_emails.png
+            icon_class:  fa-envelope

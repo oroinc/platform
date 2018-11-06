@@ -1,0 +1,88 @@
+/* @theme: admin.oro; */
+
+.oro_attachment_file {
+    border: none;
+    padding: 5px 5px 0 5px;
+    width: 295px;
+    line-height: 20px;
+    margin-top: 5px;
+    margin-bottom: 0;
+
+    .removeFile {
+        margin: 0;
+    }
+
+    .filename {
+        display: inline-block;
+        @include text-line-truncate(260px);
+    }
+
+    .delete {
+        float: right;
+        line-height: 20px;
+        margin-top: -4px;
+
+        &:after {
+            display: inline-block;
+            font: 14px/1em 'FontAwesome';
+            color: #ddd;
+            content: "\f014";
+            text-indent: 0;
+        }
+
+        &:hover:after {
+            color: #888;
+        }
+    }
+}
+
+.attachment-file {
+    max-width: 100%;
+
+    div.uploader {
+        border: none;
+        float: none;
+        display: flex;
+
+        input {
+            cursor: pointer;
+        }
+
+        input:hover ~ span.action {
+            color: $link-color-hover;
+        }
+
+        span.action {
+            border: none;
+            background: none;
+            color: $link-color;
+            cursor: pointer;
+        }
+
+        .active span.action {
+            background: none;
+        }
+
+        span.filename {
+            width: auto;
+            padding: 0;
+            flex-shrink: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .focus {
+            border: none;
+            box-shadow: none;
+        }
+    }
+
+    div.uploader.focus {
+        border: none;
+        box-shadow: none;
+
+        span.action {
+            color: $link-color;
+        }
+    }
+}

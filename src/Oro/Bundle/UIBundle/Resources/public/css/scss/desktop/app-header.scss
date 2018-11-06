@@ -8,35 +8,37 @@
     background-size: contain;
 }
 
-.navbar.app-header {
+.app-header {
+    font-size: $app-header-font-size;
     color: $app-header-text-color;
     background-color: $app-header-bg-color;
     position: relative;
-    z-index: 925;
+    z-index: $desktop-app-header-z-index;
 
-    .navbar-inner {
-        padding: 0 25px;
+    &__inner {
+        padding: 0 $app-header-h-padding;
+    }
 
-        .container {
-            display: flex;
-            position: relative;
-            line-height: $app-header-height;
-            height: $app-header-height;
-        }
+    &__container {
+        display: flex;
+        position: relative;
+        line-height: $app-header-height;
+        height: $app-header-height;
+    }
+
+    &.thick .app-header__container {
+        line-height: $app-header-thick-height;
+        height: $app-header-thick-height;
     }
 
     &.thick {
-        .navbar-inner .container {
-            line-height: $app-header-thick-height;
-            height: $app-header-thick-height;
-        }
-        .nav.user-menu {
+        .user-menu {
             .avatar {
                 display: initial;
-                max-height: 30px;
-                max-width: 30px;
-                border-radius: 50%;
-                margin: side-values(0 3px 0 7px);
+                max-height: $app-header-avatar-size;
+                max-width: $app-header-avatar-size;
+                border-radius: $app-header-avatar-border-radius;
+                margin: $app-header-avatar-margin;
             }
         }
 
@@ -45,50 +47,63 @@
         }
     }
 
+    .organization-logo-wrapper {
+        overflow: hidden;
+    }
+
     .app-logo {
-        width: 16px;
-        margin-#{$end}: 8px
+        width: $app-header-app-logo-width;
+        margin-#{$end}: $app-header-app-logo-margin-end;
+        flex-shrink: 0;
     }
 
     .logo-wrapper {
         display: flex;
         margin-#{$start}: 0;
-        margin-#{$end}: 10px;
+        margin-#{$end}: $app-header-logo-wrapper-margin-end;
+        flex-wrap: nowrap;
+        position: static;   //  necessary for showing menu outside of overflow hidden block
+        height: 100%;
     }
 
     .logo {
         color: $app-header-logo-text-color;
         font-weight: bold;
-        font-size: 17px;
+        font-size: $app-header-logo-font-size;
         line-height: inherit;
         margin: 0;
         display: inline-block;
+        overflow: hidden;
 
         a {
             color: inherit;
             text-transform: uppercase;
+            display: inline-block;
+            vertical-align: middle;
+            @include text-line-truncate($app-header-max-width, true);
 
             [class^="fa-"] {
-                font-size: 1.2em;
+                font-size: $app-header-logo-link-font-size;
             }
         }
     }
 
-    .nav.top-search {
-        padding: 0 5px 0 5px;
+    &__search-and-shortcuts {
+        padding: $app-header-search-and-shortcuts-container-padding;
         margin: 0;
         flex-shrink: 0;
         order: if-ltr(0, auto);
 
         > .dropdown {
-            margin: 0 5px;
+            margin: $app-header-search-and-shortcuts-margin;
         }
 
-        a.dropdown-toggle {
+        .dropdown-toggle {
             color: inherit;
             text-align: center;
-            position: relative;
-            top: 1px;
+            border: 0 none;
+            background-color: transparent;
+            padding: 0;
 
             &:hover,
             &:active {
@@ -97,28 +112,78 @@
 
             > [class^="fa-"] {
                 margin: 0;
-                width: 24px;
+                width: $app-header-icon-font-width;
                 font-size: $app-header-icon-font-size;
             }
         }
 
         .dropdown-menu {
-            #{$start}: -5px;
+            #{$start}: $app-header-search-and-shortcuts-dropdown-start;
 
             @include if-rtl() {
                 #{$end}: auto;
             }
+
+            &:before {
+                #{$start}: $app-header-search-and-shortcuts-arrow-start;
+            }
+        }
+
+        .nav-header { /* Dropdown smaller section title */
+            padding: $app-header-dropdown-header-v-padding $app-header-dropdown-item-h-padding;
+
+            color: $app-header-color;
+            font-size: $app-header-title-font-size;
+            line-height: 1.5;
+        }
+
+        .nav-header-title { /* Dropdown main title */
+            text-transform: $app-header-dropdown-title-text-transform;
+            display: block;
+        }
+
+        .nav-content {
+            padding: 0 $app-header-dropdown-item-h-padding;
+            margin: $app-header-dropdown-item-margin;
+        }
+
+        .select2-container {
+            width: auto;
+            max-width: $app-header-search-select-max-width;
+            height: $field-size;
+        }
+
+        .select2-container-active {
+            z-index: 1; // to show active border over near input
+        }
+
+        .search-field-container {
+            min-width: $app-header-search-input-min-width;
+            margin-#{$start}: -$input-border-width;
+        }
+
+        .search-suggestion-list {
+            top: $field-size - $input-border-width;
+
+            font-size: $app-header-search-suggestion-item-font-size;
+
+            .description {
+                font-size: $app-header-search-suggestion-item-description-font-size;
+            }
+        }
+
+        .no-result-message {
+            top: $field-size - $input-border-width;
         }
     }
 
-    .nav.user-menu {
+    .user-menu {
         display: flex;
         order: 1;
         flex-shrink: 0;
         float: none;
         background-color: inherit;
-        margin-#{$start}: 15px;
-        margin-#{$end}: 0;
+        margin-#{$start}: $desktop-app-header-user-menu-margin-start;
         height: 100%;
 
         .avatar {
@@ -127,17 +192,21 @@
 
         > li {
             line-height: inherit;
-            margin: 0 8px;
+            margin: $desktop-app-header-user-menu-item-margin;
 
             &:last-of-type {
-                margin-#{$end}: -3px;
+                margin-#{$end}: $desktop-app-header-user-menu-last-item-margin-end;
             }
 
-            > a {
+            > .dropdown-toggle,
+            > .help {
                 padding: 0;
                 color: inherit;
+                border: 0 none;
+                background-color: transparent;
                 text-shadow: none;
                 font-size: $app-header-font-size;
+
                 [class^="fa-"],
                 [class*=" fa-"] {
                     font-size: $app-header-icon-font-size;
@@ -151,13 +220,12 @@
 
         .dropdown {
             > .dropdown-menu {
-                #{$end}: -12px;
+                #{$end}: $desktop-app-header-user-menu-offset;
                 #{$start}: auto;
-                z-index: $zindexDropdown;
+                z-index: $zindex-dropdown;
 
-                &:before,
-                &:after {
-                    #{$end}: 12px;
+                &:before {
+                    #{$end}: -$desktop-app-header-user-menu-offset;
                     #{$start}: auto;
                 }
             }
@@ -168,13 +236,32 @@
         &:before {
             content: '';
             display: inline-block;
-            border-#{$start}: 1px solid $app-header-divider-color;
-            height: 1em;
+            border-#{$start}: $app-header-divider-width solid $app-header-divider-color;
+            height: $app-header-font-size;
         }
 
         > .dropdown-toggle {
             display: inline-block;
-            margin-#{$start}: 15px;
+            margin-#{$start}: $desktop-app-header-user-menu-margin-start;
+        }
+
+        .dropdown-menu {
+            .divider {
+                border-bottom: 1px solid $primary-900;
+                margin: 4px 0;
+            }
+
+            li {
+                line-height: 28px;
+
+                &:hover {
+                    background: $primary-900;
+                }
+
+                a {
+                    color: $primary-200;
+                }
+            }
         }
     }
 }

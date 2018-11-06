@@ -1,26 +1,43 @@
-@import "oroui/css/scss/mixins";
+/* @theme: admin.oro; */
 
 .notes {
     position: relative;
 
     .list-box {
-        margin-top: 10px;
+        margin-top: $note-item-margin-top;
 
         .list-item {
-            padding: 3px 10px 5px 10px;
+            padding: $content-padding-medium;
+            display: inline-block;
 
             .visual {
-                border-radius: 2px;
+                margin-#{$start}: $note-message-padding - ($note-avatar-size + $note-avatar-margin-horizontal);
+                display: block;
 
                 img {
-                    margin-top: -3px;
-                    border-radius: 2px;
-                    width: 16px;
+                    max-width: $note-avatar-size;
+                    max-height: $note-avatar-size;
+                    display: block;
                 }
 
-                .user {
-                    padding-left: 3px;
+                .avatar {
+                    border-radius: $note-avatar-size / 2;
+                    overflow: hidden;
+                    display: inline-block;
+                    float: #{$start};
+                    width: $note-avatar-size;
+                    font-size: $note-avatar-size;
+                    margin-#{$end}: $note-avatar-margin-horizontal;
+                    margin-top: $note-avatar-margin-vertical;
+                    text-align: center;
+                    line-height: $note-avatar-size;
                 }
+            }
+
+            .avatar-placeholder {
+                display: inline-block;
+
+                @include fa-icon($note-avatar-placeholder);
             }
 
             .user {
@@ -30,13 +47,15 @@
             .date {
                 font-style: normal;
                 font-size: smaller;
+                white-space: nowrap;
+                color: $primary-550;
             }
 
             .title-item {
                 white-space: nowrap;
 
                 .details {
-                    padding-left: 7px;
+                    padding-#{$start}: 7px;
                 }
             }
 
@@ -48,13 +67,34 @@
 
             .message-item {
                 width: 100%;
-                padding-left: 21px;
 
                 .message {
-                    padding-left: 10px;
-                    border-left: 1px solid #e6e6e6;
+                    color: $primary-550;
+
+                    &:before {
+                        content: '- ';
+                    }
                 }
             }
+
+            .labels {
+                text-align: #{$end};
+            }
+
+            .label {
+                border-radius: ($badge-font-size / 2) + $badge-padding-y;
+                background: $primary-830;
+                padding: $badge-padding-y $badge-padding-x;
+                font-size: $badge-font-size;
+                line-height: 1;
+                color: $primary-500;
+            }
+        }
+
+        .list-item {
+            display: block;
+            border-top: 1px solid $primary-830;
+            border-bottom: 0;
         }
 
         .list-item:last-child {
@@ -63,7 +103,7 @@
     }
 
     .accordion {
-        margin-top: 10px;
+        margin-top: $note-item-margin-top;
 
         .accordion-group {
             border: 0;
@@ -71,10 +111,14 @@
 
             .accordion-heading {
                 display: table;
-                width: 100%;
+                border-collapse: separate;
 
                 & > div {
                     display: table-cell;
+
+                    &:not(:first-child) {
+                        padding-#{$start}: $note-heading-margin;
+                    }
                 }
 
                 .message {
@@ -86,18 +130,20 @@
                 .accordion-toggle {
                     display: inline-block;
                     padding: 0;
-                    min-width: 17px;
+                    min-width: $note-accordion-icon-size + 1;
+                    margin-#{$end}: -($note-accordion-icon-size + 1);
+                    float: #{$start};
+                    position: relative;
 
-                    &:before {
-                        content: '\f078';
-                        font-family: FontAwesome;
-                        color: #727272;
-                        margin-right: 5px;
+                    @include fa-icon($note-accordion-icon, before, true) {
+                        color: $primary-550;
+                        font-size: $note-accordion-icon-size;
+                        line-height: $note-accordion-line-height;
                     }
-                }
 
-                .accordion-toggle.collapsed:before {
-                    content: '\f054';
+                    &.collapsed {
+                        @include fa-icon($note-accordion-collapsed-icon);
+                    }
                 }
             }
 
@@ -112,17 +158,18 @@
             .accordion-body {
                 .message {
                     display: none;
-                    padding-top: 10px;
+                    padding-top: $content-padding-small;
                     overflow-x: auto;
                 }
 
                 .details {
-                    padding-top: 10px;
+                    padding-top: $content-padding-small;
                 }
             }
 
             .accordion-body.in .message {
                 display: block;
+                padding-#{$start}: $note-message-padding;
             }
         }
     }

@@ -1,12 +1,12 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% if not oro_is_hash_navigation() %}
     <!DOCTYPE html>
-    <html class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version">
+    <html lang="{{ oro_language()|slice(0,2) }}" class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version">
     <head>
         {% block head %}
             <title>{% trans %}Loading...{% endtrans %}</title>
             <script id="page-title" type="text/html">{{ oro_title_render() }}</script>
-            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no{% if isMobileVersion() %}, viewport-fit=cover{% endif %}"/>
+            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0{% if isMobileVersion() %}, user-scalable=no, viewport-fit=cover{% endif %}"/>
             <meta http-equiv="cache-control" content="max-age=0" />
             <meta http-equiv="cache-control" content="no-cache" />
             <meta http-equiv="expires" content="0" />
@@ -62,10 +62,10 @@
         }) }}></div>
     {% endif %}
     {% placeholder after_body_start %}
-    <div id="progressbar">
-        <h3>{% trans %}Loading...{% endtrans %}</h3>
-        <div class="progress progress-striped active">
-            <div class="bar" style="width: 90%;"></div>
+    <div id="progressbar" class="progress-bar-container">
+        <h3 class="progress-title">{{ 'oro.ui.loading'|trans }}</h3>
+        <div class="progress infinite">
+            <div class="progress-bar" role="progressbar" aria-valuetext="{{ 'oro.ui.page_loading'|trans }}"></div>
         </div>
     </div>
     <div id="page" style="display:none;" class="app-page">
@@ -76,16 +76,16 @@
         {% endblock content_side %}
         <div class="app-page__content">
             {% block header %}
-                <header class="navbar app-header{% if oro_config_value('oro_ui.navbar_position') != 'top' %} thick{% endif %}" id="oroplatform-header">
+                <header class="app-header{% if oro_config_value('oro_ui.navbar_position') != 'top' %} thick{% endif %}" id="oroplatform-header">
                     {% placeholder before_navigation %}
-                    <div class="navbar-inner">
-                        <div class="container">
+                    <div class="app-header__inner">
+                        <div class="app-header__container">
                             {% placeholder header_logo %}
-                            <ul class="nav user-menu"
+                            <ul class="user-menu"
                                 {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/user-menu-view'}) }}>
                                 {{ block('user_menu') }}
                             </ul>
-                            <div class="nav top-search shortcuts">
+                            <div class="app-header__search-and-shortcuts">
                                 {{ block('navbar') }}
                             </div>
                             {% placeholder pin_tabs_list %}
@@ -95,7 +95,7 @@
                     {% placeholder after_navigation %}
                 </header>
             {% endblock header %}
-            <div class="app-page__main">
+            <main class="app-page__main">
                 {% if isDesktopVersion() %}
                     {% block left_panel %}
                         <div id="left-panel" class="app-page__left-panel">
@@ -129,21 +129,24 @@
                                 </div>
                             {% endblock messages %}
                         </div>
-                        <div class="breadcrumb-pin">
+                        <div class="page-toolbar">
                             {% placeholder breadcrumb_pin_before %}
                             <div id="breadcrumb"
+                                class="page-toolbar_breadcrumb" 
                                  {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/breadcrumb-view'}) }}>
                                 {% block breadcrumb %}
                                     {% placeholder breadcrumb %}
                                 {% endblock breadcrumb %}
                             </div>
-                            {% block pin_button %}
-                                {% placeholder pin_button %}
-                            {% endblock pin_button %}
-                            <div id="before-content-addition" data-layout="separate"
+                            <div id="before-content-addition" class="page-toolbar_before-content-addition" data-layout="separate"
                                  {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/before-content-addition-view'}) }}>
                                 {% block before_content_addition %}{% endblock before_content_addition %}
                             </div>
+                            {% block pin_button %}
+                                <div class="page-toolbar_bookmark-buttons">
+                                    {% placeholder pin_button %}
+                                </div>
+                            {% endblock pin_button %}
                             {% placeholder breadcrumb_pin_after %}
                         </div>
                         {% endblock before_content %}
@@ -206,7 +209,7 @@
                         </div>
                     {% endblock right_panel %}
                 {% endif %}
-            </div>
+            </main>
         {% block footer %}
             <div id="dialog-extend-fixed-container" class="ui-dialog-minimize-container"></div>
             <footer id="footer" class="footer">

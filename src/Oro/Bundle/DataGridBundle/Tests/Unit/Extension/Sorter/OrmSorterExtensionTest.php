@@ -26,6 +26,11 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithoutDefaultSorting()
     {
+        $this->sortersStateProvider
+            ->expects($this->once())
+            ->method('getStateFromParameters')
+            ->willReturn([]);
+
         $em = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -64,6 +69,11 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWhenQueryAlreadyHasOrderBy()
     {
+        $this->sortersStateProvider
+            ->expects($this->once())
+            ->method('getStateFromParameters')
+            ->willReturn([]);
+
         $em = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -94,6 +104,11 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithoutDefaultSortingForEmptyQuery()
     {
+        $this->sortersStateProvider
+            ->expects($this->once())
+            ->method('getStateFromParameters')
+            ->willReturn([]);
+
         $em = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -123,6 +138,11 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithoutDefaultSortingAndGroupBy()
     {
+        $this->sortersStateProvider
+            ->expects($this->once())
+            ->method('getStateFromParameters')
+            ->willReturn([]);
+
         $em = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -153,6 +173,11 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithoutDefaultSortingAndMultipleGroupBy()
     {
+        $this->sortersStateProvider
+            ->expects($this->once())
+            ->method('getStateFromParameters')
+            ->willReturn([]);
+
         $em = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();

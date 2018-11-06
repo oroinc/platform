@@ -706,6 +706,18 @@ The context class: [CustomizeFormDataContext](../../Processor/CustomizeFormData/
 
 The main processor class: [CustomizeFormDataProcessor](../../Processor/CustomizeFormDataProcessor.php).
 
+This action is executed when the following [events](../../Processor/CustomizeFormData/CustomizeFormDataContext.php) are dispatched:
+
+| Event Name | Description |
+| --- | --- |
+| pre_submit | This event is dispatched at the beginning of the Form::submit() method. |
+| submit | This event is dispatched just before the Form::submit() method. |
+| post_submit | This event is dispatched after the Form::submit() method. |
+| pre_validate | This event is dispatched at the end of the form submitting process, just before data validation. It can be used to final form data correcting after all listeners, except data validation listener, are executed and all relationships between submitted data are set. |
+| post_validate | This event is dispatched at the end of the form submitting process, just after data validation. It can be used to finalize the form after all listeners, including data validation listener, are executed. E.g. it can be used to correct form validation result. |
+
+Please note the all these events use the same context, so it can be used to share data between events.
+
 As example of a processor used to modify the loaded data: [MapPrimaryField](../../Processor/CustomizeFormData/MapPrimaryField.php). Also you can run `php bin/console oro:api:debug customize_form_data` to display other processors registered in this action.
 
 ## get_config Action
@@ -873,6 +885,8 @@ General methods:
 - **getFilters()** - Retrieves a [list of filters](../../Filter/FilterCollection.php) to set additional restrictions to a query used to retrieve the entity data.
 - **getFilterValues()** - Retrieves a collection of the [FilterValue](../../Filter/FilterValue.php) objects that contains all incoming filters.
 - **setFilterValues(accessor)** - Sets an [object](../../Filter/FilterValueAccessorInterface.php) to use for accessing the incoming filters.
+- **isMasterRequest()** - Indicates whether the current action processes a master API request or it is executed as part of another action.
+- **setMasterRequest($master)** - Sets a flag indicates the current action processes a master API request or it is executed as part of another action.
 - **isCorsRequest()** - Indicates whether the current request is [CORS](https://www.w3.org/TR/cors/) request.
 - **setCorsRequest($cors)** - Sets a flag indicates whether the current request is [CORS](https://www.w3.org/TR/cors/) request.
 - **hasQuery()** - Checks whether a query used to get the result data exists.
@@ -914,6 +928,7 @@ Entity configuration related methods:
 
 Entity metadata related methods:
 
+- **hasIdentifierFields()** - Checks whether metadata of an entity has at least one identifier field.
 - **getMetadataExtras()** - Retrieves a list of [requests for additional metadata info](../../Metadata/MetadataExtraInterface.php).
 - **setMetadataExtras(extras)** - Sets a list of requests for additional metadata info.
 - **hasMetadataExtra()** - Checks whether some additional metadata info is requested.

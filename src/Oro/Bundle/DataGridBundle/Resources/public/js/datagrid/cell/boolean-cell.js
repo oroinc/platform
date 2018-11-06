@@ -55,6 +55,9 @@ define([
                 var $editor = this.currentEditor.$el;
                 $editor.prop('checked', !$editor.prop('checked')).change();
                 e.stopPropagation();
+                $editor.inputWidget('isInitialized')
+                    ? $editor.inputWidget('refresh')
+                    : $editor.inputWidget('create');
             }
         },
 

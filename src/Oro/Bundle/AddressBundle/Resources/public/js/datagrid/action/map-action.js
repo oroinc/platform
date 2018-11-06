@@ -69,11 +69,7 @@ define(function(require) {
 
         getPopoverConfig: function() {
             return _.extend({
-                'placement': {
-                    placement: 'left',
-                    collision: 'flip'
-                },
-                'hideOnScroll': false,
+                'placement': 'left',
                 'container': 'body',
                 'animation': false,
                 'html': true,
@@ -95,7 +91,7 @@ define(function(require) {
                 $(document).on('mouseup', _.bind(function(e) {
                     var $map = this.mapView.$el;
                     if (!$map.is(e.target) && !$map.has(e.target).length) {
-                        $popoverTrigger.popover('destroy');
+                        $popoverTrigger.popover('dispose');
                     }
                 }, this));
             }, this)).on('hidden.bs.popover', _.bind(function() {

@@ -18,63 +18,81 @@
 <div class="oro-tabs{{ options.verticalTabs ? ' oro-tabs__vertical' }}"
      data-page-component-module="oroui/js/app/components/tabs-component"
      data-page-component-options="{{ options|json_encode }}">
-    {% if (options.subtitle) %}
-        <div class="tabs-subtitle">{{ options.subtitle }}</div>
-    {% endif %}
-    <ul class="nav nav-tabs{{ options.useDropdown ? ' nav-tabs-dropdown' }}">
-        {% for tab in tabs %}
-            {% set isActiveTab = activeTabAlias ? activeTabAlias == tab.alias : loop.index == 1 %}
-            <li class="tab {% if isActiveTab %} active{% endif %}">
-                {% set widgetOptions = {
-                    'type': tab.widgetType|default('block'),
-                    'event': 'shown.bs.tab',
-                    'multiple': false,
-                    'options': {
-                        'container': '#' ~ tab.alias,
-                        'loadingElement': '#' ~ containerAlias,
-                        'alias': tab.alias,
-                    }
-                } %}
 
-                {% set dataAttributes = {
-                    'target': '#' ~ tab.alias,
-                    'toggle': 'tab',
-                    'url': tab.url
-                } %}
-
-                {% if tab.content|default('') or isActiveTab %}
-                    {% set widgetOptions = widgetOptions|merge({'initialized': true}) %}
-                {% endif %}
-
-                {% set tabOptions = tab|merge({
-                    'widget': widgetOptions,
-                    'dataAttributes': dataAttributes,
-                    'label': tab.label
-                }) %}
-
-                {{ UI.clientLink(tabOptions) }}
-            </li>
-        {% endfor %}
-        {% if options.useDropdown %}
-            <li class="dropdown" style="display: none">
-                <a href="#" id="{{ containerAlias }}-dropdown" class="dropdown-toggle" data-toggle="dropdown">
-                    <span>{{ 'View more...'|trans }}</span> <b class="caret"></b>
-                </a>
-                <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="{{ containerAlias }}-dropdown"></ul>
-            </li>
+    <div class="oro-tabs__head">
+        {% if (options.subtitle) %}
+            <div class="tabs-subtitle">{{ options.subtitle }}</div>
         {% endif %}
-    </ul>
+        <ul class="nav nav-tabs{{ options.verticalTabs ? ' flex-column' }}{{ options.useDropdown ? ' nav-tabs-dropdown' }}" role="tablist">
+            {% for tab in tabs %}
+                {% set isActiveTab = activeTabAlias ? activeTabAlias == tab.alias : loop.index == 1 %}
+                <li class="nav-item tab">
+                    {% set widgetOptions = {
+                        'type': tab.widgetType|default('block'),
+                        'event': 'shown.bs.tab',
+                        'multiple': false,
+                        'options': {
+                            'container': '#' ~ tab.alias,
+                            'loadingElement': '#' ~ containerAlias,
+                            'alias': tab.alias,
+                        }
+                    } %}
 
-    <div class="tab-content" id="{{ containerAlias }}">
-        {% for tab in tabs %}
-            {% set isActiveTab = activeTabAlias ? activeTabAlias == tab.alias : loop.index == 1 %}
-            <div class="tab-pane{% if isActiveTab %} active{% endif %}" id="{{ tab.alias }}">
-                {% if tab.content|default('') %}
-                    {{ tab.content|raw }}
-                {% elseif isActiveTab %}
-                    {{ oro_widget_render(tab) }}
-                {% endif %}
-            </div>
-        {% endfor %}
+                    {% set dataAttributes = {
+                        'target': '#' ~ tab.alias,
+                        'toggle': 'tab',
+                        'url': tab.url
+                    } %}
+
+                    {% if tab.content|default('') or isActiveTab %}
+                        {% set widgetOptions = widgetOptions|merge({'initialized': true}) %}
+                    {% endif %}
+
+                    {% if isActiveTab %}
+                        {% set className = 'nav-link active' %}
+                        {% set ariaSelectted = 'true' %}
+                    {% else %}
+                        {% set className = 'nav-link' %}
+                        {% set ariaSelectted = 'false' %}
+                    {% endif %}
+
+                    {% set tabOptions = tab|merge({
+                        'id': tab.alias ~ '-tab',
+                        'widget': widgetOptions,
+                        'dataAttributes': dataAttributes,
+                        'label': tab.label,
+                        'class': className,
+                        'role': 'tab',
+                        'ariaSelected': ariaSelectted,
+                        'ariaControls': tab.alias
+                    }) %}
+
+                    {{ UI.clientLink(tabOptions) }}
+                </li>
+            {% endfor %}
+            {% if options.useDropdown %}
+                <li class="nav-item dropdown" style="display: none">
+                    <a href="#" role=button id="{{ containerAlias }}-dropdown" class="nav-link dropdown-toggle" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                        <span>{{ 'View more...'|trans }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="{{ containerAlias }}-dropdown"></ul>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="oro-tabs__content">
+        <div class="tab-content tab-content-without-offset" id="{{ containerAlias }}">
+            {% for tab in tabs %}
+                {% set isActiveTab = activeTabAlias ? activeTabAlias == tab.alias : loop.index == 1 %}
+                <div class="tab-pane{% if isActiveTab %} active{% endif %}" id="{{ tab.alias }}" role="tabpanel" aria-labelledby="{{ tab.alias ~ '-tab' }}">
+                    {% if tab.content|default('') %}
+                        {{ tab.content|raw }}
+                    {% elseif isActiveTab %}
+                        {{ oro_widget_render(tab) }}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
     </div>
 </div>

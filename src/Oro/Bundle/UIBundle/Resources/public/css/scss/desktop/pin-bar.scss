@@ -4,6 +4,8 @@
     display: flex;
     flex-grow: 1;
     overflow: hidden;
+    flex-basis: 0;
+    min-width: $pin-item-show-more-menu-width;
 
     .pin-holder {
         position: relative;
@@ -17,7 +19,6 @@
                 color: $pin-item-outdated-hover-color;
             }
         }
-
     }
 
     .btn-close {
@@ -54,7 +55,7 @@
     display: none; // don't show dropbox by default
     position: absolute;
     top: 0;
-    margin-#{$start}: -20px;
+    margin-#{$start}: -$pin-item-show-more-menu-width;
     height: 100%;
 
     &:before {
@@ -69,11 +70,11 @@
         pointer-events: none;
     }
 
-    a.dropdown-toggle {
+    .dropdown-toggle {
         position: relative;
         background-color: $app-header-bg-color;
         color: $pin-item-close-color;
-        width: 20px;
+        width: $pin-item-show-more-menu-width;
         font-size: $app-header-icon-font-size;
         display: inline-block;
         text-align: center;
@@ -81,6 +82,16 @@
         &:hover {
             cursor: pointer;
             color: $pin-item-close-hover-color;
+        }
+    }
+
+    .dropdown-menu {
+        #{$start}: auto;
+        #{$end}: $pin-item-show-more-menu-offset;
+
+        &:before {
+            #{$start}: auto;
+            #{$end}: $pin-item-show-more-menu-arrow-end;
         }
     }
 
@@ -94,8 +105,10 @@
     }
 
     li {
-        &.active a {
-            font-weight: bold;
+        &.active {
+            a {
+                font-weight: bold;
+            }
         }
 
         a {
@@ -105,7 +118,6 @@
 }
 
 .list-bar {
-    padding-#{$end}: 20px;
     overflow: hidden;
 
     ul {
@@ -114,6 +126,7 @@
         list-style: none;
         display: block;
         white-space: nowrap;
+
         &:empty {
             display: none;
         }
@@ -152,5 +165,10 @@
         color: inherit;
         font-size: 12px;
         line-height: 20px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        overflow: hidden;
+        vertical-align: middle;
     }
 }

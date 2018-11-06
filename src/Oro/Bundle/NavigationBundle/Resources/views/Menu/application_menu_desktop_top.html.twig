@@ -23,7 +23,7 @@
         {%- set classes = classes|merge(['dropdown', 'dropdown-level-' ~ item.level]) %}
         {%- set childrenClasses = childrenClasses|merge(['dropdown-menu', 'dropdown-menu-level-' ~ item.level]) %}
     {%- else -%}
-        {%- set classes = classes|merge(['dropdown-menu-single-item', 'dropdown-menu-level-' ~ item.level]) %}
+        {%- set classes = classes|merge(['dropdown', 'dropdown-menu-single-item', 'dropdown-level-' ~ item.level]) %}
     {%- endif -%}
     {%- if item.extras is defined and item.extras.routes is defined and item.extras.routes[0] is defined -%}
         {% set itemAttributes = itemAttributes|merge({'data-route': item.extras.routes[0]})%}
@@ -54,9 +54,11 @@
 {% block linkElement %}
     {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
 
+    {% if isDesktopVersion() %}
     {% set linkAttributes = linkAttributes|merge({
         'class': oro_menu.add_attribute_values(linkAttributes, 'class', ['dropdown-toggle']),
     }) %}
+    {% endif %}
 
     {% if item.hasChildren and item.displayChildren and item.level is sameas(0) %}
         {% set linkAttributes = linkAttributes|merge({

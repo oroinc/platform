@@ -1,0 +1,296 @@
+/* @theme: admin.oro; */
+
+/* dialog jQuery ui  start */
+.ui-dialog {
+    background: $dialog-background;
+    box-shadow: $dialog-box-shadow;
+    z-index: $dialog-z-index;
+    outline: $dialog-outline;
+    border: $dialog-border;
+    position: $dialog-position;
+    border-radius: $dialog-border-radius;
+    display: $dialog-display;
+    flex-direction: $dialog-flex-direction;
+
+    &-titlebar {
+        background: $primary-300;
+        border-radius: $dialog-border-radius $dialog-border-radius 0 0;
+
+        padding: $dialog-titlebar-inner-offset;
+        width: $dialog-titlebar-width;
+        top: $dialog-titlebar-top;
+        #{$start}: $dialog-titlebar-start;
+        flex-shrink: $dialog-titlebar-flex-shrink;
+        align-items: $dialog-titlebar-falign-items;
+        display: $dialog-titlebar-display;
+
+        cursor: $dialog-titlebar-cursor;
+
+        &:before,
+        &:after {
+            content: none;
+        }
+
+        .ui-dialog-minimize-container & {
+            position: $dialog-titlebar-minimize-position;
+        }
+
+        .ui-dialog-titlebar-close {
+            position: $dialog-titlebar-close-position;
+            #{$end}: $dialog-titlebar-close-end;
+            top: $dialog-titlebar-close-top;
+        }
+    }
+
+    &-title {
+        color: $primary-inverse;
+        font-weight: $dialog-title-font-weight;
+        font-size: $base-font-size--l;
+        display: $dialog-title-display;
+        white-space: $dialog-title-white-space;
+        overflow: $dialog-title-overflow;
+        text-overflow: $dialog-title-text-overflow;
+        flex-grow: 1;
+        flex-shrink: 1;
+        text-align: $start;
+
+        .lang-en & {
+            text-transform: capitalize;
+        }
+    }
+
+    &-content {
+        padding: $dialog-content-inner-offset;
+        margin: $dialog-content-outer-offset;
+        background: $primary-inverse;
+        position: $dialog-content-position;
+        min-width: $dialog-content-min-width;
+        width: $dialog-content-width;
+        min-height: $dialog-content-min-height; // since minHeight of dialog is 199px (clientHeight 197px - header 30px - ActionPanel 49px)
+        overflow: $dialog-content-overflow;
+        flex-shrink: $dialog-content-flex-shrink;
+        flex-grow: $dialog-content-flex-grow;
+
+        .ui-resizable-handle {
+            cursor: $dialog-resizable-handle-cursor;
+        }
+
+        .widget-content {
+            position: relative;
+        }
+    }
+
+    .ui-widget-content {
+        border: $dialog-widget-content-border;
+    }
+
+    &-titlebar-min {
+        border-radius: $dialog-border-radius;
+        cursor: $dialog-titlebar-min-cursor;
+    }
+
+    &.ui-resizable {
+        width: $dialog-resizable-width;
+
+        &:not(.ui-dialog-buttons) {
+            .ui-dialog-content {
+                height: $dialog-content-not-button-height;
+            }
+        }
+    }
+
+    .ui-widget-header {
+        border: $dialog-widget-header-border;
+    }
+
+    .widget-actions.form-actions {
+        @include clearfix();
+
+        margin: $dialog-widget-actions-outer-offset;
+        background: $primary-900;
+        padding: $dialog-widget-actions-inner-offset;
+        border-radius: 0 0 $dialog-border-radius $dialog-border-radius;
+        border: $dialog-widget-actions-border;
+    }
+
+    .ui-dialog-body {
+        font-size: $base-font-size;
+        overflow-y: $dialog-body-overflow-y;
+        max-height: $dialog-body-max-height;
+        padding: $dialog-body-inner-offset;
+    }
+
+    .ui-dialog-titlebar-buttonpane {
+        #{$end}: $dialog-titlebar-buttonpane-end;
+
+        /* iOS 11 */
+        #{$end}: $dialog-titlebar-buttonpane-end-ios11 !important;
+
+        /* iOS 11.2+ */
+        #{$end}: $dialog-titlebar-buttonpane-end-ios11-2 !important;
+        top: $dialog-titlebar-buttonpane-top;
+        margin: $dialog-titlebar-buttonpane-outer-offset;
+        height: $dialog-titlebar-buttonpane-height;
+        min-width: $dialog-titlebar-buttonpane-min-width;
+        flex-shrink: 0;
+        position: static;
+
+        [class*='ui-dialog-titlebar-'] {
+            margin-#{$end}: 13px;
+            margin-#{$start}: 0;
+            padding: 0;
+
+            .ui-icon {
+                display: none;
+            }
+
+            .ui-button-text {
+                display: none;
+            }
+
+            &:before {
+                display: inline-block;
+                color: $primary-inverse;
+                font-size: $base-font-size--l;
+                font-family: FontAwesome;
+                text-align: center;
+                line-height: 1;
+
+                .ui-dialog-minimized & {
+                    color: $primary-700;
+                }
+            }
+        }
+
+        .ui-dialog-titlebar-close:before {
+            content: $dialog-titlebar-close-icon;
+        }
+
+        .ui-dialog-titlebar-maximize:before {
+            content: $dialog-titlebar-maximize-icon;
+        }
+
+        .ui-dialog-titlebar-minimize:before {
+            content: $dialog-titlebar-minimize-icon;
+        }
+
+        .ui-dialog-titlebar-restore:before {
+            content: $dialog-titlebar-restore-icon;
+        }
+
+        // Override library styles
+        > a {
+            float: $dialog-buttons-float;
+        }
+    }
+
+    &.ui-dialog-minimized {
+        margin: $dialog-minimized-outer-offset;
+        box-shadow: $dialog-minimized-box-shadow;
+
+        .ui-dialog-titlebar {
+            margin-bottom: $dialog-minimized-titlebar-outer-bottom-offset;
+            padding: $dialog-minimized-titlebar-inner-offset;
+            background: $primary-800;
+
+            .ui-dialog-title {
+                padding-top: 2px;
+                color: $primary-200;
+                font-size: $base-font-size;
+            }
+
+            .ui-dialog-titlebar-buttonpane {
+                background: $dialog-titlebar-min-background;
+                border: $dialog-titlebar-min-border;
+                #{$end}: $dialog-titlebar-min-end;
+                top: $dialog-titlebar-min-top;
+
+                [class*='ui-dialog-titlebar-'] {
+                    margin-#{$end}: $dialog-titlebar-min-button-outer-offset;
+
+                    &:before {
+                        border-#{$end}: none;
+                        color: $primary-700;
+                        font-size: $base-font-size;
+                    }
+
+                    &:hover:before,
+                    &:active:before,
+                    &:focus:before {
+                        color: $primary-200;
+                    }
+                }
+            }
+        }
+    }
+
+    .bottom-action {
+        padding: $dialog-widget-actions-inner-offset;
+        overflow: $dialog-bottom-action-overflow;
+        background: $primary-900;
+    }
+
+    &-buttonpane {
+        background: $dialog-buttonpane-background;
+        border-radius: 0 0 $dialog-border-radius $dialog-border-radius;
+        flex-shrink: $dialog-buttonpane-flex-shrink;
+
+        .widget-actions-section {
+            margin-#{$start}: $dialog-buttonpane-widget-actions-section-offset-left;
+        }
+
+        .action-wrapper {
+            margin-#{$start}: $dialog-buttonpane-action-wrapper-offset-left;
+        }
+    }
+}
+
+.ui-dialog .ui-resizable-se {
+    height: $dialog-resizable-se-size;
+    width: $dialog-resizable-se-size;
+    margin: $dialog-resizable-se-outer-offset;
+    position: $dialog-resizable-se-position;
+    bottom: $dialog-resizable-se-bottom;
+    #{$end}: $dialog-resizable-se-end;
+    cursor: $dialog-resizable-se-cursor;
+
+    &:before,
+    &:after {
+        content: "";
+        border-top: $dialog-resizable-se-presudo-border-top;
+        display: $dialog-resizable-se-presudo-display;
+        position: $dialog-resizable-se-presudo-position;
+        top: $dialog-resizable-se-presudo-top;
+        #{$end}: $dialog-resizable-se-presudo-end;
+        bottom: $dialog-resizable-se-presudo-bottom;
+        #{$start}: $dialog-resizable-se-presudo-start;
+        height: $dialog-resizable-se-presudo-height;
+        margin: $dialog-resizable-se-presudo-margin;
+        transform: $dialog-resizable-se-presudo-transform;
+    }
+
+    &:after {
+        top: $dialog-resizable-se-presudo-db-top;
+    }
+}
+
+.ui-dialog .ui-dialog-titlebar-restore,
+.ui-dialog .ui-dialog-titlebar-close,
+.ui-dialog .ui-dialog-titlebar-maximize,
+.ui-dialog .ui-dialog-titlebar-minimize,
+.ui-dialog .ui-dialog .minimized {
+    float: $dialog-buttons-minimized-float;
+    margin: $dialog-buttons-outer-offset;
+    padding: $dialog-buttons-inner-offset;
+    font-size: $dialog-buttons-inner-font-size;
+    line-height: $dialog-buttons-inner-line-height;
+    background: $dialog-buttons-inner-background;
+    cursor: $dialog-buttons-inner-cursor;
+    border: $dialog-buttons-inner-border;
+}
+
+.ui-widget-overlay {
+    z-index: $ui-widget-overlay-z-index;
+    background-color: $ui-widget-overlay-background-color;
+}
+

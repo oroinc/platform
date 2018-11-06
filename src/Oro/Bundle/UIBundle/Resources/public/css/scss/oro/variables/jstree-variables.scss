@@ -1,0 +1,109 @@
+/* @theme: admin.oro; */
+
+$tree-link-color: $primary-200 !default;
+$tree-link-bg-color: $extra-200 !default;
+$tree-icon-color: $primary-400 !default;
+$tree-icon-color-hover: darken($tree-icon-color, 10%) !default;
+
+$jstree-wholerow-ul-width: 100% !default;
+$jstree-wholerow-ul-offset-bottom: 10px !default;
+
+$jstree-default-node-position: static !default;
+$jstree-default-node-background: transparent !default;
+$jstree-default-node-offset-left: 20px !default;
+
+$jstree-default-container-node-offset-left: $jstree-default-node-offset-left !default;
+
+$jstree-default-ocl-background: transparent !default;
+
+$jstree-themeicon-display: none !default;
+
+$jstree-open-font-family: 'FontAwesome' !default;
+$jstree-open-font-size: 15px !default;
+$jstree-open-font-weight: normal !default;
+$jstree-open-font-style: normal !default;
+$jstree-open-color: $primary-550 !default;
+
+$jstree-open-jocl-content: $fa-var-angle-down !default;
+$jstree-closed-jocl-content: $fa-var-angle-right !default;
+
+$jstree-icon-width: 21px !default;
+$jstree-icon-height: 36px !default;
+$jstree-icon-font-size: 16px !default;
+$jstree-icon-line-height: $jstree-icon-height !default;
+
+$jstree-wholerow-hovered-height: 35px !default;
+$jstree-wholerow-hovered-background: $tree-link-bg-color !default;
+
+$jstree-anchor-display: inline-block !default;
+$jstree-anchor-width: 90% !default;
+$jstree-anchor-height: 36px !default;
+$jstree-anchor-inner-offset: 0 8px 7px 8px !default;
+$jstree-anchor-line-height: 36px !default;
+$jstree-anchor-color: $tree-link-color !default;
+$jstree-anchor-border-radius: 0 !default;
+$jstree-anchor-box-shadow: none !default;
+$jstree-anchor-text-overflow: ellipsis !default;
+$jstree-anchor-overflow: hidden !default;
+
+$jstree-anchor-active-color: $tree-link-color !default;
+
+$jstree-wholerow-transition: none !default;
+
+$jstree-search-font-style: normal !default;
+$jstree-search-font-weight: normal !default;
+
+$jstree-icon-checkbox-display: inline-block !default;
+$jstree-icon-checkbox-height: 16px !default;
+$jstree-icon-checkbox-width: 16px !default;
+$jstree-icon-checkbox-border: 2px solid $primary-750 !default;
+$jstree-icon-checkbox-background: $primary-inverse !default;
+$jstree-icon-checkbox-border-radius: 3px !default;
+$jstree-icon-checkbox-cursor: pointer !default;
+$jstree-icon-checkbox-vertical-align: text-bottom !default;
+$jstree-icon-checkbox-position: relative !default;
+$jstree-icon-checkbox-color: $primary-inverse !default;
+$jstree-icon-checkbox-offset: 0 9px 0 -8px !default;
+
+$jstree-icon-checkbox-icon-position: absolute !default;
+$jstree-icon-checkbox-icon-top: 50% !default;
+$jstree-icon-checkbox-icon-left: 50% !default;
+$jstree-icon-checkbox-icon-transform: translate(-50%, -50%) !default;
+$jstree-icon-checkbox-icon-offset-left: -1px !default;
+$jstree-icon-checkbox-icon-font-size: 10px !default;
+$jstree-icon-checkbox-icon-line-height: 1 !default;
+$jstree-icon-checkbox-icon-font-family: FontAwesome !default;
+
+$jstree-checked-background: $secondary !default;
+$jstree-checked-border-color: $secondary !default;
+$jstree-checked-content: "\f00c" !default;
+
+$jstree-search-component-position: relative !default;
+$jstree-search-component-bottom-offset: $content-padding-medium !default;
+
+$jstree-search-component-clear-active-search-clear-display: block !default;
+$jstree-search-component-clear-active-search-search-display: none !default;
+
+$jstree-search-component-input-width: 100% !default;
+$jstree-search-component-input-bottom-offset: 0 !default;
+
+$jstree-search-component-clear-active-input-display: none !default;
+
+$jstree-search-component-clear-icon-display: none !default;
+$jstree-search-component-clear-icon-position: absolute !default;
+$jstree-search-component-clear-icon-top: 50% !default;
+$jstree-search-component-clear-offset-top: -12px !default;
+$jstree-search-component-clear-icon-right: 10px !default;
+$jstree-search-component-clear-icon-font-size: 16px !default;
+$jstree-search-component-clear-icon-z-index: 10 !default;
+$jstree-search-component-clear-icon-color: $tree-icon-color !default;
+$jstree-search-component-clear-icon-cursor: pointer !default;
+
+$jstree-search-component-clear-icon-hover-color: $tree-icon-color-hover !default;
+
+$jstree-search-component-search-icon-display: block !default;
+$jstree-search-component-search-icon-pointer-events: none !default;
+
+$tree-empty-content-sidebar-text-align: center !default;
+$tree-empty-content-sidebar-inner-offset: $content-padding-medium !default;
+$tree-empty-content-sidebar-background: $primary-860 !default;

@@ -15,6 +15,7 @@
 
         .title {
             @include text-line-truncate();
+            display: block;
         }
 
         a {
@@ -31,12 +32,13 @@
 
         .menu {
             margin: 0;
+            padding: 0;
 
             .title,
             .accordion-toggle {
                 color: $menu-item-text-color;
 
-                &::before {
+                &:before {
                     content: '';
 
                     display: inline-block;
@@ -64,7 +66,7 @@
                 &.collapsed {
                     font-weight: normal;
 
-                    &::before {
+                    &:before {
                         transform: rotate(0);
                     }
                 }
@@ -216,10 +218,6 @@
         box-sizing: content-box;
 
         overflow-y: auto;
-    }
-
-    .menu-icon {
-        display: none;
     }
 
     &__scroll {

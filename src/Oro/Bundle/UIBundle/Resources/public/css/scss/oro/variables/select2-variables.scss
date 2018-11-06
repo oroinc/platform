@@ -1,0 +1,279 @@
+/* @theme: admin.oro; */
+
+$select2-container-offset: 0 !default;
+$select2-container-position: relative !default;
+$select2-container-display: inline-block !default;
+$select2-container-border: 2px solid $primary-750 !default;
+$select2-container-background: $primary-inverse !default;
+$select2-container-border-radius: 2px !default;
+$select2-container-outline: none !default;
+$select2-container-width: 100% !default;
+$select2-container-vertical-align: middle !default;
+$select2-container-box-sizing: border-box !default;
+$select2-container-font-size: $base-font-size !default;
+$select2-container-height: 32px !default;
+
+$select2-container-horizontal-width: 294px !default;
+$select2-container-horizontal-max-width: 294px !default;
+
+$select2-container-input-append-width: 264px !default;
+$select2-container-input-append-max-width: 264px !default;
+
+$select2-container-active-border-color: $secondary !default;
+$select2-container-open-border-color: $primary-750 !default;
+
+$select2-choice-display: block !default;
+$select2-choice-height: 28px !default;
+$select2-choice-padding: 0 !default;
+$select2-choice-overflow: hidden !default;
+$select2-choice-position: relative !default;
+$select2-choice-white-space: nowrap !default;
+$select2-choice-line-height: 1em !default;
+$select2-choice-color: $primary-200 !default;
+$select2-choice-text-decoration: none !default;
+$select2-choice-background-clip: padding-box !default;
+$select2-choice-touch-callout: none !default;
+$select2-choice-user-select: none !default;
+$select2-choice-cursor: default !default;
+
+$select2-chosen-end-offset: 26px !default;
+$select2-chosen-inner-offset: 8px $select2-chosen-end-offset 7px 8px !default;
+$select2-chosen-height: 28px !default;
+
+$select2-chosen-icon-height: 16px !default;
+$select2-chosen-icon-offset-left: -3px !default;
+$select2-chosen-icon-vertical-align: middle !default;
+$select2-chosen-icon-float: left !default;
+
+$select2-chosen-result-entry-display: inline !default;
+$select2-chosen-result-entry-font-style: italic !default;
+$select2-chosen-result-entry-color: $primary-900 !default;
+
+$select2-choice-disabled-border-color: $primary-800 !default;
+$select2-choice-disabled-background-color: $primary-900 !default;
+$select2-choice-disabled-color: $primary-700 !default;
+$select2-choice-disabled-cursor: not-allowed !default;
+
+$select2-choice-disabled-display: none !default;
+
+$select2-choice-focus-outline: none !default;
+
+$select2-choice-image-max-width: 16px !default;
+$select2-choice-image-offset-left: -2px !default;
+$select2-choice-image-offset-right: 2px !default;
+$select2-choice-image-display: block !default;
+$select2-choice-image-float: left !default;
+$select2-choice-image-border-radius: $select2-choice-image-max-width !default;
+
+$select2-choice-span-display: block !default;
+$select2-choice-span-overflow: hidden !default;
+$select2-choice-span-white-space: nowrap !default;
+$select2-choice-span-text-overflow: ellipsis !default;
+
+$select2-container-multi-height: auto !default;
+$select2-container-min-height: 32px !default;
+$select2-container-offset: 0 !default;
+$select2-container-inner-offset: 0 !default;
+$select2-container-position: relative !default;
+$select2-container-cursor: text !default;
+$select2-container-overflow: hidden !default;
+
+$select2-search-choice-background: $primary-830 !default;
+$select2-search-choice-font-size: $base-font-size--s !default;
+$select2-search-choice-line-height: 14px !default;
+$select2-search-choice-color: $primary-400 !default;
+$select2-search-choice-border-radius: 2px !default;
+$select2-search-choice-inner-offset-vertical: 4px !default;
+$select2-search-choice-inner-offset-horizontal: 8px !default;
+$select2-search-choice-offset: 3px !default;
+$select2-search-choice-position: relative !default;
+$select2-search-choice-box-sizing: border-box !default;
+$select2-search-choice-float: $start !default;
+$select2-search-choice-list-style: none !default;
+
+$select2-search-choice-select2-locked-inner-offset: 5px 8px !default;
+
+$select2-search-choice-img-offset-top: -2px !default;
+$select2-search-choice-img-offset-bottom: -2px !default;
+$select2-search-choice-img-offset-vertical-align: top !default;
+$select2-search-choice-img-offset-width: 16px !default;
+$select2-search-choice-img-offset-height: 16px !default;
+
+$select2-search-field-inner-offset: 0 !default;
+$select2-search-field-float: left !default;
+$select2-search-field-height: auto !default;
+$select2-search-field-line-height: $select2-search-choice-line-height + (2 * $select2-search-choice-inner-offset-vertical) !default;
+$select2-search-field-background-color: transparent !default;
+$select2-search-field-offset-bottom: 0 !default;
+$select2-search-field-inner-offset: 0 !default;
+$select2-search-field-border: none !default;
+$select2-search-field-top-offset: -3px !default;
+
+$select2-search-field-offset: 0 !default;
+$select2-search-field-inner-offset: 0 !default;
+$select2-search-field-white-space: nowrap !default;
+
+$select2-search-choice-close-width: 16px !default;
+$select2-search-choice-close-height: 16px !default;
+$select2-search-choice-close-display: none !default;
+$select2-search-choice-close-position: absolute !default;
+$select2-search-choice-close-right: 24px !default;
+$select2-search-choice-close-top: 6px !default;
+$select2-search-choice-close-font-size: $base-font-size--m !default;
+$select2-search-choice-close-text-decoration: none !default;
+$select2-search-choice-close-border: 0 !default;
+$select2-search-choice-close-cursor: pointer !default;
+$select2-search-choice-close-outline: 0 !default;
+$select2-search-choice-close-z-index: 1 !default;
+
+$select2-search-multi-choices-list-style: none !default;
+$select2-search-multi-choices-offset: 3px !default;
+$select2-search-multi-choices-inner-offset: 0 !default;
+$select2-search-multi-choices-height: auto !default;
+$select2-search-multi-choices-overflow: hidden !default;
+
+$select2-search-multi-choice-close-display: block !default;
+$select2-search-multi-choice-close-width: 12px !default;
+$select2-search-multi-choice-close-height: 12px !default;
+$select2-search-multi-choice-close-right: 3px !default;
+$select2-search-multi-choice-close-top: 2px !default;
+
+$select2-search-choice-close-icon: "\f00d" !default;
+$select2-search-choice-close-icon-font-size: $base-font-size--m !default;
+$select2-search-choice-close-icon-right: 3px !default;
+$select2-search-choice-close-icon-top: 2px !default;
+$select2-search-choice-close-icon-color: $primary-200 !default;
+
+$select2-search-multi-choice-close-icon-font-size: $base-font-size--s !default;
+
+$select2-search-choice-close-allow-display: inline-block !default;
+
+$select2-search-choice-arrow-display: inline-block !default;
+$select2-search-choice-arrow-position: absolute !default;
+$select2-search-choice-arrow-right: 10px !default;
+$select2-search-choice-arrow-top: 6px !default;
+$select2-search-choice-arrow-font-size: 16px !default;
+$select2-search-choice-arrow-font-family: FontAwesome !default;
+$select2-search-choice-arrow-font-style: normal !default;
+$select2-search-choice-arrow-text-decoration: inherit !default;
+$select2-search-choice-arrow-font-smoothing: antialiased !default;
+
+$select2-search-choice-arrow-icon: "\f0d7" !default;
+$select2-search-choice-arrow-text-decoration: inherit !default;
+$select2-search-choice-arrow-display: inline-block !default;
+$select2-search-choice-arrow-speak: none !default;
+
+$select2-search-display: inline-block !default;
+$select2-search-width: 100% !default;
+$select2-search-inner-offset: 8px 8px 0 8px !default;
+$select2-search-position: relative !default;
+$select2-search-z-index: 10000 !default;
+$select2-search-white-space: nowrap !default;
+
+// !important for override default input width
+$select2-search-input-width: 100% !important !default;
+
+$select2-results-max-height: 300px !default;
+$select2-results-inner-offset: 8px !default;
+$select2-results-offset: 0 !default;
+$select2-results-position: relative !default;
+$select2-results-overflow-x: hidden !default;
+$select2-results-overflow-y: auto !default;
+
+$select2-results-image-border-radius: 16px !default;
+
+$select2-results-sub-offset: 0 !default;
+$select2-results-sub-inner-offset-left: 0 !default;
+
+$select2-result-list-style: none !default;
+$select2-result-display: list-item !default;
+$select2-result-background-image: none !default;
+
+$select2-result-with-children-font-weight: bold !default;
+
+$select2-result-hide-display: none !default;
+$select2-result-em-font-style: normal !default;
+
+$select2-result-label-inner-offset: 4px 7px 4px !default;
+$select2-result-label-offset: 0 !default;
+$select2-result-label-cursor: pointer !default;
+$select2-result-label-min-height: 1em !default;
+$select2-result-label-user-select: none !default;
+$select2-result-label-color: $primary-200 !default;
+
+$select2-result-label-img-offset-right: 5px !default;
+$select2-result-label-img-offset-left: 2px !default;
+
+$select2-result-highlighted-background: $primary-900 !default;
+$select2-result-highlighted-em-background: transparent !default;
+$select2-result-highlighted-ul-background: $primary-inverse !default;
+$select2-result-highlighted-ul-color: $primary-860 !default;
+
+$select2-results-disabled-color: $primary-700 !default;
+$select2-results-disabled-background: $primary-900 !default;
+$select2-results-disabled-display: list-item !default;
+$select2-results-disabled-cursor: default !default;
+
+$select2-results-selected-disabled-display: none !default;
+
+$select2-locked-inner: 0 !default;
+
+$select2-measure-scrollbar-position: absolute !default;
+$select2-measure-scrollbar-top: -10000px !default;
+$select2-measure-scrollbar-left: -10000px !default;
+$select2-measure-scrollbar-width: 100px !default;
+$select2-measure-scrollbar-height: 100px !default;
+$select2-measure-scrollbar-overflow: scroll !default;
+
+$select2-display-none-display: none !default;
+
+$select2-offscreen-clip: rect(0 0 0 0) !default;
+$select2-offscreen-border: none !default;
+$select2-offscreen-width: 1px !default;
+$select2-offscreen-height: 1px !default;
+$select2-offscreen-offset: 0 !default;
+$select2-offscreen-inner-offset: 0 !default;
+$select2-offscreen-overflow: hidden !default;
+$select2-offscreen-position: absolute !default;
+$select2-offscreen-outline: 0 !default;
+$select2-offscreen-left: 0 !default;
+
+$select2-match-text-decoration: underline !default;
+
+$select2-breadcrumbs-offset: 0 !default;
+$select2-breadcrumbs-inner-offset: 8px 8px 0 8px !default;
+
+$select2-breadcrumbs-empty-inner-offset: 0 !default;
+
+$select2-breadcrumbs-item-sep: '/' !default;
+$select2-breadcrumbs-item-color: $primary !default;
+$select2-breadcrumbs-item-cursor: default !default;
+
+$select2-breadcrumbs-item-last-display: none !default;
+
+$select2-drop-width: 100% !default;
+$select2-drop-offset-top: 0 !default;
+$select2-drop-position: absolute !default;
+$select2-drop-z-index: 9999 !default;
+$select2-drop-top: 100% !default;
+$select2-drop-background: $primary-inverse !default;
+$select2-drop-color: $primary !default;
+$select2-drop-border: none !default;
+$select2-drop-border-radius: 0 0 4px 4px !default;
+$select2-drop-box-shadow: 1px 3px 9px 3px rgba(0, 0, 0, .08), 1px 3px 9px 3px rgba(0, 0, 0, .08) !default;
+$select2-drop-above-box-shadow: 1px 0 9px 3px rgba(0, 0, 0, .08), 1px 0 9px 3px rgba(0, 0, 0, .08) !default;
+
+$select2-drop-above-border-radius: 4px 4px 0 0 !default;
+
+$select2-drop-result-font-style: italic !default;
+$select2-drop-result-color: $primary-800 !default;
+
+$select2-drop-highlighted-color: $primary-900 !default;
+$select2-drop-highlighted-font-style: italic !default;
+
+$select2-drop-auto-width: auto !default;
+
+$select2-drop-mask-position: absolute !default;
+$select2-drop-mask-left: 0 !default;
+$select2-drop-mask-top: 0 !default;
+$select2-drop-mask-z-index: 9998 !default;

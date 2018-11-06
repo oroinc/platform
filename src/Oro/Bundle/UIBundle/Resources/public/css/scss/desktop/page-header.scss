@@ -1,38 +1,38 @@
+/* @theme: admin.oro; */
+
 .container-fluid.page-title {
-    padding-right: 0;
+    padding-#{$end}: 0;
+    padding-#{$start}: $content-padding;
+
+    .navbar-extra {
+        margin-bottom: 10px;
+    }
 
     .navbar-extra > .row {
-        > .pull-right {
-            max-width: calc(100% - 180px);
+        > .title-buttons-container {
+            text-align: #{$end};
+            max-width: 100%;
 
-            > .title-buttons-container {
-                text-align: right;
-
-                > .pull-left,
-                > .btn-group {
-                    text-align: left;
-                    display: inline-block;
-                    margin-bottom: 4px;
-                    vertical-align: top;
-                }
-
-                > .pinned-dropdown > .btn-group {
-                    text-align: left;
-                }
+            > .pull-left,
+            > .btn-group {
+                text-align: #{$start};
+                display: inline-block;
+                margin-bottom: 4px;
+                vertical-align: top;
             }
 
-            .separator-btn {
-                margin-top: 2px;
+            > .pinned-dropdown > .btn-group {
+                text-align: #{$start};
             }
         }
 
-        > .pull-left + .pull-right {
-            max-width: none;
+        .separator-btn {
+            margin-top: 2px;
         }
     }
 
     .page-title-center.under-left-block {
-        clear: left;
+        clear: #{$start};
         position: relative;
         top: 8px;
     }
@@ -40,19 +40,35 @@
     .navigation {
         .row {
             display: flex;
+            flex-flow: row wrap;
+            justify-content: flex-end;
+
+            > div {
+                margin-bottom: 6px;
+            }
+
+            &.inline-info {
+                flex-wrap: wrap-reverse;
+                > div {
+                    margin-bottom: 0;
+                }
+            }
 
             > .pull-left-extra {
-                width: 100%;
+                flex-grow: 1;
+                margin-#{$start}: 0;
+                text-align: $start;
             }
 
             > .pull-right {
-                max-width: 100%;
                 flex-shrink: 0;
             }
         }
     }
+}
 
-    .customer-content {
+.page-title {
+    &__path {
         .top-row {
             .pull-left {
                 float: none;
@@ -60,26 +76,14 @@
             }
         }
     }
-}
 
-.customer-info {
-    h1 {
-        margin: 0 0 3px;
-
-        &.user-name {
-            margin-right: 5px;
-        }
-    }
-
-    .sub-title {
-        a {
-            color: #006acc;
-        }
+    &__entity-title {
+        margin-#{$end}: 5px;
     }
 
     .sub-title,
     .separator,
-    .user-name {
+    &__entity-title {
         display: inline;
     }
 }

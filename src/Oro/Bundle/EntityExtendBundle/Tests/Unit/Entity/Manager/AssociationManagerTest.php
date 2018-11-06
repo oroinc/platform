@@ -13,8 +13,8 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class AssociationManagerTest extends OrmTestCase

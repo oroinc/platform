@@ -1,8 +1,9 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscriber;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormEvents;
 
 class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -102,6 +103,9 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
         $configMock->expects($this->any())
             ->method('getType')
             ->will($this->returnValue($type));
+        $type->expects($this->once())
+            ->method('getInnerType')
+            ->willReturn(new SubmitType());
 
         $fieldMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()
@@ -217,6 +221,9 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
         $configMock->expects($this->any())
             ->method('getType')
             ->will($this->returnValue($type));
+        $type->expects($this->once())
+            ->method('getInnerType')
+            ->willReturn(new SubmitType());
 
         $fieldMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()->getMock();

@@ -184,6 +184,9 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getTypeOfField')
             ->with('name')
             ->willReturn('string');
+        $this->metadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn([]);
 
         $result = $this->entityNameProvider->getNameDQL('short', null, TestEntity::class, 'alias');
         $this->assertEquals('alias.name', $result);
@@ -301,11 +304,9 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function initEntityFieldsMetadata($initIdentityField = false, array $extendedFieldConfig = [])
     {
-        if ($initIdentityField) {
-            $this->metadata->expects($this->any())
-                ->method('getIdentifierFieldNames')
-                ->willReturn(['id']);
-        }
+        $this->metadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn($initIdentityField ? ['id'] : []);
 
         $this->metadata->expects($this->any())
             ->method('hasField')

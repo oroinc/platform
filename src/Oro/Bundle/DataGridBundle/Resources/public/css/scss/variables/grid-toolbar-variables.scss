@@ -1,0 +1,16 @@
+/* @theme: admin.oro; */
+
+$oro-datagrid-toolbar-input-width: 40px !default;
+$oro-datagrid-toolbar-input-height: 32px !default;
+$oro-datagrid-toolbar-input-text-align: center !default;
+$oro-datagrid-toolbar-color: $primary-200 !default;
+$oro-datagrid-toolbar-offset: 0 0 $content-padding-small !default;
+$oro-datagrid-toolbar-part-width: 50px !default;
+$oro-datagrid-toolbar-label-offset: 16px !default;
+$oro-datagrid-toolbar-tools-offset: side-values(0 0 0 8px) !default;
+
+// Mobile view
+
+$oro-datagrid-toolbar-mobile-offset: 16px 0 !default;
+$oro-datagrid-toolbar-mobile-pagination-width: 200px !default;
+$oro-datagrid-toolbar-mobile-input-offset: 0 8px !default;

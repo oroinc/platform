@@ -1,0 +1,15 @@
+services:
+    oro_message_queue.async.unique_message_processor.stub:
+        class: Oro\Bundle\MessageQueueBundle\Tests\Functional\Stub\UniqueMessageProcessorStub
+        arguments:
+            - '@oro_message_queue.job.runner'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_message_queue.async.dependent_message_processor.stub:
+        class: Oro\Bundle\MessageQueueBundle\Tests\Functional\Stub\DependentMessageProcessorStub
+        arguments:
+            - '@oro_message_queue.job.runner'
+            - '@oro_message_queue.job.dependent_job_service'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }

@@ -228,7 +228,7 @@ class ExtendConfigDumper
      */
     public function checkConfig()
     {
-        $hasAliases = file_exists(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir));
+        $hasAliases = ExtendClassLoadingUtils::aliasesExist($this->cacheDir);
         if ($hasAliases) {
             return;
         }

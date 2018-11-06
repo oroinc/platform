@@ -11,6 +11,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
@@ -220,7 +221,8 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->validator->expects($this->once())
             ->method('validate')
-            ->with($entity);
+            ->with($entity)
+            ->willReturn(new ConstraintViolationList());
 
         $this->assertNull($this->helper->validateEntity($entity));
     }

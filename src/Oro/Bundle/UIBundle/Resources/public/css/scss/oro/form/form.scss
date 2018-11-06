@@ -1,0 +1,444 @@
+/* @theme: admin.oro; */
+
+.input {
+    border-radius: $input-field-border-radius;
+    background-color: $input-background-color;
+    border: $input-border-width solid $input-border-color;
+    font-family: $input-font-family;
+    padding: $input-inner-offset;
+    box-shadow: $input-box-shadow;
+    color: $input-color;
+    margin-bottom: $input-outer-offset-bottom;
+    box-sizing: $input-box-sizing;
+    outline: $input-outline;
+    width: $field-width;
+
+    &:not(textarea) {
+        height: $field-size;
+    }
+
+    &:focus {
+        box-shadow: $input-focus-box-shadow;
+        border-color: $input-focus-border-color;
+        z-index: 1;
+
+        &:invalid {
+            &:focus {
+                box-shadow: $input-invalid-focus-box-shadow;
+                border-color: $input-invalid-focus-border-color;
+            }
+        }
+    }
+
+    &:disabled {
+        border-color: $input-disabled-border-color;
+        background-color: $input-disabled-background-color;
+        color: $input-disabled-color;
+        resize: $input-disabled-resize;
+    }
+
+    &.error {
+        border-color: $input-error-border-color;
+        box-shadow: $input-error-box-shadow;
+    }
+
+    .control-group & {
+        margin-bottom: $input-control-group-outer-offset-bottom;
+    }
+
+    @include placeholder {
+        color: $primary-700;
+    }
+}
+
+/**
+    Uploader uniform
+**/
+.uploader {
+    border-radius: $uploader-border-radius;
+    background-color: $uploader-background-color;
+    border: $input-border-width solid $input-border-color;
+    height: $uploader-height;
+    line-height: $uploader-line-height;
+    float: $uploader-float;
+    white-space: $uploader-white-space;
+    color: $uploader-color;
+    font-family: $uploader-font-family;
+
+    input {
+        width: $uploader-input-inner-width;
+    }
+
+    .filename,
+    .action {
+        height: $uploader-action-height;
+        line-height: $uploader-action-line-height;
+        display: $uploader-action-display;
+        vertical-align: $uploader-action-vertical-align;
+        padding: $uploader-action-inner-offset;
+        box-sizing: $uploader-action-box-sizing;
+    }
+
+    .filename {
+        @include text-line-truncate($uploader-filename-width);
+    }
+
+    .action {
+        border-left: $input-border-width solid $input-border-color;
+    }
+
+    &.focus,
+    &.hover {
+        border-color: $uploader-hover-border-color;
+        cursor: $uploader-hover-cursor;
+
+        .action {
+            border-left-color: $uploader-hover-action-border-left-color;
+        }
+    }
+
+    &.active {
+        .action {
+            background: $uploader-action-active-background;
+            color: $uploader-action-active-color;
+            border-color: $uploader-action-active-border-color;
+        }
+    }
+
+    &.disabled {
+        border-color: $input-disabled-border-color;
+        background-color: $input-disabled-background-color;
+        color: $input-disabled-color;
+        resize: $input-disabled-resize;
+    }
+}
+
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+.uneditable-input,
+.selector,
+select[multiple] {
+    @extend .input;
+}
+
+/*
+    Select multiple
+ */
+select[multiple] {
+    height: $select-multiple-height !important;
+    padding: $select-multiple-inner-offset;
+
+    option {
+        padding: $select-multiple-option-inner-offset;
+        border-radius: $select-multiple-option-border-radius;
+        font-size: $select-multiple-option-font-size;
+        color: $select-multiple-option-color;
+
+        &:not(:last-child) {
+            margin-bottom: $select-multiple-option-not-last-offset-bottom;
+        }
+
+        &:checked {
+            box-shadow: $select-multiple-option-checked-box-shadow;
+            color: $select-multiple-option-checked-color !important;
+        }
+    }
+
+    &:focus {
+        option {
+            &:active,
+            &::selection,
+            &:checked {
+                box-shadow: $select-multiple-option-active-box-shadow;
+            }
+        }
+    }
+}
+
+/* Select */
+.selector {
+    line-height: $selector-line-height;
+    height: $selector-height;
+    width: $selector-width;
+    border: $selector-border;
+    background-color: $selector-background-color;
+    border-radius: $selector-border-radius;
+    padding: $selector-inner-offset;
+
+    option {
+        padding-left: $selector-option-inner-offset-left;
+    }
+
+    select {
+        height: $selector-select-height;
+        line-height: $selector-select-line-height;
+        z-index: $selector-select-z-index;
+        padding: $selector-select-inner-offset;
+        left: $selector-select-left;
+        width: $selector-select-width;
+        box-sizing: $selector-select-box-sizing;
+        color: $selector-select-color;
+    }
+
+    span {
+        height: $selector-select-height;
+        display: $selector-uniform-display;
+        line-height: $selector-select-line-height;
+        box-sizing: $selector-uniform-box-sizing;
+        padding: $selector-uniform-inner-offset;
+        white-space: $selector-uniform-white-space;
+        overflow: $selector-uniform-overflow;
+        text-overflow: $selector-uniform-text-overflow;
+        position: $selector-uniform-position;
+
+        &:after {
+            content: "\f0dd";
+            margin: $selector-uniform-arrow-outer-offset;
+            display: $selector-uniform-arrow-display;
+            font-size: $base-font-size--m;
+            font-family: $selector-uniform-arrow-font-family;
+            position: $selector-uniform-arrow-position;
+            #{$end}: $selector-uniform-arrow-right;
+            color: $selector-uniform-arrow-color;
+            line-height: $selector-uniform-line-height;
+        }
+    }
+
+    &.focus,
+    &.hover,
+    &:hover {
+        box-shadow: $input-focus-box-shadow;
+        border-color: $input-focus-border-color;
+    }
+
+    &.disabled {
+        span {
+            cursor: $input-disabled-cursor;
+            border-color: $input-disabled-border-color;
+            background-color: $input-disabled-background-color;
+            color: $input-disabled-color;
+
+            &:after {
+                color: $input-disabled-border-color;
+            }
+        }
+
+        &.focus,
+        &.hover,
+        &:hover {
+            border-color: $input-disabled-border-color;
+            background-color: $input-disabled-background-color;
+            color: $input-disabled-color;
+        }
+    }
+
+    &.error {
+        span {
+            color: $input-error-color;
+
+            &:after {
+                color: $input-error-border-color;
+            }
+        }
+    }
+}
+
+.add-on {
+    vertical-align: $add-on-vertical-align;
+}
+
+.add-on,
+.btn {
+    .input-append &,
+    .input-prepend & {
+        float: $add-on-float;
+        border: $add-on-border;
+        background-color: $add-on-background-color;
+        color: $primary;
+        height: $add-on-height;
+        width: $add-on-height;
+        line-height: $add-on-line-height;
+        text-align: center;
+        padding: $add-on-inner-offset;
+        display: inline-block;
+        flex-shrink: 0;
+
+        input[type='checkbox'],
+        input[type='radio'] {
+            margin-top: $add-on-input-outer-offset-top;
+        }
+
+        &:first-child,
+        &:first-of-type {
+            border-radius: $add-on-first-child-border-radius;
+        }
+
+        &:last-child,
+        &:last-of-type {
+            border-radius: $add-on-last-child-border-radius;
+        }
+
+        &:disabled {
+            border-color: $add-on-disabled-border-color;
+            background-color: $add-on-disabled-background-color;
+            color: $add-on-disabled-color;
+        }
+    }
+
+    .error & {
+        border-color: $input-error-border-color;
+        color: $input-error-border-color;
+    }
+
+    .input-append & {
+        border-radius: $add-on-append-border-radius;
+        margin-#{$start}: $add-on-append-offset-left;
+
+        &:not(:first-of-type) {
+            margin-#{$start}: $add-on-append-outer-offset-left;
+        }
+    }
+
+    .input-prepend & {
+        border-radius: $add-on-prepend-border-radius;
+        margin-#{$end}: $add-on-prepend-offset-right;
+
+        &:not(:last-of-type) {
+            margin-#{$end}: $add-on-prepend-outer-offset-right;
+        }
+    }
+}
+
+.input-append,
+.input-prepend {
+    &.collection-element-primary {
+        .add-on {
+            background: $primary-900;
+        }
+    }
+}
+
+.btn-group {
+    .input-append &,
+    .input-prepend & {
+        &:last-child {
+            border-radius: $add-on-last-child-border-radius;
+        }
+
+        &:first-child {
+            border-radius: $add-on-first-child-border-radius;
+        }
+    }
+}
+
+.add-on,
+.entity-select-btn,
+.entity-create-btn {
+    &.btn {
+        [class^="fa-"],
+        [class*=" fa-"] {
+            margin: $entity-create-btn-icon-offset;
+            vertical-align: $entity-create-btn-icon-vertical-align;
+        }
+
+        &.dropdown-toggle {
+            width: $entity-create-btn-dropdown-toggle-width;
+            border-radius: $entity-create-btn-dropdown-toggle-border-radius;
+        }
+    }
+}
+
+.form-horizontal .control-group {
+    margin: 0;
+    max-width: 800px;
+}
+
+.form-container,
+.form-horizontal {
+    .control-group {
+        &:not(:last-of-type) {
+            margin: 0 0 $form-container-control-row-space;
+        }
+    }
+}
+
+/* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
+.controls {
+    select:not([multiple]) {
+        width: $select-width;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+}
+
+// Need refactor
+// ie, chrome, safari
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+// firefox
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+.alert .message ul:last-child {
+    margin-bottom: 0;
+}
+
+input[type='text'].hasDatepicker.ui-datepicker-dialog-is-below:focus,
+.ui-datepicker-dialog-is-below,
+.timepicker-dialog-is-below,
+.input-append.select2-drop-below,
+.controls.select2-drop-below select,
+.controls.select2-drop-below .select2-container,
+.controls .selector.focus {
+    + span.validation-failed {
+        @include floating-validation-message();
+    }
+}
+
+.loading > .input-append {
+    position: relative;
+
+    & .btn:focus {
+        outline: 0 none;
+    }
+
+    .select2-container-active .select2-choice {
+        border: 0 none;
+        box-shadow: none;
+    }
+
+    &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        opacity: .7;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: url(../../../orodatagrid/images/preloader.gif) repeat;
+    }
+}
+
+.timepicker-dialog-is-below.timepicker-error + span.validation-failed:after {
+    left: 128px;
+}

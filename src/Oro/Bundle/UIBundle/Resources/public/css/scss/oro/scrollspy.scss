@@ -1,0 +1,74 @@
+/* @theme: admin.oro; */
+
+.scrollspy {
+    position: $scrollspy-position;
+
+    overflow: $scrollspy-overflow;
+
+    &-nav {
+        margin: $scrollspy-nav-offset;
+
+        background: $scrollspy-nav-background;
+        border-radius: $scrollspy-nav-border-radius;
+
+        position: $scrollspy-nav-position;
+
+        @include clearfix();
+
+        &:after {
+            content: "";
+            position: absolute;
+            pointer-events: none;
+            bottom: -$scrollspy-nav-gradient-height;
+            left: 0;
+            right: 0;
+            height: $scrollspy-nav-gradient-height;
+            background: $scrollspy-nav-gradient;
+            z-index: $scrollspy-nav-gradient-z-index;
+        }
+
+        &-target {
+            height: $scrollspy-nav-target-height;
+        }
+
+        a,
+        .nav-link {
+            display: inline-block;
+            padding: $scrollspy-nav-navbar-inner-nav-link-inner-offset;
+
+            background-color: $scrollspy-nav-navbar-inner-nav-link-background-color;
+            border-radius: $scrollspy-nav-navbar-inner-nav-link-border-radius;
+            color: $scrollspy-nav-navbar-inner-nav-link-color;
+
+            &:hover {
+                background: $scrollspy-nav-navbar-inner-nav-link-background-color;
+            }
+
+            &.active {
+                font-weight: $scrollspy-nav-navbar-inner-nav-link-active-font-weight;
+
+                background-color: $scrollspy-nav-navbar-inner-nav-link-active-background-color;
+            }
+        }
+    }
+
+    &-title {
+        padding: $scrollspy-title-inner-offset;
+        margin: $scrollspy-title-offset;
+
+        font-size: $scrollspy-title-font-size;
+        font-weight: $scrollspy-title-font-weight;
+
+        background: $scrollspy-title-background;
+        border-radius: $scrollspy-title-border-radius;
+        color: $scrollspy-title-color;
+
+        @at-root .scrollable-container .responsive-section:first-child .scrollspy-title {
+            display: none;
+        }
+    }
+}
+
+[data-scroll-focus] {
+    outline: $scrollspy-data-scroll-focus-outline;
+}

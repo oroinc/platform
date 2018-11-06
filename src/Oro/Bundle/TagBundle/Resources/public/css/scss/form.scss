@@ -1,0 +1,80 @@
+/* @theme: admin.oro; */
+
+.tags-column-editor {
+    width: auto !important; // ignore cell width
+
+    .select2-choices {
+        max-width: 20vw;
+    }
+}
+
+.tags-select-editor {
+    min-width: $tag-selector-item-min-width; // ignore min-width
+
+    .select2-container {
+        border-radius: 0;
+        height: auto;
+        box-shadow: none;
+        border: $border-width solid $primary-750;
+    }
+
+    .select2-choices {
+        max-height: $tag-selector-item-max-height;
+        min-width: $tag-selector-item-min-width;
+        background: $primary-inverse;
+
+        &:before {
+            content: ' ';
+            float: #{$end};
+            width: $tag-selector-actions-width;
+            height: $tag-selector-item-line-height;
+            font-size: $tag-selector-item-font-size;
+            margin: side-values(0 0 $tag-selector-item-offset-vertical 0);
+        }
+
+        &.select2-search-resize {
+            padding-#{$end}: 48px;// to fill area required for actions buttons
+        }
+
+        .select2-search-field input {
+            padding: $tag-selector-item-input-inner-offset;
+            height: auto;
+            font-size: $tag-selector-item-font-size;
+            line-height: $tag-selector-item-line-height;
+            margin-#{$end}: -$tag-selector-actions-width;
+        }
+
+        .select2-search-choice {
+            box-shadow: none;
+
+            .select2-search-choice-close {
+                top: 0;
+                border: none;
+                width: $tag-selector-item-close-icon-width;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                &:before {
+                    color: $tag-selector-item-color;
+                    line-height: 1;
+                }
+            }
+
+            &.select2-locked {
+                padding: side-values($tag-selector-item-padding-vertical $tag-selector-item-padding-horizontal) !important;
+            }
+        }
+    }
+
+    .inline-editor__action-item {
+        line-height: $select2-container-min-height;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    &.inline-view-editor .select2-choices {
+        width: 100% !important;
+    }
+}

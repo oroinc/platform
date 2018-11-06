@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+use Oro\Bundle\EntityBundle\Exception\DuplicateEntityAliasException;
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 
 /**
@@ -39,6 +41,9 @@ class EntityAliasLoader
      * Loads entity aliases into the storage.
      *
      * @param EntityAliasStorage $storage
+     *
+     * @throws InvalidEntityAliasException if an alias or a plural alias for any entity is not valid
+     * @throws DuplicateEntityAliasException if duplicated entity alias is detected
      */
     public function load(EntityAliasStorage $storage)
     {

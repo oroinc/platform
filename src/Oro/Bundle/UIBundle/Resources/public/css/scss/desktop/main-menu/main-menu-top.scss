@@ -25,6 +25,14 @@
         box-shadow: $menu-dropdown-box-shadow;
     }
 
+    .dropdown-menu,
+    .dropdown-toggle {
+        &:before,
+        &:after {
+            content: none;
+        }
+    }
+
     .title {
         display: block;
         padding: $menu-item-offset;
@@ -98,7 +106,7 @@
                             bottom: 0;
                             right: 0;
                             left: 0;
-                            z-index: $zindexDropdown + 2;
+                            z-index: $zindex-dropdown + 2;
 
                             height: 6px;
 
@@ -112,7 +120,7 @@
                 }
 
                 .dropdown-menu-wrapper {
-                    z-index: $zindexDropdown + 1;
+                    z-index: $zindex-dropdown + 1;
 
 
                     &__placeholder {
@@ -268,6 +276,8 @@
                         color: $menu-item-text-color;
 
                         content: none;
+
+                        @include reset-caret();
                     }
                 }
             }

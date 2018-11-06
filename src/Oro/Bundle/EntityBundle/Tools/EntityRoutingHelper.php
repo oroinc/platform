@@ -45,20 +45,6 @@ class EntityRoutingHelper
     }
 
     /**
-     * Encodes the class name into the format that can be used in route parameters
-     *
-     * @param string $className The class name
-     *
-     * @return string The encoded class name
-     *
-     * @deprecated since 1.8, use getUrlSafeClassName
-     */
-    public function encodeClassName($className)
-    {
-        return $this->entityClassNameHelper->getUrlSafeClassName($className);
-    }
-
-    /**
      * Decodes the given string into the class name
      *
      * @param string $className The encoded class name

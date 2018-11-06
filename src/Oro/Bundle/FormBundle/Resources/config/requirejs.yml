@@ -9,7 +9,7 @@ config:
             'jquery.validate': 'jquery.validate'
     paths:
         'xregexp': 'bundles/npmassets/xregexp/xregexp-all.js'
-        'tinymce/tinymce': 'bundles/tinymce/tinymce.min.js'
+        'tinymce/tinymce': 'bundles/components/tinymce/tinymce.min.js'
         'jquery.validate': 'bundles/bowerassets/jquery-validate/dist/jquery.validate.js'
         'jquery.validate-additional-methods': 'bundles/bowerassets/jquery-validate/dist/additional-methods.js'
         'oroform/js/validator/count': 'bundles/oroform/js/validator/count.js'
@@ -61,7 +61,6 @@ config:
         'oroform/js/app/views/simple-color-choice-view': 'bundles/oroform/js/app/views/simple-color-choice-view.js'
         'oroform/js/app/views/color-table-view': 'bundles/oroform/js/app/views/color-table-view.js'
         'oroform/js/app/views/datepair-view': 'bundles/oroform/js/app/views/datepair-view.js'
-        'oroform/js/app/views/collapsible-form-row-view': 'bundles/oroform/js/app/views/collapsible-form-row-view.js'
         'oroform/js/app/views/fields-groups-collection-view': 'bundles/oroform/js/app/views/fields-groups-collection-view.js'
         'oroform/js/app/views/default-field-value-view': 'bundles/oroform/js/app/views/default-field-value-view.js'
         'oroform/js/app/views/form-loading-view': 'bundles/oroform/js/app/views/form-loading-view.js'
@@ -83,4 +82,3 @@ config:
 build:
     paths:
         'tinymce/tinymce': 'empty:'
-        'tinymce/tinymce.jquery': 'empty:'

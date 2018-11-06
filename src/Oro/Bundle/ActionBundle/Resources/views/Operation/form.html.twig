@@ -17,7 +17,7 @@
                 {% block messages %}
                     {% if messages is defined and messages|length %}
                         {% for type, items in messages %}
-                        <div class="alert alert-{{ type }}">
+                        <div class="alert alert-{{ type }}" role="alert">
                             <ul>
                                 {% for item in items %}
                                     <li>{{ item }}</li>
@@ -29,7 +29,7 @@
                 {% endblock %}
                 {% block errors %}
                     {% if errors is defined and errors|length %}
-                        <div class="alert alert-error">
+                        <div class="alert alert-error" role="alert">
                             <ul>
                             {% block errors_inner %}
                                 {% for error in errors %}
@@ -43,7 +43,7 @@
                 {% if form is defined %}
                     {% block form_errors %}
                         {% if form.vars.errors|length > 0 %}
-                            <div class="alert alert-error">
+                            <div class="alert alert-error" role="alert">
                                 {% block form_errors_inner %}
                                     {{ form_errors(form) }}
                                 {% endblock %}

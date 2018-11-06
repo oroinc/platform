@@ -124,7 +124,9 @@ define([
          * Action on multiselect widget refresh
          */
         onRefresh: function() {
-            this.getWidget().find('.ui-multiselect-checkboxes').addClass('fixed-li');
+            var widget = this.getWidget();
+            widget.find('.ui-multiselect-checkboxes').addClass('fixed-li');
+            widget.inputWidget('seekAndCreate');
         },
 
         /**

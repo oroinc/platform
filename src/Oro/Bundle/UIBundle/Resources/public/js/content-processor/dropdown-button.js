@@ -14,7 +14,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             useMainButtonsClone: false,
             truncateLength: null,
             moreLabel: '',
-            groupContainer: '<div class="btn-group pull-right"></div>',
+            groupContainer: '<div class="btn-group"></div>',
             minItemQuantity: 1,
             moreButtonAttrs: {},
             decoreClass: null
@@ -67,6 +67,15 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
         },
 
         /**
+         * Checks if the button processor has grouped buttons
+         *
+         * @return {boolean}
+         */
+        isGrouped: function() {
+            return Boolean(this.group);
+        },
+
+        /**
          * Collects all buttons of the container
          *
          * @param {jQuery|null} $element
@@ -106,12 +115,15 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
         _moreButton: function() {
             var $button = $('<a href="#"/>');
             $button
-                .attr(this.options.moreButtonAttrs)
-                .attr({'data-toggle': 'dropdown'})
-                .addClass('btn dropdown-toggle')
+                .attr($.extend({
+                    'role': 'button',
+                    'data-toggle': 'dropdown',
+                    'data-placement': 'bottom-end',
+                    'data-inherit-parent-width': 'loosely'
+                }, this.options.moreButtonAttrs))
+                .addClass('btn dropdown-toggle btn-more-actions')
                 .addClass(this.options.decoreClass || '')
-                .append(this.options.moreLabel)
-                .append('<span class="caret"></span>');
+                .append(this.options.moreLabel);
 
             return $button;
         },
@@ -125,8 +137,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
          */
         _dropdownMenu: function($buttons) {
             return $('<ul></ul>', {
-                'class': 'dropdown-menu',
-                'data-options': '{"align": "right", "attachToParent": "true"}'
+                'class': 'dropdown-menu'
             }).append(this._prepareButtons($buttons));
         },
 

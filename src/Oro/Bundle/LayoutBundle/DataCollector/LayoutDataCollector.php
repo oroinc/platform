@@ -14,6 +14,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
+/**
+ * Collector of layouts
+ */
 class LayoutDataCollector extends DataCollector
 {
     const NAME = 'layout';
@@ -28,7 +31,7 @@ class LayoutDataCollector extends DataCollector
     private $isDebug;
 
     /** @var array */
-    private $dataByBlock;
+    private $dataByBlock = [];
 
     /** @var BlockView */
     private $rootBlockView;

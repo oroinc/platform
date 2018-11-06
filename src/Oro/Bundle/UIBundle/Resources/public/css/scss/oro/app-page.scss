@@ -1,0 +1,15 @@
+/* @theme: admin.oro; */
+
+.app-page {
+    &__main {
+        background-color: #fff;
+    }
+
+    .lang-en & {
+        &__main {
+            label {
+                text-transform: capitalize;
+            }
+        }
+    }
+}

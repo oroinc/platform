@@ -1,0 +1,26 @@
+/* @theme: admin.oro; */
+
+@-webkit-keyframes spin-loading {
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin-loading {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@mixin loader($size: $loader-size, $border-width: $loader-width, $color: $loader-color) {
+    height: $size;
+    width: $size;
+
+    border: $border-width solid $color;
+
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+
+    border-radius: 50%;
+    animation: spin-loading .85s steps(40, end) infinite;
+}
