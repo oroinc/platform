@@ -71,9 +71,10 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
         );
 
         if ($isRootJobStopped) {
+            $rootJob = $job->isRoot() ? $job : $job->getRootJob();
             $this->producer->send(
                 Topics::ROOT_JOB_STOPPED,
-                new Message(['jobId' => $job->getRootJob()->getId()], MessagePriority::HIGH)
+                new Message(['jobId' => $rootJob->getId()], MessagePriority::HIGH)
             );
         }
 

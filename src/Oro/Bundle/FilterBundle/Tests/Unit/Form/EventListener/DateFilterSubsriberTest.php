@@ -174,7 +174,7 @@ class DateFilterSubsriberTest extends \PHPUnit_Framework_TestCase
                     'type'  => AbstractDateFilterType::TYPE_BETWEEN,
                     'value' => [
                         'start' => '{{' . DateModifierInterface::VAR_SOY . '}}',
-                        'end' => date('Y') . '-01-01 23:59'
+                        'end' => date('Y') . '-01-02 00:00'
                     ]
                 ]
             ],
@@ -188,7 +188,7 @@ class DateFilterSubsriberTest extends \PHPUnit_Framework_TestCase
                     'part'  => DateModifierInterface::PART_VALUE,
                     'type'  => AbstractDateFilterType::TYPE_NOT_BETWEEN,
                     'value' => [
-                        'end' => date('Y') . '-01-01 23:59',
+                        'end' => date('Y') . '-01-02 00:00',
                         'start' => '{{' . DateModifierInterface::VAR_SOY . '}}'
                     ]
                 ]
