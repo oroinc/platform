@@ -10,12 +10,17 @@
     }
 
     .jstree {
+        &-search-component {
+            margin-bottom: 13px;
+        }
+
         &-node {
-            margin-left: 24px;
+            margin: side-values(0 0 0 28px);
         }
 
         &-anchor {
-            padding: 0 8px 8px 2px;
+            padding: side-values(0 8px 8px 6px);
+            text-align: $start;
         }
 
         &-actions {
@@ -30,7 +35,7 @@
 
         &-icon:empty {
             width: 20px;
-            margin-right: 4px;
+            margin-#{$end}: 4px;
         }
 
         &-ocl {
@@ -43,11 +48,19 @@
             }
         }
 
+        &-actions__menu {
+            &--inline {
+                .action {
+                    color: $secondary;
+                }
+            }
+        }
+
         [class^="fa-"],
         [class*=" fa-"] {
             display: inline-block;
-            text-align: left;
-            margin: 0 4px 0 0;
+            text-align: center;
+            margin: side-values(0 12px 0 -4px);
             color: $primary-550;
         }
     }

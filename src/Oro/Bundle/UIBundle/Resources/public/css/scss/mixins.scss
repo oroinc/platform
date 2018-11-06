@@ -175,7 +175,7 @@ $enable-safe-area: true;
         margin-top: -38px;
         #{$start}: 10px;
         border-style: solid;
-        border-color: $error-message-balloon-background transparent;
+        border-color: $danger-ultra-dark transparent;
         border-width: 8px 4px 0;
     }
 
@@ -189,15 +189,16 @@ $enable-safe-area: true;
             bottom: 0;
             padding: side-values(5px 5px 5px 20px);
             border-radius: 4px;
-            background-color: $error-message-balloon-background;
-            color: $danger-ultra-dark;
+            background-color: $danger-ultra-dark;
+            color: $primary-inverse;
 
             &:before {
                 content: "\f00d";
                 display: inline-block;
                 width: 14px;
                 margin-#{$start}: -14px;
-                color: $danger-darken;
+                margin-#{$end}: 2px;
+                color: $primary-inverse;
                 font: normal 1.15em/1em FontAwesome, sans-serif;
             }
         }

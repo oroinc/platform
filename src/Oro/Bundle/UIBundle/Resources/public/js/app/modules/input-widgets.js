@@ -30,7 +30,7 @@ define(function(require) {
     });
 
     InputWidgetManager.addWidget('checkbox', {
-        selector: 'input[type="checkbox"]:not(.invisible),input[type="radio"]:not(.invisible)',
+        selector: 'input[type="checkbox"]:not(.invisible, .hide),input[type="radio"]:not(.invisible, .hide)',
         Widget: CheckboxInputWidget
     });
 });

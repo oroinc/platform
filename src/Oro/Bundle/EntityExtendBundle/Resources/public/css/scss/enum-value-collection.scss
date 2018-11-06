@@ -1,13 +1,15 @@
 /* @theme: admin.oro; */
 
+@import "oroui/css/scss/mixins";
+
 .enum-value-collection {
     position: relative;
     width: 297px;
 
     &__clear-default {
         position: absolute;
-        bottom: 3px;
-        right: 3px;
+        bottom: 8px;
+        #{$end}: 32px;
 
         &.disabled {
             display: none;

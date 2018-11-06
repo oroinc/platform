@@ -38,7 +38,8 @@
         <% if (!tabs.length) { %>
             <div id="calendar<%= suffix %>"></div>
         <% } else { %>
-            <ul class="nav nav-tabs nav-tabs-oro">
+        <div class="tab-container">
+            <ul class="nav nav-tabs">
                 <% _.each(tabs, function (tab, i) { %>
                     <li<% if (i === 0) { %> class="active"<% } %>><a class="<%= tab.name %>" href="#<%= tab.name %><%= suffix %>"><%= tab.label %></a></li>
                 <% }); %>
@@ -48,6 +49,7 @@
                     <div class="tab-pane<% if (i === 0) { %> active<% } %>" id="<%= tab.name %><%= suffix %>"></div>
                 <% }); %>
             </div>
+        </div>
         <% } %>
     </div>
 </script>

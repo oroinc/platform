@@ -1,0 +1,25 @@
+/* @theme: admin.oro; */
+
+@media only screen and (max-width: $medium-devices-media-breakpoint) {
+    .grid-views {
+        .oro-subtitle {
+            max-width: $oro-datagrid-grid-views-mobile-title-width;
+        }
+    }
+}
+
+@media only screen and (max-width: $small-devices-media-breakpoint) {
+    .grid-views {
+        .oro-subtitle {
+            max-width: $oro-datagrid-grid-views-mobile-small-title-width;
+        }
+    }
+}
+
+@media only screen and (max-width: $tablet-devices-media-breakpoint) {
+    .inner-grid {
+        .grid-views {
+            margin: $oro-datagrid-inner-grid-views-medium-offset;
+        }
+    }
+}

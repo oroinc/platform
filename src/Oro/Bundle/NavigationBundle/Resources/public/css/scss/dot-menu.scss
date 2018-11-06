@@ -84,7 +84,7 @@
             > .tab-content {
                 z-index: 99;
 
-                padding-#{$start}: 16px;
+                padding: $dot-menu-tabs-offset;
                 min-height: $dot-menu-dropdown-min-height;
                 max-height: $dot-menu-dropdown-max-height;
 
