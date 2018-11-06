@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var $ = require('jquery');
-    var _ = require('underscore');
     var mask = require('oroui/js/dropdown-mask');
     require('jquery-ui');
 
@@ -241,22 +240,6 @@ define(function(require) {
             event.target.dispatchEvent(simulatedEvent);
         }
 
-        $.widget('ui.sortable', $.extend({}, $.ui.sortable.prototype, {
-            /**
-             * Faster and rough handle class setting method
-             */
-            _setHandleClassName: function() {
-                this._removeClass(this.element.find('.ui-sortable-handle'), 'ui-sortable-handle');
-
-                this._addClass(
-                    this.options.handle ? this.element.find(this.options.handle) : $(_.map(this.items, function(item) {
-                        return item.item.get(0);
-                    })),
-                    'ui-sortable-handle'
-                );
-            }
-        }));
-
         $.widget('ui.sortable', $.ui.sortable, {
             /**
              * Handle the jQuery UI widget's touchstart events
@@ -345,6 +328,20 @@ define(function(require) {
                 });
 
                 this._superApply(arguments);
+            },
+
+            /**
+             * Faster and rough handle class setting method
+             */
+            _setHandleClassName: function() {
+                this._removeClass(this.element.find('.ui-sortable-handle'), 'ui-sortable-handle');
+
+                this._addClass(
+                    this.options.handle ? this.element.find(this.options.handle) : $($.map(this.items, function(item) {
+                        return item.item.get(0);
+                    })),
+                    'ui-sortable-handle'
+                );
             }
         });
     }());
