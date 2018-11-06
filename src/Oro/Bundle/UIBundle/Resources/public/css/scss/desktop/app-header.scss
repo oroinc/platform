@@ -48,13 +48,13 @@
     }
 
     .organization-logo-wrapper {
-        flex-shrink: 1;
         overflow: hidden;
     }
 
     .app-logo {
         width: $app-header-app-logo-width;
         margin-#{$end}: $app-header-app-logo-margin-end;
+        flex-shrink: 0;
     }
 
     .logo-wrapper {
@@ -79,6 +79,7 @@
             color: inherit;
             text-transform: uppercase;
             display: inline-block;
+            vertical-align: middle;
             @include text-line-truncate($app-header-max-width, true);
 
             [class^="fa-"] {

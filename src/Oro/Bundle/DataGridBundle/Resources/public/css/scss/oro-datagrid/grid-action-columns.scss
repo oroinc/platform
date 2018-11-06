@@ -14,6 +14,8 @@
     }
 
     .icon {
+        min-width: $oro-datagrid-action-min-size;
+
         font-size: $oro-datagrid-action-font-size;
     }
 
@@ -50,6 +52,7 @@
 
     padding: $oro-datagrid-action-cell-offset;
 
+    line-height: 1;
     text-align: #{$end};
 
     vertical-align: top;
@@ -81,6 +84,8 @@
         margin-#{$start}: $oro-datagrid-all-header-cell-icon-offset;
 
         vertical-align: middle;
+
+        @include fa-icon($oro-datagrid-all-header-cell-icon);
     }
 }
 

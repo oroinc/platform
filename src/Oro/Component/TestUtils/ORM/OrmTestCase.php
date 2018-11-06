@@ -7,10 +7,10 @@ use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\ChainCache;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Driver\Connection;
+use Oro\Component\Testing\TempDirExtension;
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\Mocks\FetchIterator;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * The base class for ORM related test cases.
@@ -19,29 +19,14 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var CacheProvider The metadata cache that is shared between all ORM tests */
     private $metadataCacheImpl;
 
     protected function getProxyDir($shouldBeCreated = true)
     {
-        $proxyDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'TestDoctrineProxies';
-        if ($shouldBeCreated) {
-            $fs = new Filesystem();
-            if (!$fs->exists($proxyDir)) {
-                $fs->mkdir($proxyDir);
-            }
-        }
-
-        return $proxyDir;
-    }
-
-    public function __destruct()
-    {
-        $path = $this->getProxyDir(false);
-        $fs = new Filesystem();
-        if ($fs->exists($path)) {
-            $fs->remove($path);
-        }
+        return $this->getTempDir('test_orm_proxies', $shouldBeCreated);
     }
 
     /**

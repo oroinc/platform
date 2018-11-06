@@ -52,6 +52,7 @@
         text-overflow: $dialog-title-text-overflow;
         flex-grow: 1;
         flex-shrink: 1;
+        text-align: $start;
 
         .lang-en & {
             text-transform: capitalize;

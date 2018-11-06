@@ -8,6 +8,8 @@
 @import "uniform";
 @import "oro";
 
+@import "utilites";
+
 @import "oro/main";
 
 // desktop resolution
@@ -18,6 +20,3 @@
 
 // printing rules
 @import "print/main";
-
-
-@import "bootstrap-to-delete"; // @todo delete after styles for Bootstrap 4.1 are added

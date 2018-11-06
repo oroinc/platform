@@ -95,20 +95,52 @@
 }
 
 .entities.list-group {
+    flex-direction: $entities-list-flex-direction;
+    flex-wrap: $entities-list-flex-wrap;
+    margin-top: $entities-list-offset-top;
+    margin-left: -#{$entities-list-group-item-offset-start};
+
     .list-group-item {
         padding: $entities-list-group-item-inner-offset;
-        margin-left: $entities-list-group-item-offset-left;
-        margin-right: $entities-list-group-item-offset-right.5%;
+        margin-#{$start}: $entities-list-group-item-offset-start;
+        margin-bottom: $entities-list-group-item-offset-bottom;
+        margin-#{$end}: $entities-list-group-item-offset-end;
+        border: $entities-list-group-item-border;
+        background-color: $entities-list-group-item-background-color;
+        position: $entities-list-group-item-position;
+
+        border-radius: $entities-list-group-item-border-radius;
+
         width: $entities-list-group-item-width;
-        border-top-style: $entities-list-group-item-border-top-style;
+        flex-shrink: 0;
+
+        .remove-btn {
+            [class^="fa-"],
+            [class*=" fa-"] {
+                font-size: $entities-list-group-item-close-button-size;
+            }
+        }
     }
 
     .list-group-item h4 {
         margin: $entities-list-group-item-h-offset;
+        font-size: $base-font-size;
+        font-weight: 700;
     }
 
     .default-selector {
-        margin-right: $entities-list-group-default-selector-offset-right;
+        margin-#{$end}: $entities-list-group-default-selector-offset-end;
+    }
+
+    .checkbox-view {
+        margin-#{$end}: $entities-list-group-checkbox-view-offset-end;
+    }
+
+    .remove-btn {
+        color: $entities-list-group-item-remove-btn-color;
+        position: $entities-list-group-item-remove-btn-position;
+        top: $entities-list-group-item-remove-btn-top;
+        #{$end}: $entities-list-group-item-remove-btn-end;
     }
 }
 
@@ -234,4 +266,10 @@
     margin-top: $section-content-offset-top;
     padding-top: $section-content-inner-offset-top;
     padding-bottom: $section-content-inner-offset-bottom;
+}
+
+.responsive-form-inner {
+    .float-holder {
+        margin-right: 4px;
+    }
 }

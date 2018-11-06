@@ -56,6 +56,11 @@
         .attachment-item {
             margin-top: $comment-view-attachment-item-offset;
         }
+
+        .pull-left,
+        .pull-right {
+            max-width: 100%;
+        }
     }
 
     .attachment-item {

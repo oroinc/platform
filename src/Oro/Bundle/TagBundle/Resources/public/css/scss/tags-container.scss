@@ -6,11 +6,11 @@
     &__tag-entry {
         color: $tag-item-color;
         background-color: $tag-item-background;
-        border-radius: 10px;
+        border-radius: 16px;
         font-size: 12px;
-        line-height: 12px;
-        padding: 5px 8px;
-        margin: 1px 0 2px;
+        line-height: 14px;
+        padding: 5px 12px;
+        margin: $tag-item-offset;
         display: inline-block;
         vertical-align: top;
 

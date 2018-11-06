@@ -34,7 +34,7 @@
     }
 
     &__wrapper {
-
+        width: 100%;
         .datagrid-settings-right-flap {
             display: none;
         }
@@ -74,6 +74,13 @@
 
         td.visibility-cell {
             width: 40px;
+        }
+
+        .table-wrapper {
+            .thead-sizing {
+                display: table-header-group;
+                visibility: hidden;
+            }
         }
     }
 }

@@ -49,7 +49,7 @@ define(function(require) {
             }
             PermissionView.__super__.render.call(this);
             if (dropdown) {
-                this.$('.dropdown-menu').replaceWith(dropdown.$el);
+                this.$('[data-role="dropdown-menu-content"]').replaceWith(dropdown.$el);
             }
         },
 
@@ -58,7 +58,7 @@ define(function(require) {
             var accessLevels = this.model.accessLevels;
             if (!dropdown) {
                 dropdown = new DropdownMenuCollectionView({
-                    el: this.$('.dropdown-menu'),
+                    el: this.$('[data-role="dropdown-menu-content"]'),
                     collection: accessLevels,
                     keysMap: {
                         id: 'access_level',

@@ -2,31 +2,35 @@
     Displays title and search form
 #}
 {% macro renderTitleAndButtons(pageTitle, buttons) %}
-    <div class="container-fluid page-title configuration-header">
-    {% if pageTitle is iterable %}
-        <div class="customer-info customer-simple pull-left">
-        {% for title in pageTitle%}
-            {% if not loop.last %}
-            <div class="sub-title">
-                {{ title }}
+    <div class="container-fluid page-title">
+        <div class="navigation navbar-extra navbar-extra-right">
+            <div class="row">
+                <div class="pull-left pull-left-extra">
+                    {% if pageTitle is iterable %}
+                        {% for title in pageTitle%}
+                            {% if not loop.last %}
+                            <div class="sub-title">
+                                {{ title }}
+                            </div>
+                            <span class="separator">/</span>
+                            {% else %}
+                            <h1 class="page-title__entity-title">{{ title|raw }}</h1>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <h1 class="page-title__entity-title">
+                            {{ pageTitle }}
+                        </h1>
+                    {% endif %}
+                </div>
+                <div class="pull-right title-buttons-container">
+                    {% if buttons is defined %}
+                        {% for button in buttons %}
+                            {{ button }}
+                        {% endfor %}
+                    {% endif %}
+                </div>
             </div>
-            <span class="separator">/</span>
-            {% else %}
-            <h1 class="user-name">{{ title|raw }}</h1>
-            {% endif %}
-        {% endfor %}
-        </div>
-    {% else %}
-        <h1>
-            {{ pageTitle }}
-        </h1>
-    {% endif %}
-        <div class="pull-right navbar-extra-right">
-            {% if buttons is defined %}
-                {% for button in buttons %}
-                    {{ button }}
-                {% endfor %}
-            {% endif %}
         </div>
     </div>
 {% endmacro %}

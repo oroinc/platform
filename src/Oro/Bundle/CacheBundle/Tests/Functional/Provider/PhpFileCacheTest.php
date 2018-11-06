@@ -4,13 +4,11 @@ namespace Oro\Bundle\CacheBundle\Tests\Functional\Provider;
 
 use Oro\Bundle\CacheBundle\Provider\PhpFileCache;
 use Oro\Bundle\CacheBundle\Tests\Functional\Stub\SetStateClassStub;
+use Oro\Component\Testing\TempDirExtension;
 
 class PhpFileCacheTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var string
-     */
-    private $directory;
+    use TempDirExtension;
 
     /**
      * @var PhpFileCache
@@ -19,30 +17,7 @@ class PhpFileCacheTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        do {
-            $this->directory = sys_get_temp_dir() . '/oro_cache_'. uniqid('oro', true);
-        } while (file_exists($this->directory));
-
-        $this->provider = new PhpFileCache($this->directory);
-    }
-
-    protected function tearDown()
-    {
-        if (!is_dir($this->directory)) {
-            return;
-        }
-
-        $iterator = new \RecursiveDirectoryIterator($this->directory);
-
-        foreach (new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST) as $file) {
-            if ($file->isFile()) {
-                @unlink($file->getRealPath());
-            } elseif ($file->isDir()) {
-                @rmdir($file->getRealPath());
-            }
-        }
-
-        @rmdir($this->directory);
+        $this->provider = new PhpFileCache($this->getTempDir('oro_cache'));
     }
 
     public function testObjectNotImplementsSetState()

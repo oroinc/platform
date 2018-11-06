@@ -4,7 +4,6 @@
 
 .popover {
     box-shadow: $popover-box-shadow;
-    z-index: $popover-z-index;
 
     .arrow {
         z-index: $popover-arrow-z-index;
@@ -87,8 +86,12 @@
     &-close {
         position: $popover-close-position;
         top: $popover-close-position-y;
-        right: $popover-close-position-x;
+        #{$end}: $popover-close-position-x;
         cursor: $popover-close-cursor;
         color: $popover-close-color;
+
+        &:before {
+            font-size: $popover-close-before-font-size;
+        }
     }
 }
