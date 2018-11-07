@@ -22,13 +22,7 @@
         line-height: 20px;
         margin-top: -4px;
 
-        &:after {
-            display: inline-block;
-            font: 14px/1em 'FontAwesome';
-            color: #ddd;
-            content: $fa-var-trash-o;
-            text-indent: 0;
-        }
+        @include fa-icon($fa-var-trash-o);
 
         &:hover:after {
             color: #888;
