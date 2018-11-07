@@ -9,9 +9,26 @@ use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
+/**
+ * Repository for EmailTemplate
+ */
 class EmailTemplateRepository extends EntityRepository
 {
+    /**
+     * @var AclHelper;
+     */
+    private $aclHelper;
+
+    /**
+     * @param AclHelper $aclHelper
+     */
+    public function setAclHelper(AclHelper $aclHelper)
+    {
+        $this->aclHelper = $aclHelper;
+    }
+
     /**
      * Gets a template by its name
      * This method can return null if the requested template does not exist
@@ -21,7 +38,7 @@ class EmailTemplateRepository extends EntityRepository
      */
     public function findByName($templateName)
     {
-        return $this->findOneBy(array('name' => $templateName));
+        return $this->findOneBy(['name' => $templateName]);
     }
 
     /**
@@ -40,13 +57,18 @@ class EmailTemplateRepository extends EntityRepository
         $includeNonEntity = false,
         $includeSystemTemplates = true
     ) {
-        return $this->getEntityTemplatesQueryBuilder(
+        $qb = $this->getEntityTemplatesQueryBuilder(
             $entityName,
             $organization,
             $includeNonEntity,
             $includeSystemTemplates
-        )
-            ->getQuery()->getResult();
+        );
+
+        if ($this->aclHelper === null) {
+            return $qb->getQuery()->getResult();
+        }
+
+        return $this->aclHelper->apply($qb)->getResult();
     }
 
     /**
@@ -67,6 +89,35 @@ class EmailTemplateRepository extends EntityRepository
         $includeSystemTemplates = true,
         $visibleOnly = true
     ) {
+        return $this->getTemplatesQueryBuilder(
+            $entityName,
+            $organization,
+            $includeNonEntity,
+            $includeSystemTemplates,
+            $visibleOnly
+        );
+    }
+
+    /**
+     * Return templates query builder filtered by entity name
+     *
+     * @param string       $entityName    entity class
+     * @param Organization $organization
+     * @param bool         $includeNonEntity if true - system templates will be included in result set
+     * @param bool         $includeSystemTemplates
+     * @param bool         $visibleOnly
+     * @param array        $excludeNames
+     *
+     * @return QueryBuilder
+     */
+    public function getTemplatesQueryBuilder(
+        string $entityName,
+        Organization $organization,
+        bool $includeNonEntity = false,
+        bool $includeSystemTemplates = true,
+        bool $visibleOnly = true,
+        array $excludeNames = []
+    ): QueryBuilder {
         $qb = $this->createQueryBuilder('e')
             ->where('e.entityName = :entityName')
             ->orderBy('e.name', 'ASC')
@@ -86,7 +137,12 @@ class EmailTemplateRepository extends EntityRepository
                 ->setParameter('visible', true);
         }
 
-        $qb->andWhere("e.organization = :organization")
+        if ($excludeNames) {
+            $qb->andWhere($qb->expr()->notIn('e.name', ':excludeNames'))
+                ->setParameter('excludeNames', $excludeNames);
+        }
+
+        $qb->andWhere('e.organization = :organization')
             ->setParameter('organization', $organization);
 
         return $qb;

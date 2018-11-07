@@ -1,3 +1,5 @@
+@skip
+# unskip after BAP-17730 will resolved
 Feature: Translation cache actualization
   In order to apply translation changes on the fly (immediately)
   As a User

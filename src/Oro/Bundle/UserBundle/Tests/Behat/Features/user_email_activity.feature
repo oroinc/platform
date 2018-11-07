@@ -1,5 +1,7 @@
 @ticket-BAP-10957
 @automatically-ticket-tagged
+@skip
+# unskip after BAP-16764 will resolved
 
 Feature: User email activity
   In order to have ability send email to user
