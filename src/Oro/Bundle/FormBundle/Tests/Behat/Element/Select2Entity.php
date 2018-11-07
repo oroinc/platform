@@ -246,7 +246,7 @@ class Select2Entity extends Element implements ClearableInterface
     /**
      * @return string|null
      */
-    public function getChosenValue()
+    public function getValue()
     {
         $span = $this->getParent()->find('css', 'span.select2-chosen');
 
