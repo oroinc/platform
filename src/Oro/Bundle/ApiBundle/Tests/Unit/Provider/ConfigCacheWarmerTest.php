@@ -13,10 +13,13 @@ use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Config\ConfigCacheInterface;
 
 class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     protected function setUp()
     {
         $bundle1 = new Fixtures\BarBundle\BarBundle();
@@ -58,7 +61,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
     private function decodeContent($content)
     {
         $result = null;
-        $filename = tempnam(sys_get_temp_dir(), 'php') . '.php';
+        $filename = $this->getTempFile('api_config_cache_warmer') . '.php';
         try {
             file_put_contents($filename, $content);
             $result = require $filename;

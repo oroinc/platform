@@ -130,6 +130,11 @@
             }
         }
 
+        li > a {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         li.dropdown.show > .logo {
             color: $app-header-logo-text-color;
         }
@@ -257,7 +262,8 @@
 
     @media only screen and (max-width: $small-devices-media-breakpoint) {
         &__search-and-shortcuts,
-        .user-menu {
+        .user-menu,
+        .organization-logo-wrapper {
             > .dropdown > .dropdown-menu {
                 position: fixed;
                 #{$start}: 0;
@@ -275,6 +281,10 @@
                     top: $app-header-height;
                 }
             }
+        }
+
+        .organization-logo-wrapper .dropdown .dropdown-menu:before {
+            #{$start}: $mobile-app-header-organization-logo-wrapper-margin-start;
         }
 
         .user-menu .dropdown .dropdown-menu:before {

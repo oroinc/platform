@@ -8,14 +8,13 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpFoundation\File\File;
+use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImportExportControllerTest extends WebTestCase
 {
     use MessageQueueExtension;
+    use TempDirExtension;
 
     protected function setUp()
     {
@@ -82,21 +81,22 @@ class ImportExportControllerTest extends WebTestCase
     {
         $this->client->followRedirects(true);
 
-        $tmpDirName = $this->getContainer()->getParameter('kernel.project_dir') . '/var/import_export';
-        $tmpFileName = tempnam($tmpDirName, 'download.txt');
-        $tmp = explode('/', $tmpFileName);
-        $filename = array_pop($tmp);
+        $importFileName = tempnam($this->getImportDir(), 'download.txt');
+        $parts = explode('/', $importFileName);
+        $fileName = array_pop($parts);
 
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_importexport_export_download', [
-                'fileName' => $filename
-            ])
-        );
+        try {
+            $this->client->request(
+                'GET',
+                $this->getUrl('oro_importexport_export_download', [
+                    'fileName' => $fileName
+                ])
+            );
 
-        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 200);
-
-        unlink($tmpFileName);
+            $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 200);
+        } finally {
+            unlink($importFileName);
+        }
     }
 
     public function testDownloadFileReturns404IfFileDoesntExist()
@@ -187,33 +187,15 @@ class ImportExportControllerTest extends WebTestCase
 
     public function testImportForm()
     {
-        $tmpFilePath = null;
-        $file = null;
+        $fileName = 'oro_testLineEndings.csv';
+        $importedFilePath = null;
         try {
-            $tmpDirName = $this->getContainer()->getParameter('kernel.project_dir') . '/var/import_export';
-            $fileDir = __DIR__ . '/Import/fixtures';
-            $fileName = 'oro_testLineEndings.csv';
-            $file = $fileDir . DIRECTORY_SEPARATOR . $fileName;
-            $finder = new Finder();
-            $finder
-                ->files()
-                ->name('*.csv')
-                ->in($tmpDirName);
-
-            $fs = new Filesystem();
-
-            $tmpFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $fileName;
-            $fs->copy($file, $tmpFile);
-            $file = $tmpFile;
-
-            /** @var \SplFileInfo $file */
-            foreach ($finder as $importFile) {
-                $fs->remove($importFile->getPathname());
-            }
-
+            $file = $this->copyToTempDir('import_export', __DIR__ . '/Import/fixtures')
+                . DIRECTORY_SEPARATOR
+                . $fileName;
             $csvFile = new UploadedFile(
                 $file,
-                'oro_testLineEndings.csv',
+                $fileName,
                 'text/csv'
             );
             $this->assertEquals(
@@ -265,22 +247,15 @@ class ImportExportControllerTest extends WebTestCase
                 $files
             );
             $this->assertJsonResponseSuccess();
-            $tmpFiles = glob($tmpDirName . DIRECTORY_SEPARATOR . '*.csv');
-            $tmpFilePath = $tmpFiles[count($tmpFiles)-1];
-            $tmpFile = new File($tmpFilePath);
+            $importedFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
+            $importedFilePath = $importedFiles[count($importedFiles)-1];
             $this->assertEquals(
                 substr_count(file_get_contents($file), "\n"),
-                substr_count(file_get_contents($tmpFile->getPathname()), "\r\n")
+                substr_count(file_get_contents($importedFilePath), "\r\n")
             );
         } finally {
-            if ($tmpFilePath && file_exists($tmpFilePath)) {
-                unlink($tmpFile->getPathname());
-            }
-            if ($file && file_exists($file . '_formatted')) {
-                unlink($file . '_formatted');
-            }
-            if ($file && file_exists($file . '_formatted')) {
-                unlink($file);
+            if ($importedFilePath && file_exists($importedFilePath)) {
+                unlink($importedFilePath);
             }
         }
     }
@@ -312,6 +287,14 @@ class ImportExportControllerTest extends WebTestCase
         static::assertContains('Cancel', $response->getContent());
         static::assertContains('Validate', $response->getContent());
         static::assertContains('Import file', $response->getContent());
+    }
+
+    /**
+     * @return string
+     */
+    private function getImportDir()
+    {
+        return $this->getContainer()->getParameter('kernel.project_dir') . '/var/import_export';
     }
 
     /**

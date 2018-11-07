@@ -3,9 +3,9 @@
 @import "oroui/css/scss/variables";
 
 $oro-quarter-width: auto !default;
-$oro-quarter-min-width: 60px !default;
+$oro-quarter-min-width: 68px !default;
 $oro-quarter-float: left !default;
-$oro-quarter-offset-left: 3px !default;
+$oro-quarter-offset-right: 8px !default;
 $oro-quarter-span-width: auto !default;
 $oro-quarter-select-width: auto !default;
 $oro-quarter-select-min-width: 50px !default;
@@ -29,7 +29,6 @@ $mce-tinymce-disabled-overlay-height: 100% !default;
 $mce-tinymce-disabled-overlay-background: #eee !default;
 $mce-tinymce-disabled-overlay-opacity: .4 !default;
 
-$fallback-item-max-width: 294px !default;
 $fallback-item-border: 1px solid $primary-860 !default;
 
 $fallback-item-top-offset: 10px 0 !default;
@@ -40,7 +39,8 @@ $fallback-item-label-offset: 10px 0 !default;
 $fallback-item-fallback-line-offset: 10px 0 !default;
 
 $fallback-item-use-fallback-width: 60px !default;
-$fallback-item-value-width: 294px !default;
+
+$fallback-item-mce-tinymce-width: 100% !important !default;
 
 $fallback-status-font-size: 16px !default;
 $fallback-status-cursor: pointer !default;
@@ -49,4 +49,6 @@ $fallback-item-value--first-display: inline-flex !default;
 $fallback-item-value--first-width: auto !default;
 $fallback-item-value--first-validation-width: 100% !default;
 $fallback-item-value--first-validation-order: 1 !default;
-$fallback-item-value--first-input-width: 258px !default;
+$fallback-item-value--first-input-width: 254px !default;
+
+$fallback-item-value--first-input-group-offset-end: 4px !default;

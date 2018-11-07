@@ -106,15 +106,6 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
 
     /**
      * {@inheritdoc}
-     * @deprecated since 2.3, use isOrganizationOwned instead
-     */
-    public function isGlobalLevelOwned()
-    {
-        return $this->isOrganizationOwned();
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function isBusinessUnitOwned()
     {
@@ -123,37 +114,10 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
 
     /**
      * {@inheritdoc}
-     * @deprecated since 2.3, use isBusinessUnitOwned instead
-     */
-    public function isLocalLevelOwned($deep = false)
-    {
-        return $this->isBusinessUnitOwned();
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function isUserOwned()
     {
         return self::OWNER_TYPE_USER === $this->ownerType;
-    }
-
-    /**
-     * {@inheritdoc}
-     * @deprecated since 2.3, use isUserOwned instead
-     */
-    public function isBasicLevelOwned()
-    {
-        return $this->isUserOwned();
-    }
-
-    /**
-     * {@inheritdoc}
-     * @deprecated since 2.3
-     */
-    public function isSystemLevelOwned()
-    {
-        return false;
     }
 
     /**
@@ -186,14 +150,6 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
     public function getOrganizationColumnName()
     {
         return $this->organizationColumnName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getGlobalOwnerColumnName()
-    {
-        return $this->getOrganizationColumnName();
     }
 
     /**

@@ -36,8 +36,7 @@
 }
 
 .search-results-column {
-    .customer-info {
-        padding: 0 0 0 60px;
+    .page-title {
         margin: 9px 0 5px;
 
         h1 {
@@ -50,7 +49,21 @@
             line-height: 1em;
         }
 
-        .user-name {
+        &__icon {
+            top: -4px;
+            width: 28px;
+
+            &:empty:before {
+                font-size: 22px;
+                height: 22px;
+            }
+
+            img {
+                width: 22px;
+            }
+        }
+
+        &__entity-title {
             margin: 2px 0 3px;
         }
     }

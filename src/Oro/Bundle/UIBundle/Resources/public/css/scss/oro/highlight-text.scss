@@ -30,10 +30,14 @@
     &-element[class^="fa-"],
     &-element[class*=" fa-"] {
         background-color: $highlight-text-color;
-        box-shadow: 0 -1px 0 0 $highlight-text-color,
-                    2px 0 0 0 $highlight-text-color,
-                    0 1px 0 0 $highlight-text-color,
-                    -2px 0 0 0 $highlight-text-color;
+        box-shadow: 2px -1px 0 0 $highlight-text-color,
+                    2px 1px 0 0 $highlight-text-color,
+                    -2px 1px 0 0 $highlight-text-color,
+                    -2px -1px 0 0 $highlight-text-color;
+
+        &.tooltip-icon {
+            color: $primary-550;
+        }
     }
 
     &-element.selector,

@@ -12,6 +12,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EmailTemplateRepositoryTest extends WebTestCase
 {
@@ -49,7 +50,8 @@ class EmailTemplateRepositoryTest extends WebTestCase
         $owner = $this->getReference(LoadEmailTemplateData::OWNER_USER_REFERENCE);
 
         $actualResult = $this->getRepository()->getTemplateByEntityName(
-            'Entity\Name',
+            self::getContainer()->get('oro_security.acl_helper'),
+            LoadEmailTemplateData::ENTITY_NAME,
             $owner->getOrganization(),
             true,
             true
@@ -67,7 +69,8 @@ class EmailTemplateRepositoryTest extends WebTestCase
             $this->getMainEmailTemplateByName('sync_wrong_credentials_system_box')->getId(),
             $this->getMainEmailTemplateByName('sync_wrong_credentials_user_box')->getId(),
             $this->getReference(LoadEmailTemplateData::SYSTEM_WITH_ENTITY_TEMPLATE_REFERENCE)->getId(),
-            $this->getMainEmailTemplateByName('system_maintenance')->getId()
+            $this->getReference(LoadEmailTemplateData::SYSTEM_FAIL_TO_COMPILE)->getId(),
+            $this->getMainEmailTemplateByName('system_maintenance')->getId(),
         ];
 
         self::assertEquals($expectedIds, $this->getEntitiesIds($actualResult));
@@ -90,6 +93,7 @@ class EmailTemplateRepositoryTest extends WebTestCase
         $owner = $this->getReference(LoadEmailTemplateData::OWNER_USER_REFERENCE);
 
         $actualResult = $this->getRepository()->getTemplateByEntityName(
+            self::getContainer()->get('oro_security.acl_helper'),
             'Entity\Name',
             $owner->getOrganization(),
             $includeNonEntity,
@@ -134,15 +138,18 @@ class EmailTemplateRepositoryTest extends WebTestCase
 
     /**
      * @dataProvider getEntityTemplatesDataProvider
+     *
      * @param bool $includeNonEntity
      * @param bool $includeSystemTemplates
      * @param bool $visibleOnly
+     * @param array $excludeTemplates
      * @param array $expectedReferences
      */
     public function testGetEntityTemplatesQueryBuilder(
         bool $includeNonEntity,
         bool $includeSystemTemplates,
         bool $visibleOnly,
+        array $excludeTemplates,
         array $expectedReferences
     ): void {
         $this->loadFixtures([LoadEmailTemplateData::class]);
@@ -155,7 +162,13 @@ class EmailTemplateRepositoryTest extends WebTestCase
             $owner->getOrganization(),
             $includeNonEntity,
             $includeSystemTemplates,
-            $visibleOnly
+            $visibleOnly,
+            array_map(
+                function (string $reference) {
+                    return $this->getReference($reference)->getName();
+                },
+                $excludeTemplates
+            )
         )->getQuery()->getResult();
 
         self::assertEquals($this->getReferencesIds($expectedReferences), $this->getEntitiesIds($actualResult));
@@ -171,6 +184,7 @@ class EmailTemplateRepositoryTest extends WebTestCase
                 'includeNonEntity' => false,
                 'includeSystemTemplates' => false,
                 'visibleOnly' => false,
+                'excludeTemplates' => [],
                 'expectedEmailTemplates' => [
                     LoadEmailTemplateData::NOT_SYSTEM_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE,
                     LoadEmailTemplateData::NOT_SYSTEM_NOT_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE
@@ -180,6 +194,7 @@ class EmailTemplateRepositoryTest extends WebTestCase
                 'includeNonEntity' => true,
                 'includeSystemTemplates' => false,
                 'visibleOnly' => false,
+                'excludeTemplates' => [],
                 'expectedEmailTemplates' => [
                     LoadEmailTemplateData::NO_ENTITY_NAME_TEMPLATE_REFERENCE,
                     LoadEmailTemplateData::NOT_SYSTEM_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE,
@@ -191,6 +206,7 @@ class EmailTemplateRepositoryTest extends WebTestCase
                 'includeNonEntity' => false,
                 'includeSystemTemplates' => true,
                 'visibleOnly' => false,
+                'excludeTemplates' => [],
                 'expectedEmailTemplates' => [
                     LoadEmailTemplateData::NOT_SYSTEM_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE,
                     LoadEmailTemplateData::NOT_SYSTEM_NOT_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE,
@@ -202,9 +218,56 @@ class EmailTemplateRepositoryTest extends WebTestCase
                 'includeNonEntity' => false,
                 'includeSystemTemplates' => false,
                 'visibleOnly' => true,
+                'excludeTemplates' => [],
                 'expectedEmailTemplates' => [
                     LoadEmailTemplateData::NOT_SYSTEM_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE
                 ]
+            ],
+            'with entity name only, not system templates only, include visible and not visible, excluded' => [
+                'includeNonEntity' => false,
+                'includeSystemTemplates' => false,
+                'visibleOnly' => false,
+                'excludeTemplates' => [
+                    LoadEmailTemplateData::NOT_SYSTEM_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE,
+                ],
+                'expectedEmailTemplates' => [
+                    LoadEmailTemplateData::NOT_SYSTEM_NOT_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE
+                ]
+            ],
+            'with and without entity name, not system templates only, include visible and not visible, excluded' => [
+                'includeNonEntity' => true,
+                'includeSystemTemplates' => false,
+                'visibleOnly' => false,
+                'excludeTemplates' => [
+                    LoadEmailTemplateData::NO_ENTITY_NAME_TEMPLATE_REFERENCE,
+                    LoadEmailTemplateData::NOT_SYSTEM_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE,
+                ],
+                'expectedEmailTemplates' => [
+                    LoadEmailTemplateData::NOT_SYSTEM_NO_ENTITY_TEMPLATE_REFERENCE,
+                    LoadEmailTemplateData::NOT_SYSTEM_NOT_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE
+                ]
+            ],
+            'with entity name only, system and not system templates, include visible and not visible, excluded' => [
+                'includeNonEntity' => false,
+                'includeSystemTemplates' => true,
+                'visibleOnly' => false,
+                'excludeTemplates' => [
+                    LoadEmailTemplateData::NOT_SYSTEM_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE,
+                    LoadEmailTemplateData::NOT_SYSTEM_NOT_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE,
+                ],
+                'expectedEmailTemplates' => [
+                    LoadEmailTemplateData::SYSTEM_WITH_ENTITY_TEMPLATE_REFERENCE,
+                    LoadEmailTemplateData::SYSTEM_NOT_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE
+                ]
+            ],
+            'with entity name only, system and not system templates, include visible only, excluded' => [
+                'includeNonEntity' => false,
+                'includeSystemTemplates' => false,
+                'visibleOnly' => true,
+                'excludeTemplates' => [
+                    LoadEmailTemplateData::NOT_SYSTEM_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE
+                ],
+                'expectedEmailTemplates' => []
             ]
         ];
     }

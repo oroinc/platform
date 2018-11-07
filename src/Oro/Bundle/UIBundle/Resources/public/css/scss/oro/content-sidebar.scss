@@ -63,7 +63,13 @@
         }
 
         .default-price-list-choice {
-            margin-bottom: 16px;
+            margin-bottom: 22px;
+
+            .control-label {
+                label {
+                    margin-bottom: 6px;
+                }
+            }
         }
     }
 

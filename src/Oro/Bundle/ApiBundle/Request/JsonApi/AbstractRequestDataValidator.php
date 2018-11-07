@@ -158,7 +158,12 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         ) {
             $includedPointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::INCLUDED);
             foreach ($data[JsonApiDoc::INCLUDED] as $key => $item) {
-                $this->validateTypeAndIdAreRequiredNotBlankString($item, $this->buildPointer($includedPointer, $key));
+                $pointer = $this->buildPointer($includedPointer, $key);
+                if (\is_array($item)) {
+                    $this->validateTypeAndIdAreRequiredNotBlankString($item, $pointer);
+                } else {
+                    $this->addError($pointer, 'The related resource should be an object');
+                }
             }
         }
     }

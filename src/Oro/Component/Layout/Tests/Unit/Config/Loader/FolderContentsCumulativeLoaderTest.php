@@ -6,11 +6,11 @@ use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Layout\Config\Loader\LayoutUpdateCumulativeResourceLoader;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Bundle\TestBundle\TestBundle;
+use Oro\Component\Testing\TempDirExtension;
 
 class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CopyFixturesToTemp */
-    private $copier;
+    use TempDirExtension;
 
     /** @var string */
     private $bundleDir;
@@ -20,19 +20,8 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $target = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . 'test_data';
-        $source = realpath(__DIR__ . '/../../Fixtures');
-        $this->copier = new CopyFixturesToTemp($target, $source);
-        $this->copier->copy();
-        $this->bundleDir = $target . DIRECTORY_SEPARATOR . 'Bundle' . DIRECTORY_SEPARATOR . 'TestBundle';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        $this->copier->delete();
+        $tmpDir = $this->copyToTempDir('test_data', realpath(__DIR__ . '/../../Fixtures'));
+        $this->bundleDir = $tmpDir . DIRECTORY_SEPARATOR . 'Bundle' . DIRECTORY_SEPARATOR . 'TestBundle';
     }
 
     public function testIsResourceFreshFileWasAdded()
