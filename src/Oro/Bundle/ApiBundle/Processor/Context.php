@@ -58,6 +58,9 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     const INCLUDE_HEADER = 'X-Include';
 
+    /** indicates whether the current action processes a master API request */
+    const MASTER_REQUEST = 'masterRequest';
+
     /** indicates whether the current request is CORS request */
     const CORS = 'cors';
 
@@ -98,6 +101,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         $this->configExtras = new ConfigExtraCollection();
         $this->configProvider = $configProvider;
         $this->metadataProvider = $metadataProvider;
+        $this->set(self::MASTER_REQUEST, false);
         $this->set(self::CORS, false);
     }
 
@@ -241,12 +245,24 @@ class Context extends NormalizeResultContext implements ContextInterface
         $this->filterValues = $accessor;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function isMasterRequest(): bool
+    {
+        return $this->get(self::MASTER_REQUEST);
+    }
 
     /**
-     * Indicates whether the current request is CORS request.
-     * @link https://www.w3.org/TR/cors/
-     *
-     * @return bool
+     * {@inheritdoc}
+     */
+    public function setMasterRequest(bool $master): void
+    {
+        $this->set(self::MASTER_REQUEST, $master);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function isCorsRequest(): bool
     {
@@ -254,10 +270,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     }
 
     /**
-     * Sets a flag indicates whether the current request is CORS request.
-     * @link https://www.w3.org/TR/cors/
-     *
-     * @param bool $cors
+     * {@inheritdoc}
      */
     public function setCorsRequest(bool $cors): void
     {

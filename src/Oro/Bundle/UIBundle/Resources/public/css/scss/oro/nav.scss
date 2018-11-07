@@ -67,15 +67,15 @@
     }
 
     &-extra-right {
-        padding-right: $content-padding;
+        padding-#{$end}: $content-padding;
 
         .title-buttons-container {
             .btn-group {
-                margin-left: $content-padding-small;
+                margin-#{$start}: $content-padding-small;
             }
 
             .btn-group .btn-group {
-                margin-left: 0;
+                margin-#{$start}: 0;
             }
         }
     }

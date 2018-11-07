@@ -20,7 +20,7 @@ define([
             tooltipTemplate: '<i class="fa-info-circle fa--offset-l fa--x-large" data-content="<%- content %>"' +
                 ' data-placement="top" data-toggle="popover" data-original-title="<%- title %>"></i>',
             htmlTemplate: '<div class="ui-datevariables-div <%- attributes %>">' +
-                '<b><%- title %></b><%= tooltipHTML %><ul>' +
+                '<span class="datevariables-title"><%- title %></span> <%= tooltipHTML %><ul>' +
                 '<% _.each(dateVars, function(dateVariable, varCode) { %>' +
                 '<li><a class="ui_date_variable" href="#" data-code="<%- varCode %>"><%- dateVariable %></a></li>' +
                 '<% }); %>' +

@@ -1,0 +1,22 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% set id = 'value-copy-to-clipboard-' ~ random() %}
+{% set options = {
+    id: id,
+    aCss: 'no-hash',
+    iCss: 'fa-copy',
+    class: 'btn icons-holder-text',
+    label: data|escape,
+    title: 'oro.ui.button.copy_to_clipboard.label'|trans,
+    labelInIcon: 0,
+    pageComponent: {
+        module: 'oroui/js/app/components/element-value-copy-to-clipboard-component',
+        options: {
+            elementSelector: '#' ~ id
+        }
+    }
+} %}
+
+{% block action_controll %}
+    {{ UI.clientLink(options) }}
+{% endblock %}

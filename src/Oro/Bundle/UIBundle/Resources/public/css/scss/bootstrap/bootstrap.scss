@@ -39,11 +39,3 @@
 @import "bowerassets/bootstrap/scss/carousel";
 @import "bowerassets/bootstrap/scss/utilities";
 @import "bowerassets/bootstrap/scss/print";
-
-.hide {
-    @extend .d-none;
-}
-
-.control-group {
-    @include clearfix();
-}
