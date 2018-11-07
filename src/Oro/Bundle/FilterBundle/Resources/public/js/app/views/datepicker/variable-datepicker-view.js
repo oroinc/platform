@@ -84,6 +84,7 @@ define(function(require) {
             this.defaultTabs = [
                 {
                     name: 'calendar',
+                    icon: 'calendar',
                     label: __('oro.filter.date.tab.calendar'),
                     isVisible: _.bind(function() {
                         return this.$variables.dateVariables('getPart') === 'value';
@@ -105,6 +106,7 @@ define(function(require) {
                 },
                 {
                     name: 'variables',
+                    icon: 'list-ul',
                     label: __('oro.filter.date.tab.variables')
                 }
             ];

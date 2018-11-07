@@ -29,6 +29,14 @@
         line-height: 24px;
         margin-right: 2px;
     }
+
+    &.truncate {
+        display: inline-flex;
+        .inline-actions-element_wrapper {
+            padding: 0;
+            @include text-line-truncate(200px, true);
+        }
+    }
 }
 
 .inline-actions-element_actions {

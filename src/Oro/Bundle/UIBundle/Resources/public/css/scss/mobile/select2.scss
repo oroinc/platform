@@ -64,31 +64,39 @@
         min-height: $mobile-select2-container-multi-top-min-height;
         height: $mobile-select2-container-multi-top-height;
 
-        .select2-search-choice {
-            font-size: $base-font-size--m;
-            padding: 6px 32px 6px 8px;
-            height: 32px;
-            background: $additional-extra-light;
-            margin: 4px;
-            white-space: nowrap;
-            line-height: 20px;
-            max-width: 100%;
+        .select2-choices {
+            margin: side-values($mobile-select2-search-multi-choices-offset);
 
-            > div {
-                text-overflow: ellipsis;
-                overflow: hidden;
-            }
-
-            .select2-search-choice-close {
+            .select2-search-choice {
+                font-size: $base-font-size--m;
+                padding: side-values($mobile-select2-search-choice-inner-offset);
                 height: 32px;
-                top: 0;
-                border: none;
+                background: $additional-extra-light;
+                margin: side-values($mobile-select2-search-choice-offset);
+                white-space: nowrap;
+                line-height: 20px;
+                max-width: 100%;
 
-                &:before {
-                    font-size: 16px;
-                    color: $primary-200;
-                    line-height: 32px;
-                    display: block;
+                &.select2-locked {
+                    padding: $mobile-select2-search-choice-select2-locked-inner-offset;
+                }
+
+                > div {
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                }
+
+                .select2-search-choice-close {
+                    height: 32px;
+                    top: 0;
+                    border: none;
+
+                    &:before {
+                        font-size: 16px;
+                        color: $primary-200;
+                        line-height: 32px;
+                        display: block;
+                    }
                 }
             }
         }
@@ -97,6 +105,7 @@
             input {
                 height: $mobile-select2-container-multi-select2-search-field-height;
                 line-height: $mobile-select2-container-multi-select2-search-field-line-height;
+                margin-top: $mobile-select2-container-multi-select2-search-field-top-offset;
             }
         }
     }
