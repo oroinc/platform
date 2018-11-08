@@ -10,7 +10,9 @@ define(function(require) {
     var EmailModel = require('../models/email-model');
 
     EmailEditorComponent = BaseComponent.extend({
-        options: null,
+        options: {
+            editorComponentName: 'oro_email_email_body'
+        },
 
         listen: {
             parentResize: 'passResizeEvent'
@@ -28,12 +30,13 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            this.options = options;
+            this.options = _.defaults(options || {}, this.options);
             this._deferredInit();
             this.view = new EmailEditorView({
                 el: options._sourceElement,
                 model: this.createEditorModelFromComponentOptions(options),
-                templatesProvider: emailTemplatesProvider
+                templatesProvider: emailTemplatesProvider,
+                editorComponentName: this.options.editorComponentName
             });
             this.view.render();
             this.view.renderPromise.done(_.bind(function() {
@@ -61,7 +64,7 @@ define(function(require) {
         },
 
         passResizeEvent: function() {
-            var component = this.view.pageComponent('wrap_oro_email_email_body');
+            var component = this.view.pageComponent('wrap_' + this.options.editorComponentName);
             component.trigger('parentResize');
         }
     });

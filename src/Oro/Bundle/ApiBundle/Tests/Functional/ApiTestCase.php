@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
+use Symfony\Component\Debug\BufferingLogger;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
@@ -610,5 +611,47 @@ abstract class ApiTestCase extends WebTestCase
                 $this->client->enableReboot();
             }
         }
+    }
+
+    /**
+     * Removes all messages from the request type logger that is used for test purposes.
+     *
+     * @after
+     */
+    protected function clearRequestTypeLogger()
+    {
+        $logger = $this->getRequestTypeLogger();
+        if (null !== $logger) {
+            $logger->cleanLogs();
+        }
+    }
+
+    /**
+     * @return BufferingLogger|null
+     */
+    protected function getRequestTypeLogger()
+    {
+        return null !== $this->client
+            ? $this->client->getContainer()->get('oro_api.tests.request_type_logger')
+            : null;
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getRequestTypeLogMessages()
+    {
+        $logger = $this->getRequestTypeLogger();
+        if (null === $logger) {
+            return [];
+        }
+
+        $messages = [];
+        $logs = $logger->cleanLogs();
+        foreach ($logs as $entry) {
+            $messages[] = $entry[1];
+        }
+
+        return $messages;
     }
 }

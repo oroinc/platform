@@ -79,7 +79,7 @@ $jstree-checked-border-color: $secondary !default;
 $jstree-checked-content: "\f00c" !default;
 
 $jstree-search-component-position: relative !default;
-$jstree-search-component-bottom-offset: 10px !default;
+$jstree-search-component-bottom-offset: $content-padding-medium !default;
 
 $jstree-search-component-clear-active-search-clear-display: block !default;
 $jstree-search-component-clear-active-search-search-display: none !default;
@@ -93,7 +93,7 @@ $jstree-search-component-clear-icon-display: none !default;
 $jstree-search-component-clear-icon-position: absolute !default;
 $jstree-search-component-clear-icon-top: 50% !default;
 $jstree-search-component-clear-offset-top: -12px !default;
-$jstree-search-component-clear-icon-right: 14px !default;
+$jstree-search-component-clear-icon-right: 10px !default;
 $jstree-search-component-clear-icon-font-size: 16px !default;
 $jstree-search-component-clear-icon-z-index: 10 !default;
 $jstree-search-component-clear-icon-color: $tree-icon-color !default;

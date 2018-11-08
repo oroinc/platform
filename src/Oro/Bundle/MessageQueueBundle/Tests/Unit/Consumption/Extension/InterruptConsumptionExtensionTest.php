@@ -5,10 +5,13 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
+use Oro\Component\Testing\TempDirExtension;
 use Psr\Log\LoggerInterface;
 
 class InterruptConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var string */
     protected $filePath;
 
@@ -17,10 +20,9 @@ class InterruptConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $directory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'InterruptConsumptionExtensionTest';
-        @\mkdir($directory);
-
-        $this->filePath = $directory . DIRECTORY_SEPARATOR . 'interrupt.tmp';
+        $this->filePath = $this->getTempDir('InterruptConsumptionExtensionTest')
+            . DIRECTORY_SEPARATOR
+            . 'interrupt.tmp';
 
         $this->cacheState = $this->createMock(CacheState::class);
     }

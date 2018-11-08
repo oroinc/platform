@@ -23,7 +23,10 @@
         border: 0;
         border-radius: corner-values(0 2px 2px 2px);
         box-shadow: $menu-dropdown-box-shadow;
+    }
 
+    .dropdown-menu,
+    .dropdown-toggle {
         &:before,
         &:after {
             content: none;

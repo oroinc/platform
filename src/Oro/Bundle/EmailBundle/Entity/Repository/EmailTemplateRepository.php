@@ -27,7 +27,7 @@ class EmailTemplateRepository extends EntityRepository
      */
     public function findByName($templateName)
     {
-        return $this->findOneBy(array('name' => $templateName));
+        return $this->findOneBy(['name' => $templateName]);
     }
 
     /**
@@ -70,6 +70,7 @@ class EmailTemplateRepository extends EntityRepository
      * @param bool         $includeNonEntity if true - system templates will be included in result set
      * @param bool         $includeSystemTemplates
      * @param bool         $visibleOnly
+     * @param array        $excludeNames
      *
      * @return QueryBuilder
      */
@@ -78,8 +79,9 @@ class EmailTemplateRepository extends EntityRepository
         Organization $organization,
         $includeNonEntity = false,
         $includeSystemTemplates = true,
-        $visibleOnly = true
-    ) {
+        $visibleOnly = true,
+        array $excludeNames = []
+    ): QueryBuilder {
         $qb = $this->createQueryBuilder('e')
             ->where('e.entityName = :entityName')
             ->orderBy('e.name', 'ASC')
@@ -99,7 +101,12 @@ class EmailTemplateRepository extends EntityRepository
                 ->setParameter('visible', true);
         }
 
-        $qb->andWhere("e.organization = :organization")
+        if ($excludeNames) {
+            $qb->andWhere($qb->expr()->notIn('e.name', ':excludeNames'))
+                ->setParameter('excludeNames', $excludeNames);
+        }
+
+        $qb->andWhere('e.organization = :organization')
             ->setParameter('organization', $organization);
 
         return $qb;

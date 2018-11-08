@@ -8,13 +8,14 @@
     .grid-toolbar-input {
         width: $oro-datagrid-toolbar-input-width;
         margin: $oro-datagrid-toolbar-mobile-input-offset;
+
+        text-align: $oro-datagrid-toolbar-input-text-align;
     }
 
     &__part {
         &--start {
             display: flex;
             float: #{$end};
-            padding-top: $oro-datagrid-toolbar-mobile-part-offset;
         }
     }
 

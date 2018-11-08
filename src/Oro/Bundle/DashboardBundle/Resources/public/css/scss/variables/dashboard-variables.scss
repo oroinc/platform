@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@import "oroui/css/scss/oro/variables";
+
 $dashboard-container-border: 1px solid $primary-860 !default;
 
 $dashboard-container-title-background-color: $primary-inverse !default;
@@ -16,6 +18,19 @@ $dashboard-widget-placeholder-background: $primary-860 !default;
 $dashboard-widget-placeholder-border: 2px dashed $primary-700 !default;
 $dashboard-widget-placeholder-color: $primary-600 !default;
 $dashboard-widget-configuration-border: 1px solid $primary-750 !default;
+$dashboard-widget-configuration-collapsed-margin-top: 10px !default;
+$dashboard-configuration-items-table-margin-start: $form-horizontal-control-label-width + $form-horizontal-control-margin-start !default;
+$dashboard-configuration-items-table-margin-top: $form-container-control-row-space !default;
+$dashboard-configuration-items-btn-color: $primary-700 !default;
+$dashboard-configuration-items-btn-active-color: $primary-400 !default;
+$dashboard-widget-configuration-buttons-space: 8px !default;
+
+$dashboard-widget-title-widget-width: 150px !default;
+$dashboard-widget-configuration-control-label-width: 140px !default;
+$dashboard-widget-title-widget-control-label-width: auto !default;
+$dashboard-widget-title-widget-control-label-min-width: 0 !default;
+$dashboard-widget-title-widget-controls-offset-start: $content-padding-small !default;
+$dashboard-widget-title-input-width: 100% !default;
 
 $dashboard-big-numbers-separator-color: $primary-830 !default;
 $dashboard-big-numbers-positive-color: $success-dark !default;
@@ -29,3 +44,5 @@ $dashboard-launchpad-icon-active-color: $primary-400 !default;
 $dashboard-launchpad-active-underline-color: $secondary !default;
 $dashboard-launchpad-label-color: $primary-200 !default;
 $dashboard-launchpad-bold-label-color: $primary-300 !default;
+
+$dashboard-container-other-scroll-container-offset: 10px !default;

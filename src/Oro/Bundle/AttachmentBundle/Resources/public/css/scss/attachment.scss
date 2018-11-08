@@ -14,10 +14,7 @@
 
     .filename {
         display: inline-block;
-        width: 260px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        @include text-line-truncate(260px);
     }
 
     .delete {
@@ -40,13 +37,15 @@
 }
 
 .attachment-file {
+    max-width: 100%;
+
     div.uploader {
         border: none;
         float: none;
+        display: flex;
 
         input {
             cursor: pointer;
-            width: 345px;
         }
 
         input:hover ~ span.action {
@@ -65,7 +64,11 @@
         }
 
         span.filename {
-            width: 85px;
+            width: auto;
+            padding: 0;
+            flex-shrink: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .focus {

@@ -1,8 +1,10 @@
 /* @theme: admin.oro; */
 
 @import "variables/alert-variables";
+@import "variables/progressbar-variables";
 @import "variables/checkbox-variables";
 @import "variables/content-sidebar-variables";
+@import "variables/datepicker-variables";
 @import "variables/dialog-variables";
 @import "variables/dropdown-variables";
 @import "variables/error-page";
@@ -20,6 +22,9 @@
 @import "variables/modal-variables";
 @import "variables/nav-variables";
 @import "variables/oro-tabs-variables";
+@import "variables/tabs-variables";
+@import "variables/page-header";
+@import "variables/page-toolbar-variables";
 @import "variables/scrollspy-variables";
 @import "variables/select2-variables";
 @import "variables/widget-picker";

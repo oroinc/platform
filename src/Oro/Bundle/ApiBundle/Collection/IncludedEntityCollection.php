@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Collection;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+
+/**
+ * The collection of additional entities included into API request for such actions
+ * as "create", "update", "update_subresource", etc.
+ */
 class IncludedEntityCollection implements \Countable, \IteratorAggregate
 {
     /** @var KeyObjectCollection */
@@ -10,7 +16,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     /** @var array [key => [entity class, entity id], ...] */
     private $keys = [];
 
-    /** @var array|null [entity class, entity id, entity] */
+    /** @var array|null [entity class, entity id, entity, metadata] */
     private $primaryEntity;
 
     public function __construct()
@@ -26,7 +32,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
      */
     public function setPrimaryEntityId($entityClass, $entityId)
     {
-        $this->primaryEntity = [$entityClass, $entityId, null];
+        $this->primaryEntity = [$entityClass, $entityId, null, null];
     }
 
     /**
@@ -49,24 +55,40 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     /**
      * Sets the primary entity.
      *
-     * @param object $entity
+     * @param object|null         $entity
+     * @param EntityMetadata|null $metadata
      */
-    public function setPrimaryEntity($entity)
+    public function setPrimaryEntity($entity, ?EntityMetadata $metadata)
     {
         if (null === $this->primaryEntity) {
             throw new \LogicException('The primary entity identifier must be set before.');
         }
 
         $this->primaryEntity[2] = $entity;
+        $this->primaryEntity[3] = $metadata;
     }
 
     /**
      * Gets the primary entity.
+     *
+     * @return object|null
      */
     public function getPrimaryEntity()
     {
         return null !== $this->primaryEntity
             ? $this->primaryEntity[2]
+            : null;
+    }
+
+    /**
+     * Gets the primary entity.
+     *
+     * @return EntityMetadata|null
+     */
+    public function getPrimaryEntityMetadata(): ?EntityMetadata
+    {
+        return null !== $this->primaryEntity
+            ? $this->primaryEntity[3]
             : null;
     }
 
