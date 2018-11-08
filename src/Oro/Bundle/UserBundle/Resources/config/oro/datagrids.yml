@@ -27,6 +27,8 @@ datagrids:
                 join:
                     left:
                         - { join: u.auth_status, alias: au }
+            hints:
+                - HINT_TRANSLATABLE
         inline_editing:
             enable: true
         columns:
