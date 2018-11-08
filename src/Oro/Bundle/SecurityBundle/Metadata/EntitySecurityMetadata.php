@@ -33,6 +33,9 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     /** @var array|FieldSecurityMetadata[] */
     protected $fields;
 
+    /** @var bool */
+    protected $translated = false;
+
     /**
      * Constructor
      *
@@ -170,6 +173,25 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     public function setFields(array $fields)
     {
         $this->fields = $fields;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTranslated(): bool
+    {
+        return $this->translated;
+    }
+
+    /**
+     * @param bool $translated
+     * @return EntitySecurityMetadata
+     */
+    public function setTranslated(bool $translated): self
+    {
+        $this->translated = $translated;
 
         return $this;
     }

@@ -106,6 +106,7 @@ class EntitySecurityMetadataProvider
     public function getEntities($securityType = self::ACL_SECURITY_TYPE)
     {
         $this->ensureMetadataLoaded($securityType);
+        $this->translateMetadata($this->localCache[$securityType]);
 
         return array_values($this->localCache[$securityType]);
     }
@@ -166,6 +167,7 @@ class EntitySecurityMetadataProvider
         if ($result === true) {
             return new EntitySecurityMetadata();
         }
+        $this->translateMetadata([$result]);
 
         return $result;
     }
@@ -183,7 +185,6 @@ class EntitySecurityMetadataProvider
                 $data = $this->cache->fetch($securityType);
             }
             if ($data) {
-                $this->translateMetadata($data);
                 $this->localCache[$securityType] = $data;
             } else {
                 $this->loadMetadata($securityType);
@@ -232,7 +233,6 @@ class EntitySecurityMetadataProvider
             $this->cache->save($securityType, $data);
         }
 
-        $this->translateMetadata($data);
         $this->localCache[$securityType] = $data;
     }
 
@@ -328,6 +328,10 @@ class EntitySecurityMetadataProvider
     protected function translateMetadata(array $classMetadataArray)
     {
         foreach ($classMetadataArray as $classMetadata) {
+            if ($classMetadata->isTranslated()) {
+                continue;
+            }
+
             if ($classMetadata->getLabel()) {
                 $classMetadata->setLabel($this->translator->trans($classMetadata->getLabel()));
             }
@@ -351,6 +355,7 @@ class EntitySecurityMetadataProvider
                 return strcmp($a->getLabel(), $b->getLabel());
             });
             $classMetadata->setFields($fieldMetadataArray);
+            $classMetadata->setTranslated(true);
         }
     }
 }
