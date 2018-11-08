@@ -91,5 +91,17 @@
         border-width: 0;
         font-size: $base-font-size--m;
         vertical-align: text-top;
+        line-height: 1;
+    }
+
+    .filename {
+        word-break: break-all;
+    }
+}
+
+@media only screen and (max-width: $tablet-devices-media-breakpoint) {
+    .attachment-item {
+        margin: 4px 0;
+        width: 100%;
     }
 }
