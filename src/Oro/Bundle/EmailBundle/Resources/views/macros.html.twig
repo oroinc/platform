@@ -579,38 +579,41 @@
     Render title and buttons for Mailbox configuration
 #}
 {% macro renderMailboxConfigTitleAndButtons(pageTitle, buttons) %}
-    <div class="container-fluid page-title configuration-header">
-        {% if pageTitle is iterable %}
-            <div class="customer-info customer-simple pull-left">
-                {% for title in pageTitle%}
-                    {% if not loop.last %}
-                        <div class="sub-title">
-                            {% if title is iterable and title.link is defined and title.label is defined %}
-                                <a href="{{ title.link }}">{{ title.label }}</a>
+    <div class="container-fluid page-title">
+        <div class="navigation navbar-extra navbar-extra-right">
+            <div class="row">
+                <div class="pull-left pull-left-extra">
+                    {% if pageTitle is iterable %}
+                        {% for title in pageTitle%}
+                            {% if not loop.last %}
+                                <div class="sub-title">
+                                    {% if title is iterable and title.link is defined and title.label is defined %}
+                                        <a href="{{ title.link }}">{{ title.label }}</a>
+                                    {% else %}
+                                        {{ title }}
+                                    {% endif %}
+                                </div>
+                                <span class="separator">/</span>
                             {% else %}
-                                {{ title }}
+                                <h1 class="page-title__entity-title">
+                                    {% if title is iterable and title.link is defined and title.label is defined %}
+                                        <a href="{{ title.link }}">{{ title.label }}</a>
+                                    {% else %}
+                                        {{ title }}
+                                    {% endif %}
+                                </h1>
                             {% endif %}
-                        </div>
-                        <span class="separator">/</span>
+                        {% endfor %}
                     {% else %}
-                        <h1 class="user-name">
-                            {% if title is iterable and title.link is defined and title.label is defined %}
-                                <a href="{{ title.link }}">{{ title.label }}</a>
-                            {% else %}
-                                {{ title }}
-                            {% endif %}
+                        <h1 class="page-title__entity-title">
+                            {{ pageTitle }}
                         </h1>
                     {% endif %}
-                {% endfor %}
+                </div>
+                <div class="pull-right title-buttons-container">
+                    {{ buttons|raw }}
+                </div>
             </div>
-        {% else %}
-            <h1>
-                {{ pageTitle }}
-            </h1>
-        {% endif %}
-
-        <div class="pull-right title-buttons-container">
-            {{ buttons|raw }}
         </div>
     </div>
 {% endmacro %}

@@ -5,4 +5,20 @@
 .breadcrumb {
     font-size: $breadcrumb-font-size;
     color: $breadcrumb-color;
+
+    + .breadcrumb-item {
+        @include if-rtl() {
+            padding-left: 0;
+        }
+
+        padding-#{$start}: $breadcrumb-item-padding;
+
+        &::before {
+            @include if-rtl() {
+                padding-right: 0;
+            }
+
+            padding-#{$end}: $breadcrumb-item-padding;
+        }
+    }
 }

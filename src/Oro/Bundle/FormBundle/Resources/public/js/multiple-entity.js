@@ -214,6 +214,12 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
                 '&default=' + (defaultEl || '');
         },
 
+        _initWidgets: function() {
+            _.delay(_.bind(function() {
+                this.$el.inputWidget('seekAndCreate');
+            }, this));
+        },
+
         processSelectedEntities: function(added, addedModels, removed) {
             var self = this;
 
@@ -252,6 +258,8 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
             }
 
             this.selectorDialog.remove();
+
+            this._initWidgets();
         },
 
         render: function() {
@@ -263,6 +271,7 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
 
             this.$entitiesContainer = this.$el.find(this.options.entitiesContainerSelector);
 
+            this._initWidgets();
             return this;
         }
     });

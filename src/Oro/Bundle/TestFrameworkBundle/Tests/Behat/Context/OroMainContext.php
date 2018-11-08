@@ -1157,7 +1157,7 @@ class OroMainContext extends MinkContext implements
 
         self::assertEquals($this->getPage($page . ' View')->getRoute(), $route['_route']);
 
-        $actualEntityTitle = $this->getSession()->getPage()->find('css', 'h1.user-name');
+        $actualEntityTitle = $this->getSession()->getPage()->find('css', 'h1.page-title__entity-title');
         self::assertNotNull($actualEntityTitle, sprintf('Entity title not found on "%s" view page', $page));
         self::assertEquals($entityTitle, $actualEntityTitle->getText());
     }
@@ -1203,7 +1203,7 @@ class OroMainContext extends MinkContext implements
     public function updatedDateMustBeGraterThenCreatedDate()
     {
         /** @var NodeElement[] $records */
-        $records = $this->getSession()->getPage()->findAll('css', 'div.navigation div.customer-content ul li');
+        $records = $this->getSession()->getPage()->findAll('css', 'div.navigation div.page-title__path ul li');
         $createdDate = new \DateTime(
             str_replace('Created At: ', '', $records[0]->getText())
         );
@@ -1225,7 +1225,7 @@ class OroMainContext extends MinkContext implements
     {
         self::assertEquals(
             $owner,
-            $this->getSession()->getPage()->find('css', '.user-info-state li a')->getText()
+            $this->getSession()->getPage()->find('css', '.page-title__entity-info-state li a')->getText()
         );
     }
 

@@ -92,6 +92,11 @@ define(function(require) {
             scrollspy.init($container);
 
             $container.trigger('initLayout');
+
+            $container.on({
+                'content:changed': this.onContentChanged,
+                'content:remove': this.onContentRemove
+            });
         },
 
         initPopover: function(container, options) {
@@ -170,6 +175,11 @@ define(function(require) {
 
             $container = $(container);
 
+            $container.off({
+                'content:changed': this.onContentChanged,
+                'content:remove': this.onContentRemove
+            });
+
             this.unstyleForm($container);
 
             $container.trigger('disposeLayout');
@@ -190,7 +200,6 @@ define(function(require) {
          */
         styleForm: function($container) {
             $container.inputWidget('seekAndCreate');
-            $container.one('content:changed', _.bind(this.styleForm, this, $container));
         },
 
         /**
@@ -319,6 +328,14 @@ define(function(require) {
          */
         scrollbarWidth: function() {
             return scrollHelper.scrollbarWidth();
+        },
+
+        onContentChanged: function(e) {
+            layout.styleForm($(e.target));
+        },
+
+        onContentRemove: function(e) {
+            layout.unstyleForm($(e.target));
         }
     };
 

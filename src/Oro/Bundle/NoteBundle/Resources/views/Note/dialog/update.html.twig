@@ -20,9 +20,7 @@
                         {{ form_widget(form.message) }}
                         {{ form_errors(form.message) }}
                     </label>
-                    <div class="pull-left">
-                        {{ form_widget(form.attachment) }}
-                    </div>
+                    {{ form_widget(form.attachment) }}
                 </fieldset>
                 <fieldset class="form-horizontal">
                     {{ form_rest(form) }}

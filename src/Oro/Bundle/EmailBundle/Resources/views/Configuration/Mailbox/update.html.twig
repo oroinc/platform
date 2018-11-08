@@ -88,7 +88,7 @@
             {% set mailboxId = form.vars.value.id %}
             <fieldset class="form-horizontal form-horizontal-large auto-response-rules">
                 <div class="auto-response-rule-header">
-                    <h5>{{ 'oro.email.autoresponserule.entity_plural_label'|trans }}</h5>
+                    <h5 class="user-fieldset">{{ 'oro.email.autoresponserule.entity_plural_label'|trans }}</h5>
                     {{ UI.clientLink({
                         'dataUrl': path('oro_email_autoresponserule_create', {mailbox: mailboxId}),
                         'aCss': 'pull-right no-hash btn btn-primary',

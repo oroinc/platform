@@ -5,17 +5,15 @@
         <label>
             {{ form_widget(form.message) }}
         </label>
-        <div class="pull-left">
-            {{ form_widget(form.attachment) }}
-            <% if (attachmentURL) { %>
-            <div class="attachment-item">
-                <i class="fa-paperclip"></i>
-                <a href="<%- attachmentURL %>" class="no-hash" title="<%- attachmentFileName %>"><%- attachmentFileName %></a> (<%- attachmentSize %>)
-                <button class="btn btn-link fa-close remove-attachment" type="button"></button>
-            </div>
-            <% } %>
+        {{ form_widget(form.attachment) }}
+        <% if (attachmentURL) { %>
+        <div class="attachment-item">
+            <i class="fa-paperclip"></i>
+            <a href="<%- attachmentURL %>" class="no-hash" title="<%- attachmentFileName %>"><%- attachmentFileName %></a> (<%- attachmentSize %>)
+            <button class="btn btn-link fa-close remove-attachment" type="button"></button>
         </div>
-        <div class="widget-actions pull-right">
+        <% } %>
+        <div class="widget-actions">
             <button class="btn cancel-comment-button" type="reset">
                 <%= _.__('oro.comment.from.button.cancel_comment.label')  %>
             </button>

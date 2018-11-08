@@ -5,7 +5,10 @@
         width: $oro-quarter-width !important;
         min-width: $oro-quarter-min-width;
         float: $oro-quarter-float;
-        margin-left: $oro-quarter-offset-left;
+
+        &:not(:last-child) {
+            margin-#{$end}: $oro-quarter-offset-right;
+        }
 
         span {
             width: $oro-quarter-span-width !important;
@@ -64,14 +67,16 @@
 }
 
 .fallback-item {
-    max-width: $fallback-item-max-width;
-
     &:not(:first-child) {
         border-top: $fallback-item-border;
     }
 
     &:last-child {
         border-bottom: $fallback-item-border;
+    }
+
+    .mce-tinymce {
+        width: $fallback-item-mce-tinymce-width;
     }
 }
 
@@ -99,11 +104,7 @@
 }
 
 .fallback-item-use-fallback {
-    width: $fallback-item-use-fallback-width;
-}
-
-.fallback-item-value {
-    width: $fallback-item-value-width;
+    min-width: $fallback-item-use-fallback-width;
 }
 
 .fallback-item-value-input {
@@ -124,6 +125,12 @@
     .validation-failed {
         width: $fallback-item-value--first-validation-width;
         order: $fallback-item-value--first-validation-order;
+    }
+
+    .input-append {
+        .input-group {
+            margin-right: $fallback-item-value--first-input-group-offset-end;
+        }
     }
 
     input[type="text"] {

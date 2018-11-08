@@ -15,7 +15,7 @@
  - Routes
  - Datagrids
 
-Every active *operation* shows a button or a link on the corresponding page. The button is displayed only if all the described preconditions are met. The *operation* is performed by clicking the button if all the described preconditions and conditions are met. Also, if the operation has a form dialog configuration, then a a modal dialog with fields appears when clicking the button. 
+Every active *operation* shows a button or a link on the corresponding page. The button is displayed only if all the described preconditions are met. For the *operation* button or link to be displayed the `preconditions` section should evaluate to `true`.  After a user clicks on the button or link the *operation* will be performed only if the `conditions` section evaluates to `true`. Also, if the operation has a form dialog configuration, then a a modal dialog with fields appears when clicking the button. 
 
 ## How does it work?
 

@@ -214,6 +214,9 @@ define([
         },
 
         calculateMenuPosition: function($element) {
+            if (!$element.length) {
+                return 0;
+            }
             return _.isRTL()
                 ? Math.ceil($element.offset().left)
                 : Math.ceil($element.offset().left + $element.outerWidth());

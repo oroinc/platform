@@ -21,7 +21,9 @@
                 {% endif %}
                 {{ form_rest(form) }}
             </div>
-            <button class="removeRow btn btn-icon btn-action btn-link" type="button" data-related="{{ name }}">×</button>
+            <button class="removeRow btn btn-icon btn-square-light" type="button" data-related="{{ name }}">
+                <span class="fa-close"></span>
+            </button>
         </div>
     </div>
 {% endmacro %}
@@ -1124,7 +1126,7 @@
     {% endspaceless %}
 {%- endmacro -%}
 
-{%- macro renderUrl(url, text, class, title) -%}
+{%- macro renderUrl(url, text, class, title, attributes) -%}
     {% spaceless %}
         {% if text is empty %}
             {% set text = url %}
@@ -1137,10 +1139,36 @@
         {% endif %}
         {% if url is not empty %}
             <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="{{ class }}"
-                    {% if (not oro_is_url_local(url)) %} target="_blank"{% endif %}>{{ text }}</a>
+            {% if (not oro_is_url_local(url)) %} target="_blank"{% endif %}
+            {% for name,value in attributes|default({}) %}
+                {{ name }}="{{ value }}"
+            {% endfor %}
+            >{{ text }}</a>
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
+
+{%- macro renderUrlWithActions(parameters, entity) -%}
+    {% set url = parameters.url|default %}
+    {%- set actions %}
+        {%- placeholder url_actions with {data: url, entity: entity} -%}
+    {% endset -%}
+    {% set actions = actions|trim %}
+    <span class="inline-actions-element truncate{% if actions is empty %} inline-actions-element_no-actions{% endif %}">
+        <span class="inline-actions-element_wrapper">
+            {{ _self.renderUrl(
+                url,
+                parameters.text|default,
+                parameters.class|default,
+                parameters.title|default,
+                parameters.attributes|default
+            ) }}
+        </span>
+        {% if actions is not empty -%}
+            <span class="inline-actions-element_actions url-actions">{{ actions|raw }}</span>
+        {%- endif %}
+    </span>
+{%- endmacro %}
 
 {%- macro renderPhone(phone, title) -%}
     {% if title is empty %}
