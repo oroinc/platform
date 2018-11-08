@@ -290,6 +290,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
             $expectedFields[$key] = $expectedField;
         }
         $expectedEntity->setFields($expectedFields);
+        $expectedEntity->setTranslated(true);
 
         return $expectedEntity;
     }
