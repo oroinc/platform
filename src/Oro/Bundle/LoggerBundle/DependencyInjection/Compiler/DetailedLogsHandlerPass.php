@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\LoggerBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException;
+use Oro\Component\DependencyInjection\Compiler\CompilerPassProviderTrait;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException;
 
 /**
  * This compiler pass hides detailed logs handler's nested handler for all channels
@@ -15,6 +17,8 @@ use Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException;
  */
 class DetailedLogsHandlerPass implements CompilerPassInterface
 {
+    use CompilerPassProviderTrait;
+
     const DETAILED_LOGS_HANDLER_SERVICE_PREFIX = 'oro_logger.monolog.detailed_logs.handler.';
     const DETAILED_LOGS_HANDLER_PROTOTYPE_ID = 'oro_logger.monolog.detailed_logs.handler.prototype';
     const MONOLOG_LOGGER_SERVICE_ID = 'monolog.logger';
@@ -69,14 +73,7 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
      */
     protected function removeNestedHandlersFromAllChannels(ContainerBuilder $container)
     {
-        $loggers = [self::MONOLOG_LOGGER_SERVICE_ID => $container->findDefinition(self::MONOLOG_LOGGER_SERVICE_ID)];
-
-        foreach ($container->findTaggedServiceIds(self::MONOLOG_LOGGER_SERVICE_ID) as $tags) {
-            foreach ($tags as $tag) {
-                $loggerId = sprintf(self::MONOLOG_LOGGER_SERVICE_ID . '.%s', $tag['channel']);
-                $loggers[$loggerId] = $container->findDefinition($loggerId);
-            }
-        }
+        $loggers = $this->getLoggersDefinitions($container);
 
         foreach ($loggers as $logger) {
             $calls = array_filter($logger->getMethodCalls(), function ($call) {
@@ -114,6 +111,52 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
 
                 break;
             }
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return Definition[]
+     */
+    private function getLoggersDefinitions(ContainerBuilder $container)
+    {
+        $loggersDefinitions = [
+            self::MONOLOG_LOGGER_SERVICE_ID => $container->findDefinition(self::MONOLOG_LOGGER_SERVICE_ID)
+        ];
+
+        foreach ($container->findTaggedServiceIds(self::MONOLOG_LOGGER_SERVICE_ID) as $tags) {
+            foreach ($tags as $tag) {
+                $this->addLoggerDefinition($container, $tag['channel'], $loggersDefinitions);
+            }
+        }
+
+        /** @var LoggerChannelPass $loggerChannelCompilerPass */
+        $loggerChannelCompilerPass = $this->findCompilerPassByClassName($container, LoggerChannelPass::class);
+        if (null !== $loggerChannelCompilerPass) {
+            $channels = $loggerChannelCompilerPass->getChannels();
+            foreach ($channels as $channel) {
+                $this->addLoggerDefinition($container, $channel, $loggersDefinitions);
+            }
+        }
+
+        return $loggersDefinitions;
+    }
+
+    /**
+     * Add Logger's definition to the array
+     *
+     * @param ContainerBuilder $container
+     * @param string $channel
+     * @param Definition[] $loggersDefinitions
+     */
+    private function addLoggerDefinition(ContainerBuilder $container, $channel, &$loggersDefinitions)
+    {
+        $loggerId = sprintf(self::MONOLOG_LOGGER_SERVICE_ID . '.%s', $channel);
+        if (!isset($loggersDefinitions[$loggerId])
+            && $container->hasDefinition($loggerId)
+        ) {
+            $loggersDefinitions[$loggerId] = $container->findDefinition($loggerId);
         }
     }
 }
