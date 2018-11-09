@@ -15,7 +15,7 @@ define(function(require) {
         autoRender: true,
         fixSidebarHeight: true,
         sidebar: '[data-role="sidebar"]',
-        scrollbar: '[data-role="sidebar"]',
+        scrollbar: '[data-role="sidebar-content"]',
         content: '[data-role="content"]',
         resizableSidebar: !tools.isMobile()
     }, config);
