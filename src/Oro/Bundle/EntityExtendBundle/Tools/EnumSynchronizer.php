@@ -5,11 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Gedmo\Translatable\TranslatableListener;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -18,6 +14,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -345,25 +342,24 @@ class EnumSynchronizer
     }
 
     /**
-     * @param AbstractEnumValue[] $values
+     * @param array|AbstractEnumValue[] $values
      * @param array $options
      * @param EntityManager $em
      * @param EnumValueRepository $enumRepo
      *
-     * @return AbstractEnumValue[]
+     * @return array|AbstractEnumValue[]
      */
     protected function processValues(array $values, array $options, EntityManager $em, EnumValueRepository $enumRepo)
     {
-        $ids = [];
+        $this->fillOptionIds($values, $options);
+
         /** @var AbstractEnumValue[] $changes */
         $changes = [];
         /** @var AbstractEnumValue[] $removes */
         $removes = [];
         foreach ($values as $value) {
-            $id = $value->getId();
-            $optionKey = $this->getEnumOptionKey($id, $options);
+            $optionKey = $this->getEnumOptionKey($value->getId(), $options);
             if ($optionKey !== null) {
-                $ids[] = $id;
                 if ($this->setEnumValueProperties($value, $options[$optionKey])) {
                     $changes[] = $value;
                 }
@@ -378,17 +374,51 @@ class EnumSynchronizer
         }
 
         foreach ($options as $option) {
-            $id = $this->generateEnumValueId($option['label'], $ids);
-            $ids[] = $id;
             $value = $enumRepo->createEnumValue(
                 $option['label'],
                 $option['priority'],
                 $option['is_default'],
-                $id
+                $option['id']
             );
             $em->persist($value);
             $changes[] = $value;
         }
+
         return $changes;
+    }
+
+    /**
+     * @param array|AbstractEnumValue[] $values
+     * @param array $option
+     * @return null|string
+     */
+    protected function getIdByExistingValues(array $values, array $option)
+    {
+        foreach ($values as $value) {
+            if (mb_strtolower($value->getName()) === mb_strtolower($option['label'])) {
+                return $value->getId();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array $values
+     * @param array $options
+     */
+    protected function fillOptionIds(array $values, array &$options)
+    {
+        $ids = [];
+        foreach ($options as &$option) {
+            if (!array_key_exists('id', $option) || $option['id'] === null || $option['id'] === '') {
+                $id = $this->getIdByExistingValues($values, $option);
+                if (!$id) {
+                    $id = $this->generateEnumValueId($option['label'], $ids);
+                }
+                $option['id'] = $id;
+            }
+            $ids[] = $option['id'];
+        }
     }
 }
