@@ -9,25 +9,27 @@
 }
 
 .tags-select-editor {
-    min-width: 180px; // ignore min-width
+    min-width: $tag-selector-item-min-width; // ignore min-width
 
     .select2-container {
         border-radius: 0;
         height: auto;
+        box-shadow: none;
+        border: $border-width solid $primary-750;
     }
 
     .select2-choices {
-        max-height: 40vh;
-        min-width: 180px;
-        overflow: auto;
+        max-height: $tag-selector-item-max-height;
+        min-width: $tag-selector-item-min-width;
         background: $primary-inverse;
-        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
 
         &:before {
-            content: '';
+            content: ' ';
             float: #{$end};
-            width: 74px;
-            height: 26px;
+            width: $tag-selector-actions-width;
+            height: $tag-selector-item-line-height;
+            font-size: $tag-selector-item-font-size;
+            margin: side-values(0 0 $tag-selector-item-offset-vertical 0);
         }
 
         &.select2-search-resize {
@@ -35,34 +37,41 @@
         }
 
         .select2-search-field input {
-            height: 26px;
-            padding: 1px 5px;
+            padding: $tag-selector-item-input-inner-offset;
+            height: auto;
+            font-size: $tag-selector-item-font-size;
+            line-height: $tag-selector-item-line-height;
+            margin-#{$end}: -$tag-selector-actions-width;
         }
 
         .select2-search-choice {
-            font-size: $base-font-size--s;
-            line-height: $base-font-size--s;
-            padding: side-values(5px 20px 5px 8px);
-            color: $tag-item-color;
-            background: $tag-item-background;
-            border: 0 none;
-            border-radius: 10px;
             box-shadow: none;
-            margin-#{$start}: 4px;
-            margin-bottom: 0;
 
             .select2-search-choice-close {
-                top: 4px;
+                top: 0;
+                border: none;
+                width: $tag-selector-item-close-icon-width;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
 
                 &:before {
-                    color: $tag-item-color;
+                    color: $tag-selector-item-color;
+                    line-height: 1;
                 }
             }
 
             &.select2-locked {
-                padding: side-values(4px 5px 3px 6px) !important;
+                padding: side-values($tag-selector-item-padding-vertical $tag-selector-item-padding-horizontal) !important;
             }
         }
+    }
+
+    .inline-editor__action-item {
+        line-height: $select2-container-min-height;
+        padding-top: 0;
+        padding-bottom: 0;
     }
 
     &.inline-view-editor .select2-choices {

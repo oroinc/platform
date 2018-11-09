@@ -9,5 +9,10 @@
         &:last-child {
             margin-#{$end}: 0;
         }
+
+        &.pressed {
+            background-color: $oro-datagrid-actions-panel-action-pressed-background-color;
+            box-shadow: $oro-datagrid-actions-panel-action-pressed-box-shadow;
+        }
     }
 }

@@ -8,6 +8,11 @@
 
     width: $jstree-wrapper-width;
 
+    .controls & {
+        max-width: $field-width;
+        padding-top: 0;
+    }
+
     &__title {
         display: $jstree-wrapper-title-display;
 

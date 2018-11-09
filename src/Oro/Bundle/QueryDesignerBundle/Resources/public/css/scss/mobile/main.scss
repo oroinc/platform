@@ -1,0 +1,32 @@
+/* @theme: admin.oro; */
+
+.mobile-version {
+    @import "oroui/css/scss/mobile/variables/layout";
+
+    $condition-container-min-height: 200px !default;
+
+    @media only screen and (max-width: $small-devices-media-breakpoint) {
+        .condition-builder {
+            min-width: 0;
+
+            > div {
+                flex-direction: column;
+            }
+
+            .criteria-list-container {
+                width: 100%;
+            }
+
+            .condition-container {
+                width: 100%;
+                min-height: $condition-container-min-height;
+                margin-#{$start}: 0;
+                margin-top: $condition-builder-condition-container-margin-start;
+
+                .drag-n-drop-hint {
+                    height: $condition-container-min-height;
+                }
+            }
+        }
+    }
+}

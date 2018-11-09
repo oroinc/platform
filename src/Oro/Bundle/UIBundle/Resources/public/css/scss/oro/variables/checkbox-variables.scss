@@ -2,15 +2,14 @@
 
 $checkbox-line-height: 1em !default;
 $checkbox-display: inline-block !default;
-$checkbox-vertical-align: -3px !default;
+$checkbox-vertical-align: middle !default;
 $checkbox-position: relative !default;
-$checkbox-overflow: hidden !default;
 
 $checkbox-controls-offset-top: 12px !default;
 
-$checkbox-sibling-outer-offset-start: 5px !default;
+$checkbox-sibling-outer-offset-start: 8px !default;
 
-$checkbox-icon-display: inline-block !default;
+$checkbox-icon-display: block !default;
 $checkbox-icon-height: 16px !default;
 $checkbox-icon-width: 16px !default;
 $checkbox-icon-border: 2px solid $primary-750 !default;
@@ -23,8 +22,8 @@ $checkbox-icon-color: $primary-inverse !default;
 $checkbox-icon-marker-position: absolute !default;
 $checkbox-icon-marker-top: 50% !default;
 $checkbox-icon-marker-start: 50% !default;
-$checkbox-icon-marker-transform: translate(-50%, -50%) !default;
-$checkbox-icon-marker-font-size: 10px !default;
+$checkbox-icon-marker-transform: translate(if-ltr(-50%, 50%), -50%) !default;
+$checkbox-icon-marker-font-size: 14px !default;
 $checkbox-icon-marker-line-height: 1 !default;
 $checkbox-icon-marker-font-family: FontAwesome !default;
 
