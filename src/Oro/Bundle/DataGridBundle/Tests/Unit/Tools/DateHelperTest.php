@@ -20,21 +20,15 @@ class DateHelperTest extends \PHPUnit_Framework_TestCase
         $this->dateHelper = new DateHelper($this->localeSettings);
     }
 
-    private function getTimeZoneOffset($timeZone)
-    {
-        return (new \DateTime('now', new \DateTimeZone($timeZone)))->format('P');
-    }
-
     public function testGetTimeZoneOffset()
     {
         $this->localeSettings->expects(self::once())
             ->method('getTimeZone')
-            ->willReturn('Europe/Kiev');
+            ->willReturn('Asia/Tokyo');
 
-        $offset = $this->getTimeZoneOffset('Europe/Kiev');
-        self::assertEquals($offset, $this->dateHelper->getTimeZoneOffset());
+        self::assertEquals('+09:00', $this->dateHelper->getTimeZoneOffset());
         // test that the offset is cached
-        self::assertEquals($offset, $this->dateHelper->getTimeZoneOffset());
+        self::assertEquals('+09:00', $this->dateHelper->getTimeZoneOffset());
     }
 
     public function testGetTimeZoneOffsetForUTC()
@@ -50,11 +44,10 @@ class DateHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->localeSettings->expects(self::once())
             ->method('getTimeZone')
-            ->willReturn('Europe/Kiev');
+            ->willReturn('Asia/Tokyo');
 
-        $offset = $this->getTimeZoneOffset('Europe/Kiev');
         self::assertEquals(
-            sprintf('CONVERT_TZ(e.createdAt, \'+00:00\', \'%s\')', $offset),
+            'CONVERT_TZ(e.createdAt, \'+00:00\', \'+09:00\')',
             $this->dateHelper->getConvertTimezoneExpression('e.createdAt')
         );
     }

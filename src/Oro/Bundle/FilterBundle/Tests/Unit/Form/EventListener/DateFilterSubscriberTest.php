@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class DateFilterSubsriberTest extends \PHPUnit_Framework_TestCase
+class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /** @var DateFilterSubscriber */
     protected $subscriber;
