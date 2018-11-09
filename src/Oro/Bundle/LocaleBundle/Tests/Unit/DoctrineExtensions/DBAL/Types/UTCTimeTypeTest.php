@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\DoctrineExtensions\DBAL\Types;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-
 use Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType;
 
 class UTCTimeTypeTest extends \PHPUnit_Framework_TestCase
@@ -29,17 +27,11 @@ class UTCTimeTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->platform = $this->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
             ->disableOriginalConstructor()
-            ->setMethods(array('getTimeFormatString'))
+            ->setMethods(['getTimeFormatString'])
             ->getMockForAbstractClass();
         $this->platform->expects($this->any())
             ->method('getTimeFormatString')
             ->will($this->returnValue('H:i:s'));
-    }
-
-    protected function tearDown()
-    {
-        unset($this->type);
-        unset($this->platform);
     }
 
     /**
@@ -52,17 +44,15 @@ class UTCTimeTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->type->convertToDatabaseValue($source, $this->platform));
     }
 
+    /**
+     * @param string $tzId
+     * @return bool
+     */
     protected function timezoneExhibitsDST($tzId)
     {
-        $tz = new \DateTimeZone($tzId);
-        $date = new \DateTime("now", $tz);
-        $trans = $tz->getTransitions();
-        foreach ($trans as $k => $t) {
-            if ($t["ts"] >= $date->format('U')) {
-                return $trans[$k-1]['isdst'];
-            }
-        }
-        return false;
+        $date = new \DateTime('now', new \DateTimeZone($tzId));
+
+        return $date->format('I');
     }
 
     /**
@@ -70,24 +60,32 @@ class UTCTimeTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function convertToDatabaseValueDataProvider()
     {
-        return array(
-            'null' => array(
+        return [
+            'null' => [
                 'source'   => null,
                 'expected' => null,
-            ),
-            'UTC' => array(
+            ],
+            'UTC' => [
                 'source' => new \DateTime('08:00:00', new \DateTimeZone('UTC')),
                 'expected' => '08:00:00',
-            ),
-            'positive shift' => array(
+            ],
+            'positive shift' => [
+                'source' => new \DateTime('10:00:00', new \DateTimeZone('Asia/Tokyo')), // UTC+9
+                'expected' => '01:00:00',
+            ],
+            'negative shift' => [
+                'source' => new \DateTime('10:00:00', new \DateTimeZone('America/Jamaica')), // UTC-5
+                'expected' => '15:00:00',
+            ],
+            'positive shift with DST' => [
                 'source' => new \DateTime('08:00:00', new \DateTimeZone('Europe/Athens')),
-                'expected' => ($this->timezoneExhibitsDST('Europe/Athens')) ? '05:00:00': '06:00:00',
-            ),
-            'negative shift' => array(
+                'expected' => $this->timezoneExhibitsDST('Europe/Athens') ? '05:00:00' : '06:00:00',
+            ],
+            'negative shift with DST' => [
                 'source' => new \DateTime('08:00:00', new \DateTimeZone('America/Los_Angeles')),
-                'expected' => ($this->timezoneExhibitsDST('America/Los_Angeles')) ? '15:00:00': '16:00:00',
-            ),
-        );
+                'expected' => $this->timezoneExhibitsDST('America/Los_Angeles') ? '15:00:00' : '16:00:00',
+            ],
+        ];
     }
 
     public function testConvertToPHPValue()
