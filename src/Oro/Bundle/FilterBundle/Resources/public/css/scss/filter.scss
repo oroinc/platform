@@ -146,7 +146,6 @@
 
     .selector {
         width: $filter-box-selector-width;
-
     }
 
     .filter-update {
@@ -156,17 +155,11 @@
     .filter-select-oro {
         line-height: $filter-select-oro-line-height;
         width: $filter-select-oro-width; /* need for flexible width at filter grid */
+        padding: $selector-uniform-inner-offset;
+        border: $selector-border;
 
         &-wrapper {
-            margin-bottom: $filter-select-oro-wrapper-offset-bottom;
-
-            .selector {
-                width: $filter-select-oro-wrapper-width;
-
-                span {
-                    width: $filter-select-oro-wrapper-span-width;
-                }
-            }
+            margin-bottom: $input-outer-offset-bottom;
         }
     }
 
@@ -349,6 +342,10 @@
             vertical-align: $filter-item-dropdown-toggle-vertical-align;
             line-height: $filter-item-dropdown-toggle-line-height;
             position: $filter-item-dropdown-toggle-position;
+        }
+
+        .dropdown-menu {
+            min-width: $filter-item-dropdown-menu-min-width !important;
         }
 
         & > .btn {
@@ -577,14 +574,6 @@
         }
     }
 
-    &-single {
-        .ui-multiselect-checkboxes {
-            label {
-                line-height: $ui-multiselect-checkboxes-label-line-height;
-            }
-        }
-    }
-
     &.select-filter-widget {
         // Rewrite inline styles for filter manager
         width: $select-filter-widget-width !important;
@@ -686,7 +675,7 @@
 
     .timepicker-input {
         width: $filter-date-range-timepicker-input-width;
-        margin: $filter-date-range-timepicker-input-offset;
+        margin: 0 0 $input-outer-offset-bottom 0;
     }
 }
 

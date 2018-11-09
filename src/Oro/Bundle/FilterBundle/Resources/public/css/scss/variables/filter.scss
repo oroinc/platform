@@ -163,7 +163,7 @@ $select-filter-widget-close-display: none !default;
 
 $select-filter-widget-checkboxes-label-white-space: nowrap !default;
 $select-filter-widget-checkboxes-label-offset: 0 !default;
-$select-filter-widget-checkboxes-label-inner-offset: side-values(2px 15px 1px) !important;
+$select-filter-widget-checkboxes-label-inner-offset: side-values(2px 15px 2px) !important;
 $select-filter-widget-checkboxes-label-float: left !default;
 
 $select-filter-widget-checkboxes-offset: 0 6px 5px 5px !default;
@@ -223,6 +223,8 @@ $filter-item-btn-hover-background-color: $primary-830 !default;
 $filter-item-dropdown-toggle-vertical-align: top !default;
 $filter-item-dropdown-toggle-line-height: 28px !default;
 $filter-item-dropdown-toggle-position: relative !default;
+
+$filter-item-dropdown-menu-min-width: 100% !default;
 
 $filter-item-fa-close-color: #aaa !default;
 $filter-item-fa-close-font-size: 14px !default;
