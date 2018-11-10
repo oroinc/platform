@@ -117,8 +117,8 @@ class EmailApiEntityManager extends ApiEntityManager
                     ]
                 ]
             ],
-            'post_serialize'  => function (array &$result) {
-                $this->postSerializeEmail($result);
+            'post_serialize'  => function (array $result) {
+                return $this->postSerializeEmail($result);
             }
         ];
 
@@ -127,8 +127,10 @@ class EmailApiEntityManager extends ApiEntityManager
 
     /**
      * @param array $result
+     *
+     * @return array
      */
-    protected function postSerializeEmail(array &$result)
+    protected function postSerializeEmail(array $result): array
     {
         $result['to']  = [];
         $result['cc']  = [];
@@ -158,5 +160,7 @@ class EmailApiEntityManager extends ApiEntityManager
             $result['folders'] = [$emailUser['folders']];
         }
         unset($result['emailUsers']);
+
+        return $result;
     }
 }

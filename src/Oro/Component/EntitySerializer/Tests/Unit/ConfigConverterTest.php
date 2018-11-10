@@ -231,10 +231,12 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
 
     public static function postSerialize1(array $item)
     {
+        return $item;
     }
 
     public static function postSerialize2(array $item)
     {
+        return $item;
     }
 
     public static function dataTransformer1($class, $property, $value, $config)

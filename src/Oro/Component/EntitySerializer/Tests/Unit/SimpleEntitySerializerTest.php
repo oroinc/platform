@@ -774,59 +774,6 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    /**
-     * @deprecated since 1.9. Use new signature of 'post_serialize' callback:
-     * function (array $item) : array
-     */
-    public function testSimpleEntityWithPostActionDeprecated()
-    {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', 1);
-
-        $this->setQueryExpectation(
-            $this->getDriverConnectionMock($this->em),
-            'SELECT g0_.id AS id_0, g0_.name AS name_1, g0_.label AS label_2'
-            . ', g0_.public AS public_3, g0_.is_exception AS is_exception_4'
-            . ' FROM group_table g0_'
-            . ' WHERE g0_.id = ?',
-            [
-                [
-                    'id_0'           => 1,
-                    'name_1'         => 'test_name',
-                    'label_2'        => 'test_label',
-                    'public_3'       => 1,
-                    'is_exception_4' => 0
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $result = $this->serializer->serialize(
-            $qb,
-            [
-                'post_serialize' => function (array &$result) {
-                    $result['additional'] = $result['name'] . '_additional';
-                }
-            ]
-        );
-
-        $this->assertArrayEquals(
-            [
-                [
-                    'id'          => 1,
-                    'name'        => 'test_name',
-                    'label'       => 'test_label',
-                    'public'      => true,
-                    'isException' => false,
-                    'additional'  => 'test_name_additional'
-                ]
-            ],
-            $result
-        );
-    }
-
     public function testSimpleEntityWithMetadata()
     {
         $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')

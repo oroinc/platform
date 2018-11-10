@@ -37,8 +37,8 @@ class EmailOriginApiEntityManager extends ApiEntityManager
                     ]
                 ]
             ],
-            'post_serialize'       => function (array &$result) {
-                $this->postSerializeEmailOrigin($result);
+            'post_serialize'       => function (array $result) {
+                return $this->postSerializeEmailOrigin($result);
             }
         ];
 
@@ -51,8 +51,10 @@ class EmailOriginApiEntityManager extends ApiEntityManager
 
     /**
      * @param array $result
+     *
+     * @return array
      */
-    protected function postSerializeEmailOrigin(array &$result)
+    protected function postSerializeEmailOrigin(array $result): array
     {
         $properties = [];
         foreach ($this->getEmailOriginProperties($result['__class__']) as $prop) {
@@ -62,6 +64,8 @@ class EmailOriginApiEntityManager extends ApiEntityManager
         $result['properties'] = $properties;
 
         unset($result['__class__']);
+
+        return $result;
     }
 
     /**

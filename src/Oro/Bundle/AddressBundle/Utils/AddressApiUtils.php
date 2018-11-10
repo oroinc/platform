@@ -23,8 +23,8 @@ class AddressApiUtils
                 'country' => ['fields' => 'name'],
                 'region'  => ['fields' => 'name']
             ],
-            'post_serialize'  => function (array &$result) {
-                self::postSerializeAddress($result);
+            'post_serialize'  => function (array $result) {
+                return self::postSerializeAddress($result);
             }
         ];
 
@@ -162,8 +162,10 @@ class AddressApiUtils
 
     /**
      * @param array $result
+     *
+     * @return array
      */
-    protected static function postSerializeAddress(array &$result)
+    protected static function postSerializeAddress(array $result): array
     {
         // just a temporary workaround until new API is implemented
         // the normal solution can be to use region_name virtual field and
@@ -174,5 +176,7 @@ class AddressApiUtils
             $result['region'] = $result['regionText'];
         }
         unset($result['regionText']);
+
+        return $result;
     }
 }
