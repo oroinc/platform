@@ -40,50 +40,11 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
     public function normalizeConfigProvider()
     {
         return [
-            // @deprecated since 1.9. Use 'exclude' attribute for a field instead of 'excluded_fields' for an entity
-            'excluded_fields (deprecated)'                            => [
+            'order_by'                                                => [
                 'config'         => [
                     'fields' => [
                         'phones' => [
-                            'excluded_fields' => ['name', 'code'],
-                            'fields'          => [
-                                'id'   => null,
-                                'name' => null
-                            ]
-                        ]
-                    ]
-                ],
-                'expectedConfig' => [
-                    'fields' => [
-                        'phones' => [
-                            '_excluded_fields' => ['name', 'code'],
-                            'fields'           => [
-                                'id'   => null,
-                                'name' => ['exclude' => true],
-                                'code' => ['exclude' => true]
-                            ]
-                        ]
-                    ]
-                ],
-                'configObject'   => [
-                    'fields' => [
-                        'phones' => [
-                            '_excluded_fields' => ['name', 'code'],
-                            'fields'           => [
-                                'id'   => [],
-                                'name' => ['exclude' => true],
-                                'code' => ['exclude' => true]
-                            ]
-                        ]
-                    ]
-                ],
-            ],
-            // @deprecated since 1.9. Use 'order_by' attribute instead of 'orderBy'
-            'order_by (deprecated)'                                   => [
-                'config'         => [
-                    'fields' => [
-                        'phones' => [
-                            'orderBy' => ['primary' => 'DESC']
+                            'order_by' => ['primary' => 'DESC']
                         ]
                     ]
                 ],
@@ -98,79 +59,6 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                     'fields' => [
                         'phones' => [
                             'order_by' => ['primary' => 'DESC']
-                        ]
-                    ]
-                ],
-            ],
-            // @deprecated since 1.9. Use `property_path` attribute instead of 'result_name'
-            'result_name (deprecated)'                                => [
-                'config'         => [
-                    'fields' => [
-                        'phones' => [
-                            'fields' => [
-                                'primary' => ['result_name' => 'isPrimary']
-                            ]
-                        ]
-                    ]
-                ],
-                'expectedConfig' => [
-                    'fields' => [
-                        'phones' => [
-                            '_renamed_fields' => ['primary' => 'isPrimary'],
-                            'fields'          => [
-                                'isPrimary' => ['property_path' => 'primary']
-                            ]
-                        ]
-                    ]
-                ],
-                'configObject'   => [
-                    'fields' => [
-                        'phones' => [
-                            '_renamed_fields' => ['primary' => 'isPrimary'],
-                            'fields'          => [
-                                'isPrimary' => ['property_path' => 'primary']
-                            ]
-                        ]
-                    ]
-                ],
-            ],
-            // @deprecated since 1.9. Use `property_path` attribute instead of 'result_name'
-            'result_name_with_data_transformer (deprecated)'          => [
-                'config'         => [
-                    'fields' => [
-                        'phones' => [
-                            'fields' => [
-                                'primary' => [
-                                    'result_name'      => 'isPrimary',
-                                    'data_transformer' => 'primary_field_transformer'
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                'expectedConfig' => [
-                    'fields' => [
-                        'phones' => [
-                            '_renamed_fields' => ['primary' => 'isPrimary'],
-                            'fields'          => [
-                                'isPrimary' => [
-                                    'property_path'    => 'primary',
-                                    'data_transformer' => 'primary_field_transformer'
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                'configObject'   => [
-                    'fields' => [
-                        'phones' => [
-                            '_renamed_fields' => ['primary' => 'isPrimary'],
-                            'fields'          => [
-                                'isPrimary' => [
-                                    'property_path'    => 'primary',
-                                    'data_transformer' => ['primary_field_transformer']
-                                ]
-                            ]
                         ]
                     ]
                 ],

@@ -10,6 +10,9 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * The API manager for Attachment entity.
+ */
 class AttachmentApiEntityManager extends ApiEntityManager
 {
     /** @var AuthorizationCheckerInterface */
@@ -70,8 +73,8 @@ class AttachmentApiEntityManager extends ApiEntityManager
                 'organization' => ['fields' => 'name'],
                 'file'         => ['fields' => 'id']
             ],
-            'post_serialize' => function (array &$result) {
-                $this->postSerializeAttachment($result);
+            'post_serialize' => function (array $result) {
+                return $this->postSerializeAttachment($result);
             }
         ];
 
@@ -87,8 +90,10 @@ class AttachmentApiEntityManager extends ApiEntityManager
 
     /**
      * @param array $result
+     *
+     * @return array
      */
-    protected function postSerializeAttachment(array &$result)
+    protected function postSerializeAttachment(array $result): array
     {
         if (!empty($result['file'])) {
             $result['file'] = $this->attachmentManager->getFileRestApiUrl(
@@ -113,6 +118,8 @@ class AttachmentApiEntityManager extends ApiEntityManager
         foreach ($attachmentTargets as $targetClass => $fieldName) {
             unset($result[$fieldName]);
         }
+
+        return $result;
     }
 
     /**
