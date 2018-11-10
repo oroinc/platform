@@ -30,6 +30,10 @@
 * Removed `Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper::applyAclToCriteria` method. Please use `apply` method with Doctrine Query or Query builder instead.
 #### DatagridBundle
 * Removed all logic related with column manager. The logic of column manager was transformed and expanded in [Datagrid Settings](./src/Oro/Bundle/DataGridBundle/Resources/doc/frontend/datagrid_settings.md)
+#### EntitySerializer Component
+* Removed `excluded_fields` deprecated configuration attribute for an entity. Use `exclude` attribute for a field instead.
+* Removed `result_name` deprecated configuration attribute for a field. Use `property_path` attribute instead.
+* Removed `orderBy` deprecated configuration attribute. Use `order_by` attribute instead.
 
 ### Changed
 #### AddressBundle

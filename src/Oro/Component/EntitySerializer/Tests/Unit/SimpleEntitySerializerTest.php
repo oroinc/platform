@@ -262,50 +262,6 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    /**
-     * @deprecated since 1.9. Use 'exclude' attribute for a field instead of 'excluded_fields' for an entity
-     */
-    public function testSimpleEntityWithExclusionDeprecated()
-    {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', 1);
-
-        $this->setQueryExpectation(
-            $this->getDriverConnectionMock($this->em),
-            'SELECT g0_.id AS id_0, g0_.label AS label_1, g0_.public AS public_2'
-            . ' FROM group_table g0_'
-            . ' WHERE g0_.id = ?',
-            [
-                [
-                    'id_0'     => 1,
-                    'label_1'  => 'test_label',
-                    'public_2' => 1,
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $result = $this->serializer->serialize(
-            $qb,
-            [
-                'excluded_fields' => ['name', 'isException'],
-            ]
-        );
-
-        $this->assertArrayEquals(
-            [
-                [
-                    'id'     => 1,
-                    'label'  => 'test_label',
-                    'public' => true
-                ]
-            ],
-            $result
-        );
-    }
-
     public function testSimpleEntityWithComputedField()
     {
         $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
@@ -388,54 +344,6 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                         'exclude' => true
                     ]
                 ]
-            ]
-        );
-
-        $this->assertArrayEquals(
-            [
-                [
-                    'id'     => 1,
-                    'label'  => 'test_label',
-                    'public' => true
-                ]
-            ],
-            $result
-        );
-    }
-
-    /**
-     * @deprecated since 1.9. Use 'exclude' attribute for a field instead of 'excluded_fields' for an entity
-     */
-    public function testSimpleEntityWithExclusionDeprecatedAndPartialLoadDisabled()
-    {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', 1);
-
-        $this->setQueryExpectation(
-            $this->getDriverConnectionMock($this->em),
-            'SELECT g0_.id AS id_0, g0_.name AS name_1, g0_.label AS label_2'
-            . ', g0_.public AS public_3, g0_.is_exception AS is_exception_4'
-            . ' FROM group_table g0_'
-            . ' WHERE g0_.id = ?',
-            [
-                [
-                    'id_0'           => 1,
-                    'name_1'         => 'test_name',
-                    'label_2'        => 'test_label',
-                    'public_3'       => 1,
-                    'is_exception_4' => 0
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $result = $this->serializer->serialize(
-            $qb,
-            [
-                'excluded_fields'      => ['name', 'isException'],
-                'disable_partial_load' => true
             ]
         );
 
@@ -572,51 +480,6 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                     'name' => [
                         'exclude' => true
                     ],
-                ],
-            ]
-        );
-
-        $this->assertArrayEquals(
-            [
-                [
-                    'id' => 1,
-                ]
-            ],
-            $result
-        );
-    }
-
-    /**
-     * @deprecated since 1.9. Use 'exclude' attribute for a field instead of 'excluded_fields' for an entity
-     */
-    public function testSimpleEntityWithSpecifiedFieldsAndExclusionsDeprecated()
-    {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', 1);
-
-        $this->setQueryExpectation(
-            $this->getDriverConnectionMock($this->em),
-            'SELECT g0_.id AS id_0'
-            . ' FROM group_table g0_'
-            . ' WHERE g0_.id = ?',
-            [
-                [
-                    'id_0' => 1,
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $result = $this->serializer->serialize(
-            $qb,
-            [
-                'exclusion_policy' => 'all',
-                'excluded_fields'  => ['name'],
-                'fields'           => [
-                    'id'   => null,
-                    'name' => null,
                 ],
             ]
         );
@@ -1017,11 +880,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    /**
-     * @deprecated since 1.9. Use 'exclude' attribute for a field instead of 'excluded_fields' for an entity
-     * @deprecated since 1.9. Use `property_path` attribute instead of 'result_name'
-     */
-    public function testSimpleEntityWithMetadataDeprecated()
+    public function testSimpleEntityWithMetadataWithoutPropertyPath()
     {
         $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -1045,10 +904,16 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $result = $this->serializer->serialize(
             $qb,
             [
-                'excluded_fields' => ['name', 'public', 'isException'],
-                'fields'          => [
-                    '__class__' => [
-                        'result_name' => 'entity'
+                'fields' => [
+                    '__class__'   => null,
+                    'name'        => [
+                        'exclude' => true
+                    ],
+                    'public'      => [
+                        'exclude' => true
+                    ],
+                    'isException' => [
+                        'exclude' => true
                     ]
                 ]
             ]
@@ -1057,9 +922,9 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->assertArrayEquals(
             [
                 [
-                    'id'     => 1,
-                    'label'  => 'test_label',
-                    'entity' => Entity\Group::class
+                    'id'        => 1,
+                    'label'     => 'test_label',
+                    '__class__' => Entity\Group::class
                 ]
             ],
             $result
@@ -1096,56 +961,6 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                     'label'  => null,
                     'entity' => [
                         'property_path' => '__class__'
-                    ]
-                ]
-            ]
-        );
-
-        $this->assertArrayEquals(
-            [
-                [
-                    'id'     => 1,
-                    'label'  => 'test_label',
-                    'entity' => Entity\Group::class
-                ]
-            ],
-            $result
-        );
-    }
-
-    /**
-     * @deprecated since 1.9. Use `property_path` attribute instead of 'result_name'
-     */
-    public function testSimpleEntityWithMetadataAndExcludeAllPolicyDeprecated()
-    {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', 1);
-
-        $this->setQueryExpectation(
-            $this->getDriverConnectionMock($this->em),
-            'SELECT g0_.id AS id_0, g0_.label AS label_1'
-            . ' FROM group_table g0_'
-            . ' WHERE g0_.id = ?',
-            [
-                [
-                    'id_0'    => 1,
-                    'label_1' => 'test_label'
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $result = $this->serializer->serialize(
-            $qb,
-            [
-                'exclusion_policy' => 'all',
-                'fields'           => [
-                    'id'        => null,
-                    'label'     => null,
-                    '__class__' => [
-                        'result_name' => 'entity'
                     ]
                 ]
             ]
