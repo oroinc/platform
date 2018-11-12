@@ -309,6 +309,34 @@ class EntityConfig
     }
 
     /**
+     * Indicates whether an additional element with
+     * key "_" {@see \Oro\Component\EntitySerializer\ConfigUtil::INFO_RECORD_KEY} and value ['has_more' => true]
+     * should be added to a collection if it has more records than it was requested.
+     *
+     * @return string An exclusion strategy, e.g. "none" or "all"
+     */
+    public function getHasMore()
+    {
+        return (bool)$this->get(ConfigUtil::HAS_MORE, false);
+    }
+
+    /**
+     * Set a flag indicates whether an additional element with
+     * key "_" {@see \Oro\Component\EntitySerializer\ConfigUtil::INFO_RECORD_KEY} and value ['has_more' => true]
+     * should be added to a collection if it has more records than it was requested.
+     *
+     * @param bool $hasMore
+     */
+    public function setHasMore($hasMore)
+    {
+        if ($hasMore) {
+            $this->items[ConfigUtil::HAS_MORE] = true;
+        } else {
+            unset($this->items[ConfigUtil::HAS_MORE]);
+        }
+    }
+
+    /**
      * Gets Doctrine query hints.
      * Each hint can be a string or an associative array with "name" and "value" keys.
      *
