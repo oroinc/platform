@@ -21,6 +21,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
  * Loads sub-resources configured in "Resources/config/oro/api.yml".
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class LoadFromConfigBag extends LoadSubresources
 {
@@ -226,12 +227,18 @@ class LoadFromConfigBag extends LoadSubresources
         if (null === $config) {
             return null;
         }
+
+        $resolvedAssociationName = $config->findFieldNameByPropertyPath($associationName);
+        if (!$resolvedAssociationName) {
+            return null;
+        }
+
         $metadata = $this->getMetadata($entityClass, $version, $requestType, $config);
         if (null === $metadata) {
             return null;
         }
 
-        return $metadata->getAssociation($associationName);
+        return $metadata->getAssociation($resolvedAssociationName);
     }
 
     /**

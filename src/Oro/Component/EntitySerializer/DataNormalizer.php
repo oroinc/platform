@@ -31,8 +31,8 @@ class DataNormalizer
      */
     protected function normalizeRows(array &$rows, EntityConfig $config)
     {
-        foreach ($rows as &$row) {
-            if (is_array($row)) {
+        foreach ($rows as $key => &$row) {
+            if (ConfigUtil::INFO_RECORD_KEY !== $key && is_array($row)) {
                 $this->normalizeRow($row, $config);
             }
         }
@@ -75,7 +75,10 @@ class DataNormalizer
             // to-many association
             $values = [];
             foreach ($row[$field] as $key => $value) {
-                if (is_array($value) && array_key_exists($targetField, $value)) {
+                if (ConfigUtil::INFO_RECORD_KEY !== $key
+                    && is_array($value)
+                    && array_key_exists($targetField, $value)
+                ) {
                     $value = $value[$targetField];
                 }
                 $values[$key] = $value;

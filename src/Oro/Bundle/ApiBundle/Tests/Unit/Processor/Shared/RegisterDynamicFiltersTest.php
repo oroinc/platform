@@ -737,8 +737,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $request = $this->getRequest('filter[target][users]=123');
 
         $filter = new SelfIdentifiableFilterStub('integer');
-        $filterValue = new FilterValue('target.users', '123');
-        $filterValue->setSourceKey('filter[target][users]');
+        $filterValue = FilterValue::createFromSource('filter[target][users]', 'target.users', '123');
         $exception = new InvalidFilterValueKeyException('some error', $filterValue);
         $filter->setFoundFilterKeys($exception);
 

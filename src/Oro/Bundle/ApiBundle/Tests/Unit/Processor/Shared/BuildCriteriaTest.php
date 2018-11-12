@@ -74,8 +74,14 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
     public function testProcess()
     {
         $filterValues = new TestFilterValueAccessor();
-        $filterValues->set('filter[label]', new FilterValue('label', 'val1', ComparisonFilter::EQ));
-        $filterValues->set('filter[name]', new FilterValue('name', 'val2', ComparisonFilter::EQ));
+        $filterValues->set(
+            'filter[label]',
+            FilterValue::createFromSource('filter[label]', 'label', 'val1', ComparisonFilter::EQ)
+        );
+        $filterValues->set(
+            'filter[name]',
+            FilterValue::createFromSource('filter[name]', 'name', 'val2', ComparisonFilter::EQ)
+        );
 
         $filers = $this->context->getFilters();
         $filers->add('filter[label]', $this->getComparisonFilter('string', 'label'));
@@ -100,8 +106,14 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
     public function testProcessShouldApplyFiltersInCorrectOrder()
     {
         $filterValues = new TestFilterValueAccessor();
-        $filterValues->set('filter[label]', new FilterValue('label', 'val1', ComparisonFilter::EQ));
-        $filterValues->set('filter[name]', new FilterValue('name', 'val2', ComparisonFilter::EQ));
+        $filterValues->set(
+            'filter[label]',
+            FilterValue::createFromSource('filter[label]', 'label', 'val1', ComparisonFilter::EQ)
+        );
+        $filterValues->set(
+            'filter[name]',
+            FilterValue::createFromSource('filter[name]', 'name', 'val2', ComparisonFilter::EQ)
+        );
 
         $filers = $this->context->getFilters();
         $filers->add('filter[name]', $this->getComparisonFilter('string', 'association.name'));
@@ -126,7 +138,10 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
     public function testProcessForUnknownFilter()
     {
         $filterValues = new TestFilterValueAccessor();
-        $filterValues->set('filter[name]', new FilterValue('name', 'val', ComparisonFilter::EQ));
+        $filterValues->set(
+            'filter[name]',
+            FilterValue::createFromSource('filter[name]', 'name', 'val', ComparisonFilter::EQ)
+        );
 
         $this->context->setFilterValues($filterValues);
         $this->context->setCriteria($this->getCriteria());
@@ -140,7 +155,10 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
     public function testProcessWhenApplyFilterFailed()
     {
         $filterValues = new TestFilterValueAccessor();
-        $filterValues->set('filter[name]', new FilterValue('name', 'val', ComparisonFilter::EQ));
+        $filterValues->set(
+            'filter[name]',
+            FilterValue::createFromSource('filter[name]', 'name', 'val', ComparisonFilter::EQ)
+        );
 
         $filter = $this->createMock(ComparisonFilter::class);
         $exception = new \Exception('some error');
@@ -170,9 +188,10 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
     public function testProcessWhenApplyPredefinedFilterFailed()
     {
         $filterValues = new TestFilterValueAccessor();
-        $filterValue = new FilterValue('someFilter', 'val', ComparisonFilter::EQ);
-        $filterValues->set('someFilter', $filterValue);
-        $filterValue->setSourceKey(null);
+        $filterValues->set(
+            'someFilter',
+            new FilterValue('someFilter', 'val', ComparisonFilter::EQ)
+        );
 
         $filter = $this->createMock(ComparisonFilter::class);
         $exception = new \Exception('some error');

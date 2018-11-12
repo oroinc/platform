@@ -40,6 +40,7 @@ class EntitySecurityMetadataTest extends \PHPUnit\Framework\TestCase
         static::assertEquals('SomeLabel', $this->entity->getLabel());
         static::assertEquals('SomeDescription', $this->entity->getDescription());
         static::assertEquals('SomeCategory', $this->entity->getCategory());
+        static::assertFalse($this->entity->isTranslated());
         $fields = $this->entity->getFields();
         static::assertCount(2, $fields);
         static::assertEquals(new FieldSecurityMetadata('first', 'First Label'), $fields['first']);
@@ -67,5 +68,23 @@ class EntitySecurityMetadataTest extends \PHPUnit\Framework\TestCase
             new FieldSecurityMetadata('second', 'Second Label', ['VIEW'], 'Second Description'),
             $fields['second']
         );
+    }
+
+    public function testSetters()
+    {
+        $label = 'SomeAnotherLabel';
+        $this->entity->setLabel($label);
+        static::assertEquals($label, $this->entity->getLabel());
+
+        $description = 'SomeAnotherDescription';
+        $this->entity->setDescription($description);
+        static::assertEquals($description, $this->entity->getDescription());
+
+        $this->entity->setTranslated(true);
+        static::assertTrue($this->entity->isTranslated());
+
+        $fields = [new FieldSecurityMetadata('anotherField', 'AnotherFieldLabel')];
+        $this->entity->setFields($fields);
+        static::assertEquals($fields, $this->entity->getFields());
     }
 }

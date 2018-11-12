@@ -10,14 +10,13 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\EntitySerializer\Filter\EntityAwareFilterInterface;
 
 /**
- * Serializer Implementation.
+ * The serializer that loads data for primary and associated entities from the database
+ * using the minimum possible number of queries and converts entities to an array
+ * bases on a specified configuration.
  *
- * This is draft implementation of the entity serializer.
- *       It is expected that the full implementation will be done when new API component is implemented.
- * What need to do:
+ * Things that can be improved:
  *  * by default the value of identifier field should be used
  *    for related entities (now it should be configured manually in serialization rules)
- *  * add support for extended fields
  *
  * Example of serialization rules used in the $config parameter of
  * {@see serialize}, {@see serializeEntities} and {@see prepareQuery} methods:
@@ -200,12 +199,17 @@ class EntitySerializer
 
         $this->updateQuery($qb, $entityConfig);
         $data = $this->queryFactory->getQuery($qb, $entityConfig)->getResult();
+
+        $hasMore = $this->preSerializeItems($data, $entityConfig, $qb->getMaxResults());
         $data = $this->serializeItems(
             (array)$data,
             $this->doctrineHelper->getRootEntityClass($qb),
             $entityConfig,
             $context
         );
+        if ($hasMore) {
+            $data[ConfigUtil::INFO_RECORD_KEY] = [ConfigUtil::HAS_MORE => true];
+        }
 
         return $this->dataNormalizer->normalizeData($data, $entityConfig);
     }
@@ -250,6 +254,24 @@ class EntitySerializer
         return $this->configConverter->convertConfig(
             $this->configNormalizer->normalizeConfig($config)
         );
+    }
+
+    /**
+     * @param array        $items
+     * @param EntityConfig $config
+     * @param int|null     $limit
+     *
+     * @return bool
+     */
+    protected function preSerializeItems(array &$items, EntityConfig $config, $limit)
+    {
+        $hasMore = false;
+        if (null !== $limit && $config->getHasMore() && count($items) > $limit) {
+            $hasMore = true;
+            $items = array_slice($items, 0, $limit);
+        }
+
+        return $hasMore;
     }
 
     /**
@@ -592,8 +614,14 @@ class EntitySerializer
             foreach ($relatedData as $field => $relatedItems) {
                 $resultItem[$field] = [];
                 if (!empty($relatedItems[$entityId])) {
-                    foreach ($relatedItems[$entityId] as $relatedItem) {
-                        $resultItem[$field][] = $relatedItem;
+                    $items = $relatedItems[$entityId];
+                    foreach ($items as $key => $relatedItem) {
+                        if (ConfigUtil::INFO_RECORD_KEY !== $key) {
+                            $resultItem[$field][] = $relatedItem;
+                        }
+                    }
+                    if (isset($items[ConfigUtil::INFO_RECORD_KEY])) {
+                        $resultItem[$field][ConfigUtil::INFO_RECORD_KEY] = $items[ConfigUtil::INFO_RECORD_KEY];
                     }
                 }
             }
@@ -623,16 +651,15 @@ class EntitySerializer
      */
     protected function loadRelatedItems($entityIds, $mapping, EntityConfig $config, array $context)
     {
-        $result = [];
-
         $entityClass = $mapping['targetEntity'];
+        $limit = $config->getMaxResults();
         $bindings = $this->getRelatedItemsBindings($entityIds, $mapping, $config);
 
         $items = [];
         $resultFieldName = $this->getIdFieldNameIfIdOnlyRequested($config, $entityClass);
+        $relatedItemIds = $this->getRelatedItemsIds($bindings, $limit);
         if (null !== $resultFieldName) {
             $postSerializeHandler = $config->getPostSerializeHandler();
-            $relatedItemIds = $this->getRelatedItemsIds($bindings);
             foreach ($relatedItemIds as $relatedItemId) {
                 $relatedItem = [$resultFieldName => $relatedItemId];
                 if (null !== $postSerializeHandler) {
@@ -645,22 +672,29 @@ class EntitySerializer
                 $items[$relatedItemId] = $relatedItem;
             }
         } else {
-            $qb = $this->queryFactory->getRelatedItemsQueryBuilder(
-                $entityClass,
-                $this->getRelatedItemsIds($bindings)
-            );
+            $qb = $this->queryFactory->getRelatedItemsQueryBuilder($entityClass, $relatedItemIds);
             $this->updateQuery($qb, $config);
             $data = $this->queryFactory->getQuery($qb, $config)->getResult();
             if (!empty($data)) {
                 $items = $this->serializeItems((array)$data, $entityClass, $config, $context, true);
             }
         }
+
+        $result = [];
         if (!empty($items)) {
             foreach ($bindings as $entityId => $relatedEntityIds) {
                 foreach ($relatedEntityIds as $relatedEntityId) {
                     if (isset($items[$relatedEntityId])) {
                         $result[$entityId][] = $items[$relatedEntityId];
                     }
+                }
+                if (null !== $limit
+                    && $config->getHasMore()
+                    && isset($result[$entityId])
+                    && count($result[$entityId]) == $limit
+                    && count($relatedEntityIds) > $limit
+                ) {
+                    $result[$entityId][ConfigUtil::INFO_RECORD_KEY] = [ConfigUtil::HAS_MORE => true];
                 }
             }
         }
@@ -718,15 +752,22 @@ class EntitySerializer
     }
 
     /**
-     * @param array $bindings [entityId => relatedEntityId, ...]
+     * @param array    $bindings [entityId => relatedEntityId, ...]
+     * @param int|null $limit
      *
      * @return array of unique ids of all related entities from $bindings array
      */
-    protected function getRelatedItemsIds($bindings)
+    protected function getRelatedItemsIds($bindings, $limit)
     {
         $result = [];
         foreach ($bindings as $ids) {
+            $counter = 0;
             foreach ($ids as $id) {
+                $counter++;
+                if (null !== $limit && $counter > $limit) {
+                    break;
+                }
+
                 if (!isset($result[$id])) {
                     $result[$id] = $id;
                 }
