@@ -633,39 +633,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         $content = self::jsonToArray($response->getContent());
         $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
 
-        self::assertArrayContains($expectedContent, $content);
-
-        // test the primary data collection count and order
-        if (!empty($expectedContent[JsonApiDoc::DATA])) {
-            $expectedData = $expectedContent[JsonApiDoc::DATA];
-            if (is_array($expectedData) && isset($expectedData[0][JsonApiDoc::TYPE])) {
-                $expectedItems = $this->getResponseDataItems($expectedData);
-                $actualItems = $this->getResponseDataItems($content[JsonApiDoc::DATA]);
-                self::assertSame(
-                    $expectedItems,
-                    $actualItems,
-                    'Failed asserting the primary data collection items count and order.'
-                );
-            }
-        }
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return array [['type' => entity type, 'id' => entity id], ...]
-     */
-    private function getResponseDataItems(array $data)
-    {
-        $result = [];
-        foreach ($data as $item) {
-            $result[] = [
-                JsonApiDoc::TYPE => $item[JsonApiDoc::TYPE],
-                JsonApiDoc::ID   => $item[JsonApiDoc::ID]
-            ];
-        }
-
-        return $result;
+        self::assertThat($content, new JsonApiDocContainsConstraint($expectedContent, false));
     }
 
     /**
