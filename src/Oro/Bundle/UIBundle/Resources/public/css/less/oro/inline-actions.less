@@ -24,6 +24,14 @@
     line-height: 24px;
     margin-right: 2px;
   }
+  &.truncate {
+    display: inline-flex;
+    .inline-actions-element_wrapper {
+      width: 200px !important;
+      padding: 0;
+      .text-line-truncate();
+    }
+  }
 }
 .inline-actions-element_actions {
   display: inline-block;

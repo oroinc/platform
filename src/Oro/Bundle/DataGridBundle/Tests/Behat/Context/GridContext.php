@@ -762,7 +762,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Then I should see "Priority" in "Warehouse" table
      * Example: Then I should not see "Apple" in "Basket" table
      *
-     * @Then /^I should (?P<type>(?:|see|not see)) "(?P<content>[\w\s]+)" in "(?P<tableContent>[\w\s]+)" table$/
+     * @Then /^I should (?P<type>(?:|see|not see)) "(?P<content>.+)" in "(?P<tableContent>[\w\s]+)" table$/
      */
     public function assertContentInTable($type, $content, $tableContent)
     {
