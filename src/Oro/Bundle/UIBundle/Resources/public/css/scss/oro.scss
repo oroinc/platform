@@ -476,13 +476,7 @@ h5.user-fieldset {
 .separator-btn {
     border-#{$start}: 1px solid $additional-extra-lighten;
     margin: 4px 8px 0;
-    height: 24px;
-}
-
-.title-buttons-container {
-    .pull-left > .separator-btn {
-        margin-#{$end}: 1px;
-    }
+    height: $btn-line-height;
 }
 
 .pagination-centered > label {
