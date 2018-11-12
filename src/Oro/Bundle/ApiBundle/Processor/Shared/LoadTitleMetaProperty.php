@@ -12,16 +12,17 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
+ * The base class for processors that add "title" meta property value the result.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class LoadTitleMetaProperty implements ProcessorInterface
 {
-    const OPERATION_NAME = 'loadTitleMetaProperty';
+    public const OPERATION_NAME = 'loadTitleMetaProperty';
 
-    const TITLE_META_PROPERTY_NAME = 'title';
+    public const TITLE_META_PROPERTY_NAME = 'title';
 
-    /** @internal Used for composite keys comparison */
-    const COMPOSITE_KEYS = 'composite_keys';
+    /** Used for composite keys comparison */
+    private const COMPOSITE_KEYS = 'composite_keys';
 
     /** @var EntityTitleProvider */
     protected $entityTitleProvider;

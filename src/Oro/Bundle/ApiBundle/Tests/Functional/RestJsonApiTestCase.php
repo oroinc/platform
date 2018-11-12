@@ -37,9 +37,12 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
+        $this->checkWsseAuthHeader($server);
+
         if (!empty($parameters['filter'])) {
             foreach ($parameters['filter'] as $key => $filter) {
                 $filter = self::processTemplateData($filter);
@@ -48,11 +51,19 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                         foreach ($filter as $k => $v) {
                             if (is_array($v)) {
                                 $filter[$k] = implode(',', $v);
+                            } elseif (is_bool($v)) {
+                                $filter[$k] = $v ? '1' : '0';
+                            } elseif (!is_string($v)) {
+                                $filter[$k] = (string)$v;
                             }
                         }
                     } else {
                         $filter = implode(',', $filter);
                     }
+                } elseif (is_bool($filter)) {
+                    $filter = $filter ? '1' : '0';
+                } elseif (!is_string($filter)) {
+                    $filter = (string)$filter;
                 }
                 $parameters['filter'][$key] = $filter;
             }
@@ -67,12 +78,6 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                 $uri .= $separator . $filters;
             }
             unset($parameters['filters']);
-        }
-
-        if (!array_key_exists('HTTP_X-WSSE', $server)) {
-            $server = array_replace($server, $this->getWsseAuthHeader());
-        } elseif (!$server['HTTP_X-WSSE']) {
-            unset($server['HTTP_X-WSSE']);
         }
 
         $this->client->request(

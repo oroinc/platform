@@ -56,6 +56,16 @@ abstract class RestApiTestCase extends ApiTestCase
     }
 
     /**
+     * Returns the base URL for all REST API requests, e.g. "http://localhost/api".
+     *
+     * @return string
+     */
+    protected function getApiBaseUrl()
+    {
+        return substr($this->getUrl($this->getListRouteName(), ['entity' => 'test'], true), 0, -5);
+    }
+
+    /**
      * Sends REST API request.
      *
      * @param string      $method
@@ -67,6 +77,18 @@ abstract class RestApiTestCase extends ApiTestCase
      * @return Response
      */
     abstract protected function request($method, $uri, array $parameters = [], array $server = [], $content = null);
+
+    /**
+     * @param array $server
+     */
+    protected function checkWsseAuthHeader(array &$server)
+    {
+        if (!array_key_exists('HTTP_X-WSSE', $server)) {
+            $server = array_replace($server, $this->getWsseAuthHeader());
+        } elseif (!$server['HTTP_X-WSSE']) {
+            unset($server['HTTP_X-WSSE']);
+        }
+    }
 
     /**
      * Sends OPTIONS request.
