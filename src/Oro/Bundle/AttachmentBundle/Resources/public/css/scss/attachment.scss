@@ -34,9 +34,12 @@
     max-width: 100%;
 
     .uploader {
-        border: none;
-        float: none;
         display: flex;
+        align-items: center;
+        max-width: 516px;
+        float: none;
+
+        border: none;
 
         input {
             cursor: pointer;
@@ -81,10 +84,23 @@
     }
 }
 
+.note-attachments {
+    .attachment-item {
+        display: block;
+    }
+}
+
+.control-group {
+    .attachment-item {
+        max-width: 294px;
+    }
+}
+
 .attachment-item {
-    display: inline-block;
-    position: relative;
-    margin: 4px $content-padding-medium 0 0;
+    display: flex;
+    align-items: center;
+    max-width: 516px;
+    margin: 4px 0 0 0;
 
     .remove-attachment {
         padding: 0;
@@ -95,7 +111,21 @@
     }
 
     .filename {
-        word-break: break-all;
+        max-width: calc(100% - 106px);
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    [class^="fa-"],
+    [class*="fa-"] {
+        margin-right: 3px;
+        line-height: 21px;
+
+        &:last-child {
+            margin: 0 0 0 3px;
+        }
     }
 }
 

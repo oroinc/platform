@@ -88,7 +88,7 @@
                     <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename" title="{{ value.originalFilename }}">
                         {{  value.originalFilename }}
                     </a>
-                    ({{ file_size(value.fileSize) }})
+                    <span class="file-size">({{ file_size(value.fileSize) }})</span>
                     {{ form_row(form.emptyFile) }}
                     <i data-role="remove"
                        class="btn btn-square-lighter fa-close remove-attachment"
