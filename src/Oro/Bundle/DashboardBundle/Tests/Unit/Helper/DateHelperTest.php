@@ -5,7 +5,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Helper;
 use DateTime;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
@@ -15,13 +15,13 @@ class DateHelperTest extends OrmTestCase
     /** @var DateHelper */
     protected $helper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $settings;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $aclHelper;
 
     public function setUp()
@@ -390,40 +390,6 @@ class DateHelperTest extends OrmTestCase
         );
 
         $this->assertEquals($expectedData, $actualData);
-    }
-
-    /**
-     * @dataProvider getPreviousDateTimeIntervalDataProvider
-     *
-     * @param Datetime $from
-     * @param Datetime $to
-     * @param Datetime $expectedStart
-     * @param Datetime $expectedEnd
-     */
-    public function testGetPreviousDateTimeInterval(
-        \Datetime $from,
-        \Datetime $to,
-        \Datetime $expectedStart,
-        \Datetime $expectedEnd
-    ) {
-        list($start, $end) = $this->helper->getPreviousDateTimeInterval($from, $to);
-
-        $this->assertEquals($start, $expectedStart);
-        $this->assertEquals($end, $expectedEnd);
-    }
-
-    public function getPreviousDateTimeIntervalDataProvider()
-    {
-        $timezone = new \DateTimeZone('UTC');
-
-        return [
-            [
-                'from'          => new \DateTime('2014-01-01 00:00:00', $timezone),
-                'to'            => new \DateTime('2014-01-02 23:59:59', $timezone),
-                'expectedStart' => new \DateTime('2013-12-30 00:00:00', $timezone),
-                'expectedEnd'   => new \DateTime('2013-12-31 23:59:59', $timezone),
-            ]
-        ];
     }
 
     /**

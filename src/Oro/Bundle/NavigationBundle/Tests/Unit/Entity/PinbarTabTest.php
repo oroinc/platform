@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 
-class PinbarTabTest extends \PHPUnit_Framework_TestCase
+class PinbarTabTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetMaximizedNotEmpty()
     {

@@ -8,10 +8,10 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class RemoveLocationHeaderTest extends FormProcessorTestCase
 {
-    const RESPONSE_LOCATION_HEADER_NAME = 'Location';
+    private const RESPONSE_LOCATION_HEADER_NAME = 'Location';
 
     /** @var RemoveLocationHeader */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -27,7 +27,7 @@ class RemoveLocationHeaderTest extends FormProcessorTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             $testCount,
             $this->context->getResponseHeaders()->get(self::RESPONSE_LOCATION_HEADER_NAME)
         );
@@ -41,7 +41,7 @@ class RemoveLocationHeaderTest extends FormProcessorTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertNull(
+        self::assertNull(
             $this->context->getResponseHeaders()->get(self::RESPONSE_LOCATION_HEADER_NAME)
         );
     }
@@ -52,7 +52,7 @@ class RemoveLocationHeaderTest extends FormProcessorTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertNull(
+        self::assertNull(
             $this->context->getResponseHeaders()->get(self::RESPONSE_LOCATION_HEADER_NAME)
         );
     }

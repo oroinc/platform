@@ -17,7 +17,7 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 class LoadNormalizedEntityTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionProcessorBagInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
     private $processorBag;
 
     /** @var LoadNormalizedEntity */
@@ -32,23 +32,23 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $this->processor = new LoadNormalizedEntity($this->processorBag);
     }
 
-    public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNormalizadResult()
+    public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNormalizedResult()
     {
         $metadata = new EntityMetadata();
-        $normalizadResult = ['key' => 'value'];
+        $normalizedResult = ['key' => 'value'];
 
         $this->processorBag->expects(self::never())
             ->method('getProcessor');
 
         $this->context->setMetadata($metadata);
-        $this->context->setResult($normalizadResult);
+        $this->context->setResult($normalizedResult);
         $this->processor->process($this->context);
 
-        self::assertEquals($normalizadResult, $this->context->getResult());
+        self::assertEquals($normalizedResult, $this->context->getResult());
         self::assertTrue($this->context->isProcessed(LoadNormalizedEntity::OPERATION_NAME));
     }
 
-    public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNotNormalizadResult()
+    public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNotNormalizedResult()
     {
         $metadata = new EntityMetadata();
 
@@ -89,6 +89,9 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessWhenGetActionSuccess()
     {
         $getResult = ['key' => 'value'];
@@ -120,11 +123,15 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
+        $this->context->setMasterRequest(true);
+        $this->context->setCorsRequest(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
 
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
+        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setCorsRequest(false);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedGetContext->setClassName($this->context->getClassName());
         $expectedGetContext->setId($this->context->getId());
@@ -166,6 +173,8 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $expectedContext = new FormContextStub($this->configProvider, $this->metadataProvider);
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
+        $expectedContext->setMasterRequest(true);
+        $expectedContext->setCorsRequest(true);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedContext->setId($this->context->getId());
         $expectedContext->setClassName($this->context->getClassName());

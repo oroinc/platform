@@ -2,131 +2,149 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Collection\Criteria;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl;
-use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
-class ProtectQueryByAclTest extends OrmRelatedTestCase
+class ProtectQueryByAclTest extends GetListProcessorOrmRelatedTestCase
 {
+    private const DEFAULT_PERMISSION = 'TEST';
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclHelper */
+    private $aclHelper;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclAnnotationProvider */
+    private $aclAnnotationProvider;
+
     /** @var ProtectQueryByAcl */
-    protected $processor;
+    private $processor;
 
-    /** @var Context */
-    protected $context;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $aclHelper;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $aclAnnotationProvider;
-
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->aclAnnotationProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->aclHelper = $this->createMock(AclHelper::class);
+        $this->aclAnnotationProvider = $this->createMock(AclAnnotationProvider::class);
+
         $this->processor = new ProtectQueryByAcl(
             $this->doctrineHelper,
             $this->aclHelper,
             $this->aclAnnotationProvider,
-            'VIEW'
+            self::DEFAULT_PERMISSION
         );
-
-        $configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->context = new Context($configProvider, $metadataProvider);
     }
 
-    /**
-     * @return Criteria
-     */
-    protected function getCriteria()
+    public function testProcessWhenQueryIsNotDoctrineQuery()
     {
-        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return new Criteria($resolver);
-    }
-
-    public function testProcessWhenQueryIsAlreadyBuilt()
-    {
-        $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
-        $this->context->setClassName($className);
         $query = new \stdClass();
+
+        $this->aclHelper->expects(self::never())
+            ->method('apply');
+
+        $this->context->setClassName(Product::class);
         $this->context->setQuery($query);
-
-        $this->aclHelper->expects($this->never())
-            ->method('applyAclToCriteria');
-
         $this->processor->process($this->context);
-    }
-
-    public function testProcessWhenCriteriaObjectDoesNotExist()
-    {
-        $this->processor->process($this->context);
-
-        $this->assertNull($this->context->getCriteria());
     }
 
     public function testProcessWithoutConfig()
     {
-        $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
-        $this->context->setClassName($className);
-        $config = new EntityDefinitionConfig();
-        $this->context->setConfig($config);
-        $criteria = $this->getCriteria();
-        $this->context->setCriteria($criteria);
+        $query = $this->createMock(QueryBuilder::class);
 
-        $this->aclHelper->expects($this->once())
-            ->method('applyAclToCriteria')
-            ->with($className, $criteria, 'VIEW');
+        $this->aclHelper->expects(self::once())
+            ->method('apply')
+            ->with($query, self::DEFAULT_PERMISSION);
 
+        $this->context->setClassName(Product::class);
+        $this->context->setConfig(null);
+        $this->context->setQuery($query);
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithConfig()
+    public function testProcessWhenConfigDoesNotContainAclResource()
     {
-        $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
-        $this->context->setClassName($className);
         $config = new EntityDefinitionConfig();
-        $aclResource = 'acme_test_delete_resource';
-        $config->setAclResource($aclResource);
+        $query = $this->createMock(QueryBuilder::class);
+
+        $this->aclHelper->expects(self::once())
+            ->method('apply')
+            ->with($query, self::DEFAULT_PERMISSION);
+
+        $this->context->setClassName(Product::class);
         $this->context->setConfig($config);
-        $criteria = $this->getCriteria();
-        $this->context->setCriteria($criteria);
-        $aclAnnotation = new Acl(
-            [
-                'id' => $aclResource,
-                'class' => $className,
-                'permission' => 'DELETE',
-                'type' => 'entity'
+        $this->context->setQuery($query);
+        $this->processor->process($this->context);
+    }
 
-            ]
-        );
+    public function testProcessConfigContainsAclResource()
+    {
+        $className = Product::class;
+        $permission = 'DELETE';
+        $aclResource = 'acme_test_delete_resource';
+        $config = new EntityDefinitionConfig();
+        $config->setAclResource($aclResource);
+        $aclAnnotation = new Acl([
+            'id'         => $aclResource,
+            'class'      => $className,
+            'permission' => $permission,
+            'type'       => 'entity'
+        ]);
+        $query = $this->createMock(QueryBuilder::class);
 
-        $this->aclAnnotationProvider->expects($this->once())
+        $this->aclAnnotationProvider->expects(self::once())
             ->method('findAnnotationById')
             ->with($aclResource)
             ->willReturn($aclAnnotation);
+        $this->aclHelper->expects(self::once())
+            ->method('apply')
+            ->with($query, $permission);
 
-        $this->aclHelper->expects($this->once())
-            ->method('applyAclToCriteria')
-            ->with($className, $criteria, 'DELETE');
+        $this->context->setClassName($className);
+        $this->context->setConfig($config);
+        $this->context->setQuery($query);
+        $this->processor->process($this->context);
+    }
 
+    public function testProcessConfigContainsUnknownAclResource()
+    {
+        $className = Product::class;
+        $aclResource = 'acme_test_delete_resource';
+        $config = new EntityDefinitionConfig();
+        $config->setAclResource($aclResource);
+        $query = $this->createMock(QueryBuilder::class);
+
+        $this->aclAnnotationProvider->expects(self::once())
+            ->method('findAnnotationById')
+            ->with($aclResource)
+            ->willReturn(null);
+        $this->aclHelper->expects(self::never())
+            ->method('apply');
+
+        $this->context->setClassName($className);
+        $this->context->setConfig($config);
+        $this->context->setQuery($query);
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessWhenAclIsDisabled()
+    {
+        $className = Product::class;
+        $config = new EntityDefinitionConfig();
+        $config->setAclResource(null);
+        $query = $this->createMock(QueryBuilder::class);
+
+        $this->aclAnnotationProvider->expects(self::never())
+            ->method('findAnnotationById');
+        $this->aclHelper->expects(self::never())
+            ->method('apply');
+
+        $this->context->setClassName($className);
+        $this->context->setConfig($config);
+        $this->context->setQuery($query);
         $this->processor->process($this->context);
     }
 }

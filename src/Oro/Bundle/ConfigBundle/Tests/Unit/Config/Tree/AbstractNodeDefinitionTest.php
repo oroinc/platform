@@ -4,7 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config\Tree;
 
 use Oro\Bundle\ConfigBundle\Config\Tree\AbstractNodeDefinition;
 
-class AbstractNodeDefinitionTest extends \PHPUnit_Framework_TestCase
+class AbstractNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_NAME     = 'testNodeName';
     const TEST_PRIORITY = 255;

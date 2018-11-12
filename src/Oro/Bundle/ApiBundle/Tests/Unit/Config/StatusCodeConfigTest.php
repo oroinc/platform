@@ -4,40 +4,40 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
 
-class StatusCodeConfigTest extends \PHPUnit_Framework_TestCase
+class StatusCodeConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testCustomAttribute()
     {
         $attrName = 'test';
 
         $config = new StatusCodeConfig();
-        $this->assertFalse($config->has($attrName));
-        $this->assertNull($config->get($attrName));
-        $this->assertSame([], $config->keys());
+        self::assertFalse($config->has($attrName));
+        self::assertNull($config->get($attrName));
+        self::assertSame([], $config->keys());
 
         $config->set($attrName, null);
-        $this->assertFalse($config->has($attrName));
-        $this->assertNull($config->get($attrName));
-        $this->assertEquals([], $config->toArray());
-        $this->assertSame([], $config->keys());
+        self::assertFalse($config->has($attrName));
+        self::assertNull($config->get($attrName));
+        self::assertEquals([], $config->toArray());
+        self::assertSame([], $config->keys());
 
         $config->set($attrName, false);
-        $this->assertTrue($config->has($attrName));
-        $this->assertFalse($config->get($attrName));
-        $this->assertEquals([$attrName => false], $config->toArray());
-        $this->assertEquals([$attrName], $config->keys());
+        self::assertTrue($config->has($attrName));
+        self::assertFalse($config->get($attrName));
+        self::assertEquals([$attrName => false], $config->toArray());
+        self::assertEquals([$attrName], $config->keys());
 
         $config->remove($attrName);
-        $this->assertFalse($config->has($attrName));
-        $this->assertNull($config->get($attrName));
-        $this->assertSame([], $config->toArray());
-        $this->assertSame([], $config->keys());
+        self::assertFalse($config->has($attrName));
+        self::assertNull($config->get($attrName));
+        self::assertSame([], $config->toArray());
+        self::assertSame([], $config->keys());
     }
 
     public function testClone()
     {
         $config = new StatusCodeConfig();
-        $this->assertEmpty($config->toArray());
+        self::assertEmpty($config->toArray());
 
         $config->set('test', 'value');
         $objValue = new \stdClass();
@@ -46,47 +46,47 @@ class StatusCodeConfigTest extends \PHPUnit_Framework_TestCase
 
         $configClone = clone $config;
 
-        $this->assertEquals($config, $configClone);
-        $this->assertNotSame($objValue, $configClone->get('test_object'));
+        self::assertEquals($config, $configClone);
+        self::assertNotSame($objValue, $configClone->get('test_object'));
     }
 
     public function testExcluded()
     {
         $config = new StatusCodeConfig();
-        $this->assertFalse($config->hasExcluded());
-        $this->assertFalse($config->isExcluded());
+        self::assertFalse($config->hasExcluded());
+        self::assertFalse($config->isExcluded());
 
         $config->setExcluded();
-        $this->assertTrue($config->hasExcluded());
-        $this->assertTrue($config->isExcluded());
-        $this->assertEquals(['exclude' => true], $config->toArray());
+        self::assertTrue($config->hasExcluded());
+        self::assertTrue($config->isExcluded());
+        self::assertEquals(['exclude' => true], $config->toArray());
 
         $config->setExcluded(false);
-        $this->assertTrue($config->hasExcluded());
-        $this->assertFalse($config->isExcluded());
-        $this->assertEquals([], $config->toArray());
+        self::assertTrue($config->hasExcluded());
+        self::assertFalse($config->isExcluded());
+        self::assertEquals([], $config->toArray());
     }
 
     public function testDescription()
     {
         $config = new StatusCodeConfig();
-        $this->assertFalse($config->hasDescription());
-        $this->assertNull($config->getDescription());
+        self::assertFalse($config->hasDescription());
+        self::assertNull($config->getDescription());
 
         $config->setDescription('text');
-        $this->assertTrue($config->hasDescription());
-        $this->assertEquals('text', $config->getDescription());
-        $this->assertEquals(['description' => 'text'], $config->toArray());
+        self::assertTrue($config->hasDescription());
+        self::assertEquals('text', $config->getDescription());
+        self::assertEquals(['description' => 'text'], $config->toArray());
 
         $config->setDescription(null);
-        $this->assertFalse($config->hasDescription());
-        $this->assertNull($config->getDescription());
-        $this->assertEquals([], $config->toArray());
+        self::assertFalse($config->hasDescription());
+        self::assertNull($config->getDescription());
+        self::assertEquals([], $config->toArray());
 
         $config->setDescription('text');
         $config->setDescription('');
-        $this->assertFalse($config->hasDescription());
-        $this->assertNull($config->getDescription());
-        $this->assertEquals([], $config->toArray());
+        self::assertFalse($config->hasDescription());
+        self::assertNull($config->getDescription());
+        self::assertEquals([], $config->toArray());
     }
 }

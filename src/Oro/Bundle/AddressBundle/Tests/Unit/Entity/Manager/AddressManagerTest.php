@@ -1,14 +1,14 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Entity\Manager;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity\Manager;
 
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Entity\Manager\AddressManager;
 
-class AddressManagerTest extends \PHPUnit_Framework_TestCase
+class AddressManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $om;
 
@@ -119,7 +119,7 @@ class AddressManagerTest extends \PHPUnit_Framework_TestCase
      * Return repository mock
      *
      * @param array $addressCriteria
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getRepository($addressCriteria = array())
     {

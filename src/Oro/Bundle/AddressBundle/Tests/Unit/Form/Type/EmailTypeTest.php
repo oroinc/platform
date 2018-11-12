@@ -6,7 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType as SymfonyEmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 
-class EmailTypeTest extends \PHPUnit_Framework_TestCase
+class EmailTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailType

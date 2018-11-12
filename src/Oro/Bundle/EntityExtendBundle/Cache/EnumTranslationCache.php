@@ -58,8 +58,9 @@ class EnumTranslationCache
     public function fetch(string $enumValueEntityClass): array
     {
         $key = $this->getKey($enumValueEntityClass);
+        $value = $this->cache->fetch($key);
 
-        return $this->cache->contains($key) ? $this->cache->fetch($key) : [];
+        return false !== $value ? $value : [];
     }
 
     /**

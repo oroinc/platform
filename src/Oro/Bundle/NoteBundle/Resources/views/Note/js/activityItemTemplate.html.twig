@@ -28,10 +28,10 @@
 
     {% set action %}
         <% if (editable) { %>
-        <a href="#" class="action item-edit-button"
+        <a href="#" class="dropdown-item action item-edit-button"
            title="{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}"
            data-action-extra-options="{{ {dialogOptions: {width: 1000}}|json_encode }}">
-            <i class="fa-pencil-square-o hide-text">{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}</i>
+            <span class="fa-pencil-square-o hide-text" aria-hidden="true">{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}</span>
             {{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}
         </a>
         <% } %>
@@ -40,9 +40,9 @@
 
     {% set action %}
         <% if (removable) { %>
-        <a href="#" class="action item-remove-button"
+        <a href="#" class="dropdown-item action item-remove-button"
            title="{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName}) }}">
-            <i class="fa-trash-o hide-text">{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName}) }}</i>
+            <span class="fa-trash-o hide-text" aria-hidden="true">{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName}) }}</span>
             {{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName}) }}
         </a>
         <% } %>

@@ -6,7 +6,7 @@ use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 
-class ExtendClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class ExtendClassMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ExtendClassMetadataFactory

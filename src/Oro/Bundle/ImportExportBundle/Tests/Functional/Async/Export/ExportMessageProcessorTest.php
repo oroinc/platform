@@ -122,7 +122,7 @@ class ExportMessageProcessorTest extends WebTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ExportHandler
+     * @return \PHPUnit\Framework\MockObject\MockObject|ExportHandler
      */
     private function createExportHandlerMock()
     {
@@ -130,7 +130,7 @@ class ExportMessageProcessorTest extends WebTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionMock()
     {

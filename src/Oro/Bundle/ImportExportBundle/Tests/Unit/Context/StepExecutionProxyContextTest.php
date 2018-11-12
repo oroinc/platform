@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
+use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
+use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 
-class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
+class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $stepExecution;
 
@@ -52,11 +54,33 @@ class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
         $this->stepExecution->expects($this->once())
             ->method('setReadCount')
             ->with(2);
-        $this->stepExecution->expects($this->once())
+        $this->stepExecution
+            ->expects(self::exactly(3))
             ->method('getReadCount')
             ->will($this->returnValue(1));
 
+        $jobInstance = $this->createMock(JobInstance::class);
+        $jobInstance
+            ->expects(self::exactly(2))
+            ->method('getRawConfiguration')
+            ->willReturnOnConsecutiveCalls(['incremented_read' => false], ['incremented_read' => true]);
+
+        $jobExecution = $this->createMock(JobExecution::class);
+        $jobExecution
+            ->expects(self::exactly(2))
+            ->method('getJobInstance')
+            ->willReturn($jobInstance);
+
+        $this->stepExecution
+            ->expects(self::exactly(2))
+            ->method('getJobExecution')
+            ->willReturn($jobExecution);
+
         $this->context->incrementReadCount();
+        self::assertEquals(1, $this->context->getReadCount());
+
+        $this->context->incrementReadCount();
+        self::assertEquals(1, $this->context->getReadCount());
     }
 
     public function testGetReadCount()

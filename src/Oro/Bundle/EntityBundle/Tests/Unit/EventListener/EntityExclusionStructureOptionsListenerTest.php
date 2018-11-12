@@ -14,14 +14,14 @@ use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_TestCase
+class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $managerRegistry;
 
-    /** @var ExclusionProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $exclusionProvider;
 
     /** @var EntityExclusionStructureOptionsListener */

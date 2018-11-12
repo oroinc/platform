@@ -12,6 +12,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Segment form type
+ * Used for creating segments, extends abstract query designer
+ */
 class SegmentType extends AbstractQueryDesignerType
 {
     /**
@@ -48,7 +52,7 @@ class SegmentType extends AbstractQueryDesignerType
     {
         return [
             'column_column_field_choice_options' => [
-                'exclude_fields' => ['relation_type'],
+                'exclude_fields' => ['relationType'],
             ],
             'column_column_choice_type' => HiddenType::class,
             'filter_column_choice_type' => EntityFieldSelectType::class

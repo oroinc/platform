@@ -12,14 +12,14 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class WorkflowEntityConnectorTest extends \PHPUnit_Framework_TestCase
+class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     /** @var WorkflowEntityConnector */
     protected $entityConnector;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
     protected function setUp()

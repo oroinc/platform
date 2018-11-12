@@ -13,18 +13,18 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 
-class WorkflowStartListenerTest extends \PHPUnit_Framework_TestCase
+class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $systemWorkflowManager;
 
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowManager;
 
-    /** @var WorkflowManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowManagerRegistry;
 
-    /** @var WorkflowAwareCache|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowAwareCache|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowAwareCache;
 
     /** @var WorkflowStartListener */
@@ -162,7 +162,7 @@ class WorkflowStartListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getWorkflow()
     {
@@ -197,7 +197,7 @@ class WorkflowStartListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param $entity
      * @param EntityManager|null $entityManager
-     * @return LifecycleEventArgs|\PHPUnit_Framework_MockObject_MockObject
+     * @return LifecycleEventArgs|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getEvent($entity, EntityManager $entityManager = null)
     {

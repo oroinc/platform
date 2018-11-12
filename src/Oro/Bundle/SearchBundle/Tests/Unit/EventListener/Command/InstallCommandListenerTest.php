@@ -12,21 +12,21 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class InstallCommandListenerTest extends \PHPUnit_Framework_TestCase
+class InstallCommandListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RequestStack */
     protected $requestStack;
 
-    /** @var Command|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Command|\PHPUnit\Framework\MockObject\MockObject */
     protected $command;
 
-    /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $input;
 
-    /** @var OutputInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $output;
 
-    /** @var CommandExecutor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CommandExecutor|\PHPUnit\Framework\MockObject\MockObject */
     protected $commandExecutor;
 
     /** @var InstallerEvent */

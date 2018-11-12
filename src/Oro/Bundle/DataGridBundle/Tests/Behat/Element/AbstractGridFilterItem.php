@@ -16,6 +16,19 @@ abstract class AbstractGridFilterItem extends Element
         }
     }
 
+    /**
+     * Close filter
+     */
+    public function close()
+    {
+        if ($this->isOpen()) {
+            $this->find('css', '.filter-criteria-selector')->click();
+        }
+    }
+
+    /**
+     * @return bool
+     */
     public function isOpen()
     {
         return $this->hasClass('open-filter');

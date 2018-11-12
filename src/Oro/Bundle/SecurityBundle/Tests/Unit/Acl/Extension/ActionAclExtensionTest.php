@@ -8,10 +8,10 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
-class ActionAclExtensionTest extends \PHPUnit_Framework_TestCase
+class ActionAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ActionMetadataProvider
+     * @var \PHPUnit\Framework\MockObject\MockObject|ActionMetadataProvider
      */
     protected $metadataProvider;
 

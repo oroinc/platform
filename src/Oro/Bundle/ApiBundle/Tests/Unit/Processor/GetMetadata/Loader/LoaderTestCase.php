@@ -7,23 +7,21 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 
-class LoaderTestCase extends \PHPUnit_Framework_TestCase
+class LoaderTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param string|null $className
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     * @return \PHPUnit\Framework\MockObject\MockObject|ClassMetadata
      */
     protected function getClassMetadataMock($className = null)
     {
         if ($className) {
-            $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->setConstructorArgs([$className])
                 ->getMock();
         } else {
-            $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-                ->disableOriginalConstructor()
-                ->getMock();
+            $classMetadata = $this->createMock(ClassMetadata::class);
         }
         $classMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
 

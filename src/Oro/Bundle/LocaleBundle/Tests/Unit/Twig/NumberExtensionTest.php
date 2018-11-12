@@ -6,14 +6,14 @@ use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Twig\NumberExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class NumberExtensionTest extends \PHPUnit_Framework_TestCase
+class NumberExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var NumberExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $formatter;
 
     protected function setUp()
@@ -34,15 +34,20 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
         $attribute = 'grouping_used';
         $style = 'decimal';
         $locale = 'fr_CA';
+        $attributes = ['decimal_digits' => 4];
         $expectedResult = 1;
 
         $this->formatter->expects($this->once())->method('getAttribute')
-            ->with($attribute, $style, $locale)
+            ->with($attribute, $style, $locale, $attributes)
             ->will($this->returnValue($expectedResult));
 
         $this->assertEquals(
             $expectedResult,
-            self::callTwigFunction($this->extension, 'oro_locale_number_attribute', [$attribute, $style, $locale])
+            self::callTwigFunction(
+                $this->extension,
+                'oro_locale_number_attribute',
+                [$attribute, $style, $locale, $attributes]
+            )
         );
     }
 

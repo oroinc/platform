@@ -6,7 +6,7 @@ use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class LessThanTest extends \PHPUnit_Framework_TestCase
+class LessThanTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Condition\LessThan */
     protected $condition;

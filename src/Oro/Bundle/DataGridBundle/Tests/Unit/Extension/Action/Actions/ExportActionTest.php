@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Action\Actions;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ExportAction;
 
-class ExportActionTest extends \PHPUnit_Framework_TestCase
+class ExportActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExportAction */
     protected $action;

@@ -36,7 +36,7 @@ class TranslationOperationsTest extends ActionTestCase
     }
 
     /**
-     * @dataProvider testRemoveTranslationOperationDataProvider
+     * @dataProvider removeTranslationOperationDataProvider
      *
      * @param string $translation
      */
@@ -66,7 +66,7 @@ class TranslationOperationsTest extends ActionTestCase
     /**
      * @return array
      */
-    public function testRemoveTranslationOperationDataProvider()
+    public function removeTranslationOperationDataProvider()
     {
         return [
             'scope SYSTEM' => [LoadTranslations::TRANSLATION_KEY_1],
@@ -84,7 +84,7 @@ class TranslationOperationsTest extends ActionTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Translator
+     * @return \PHPUnit\Framework\MockObject\MockObject|Translator
      */
     private function getTranslatorMock()
     {

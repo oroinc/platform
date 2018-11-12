@@ -10,13 +10,13 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
     private $resourcesProvider;
 
     /** @var SetHttpAllowHeaderForList */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -73,7 +73,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('GET, POST', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, GET, POST', $this->context->getResponseHeaders()->get('Allow'));
     }
 
     public function testProcessWhenNoAllowedHttpMethods()
@@ -109,6 +109,6 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('GET, PATCH, POST, DELETE', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, GET, PATCH, POST, DELETE', $this->context->getResponseHeaders()->get('Allow'));
     }
 }

@@ -7,7 +7,7 @@ use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class AuditTest extends \PHPUnit_Framework_TestCase
+class AuditTest extends \PHPUnit\Framework\TestCase
 {
     public function testUser()
     {

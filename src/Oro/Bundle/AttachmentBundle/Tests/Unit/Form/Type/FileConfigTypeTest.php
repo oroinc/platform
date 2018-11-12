@@ -5,7 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileConfigType;
 use Symfony\Component\Form\FormEvents;
 
-class FileConfigTypeTest extends \PHPUnit_Framework_TestCase
+class FileConfigTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FileConfigType */
     protected $type;

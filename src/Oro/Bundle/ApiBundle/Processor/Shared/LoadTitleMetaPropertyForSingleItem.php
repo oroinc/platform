@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 
 /**
- * If it was requested, adds "title" meta property value to a result item.
+ * Adds "title" meta property value to a result item if it was requested.
  */
 class LoadTitleMetaPropertyForSingleItem extends LoadTitleMetaProperty
 {

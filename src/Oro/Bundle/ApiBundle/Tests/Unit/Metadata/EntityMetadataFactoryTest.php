@@ -13,7 +13,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 class EntityMetadataFactoryTest extends OrmRelatedTestCase
 {
     /** @var EntityMetadataFactory */
-    protected $metadataFactory;
+    private $metadataFactory;
 
     protected function setUp()
     {
@@ -34,7 +34,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class)
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateEntityMetadataForEntityWithCompositeIdentifier()
@@ -49,7 +49,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             $this->doctrineHelper->getEntityMetadataForClass(Entity\CompositeKeyEntity::class)
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateMetaPropertyMetadata()
@@ -63,7 +63,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'name'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateMetaPropertyMetadataByPropertyPath()
@@ -77,7 +77,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'owner.id'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateMetaPropertyMetadataWhenDataTypeIsSpecified()
@@ -92,7 +92,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'integer'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateMetaPropertyMetadataForNotManageableField()
@@ -105,7 +105,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'unmanageableField'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateFieldMetadataForIdentifier()
@@ -120,7 +120,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'id'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateFieldMetadata()
@@ -136,7 +136,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'name'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateFieldMetadataByPropertyPath()
@@ -152,7 +152,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'category.label'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateFieldMetadataWhenDataTypeIsSpecified()
@@ -169,7 +169,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'integer'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateFieldMetadataForNullable()
@@ -184,7 +184,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'updatedAt'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateAssociationMetadataForManyToOne()
@@ -203,7 +203,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'category'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateAssociationMetadataForManyToOneByPropertyPath()
@@ -222,7 +222,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'owner.category'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateAssociationMetadataForNotNullableManyToOne()
@@ -241,7 +241,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'category'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateAssociationMetadataForManyToMany()
@@ -260,7 +260,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'users'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateAssociationMetadataForManyToManyByPropertyPath()
@@ -279,7 +279,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'owner.groups'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 
     public function testCreateAssociationMetadataWithDataType()
@@ -299,6 +299,6 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
             'integer'
         );
 
-        $this->assertEquals($expectedMetadata, $metadata);
+        self::assertEquals($expectedMetadata, $metadata);
     }
 }

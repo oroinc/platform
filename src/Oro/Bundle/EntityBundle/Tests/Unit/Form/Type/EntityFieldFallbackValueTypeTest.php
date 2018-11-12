@@ -16,7 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
 {
-    /** @var EntityFallbackResolver|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityFallbackResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $fallbackResolver;
 
     public function testOptionsCanBeOverridden()

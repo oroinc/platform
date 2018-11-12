@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class ThemeListenerTest extends \PHPUnit_Framework_TestCase
+class ThemeListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ThemeListener */
     protected $listener;

@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
+use Oro\Bundle\ApiBundle\Processor\Options\OptionsContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\AddRelationshipContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship\DeleteRelationshipContext;
@@ -356,6 +357,91 @@ abstract class RequestActionHandler
     }
 
     /**
+     * Handles "OPTIONS /api/{entity}/{id}" request,
+     * that returns the communication options for the target resource.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleOptionsItem(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiActions::OPTIONS);
+        /** @var OptionsContext $context */
+        $context = $processor->createContext();
+        $this->preparePrimaryContext($context, $request);
+        $this->prepareOptionsContext($context, $request, OptionsContext::ACTION_TYPE_ITEM);
+        $context->setId($this->getRequestParameter($request, 'id'));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Handles "OPTIONS /api/{entity}" request,
+     * that returns the communication options for the target resource.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleOptionsList(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiActions::OPTIONS);
+        /** @var OptionsContext $context */
+        $context = $processor->createContext();
+        $this->preparePrimaryContext($context, $request);
+        $this->prepareOptionsContext($context, $request, OptionsContext::ACTION_TYPE_LIST);
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Handles "OPTIONS /api/{entity}/{id}/{association}" request,
+     * that returns the communication options for the target resource.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleOptionsSubresource(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiActions::OPTIONS);
+        /** @var OptionsContext $context */
+        $context = $processor->createContext();
+        $this->prepareSubresourceContext($context, $request);
+        $this->prepareOptionsContext($context, $request, OptionsContext::ACTION_TYPE_SUBRESOURCE);
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Handles "OPTIONS /api/{entity}/{id}/relationships/{association}" request,
+     * that returns the communication options for the target resource.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleOptionsRelationship(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiActions::OPTIONS);
+        /** @var OptionsContext $context */
+        $context = $processor->createContext();
+        $this->prepareSubresourceContext($context, $request);
+        $this->prepareOptionsContext($context, $request, OptionsContext::ACTION_TYPE_RELATIONSHIP);
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
      * Handles not allowed "/api/{entity}/{id}" request.
      *
      * @param Request $request
@@ -455,6 +541,7 @@ abstract class RequestActionHandler
         foreach ($this->requestType as $type) {
             $requestType->add($type);
         }
+        $context->setMasterRequest(true);
         $context->setRequestHeaders($this->getRequestHeaders($request));
     }
 
@@ -478,6 +565,16 @@ abstract class RequestActionHandler
         $context->setParentClassName($this->getRequestParameter($request, 'entity'));
         $context->setParentId($this->getRequestParameter($request, 'id'));
         $context->setAssociationName($this->getRequestParameter($request, 'association'));
+    }
+
+    /**
+     * @param OptionsContext $context
+     * @param Request        $request
+     * @param string         $actionType
+     */
+    protected function prepareOptionsContext(OptionsContext $context, Request $request, string $actionType): void
+    {
+        $context->setActionType($actionType);
     }
 
     /**

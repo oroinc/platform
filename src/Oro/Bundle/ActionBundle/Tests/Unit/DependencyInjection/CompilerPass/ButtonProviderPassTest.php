@@ -5,9 +5,9 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ButtonProviderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class ButtonProviderPassTest extends \PHPUnit_Framework_TestCase
+class ButtonProviderPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $builder;
 
     /**
@@ -20,7 +20,7 @@ class ButtonProviderPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        /* @var $compilerPass ButtonProviderPass|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $compilerPass ButtonProviderPass|\PHPUnit\Framework\MockObject\MockObject */
         $compilerPass = $this->getMockBuilder(ButtonProviderPass::class)
             ->setMethods(['registerTaggedServices'])
             ->getMock();

@@ -4,10 +4,10 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 
-class EntityDataEventTest extends \PHPUnit_Framework_TestCase
+class EntityDataEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityData;
 

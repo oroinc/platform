@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class SecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
+class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SecurityFirewallCompilerPass */
     private $compiler;
@@ -101,7 +101,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
             [
                 new IteratorArgument(
                     [
-                        new Reference('security.access_listener'),
+                        new Reference('security.access_listener')
                     ]
                 ),
                 $exceptionListener

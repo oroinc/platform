@@ -13,7 +13,7 @@ use Oro\Component\Duplicator\Matcher\MatcherFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class DuplicateEntityTest extends \PHPUnit_Framework_TestCase
+class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ContextAccessor
@@ -128,10 +128,10 @@ class DuplicateEntityTest extends \PHPUnit_Framework_TestCase
     {
         $target = new \stdClass();
 
-        /** @var ContextAccessor|\PHPUnit_Framework_MockObject_MockObject $contextAccessor */
+        /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject $contextAccessor */
         $contextAccessor = $this->getMockBuilder(ContextAccessor::class)->disableOriginalConstructor()->getMock();
 
-        /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject $eventDispatcher $eventDispatcher */
+        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher $eventDispatcher */
         $eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $action = new DuplicateEntity($contextAccessor);

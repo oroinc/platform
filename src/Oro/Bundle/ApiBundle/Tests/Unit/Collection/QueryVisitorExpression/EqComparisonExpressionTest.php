@@ -6,26 +6,33 @@ use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EqComparisonExpression;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class EqComparisonExpressionTest extends \PHPUnit_Framework_TestCase
+class EqComparisonExpressionTest extends \PHPUnit\Framework\TestCase
 {
     public function testWalkComparisonExpression()
     {
         $expression = new EqComparisonExpression();
-        $expressionVisitor = new QueryExpressionVisitor();
-        $fieldName = 'e.test';
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+        $field = 'e.test';
+        $expr = 'LOWER(e.test)';
         $parameterName = 'test_1';
         $value = 'text';
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
-            $fieldName,
+            $field,
+            $expr,
             $parameterName,
             $value
         );
 
         self::assertEquals(
-            new Comparison($fieldName, '=', ':' . $parameterName),
+            new Comparison($expr, '=', ':' . $parameterName),
             $result
         );
         self::assertEquals(
@@ -37,19 +44,25 @@ class EqComparisonExpressionTest extends \PHPUnit_Framework_TestCase
     public function testWalkComparisonExpressionForNullValue()
     {
         $expression = new EqComparisonExpression();
-        $expressionVisitor = new QueryExpressionVisitor();
-        $fieldName = 'e.test';
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+        $field = 'e.test';
+        $expr = 'LOWER(e.test)';
         $parameterName = 'test_1';
         $value = null;
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
-            $fieldName,
+            $field,
+            $expr,
             $parameterName,
             $value
         );
 
-        self::assertEquals($fieldName . ' IS NULL', $result);
+        self::assertEquals($expr . ' IS NULL', $result);
         self::assertEmpty($expressionVisitor->getParameters());
     }
 }

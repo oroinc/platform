@@ -23,7 +23,7 @@
         {%- set classes = classes|merge(['dropdown', 'dropdown-level-' ~ item.level]) %}
         {%- set childrenClasses = childrenClasses|merge(['dropdown-menu', 'dropdown-menu-level-' ~ item.level]) %}
     {%- else -%}
-        {%- set classes = classes|merge(['dropdown-menu-single-item']) %}
+        {%- set classes = classes|merge(['dropdown', 'dropdown-menu-single-item', 'dropdown-level-' ~ item.level]) %}
     {%- endif -%}
     {%- if item.extras is defined and item.extras.routes is defined and item.extras.routes[0] is defined -%}
         {% set itemAttributes = itemAttributes|merge({'data-route': item.extras.routes[0]})%}
@@ -31,15 +31,37 @@
             {% set itemAttributes = itemAttributes|merge({'data-routes': item.extras.routes|slice(1)|json_encode })%}
         {%- endif -%}
     {%- endif -%}
-    {{- block('item_renderer') -}}
+
+    {% if item.level == 1 %}
+        {% set hasValidChildren = false %}
+
+        {% for sub_item in item if not hasValidChildren %}
+            {%- set showNonAuthorized = sub_item.extras.show_non_authorized is defined and sub_item.extras.show_non_authorized -%}
+            {%- set displayable = sub_item.extras.isAllowed or showNonAuthorized -%}
+            {% if sub_item.displayed and displayable and not sub_item.getExtra('divider') %}
+                {% set hasValidChildren = true %}
+            {% endif %}
+        {% endfor %}
+
+        {% if (item.uri is empty or item.uri != '#') or (item.hasChildren and item.displayChildren and hasValidChildren) %}
+            {{ block('item_renderer') }}
+        {% endif %}
+    {% else %}
+        {{ block('item_renderer') }}
+    {% endif %}
 {%- endblock -%}
 
 {% block linkElement %}
     {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
 
+    {% if isDesktopVersion() %}
+    {% set linkAttributes = linkAttributes|merge({
+        'class': oro_menu.add_attribute_values(linkAttributes, 'class', ['dropdown-toggle']),
+    }) %}
+    {% endif %}
+
     {% if item.hasChildren and item.displayChildren and item.level is sameas(0) %}
         {% set linkAttributes = linkAttributes|merge({
-            'class':       oro_menu.add_attribute_values(linkAttributes, 'class', ['dropdown-toggle']),
             'data-toggle': 'dropdown'
         }) %}
     {% endif %}

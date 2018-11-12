@@ -8,7 +8,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class WorkflowEntityAclIdentityTest extends \PHPUnit_Framework_TestCase
+class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var WorkflowEntityAclIdentity

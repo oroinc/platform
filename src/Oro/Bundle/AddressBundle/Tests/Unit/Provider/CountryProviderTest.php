@@ -6,9 +6,9 @@ use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository;
 use Oro\Bundle\AddressBundle\Provider\CountryProvider;
 
-class CountryProviderTest extends \PHPUnit_Framework_TestCase
+class CountryProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CountryRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CountryRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
     /** @var CountryProvider */

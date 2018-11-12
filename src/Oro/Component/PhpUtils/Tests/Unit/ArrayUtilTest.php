@@ -4,7 +4,7 @@ namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 
-class ArrayUtilTest extends \PHPUnit_Framework_TestCase
+class ArrayUtilTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider interposeDataProvider
@@ -678,112 +678,6 @@ class ArrayUtilTest extends \PHPUnit_Framework_TestCase
                     [3, 6],
                     [100, 100],
                 ]
-            ]
-        ];
-    }
-
-    /**
-     * @param array $array
-     * @param mixed $columnKey
-     * @param mixed $indexKey
-     * @param array $expected
-     *
-     * @dataProvider arrayColumnProvider
-     */
-    public function testArrayColumn(array $array, $columnKey, $indexKey, array $expected)
-    {
-        $this->assertEquals(
-            $expected,
-            ArrayUtil::arrayColumn($array, $columnKey, $indexKey)
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function arrayColumnProvider()
-    {
-        return [
-            'empty'        => [[], 'value', 'value', []],
-            'no_index'     => [
-                [
-                    [
-                        'id'    => 'id1',
-                        'value' => 'value2'
-                    ]
-                ],
-                'value',
-                null,
-                ['value2']
-            ],
-            'index'        => [
-                [
-                    [
-                        'id'    => 'id1',
-                        'value' => 'value2'
-                    ]
-                ],
-                'value',
-                'id',
-                ['id1' => 'value2']
-            ],
-            'wrong_index'  => [
-                [
-                    ['value' => 'value2']
-                ],
-                'value',
-                'id',
-                []
-            ],
-            'wrong_column' => [
-                [
-                    ['value' => 'value2']
-                ],
-                'id',
-                null,
-                []
-            ],
-            '0 column (key for which empty() is true)' => [
-                [
-                    ['a', 'b'],
-                    ['first', 'second'],
-                ],
-                0,
-                null,
-                ['a', 'first'],
-            ]
-        ];
-    }
-
-    /**
-     * @param array  $array
-     * @param mixed  $columnKey
-     * @param mixed  $indexKey
-     * @param string $expectedMessage
-     *
-     * @dataProvider arrayColumnInputData
-     */
-    public function testArrayColumnInputData(array $array, $columnKey, $indexKey, $expectedMessage)
-    {
-        $this->expectException('\InvalidArgumentException');
-        $this->expectExceptionMessage($expectedMessage);
-
-        ArrayUtil::arrayColumn($array, $columnKey, $indexKey);
-    }
-
-    /**
-     * @return array
-     */
-    public function arrayColumnInputData()
-    {
-        return [
-            'empty_column_key' => [
-                [
-                    ['id' => 'value']
-                ],
-                null,
-                null,
-                'Column key is empty'
             ]
         ];
     }

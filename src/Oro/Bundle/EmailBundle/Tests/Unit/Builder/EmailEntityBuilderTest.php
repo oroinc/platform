@@ -14,30 +14,44 @@ use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Exception\EmailAddressParseException;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Psr\Log\LoggerInterface;
 
-class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
+class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailEntityBuilder */
     private $builder;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailEntityBatchProcessor|\PHPUnit\Framework\MockObject\MockObject */
     private $batch;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
     protected function setUp()
     {
         $this->batch = $this->createMock(EmailEntityBatchProcessor::class);
         $addrManager = new EmailAddressManager('Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures', 'Test%sProxy');
         $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->builder = new EmailEntityBuilder($this->batch, $addrManager, new EmailAddressHelper(), $this->doctrine);
+        $this->builder = new EmailEntityBuilder(
+            $this->batch,
+            $addrManager,
+            new EmailAddressHelper(),
+            $this->doctrine,
+            $this->logger
+        );
     }
 
     private function initEmailStorage()
     {
-        $storage = array();
+        $storage = [];
         $this->batch->expects($this->any())
             ->method('getAddress')
             ->will(
@@ -61,26 +75,7 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testEmailUser()
     {
-        $emailMetadata = $this->createMock(ClassMetadata::class);
-        $emailMetadata->expects(self::once())
-            ->method('getFieldMapping')
-            ->with('fromName')
-            ->willReturn(['length' => 100]);
-        $emailRecipientMetadata = $this->createMock(ClassMetadata::class);
-        $emailRecipientMetadata->expects(self::once())
-            ->method('getFieldMapping')
-            ->with('name')
-            ->willReturn(['length' => 100]);
-        $em = $this->createMock(EntityManager::class);
-        $em->expects(self::exactly(2))
-            ->method('getClassMetadata')
-            ->willReturnMap([
-                [Email::class, $emailMetadata],
-                [EmailRecipient::class, $emailRecipientMetadata]
-            ]);
-        $this->doctrine->expects(self::exactly(2))
-            ->method('getManagerForClass')
-            ->willReturn($em);
+        $this->mockMetadata();
 
         $this->initEmailStorage();
 
@@ -121,7 +116,14 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($emailUser->getEmail()->getEmailUsers()->contains($emailUser));
     }
 
-    public function testToRecipient()
+    /**
+     * @param string $recipient
+     * @param string $expectedName
+     * @param string $expectedEmail
+     *
+     * @dataProvider getTestToRecipientDataProvider
+     */
+    public function testToRecipient(string $recipient, string $expectedName, string $expectedEmail)
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects(self::once())
@@ -139,11 +141,30 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($em);
 
         $this->initEmailStorage();
-        $result = $this->builder->recipientTo('"Test" <test@example.com>');
+        $result = $this->builder->recipientTo($recipient);
 
         $this->assertEquals(EmailRecipient::TO, $result->getType());
-        $this->assertEquals('"Test" <test@example.com>', $result->getName());
-        $this->assertEquals('test@example.com', $result->getEmailAddress()->getEmail());
+        $this->assertEquals($expectedName, $result->getName());
+        $this->assertEquals($expectedEmail, $result->getEmailAddress()->getEmail());
+    }
+
+    /**
+     * @return array
+     */
+    public function getTestToRecipientDataProvider()
+    {
+        return [
+            'full recipient' => [
+                'recipient' => '"Test" <test@example.com>',
+                'expectedName' => '"Test" <test@example.com>',
+                'expectedEmail' => 'test@example.com'
+            ],
+            'email adress' => [
+                'recipient' => 'test@example.com',
+                'expectedName' => 'test@example.com',
+                'expectedEmail' => 'test@example.com'
+            ]
+        ];
     }
 
     public function testCcRecipient()
@@ -198,7 +219,7 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testFolder()
     {
-        $storage = array();
+        $storage = [];
         $this->batch->expects($this->exactly(10))
             ->method('getFolder')
             ->will(
@@ -282,6 +303,10 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string $email
+     * @param EmailAddressParseException|null $expectedException
+     * @param string $message
+     *
      * @dataProvider validateEmailDataProvider
      */
     public function testValidateEmailAddress($email, $expectedException, $message)
@@ -293,6 +318,9 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->address($email);
     }
 
+    /**
+     * @return array
+     */
     public function validateEmailDataProvider()
     {
         return [
@@ -310,7 +338,89 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
                 'email' => 'test@example.com',
                 'expectedException' => null,
                 'expectedExceptionMessage' => ''
+            ],
+            [
+                'email' => '',
+                'expectedException' => EmailAddressParseException::class,
+                'expectedExceptionMessage' => 'Not valid email address'
             ]
         ];
+    }
+
+    /**
+     * @param string $email
+     * @param string $expectedContextMessage
+     *
+     * @dataProvider getTestValidateRecipientEmailAddressDataProvider
+     */
+    public function testValidateRecipientEmailAddress(string $email, string $expectedContextMessage)
+    {
+        $this->mockMetadata();
+
+        $this->logger->expects($this->once())
+            ->method('warning')
+            ->with(
+                'An invalid recipient address has been ignored',
+                ['exception' => $expectedContextMessage]
+            );
+
+        $date = new \DateTime('now');
+        $this->builder->emailUser(
+            'testSubject',
+            '"Test" <test@example.com>',
+            $email,
+            $date,
+            $date,
+            $date,
+            Email::NORMAL_IMPORTANCE,
+            ['test1@example.com']
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function getTestValidateRecipientEmailAddressDataProvider()
+    {
+        $longEmailAddress = str_repeat('domain', 50).'@mail.com';
+
+        return [
+            [
+                'email' => ' ',
+                'expectedContextMessage' => 'Not valid email address:  '
+            ],
+            [
+                'email' => 'test email',
+                'expectedContextMessage' => 'Not valid email address: test email'
+            ],
+            [
+                'email' => $longEmailAddress,
+                'expectedContextMessage' => 'Email address is too long: '.$longEmailAddress
+            ]
+        ];
+    }
+
+    private function mockMetadata()
+    {
+        $emailMetadata = $this->createMock(ClassMetadata::class);
+        $emailMetadata->expects(self::once())
+            ->method('getFieldMapping')
+            ->with('fromName')
+            ->willReturn(['length' => 100]);
+        $emailRecipientMetadata = $this->createMock(ClassMetadata::class);
+        $emailRecipientMetadata->expects(self::once())
+            ->method('getFieldMapping')
+            ->with('name')
+            ->willReturn(['length' => 100]);
+        $em = $this->createMock(EntityManager::class);
+        $em->expects(self::exactly(2))
+            ->method('getClassMetadata')
+            ->willReturnMap([
+                [Email::class, $emailMetadata],
+                [EmailRecipient::class, $emailRecipientMetadata]
+            ]);
+        $this->doctrine->expects(self::exactly(2))
+            ->method('getManagerForClass')
+            ->willReturn($em);
     }
 }

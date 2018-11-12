@@ -12,22 +12,25 @@ use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDum
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Filesystem\Filesystem;
 
-class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
+class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     const CLASS_NAMESPACE = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\Dumper';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityManagerBag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var ConfigProviderMock */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $generator;
 
     /** @var string */
@@ -36,7 +39,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
     /** @var ExtendConfigDumper */
     protected $dumper;
 
-    /** @var ExtendEntityConfigProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExtendEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendEntityConfigProvider;
 
     public function setUp()
@@ -55,8 +58,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->extendEntityConfigProvider = $this->createMock(ExtendEntityConfigProviderInterface::class);
 
-        $this->cacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ExtendConfigDumperTest' . DIRECTORY_SEPARATOR
-            . 'Dumper' . DIRECTORY_SEPARATOR . 'cache';
+        $this->cacheDir = $this->getTempDir('ExtendConfigDumperTest', false);
 
         $this->dumper = new ExtendConfigDumper(
             $this->entityManagerBag,
@@ -67,15 +69,6 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
             $this->extendEntityConfigProvider,
             $this->cacheDir
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        $fileSystem = new Filesystem();
-        $fileSystem->remove(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ExtendConfigDumperTest');
     }
 
     public function testCheckConfigWhenAliasesExists()

@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategy;
 
-class NameStrategyTest extends \PHPUnit_Framework_TestCase
+class NameStrategyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var NameStrategy

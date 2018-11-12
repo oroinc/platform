@@ -25,7 +25,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Tests extensions config tree definitions
  */
-class EntityConfigurationTest extends \PHPUnit_Framework_TestCase
+class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider loadConfigurationDataProvider

@@ -7,7 +7,7 @@ use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 
-class ReindexCommandTest extends \PHPUnit_Framework_TestCase
+class ReindexCommandTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
@@ -93,7 +93,7 @@ class ReindexCommandTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|IndexerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|IndexerInterface
      */
     private function createSearchIndexerMock()
     {

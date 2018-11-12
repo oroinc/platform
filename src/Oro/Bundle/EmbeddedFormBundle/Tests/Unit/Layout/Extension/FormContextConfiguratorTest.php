@@ -12,9 +12,9 @@ use Oro\Component\Layout\LayoutContext;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
+class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     /** @var FormContextConfigurator */

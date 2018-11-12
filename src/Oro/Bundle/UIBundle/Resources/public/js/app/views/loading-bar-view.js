@@ -16,19 +16,23 @@ define(function(require) {
             'ajaxLoading', 'pageLoading'
         ]),
 
-        /** @property {string} */
+        /**
+         * @property {string}
+         */
         className: 'loading-bar',
 
-        /** @property {string} */
+        /**
+         * @property {string}
+         */
         container: 'body',
 
         /**
-         * @property {Object}
+         * @property {Boolean}
          */
         ajaxLoading: false,
 
         /**
-         * @property {Object}
+         * @property {Boolean}
          */
         pageLoading: false,
 
@@ -58,21 +62,21 @@ define(function(require) {
             var self = this;
 
             if (this.pageLoading) {
-                $(document).ready(function() {
+                $(document).on('ready' + this.eventNamespace(), function() {
                     self.showLoader();
                 });
 
-                $(window).on('load', function() {
+                $(window).on('load' + this.eventNamespace(), function() {
                     self.hideLoader();
                 });
             }
 
             if (this.ajaxLoading) {
-                $(document).ajaxStart(function() {
+                $(document).on('ajaxStart' + this.eventNamespace(), function() {
                     self.showLoader();
                 });
 
-                $(document).ajaxComplete(function() {
+                $(document).on('ajaxComplete' + this.eventNamespace(), function() {
                     self.hideLoader();
                 });
             }
@@ -102,6 +106,17 @@ define(function(require) {
                 });
             }, this));
             this.active = false;
+        },
+
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
+            $(document).off(this.eventNamespace());
+            $(window).off(this.eventNamespace());
+
+            LoadingBarView.__super__.dispose.call(this);
         }
     });
 

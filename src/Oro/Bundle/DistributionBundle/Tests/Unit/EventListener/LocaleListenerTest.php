@@ -14,29 +14,29 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class LocaleListenerTest extends \PHPUnit_Framework_TestCase
+class LocaleListenerTest extends \PHPUnit\Framework\TestCase
 {
     const LANG = 'de';
 
-    /** @var Connection|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     protected $connection;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
     /** @var RequestContext */
     protected $requestContext;
 
-    /** @var RequestContextAwareInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RequestContextAwareInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $router;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
-    /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject */
     protected $event;
 
     /** @var Request */

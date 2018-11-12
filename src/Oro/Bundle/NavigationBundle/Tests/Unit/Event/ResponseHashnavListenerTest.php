@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
+class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_URL = 'http://test_url/';
     const TEMPLATE = 'OroNavigationBundle:HashNav:redirect.html.twig';
@@ -28,17 +28,17 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
     protected $response;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $templating;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $event;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $tokenStorage;
 

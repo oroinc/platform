@@ -5,7 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Test\Assert;
 /**
  * Constraint that checks if exactly given messages were sent.
  */
-class SentMessagesConstraint extends \PHPUnit_Framework_Constraint
+class SentMessagesConstraint extends \PHPUnit\Framework\Constraint\Constraint
 {
     /**
      * @var array [['topic' => topic name, 'message' => message], ...]
@@ -35,7 +35,7 @@ class SentMessagesConstraint extends \PHPUnit_Framework_Constraint
                 return false;
             }
 
-            throw new \PHPUnit_Framework_ExpectationFailedException(
+            throw new \PHPUnit\Framework\ExpectationFailedException(
                 trim($description . "\n" . 'Failed asserting that exactly all messages were sent.'),
                 $f
             );

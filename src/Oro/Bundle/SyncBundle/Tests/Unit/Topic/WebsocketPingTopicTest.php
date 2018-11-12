@@ -7,13 +7,13 @@ use Oro\Bundle\SyncBundle\Topic\WebsocketPingTopic;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Ratchet\Wamp\Topic;
 
-class WebsocketPingTopicTest extends \PHPUnit_Framework_TestCase
+class WebsocketPingTopicTest extends \PHPUnit\Framework\TestCase
 {
     use LoggerAwareTraitTestTrait;
 
     private const TIMEOUT = 333;
 
-    /** @var TopicPeriodicTimer|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TopicPeriodicTimer|\PHPUnit\Framework\MockObject\MockObject */
     private $periodicTimer;
 
     /** @var WebsocketPingTopic */

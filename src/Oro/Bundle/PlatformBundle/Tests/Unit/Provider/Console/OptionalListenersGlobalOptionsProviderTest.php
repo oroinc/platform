@@ -10,10 +10,10 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 
-class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit_Framework_TestCase
+class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var OptionalListenerManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $listenersManager;
 
@@ -57,7 +57,7 @@ class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit_Framework_Test
 
     public function testResolveGlobalOptionsWhenNoListeners()
     {
-        /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject $input */
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->once())
             ->method('getOption')
@@ -73,7 +73,7 @@ class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit_Framework_Test
 
     public function testResolveGlobalOptionsWhenAllListeners()
     {
-        /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject $input */
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->once())
             ->method('getOption')
@@ -92,7 +92,7 @@ class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit_Framework_Test
     public function testResolveGlobalOptions()
     {
         $listeners = ['some_listener_service'];
-        /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject $input */
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->once())
             ->method('getOption')

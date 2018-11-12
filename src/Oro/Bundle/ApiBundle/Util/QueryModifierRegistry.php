@@ -40,7 +40,7 @@ class QueryModifierRegistry
      * Makes modifications of the given query builder and suitable for the given request type.
      *
      * @param QueryBuilder $qb             The query builder to modify
-     * @param bool         $skipRootEntity Whether the root entiry should be protected or not
+     * @param bool         $skipRootEntity Whether the root entity should be protected or not
      * @param RequestType  $requestType    The request type, for example "rest", "soap", etc.
      */
     public function modifyQuery(QueryBuilder $qb, bool $skipRootEntity, RequestType $requestType): void

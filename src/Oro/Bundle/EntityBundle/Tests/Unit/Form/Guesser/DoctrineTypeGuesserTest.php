@@ -7,7 +7,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 
-class DoctrineTypeGuesserTest extends \PHPUnit_Framework_TestCase
+class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DoctrineTypeGuesser
@@ -15,12 +15,12 @@ class DoctrineTypeGuesserTest extends \PHPUnit_Framework_TestCase
     protected $guesser;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $managerRegistry;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityConfigProvider;
 

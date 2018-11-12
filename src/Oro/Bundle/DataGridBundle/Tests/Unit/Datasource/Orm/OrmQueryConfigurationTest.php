@@ -9,7 +9,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 /**
  * @SuppressWarnings(PHPMD)
  */
-class OrmQueryConfigurationTest extends \PHPUnit_Framework_TestCase
+class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DatagridConfiguration */
     protected $config;

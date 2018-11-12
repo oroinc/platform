@@ -25,9 +25,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
+class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityMetadataHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityMetadataHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityMetadataHelper;
 
     /** @var ExtendOptionsManager */
@@ -43,17 +43,6 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
 
-        $this->entityMetadataHelper->expects($this->any())
-            ->method('getEntityClassByTableName')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['table1', 'Acme\AcmeBundle\Entity\Entity1'],
-                        ['table2', 'Acme\AcmeBundle\Entity\Entity2'],
-                        ['oro_enum_test_enum', ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Enum'],
-                    ]
-                )
-            );
         $this->entityMetadataHelper->expects($this->any())
             ->method('getEntityClassesByTableName')
             ->will(

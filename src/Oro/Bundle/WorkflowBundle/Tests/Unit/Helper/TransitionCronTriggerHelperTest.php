@@ -14,20 +14,20 @@ use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
-class TransitionCronTriggerHelperTest extends \PHPUnit_Framework_TestCase
+class TransitionCronTriggerHelperTest extends \PHPUnit\Framework\TestCase
 {
     const TRANSITION_NAME = 'test_transition';
     const RELATED_CLASS_NAME = 'stdClass';
     const RELATED_CLASS_ID_FIELD = 'id';
     const FILTER = 'filter != null';
 
-    /** @var WorkflowItemRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowItemRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var WorkflowAwareEntityFetcher|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowAwareEntityFetcher|\PHPUnit\Framework\MockObject\MockObject */
     protected $fetcher;
 
     /** @var TransitionCronTriggerHelper */
@@ -99,7 +99,7 @@ class TransitionCronTriggerHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $steps
-     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getWorkflowMock(array $steps = [])
     {

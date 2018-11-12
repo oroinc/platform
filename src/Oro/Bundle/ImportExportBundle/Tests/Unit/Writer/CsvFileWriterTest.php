@@ -5,9 +5,12 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\CsvFileWriter;
+use Oro\Component\Testing\TempDirExtension;
 
-class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
+class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var CsvFileWriter */
     protected $writer;
 
@@ -17,7 +20,7 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
     /** @var string */
     private $tmpDir;
 
-    /** @var ContextRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextRegistry;
 
     protected function setUp()
@@ -27,9 +30,8 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getByStepExecution'])
             ->getMock();
 
-        $this->tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'CsvFileWriterTest';
+        $this->tmpDir = $this->getTempDir('CsvFileWriterTest');
 
-        @\mkdir($this->tmpDir);
         $this->filePath = $this->tmpDir . DIRECTORY_SEPARATOR . 'new_file.csv';
 
         $this->writer = new CsvFileWriter($this->contextRegistry);
@@ -38,10 +40,6 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         $this->writer->close();
-        if (is_file($this->filePath)) {
-            unlink($this->filePath);
-        }
-        @\rmdir($this->tmpDir);
     }
 
     /**
@@ -114,7 +112,7 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
 
     public function optionsDataProvider()
     {
-        $filePath = sys_get_temp_dir() . '/CsvFileWriterTest/new_file.csv';
+        $filePath = $this->getTempDir('CsvFileWriterTest', null) . DIRECTORY_SEPARATOR . 'new_file.csv';
 
         return [
             'first_item_header' => [
@@ -216,7 +214,7 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $jobInstanceRawConfiguration
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|StepExecution
+     * @return \PHPUnit\Framework\MockObject\MockObject|StepExecution
      */
     protected function getMockStepExecution(array $jobInstanceRawConfiguration)
     {

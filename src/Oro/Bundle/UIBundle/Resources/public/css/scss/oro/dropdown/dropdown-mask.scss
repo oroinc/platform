@@ -1,0 +1,20 @@
+/* @theme: admin.oro; */
+
+.oro-dropdown-mask {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+    min-height: 100%;
+    min-width: 100%;
+    height: auto;
+    width: auto;
+    opacity: 0;
+    z-index: $zindex-dropdown - 101;
+    background-color: #fff;
+
+    // opacity should not be zero for valid scroll work on IOS
+    opacity: .001;
+}

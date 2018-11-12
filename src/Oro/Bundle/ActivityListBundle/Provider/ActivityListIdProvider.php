@@ -3,13 +3,15 @@
 namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\ActivityListBundle\AccessRule\ActivityListAccessRule;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
-use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
@@ -27,34 +29,34 @@ class ActivityListIdProvider
     /** @var ActivityListChainProvider */
     private $chainProvider;
 
-    /** @var ActivityListAclCriteriaHelper */
-    private $activityListAclHelper;
-
     /** @var ActivityListFilterHelper */
     private $activityListFilterHelper;
 
     /** @var ActivityInheritanceTargetsHelper */
     private $activityInheritanceTargetsHelper;
 
+    /** @var AclHelper */
+    private $aclHelper;
+
     /**
      * @param ConfigManager                    $config
      * @param ActivityListChainProvider        $chainProvider
-     * @param ActivityListAclCriteriaHelper    $activityListAclHelper
      * @param ActivityListFilterHelper         $activityListFilterHelper
      * @param ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
+     * @param AclHelper                        $aclHelper
      */
     public function __construct(
         ConfigManager $config,
         ActivityListChainProvider $chainProvider,
-        ActivityListAclCriteriaHelper $activityListAclHelper,
         ActivityListFilterHelper $activityListFilterHelper,
-        ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
+        ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper,
+        AclHelper $aclHelper
     ) {
         $this->config = $config;
         $this->chainProvider = $chainProvider;
-        $this->activityListAclHelper = $activityListAclHelper;
         $this->activityListFilterHelper = $activityListFilterHelper;
         $this->activityInheritanceTargetsHelper = $activityInheritanceTargetsHelper;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -103,10 +105,17 @@ class ActivityListIdProvider
             ->andWhere('associatedEntity = :associatedEntityId')
             ->setParameter(':associatedEntityId', $entityId);
 
-        $this->activityListAclHelper->applyAclCriteria($getIdsQb, $this->chainProvider->getProviders());
+        $query = $this->aclHelper->apply(
+            $getIdsQb,
+            'VIEW',
+            [
+                AclAccessRule::DISABLE_RULE => true,
+                ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS => 'ao'
+            ]
+        );
 
         $ids = array_merge(
-            $getIdsQb->getQuery()->getArrayResult(),
+            $query->getArrayResult(),
             $this->getGroupedActivityListIdsForInheritances($qb, $entityClass, $entityId)
         );
 
@@ -142,10 +151,17 @@ class ActivityListIdProvider
         $this->applyPageFilter($getIdsQb, $pageFilter);
 
         $this->activityListFilterHelper->addFiltersToQuery($getIdsQb, $filter);
-        $this->activityListAclHelper->applyAclCriteria($getIdsQb, $this->chainProvider->getProviders());
+        $query = $this->aclHelper->apply(
+            $getIdsQb,
+            'VIEW',
+            [
+                AclAccessRule::DISABLE_RULE => true,
+                ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS => 'ao'
+            ]
+        );
 
         $ids = array_merge(
-            $getIdsQb->getQuery()->getArrayResult(),
+            $query->getArrayResult(),
             $this->getListDataIdsForInheritances($getIdsQb, $entityClass, $entityId, $filter, $pageFilter)
         );
 
@@ -221,9 +237,17 @@ class ActivityListIdProvider
             );
 
             $this->activityListFilterHelper->addFiltersToQuery($inheritanceQb, $filter);
-            $this->activityListAclHelper->applyAclCriteria($inheritanceQb, $this->chainProvider->getProviders());
 
-            $ids = array_merge($ids, $inheritanceQb->getQuery()->getArrayResult());
+            $query = $this->aclHelper->apply(
+                $inheritanceQb,
+                'VIEW',
+                [
+                    AclAccessRule::DISABLE_RULE => true,
+                    ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS => 'ao'
+                ]
+            );
+
+            $ids = array_merge($ids, $query->getArrayResult());
         }
 
         return $ids;
@@ -252,9 +276,15 @@ class ActivityListIdProvider
                 ':associatedEntityId'
             );
 
-            $this->activityListAclHelper->applyAclCriteria($inheritanceQb, $this->chainProvider->getProviders());
-
-            $ids = array_merge($ids, $inheritanceQb->getQuery()->getArrayResult());
+            $query = $this->aclHelper->apply(
+                $inheritanceQb,
+                'VIEW',
+                [
+                    AclAccessRule::DISABLE_RULE => true,
+                    ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS => 'ao'
+                ]
+            );
+            $ids = array_merge($ids, $query->getArrayResult());
         }
 
         return $ids;

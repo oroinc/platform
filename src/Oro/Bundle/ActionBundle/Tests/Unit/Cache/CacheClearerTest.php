@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Cache;
 use Oro\Bundle\ActionBundle\Cache\CacheClearer;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 
-class CacheClearerTest extends \PHPUnit_Framework_TestCase
+class CacheClearerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CacheClearer */
     protected $clearer;
@@ -29,7 +29,7 @@ class CacheClearerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConfigurationProviderInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigurationProviderInterface
      */
     protected function getProviderMock()
     {

@@ -6,18 +6,18 @@ use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class EnumTranslationCacheTest extends \PHPUnit_Framework_TestCase
+class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = 'FooBar';
     const LOCALE = 'en';
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    /** @var Cache|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    /** @var EnumTranslationCache|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
     private $enumTranslationCache;
 
     public function setUp()
@@ -67,23 +67,18 @@ class EnumTranslationCacheTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param bool $isContains
-     * @param int $fetchCount
      * @param array $values
      *
      * @dataProvider getDataForFetch
      */
-    public function testFetch(bool $isContains, int $fetchCount, array $values)
+    public function testFetch(bool $isContains, array $values)
     {
         $key = $this->getKey();
 
         $this->cache->expects($this->once())
-            ->method('contains')
-            ->with($key)
-            ->willReturn($isContains);
-        $this->cache->expects($this->exactly($fetchCount))
             ->method('fetch')
             ->with($key)
-            ->willReturn($values);
+            ->willReturn($isContains ? $values : false);
 
         $this->assertEquals($values, $this->enumTranslationCache->fetch(self::CLASS_NAME));
     }
@@ -96,17 +91,14 @@ class EnumTranslationCacheTest extends \PHPUnit_Framework_TestCase
         return [
             'not contains' => [
                 'isContains' => false,
-                'fetchCount' => 0,
                 'values' => []
             ],
             'contains empty' => [
                 'isContains' => true,
-                'fetchCount' => 1,
                 'values' => []
             ],
             'contains values' => [
                 'isContains' => true,
-                'fetchCount' => 1,
                 'values' => [
                     ['value' => 1],
                     ['value' => 2]

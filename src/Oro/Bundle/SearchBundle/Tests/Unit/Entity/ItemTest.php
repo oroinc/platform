@@ -9,7 +9,7 @@ use Oro\Bundle\SearchBundle\Entity\IndexInteger;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
 use Oro\Bundle\SearchBundle\Entity\Item;
 
-class ItemTest extends \PHPUnit_Framework_TestCase
+class ItemTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Oro\Bundle\SearchBundle\Entity\Item
@@ -208,5 +208,25 @@ class ItemTest extends \PHPUnit_Framework_TestCase
         $integerFields = $this->item->getIntegerFields();
         $this->assertEquals(2, $integerFields->count());
         $this->assertEquals(5, $integerFields->get(3)->getValue());
+    }
+
+    public function testSetWeight()
+    {
+        $this->assertAttributeEquals(1, 'weight', $this->item);
+
+        $weight = 4.2;
+        $this->item->setWeight($weight);
+
+        $this->assertAttributeEquals($weight, 'weight', $this->item);
+    }
+
+    public function testGetWeight()
+    {
+        $this->assertEquals(1, $this->item->getWeight());
+
+        $weight = 4.2;
+        $this->item->setWeight($weight);
+
+        $this->assertEquals($weight, $this->item->getWeight());
     }
 }

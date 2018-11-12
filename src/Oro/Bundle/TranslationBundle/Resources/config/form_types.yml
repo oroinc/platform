@@ -8,6 +8,7 @@ services:
         arguments:
           - "@doctrine"
           - "@form.choice_list_factory.default"
+          - "@oro_security.acl_helper"
         tags:
             - { name: form.type, alias: translatable_entity }
 

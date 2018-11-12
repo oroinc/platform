@@ -163,7 +163,7 @@ Key classes
 Here is a list of key classes of EmailBundle:
 
  - EmailEntityBuilder - provides a way to easy build email related entities and responsible to correct building of a batch of email entities when you need to add a lot of emails in one database transaction.
- - EntityCacheWarmer and EntityCacheClearer - create/remove a proxy class for EmailAddress entity in app/entities folder.
+ - EntityCacheWarmer - create/remove a proxy class for EmailAddress entity in app/entities folder.
  - EmailAddressManager - responsible to correct creation of a proxy object for EmailAddress entity and allow to get correct doctrine repository for this entity. This class must be used because EmailAddress is doctrine mapped superclass and it cannot be created directly.
  - EmailOwnerManager - responsible to bind/unbind EmailAddress to the correct owner. This class handles modifications of all entities implement EmailOwnerInterface and EmailInterface and makes necessary changes in oro_email_address table.
  - EmailOwnerProviderStorage - holds all available email owner providers.

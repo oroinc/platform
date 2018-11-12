@@ -8,7 +8,7 @@ use Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerExpressionVerifier;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 
-class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit_Framework_TestCase
+class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TransitionEventTriggerExpressionVerifier */
     private $verifier;

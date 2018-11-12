@@ -4,18 +4,18 @@ html,
 body,
 .app-page,
 .app-page__central-panel {
-  height: auto !important;
+    height: auto !important;
 }
 
 .app-page {
-  display: block;
-  &__main {
     display: block;
-    width: 100% !important;
-  }
+    &__main {
+        display: block;
+        width: 100% !important;
+    }
 
-  &__left-panel,
-  &__right-panel {
-    display: none;
-  }
+    &__left-panel,
+    &__right-panel {
+        display: none;
+    }
 }

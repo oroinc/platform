@@ -72,7 +72,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         return [
             [null, null],
             ['', null],
-            [[], null],
+            [[], null]
         ];
     }
 
@@ -188,7 +188,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $entity->setName('test');
 
         $includedEntities->setPrimaryEntityId($value['class'], $value['id']);
-        $includedEntities->setPrimaryEntity($entity);
+        $includedEntities->setPrimaryEntity($entity, null);
 
         self::assertEquals($entity, $transformer->reverseTransform($value));
     }

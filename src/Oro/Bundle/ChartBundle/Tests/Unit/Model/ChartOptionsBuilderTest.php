@@ -4,7 +4,7 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder;
 
-class ChartOptionsBuilderTest extends \PHPUnit_Framework_TestCase
+class ChartOptionsBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ChartOptionsBuilder

@@ -16,7 +16,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class RestJsonApiTestCase extends RestApiTestCase
 {
-    const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
+    protected const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
 
     /**
      * {@inheritdoc}
@@ -36,17 +36,13 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
-     * Sends REST API request.
-     *
-     * @param string $method
-     * @param string $uri
-     * @param array  $parameters
-     * @param array  $server
-     *
-     * @return Response
+     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function request($method, $uri, array $parameters = [], array $server = [])
+    protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
+        $this->checkWsseAuthHeader($server);
+
         if (!empty($parameters['filter'])) {
             foreach ($parameters['filter'] as $key => $filter) {
                 $filter = self::processTemplateData($filter);
@@ -55,11 +51,19 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                         foreach ($filter as $k => $v) {
                             if (is_array($v)) {
                                 $filter[$k] = implode(',', $v);
+                            } elseif (is_bool($v)) {
+                                $filter[$k] = $v ? '1' : '0';
+                            } elseif (!is_string($v)) {
+                                $filter[$k] = (string)$v;
                             }
                         }
                     } else {
                         $filter = implode(',', $filter);
                     }
+                } elseif (is_bool($filter)) {
+                    $filter = $filter ? '1' : '0';
+                } elseif (!is_string($filter)) {
+                    $filter = (string)$filter;
                 }
                 $parameters['filter'][$key] = $filter;
             }
@@ -76,16 +80,13 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             unset($parameters['filters']);
         }
 
-        if (!isset($server['HTTP_X-WSSE'])) {
-            $server = array_replace($server, $this->getWsseAuthHeader());
-        }
-
         $this->client->request(
             $method,
             $uri,
             $parameters,
             [],
-            array_replace($server, ['CONTENT_TYPE' => self::JSON_API_CONTENT_TYPE])
+            array_replace($server, ['CONTENT_TYPE' => self::JSON_API_CONTENT_TYPE]),
+            $content
         );
 
         // make sure that REST API call does not start the session
@@ -637,39 +638,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         $content = self::jsonToArray($response->getContent());
         $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
 
-        self::assertArrayContains($expectedContent, $content);
-
-        // test the primary data collection count and order
-        if (!empty($expectedContent[JsonApiDoc::DATA])) {
-            $expectedData = $expectedContent[JsonApiDoc::DATA];
-            if (is_array($expectedData) && isset($expectedData[0][JsonApiDoc::TYPE])) {
-                $expectedItems = $this->getResponseDataItems($expectedData);
-                $actualItems = $this->getResponseDataItems($content[JsonApiDoc::DATA]);
-                self::assertSame(
-                    $expectedItems,
-                    $actualItems,
-                    'Failed asserting the primary data collection items count and order.'
-                );
-            }
-        }
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return array [['type' => entity type, 'id' => entity id], ...]
-     */
-    private function getResponseDataItems(array $data)
-    {
-        $result = [];
-        foreach ($data as $item) {
-            $result[] = [
-                JsonApiDoc::TYPE => $item[JsonApiDoc::TYPE],
-                JsonApiDoc::ID   => $item[JsonApiDoc::ID]
-            ];
-        }
-
-        return $result;
+        self::assertThat($content, new JsonApiDocContainsConstraint($expectedContent, false));
     }
 
     /**
@@ -732,8 +701,8 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                 $content[JsonApiDoc::ERRORS],
                 'Unexpected number of validation errors'
             );
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            throw new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     "%s\nResponse:\n%s",
                     $e->getMessage(),
@@ -811,7 +780,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                 $data[JsonApiDoc::ID] = sprintf('<toString(@%s->%s)>', $referenceId, $entityIdFieldName);
                 if (isset($data[JsonApiDoc::ATTRIBUTES])) {
                     $attributes = $data[JsonApiDoc::ATTRIBUTES];
-                    $dateFields = ['createdAt', 'updatedAt', 'created', 'updated'];
+                    $dateFields = ['createdAt', 'updatedAt'];
                     foreach ($dateFields as $field) {
                         if (isset($attributes[$field])) {
                             $data[JsonApiDoc::ATTRIBUTES][$field] = sprintf(
@@ -857,6 +826,24 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         self::assertArrayHasKey(JsonApiDoc::ID, $content[JsonApiDoc::DATA]);
 
         return $content[JsonApiDoc::DATA][JsonApiDoc::ID];
+    }
+
+    /**
+     * @param Response $response
+     * @param string   $includeId
+     *
+     * @return string
+     */
+    protected static function getNewResourceIdFromIncludedSection(Response $response, string $includeId): string
+    {
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('included', $responseContent);
+        foreach ($responseContent['included'] as $item) {
+            if (isset($item['meta']['includeId']) && $item['meta']['includeId'] === $includeId) {
+                return $item['id'];
+            }
+        }
+        self::fail(sprintf('New resource "%s" was not found.', $includeId));
     }
 
     /**

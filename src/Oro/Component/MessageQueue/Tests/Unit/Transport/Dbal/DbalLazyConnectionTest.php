@@ -8,7 +8,7 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class DbalLazyConnectionTest extends \PHPUnit_Framework_TestCase
+class DbalLazyConnectionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 
@@ -140,7 +140,7 @@ class DbalLazyConnectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @return \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
      */
     private function createManagerRegistryMock()
     {
@@ -148,7 +148,7 @@ class DbalLazyConnectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @return \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
      */
     private function createManagerRegistryStub($connection = null)
     {
@@ -163,7 +163,7 @@ class DbalLazyConnectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     * @return \PHPUnit\Framework\MockObject\MockObject|Connection
      */
     private function createDBALConnectionMock()
     {

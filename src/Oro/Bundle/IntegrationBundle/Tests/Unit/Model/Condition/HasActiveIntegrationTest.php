@@ -4,10 +4,10 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Model\Condition;
 
 use Oro\Bundle\IntegrationBundle\Model\Condition\HasActiveIntegration;
 
-class HasActiveIntegrationTest extends \PHPUnit_Framework_TestCase
+class HasActiveIntegrationTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $registry;
 

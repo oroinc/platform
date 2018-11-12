@@ -5,10 +5,10 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\AddressBundle\DependencyInjection\Compiler\AddressProviderPass;
 use Symfony\Component\DependencyInjection\Reference;
 
-class AddressProviderPassTest extends \PHPUnit_Framework_TestCase
+class AddressProviderPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $container;
 

@@ -10,7 +10,7 @@ use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EmailBundle\Model\Action\RequestMailboxes;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
-class RequestMailboxesTest extends \PHPUnit_Framework_TestCase
+class RequestMailboxesTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RequestMailboxes */
     protected $action;

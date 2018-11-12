@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
 /**
+ * The execution context for processors for "get_metadata" action.
  * @method EntityMetadata|null getResult()
  */
 class MetadataContext extends ApiContext
@@ -115,6 +116,25 @@ class MetadataContext extends ApiContext
         return in_array($extraName, $this->get(self::EXTRA), true);
     }
 
+    /**
+     * Gets additional metadata if it was requested.
+     *
+     * @param string $extraName
+     *
+     * @return MetadataExtraInterface|null
+     */
+    public function getExtra($extraName)
+    {
+        $result = null;
+        foreach ($this->extras as $extra) {
+            if ($extra->getName() === $extraName) {
+                $result = $extra;
+                break;
+            }
+        }
+
+        return $result;
+    }
     /**
      * Gets a list of requested additional metadata.
      *

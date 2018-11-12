@@ -20,21 +20,21 @@ use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
+class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclPrivilegeRepository */
     private $repository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $extensionSelector;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $aceProvider;
 
     protected function setUp()

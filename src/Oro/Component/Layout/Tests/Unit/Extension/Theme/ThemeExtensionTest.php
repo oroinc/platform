@@ -13,24 +13,24 @@ use Oro\Component\Layout\Loader\Driver\DriverInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoader;
 use Oro\Component\Layout\RawLayoutBuilder;
 
-class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
+class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ThemeExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ChainPathProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ChainPathProvider */
     protected $pathProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DriverInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DriverInterface */
     protected $phpDriver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DriverInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DriverInterface */
     protected $yamlDriver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DependencyInitializer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DependencyInitializer */
     protected $dependencyInitializer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceProviderInterface */
     protected $resourceProvider;
 
     protected function setUp()
@@ -159,7 +159,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
      * @param string $id
      * @param null|string $theme
      *
-     * @return LayoutItemInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return LayoutItemInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getLayoutItem($id, $theme = null)
     {

@@ -175,7 +175,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $container->setDefinition(self::API_DOC_HTML_FORMATTER_SERVICE, $compositeHtmlFormatterDef);
         $compositeHtmlFormatterDef->setPublic($isPublicService);
 
-        // configure formatters accorting to views config
+        // configure formatters according to views config
         $htmlFormatters = [];
         $views = $this->getApiDocViews($container);
         foreach ($views as $name => $view) {
@@ -201,7 +201,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
             self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE
         );
         if (null !== $chainServiceDef) {
-            // find services
             $services = [];
             $views = $container->getParameter(OroApiExtension::API_DOC_VIEWS_PARAMETER_NAME);
             $taggedServices = $container->findTaggedServiceIds(self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME);
@@ -230,11 +229,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
                 return;
             }
 
-            // sort by priority and flatten
-            krsort($services);
-            $services = call_user_func_array('array_merge', $services);
-
-            // register
+            $services = DependencyInjectionUtil::sortByPriorityAndFlatten($services);
             foreach ($services as $service) {
                 $chainServiceDef->addMethodCall('addResolver', $service);
             }

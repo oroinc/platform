@@ -23,6 +23,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraints\Valid;
 
+/**
+ * Form type to represent email
+ */
 class EmailType extends AbstractType
 {
     /** @var AuthorizationCheckerInterface */
@@ -205,9 +208,12 @@ class EmailType extends AbstractType
             $event->setData($data);
         }
 
-        $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
         $form = $event->getForm();
+        if (!$form->has('template')) {
+            return;
+        }
 
+        $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
         FormUtils::replaceField(
             $form,
             'template',

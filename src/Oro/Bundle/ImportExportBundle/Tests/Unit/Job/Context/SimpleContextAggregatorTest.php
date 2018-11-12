@@ -10,9 +10,9 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator;
 
-class SimpleContextAggregatorTest extends \PHPUnit_Framework_TestCase
+class SimpleContextAggregatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $contextRegistry;
 
     /** @var SimpleContextAggregator */

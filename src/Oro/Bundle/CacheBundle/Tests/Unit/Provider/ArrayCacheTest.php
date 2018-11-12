@@ -4,7 +4,7 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\CacheBundle\Provider\ArrayCache;
 
-class ArrayCacheTest extends \PHPUnit_Framework_TestCase
+class ArrayCacheTest extends \PHPUnit\Framework\TestCase
 {
     const CACHE_KEY = 'datetime_key';
 

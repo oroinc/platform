@@ -19,32 +19,32 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
+class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerInterface */
     protected $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|NameStrategyInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|NameStrategyInterface */
     protected $nameStrategy;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RouterInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface */
     protected $router;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
     /** @var DataGridExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridRouteHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DatagridRouteHelper */
     protected $datagridRouteHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RequestStack */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RequestStack */
     protected $requestStack;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
     protected function setUp()
@@ -164,7 +164,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $params = ['foo' => 'bar'];
         $url = '/datagrid/test-grid?test-grid-test-scope=foo=bar';
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|DatagridInterface $grid */
         $grid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
         $metadata = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datagrid\\Common\\MetadataObject')
             ->disableOriginalConstructor()
@@ -238,7 +238,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetGridDataWorks()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|DatagridInterface $grid */
         $grid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
         $gridData = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datagrid\\Common\\ResultsObject')
             ->disableOriginalConstructor()
@@ -262,7 +262,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetGridDataException()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|DatagridInterface $grid */
         $grid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
         $gridData = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datagrid\\Common\\ResultsObject')
             ->disableOriginalConstructor()
@@ -305,7 +305,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGenerateGridElementIdWorks($gridName, $gridScope, $expectedPattern)
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|DatagridInterface $grid */
         $grid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
 
         $grid->expects($this->once())
@@ -374,7 +374,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
                 'columns' => [$columnAttributes]
             ]);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|DatagridInterface $grid */
         $grid = $this->createMock(DatagridInterface::class);
         $grid->expects($this->exactly(2))
             ->method('getMetadata')

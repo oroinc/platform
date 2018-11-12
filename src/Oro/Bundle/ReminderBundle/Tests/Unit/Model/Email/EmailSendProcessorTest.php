@@ -4,13 +4,13 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model\Email;
 
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
-use Oro\Bundle\ReminderBundle\Event\ReminderEvents;
 use Oro\Bundle\ReminderBundle\Event\SendReminderEmailEvent;
-use Oro\Bundle\ReminderBundle\Model\Email\EmailNotification;
 use Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor;
+use Oro\Bundle\ReminderBundle\Model\Email\TemplateEmailNotification;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
+class EmailSendProcessorTest extends \PHPUnit\Framework\TestCase
 {
     const EXCEPTION_MESSAGE = 'message';
 
@@ -20,17 +20,17 @@ class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
     protected $processor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject | EmailNotificationManager
+     * @var \PHPUnit\Framework\MockObject\MockObject|EmailNotificationManager
      */
     protected $emailNotificationManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject | EmailNotification
+     * @var \PHPUnit\Framework\MockObject\MockObject|TemplateEmailNotification
      */
     protected $emailNotification;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject | EventDispatcher
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher
      */
     protected $eventDispatcher;
 
@@ -41,12 +41,7 @@ class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->emailNotification = $this
-            ->getMockBuilder(EmailNotification::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('setReminder', 'getEntity'))
-            ->getMock();
-
+        $this->emailNotification = $this->createMock(TemplateEmailNotification::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
 
         $this->processor = new EmailSendProcessor(
@@ -58,8 +53,10 @@ class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testPush()
     {
-        $fooReminder = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $barReminder = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        /** @var Reminder $fooReminder */
+        $fooReminder = $this->createMock(Reminder::class);
+        /** @var Reminder $barReminder */
+        $barReminder = $this->createMock(Reminder::class);
 
         $this->processor->push($fooReminder);
         $this->processor->push($barReminder);
@@ -73,40 +70,20 @@ class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        $fooEntity = $this->createMock(\stdClass::class);
-        $fooReminder = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $barEntity = $this->createMock(\ArrayObject::class);
-        $barReminder = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        /** @var Reminder|MockObject $fooReminder */
+        $fooReminder = $this->createMock(Reminder::class);
+        /** @var Reminder|MockObject $barReminder */
+        $barReminder = $this->createMock(Reminder::class);
 
         $this->emailNotification
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('setReminder')
-            ->with($fooReminder);
-
-        $this->emailNotification
-            ->expects($this->at(1))
-            ->method('getEntity')
-            ->will($this->returnValue($fooEntity));
-
-        $this->emailNotification
-            ->expects($this->at(2))
-            ->method('setReminder')
-            ->with($barReminder);
-
-        $this->emailNotification
-            ->expects($this->at(3))
-            ->method('getEntity')
-            ->will($this->returnValue($barEntity));
+            ->withConsecutive($fooReminder, $barReminder);
 
         $this->emailNotificationManager
-            ->expects($this->at(0))
-            ->method('process')
-            ->with($fooEntity, array($this->emailNotification));
-
-        $this->emailNotificationManager
-            ->expects($this->at(1))
-            ->method('process')
-            ->with($barEntity, array($this->emailNotification));
+            ->expects($this->exactly(2))
+            ->method('processSingle')
+            ->with($this->emailNotification);
 
         $fooReminder->expects($this->once())
             ->method('setState')
@@ -116,31 +93,12 @@ class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('setState')
             ->with(Reminder::STATE_SENT);
 
-        $assertEvent = $this->callback(function ($event) use ($fooReminder) {
-            $this->assertInstanceOf('Oro\Bundle\ReminderBundle\Event\SendReminderEmailEvent', $event);
-            /** @var SendReminderEmailEvent $event */
-            $this->assertEquals($fooReminder, $event->getReminder());
-            return true;
-        });
-        $this->eventDispatcher->expects($this->at(0))
-            ->method('dispatch')
-            ->with(
-                ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND,
-                $assertEvent
-            );
+        $barEvent = new SendReminderEmailEvent($barReminder);
+        $fooEvent = new SendReminderEmailEvent($fooReminder);
 
-        $assertEvent = $this->callback(function ($event) use ($barReminder) {
-            $this->assertInstanceOf('Oro\Bundle\ReminderBundle\Event\SendReminderEmailEvent', $event);
-            /** @var SendReminderEmailEvent $event */
-            $this->assertEquals($barReminder, $event->getReminder());
-            return true;
-        });
-        $this->eventDispatcher->expects($this->at(1))
+        $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->with(
-                ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND,
-                $assertEvent
-            );
+            ->withConsecutive($barEvent, $fooEvent);
 
         $this->processor->push($fooReminder);
         $this->processor->push($barReminder);
@@ -150,25 +108,20 @@ class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessFailed()
     {
-        $fooEntity = $this->createMock(\stdClass::class);
-        $fooReminder = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        /** @var Reminder|MockObject $fooReminder */
+        $fooReminder = $this->createMock(Reminder::class);
 
         $this->emailNotification
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('setReminder')
             ->with($fooReminder);
-
-        $this->emailNotification
-            ->expects($this->at(1))
-            ->method('getEntity')
-            ->will($this->returnValue($fooEntity));
 
         $exception = new \Exception();
 
         $this->emailNotificationManager
             ->expects($this->once())
-            ->method('process')
-            ->with($fooEntity, array($this->emailNotification))
+            ->method('processSingle')
+            ->with($this->emailNotification)
             ->will($this->throwException($exception));
 
         $fooReminder->expects($this->once())

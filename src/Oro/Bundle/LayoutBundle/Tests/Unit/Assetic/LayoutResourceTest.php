@@ -5,13 +5,15 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Assetic;
 use Oro\Bundle\LayoutBundle\Assetic\LayoutResource;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Oro\Component\Testing\TempDirExtension;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
-class LayoutResourceTest extends \PHPUnit_Framework_TestCase
+class LayoutResourceTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var LayoutResource */
     protected $layoutResource;
 
@@ -23,38 +25,16 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->temporaryDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'LayoutResourceTest';
+        $this->temporaryDir = $this->copyToTempDir(
+            'LayoutResourceTest',
+            __DIR__ . DIRECTORY_SEPARATOR . 'sample_data'
+        );
         $this->layoutResource = new LayoutResource(
             $this->getThemeManager(),
             new Filesystem(),
             $this->temporaryDir
         );
         $this->layoutResource->setLogger($this->createMock(LoggerInterface::class));
-
-        $fs = new Filesystem();
-        $fs->copy(
-            __DIR__ . DIRECTORY_SEPARATOR . 'sample_data' . DIRECTORY_SEPARATOR . 'assets.yml',
-            $this->temporaryDir . DIRECTORY_SEPARATOR . 'assets.yml'
-        );
-        $fs->copy(
-            __DIR__ . DIRECTORY_SEPARATOR . 'sample_data' . DIRECTORY_SEPARATOR . 'styles.css',
-            $this->temporaryDir . DIRECTORY_SEPARATOR . 'styles.css'
-        );
-    }
-
-    protected function tearDown()
-    {
-        unset($this->layoutResource, $this->themeManager);
-
-        $fs = new Filesystem();
-        $finder = new Finder();
-
-        if (is_dir($this->temporaryDir)) {
-            $fs->remove($finder->files()->in($this->temporaryDir));
-        }
-        @\rmdir($this->temporaryDir);
-
-        self::assertDirectoryNotExists($this->temporaryDir);
     }
 
     /**

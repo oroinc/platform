@@ -2,8 +2,10 @@
 <script type="text/template" id="choice-filter-template-embedded">
     <span> field value </span>
     <div class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= selectedChoiceLabel %></a>:
-        <ul class="dropdown-menu">
+        <% var togglerId = _.uniqueId('dropdown-') %>
+        <a id="<%- togglerId %>" class="dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+           aria-haspopup="true" aria-expanded="false"><%= selectedChoiceLabel %></a>:
+        <ul class="dropdown-menu" role="menu" aria-labelledby="<%- togglerId %>">
             <% _.each(choices, function (option) { %>
                 <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
                     <a class="choice-value" href="#" data-value="<%= option.value %>"><%= option.label %></a>
@@ -36,7 +38,8 @@
         <% if (!tabs.length) { %>
             <div id="calendar<%= suffix %>"></div>
         <% } else { %>
-            <ul class="nav nav-tabs nav-tabs-oro">
+        <div class="tab-container">
+            <ul class="nav nav-tabs">
                 <% _.each(tabs, function (tab, i) { %>
                     <li<% if (i === 0) { %> class="active"<% } %>><a class="<%= tab.name %>" href="#<%= tab.name %><%= suffix %>"><%= tab.label %></a></li>
                 <% }); %>
@@ -46,6 +49,7 @@
                     <div class="tab-pane<% if (i === 0) { %> active<% } %>" id="<%= tab.name %><%= suffix %>"></div>
                 <% }); %>
             </div>
+        </div>
         <% } %>
     </div>
 </script>

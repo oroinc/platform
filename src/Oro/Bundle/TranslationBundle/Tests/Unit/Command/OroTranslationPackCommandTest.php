@@ -4,14 +4,17 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 
 use Oro\Bundle\TranslationBundle\Command\OroTranslationPackCommand;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\TestKernel;
+use Oro\Component\Testing\TempDirExtension;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
+class OroTranslationPackCommandTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     public function testConfigure()
     {
-        $kernel = new TestKernel();
+        $kernel = $this->getKernel();
         $kernel->boot();
         $app = new Application($kernel);
         $app->add($this->getCommandMock());
@@ -33,7 +36,7 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecute($input, $expectedCalls = array(), $exception = false)
     {
-        $kernel = new TestKernel();
+        $kernel = $this->getKernel();
         $kernel->boot();
         $app         = new Application($kernel);
         $commandMock = $this->getCommandMock(array_keys($expectedCalls));
@@ -130,7 +133,7 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
 
     public function runUploadDownloadTest($commandName, $args = [])
     {
-        $kernel = new TestKernel();
+        $kernel = $this->getKernel();
         $kernel->boot();
 
         $projectId   = 'someproject';
@@ -181,7 +184,7 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteWithoutMode()
     {
-        $kernel = new TestKernel();
+        $kernel = $this->getKernel();
         $kernel->boot();
 
         $app         = new Application($kernel);
@@ -215,7 +218,7 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
      *
      * @param array $methods
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|OroTranslationPackCommand
+     * @return \PHPUnit\Framework\MockObject\MockObject|OroTranslationPackCommand
      */
     protected function getCommandMock($methods = array('asText'))
     {
@@ -228,10 +231,18 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
     /**
      * @param $class
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getNewMock($class)
     {
         return $this->createMock($class);
+    }
+
+    /**
+     * @return TestKernel
+     */
+    private function getKernel()
+    {
+        return new TestKernel($this->getTempDir('translation-test-stub-cache'));
     }
 }

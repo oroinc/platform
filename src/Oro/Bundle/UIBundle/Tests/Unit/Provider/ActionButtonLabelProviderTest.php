@@ -6,7 +6,7 @@ use Oro\Bundle\UIBundle\Provider\ActionButtonLabelProvider;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\TestBaseClass;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\TestClass;
 
-class ActionButtonLabelProviderTest extends \PHPUnit_Framework_TestCase
+class ActionButtonLabelProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataProvider

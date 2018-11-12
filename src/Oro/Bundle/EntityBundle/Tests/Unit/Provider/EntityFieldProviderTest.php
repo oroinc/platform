@@ -21,7 +21,7 @@ use Symfony\Component\Translation\Translator;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
+class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigProviderMock */
     protected $entityConfigProvider;
@@ -29,19 +29,19 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigProviderMock */
     protected $extendConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassResolver */
     protected $entityClassResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|VirtualFieldProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|VirtualFieldProviderInterface */
     protected $virtualFieldProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|VirtualRelationProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|VirtualRelationProviderInterface */
     protected $virtualRelationProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     protected $doctrine;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Translator */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Translator */
     protected $translator;
 
     /** @var EntityProvider */

@@ -24,19 +24,19 @@ use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
  */
 class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityOverrideProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
     private $entityOverrideProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     private $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CompleteCustomAssociationHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CompleteCustomAssociationHelper */
     private $customAssociationHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ExclusionProviderRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExclusionProviderRegistry */
     private $exclusionProviderRegistry;
 
     /** @var CompleteEntityDefinitionHelper */
@@ -1134,7 +1134,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     'association1' => [
                         'data_type'    => 'some_custom_association',
                         'target_class' => 'Test\Association1Target',
-                        'target_type'  => 'to-one',
+                        'target_type'  => 'to-one'
                     ]
                 ]
             ],

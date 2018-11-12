@@ -10,7 +10,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 class WidgetSortByTypeTest extends TypeTestCase
 {
     /**
-     * @var EntityFieldProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fieldProvider;
 

@@ -18,23 +18,23 @@ use Oro\Component\DependencyInjection\ServiceLink;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
+class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_ENTITY  = 'Test\Entity\TestEntity';
     const TEST_ENTITY2 = 'Test\Entity\TestEntity2';
     const TEST_FIELD   = 'testField';
     const TEST_FIELD2  = 'testField2';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $repo;
 
     /** @var LockObject */
     protected $lockObject;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $databaseChecker;
 
     /** @var ConfigModelManager */
@@ -1214,7 +1214,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param EntityConfigModel[] $entityModels
      * @param array               $entityStates
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function prepareEntityConfigRepository($entityModels = [], $entityStates = [])
     {
@@ -1240,7 +1240,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($uow));
         $uow->expects($this->exactly(count($entityStates)))
             ->method('getEntityState')
-            ->will(new \PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls($entityStates));
+            ->will(new \PHPUnit\Framework\MockObject\Stub\ConsecutiveCalls($entityStates));
     }
 
     /**

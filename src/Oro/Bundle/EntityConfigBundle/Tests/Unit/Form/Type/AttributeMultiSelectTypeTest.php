@@ -20,7 +20,7 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
     /** @var AttributeMultiSelectType */
     private $formType;
 
-    /** @var AttributeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $managerMock;
 
     protected function setUp()

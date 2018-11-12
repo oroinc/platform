@@ -12,9 +12,9 @@ use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class TypedRequestDataValidatorTest extends \PHPUnit_Framework_TestCase
+class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
     /** @var RequestType */
@@ -455,6 +455,16 @@ class TypedRequestDataValidatorTest extends \PHPUnit_Framework_TestCase
                 ['data' => ['type' => 'products'], 'included' => []],
                 'The \'included\' property should not be empty',
                 '/included'
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        'test'
+                    ]
+                ],
+                ['The related resource should be an object'],
+                ['/included/0']
             ],
             [
                 [

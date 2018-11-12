@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Entity;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 
-class AddressTypeTest extends \PHPUnit_Framework_TestCase
+class AddressTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AddressType

@@ -5,7 +5,7 @@ namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 use Doctrine\ORM\Query;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 
-class QueryHintResolverTest extends \PHPUnit_Framework_TestCase
+class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
 {
     /** @var QueryHintResolver */
     protected $queryHintResolver;

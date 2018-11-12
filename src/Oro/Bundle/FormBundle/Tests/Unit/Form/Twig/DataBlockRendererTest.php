@@ -8,7 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Forms;
 
-class DataBlockRendererTest extends \PHPUnit_Framework_TestCase
+class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Twig_Environment

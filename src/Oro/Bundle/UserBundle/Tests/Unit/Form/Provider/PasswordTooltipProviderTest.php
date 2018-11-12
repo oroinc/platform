@@ -7,7 +7,7 @@ use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
 use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
+class PasswordTooltipProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslatorInterface */
     protected $translator;

@@ -13,21 +13,21 @@ use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
+class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OrmDatasource */
     protected $datasource;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var YamlProcessor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var YamlProcessor|\PHPUnit\Framework\MockObject\MockObject */
     protected $processor;
 
-    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
-    /** @var ParameterBinderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ParameterBinderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $parameterBinder;
 
     protected function setUp()
@@ -53,8 +53,13 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider hintConfigProvider
+     *
+     * @param array|null $hints
+     * @param array|null $countHints
+     * @param array $expected
+     * @param array $expectedCountQueryHints
      */
-    public function testHints($hints, $expected)
+    public function testHints($hints, $countHints, array $expected, array $expectedCountQueryHints)
     {
         $entityClass      = 'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass';
         $configs['query'] = [
@@ -65,6 +70,9 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
         ];
         if (null !== $hints) {
             $configs['hints'] = $hints;
+        }
+        if (null !== $countHints) {
+            $configs['count_hints'] = $countHints;
         }
 
         $this->prepareEntityManagerForTestHints($entityClass);
@@ -95,9 +103,13 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
             $expected,
             $query->getHints()
         );
+        $this->assertEquals(
+            $expectedCountQueryHints,
+            $this->datasource->getCountQueryHints()
+        );
     }
 
-    protected function prepareEntityManagerForTestHints($entityClass)
+    protected function prepareEntityManagerForTestHints()
     {
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
@@ -127,14 +139,27 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($configuration));
     }
 
+    /**
+     * @return array
+     */
     public function hintConfigProvider()
     {
         return [
             [
                 null,
+                null,
+                [],
                 []
             ],
             [
+                [],
+                null,
+                [],
+                []
+            ],
+            [
+                [],
+                [],
                 [],
                 []
             ],
@@ -142,49 +167,77 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
                 [
                     ['name' => 'HINT_FORCE_PARTIAL_LOAD', 'value' => true]
                 ],
+                null,
                 [
                     Query::HINT_FORCE_PARTIAL_LOAD => true
+                ],
+                [
+                    ['name' => 'HINT_FORCE_PARTIAL_LOAD', 'value' => true]
                 ]
+            ],
+            [
+                [
+                    ['name' => 'HINT_FORCE_PARTIAL_LOAD', 'value' => true]
+                ],
+                [],
+                [
+                    Query::HINT_FORCE_PARTIAL_LOAD => true
+                ],
+                []
             ],
             [
                 [
                     ['name' => 'HINT_FORCE_PARTIAL_LOAD', 'value' => false]
                 ],
+                null,
                 [
                     Query::HINT_FORCE_PARTIAL_LOAD => false
+                ],
+                [
+                    ['name' => 'HINT_FORCE_PARTIAL_LOAD', 'value' => false]
                 ]
             ],
             [
                 [
                     ['name' => 'HINT_FORCE_PARTIAL_LOAD']
                 ],
+                null,
                 [
                     Query::HINT_FORCE_PARTIAL_LOAD => true
+                ],
+                [
+                    ['name' => 'HINT_FORCE_PARTIAL_LOAD']
                 ]
             ],
             [
-                [
-                    'HINT_FORCE_PARTIAL_LOAD'
-                ],
-                [
-                    Query::HINT_FORCE_PARTIAL_LOAD => true
-                ]
+                ['HINT_FORCE_PARTIAL_LOAD'],
+                null,
+                [Query::HINT_FORCE_PARTIAL_LOAD => true],
+                ['HINT_FORCE_PARTIAL_LOAD']
             ],
             [
                 [
                     ['name' => 'some_custom_hint', 'value' => 'test_val']
                 ],
+                null,
                 [
                     'some_custom_hint' => 'test_val'
-                ]
-            ],
-            [
-                [
-                    'some_custom_hint'
                 ],
                 [
-                    'some_custom_hint' => true
-                ]
+                    ['name' => 'some_custom_hint', 'value' => 'test_val']
+                ],
+            ],
+            [
+                ['some_custom_hint'],
+                null,
+                ['some_custom_hint' => true],
+                ['some_custom_hint'],
+            ],
+            [
+                ['some_custom_hint'],
+                ['some_custom_count_hint'],
+                ['some_custom_hint' => true],
+                ['some_custom_count_hint'],
             ],
         ];
     }

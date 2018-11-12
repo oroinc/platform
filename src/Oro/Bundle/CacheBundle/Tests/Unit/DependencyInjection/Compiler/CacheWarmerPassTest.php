@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
-class CacheWarmerPassTest extends \PHPUnit_Framework_TestCase
+class CacheWarmerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CacheWarmerPass */
     protected $compilerPass;
@@ -41,7 +41,7 @@ class CacheWarmerPassTest extends \PHPUnit_Framework_TestCase
             $this->expectException('\InvalidArgumentException');
         }
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Definition $service */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Definition $service */
         $service = $this->createMock(Definition::class);
         $service->expects(true === $isValid ? $this->once() : $this->never())->method('addMethodCall');
 

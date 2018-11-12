@@ -5,12 +5,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Model;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class LabelTest extends \PHPUnit_Framework_TestCase
+class LabelTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     private $translator;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
     }

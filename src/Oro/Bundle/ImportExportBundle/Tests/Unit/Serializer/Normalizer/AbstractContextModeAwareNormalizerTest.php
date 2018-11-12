@@ -4,10 +4,10 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\ImportExport\Serializer\Norma
 
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\AbstractContextModeAwareNormalizer;
 
-class AbstractContextModeAwareNormalizerTest extends \PHPUnit_Framework_TestCase
+class AbstractContextModeAwareNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var AbstractContextModeAwareNormalizer|\PHPUnit_Framework_MockObject_MockObject
+     * @var AbstractContextModeAwareNormalizer|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $normalizer;
 

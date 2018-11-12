@@ -7,10 +7,10 @@ use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class SimpleFilterFactoryTest extends \PHPUnit_Framework_TestCase
+class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SimpleFilterFactory */
-    protected $filterFactory;
+    private $filterFactory;
 
     /**
      * {@inheritdoc}

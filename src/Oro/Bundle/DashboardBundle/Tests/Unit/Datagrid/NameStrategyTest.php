@@ -6,7 +6,7 @@ use Oro\Bundle\DashboardBundle\Datagrid\NameStrategy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class NameStrategyTest extends \PHPUnit_Framework_TestCase
+class NameStrategyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var NameStrategy

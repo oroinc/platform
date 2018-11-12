@@ -19,14 +19,14 @@ class EntityIdTransformerCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        // find entity id transformers
         $transformers = [];
         $taggedServices = $container->findTaggedServiceIds(self::TRANSFORMER_TAG);
         foreach ($taggedServices as $id => $attributes) {
+            $container->getDefinition($id)->setPublic(true);
             foreach ($attributes as $tagAttributes) {
                 $transformers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     $id,
-                    DependencyInjectionUtil::getAttribute($tagAttributes, 'requestType', null)
+                    DependencyInjectionUtil::getRequestType($tagAttributes)
                 ];
             }
         }
@@ -34,10 +34,8 @@ class EntityIdTransformerCompilerPass implements CompilerPassInterface
             return;
         }
 
-        // sort by priority and flatten
         $transformers = DependencyInjectionUtil::sortByPriorityAndFlatten($transformers);
 
-        // register
         $container->getDefinition(self::TRANSFORMER_REGISTRY_SERVICE_ID)
             ->replaceArgument(0, $transformers);
     }

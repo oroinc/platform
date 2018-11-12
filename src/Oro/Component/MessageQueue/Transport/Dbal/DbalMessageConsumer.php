@@ -307,7 +307,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
                     'UPDATE %1$s SET consumer_id=:consumerId'
                     . ' WHERE id = (SELECT id FROM %1$s WHERE consumer_id IS NULL AND queue=:queue'
                     . ' AND (delayed_until IS NULL OR delayed_until<=:delayedUntil)'
-                    . ' ORDER BY priority DESC, id ASC LIMIT 1 FOR UPDATE SKIP LOCKED)',
+                    . ' ORDER BY priority DESC, id ASC LIMIT 1 FOR UPDATE)',
                     $this->connection->getTableName()
                 ));
             } else {

@@ -9,13 +9,13 @@ use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\Ch
 use Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class ChoicesGuesserTest extends \PHPUnit_Framework_TestCase
+class ChoicesGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $choiceHelper;
 

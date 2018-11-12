@@ -9,13 +9,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class TaggedServiceLinkRegistryCompilerPassTest extends \PHPUnit_Framework_TestCase
+class TaggedServiceLinkRegistryCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     const TAG_NAME = 'tag_name';
     const SERVICE_NAME = 'service_name';
     const METHOD_NAME = 'methodName';
     
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $containerBuilder;
 
     /** @var TaggedServiceLinkRegistryCompilerPass */

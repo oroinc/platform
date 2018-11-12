@@ -16,15 +16,15 @@ use Oro\Component\ConfigExpression\ExpressionFactory;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class OperationButtonTest extends \PHPUnit_Framework_TestCase
+class OperationButtonTest extends \PHPUnit\Framework\TestCase
 {
     /** @var string */
     protected $originOperationName;
 
-    /** @var Operation|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Operation|\PHPUnit\Framework\MockObject\MockObject */
     protected $operation;
 
-    /** @var OperationDefinition|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OperationDefinition|\PHPUnit\Framework\MockObject\MockObject */
     protected $definition;
 
     /** @var OperationButton */

@@ -18,18 +18,18 @@ use Oro\Component\MessageQueue\Util\JSON;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
+class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DbalSession|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DbalSession|\PHPUnit\Framework\MockObject\MockObject */
     private $session;
 
-    /** @var DbalDestination|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DbalDestination|\PHPUnit\Framework\MockObject\MockObject */
     private $queue;
 
-    /** @var DbalConnection|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DbalConnection|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
 
-    /** @var Connection|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     private $dbal;
 
     /** @var DbalMessageConsumer */
@@ -87,7 +87,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('getQueueName')
             ->willReturn('test_queue');
 
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $updateStatement = $this->createMock(Statement::class);
         $updateStatement->expects($this->once())
             ->method('execute')
@@ -99,7 +99,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('rowCount')
             ->willReturn(1);
 
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $selectStatement = $this->createMock(Statement::class);
         $selectStatement->expects($this->once())
             ->method('execute')
@@ -151,7 +151,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('getQueueName')
             ->willReturn('test_queue');
 
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $updateStatement = $this->createMock(Statement::class);
         $updateStatement->expects($this->once())
             ->method('execute')
@@ -163,7 +163,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('rowCount')
             ->willReturn(1);
 
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $selectStatement = $this->createMock(Statement::class);
         $selectStatement->expects($this->once())
             ->method('execute')
@@ -205,7 +205,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('getQueueName')
             ->willReturn('test_queue');
 
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $updateStatement = $this->createMock(Statement::class);
         $updateStatement->expects($this->once())
             ->method('execute')
@@ -253,7 +253,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('getQueueName')
             ->willReturn('test_queue');
 
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $updateStatement = $this->createMock(Statement::class);
         $updateStatement->expects($this->once())
             ->method('execute')
@@ -265,7 +265,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('rowCount')
             ->willReturn(1);
 
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $selectStatement = $this->createMock(Statement::class);
         $selectStatement->expects($this->once())
             ->method('execute')
@@ -317,7 +317,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('getQueueName')
             ->willReturn('test_queue');
 
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $updateStatement = $this->createMock(Statement::class);
         $updateStatement->expects($this->once())
             ->method('execute')
@@ -329,7 +329,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('rowCount')
             ->willReturn(1);
 
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $selectStatement = $this->createMock(Statement::class);
         $selectStatement->expects($this->once())
             ->method('execute')
@@ -371,7 +371,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('getQueueName')
             ->willReturn('test_queue');
 
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $updateStatement = $this->createMock(Statement::class);
         $updateStatement->expects($this->once())
             ->method('execute')
@@ -415,7 +415,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testAcknowledge()
     {
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $deleteStatement = $this->createMock(Statement::class);
         $deleteStatement->expects($this->once())
             ->method('execute')
@@ -443,7 +443,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testAcknowledgeWithRetry()
     {
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $deleteStatement = $this->createMock(Statement::class);
         $deleteStatement->expects($this->exactly(2))
             ->method('execute')
@@ -473,7 +473,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testAcknowledgeLogicException()
     {
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $deleteStatement = $this->createMock(Statement::class);
         $deleteStatement->expects($this->once())
             ->method('execute')
@@ -514,7 +514,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testReject()
     {
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $deleteStatement = $this->createMock(Statement::class);
         $deleteStatement->expects($this->once())
             ->method('execute')
@@ -542,7 +542,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testRejectWithRetry()
     {
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $deleteStatement = $this->createMock(Statement::class);
         $deleteStatement->expects($this->exactly(2))
             ->method('execute')
@@ -576,7 +576,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('getQueueName')
             ->willReturn('test_queue');
 
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $deleteStatement = $this->createMock(Statement::class);
         $deleteStatement->expects($this->once())
             ->method('execute')
@@ -632,7 +632,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testRejectLogicException()
     {
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $deleteStatement = $this->createMock(Statement::class);
         $deleteStatement->expects($this->once())
             ->method('execute')
@@ -667,7 +667,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('getQueueName')
             ->willReturn('test_queue');
 
-        /** @var Statement|\PHPUnit_Framework_MockObject_MockObject $statement */
+        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
         $deleteStatement = $this->createMock(Statement::class);
         $deleteStatement->expects($this->once())
             ->method('execute')

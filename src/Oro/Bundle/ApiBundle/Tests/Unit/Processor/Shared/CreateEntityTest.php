@@ -14,22 +14,19 @@ use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
 class CreateEntityTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityLoader */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityLoader */
     private $entityLoader;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityInstantiator */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityInstantiator */
     private $entityInstantiator;
 
     /** @var CreateEntity */
     private $processor;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

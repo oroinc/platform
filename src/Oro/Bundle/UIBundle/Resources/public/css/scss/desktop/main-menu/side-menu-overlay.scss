@@ -1,18 +1,16 @@
 /* @theme: admin.oro; */
 
 .side-menu-overlay {
-    $side-menu-overlay-header-height: 108px;
-
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 100%;
+    #{$start}: 100%;
     z-index: -1;
 
     width: 100vw;
     height: 100vh;
     max-width: 100vw;
-    min-width: $widthBodyPage;
+    min-width: $width-body-page;
 
     font-size: $menu-font-size;
 
@@ -20,12 +18,12 @@
 
     opacity: 0;
 
-    transition: opacity 300ms linear;
+    transition: opacity 150ms linear;
 
     visibility: hidden;
 
     &.open {
-        z-index: $oroZindexDropdown + 30;
+        z-index: $zindex-dropdown - 70;
 
         visibility: visible;
 
@@ -35,7 +33,7 @@
     &__header {
         position: relative;
 
-        padding: 24px 16px 20px 32px;
+        padding: side-values(24px 16px 20px 32px);
         width: 248px;
         height: $side-menu-overlay-header-height;
     }
@@ -46,8 +44,9 @@
 
     &__search-icon {
         position: absolute;
-        right: 0;
-        top: 1px;
+        top: 0;
+        #{$end}: 8px;
+        bottom: 0;
         padding: 4px;
 
         background-color: transparent;
@@ -66,15 +65,18 @@
 
     &__field {
         width: 100%;
-        height: 30px;
-        padding-right: 24px;
+        padding-#{$end}: 24px;
         margin: 0;
 
         box-sizing: border-box;
     }
 
+    &__no-result {
+        margin: 8px 0;
+    }
+
     &__title {
-        font-size: 21px;
+        font-size: $side-menu-overlay-title-font-size;
         line-height: 1.2;
     }
 
@@ -90,7 +92,9 @@
         top: 10px;
         z-index: 1;
 
-        font-size: 18px;
+        margin-#{$end}: $side-menu-overlay-button-offset;
+
+        font-size: $side-menu-overlay-button-font-size;
 
         background-color: transparent;
         border: none;
@@ -104,10 +108,14 @@
         }
     }
 
+    &__ui-helper {
+        direction: $side-menu-overlay-ui-helper-direction;
+    }
+
     &__fill,
     &__fill-blur,
     &__fill-blur-inner {
-        text-align: right;
+        text-align: $side-menu-overlay-ui-helper-text-align;
 
         color: transparent;
 
@@ -125,22 +133,26 @@
     &__fill::after {
         z-index: -1;
 
+        width: $side-menu-overlay-ui-fill-width;
+
         background-color: $menu-dropdown-background-color;
 
-        transform: translate(-100%);
-
-        width: 300%;
+        transform: $side-menu-overlay-ui-fill-transform;
     }
 
     &__fill-blur::after {
-        width: 36px;
+        width: $side-menu-fill-blur-width;
+
+        margin-#{$end}: $side-menu-overlay-ui-fill-blur-offset;
 
         background-color: $menu-dropdown-background-color;
-        box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, .19);
+        box-shadow: $side-menu-overlay-ui-fill-blur-box-shadow;
     }
 
     &__fill-blur-inner::after {
         background-color: rgba($primary-inverse, .5);
+
+        transform: $side-menu-overlay-ui-fill-blur-inner-transform;
     }
 
     .menu {
@@ -154,10 +166,11 @@
         min-height: 340px;;
         height: inherit;
         margin: 0;
-
+        padding: 0;
         list-style: none;
 
-        overflow: auto;
+        overflow-x: auto;
+        overflow-y: hidden;
     }
 
     .menu-item {
@@ -169,11 +182,11 @@
         &:not(.ui-helper) {
             position: relative;
 
-            &:after {
+            &:before {
                 position: absolute;
                 top: 0;
                 right: 0;
-                bottom: -100px;
+                bottom: -500px;
 
                 width: 1px;
 
@@ -205,7 +218,7 @@
             $selector: '&-level-' + $i;
 
             #{$selector} {
-                padding-left: $menu-overlay-title-offset * 1px;
+                padding-#{$start}: $menu-overlay-title-offset * 1px;
 
                 @if $i == 2 {
                     font-size: ($menu-font-size + 2);
@@ -261,5 +274,9 @@
     .highlight {
         text-decoration: underline;
         background-color: $menu-item-text-highlight-color;
+    }
+
+    .divider {
+        display: none;
     }
 }

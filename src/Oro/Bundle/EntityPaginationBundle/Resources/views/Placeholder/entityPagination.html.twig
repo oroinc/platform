@@ -19,43 +19,47 @@
         {% set componentName = 'oroui/js/app/components/hidden-redirect-component' %}
         {% set componentOptions = {type: 'warning'} %}
         
-        <div id="entity-pagination">
-            <div class="pagination">
-                <ul class="icons-holder">
-                    <li {% if pager.current == 1 %} class="disabled" {% endif %}>
-                        <a href="{{ path(first_route, allParams) }}"
-                           data-page-component-module="{{ componentName }}"
-                           data-page-component-options="{{ componentOptions|json_encode }}">
-                            {{ 'oro.entity_pagination.first'|trans }}
-                        </a>
-                    </li>
-                    <li {% if pager.current == 1 %} class="disabled" {% endif %}>
-                        <a href="{{ path(previous_route, allParams) }}"
-                           data-page-component-module="{{ componentName }}"
-                           data-page-component-options="{{ componentOptions|json_encode }}">
-                            <i class="fa-chevron-left hide-text"></i>
-                        </a>
-                    </li>
-                    <li><div class="pagination-current">{{ pager.current }}</div></li>
-                    <li {% if pager.current == pager.total %} class="disabled" {% endif %}>
-                        <a href="{{ path(next_route, allParams) }}"
-                           data-page-component-module="{{ componentName }}"
-                           data-page-component-options="{{ componentOptions|json_encode }}">
-                            <i class="fa-chevron-right hide-text"></i>
-                        </a>
-                    </li>
-                    <li {% if pager.current == pager.total %} class="disabled" {% endif %}>
-                        <a href="{{ path(last_route, allParams) }}"
-                           data-page-component-module="{{ componentName }}"
-                           data-page-component-options="{{ componentOptions|json_encode }}">
-                            {{ 'oro.entity_pagination.last'|trans }}
-                        </a>
-                    </li>
-                </ul>
+        <div id="entity-pagination" class="entity-pagination">
+            <ul class="pagination pagination--mini">
+                <li class="page-item{% if pager.current == 1 %} disabled{% endif %}">
+                    <a href="{{ path(first_route, allParams) }}"
+                       class="page-link" 
+                       data-page-component-module="{{ componentName }}"
+                       data-page-component-options="{{ componentOptions|json_encode }}">
+                        {{ 'oro.entity_pagination.first'|trans }}
+                    </a>
+                </li>
+                <li class="page-item{% if pager.current == 1 %} disabled{% endif %}">
+                    <a href="{{ path(previous_route, allParams) }}"
+                       class="page-link"
+                       data-page-component-module="{{ componentName }}"
+                       data-page-component-options="{{ componentOptions|json_encode }}">
+                        <i class="fa-chevron-left hide-text"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <div class="page-current">{{ pager.current }}</div>
+                </li>
+                <li class="page-item{% if pager.current == pager.total %} disabled{% endif %}">
+                    <a href="{{ path(next_route, allParams) }}"
+                       class="page-link"
+                       data-page-component-module="{{ componentName }}"
+                       data-page-component-options="{{ componentOptions|json_encode }}">
+                        <i class="fa-chevron-right hide-text"></i>
+                    </a>
+                </li>
+                <li class="page-item{% if pager.current == pager.total %} disabled{% endif %}">
+                    <a href="{{ path(last_route, allParams) }}"
+                       class="page-link"
+                       data-page-component-module="{{ componentName }}"
+                       data-page-component-options="{{ componentOptions|json_encode }}">
+                        {{ 'oro.entity_pagination.last'|trans }}
+                    </a>
+                </li>
+            </ul>
 
-                <div class="dib pagination-total">
-                    {{ 'oro.entity_pagination.pager_of_%total%_record|pager_of_%total%_records'|transchoice(pager.total, {'%total%': pager.total}) }}
-                </div>
+            <div class="entity-pagination_total">
+                {{ 'oro.entity_pagination.pager_of_%total%_record|pager_of_%total%_records'|transchoice(pager.total, {'%total%': pager.total}) }}
             </div>
         </div>
     {% endif %}

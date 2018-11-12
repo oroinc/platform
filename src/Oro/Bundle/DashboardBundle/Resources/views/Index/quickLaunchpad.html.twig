@@ -3,7 +3,7 @@
 {% block content %}
     <div class="layout-content dashboard-container-wrapper">
         <div class="container-fluid page-title">
-            <div class="navigation clearfix navbar-extra navbar-extra-right">
+            <div class="navigation navbar-extra navbar-extra-right">
                 <div class="row">
                     {% block title %}
                         <div class="pull-left pull-left-extra">
@@ -42,20 +42,16 @@
             </div>
         </div>
         {% block widgets_content %}
-            <div class="scrollable-container">
-                <div class="responsive-section launchpad-container">
-                    <div class="clearfix">
-                        <div class="container">
-                            {% block widgets %}
-                                <div class="responsive-cell dashboard-column">
-                                    {% placeholder quick_launchpad_left_column %}
-                                </div>
-                                <div class="responsive-cell dashboard-column">
-                                    {% placeholder quick_launchpad_right_column %}
-                                </div>
-                            {% endblock widgets %}
-                        </div>
+            <div class="container-fluid scrollable-container">
+                <div class="row launchpad-container">
+                {% block widgets %}
+                    <div class="launchpad-first-column">
+                        {% placeholder quick_launchpad_left_column %}
                     </div>
+                    <div class="launchpad-second-column">
+                        {% placeholder quick_launchpad_right_column %}
+                    </div>
+                {% endblock widgets %}
                 </div>
             </div>
         {% endblock widgets_content %}

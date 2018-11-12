@@ -6,12 +6,12 @@ use Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
-class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
+class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  DateTimeNormalizer */
     protected $normalizer;
 
-    /** @var  LocaleSettings|PHPUnit_Framework_MockObject_MockObject */
+    /** @var  LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     protected $localeSettings;
 
     protected function setUp()
@@ -81,7 +81,7 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testNormalizeProvider
+     * @dataProvider normalizeProvider
      *
      * @param string    $expected
      * @param \DateTime $date
@@ -116,7 +116,7 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testNormalizeProvider()
+    public function normalizeProvider()
     {
         $date = new \DateTime('2013-12-31 23:59:59+0200');
 
@@ -228,7 +228,7 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testDenormalizeProvider
+     * @dataProvider denormalizeProvider
      *
      * @param \DateTime $expected
      * @param string    $data
@@ -263,7 +263,7 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testDenormalizeProvider()
+    public function denormalizeProvider()
     {
         return [
             // Tests denormalization with default formats

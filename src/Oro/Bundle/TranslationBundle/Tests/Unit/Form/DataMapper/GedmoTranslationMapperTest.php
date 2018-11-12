@@ -6,7 +6,7 @@ use Oro\Bundle\TranslationBundle\Form\DataMapper\GedmoTranslationMapper;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
 
-class GedmoTranslationMapperTest extends \PHPUnit_Framework_TestCase
+class GedmoTranslationMapperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var GedmoTranslationMapper
@@ -14,7 +14,7 @@ class GedmoTranslationMapperTest extends \PHPUnit_Framework_TestCase
     private $mapper;
 
     /**
-     * @var FormInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var FormInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $form;
 

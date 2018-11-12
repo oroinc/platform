@@ -7,12 +7,12 @@ use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity;
 
-class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
+class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param  string                                   $class
-     * @param  \PHPUnit_Framework_MockObject_MockObject $metadata
-     * @param  \PHPUnit_Framework_MockObject_MockObject $objectManager
+     * @param  \PHPUnit\Framework\MockObject\MockObject $metadata
+     * @param  \PHPUnit\Framework\MockObject\MockObject $objectManager
      * @return ApiEntityManager
      */
     protected function createApiEntityManager($class, $metadata = null, $objectManager = null)
@@ -66,14 +66,11 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test getList with criteria as an array
+     * Test getListQueryBuilder with criteria as an array
      */
     public function testGetSimpleFilteredList()
     {
         $className = 'Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity';
-        $entity = new Entity();
-        $entity->id = 1;
-        $entity->name = 'entityName';
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->setConstructorArgs(array($className))
@@ -83,6 +80,10 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
         $metadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->will($this->returnValue(array('id')));
+
+        $queryBuilder = $this->getMockBuilder('\Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $objectManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -93,16 +94,18 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        $repository
-            ->expects($this->once())
-            ->method('matching')
-            ->will($this->returnValue(new ArrayCollection([$entity])));
+        $repository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
 
         $objectManager
             ->expects($this->once())
             ->method('getRepository')
             ->with($this->equalTo($className))
             ->will($this->returnValue($repository));
+
+        $queryBuilder->expects($this->once())
+            ->method('addCriteria');
 
         $manager = $this->createApiEntityManager($className, $metadata, $objectManager);
 
@@ -113,20 +116,17 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch');
         $manager->setEventDispatcher($eventDispatcher);
 
-        $result = $manager->getList(3, 1, $criteria);
+        $result = $manager->getListQueryBuilder(3, 1, $criteria);
 
-        $this->assertSame($result[0], $entity);
+        $this->assertSame($result, $queryBuilder);
     }
 
     /**
-     * Test getList with criteria as Criteria instance
+     * Test getListQueryBuilder with criteria as Criteria instance
      */
     public function testGetCriteriaFilteredList()
     {
         $className = 'Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity';
-        $entity = new Entity();
-        $entity->id = 1;
-        $entity->name = 'entityName';
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->setConstructorArgs(array($className))
@@ -137,6 +137,10 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getIdentifierFieldNames')
             ->will($this->returnValue(array('id')));
 
+        $queryBuilder = $this->getMockBuilder('\Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $objectManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->setMethods(array('getClassMetadata', 'getRepository'))
@@ -146,17 +150,19 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        $repository
-            ->expects($this->once())
-            ->method('matching')
-            ->with($this->equalTo($criteria))
-            ->will($this->returnValue(new ArrayCollection([$entity])));
+        $repository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
 
         $objectManager
             ->expects($this->once())
             ->method('getRepository')
             ->with($this->equalTo($className))
             ->will($this->returnValue($repository));
+
+        $queryBuilder->expects($this->once())
+            ->method('addCriteria')
+            ->with($this->equalTo($criteria));
 
         $manager = $this->createApiEntityManager($className, $metadata, $objectManager);
 
@@ -167,8 +173,8 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch');
         $manager->setEventDispatcher($eventDispatcher);
 
-        $result = $manager->getList(3, 1, $criteria);
-        $this->assertSame($result[0], $entity);
+        $result = $manager->getListQueryBuilder(3, 1, $criteria);
+        $this->assertSame($result, $queryBuilder);
     }
 
     /**

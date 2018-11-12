@@ -5,21 +5,26 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 use Oro\Bundle\TranslationBundle\Controller\Controller;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
+use Oro\Component\Testing\TempDirExtension;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
-class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
+class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Controller|\PHPUnit_Framework_MockObject_MockObject */
+    use TempDirExtension;
+
+    /** @var Controller|\PHPUnit\Framework\MockObject\MockObject */
     protected $translationControllerMock;
 
-    /** @var Router|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
     protected $routerMock;
 
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
-    /** @var LanguageProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $languageProvider;
 
     /** @var JsTranslationDumper */
@@ -30,19 +35,10 @@ class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->translationControllerMock = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Controller\Controller')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->routerMock = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
-
-        $this->languageProvider = $this->getMockBuilder(LanguageProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translationControllerMock = $this->createMock(Controller::class);
+        $this->routerMock = $this->createMock(Router::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->languageProvider = $this->createMock(LanguageProvider::class);
 
         $this->dumper = new JsTranslationDumper(
             $this->translationControllerMock,
@@ -54,37 +50,21 @@ class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
         $this->dumper->setLogger($this->logger);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset(
-            $this->translationControllerMock,
-            $this->routerMock,
-            $this->logger,
-            $this->languageProvider,
-            $this->dumper
-        );
-    }
-
     public function testDumpTranslations()
     {
-        $routeMock = $this->getMockBuilder('Symfony\Component\Routing\Route')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $routeMock = $this->createMock(Route::class);
         $routeMock->expects($this->once())
             ->method('getPath')
-            ->will($this->returnValue('/tmp/test{_locale}'));
+            ->willReturn($this->getTempDir('js_trans_dumper', null) . '/test{_locale}');
 
-        $routeCollectionMock = $this->createMock('Symfony\Component\Routing\RouteCollection');
+        $routeCollectionMock = $this->createMock(RouteCollection::class);
         $routeCollectionMock->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($routeMock));
+            ->willReturn($routeMock);
 
         $this->routerMock->expects($this->once())
             ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollectionMock));
+            ->willReturn($routeCollectionMock);
 
         $this->logger->expects($this->once())
             ->method('info');
@@ -92,7 +72,7 @@ class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
         $this->translationControllerMock->expects($this->once())
             ->method('renderJsTranslationContent')
             ->with([], 'en')
-            ->will($this->returnValue('test'));
+            ->willReturn('test');
 
         $this->languageProvider->expects($this->once())
             ->method('getAvailableLanguages')
@@ -103,21 +83,19 @@ class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testDumpTranslationsWithLocales()
     {
-        $routeMock = $this->getMockBuilder('Symfony\Component\Routing\Route')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $routeMock = $this->createMock(Route::class);
         $routeMock->expects($this->once())
             ->method('getPath')
-            ->will($this->returnValue('/tmp/test{_locale}'));
+            ->willReturn($this->getTempDir('js_trans_dumper', null) . '/test{_locale}');
 
-        $routeCollectionMock = $this->createMock('Symfony\Component\Routing\RouteCollection');
+        $routeCollectionMock = $this->createMock(RouteCollection::class);
         $routeCollectionMock->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($routeMock));
+            ->willReturn($routeMock);
 
         $this->routerMock->expects($this->once())
             ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollectionMock));
+            ->willReturn($routeCollectionMock);
 
         $this->logger->expects($this->once())
             ->method('info');
@@ -125,9 +103,10 @@ class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
         $this->translationControllerMock->expects($this->once())
             ->method('renderJsTranslationContent')
             ->with([], 'en_US')
-            ->will($this->returnValue('test'));
+            ->willReturn('test');
 
-        $this->languageProvider->expects($this->never())->method('getAvailableLanguages');
+        $this->languageProvider->expects($this->never())
+            ->method('getAvailableLanguages');
 
         $this->dumper->dumpTranslations(['en_US']);
     }

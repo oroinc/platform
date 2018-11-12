@@ -13,7 +13,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Adds "fields[]" filters that can be used to specify which fields of primary
+ * Adds "fields" filters that can be used to specify which fields of primary
  * or related entities should be returned.
  * As this filter has influence on the entity configuration, it is handled by a separate processor.
  * @see \Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleFieldsFilter

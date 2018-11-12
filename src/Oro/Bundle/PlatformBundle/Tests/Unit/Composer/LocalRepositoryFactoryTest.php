@@ -6,7 +6,7 @@ use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory;
 use Oro\Bundle\PlatformBundle\OroPlatformBundle;
 use Symfony\Component\Filesystem\Filesystem;
 
-class LocalRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
+class LocalRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LocalRepositoryFactory

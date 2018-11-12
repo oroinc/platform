@@ -5,7 +5,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Utils;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 
-class TreeUtilsTest extends \PHPUnit_Framework_TestCase
+class TreeUtilsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test group tree

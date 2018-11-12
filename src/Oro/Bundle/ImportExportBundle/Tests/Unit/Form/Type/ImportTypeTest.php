@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Validation;
 class ImportTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ProcessorRegistry
+     * @var \PHPUnit\Framework\MockObject\MockObject|ProcessorRegistry
      */
     protected $processorRegistry;
 
@@ -47,7 +47,7 @@ class ImportTypeTest extends FormIntegrationTestCase
             ->will(
                 $this->returnCallback(
                     function ($type, $entityName) {
-                        \PHPUnit_Framework_Assert::assertEquals(ProcessorRegistry::TYPE_IMPORT, $type);
+                        \PHPUnit\Framework\Assert::assertEquals(ProcessorRegistry::TYPE_IMPORT, $type);
                         return array($type . $entityName);
                     }
                 )

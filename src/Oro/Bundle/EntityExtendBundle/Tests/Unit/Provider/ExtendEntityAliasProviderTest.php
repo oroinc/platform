@@ -11,12 +11,12 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityAliasProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
+class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityAliasConfigBag */
     protected $entityAliasConfigBag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var ExtendEntityAliasProvider */

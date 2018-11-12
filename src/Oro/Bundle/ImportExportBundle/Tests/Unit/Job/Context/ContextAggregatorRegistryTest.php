@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Job\Context;
 use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorInterface;
 use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry;
 
-class ContextAggregatorRegistryTest extends \PHPUnit_Framework_TestCase
+class ContextAggregatorRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ContextAggregatorRegistry */
     private $contextAggregatorRegistry;

@@ -6,9 +6,9 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotPhpKeyword;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotPhpKeywordValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class NotPhpKeywordValidatorTest extends \PHPUnit_Framework_TestCase
+class NotPhpKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $context;
 
     /** @var NotPhpKeywordValidator */

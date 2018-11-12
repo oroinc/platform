@@ -12,7 +12,7 @@ use Oro\Bundle\SearchBundle\Query\Result;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class IndexerQueryTest extends \PHPUnit_Framework_TestCase
+class IndexerQueryTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_VALUE = 'test_value';
     const TEST_COUNT = 42;
@@ -20,16 +20,16 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
     /** @var IndexerQuery */
     protected $query;
 
-    /** @var Indexer|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
     protected $searchIndexer;
 
-    /** @var Query|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Query|\PHPUnit\Framework\MockObject\MockObject */
     protected $innerQuery;
 
     /** @var array */
     protected $testElements = [1, 2, 3];
 
-    /** @var Criteria|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Criteria|\PHPUnit\Framework\MockObject\MockObject */
     protected $criteria;
 
     protected function setUp()

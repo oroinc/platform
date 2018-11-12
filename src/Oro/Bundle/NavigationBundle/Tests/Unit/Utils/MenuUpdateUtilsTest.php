@@ -12,12 +12,12 @@ use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
+class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
     use MenuItemTestTrait;
 
-    /** @var MenuUpdateHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var MenuUpdateHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $menuUpdateHelper;
 
     /**
@@ -85,7 +85,7 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $expectedItem->setUri('URI');
         $expectedItem->setExtra('description', 'second test description');
 
-        /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
+        /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject $localizationHelper */
         $localizationHelper = $this->createMock(LocalizationHelper::class);
         $localizationHelper->expects($this->atLeastOnce())
             ->method('getCurrentLocalization')
@@ -105,7 +105,7 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $update->setParentKey('item-2');
         $update->setUri('URI');
 
-        /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
+        /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject $localizationHelper */
         $localizationHelper = $this->createMock(LocalizationHelper::class);
         MenuUpdateUtils::updateMenuItem($update, $menu, $localizationHelper);
 
@@ -127,7 +127,7 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $expectedItem->setUri('URI');
         $update->setCustom(true);
 
-        /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
+        /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject $localizationHelper */
         $localizationHelper = $this->createMock(LocalizationHelper::class);
         MenuUpdateUtils::updateMenuItem($update, $menu, $localizationHelper);
 
@@ -144,7 +144,7 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $update->setParentKey('item-1');
         $update->setCustom(true);
 
-        /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
+        /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject $localizationHelper */
         $localizationHelper = $this->createMock(LocalizationHelper::class);
 
         $options = ['extras' => ['test' => 'test']];

@@ -8,7 +8,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class ActivityListTest extends \PHPUnit_Framework_TestCase
+class ActivityListTest extends \PHPUnit\Framework\TestCase
 {
     public function testIdGetter()
     {
@@ -56,7 +56,7 @@ class ActivityListTest extends \PHPUnit_Framework_TestCase
             ['updatedAt', new \DateTime('now')],
             ['createdAt', new \DateTime('now')],
             ['owner', new User()],
-            ['editor', new User()],
+            ['updatedBy', new User()],
             ['organization', new Organization()]
         ];
     }

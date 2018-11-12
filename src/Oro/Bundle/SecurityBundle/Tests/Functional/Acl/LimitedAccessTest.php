@@ -3,11 +3,12 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\Acl;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
-use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -18,6 +19,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class LimitedAccessTest extends WebTestCase
 {
+    use RolePermissionExtension;
+
     /** @var TestEntity */
     protected $testEntity;
 
@@ -72,23 +75,15 @@ class LimitedAccessTest extends WebTestCase
             $em->persist($this->testEntity);
             $em->flush();
 
-            /** @var AclManager $aclManager */
-            $aclManager = $this->getContainer()->get('oro_security.acl.manager');
-            $fieldEditMaskBuilder = $aclManager
-                ->getExtensionSelector()
-                ->selectByExtensionKey('entity')
-                ->getFieldExtension()
-                ->getMaskBuilder('EDIT');
-            $fieldEditMaskBuilder
-                ->add($fieldEditMaskBuilder->getMask('MASK_VIEW_SYSTEM'))
-                ->add($fieldEditMaskBuilder->getMask('MASK_EDIT_BASIC'));
-            $aclManager->setFieldPermission(
-                $aclManager->getSid($em->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_USER'])),
-                $aclManager->getOid('entity:' . TestEntity::class),
+            $this->updateRolePermissionsForField(
+                'ROLE_USER',
+                TestEntity::class,
                 'name',
-                $fieldEditMaskBuilder->get()
+                [
+                    'VIEW' => AccessLevel::SYSTEM_LEVEL,
+                    'EDIT' => AccessLevel::BASIC_LEVEL
+                ]
             );
-            $aclManager->flush();
         }
     }
 

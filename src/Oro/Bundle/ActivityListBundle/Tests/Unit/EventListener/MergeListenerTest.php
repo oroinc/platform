@@ -12,21 +12,21 @@ use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class MergeListenerTest extends \PHPUnit_Framework_TestCase
+class MergeListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MergeListener */
     protected $listener;
 
-    /** @var EntityMetadata|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityMetadata|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityMetadata;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $configProvider;
 
-    /** @var ActivityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $activityManager;
 
     protected function setUp()

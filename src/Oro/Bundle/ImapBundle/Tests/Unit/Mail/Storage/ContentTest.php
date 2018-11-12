@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Storage;
 
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
 
-class ContentTest extends \PHPUnit_Framework_TestCase
+class ContentTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructorAndGetters()
     {

@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Entity;
 use Oro\Bundle\SearchBundle\Entity\IndexDatetime;
 use Oro\Bundle\SearchBundle\Entity\Item;
 
-class IndexDatetimeTest extends \PHPUnit_Framework_TestCase
+class IndexDatetimeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Oro\Bundle\SearchBundle\Entity\IndexDatetime

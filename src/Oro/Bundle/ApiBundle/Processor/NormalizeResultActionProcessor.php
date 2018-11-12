@@ -17,11 +17,13 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * The base processor for actions with "normalize_result" group.
- * Processors from this group are intended to prepare valid response ant they are executed
- * regardless whether an error occurred or not.
+ * Processors from this group are intended to prepare a valid response
+ * and they are executed regardless whether an error occurred or not.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAwareInterface
 {
@@ -83,7 +85,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
      * @param string                 $processorId
      * @param string|null            $group
      *
-     * @throws \Exception if soft errors handling was not requested
+     * @throws \Exception if the soft handling of errors was not requested
      */
     protected function handleErrors(NormalizeResultContext $context, $processorId, $group)
     {
@@ -111,7 +113,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
      * @param string                 $processorId
      * @param string|null            $group
      *
-     * @throws \Exception if soft errors handling was not requested
+     * @throws \Exception if the soft handling of errors was not requested
      */
     protected function handleException(\Exception $e, NormalizeResultContext $context, $processorId, $group)
     {
@@ -126,7 +128,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
             if (!$context->isSoftErrorsHandling()) {
                 throw $e;
             }
-            // in case if soft errors handling is enabled just add an error to the context
+            // if the soft handling of errors is enabled, just add an error to the context
             $context->addError(Error::createByException($e));
         } else {
             // add an error to the context
@@ -157,7 +159,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
                     $this->getLogContext($context)
                 )
             );
-        } else {
+        } elseif (!$e instanceof AuthenticationException) {
             $this->logger->error(
                 \sprintf('The execution of "%s" processor is failed.', $processorId),
                 \array_merge(['exception' => $e], $this->getLogContext($context))
@@ -168,7 +170,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
     /**
      * Indicates whether the given exception represents an error
      * that is properly handled and the current API action response contains information about this error.
-     * Actualy such exceptions are an alternative for adding an error to the action context.
+     * Actually such exceptions are an alternative for adding an error to the action context.
      * Examples of safe exceptions:
      * * invalid request data
      * * requesting not existing resource
@@ -220,7 +222,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
             try {
                 $processor->process($context);
             } catch (\Exception $e) {
-                if (null !== $this->logger) {
+                if (null !== $this->logger && !$e instanceof AuthenticationException) {
                     $this->logger->error(
                         \sprintf('The execution of "%s" processor is failed.', $processors->getProcessorId()),
                         \array_merge(['exception' => $e], $this->getLogContext($context))

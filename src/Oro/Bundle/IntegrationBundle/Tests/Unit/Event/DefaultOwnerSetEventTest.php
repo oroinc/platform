@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Event;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent;
 
-class DefaultOwnerSetEventTest extends \PHPUnit_Framework_TestCase
+class DefaultOwnerSetEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testInterface()
     {

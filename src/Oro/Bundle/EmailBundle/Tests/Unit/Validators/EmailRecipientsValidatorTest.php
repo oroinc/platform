@@ -7,12 +7,12 @@ use Oro\Bundle\EmailBundle\Validator\Constraints\EmailRecipients;
 use Oro\Bundle\EmailBundle\Validator\EmailRecipientsValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class EmailRecipientsValidatorTest extends \PHPUnit_Framework_TestCase
+class EmailRecipientsValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailRecipients */
     protected $constraint;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $context;
 
     protected function setUp()

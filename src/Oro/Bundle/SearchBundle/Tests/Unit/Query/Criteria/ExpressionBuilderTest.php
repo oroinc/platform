@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\Expr\Value;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
 use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;
 
-class ExpressionBuilderTest extends \PHPUnit_Framework_TestCase
+class ExpressionBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExpressionBuilder */
     private $builder;

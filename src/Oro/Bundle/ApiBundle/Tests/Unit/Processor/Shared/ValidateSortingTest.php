@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
 class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
@@ -67,7 +68,10 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $sortersConfig->getField('id')->setExcluded(true);
 
         $this->prepareFilters();
-        $this->context->getFilterValues()->get('sort')->setSourceKey('sortFilterSourceKey');
+        $sortFilterValue = $this->context->getFilterValues()->get('sort');
+        $sortFilterValue->setSource(
+            FilterValue::createFromSource('sortFilterSourceKey', $sortFilterValue->getPath(), '')
+        );
 
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);

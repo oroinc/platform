@@ -5,7 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\LocaleBundle\Form\Type\NameFormatType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class NameFormatTypeTest extends \PHPUnit_Framework_TestCase
+class NameFormatTypeTest extends \PHPUnit\Framework\TestCase
 {
     public function testFormType()
     {

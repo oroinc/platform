@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker;
 
-class ClassMethodNameCheckerTest extends \PHPUnit_Framework_TestCase
+class ClassMethodNameCheckerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools\TestEntity';
 

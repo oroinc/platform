@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 class CompleteCompositeIdentifierFilterTest extends ConfigProcessorTestCase
 {
     /** @var CompleteCompositeIdentifierFilter */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

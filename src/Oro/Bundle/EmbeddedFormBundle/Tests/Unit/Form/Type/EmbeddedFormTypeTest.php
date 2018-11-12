@@ -8,7 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class EmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
+class EmbeddedFormTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test
@@ -23,7 +23,7 @@ class EmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldBuildForm()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject | FormBuilderInterface $builder */
+        /** @var \PHPUnit\Framework\MockObject\MockObject | FormBuilderInterface $builder */
         $builder = $this->createMock('\Symfony\Component\Form\FormBuilder');
         $builder->expects($this->at(0))
             ->method('add')
@@ -51,7 +51,7 @@ class EmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldConfigureOptions()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject | OptionsResolver $resolver */
+        /** @var \PHPUnit\Framework\MockObject\MockObject | OptionsResolver $resolver */
         $resolver = $this->createMock('\Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')

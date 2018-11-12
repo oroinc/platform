@@ -4,7 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config\Tree;
 
 use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 
-class FieldNodeDefinitionTest extends \PHPUnit_Framework_TestCase
+class FieldNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_NAME = 'testNodeName';
     const TEST_TYPE = 'text';

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DistributionBundle;
 
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
-
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
@@ -14,7 +13,6 @@ use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
-
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;

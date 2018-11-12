@@ -34,10 +34,10 @@ class DoctrineHelper extends BaseHelper
      * Returns the given API resource class if it is a manageable entity;
      * otherwise, checks if the API resource is based on a manageable entity, and if so,
      * returns the class name of this entity.
-     * If both the API resource class and its parent are not manageable entitities, returns NULL.
+     * If both the API resource class and its parent are not manageable entities, returns NULL.
      *
-     * @param string                      $resourceClass The class name of API resouce
-     * @param EntityDefinitionConfig|null $config        The API resouce configuration
+     * @param string                      $resourceClass The class name of API resource
+     * @param EntityDefinitionConfig|null $config        The API resource configuration
      *
      * @return string|null
      */
@@ -61,10 +61,10 @@ class DoctrineHelper extends BaseHelper
 
     /**
      * Returns the given API resource class if it is a manageable entity;
-     * otherwise, checks whether one of its parent classe is a manageable entity, and if so,
+     * otherwise, checks whether one of its parent class is a manageable entity, and if so,
      * returns the parent class name that is a manageable entity.
      *
-     * @param string $resourceClass The class name of API resouce
+     * @param string $resourceClass The class name of API resource
      *
      * @return string|null
      */
@@ -176,13 +176,10 @@ class DoctrineHelper extends BaseHelper
         $relations = [];
         $fieldNames = $metadata->getAssociationNames();
         foreach ($fieldNames as $fieldName) {
-            $mapping = $metadata->getAssociationMapping($fieldName);
-            if ($mapping['type'] & ClassMetadata::TO_ONE) {
-                $targetMetadata = $this->getEntityMetadataForClass($mapping['targetEntity']);
-                $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
-                if (count($targetIdFieldNames) === 1) {
-                    $relations[$fieldName] = $targetMetadata->getTypeOfField(reset($targetIdFieldNames));
-                }
+            $targetMetadata = $this->getEntityMetadataForClass($metadata->getAssociationTargetClass($fieldName));
+            $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
+            if (count($targetIdFieldNames) === 1) {
+                $relations[$fieldName] = $targetMetadata->getTypeOfField(reset($targetIdFieldNames));
             }
         }
 

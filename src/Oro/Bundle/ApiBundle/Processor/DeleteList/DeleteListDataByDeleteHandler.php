@@ -16,15 +16,11 @@ class DeleteListDataByDeleteHandler extends BaseProcessor
      */
     protected function processDelete($data, DeleteHandler $handler, EntityManagerInterface $em)
     {
-        /** @var DeleteListContext $context */
-
         if (!\is_array($data) && !$data instanceof \Traversable) {
-            throw new \RuntimeException(
-                \sprintf(
-                    'The result property of the context should be array or Traversable, "%s" given.',
-                    \is_object($data) ? \get_class($data) : \gettype($data)
-                )
-            );
+            throw new \RuntimeException(\sprintf(
+                'The result property of the context should be array or Traversable, "%s" given.',
+                \is_object($data) ? \get_class($data) : \gettype($data)
+            ));
         }
 
         $em->getConnection()->beginTransaction();

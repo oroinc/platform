@@ -6,7 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\Mailer\MessageFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class MessageFactoryTest extends \PHPUnit_Framework_TestCase
+class MessageFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreateMessage()
     {

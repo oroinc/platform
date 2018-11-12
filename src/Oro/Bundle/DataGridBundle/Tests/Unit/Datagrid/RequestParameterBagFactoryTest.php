@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
+class RequestParameterBagFactoryTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_NAME = 'testGrid';
 
@@ -15,7 +15,7 @@ class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
     /** @var RequestParameterBagFactory */
     protected $factory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $request;
 
     protected function setUp()

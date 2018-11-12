@@ -4,13 +4,14 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class CurrentApplicationProviderTest extends \PHPUnit_Framework_TestCase
+class CurrentApplicationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
     protected $tokenStorage;
 
     /** @var CurrentApplicationProvider */
@@ -120,12 +121,12 @@ class CurrentApplicationProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param UserInterface|string $user
-     * @param \PHPUnit_Framework_MockObject_Matcher_Invocation $expects
+     * @param \PHPUnit\Framework\MockObject\Matcher\Invocation $expects
      * @return TokenInterface
      */
-    protected function createToken($user, \PHPUnit_Framework_MockObject_Matcher_Invocation $expects = null)
+    protected function createToken($user, Invocation $expects = null)
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|TokenInterface $token */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|TokenInterface $token */
         $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token->expects($expects ?: $this->once())
             ->method('getUser')

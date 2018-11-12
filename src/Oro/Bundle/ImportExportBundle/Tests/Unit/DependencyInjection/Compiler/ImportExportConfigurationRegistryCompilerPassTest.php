@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class ImportExportConfigurationRegistryCompilerPassTest extends TestCase
 {
     /**
-     * @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     private $container;
 

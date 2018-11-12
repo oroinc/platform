@@ -16,7 +16,7 @@ class UserMenu extends Element
 
     public function open()
     {
-        $this->find('css', 'i.fa-caret-down')->click();
+        $this->find('css', '#user-menu > [data-toggle="dropdown"]')->click();
     }
 
     /**

@@ -5,7 +5,8 @@ namespace Oro\Bundle\AddressBundle\Utils;
 use Doctrine\ORM\EntityManager;
 
 /**
- * @todo: it is temporary workaround to avoid copy-paste until new API is implemented
+ * Contains a set of static methods that are used in API managers and controllers for different kind of addresses.
+ * It is temporary workaround to avoid copy-paste until new API is implemented
  */
 class AddressApiUtils
 {
@@ -17,20 +18,20 @@ class AddressApiUtils
     public static function getAddressConfig($isTypedAddress = false)
     {
         $result = [
-            'excluded_fields' => ['owner'],
-            'fields'          => [
+            'fields' => [
+                'owner'   => ['exclude' => true],
                 'country' => ['fields' => 'name'],
                 'region'  => ['fields' => 'name']
             ],
-            'post_serialize'  => function (array &$result) {
-                self::postSerializeAddress($result);
+            'post_serialize'  => function (array $result) {
+                return self::postSerializeAddress($result);
             }
         ];
 
         if ($isTypedAddress) {
             $result['fields']['types'] = [
-                'fields'  => 'name',
-                'orderBy' => [
+                'fields'   => 'name',
+                'order_by' => [
                     'name' => 'ASC'
                 ]
             ];
@@ -45,7 +46,7 @@ class AddressApiUtils
      */
     public static function fixAddress(array &$address, EntityManager $em)
     {
-        // @todo: just a temporary workaround until new API is implemented
+        // just a temporary workaround until new API is implemented
         // - convert country name to country code (as result we accept both the code and the name)
         //   also it will be good to accept ISO3 code in future, need to be discussed with product owners
         // - convert region name to region code (as result we accept the combined code, code and name)
@@ -161,10 +162,12 @@ class AddressApiUtils
 
     /**
      * @param array $result
+     *
+     * @return array
      */
-    protected static function postSerializeAddress(array &$result)
+    protected static function postSerializeAddress(array $result): array
     {
-        // @todo: just a temporary workaround until new API is implemented
+        // just a temporary workaround until new API is implemented
         // the normal solution can be to use region_name virtual field and
         // exclusion rule declared in oro/entity.yml
         // - for 'region' field use a region text if filled; otherwise, use region name
@@ -173,5 +176,7 @@ class AddressApiUtils
             $result['region'] = $result['regionText'];
         }
         unset($result['regionText']);
+
+        return $result;
     }
 }

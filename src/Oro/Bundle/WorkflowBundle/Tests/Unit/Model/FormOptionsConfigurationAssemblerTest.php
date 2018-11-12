@@ -9,18 +9,18 @@ use Oro\Bundle\WorkflowBundle\Model\FormOptionsConfigurationAssembler;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\CustomFormType;
 use Symfony\Component\Form\FormRegistryInterface;
 
-class FormOptionsConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
+class FormOptionsConfigurationAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  FormOptionsConfigurationAssembler */
     protected $assembler;
 
-    /** @var  FormRegistryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formRegistry;
 
-    /** @var  FormHandlerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  FormHandlerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $formHandlerRegistry;
 
-    /** @var  FormTemplateDataProviderRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  FormTemplateDataProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $formTemplateDataProviderRegistry;
 
     /** @var array */

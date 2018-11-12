@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Entity;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractPhone;
 
-class AbstractPhoneTest extends \PHPUnit_Framework_TestCase
+class AbstractPhoneTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AbstractPhone
@@ -96,7 +96,7 @@ class AbstractPhoneTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string|null $phone
      * @param int $id
-     * @return AbstractPhone|\PHPUnit_Framework_MockObject_MockObject
+     * @return AbstractPhone|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createPhone($phone = null, $id = null)
     {

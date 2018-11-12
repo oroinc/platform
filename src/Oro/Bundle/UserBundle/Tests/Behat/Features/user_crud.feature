@@ -6,7 +6,7 @@ Feature: User CRUD
   Scenario: Create new user
     Given I login as administrator
     And go to System/User Management/Users
-    And press "Create User"
+    And click "Create User"
     When I save and close form
     Then I should see validation errors:
       | Enabled       | This value should not be null.  |
@@ -43,7 +43,6 @@ Feature: User CRUD
       | First Name        | Johnny                |
       | Last Name         | Mnemonic              |
       | Primary Email     | edited@test.com       |
-      | Enabled           | Enabled        |
 
   Scenario: Delete user
     Given I should see johnny in grid

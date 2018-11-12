@@ -1,4 +1,5 @@
 .mobile-version {
+    @import "variables";
     @import "form";
 
     fieldset .span6 {
@@ -7,7 +8,7 @@
     }
 
     .mce-tinymce.mce-fullscreen {
-        z-index: $oroMobileHeaderZindex + 20;
+        z-index: 10000;
         border-radius: 0;
 
         .mce-toolbar-grp {
@@ -17,19 +18,14 @@
     }
 
     .responsive-form-inner {
-        .responsive-cell:not(:only-child) {
-            @media screen and (min-width: 1024px) and (max-width: 1220px) {
-                width: 50%;
-                float: left;
-            }
-        }
-
         .input-append {
             display: flex;
+            flex-grow: 1;
         }
 
         .float-holder {
-            width: calc(100% - 26px);
+            width: calc(100% - 44px);
+            margin-right: 4px;
         }
 
         .select2-container {
@@ -42,14 +38,9 @@
             width: 100%;
         }
 
-        input[type="password"] {
-            height: 30px;
-            box-sizing: border-box;
-        }
-
         .control-group-checkbox {
             .control-label {
-                margin-left: 20px;
+                margin-left: 26px;
             }
 
             .controls {
@@ -65,13 +56,6 @@
                     width: 100% !important //Override js width setting
                 }
             }
-        }
-
-        .fa-info-circle {
-            padding: 0;
-            margin: 0;
-            width: auto;
-            line-height: 20px;
         }
     }
 }

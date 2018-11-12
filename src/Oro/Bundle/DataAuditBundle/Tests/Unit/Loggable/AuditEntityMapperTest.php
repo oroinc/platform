@@ -6,7 +6,7 @@ use Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class AuditEntityMapperTest extends \PHPUnit_Framework_TestCase
+class AuditEntityMapperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AuditEntityMapper

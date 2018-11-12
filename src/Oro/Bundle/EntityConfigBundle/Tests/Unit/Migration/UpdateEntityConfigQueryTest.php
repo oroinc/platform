@@ -12,11 +12,11 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Psr\Log\LoggerInterface;
 
-class UpdateEntityConfigQueryTest extends \PHPUnit_Framework_TestCase
+class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
 {
     const FIELD_NAME = 'fieldName';
 
-    /** @var Connection|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
 
     /** @var UpdateEntityConfigQuery */
@@ -133,7 +133,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit_Framework_TestCase
                 ]
             ]);
 
-        /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject $logger */
+        /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
         $logger->expects($this->at(0))
@@ -162,7 +162,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit_Framework_TestCase
     /**
      * @param $key
      * @param $value
-     * @return Statement|\PHPUnit_Framework_MockObject_MockObject
+     * @return Statement|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function setUpConnection($key, $value)
     {

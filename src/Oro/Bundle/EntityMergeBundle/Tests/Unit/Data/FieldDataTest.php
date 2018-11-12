@@ -5,15 +5,15 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Data;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
-class FieldDataTest extends \PHPUnit_Framework_TestCase
+class FieldDataTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityData;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $fieldMetadata;
 

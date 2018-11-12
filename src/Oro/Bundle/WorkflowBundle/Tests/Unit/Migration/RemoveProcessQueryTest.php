@@ -6,15 +6,15 @@ use Doctrine\DBAL\Connection;
 use Oro\Bundle\WorkflowBundle\Migration\RemoveProcessesQuery;
 use Psr\Log\LoggerInterface;
 
-class RemoveProcessQueryTest extends \PHPUnit_Framework_TestCase
+class RemoveProcessQueryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var Connection|\PHPUnit_Framework_MockObject_MockObject
+     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
      */
     private $connector;
 
     /**
-     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $logger;
 

@@ -14,7 +14,7 @@ class ExportTypeTest extends FormIntegrationTestCase
     const ENTITY_NAME = 'testName';
 
     /**
-     * @var ProcessorRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $processorRegistry;
 

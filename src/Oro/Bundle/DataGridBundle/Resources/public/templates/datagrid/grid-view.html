@@ -1,34 +1,53 @@
-<div class="btn-toolbar">
-    <% if (choices.length) { %>
-    <div class="btn-group views-group">
-        <div data-toggle="dropdown" class="btn btn-link dropdown-toggle <% if (disabled) { %>disabled<% } %>">
+<% if (choices.length) { %>
+    <% var gridViewTogglerId = _.uniqueId('dropdown-') %>
+    <div class="views-group">
+        <div id="<%- gridViewTogglerId %>"
+             data-toggle="dropdown"
+             data-placement="bottom-start"
+             class="grid-views-toogler <% if (disabled) { %>disabled<% } %>"
+             role="button"
+             aria-haspopup="true"
+             aria-expanded="false"
+        >
             <% // this is already escaped in the title template %>
             <%= title %>
         </div>
-        <ul class="dropdown-menu">
+        <div class="grid-views-dropdown dropdown-menu" aria-labelledby="<%- gridViewTogglerId %>">
             <% _.each(choices, function (choice) { %>
-            <li><a href="#" data-value="<%- choice.value %>">
-                <% if (choice.icon) { %><i class="<%- choice.icon %>"></i><% } %><%- choice.label %></a>
-            </li>
+                <a class="grid-views-item dropdown-item" href="#" role="button" data-value="<%- choice.value %>">
+                    <% if (choice.icon) { %>
+                        <span class="grid-views-choice-icon <%- choice.icon %>" aria-hidden="true"></span>
+                    <% } %>
+                    <span class="grid-views-choice">
+                        <%- choice.label %>
+                    </span>
+                </a>
             <% }); %>
-        </ul>
-    </div>
-    <% } %>
-    <% if (showActions) { %>
-    <div class="btn-group actions-group">
-        <div class="btn btn-link dropdown-toggle" data-toggle="dropdown" href="#">
-            <%- actionsLabel %>
         </div>
-        <ul class="dropdown-menu">
+    </div>
+<% } %>
+<% if (showActions) { %>
+    <% var gridViewActionsTogglerId = _.uniqueId('dropdown-') %>
+    <div class="actions-group">
+        <button id="<%- gridViewActionsTogglerId %>"
+                class="grid-view-btn btn btn-link"
+                data-toggle="dropdown"
+                data-placement="bottom-start"
+                data-modifiers="<%- JSON.stringify({preventOverflow: {enabled: false}, hide: {enabled: false}}) %>"
+                aria-haspopup="true"
+                aria-expanded="false"
+        >
+            <%- actionsLabel %>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="<%- gridViewActionsTogglerId %>">
             <% _.each(actions, function(action) { %>
                 <% if (action.enabled) { %>
-                    <li><a href="#" class="<%- action.name %>"><%- action.label %></a></li>
+                    <a href="#" role="button" class="grid-views-item dropdown-item <%- action.name %>"><%- action.label %></a>
                 <% } %>
             <% }); %>
-        </ul>
+        </div>
         <% if (dirty) { %>
-            <div class="edited-label">&nbsp;-&nbsp;<%- editedLabel %></div>
+            <span class="edited-label">&nbsp;-&nbsp;<%- editedLabel %></span>
         <% } %>
     </div>
-    <% } %>
-</div>
+<% } %>

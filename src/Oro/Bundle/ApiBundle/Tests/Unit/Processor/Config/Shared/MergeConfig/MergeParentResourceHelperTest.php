@@ -13,16 +13,16 @@ use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeParentResource
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 
-class MergeParentResourceHelperTest extends \PHPUnit_Framework_TestCase
+class MergeParentResourceHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
-    protected $configProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    private $configProvider;
 
     /** @var ConfigContext */
-    protected $context;
+    private $context;
 
     /** @var MergeParentResourceHelper */
-    protected $mergeParentResourceHelper;
+    private $mergeParentResourceHelper;
 
     protected function setUp()
     {
@@ -42,7 +42,7 @@ class MergeParentResourceHelperTest extends \PHPUnit_Framework_TestCase
      * @param string $parentResourceClass
      * @param Config $parentConfig
      */
-    protected function loadParentConfig($parentResourceClass, Config $parentConfig)
+    private function loadParentConfig($parentResourceClass, Config $parentConfig)
     {
         $this->configProvider->expects(self::once())
             ->method('getConfig')

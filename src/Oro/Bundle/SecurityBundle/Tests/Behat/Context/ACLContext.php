@@ -286,7 +286,7 @@ class ACLContext extends OroFeatureContext implements
      * Asserts that provided capability permissions allowed on view page
      *
      * Example: And following capability permissions should be checked:
-     *           | Manage Abandoned Cart Campaigns |
+     *           | Access system information |
      *
      * @Then /^following capability permissions should be checked:$/
      */
@@ -309,7 +309,7 @@ class ACLContext extends OroFeatureContext implements
      * Asserts that provided capability permissions disallowed on view page
      *
      * Example: And following capability permissions should be unchecked:
-     *           | Manage Abandoned Cart Campaigns |
+     *           | Access system information |
      *
      * @Then /^following capability permissions should be unchecked:$/
      */

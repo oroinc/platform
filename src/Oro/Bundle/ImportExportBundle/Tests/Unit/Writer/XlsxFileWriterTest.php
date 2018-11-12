@@ -6,16 +6,19 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Liuggio\ExcelBundle\Factory;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\XlsxFileWriter;
+use Oro\Component\Testing\TempDirExtension;
 
-class XlsxFileWriterTest extends \PHPUnit_Framework_TestCase
+class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var XlsxFileWriter */
     protected $writer;
 
     /** @var string */
     protected $filePath;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContextRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContextRegistry */
     protected $contextRegistry;
 
     /** @var Factory */
@@ -33,8 +36,7 @@ class XlsxFileWriterTest extends \PHPUnit_Framework_TestCase
 
         $this->excel = new Factory();
 
-        $this->tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'XlsxFileWriterTest';
-        @\mkdir($this->tmpDir);
+        $this->tmpDir = $this->getTempDir('XlsxFileWriterTest');
 
         $this->filePath = $this->tmpDir . '/new_file.xlsx';
         $this->writer = new XlsxFileWriter($this->contextRegistry, $this->excel);
@@ -42,10 +44,7 @@ class XlsxFileWriterTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        if (is_file($this->filePath)) {
-            unlink($this->filePath);
-        }
-        @\rmdir($this->tmpDir);
+        $this->writer->close();
     }
 
     /**
@@ -108,7 +107,7 @@ class XlsxFileWriterTest extends \PHPUnit_Framework_TestCase
 
     public function optionsDataProvider()
     {
-        $filePath = sys_get_temp_dir() . '/XlsxFileWriterTest/new_file.xlsx';
+        $filePath = $this->getTempDir('XlsxFileWriterTest', null) . DIRECTORY_SEPARATOR . 'new_file.xlsx';
 
         return [
             'first_item_header' => [
@@ -183,7 +182,7 @@ class XlsxFileWriterTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $jobInstanceRawConfiguration
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|StepExecution
+     * @return \PHPUnit\Framework\MockObject\MockObject|StepExecution
      */
     protected function getMockStepExecution(array $jobInstanceRawConfiguration)
     {

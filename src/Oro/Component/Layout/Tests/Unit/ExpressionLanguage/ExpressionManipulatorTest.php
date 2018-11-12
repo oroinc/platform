@@ -8,7 +8,7 @@ use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\UnaryNode;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
-class ExpressionManipulatorTest extends \PHPUnit_Framework_TestCase
+class ExpressionManipulatorTest extends \PHPUnit\Framework\TestCase
 {
     public function testToArray()
     {

@@ -255,7 +255,6 @@ define(function(require) {
             }));
 
             this._appendFilter($filter);
-            this._refreshWidth();
         },
 
         /**
@@ -472,19 +471,6 @@ define(function(require) {
             }
 
             return selectedChoiceLabel;
-        },
-
-        /**
-         * Update width of filter
-         */
-        _refreshWidth: function() {
-            var valueFrame = this.$('.value-field-frame');
-            // update left and right margins of value field frame
-            var leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
-            var rightWidth = this.$('.filter-update').outerWidth();
-
-            valueFrame.css('margin-left', leftWidth);
-            valueFrame.css('padding-right', rightWidth);
         },
 
         /**

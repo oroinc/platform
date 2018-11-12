@@ -16,7 +16,7 @@ class TwigRendererEngineTest extends RendererEngineTest
     protected $twigRendererEngine;
 
     /**
-     * @var Environment|\PHPUnit_Framework_MockObject_MockObject
+     * @var Environment|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $environment;
 
@@ -38,7 +38,7 @@ class TwigRendererEngineTest extends RendererEngineTest
 
         $this->twigRendererEngine->setConfigManager($configManager);
 
-        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
+        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = 'cache_key';
         $template = $this->createMock('\Twig_Template');

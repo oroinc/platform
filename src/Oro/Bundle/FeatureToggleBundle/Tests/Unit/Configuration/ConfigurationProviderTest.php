@@ -9,7 +9,7 @@ use Oro\Bundle\FeatureToggleBundle\Exception\CircularReferenceException;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 
-class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider configurationDataProvider
@@ -20,7 +20,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     public function testWarmUpCache(array $configuration, array $bundles, array $mergedConfiguration)
     {
         $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
+        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
         $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
@@ -29,9 +29,6 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             $cache
         );
 
-        $cache->expects($this->once())
-            ->method('delete')
-            ->with(FeatureToggleConfiguration::ROOT);
         $cache->expects($this->once())
             ->method('save')
             ->with(FeatureToggleConfiguration::ROOT, $mergedConfiguration);
@@ -42,7 +39,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     public function testClearCache()
     {
         $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
+        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
         $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             [],
@@ -69,7 +66,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         array $mergedConfiguration
     ) {
         $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
+        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
         $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
@@ -79,10 +76,6 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         $ignoreCache = false;
-        $cache->expects($this->once())
-            ->method('contains')
-            ->with(FeatureToggleConfiguration::ROOT)
-            ->willReturn(true);
         $cache->expects($this->once())
             ->method('fetch')
             ->with(FeatureToggleConfiguration::ROOT)
@@ -105,7 +98,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         array $mergedConfiguration
     ) {
         $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
+        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
         $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
@@ -136,7 +129,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         array $mergedConfiguration
     ) {
         $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
+        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
         $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
@@ -147,12 +140,9 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $ignoreCache = false;
         $cache->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(FeatureToggleConfiguration::ROOT)
             ->willReturn(false);
-        $cache->expects($this->once())
-            ->method('delete')
-            ->with(FeatureToggleConfiguration::ROOT);
         $cache->expects($this->once())
             ->method('save')
             ->with(FeatureToggleConfiguration::ROOT, $mergedConfiguration);
@@ -175,7 +165,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         array $mergedConfiguration
     ) {
         $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
+        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
         $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
@@ -185,10 +175,6 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         $ignoreCache = false;
-        $cache->expects($this->once())
-            ->method('contains')
-            ->with(FeatureToggleConfiguration::ROOT)
-            ->willReturn(true);
         $cache->expects($this->once())
             ->method('fetch')
             ->with(FeatureToggleConfiguration::ROOT)
@@ -212,7 +198,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         array $mergedConfiguration
     ) {
         $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
+        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
         $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
@@ -223,12 +209,9 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $ignoreCache = false;
         $cache->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(FeatureToggleConfiguration::ROOT)
             ->willReturn(false);
-        $cache->expects($this->once())
-            ->method('delete')
-            ->with(FeatureToggleConfiguration::ROOT);
         $cache->expects($this->once())
             ->method('save')
             ->with(FeatureToggleConfiguration::ROOT, $mergedConfiguration);
@@ -266,7 +249,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $ignoreCache = true;
         $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
+        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
         $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
@@ -299,7 +282,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $ignoreCache = true;
         $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
+        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
         $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,

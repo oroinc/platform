@@ -1,14 +1,16 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
 use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddress;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddressOwner;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 
-class FixAddressesPrimarySubscriberTest extends \PHPUnit_Framework_TestCase
+class FixAddressesPrimarySubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FixAddressesPrimarySubscriber
@@ -34,15 +36,7 @@ class FixAddressesPrimarySubscriberTest extends \PHPUnit_Framework_TestCase
     public function testPostSubmit(array $allAddresses, $formAddressKey, array $expectedAddressesData)
     {
         $owner = new TypedAddressOwner($allAddresses);
-
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->setMethods(array('getData'))
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event->expects($this->once())
-            ->method('getData')
-            ->will($this->returnValue($allAddresses[$formAddressKey]));
+        $event = new FormEvent($this->createMock(FormInterface::class), $allAddresses[$formAddressKey]);
 
         $this->subscriber->postSubmit($event);
 

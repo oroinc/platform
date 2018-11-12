@@ -6,11 +6,11 @@ use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 use Oro\Bundle\TranslationBundle\Twig\TranslationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
+class TranslationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var TranslationsDatagridRouteHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslationsDatagridRouteHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $translationRouteHelper;
 
     /** @var TranslationExtension */

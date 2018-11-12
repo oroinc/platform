@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Collection\Join;
 /**
  * Performs the following normalizations of the Criteria object:
  * * sets missing join aliases
+ * * adds required joins
  * * replaces LEFT JOIN with INNER JOIN where it is possible
  */
 class CriteriaNormalizer
@@ -21,12 +22,25 @@ class CriteriaNormalizer
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
+    /** @var RequireJoinsFieldVisitorFactory */
+    private $requireJoinsFieldVisitorFactory;
+
+    /** @var OptimizeJoinsFieldVisitorFactory */
+    private $optimizeJoinsFieldVisitorFactory;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @param DoctrineHelper                   $doctrineHelper
+     * @param RequireJoinsFieldVisitorFactory  $requireJoinsFieldVisitorFactory
+     * @param OptimizeJoinsFieldVisitorFactory $optimizeJoinsFieldVisitorFactory
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        RequireJoinsFieldVisitorFactory $requireJoinsFieldVisitorFactory,
+        OptimizeJoinsFieldVisitorFactory $optimizeJoinsFieldVisitorFactory
+    ) {
         $this->doctrineHelper = $doctrineHelper;
+        $this->requireJoinsFieldVisitorFactory = $requireJoinsFieldVisitorFactory;
+        $this->optimizeJoinsFieldVisitorFactory = $optimizeJoinsFieldVisitorFactory;
     }
 
     /**
@@ -58,7 +72,7 @@ class CriteriaNormalizer
     }
 
     /**
-     * Makes sure that this criteria object contains all required joins and aliases are set for all joins.
+     * Makes sure that this criteria object contains all required joins.
      *
      * @param Criteria $criteria
      * @param string   $rootEntityClass
@@ -240,7 +254,7 @@ class CriteriaNormalizer
         $fields = [];
         $whereExpr = $criteria->getWhereExpression();
         if (null !== $whereExpr) {
-            $visitor = new FieldVisitor();
+            $visitor = $this->requireJoinsFieldVisitorFactory->createExpressionVisitor();
             $visitor->dispatch($whereExpr);
             $fields = $visitor->getFields();
         }
@@ -267,7 +281,7 @@ class CriteriaNormalizer
             return [];
         }
 
-        $visitor = new OptimizeJoinsFieldVisitor();
+        $visitor = $this->optimizeJoinsFieldVisitorFactory->createExpressionVisitor();
         $visitor->dispatch($whereExpr);
 
         return $visitor->getFields();
@@ -276,7 +290,7 @@ class CriteriaNormalizer
     /**
      * @param array $pathMap
      */
-    private function sortJoinPathMap(array &$pathMap)
+    private function sortJoinPathMap(array &$pathMap): void
     {
         \uasort(
             $pathMap,

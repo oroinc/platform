@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints;
 
 class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
@@ -20,10 +21,7 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
     /** @var CollectFormErrors */
     private $processor;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -31,7 +29,8 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
 
         $this->processor = new CollectFormErrors(
             new ConstraintTextExtractor(),
-            $this->errorCompleterRegistry
+            $this->errorCompleterRegistry,
+            PropertyAccess::createPropertyAccessor()
         );
     }
 

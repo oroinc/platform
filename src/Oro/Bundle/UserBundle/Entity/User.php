@@ -23,13 +23,18 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 
 /**
+ * This entity represents a user of a system
+ *
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  *
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\UserRepository")
  * @ORM\Table(name="oro_user", indexes = {
- *      @ORM\Index("user_first_name_last_name_idx", columns = {"first_name", "last_name"})
+ *      @ORM\Index("user_first_name_last_name_idx", columns = {"first_name", "last_name"}),
+ *      @ORM\Index(name="idx_oro_user_email_lowercase", columns={"email_lowercase"}),
  * })
  * @ORM\HasLifecycleCallbacks()
  * @Config(
@@ -131,6 +136,24 @@ class User extends ExtendUser implements
      * )
      */
     protected $email;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="email_lowercase", type="string", length=255)
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=false
+     *          },
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      },
+     *      mode="hidden"
+     * )
+     */
+    protected $emailLowercase;
 
     /**
      * Name prefix
@@ -679,40 +702,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * Returns the true Collection of Roles.
-     *
-     * @deprecated since 1.8
-     *
-     * @return Collection
-     */
-    public function getRolesCollection()
-    {
-        return $this->roles;
-    }
-
-    /**
-     * Directly set the Collection of Roles.
-     *
-     * @deprecated since 1.8
-     *
-     * @param Collection $collection
-     *
-     * @return User
-     * @throws \InvalidArgumentException
-     */
-    public function setRolesCollection($collection)
-    {
-        if (!$collection instanceof Collection) {
-            throw new \InvalidArgumentException(
-                '$collection must be an instance of Doctrine\Common\Collections\Collection'
-            );
-        }
-        $this->roles = $collection;
-
-        return $this;
-    }
-
-    /**
      * Pre persist event listener
      *
      * @ORM\PrePersist
@@ -939,8 +928,17 @@ class User extends ExtendUser implements
     public function setEmail($email)
     {
         $this->email = $email;
+        $this->emailLowercase = mb_strtolower($email);
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmailLowercase(): string
+    {
+        return $this->emailLowercase;
     }
 
     /**

@@ -26,7 +26,7 @@ class EntityCollectionTypeTest extends TypeTestCase
 
     public function testShouldClearCollectionWhenRemoveAllItems()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ArrayCollection $groups */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ArrayCollection $groups */
         $groups = $this->getMockBuilder(ArrayCollection::class)
             ->setMethods(['clear'])
             ->getMock();

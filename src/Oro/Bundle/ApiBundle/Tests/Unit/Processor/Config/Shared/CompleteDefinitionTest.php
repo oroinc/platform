@@ -9,17 +9,17 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class CompleteDefinitionTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityDefinitionHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CompleteDefinition\CompleteEntityDefinitionHelper */
+    private $entityDefinitionHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $objectDefinitionHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CompleteDefinition\CompleteObjectDefinitionHelper */
+    private $objectDefinitionHelper;
 
     /** @var CompleteDefinition */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -42,7 +42,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             'exclusion_policy' => 'all'
         ];
 
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('isManageableEntityClass');
         $this->entityDefinitionHelper->expects(self::never())
             ->method('completeDefinition');
@@ -57,7 +57,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
     {
         $definition = new EntityDefinitionConfig();
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
@@ -77,7 +77,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
     {
         $definition = new EntityDefinitionConfig();
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(false);

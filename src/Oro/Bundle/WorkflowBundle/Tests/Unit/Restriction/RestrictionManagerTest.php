@@ -8,18 +8,18 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 
-class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
+class RestrictionManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowRegistry;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var RestrictionManager */
     protected $restrictionManager;
 
-    /** @var WorkflowRestrictionRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowRestrictionRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
     protected function setUp()

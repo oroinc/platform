@@ -6,19 +6,20 @@ OroCacheBundle introduces the configuration of the application data cache storag
 
 ## Table of Contents
 
- - [Abstract cache services](#abstract-cache-services)
- - [APC cache](#apc-cache)
+ - [Abstract cache services](#abstract-cache-services) 
  - [Warm up config cache](#warm-up-config-cache)
  - [Caching of Symfony Validation rules](#caching-of-symfony-validation-rules)
 
 ## Abstract cache services
 
-There are two abstract services you can use as a parent for your cache services:
+There are three abstract services you can use as a parent for your cache services:
 
  - `oro.file_cache.abstract` - this cache should be used for caching data private for each node in a web farm
  - `oro.cache.abstract` - this cache should be used for caching data that need to be shared between nodes in a web farm
+ - `oro.cache.abstract.without_memory_cache` - the same as `oro.cache.abstract` but without using additional in-memory caching, it can be used to avoid unnecessary memory usage and performance penalties if in-memory caching is not needed, e.g. you implemented some more efficient in-memory caching strategy around your cache service
 
 The following example shows how this services can be used:
+
 ``` yaml
 services:
     acme.test.cache:
@@ -28,7 +29,8 @@ services:
             - [ setNamespace, [ 'acme_test' ] ]
 ```
 
-Also each of these abstract services can be re-declared in the application configuration file, for example:
+Also `oro.file_cache.abstract` and `oro.cache.abstract` services can be re-declared in the application configuration file, for example:
+
 ``` yaml
 services:
     oro.cache.abstract:
@@ -37,30 +39,9 @@ services:
         arguments:            [%kernel.cache_dir%/oro_data]
 ```
 
+The `oro.cache.abstract.without_memory_cache` service is always declared automatically based on `oro.cache.abstract` service.
+
 Read more about the [caching policy and default implementation](Resources/doc/caching_policy.md).
-
-## APC cache
-
-There is a possibility to use APC cache and few steps should be completed for this.
-
-First of all, APC should be installed and enabled in the system. After this, the production configuration file (`config_prod.yml`) should be updated with the following parameters:
-
-
-``` yaml
-doctrine:
-    orm:
-        auto_mapping: true
-        query_cache_driver:    apc
-        metadata_cache_driver: apc
-        result_cache_driver: apc
-
-services:
-    oro.cache.abstract:
-        abstract:             true
-        class:                Doctrine\Common\Cache\ApcCache
-```
-
-On the last step of the configuration, production cache should be cleared.
 
 ## Warm up config cache
 

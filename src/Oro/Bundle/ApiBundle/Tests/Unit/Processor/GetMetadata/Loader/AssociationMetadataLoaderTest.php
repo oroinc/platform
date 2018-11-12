@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
 
-class AssociationMetadataLoaderTest extends \PHPUnit_Framework_TestCase
+class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
 {
     private const TEST_CLASS_NAME        = 'Test\Class';
     private const TEST_VERSION           = '1.1';
@@ -21,11 +21,11 @@ class AssociationMetadataLoaderTest extends \PHPUnit_Framework_TestCase
     /** @var MetadataContext */
     private $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
     private $metadataProvider;
 
     /** @var AssociationMetadataLoader */
-    protected $associationMetadataLoader;
+    private $associationMetadataLoader;
 
     protected function setUp()
     {

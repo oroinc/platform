@@ -7,7 +7,7 @@ use Oro\Bundle\FormBundle\Validator\Constraints\ContainsPrimary;
 use Oro\Bundle\FormBundle\Validator\Constraints\ContainsPrimaryValidator;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
-class ContainsPrimaryValidatorTest extends \PHPUnit_Framework_TestCase
+class ContainsPrimaryValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
@@ -112,7 +112,7 @@ class ContainsPrimaryValidatorTest extends \PHPUnit_Framework_TestCase
      * Get primary item mock.
      *
      * @param bool $isPrimary
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getPrimaryItemMock($isPrimary)
     {

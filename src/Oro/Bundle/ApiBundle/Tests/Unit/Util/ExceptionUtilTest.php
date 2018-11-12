@@ -5,13 +5,13 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 
-class ExceptionUtilTest extends \PHPUnit_Framework_TestCase
+class ExceptionUtilTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetProcessorUnderlyingExceptionWithoutInnerException()
     {
         $exception = new \InvalidArgumentException();
 
-        $this->assertSame(
+        self::assertSame(
             $exception,
             ExceptionUtil::getProcessorUnderlyingException($exception)
         );
@@ -25,7 +25,7 @@ class ExceptionUtilTest extends \PHPUnit_Framework_TestCase
             new \InvalidArgumentException()
         );
 
-        $this->assertSame(
+        self::assertSame(
             $exception,
             ExceptionUtil::getProcessorUnderlyingException($exception)
         );
@@ -41,7 +41,7 @@ class ExceptionUtilTest extends \PHPUnit_Framework_TestCase
             $innerException
         );
 
-        $this->assertSame(
+        self::assertSame(
             $innerException,
             ExceptionUtil::getProcessorUnderlyingException($exception)
         );
@@ -62,7 +62,7 @@ class ExceptionUtilTest extends \PHPUnit_Framework_TestCase
             $executionFailedException
         );
 
-        $this->assertSame(
+        self::assertSame(
             $exception,
             ExceptionUtil::getProcessorUnderlyingException($exception)
         );

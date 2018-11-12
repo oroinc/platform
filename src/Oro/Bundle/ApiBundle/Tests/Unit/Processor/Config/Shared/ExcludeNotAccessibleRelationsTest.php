@@ -12,13 +12,13 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
     private $resourcesProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityOverrideProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
     private $entityOverrideProvider;
 
     /** @var ExcludeNotAccessibleRelations */
@@ -618,7 +618,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForAssocciationToOverriddenEntity()
+    public function testProcessForAssociationToOverriddenEntity()
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -736,7 +736,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForAssocciationToOverriddenEntityInTableInheritanceSubClass()
+    public function testProcessForAssociationToOverriddenEntityInTableInheritanceSubClass()
     {
         $config = [
             'exclusion_policy' => 'all',

@@ -28,19 +28,19 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class CompleteDescriptionsTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityDescriptionProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDescriptionProvider */
     private $entityDocProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceDocProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceDocProvider */
     private $resourceDocProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceDocParserRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceDocParserRegistry */
     private $resourceDocParserRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceDocParserInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceDocParserInterface */
     private $resourceDocParser;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     private $translator;
 
     /** @var ConfigProviderMock */
@@ -1605,6 +1605,75 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
+    public function testPrimaryResourceDescriptionWhenEntityDocProviderReturnsNull()
+    {
+        $entityClass = 'Test\Entity';
+        $targetAction = 'get';
+        $config = [
+            'exclusion_policy' => 'all'
+        ];
+        $entityDescription = 'Entity';
+        $actionDescription = 'Get Entity';
+
+        $this->entityDocProvider->expects(self::once())
+            ->method('getEntityDescription')
+            ->with($entityClass)
+            ->willReturn(null);
+        $this->resourceDocProvider->expects(self::once())
+            ->method('getResourceDescription')
+            ->with($targetAction, $entityDescription)
+            ->willReturn($actionDescription);
+
+        $this->context->setClassName($entityClass);
+        $this->context->setTargetAction($targetAction);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'description'            => $actionDescription
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testPrimaryResourceDescriptionWhenEntityDocProviderReturnsNullForCollectionResource()
+    {
+        $entityClass = 'Test\Entity';
+        $targetAction = 'get_list';
+        $config = [
+            'exclusion_policy' => 'all'
+        ];
+        $entityDescription = 'Entity';
+        $actionDescription = 'Get list of Entity';
+
+        $this->entityDocProvider->expects(self::once())
+            ->method('getEntityPluralDescription')
+            ->with($entityClass)
+            ->willReturn(null);
+        $this->resourceDocProvider->expects(self::once())
+            ->method('getResourceDescription')
+            ->with($targetAction, $entityDescription)
+            ->willReturn($actionDescription);
+
+        $this->context->setClassName($entityClass);
+        $this->context->setTargetAction($targetAction);
+        $this->context->setIsCollection(true);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'description'            => $actionDescription
+            ],
+            $this->context->getResult()
+        );
+    }
+
     public function testPrimaryResourceDescriptionLoadedByEntityDocProvider()
     {
         $entityClass = 'Test\Entity';
@@ -1793,7 +1862,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             'exclusion_policy'       => 'all',
             'documentation_resource' => ['documentation.md']
         ];
-        $subresourceDocumentation = 'subresurce description';
+        $subresourceDocumentation = 'subresource description';
 
         $this->resourceDocParser->expects(self::once())
             ->method('registerDocumentationResource')

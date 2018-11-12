@@ -40,16 +40,16 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 {
     const CONFIG_NAME = 'system_configuration';
 
-    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var ChainSearchProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ChainSearchProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $searchProvider;
 
-    /** @var  FormRegistryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formRegistry;
 
     /**

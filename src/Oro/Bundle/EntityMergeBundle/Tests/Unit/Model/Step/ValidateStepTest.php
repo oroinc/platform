@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Step;
 use Oro\Bundle\EntityMergeBundle\Model\Step\ValidateStep;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ValidateStepTest extends \PHPUnit_Framework_TestCase
+class ValidateStepTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ValidateStep
@@ -13,12 +13,12 @@ class ValidateStepTest extends \PHPUnit_Framework_TestCase
     protected $step;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $validator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $constraintViolation;
 

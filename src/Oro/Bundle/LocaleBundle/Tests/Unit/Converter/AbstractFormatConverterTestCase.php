@@ -6,7 +6,7 @@ use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 
-abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCase
 {
     const LOCALE_EN = 'en';
     const LOCALE_RU = 'ru';

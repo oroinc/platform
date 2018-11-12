@@ -1,8 +1,15 @@
+nelmio_api_doc_index:
+    path: '%oro_api.rest.prefix%doc/{view}'
+    methods: [GET]
+    defaults:
+        _controller: NelmioApiDocBundle:ApiDoc:index
+        view: rest_json_api
+
 # * GET method: returns an entity of the given type by its identifier
 # * DELETE method: deletes an entity of the given type by its identifier
 # * PATCH method: updates the specified fields of the given entity
 oro_rest_api_item:
-    path: /api/{entity}/{id}
+    path: '%oro_api.rest.prefix%{entity}/{id}'
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
@@ -15,7 +22,7 @@ oro_rest_api_item:
 # * DELETE method: deletes a list of entities of the given type by the given filters
 # * POST method: creates an entity of the given type
 oro_rest_api_list:
-    path: /api/{entity}
+    path: '%oro_api.rest.prefix%{entity}'
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
@@ -40,7 +47,7 @@ oro_rest_api_list:
 #   This type of the request is non-standard and do not have default implementation,
 #   additional processors should be added for each association requires it.
 oro_rest_api_subresource:
-    path: /api/{entity}/{id}/{association}
+    path: '%oro_api.rest.prefix%{entity}/{id}/{association}'
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
@@ -58,7 +65,7 @@ oro_rest_api_subresource:
 # * POST method: adds the specified entities to the relationship represented by the given to-many association
 # * DELETE method: deletes the specified entities from the relationship represented by the given to-many association
 oro_rest_api_relationship:
-    path: /api/{entity}/{id}/relationships/{association}
+    path: '%oro_api.rest.prefix%{entity}/{id}/relationships/{association}'
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:

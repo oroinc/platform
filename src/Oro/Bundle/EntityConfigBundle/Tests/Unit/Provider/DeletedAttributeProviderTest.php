@@ -10,15 +10,15 @@ use Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository;
 use Oro\Bundle\EntityConfigBundle\Provider\AttributeValueProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\DeletedAttributeProvider;
 
-class DeletedAttributeProviderTest extends \PHPUnit_Framework_TestCase
+class DeletedAttributeProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ConfigModelManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigModelManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $configModelManager;
 
     /**
-     * @var AttributeValueProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var AttributeValueProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $attributeValueProvider;
 

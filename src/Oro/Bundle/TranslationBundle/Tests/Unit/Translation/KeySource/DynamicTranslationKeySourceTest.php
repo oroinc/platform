@@ -5,7 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation\KeySource;
 use Oro\Bundle\TranslationBundle\Translation\KeySource\DynamicTranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 
-class DynamicTranslationKeySourceTest extends \PHPUnit_Framework_TestCase
+class DynamicTranslationKeySourceTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DynamicTranslationKeySource

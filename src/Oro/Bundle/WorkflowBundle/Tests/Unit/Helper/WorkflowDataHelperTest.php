@@ -21,15 +21,15 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class WorkflowDataHelperTest extends \PHPUnit_Framework_TestCase
+class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var UrlGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $router;
 
     /** @var WorkflowDataHelper */
@@ -313,7 +313,7 @@ class WorkflowDataHelperTest extends \PHPUnit_Framework_TestCase
         $step->setName('Start');
         $step->setAllowedTransitions($allowed);
 
-        /** @var StepManager|\PHPUnit_Framework_MockObject_MockObject $stepManager */
+        /** @var StepManager|\PHPUnit\Framework\MockObject\MockObject $stepManager */
         $stepManager = $this->getMockBuilder(StepManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -332,7 +332,7 @@ class WorkflowDataHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var RestrictionManager|\PHPUnit_Framework_MockObject_MockObject $restrictionManager */
+        /** @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject $restrictionManager */
         $restrictionManager = $this->getMockBuilder(RestrictionManager::class)
             ->disableOriginalConstructor()
             ->getMock();

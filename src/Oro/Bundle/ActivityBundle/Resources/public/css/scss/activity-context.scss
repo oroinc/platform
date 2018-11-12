@@ -1,110 +1,134 @@
-@import "oroui/css/scss/variables";
+/* @theme: admin.oro; */
 
 .activity-list-widget {
-  .activity-context-activity-list {
-    padding: 0 $horizontalPadding;
-  }
+    .activity-context-activity-list {
+        padding: 0 $horizontal-padding;
+    }
 }
 
 .activity-context-activity {
-  display: none;
+    display: none;
 }
 
 .activity-context-activity-list {
-  margin-bottom: 5px;
+    margin-bottom: 5px;
 }
 
 .activity-context-activity-items .context-item {
-  display: inline-block;
-  margin-right: 8px;
-  font-size: 11px;
+    background: $activity-context-item-background;
+    color: $activity-context-item-color;
+    display: $activity-context-item-display;
+    margin: $activity-context-item-offset;
+    padding: $activity-context-item-inner-offset;
+    font-size: $activity-context-item-font-size;
 }
 
 .cell-context-item,
 .context-item {
-  .context-label {
-    max-width: 180px;
-    display: inline-block;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    vertical-align: bottom;
-  }
+    .context-label {
+        max-width: 180px;
+        display: inline-block;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        vertical-align: bottom;
+    }
 }
+
 .context-item {
-  list-style: none;
-  cursor: pointer;
-  white-space: nowrap;
-  &.active,
-  .dropdown-menu &:hover {
-    background: #f3f3f3;
-    color: #444444;
-  }
+    background: $context-item-background;
+    color: $context-item-color;
+    padding: $context-item-inner-offset;
+    border-radius: $context-item-border-radius;
+    list-style: none;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &.active,
+    .dropdown-menu &:hover {
+        background: $primary-860;
+        color: #444;
+    }
 }
 
-.cell-context-item{
-  display: inline-block;
-  white-space: nowrap;
-}
-
-.customer-content .context-item .fa-close {
-  cursor: pointer;
+.cell-context-item {
+    display: inline-block;
+    white-space: nowrap;
 }
 
 .activity-context-activity-label {
-  float: left;
-  margin-right: 10px;
-  font-size: 11px;
-  line-height: 14px;
+    float: $activity-context-activity-label-float;
+    margin: $activity-context-activity-label-offset;
+    font-size: $activity-context-activity-label-font-size;
+    line-height: $activity-context-activity-label-line-height;
+    color: $activity-context-activity-label-color;
 }
 
 .activity-context-activity-items {
-  margin-left: 55px;
-  font-size: 11px;
-  line-height: 14px;
+    margin-left: 55px;
+    font-size: 11px;
+    line-height: 14px;
 }
 
 .activity-context-activity-block {
-  .activity-context-activity {
-    margin-top: 5px;
-    width: 720px;
-  }
+    .activity-context-activity {
+        margin-top: 5px;
+        width: 720px;
+    }
+
+    @at-root .page-title {
+        .activity-context-activity-block {
+            display: block !important;
+
+            .activity-context-activity {
+                margin-top: 0;
+                width: auto;
+            }
+        }
+
+        .context-item .fa-close {
+            cursor: pointer;
+        }
+    }
 }
 
 .context-items-dropdown {
-  top: 38px;
-  left: 14px;
-  border-color: #d3d3d3;
-  .context-item {
-    padding: 2px 8px;
-    font-size: 13px;
-  }
+    top: 38px;
+    left: 14px;
+    border-color: #d3d3d3;
+
+    .context-item {
+        padding: 2px 8px;
+        font-size: 13px;
+    }
 }
 
 .activity-context-current-block {
-  cursor: pointer;
-  background-color: #FFFFFF;
-  border: none;
-  outline: none;
-  margin: 10px 10px 15px 10px;
-  box-shadow: none;
-  .btn-group.open & {
+    cursor: pointer;
+    background-color: #fff;
+    border: none;
+    outline: none;
+    margin: 10px 10px 15px 10px;
     box-shadow: none;
-  }
+
+    .btn-group.open & {
+        box-shadow: none;
+    }
 }
 
 .activity-context-current-item {
-  font-size: 18px;
-  font-weight: bold;
-  color: #666666;
+    font-size: 18px;
+    font-weight: bold;
+    color: #666;
 }
 
 .control-group .controls .activity-context-activity-items {
-  padding-top: 5px;
-  margin-left: 0;
-  .context-item {
-    color: #777;
-    font-size: 13px;
-    line-height: 20px;
-    padding: 0 2px;
-  }
+    padding-top: 5px;
+    margin-left: 0;
+
+    .context-item {
+        color: #777;
+        font-size: 13px;
+        line-height: 20px;
+        padding: 0 2px;
+    }
 }

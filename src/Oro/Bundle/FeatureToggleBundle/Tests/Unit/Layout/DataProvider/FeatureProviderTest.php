@@ -5,10 +5,10 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Layout\DataProvider;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Layout\DataProvider\FeatureProvider;
 
-class FeatureProviderTest extends \PHPUnit_Framework_TestCase
+class FeatureProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject
+     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $featureChecker;
 

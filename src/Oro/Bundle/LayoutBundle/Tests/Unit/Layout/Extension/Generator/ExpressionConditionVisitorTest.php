@@ -12,7 +12,7 @@ use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
-class ExpressionConditionVisitorTest extends \PHPUnit_Framework_TestCase
+class ExpressionConditionVisitorTest extends \PHPUnit\Framework\TestCase
 {
     // @codingStandardsIgnoreStart
     public function testVisit()

@@ -7,7 +7,7 @@ use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
-class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
+class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
 {
     const DIMENSION_ORIGINAL = 'product_original';
     const DIMENSION_LARGE = 'product_large';

@@ -58,17 +58,17 @@ class FieldDirectionTest extends RestJsonApiTestCase
                 ]
             ]
         );
-        self::assertEquals(
+        $this->assertResponseContains(
             [
                 'meta' => [
                     'name' => 'A name'
                 ]
             ],
-            self::jsonToArray($response->getContent())
+            $response
         );
     }
 
-    public function testOutputOnlyFieldhouldBeInResponseData()
+    public function testOutputOnlyFieldShouldBeInResponseData()
     {
         $this->appendEntityConfig(
             TestResourceWithoutIdentifier::class,
@@ -93,18 +93,18 @@ class FieldDirectionTest extends RestJsonApiTestCase
                 ]
             ]
         );
-        self::assertEquals(
+        $this->assertResponseContains(
             [
                 'meta' => [
                     'name'        => 'A name',
                     'description' => null
                 ]
             ],
-            self::jsonToArray($response->getContent())
+            $response
         );
     }
 
-    public function testOutputOnlyFieldShoulNotBeAcceptedInRequestData()
+    public function testOutputOnlyFieldShouldNotBeAcceptedInRequestData()
     {
         $this->appendEntityConfig(
             TestResourceWithoutIdentifier::class,

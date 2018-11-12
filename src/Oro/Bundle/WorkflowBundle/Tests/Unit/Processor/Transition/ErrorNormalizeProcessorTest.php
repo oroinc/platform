@@ -18,9 +18,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  * Suppressing for stubs and mock classes
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class ErrorNormalizeProcessorTest extends \PHPUnit_Framework_TestCase
+class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
     /** @var  ErrorNormalizeProcessor */
@@ -56,10 +56,10 @@ class ErrorNormalizeProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function createContextAndLoggingAssertions(\Throwable $error): TransitionContext
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
 
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
 
@@ -132,7 +132,7 @@ class ErrorNormalizeProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSkipHasNoError()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('hasError')->willReturn(false);
         $context->expects($this->never())->method('getError');
@@ -142,7 +142,7 @@ class ErrorNormalizeProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSkipAsResponseCodeAndMessageAlreadyDefined()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('hasError')->willReturn(true);
         $context->expects($this->exactly(2))

@@ -9,7 +9,7 @@ use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\TriggerDriver\PdoMysql;
 
-class EntityTriggerManagerTest extends \PHPUnit_Framework_TestCase
+class EntityTriggerManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EntityTriggerManager
@@ -22,12 +22,12 @@ class EntityTriggerManagerTest extends \PHPUnit_Framework_TestCase
     private $testEntityClass = 'testEntity';
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $doctrineHelper;
 
     /**
-     * @var Connection|\PHPUnit_Framework_MockObject_MockObject
+     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
      */
     private $connection;
 
@@ -62,7 +62,7 @@ class EntityTriggerManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testAddingDriver()
     {
-        /** @var DatabaseDriverInterface|\PHPUnit_Framework_MockObject_MockObject $driver */
+        /** @var DatabaseDriverInterface|\PHPUnit\Framework\MockObject\MockObject $driver */
         $driver = $this->createMock(PdoMysql::class);
 
         $driver->expects($this->once())

@@ -2,49 +2,31 @@
 
 namespace Oro\Component\TestUtils\ORM;
 
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Cache\ChainCache;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Driver\Connection;
+use Oro\Component\Testing\TempDirExtension;
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\Mocks\FetchIterator;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Base testcase class for all ORM testcases.
+ * The base class for ORM related test cases.
  *
  * This class is a clone of Doctrine\Tests\OrmTestCase that is excluded from doctrine package since v2.4.
  */
-abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
+abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * The metadata cache that is shared between all ORM tests (except functional tests).
-     */
-    private static $metadataCacheImpl = null;
-    /**
-     * The query cache that is shared between all ORM tests (except functional tests).
-     */
-    private static $queryCacheImpl = null;
+    use TempDirExtension;
+
+    /** @var CacheProvider The metadata cache that is shared between all ORM tests */
+    private $metadataCacheImpl;
 
     protected function getProxyDir($shouldBeCreated = true)
     {
-        $proxyDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'TestDoctrineProxies';
-        if ($shouldBeCreated) {
-            $fs = new Filesystem();
-            if (!$fs->exists($proxyDir)) {
-                $fs->mkdir($proxyDir);
-            }
-        }
-
-        return $proxyDir;
-    }
-
-    public function __destruct()
-    {
-        $path = $this->getProxyDir(false);
-        $fs = new Filesystem();
-        if ($fs->exists($path)) {
-            $fs->remove($path);
-        }
+        return $this->getTempDir('test_orm_proxies', $shouldBeCreated);
     }
 
     /**
@@ -63,15 +45,11 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function getTestEntityManager($conn = null, $eventManager = null, $withSharedMetadata = true)
     {
-        $metadataCache = $withSharedMetadata
-            ? self::getSharedMetadataCacheImpl()
-            : new \Doctrine\Common\Cache\ArrayCache;
-
         $config = new \Doctrine\ORM\Configuration();
 
-        $config->setMetadataCacheImpl($metadataCache);
+        $config->setMetadataCacheImpl($this->getMetadataCacheImpl($withSharedMetadata));
         $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver([], true));
-        $config->setQueryCacheImpl(self::getSharedQueryCacheImpl());
+        $config->setQueryCacheImpl($this->getQueryCacheImpl());
         $config->setProxyDir($this->getProxyDir());
         $config->setProxyNamespace('Doctrine\Tests\Proxies');
 
@@ -116,7 +94,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      * @param array $params
      * @param array $types
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createFetchStatementMock(array $records, array $params = [], array $types = [])
     {
@@ -124,7 +102,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
         $statement->expects($this->exactly(count($records) + 1))
             ->method('fetch')
             ->will(
-                new \PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls(
+                new \PHPUnit\Framework\MockObject\Stub\ConsecutiveCalls(
                     array_merge($records, [false])
                 )
             );
@@ -156,7 +134,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      *
      * @param EntityManagerMock $em
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getDriverConnectionMock(EntityManagerMock $em)
     {
@@ -171,7 +149,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      *
      * @param int $numberOfRecords
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createCountStatementMock($numberOfRecords)
     {
@@ -183,14 +161,14 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $conn
+     * @param \PHPUnit\Framework\MockObject\MockObject $conn
      * @param string                                   $sql    SQL that run in database
      * @param array                                    $result data that will return after SQL execute
      * @param array                                    $params
      * @param array                                    $types
      */
     protected function setQueryExpectation(
-        \PHPUnit_Framework_MockObject_MockObject $conn,
+        \PHPUnit\Framework\MockObject\MockObject $conn,
         $sql,
         $result,
         $params = [],
@@ -212,7 +190,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $conn
+     * @param \PHPUnit\Framework\MockObject\MockObject $conn
      * @param int                                      $expectsAt
      * @param string                                   $sql
      * @param array                                    $result
@@ -220,7 +198,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      * @param array                                    $types
      */
     protected function setQueryExpectationAt(
-        \PHPUnit_Framework_MockObject_MockObject $conn,
+        \PHPUnit\Framework\MockObject\MockObject $conn,
         $expectsAt,
         $sql,
         $result,
@@ -242,21 +220,29 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
         }
     }
 
-    private static function getSharedMetadataCacheImpl()
+    /**
+     * @return CacheProvider
+     */
+    private function getMetadataCacheImpl($withSharedMetadata)
     {
-        if (self::$metadataCacheImpl === null) {
-            self::$metadataCacheImpl = new \Doctrine\Common\Cache\ArrayCache;
+        if (!$withSharedMetadata) {
+            // do not cache anything to avoid influence between tests
+            return new ChainCache();
         }
 
-        return self::$metadataCacheImpl;
+        if ($this->metadataCacheImpl === null) {
+            $this->metadataCacheImpl = new ArrayCache();
+        }
+
+        return $this->metadataCacheImpl;
     }
 
-    private static function getSharedQueryCacheImpl()
+    /**
+     * @return CacheProvider
+     */
+    private function getQueryCacheImpl()
     {
-        if (self::$queryCacheImpl === null) {
-            self::$queryCacheImpl = new \Doctrine\Common\Cache\ArrayCache;
-        }
-
-        return self::$queryCacheImpl;
+        // do not cache anything to avoid influence between tests
+        return new ChainCache();
     }
 }

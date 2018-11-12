@@ -166,7 +166,7 @@ trait DocumentationTestTrait
                 'Missing documentation. Default value is used: "%s"',
                 $definition['documentation']
             );
-        } elseif ($this->hasDuplates($definition['documentation'])) {
+        } elseif ($this->hasDuplicates($definition['documentation'])) {
             $missingDocs[] = 'Duplicates in documentation. Full documentation:' . "\n" . $definition['documentation'];
         }
         if (!empty($definition['parameters'])) {
@@ -199,7 +199,7 @@ trait DocumentationTestTrait
      *
      * @return bool
      */
-    private function hasDuplates($documentation)
+    private function hasDuplicates($documentation)
     {
         $delimiter = strpos($documentation, '.');
         if (false === $delimiter) {
@@ -264,21 +264,21 @@ trait DocumentationTestTrait
     }
 
     /**
-     * @param $entityType
-     * @param $subresiurce
-     * @param $action
+     * @param string $entityType
+     * @param string $subresource
+     * @param string $action
      *
      * @return array
      */
-    private function getSubresourceEntityDocsForAction($entityType, $subresiurce, $action)
+    private function getSubresourceEntityDocsForAction($entityType, $subresource, $action)
     {
         return $this->filterDocs(
             $this->getExtractor()->all(self::VIEW),
-            function (Route $route) use ($entityType, $action, $subresiurce) {
+            function (Route $route) use ($entityType, $action, $subresource) {
                 return
                     $route->getDefault('entity') === $entityType
                     && $route->getDefault('_action') === $action
-                    && $route->getDefault('association') === $subresiurce;
+                    && $route->getDefault('association') === $subresource;
             }
         );
     }
@@ -301,5 +301,46 @@ trait DocumentationTestTrait
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $entityType
+     */
+    private function checkOptionsDocumentationForEntity($entityType)
+    {
+        $docs = $this->getEntityDocsForAction($entityType, ApiActions::OPTIONS);
+        $data = $this->getSimpleFormatter()->format($docs);
+        foreach ($data as $resource => $resourceData) {
+            $resourceData = reset($resourceData);
+            $this->checkOptionsDocumentationForResource($resource, $resourceData);
+        }
+    }
+
+    /**
+     * @param string $resource
+     * @param string $resourceData
+     */
+    private function checkOptionsDocumentationForResource($resource, array $resourceData)
+    {
+        self::assertArrayContains(
+            [
+                'description'   => 'Get options',
+                'documentation' => 'Get communication options for a resource'
+            ],
+            $resourceData,
+            $resource
+        );
+        self::assertTrue(
+            empty($resourceData['parameters']),
+            sprintf('The "parameters" section for %s should be empty', $resource)
+        );
+        self::assertTrue(
+            empty($resourceData['filters']),
+            sprintf('The "filters" section for %s should be empty', $resource)
+        );
+        self::assertTrue(
+            empty($resourceData['response']),
+            sprintf('The "response" section for %s should be empty', $resource)
+        );
     }
 }

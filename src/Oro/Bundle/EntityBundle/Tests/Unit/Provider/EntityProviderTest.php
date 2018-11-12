@@ -9,21 +9,21 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
-class EntityProviderTest extends \PHPUnit_Framework_TestCase
+class EntityProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $entityConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $extendConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $entityClassResolver;
 
     /** @var EntityProvider */
     private $provider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $featureChecker;
 
     /**
@@ -103,6 +103,88 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($expected, $result);
+    }
+
+    public function testGetEnabledEntity()
+    {
+        $entityName = 'Acme:Test';
+        $entityClassName = 'Acme\Entity\Test';
+        $entityConfig = $this->getEntityConfig(
+            $entityClassName,
+            [
+                'label'        => 'Test Label',
+                'plural_label' => 'Test Plural Label',
+                'icon'         => 'fa-test'
+            ]
+        );
+        $entityExtendConfig = $this->getEntityConfig(
+            $entityClassName,
+            [
+                'state' => ExtendScope::STATE_ACTIVE
+            ]
+        );
+
+        $this->entityConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($entityClassName)
+            ->willReturn($entityConfig);
+
+        $this->extendConfigProvider->expects($this->once())
+            ->method('getConfigById')
+            ->with($entityConfig->getId())
+            ->willReturn($entityExtendConfig);
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with($entityClassName, 'entities')
+            ->willReturn(true);
+
+        $result = $this->provider->getEnabledEntity($entityName);
+
+        $expected = [
+            'name'         => $entityClassName,
+            'label'        => 'Test Label',
+            'plural_label' => 'Test Plural Label',
+            'icon'         => 'fa-test'
+        ];
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\RuntimeException
+     */
+    public function testGetEnabledEntityWhenEntityIsNotAccessibleYet()
+    {
+        $entityName = 'Acme:Test';
+        $entityClassName = 'Acme\Entity\Test';
+        $entityConfig = $this->getEntityConfig(
+            $entityClassName,
+            [
+                'label'        => 'Test Label',
+                'plural_label' => 'Test Plural Label',
+                'icon'         => 'fa-test'
+            ]
+        );
+        $entityExtendConfig = $this->getEntityConfig(
+            $entityClassName,
+            [
+                'state' => ExtendScope::STATE_NEW
+            ]
+        );
+
+        $this->entityConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($entityClassName)
+            ->willReturn($entityConfig);
+
+        $this->extendConfigProvider->expects($this->once())
+            ->method('getConfigById')
+            ->with($entityConfig->getId())
+            ->willReturn($entityExtendConfig);
+        $this->featureChecker->expects($this->never())
+            ->method('isResourceEnabled');
+
+        $result = $this->provider->getEnabledEntity($entityName);
     }
 
     /**
@@ -401,9 +483,16 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
-    protected function getEntityConfig($entityClassName, $values)
+    /**
+     * @param string $entityClassName
+     * @param array  $values
+     * @param string $scope
+     *
+     * @return Config
+     */
+    protected function getEntityConfig($entityClassName, $values, $scope = 'entity')
     {
-        $entityConfigId = new EntityConfigId('entity', $entityClassName);
+        $entityConfigId = new EntityConfigId($scope, $entityClassName);
         $entityConfig   = new Config($entityConfigId);
         $entityConfig->setValues($values);
 

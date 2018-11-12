@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EmailBundle\Provider\VariablesProvider;
 
-class VariablesProviderTest extends \PHPUnit_Framework_TestCase
+class VariablesProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var VariablesProvider */
     protected $provider;

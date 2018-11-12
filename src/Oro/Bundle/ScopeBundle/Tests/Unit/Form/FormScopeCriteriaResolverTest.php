@@ -9,15 +9,15 @@ use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
 
-class FormScopeCriteriaResolverTest extends \PHPUnit_Framework_TestCase
+class FormScopeCriteriaResolverTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ScopeManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $manager;
 
     /**
-     * @var FormScopeCriteriaResolver|\PHPUnit_Framework_MockObject_MockObject
+     * @var FormScopeCriteriaResolver|\PHPUnit\Framework\MockObject\MockObject
      */
     private $resolver;
 

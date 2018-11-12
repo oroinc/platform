@@ -8,18 +8,18 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class EntityOverrideProviderRegistryTest extends \PHPUnit_Framework_TestCase
+class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityOverrideProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
     private $defaultProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityOverrideProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
     private $firstProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityOverrideProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
     private $secondProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
     protected function setUp()

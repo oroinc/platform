@@ -14,29 +14,29 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Routing\RouterInterface;
 
-class NavigationItemBuilderTest extends \PHPUnit_Framework_TestCase
+class NavigationItemBuilderTest extends \PHPUnit\Framework\TestCase
 {
     const ITEM_TYPE = 'favorite';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $router;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $featureChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $factory;
 
     /** @var NavigationItemBuilder */
     protected $builder;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|KnpItemInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|KnpItemInterface */
     protected $menu;
 
     protected function setUp()

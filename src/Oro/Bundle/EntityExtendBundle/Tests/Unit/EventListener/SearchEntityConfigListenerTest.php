@@ -14,18 +14,18 @@ use Oro\Bundle\EntityExtendBundle\EventListener\SearchEntityConfigListener;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
-class SearchEntityConfigListenerTest extends \PHPUnit_Framework_TestCase
+class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_CLASS = 'Test\Class';
     const TEST_FIELD = 'testField';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $searchMappingProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $searchIndexer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var SearchEntityConfigListener */

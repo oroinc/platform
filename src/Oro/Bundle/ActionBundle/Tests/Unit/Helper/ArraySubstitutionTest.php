@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\ActionBundle\Helper\ArraySubstitution;
 
-class ArraySubstitutionTest extends \PHPUnit_Framework_TestCase
+class ArraySubstitutionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param array $map

@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 
-class DashboardTest extends \PHPUnit_Framework_TestCase
+class DashboardTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Dashboard

@@ -3,11 +3,12 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectResources;
 
 use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
+use Oro\Bundle\ApiBundle\Request\ApiResourceCollection;
 
-class CollectResourcesContextTest extends \PHPUnit_Framework_TestCase
+class CollectResourcesContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CollectResourcesContext */
-    protected $context;
+    private $context;
 
     protected function setUp()
     {
@@ -16,17 +17,14 @@ class CollectResourcesContextTest extends \PHPUnit_Framework_TestCase
 
     public function testResultShouldBeInitialized()
     {
-        $this->assertInstanceOf(
-            'Oro\Bundle\ApiBundle\Request\ApiResourceCollection',
-            $this->context->getResult()
-        );
+        self::assertInstanceOf(ApiResourceCollection::class, $this->context->getResult());
     }
 
     public function testAccessibleResources()
     {
-        $this->assertEquals([], $this->context->getAccessibleResources());
+        self::assertEquals([], $this->context->getAccessibleResources());
 
         $this->context->setAccessibleResources(['Test\Class']);
-        $this->assertEquals(['Test\Class'], $this->context->getAccessibleResources());
+        self::assertEquals(['Test\Class'], $this->context->getAccessibleResources());
     }
 }

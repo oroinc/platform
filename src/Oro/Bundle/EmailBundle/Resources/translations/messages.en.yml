@@ -175,6 +175,9 @@ oro:
             current_time:        Current time
             siganture:           Signature (|oro_html_strip_tags should be removed to allow usage of it's html view)
 
+            # errors
+            failed_to_compile: This email template can't be used
+
         attachment:
             copy_to_record: Copy to Record
             save: Download
@@ -289,6 +292,7 @@ oro:
         seen.label:               Is Seen
         thread_id.label:          Thread ID
         show_details.tooltip:     Show details
+        show_details.label:       Email details
         contexts:
             tooltip:              Context is any record or records that have meaningful relation to an email conversation. When you add context of a record to the email conversation, it will be displayed in the Activity list of that record.
         not_found:                Email with id "%id%" can not be found

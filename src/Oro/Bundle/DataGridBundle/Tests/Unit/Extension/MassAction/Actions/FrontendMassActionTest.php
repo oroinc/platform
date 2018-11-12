@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\FrontendMassAction;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension;
 use Symfony\Component\HttpFoundation\Request;
 
-class FrontendMassActionTest extends \PHPUnit_Framework_TestCase
+class FrontendMassActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FrontendMassAction */
     protected $action;

@@ -9,15 +9,15 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache;
 
-class WorkflowAwareCacheInvalidationTest extends \PHPUnit_Framework_TestCase
+class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ArrayCache */
     protected $cache;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var WorkflowDefinitionRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $definitionRepository;
 
     /** @var WorkflowAwareCache */

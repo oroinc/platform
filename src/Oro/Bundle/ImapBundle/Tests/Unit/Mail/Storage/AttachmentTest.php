@@ -8,9 +8,9 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Value;
 use Zend\Mail\Header\GenericHeader;
 use Zend\Mail\Headers;
 
-class AttachmentTest extends \PHPUnit_Framework_TestCase
+class AttachmentTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $part;
 
     /** @var Attachment */

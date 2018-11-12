@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStr
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class DateTimeExtensionTest extends \PHPUnit_Framework_TestCase
+class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DateTimeExtension */
     private $extension;

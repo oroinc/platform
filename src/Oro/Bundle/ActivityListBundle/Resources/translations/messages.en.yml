@@ -16,6 +16,7 @@ oro:
         created_at.label:    Created at
         updated_at.label:    Updated at
         description.label:   Description
+        actions.label:       Activity actions
 
         no_activities_exist: No activities found
 

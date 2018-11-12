@@ -134,7 +134,7 @@
                         @if (map_has_key($font-variant, 'weight')) {
                             $font-weigh: map_get($font-variant, 'weight');
                         }
-                        @if (map_has_key($font-variants, 'style')) {
+                        @if (map_has_key($font-variant, 'style')) {
                             $font-style: map_get($font-variant, 'style');
                         }
 

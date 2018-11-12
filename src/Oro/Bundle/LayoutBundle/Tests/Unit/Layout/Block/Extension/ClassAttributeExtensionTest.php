@@ -12,14 +12,14 @@ use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
 
-class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
+class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ClassAttributeExtension */
     protected $extension;
 
     protected function setUp()
     {
-        /** @var ExpressionEncoderRegistry|\PHPUnit_Framework_MockObject_MockObject $encoderRegistry */
+        /** @var ExpressionEncoderRegistry|\PHPUnit\Framework\MockObject\MockObject $encoderRegistry */
         $encoderRegistry = $this
             ->getMockBuilder('Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry')
             ->disableOriginalConstructor()

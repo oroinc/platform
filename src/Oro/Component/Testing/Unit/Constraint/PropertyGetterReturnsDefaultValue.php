@@ -5,7 +5,7 @@ namespace Oro\Component\Testing\Unit\Constraint;
 /**
  * Constraint that asserts that a get*() or is*() getter returns default property value.
  */
-class PropertyGetterReturnsDefaultValue extends \PHPUnit_Framework_Constraint
+class PropertyGetterReturnsDefaultValue extends \PHPUnit\Framework\Constraint\Constraint
 {
     /**
      * @var string
@@ -67,7 +67,7 @@ class PropertyGetterReturnsDefaultValue extends \PHPUnit_Framework_Constraint
                 'is' . ucfirst($this->propertyName),
                 $this->propertyName
             );
-            throw new \PHPUnit_Framework_Exception($message);
+            throw new \PHPUnit\Framework\Exception($message);
         }
 
         $class = new \ReflectionClass($other);

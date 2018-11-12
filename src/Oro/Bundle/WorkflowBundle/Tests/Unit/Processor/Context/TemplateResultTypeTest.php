@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Context;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TemplateResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface;
 
-class TemplateResultTypeTest extends \PHPUnit_Framework_TestCase
+class TemplateResultTypeTest extends \PHPUnit\Framework\TestCase
 {
     public function testInterface()
     {

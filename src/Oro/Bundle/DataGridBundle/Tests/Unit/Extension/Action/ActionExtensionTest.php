@@ -20,18 +20,18 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class ActionExtensionTest extends \PHPUnit_Framework_TestCase
+class ActionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ActionFactory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ActionFactory|\PHPUnit\Framework\MockObject\MockObject */
     protected $actionFactory;
 
-    /** @var ActionMetadataFactory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ActionMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
     protected $actionMetadataFactory;
 
-    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var OwnershipQueryHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OwnershipQueryHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $ownershipQueryHelper;
 
     /** @var ActionExtension */

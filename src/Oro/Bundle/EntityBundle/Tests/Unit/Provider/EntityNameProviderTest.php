@@ -7,12 +7,12 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 
-class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
+class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $metadata;
 
     /** @var EntityNameProvider */
@@ -184,6 +184,9 @@ class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getTypeOfField')
             ->with('name')
             ->willReturn('string');
+        $this->metadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn([]);
 
         $result = $this->entityNameProvider->getNameDQL('short', null, TestEntity::class, 'alias');
         $this->assertEquals('alias.name', $result);
@@ -301,11 +304,9 @@ class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function initEntityFieldsMetadata($initIdentityField = false, array $extendedFieldConfig = [])
     {
-        if ($initIdentityField) {
-            $this->metadata->expects($this->any())
-                ->method('getIdentifierFieldNames')
-                ->willReturn(['id']);
-        }
+        $this->metadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn($initIdentityField ? ['id'] : []);
 
         $this->metadata->expects($this->any())
             ->method('hasField')

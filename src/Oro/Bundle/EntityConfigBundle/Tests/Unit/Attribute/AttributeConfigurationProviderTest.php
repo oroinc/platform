@@ -10,18 +10,18 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Layout\DataProvider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
-class AttributeConfigurationProviderTest extends \PHPUnit_Framework_TestCase
+class AttributeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = \stdClass::class;
     const FIELD_NAME = 'test_field';
 
-    /** @var ConfigInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfig;
 
-    /** @var ConfigInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendConfig;
 
-    /** @var ConfigInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $attributeConfig;
 
     /** @var AttributeConfigurationProvider */
@@ -36,7 +36,7 @@ class AttributeConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         $this->extendConfig = $this->createMock(ConfigInterface::class);
         $this->attributeConfig = $this->createMock(ConfigInterface::class);
 
-        /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
+        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->once())
             ->method('getProvider')
@@ -126,11 +126,11 @@ class AttributeConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param ConfigInterface $config
-     * @return ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProvider(ConfigInterface $config)
     {
-        /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject $configProvider */
+        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider */
         $configProvider = $this->createMock(ConfigProvider::class);
         $configProvider->expects($this->any())
             ->method('getConfig')

@@ -9,7 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
+class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PropertyConfigContainer */
     protected $configContainer;

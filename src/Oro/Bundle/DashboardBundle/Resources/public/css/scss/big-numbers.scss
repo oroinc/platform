@@ -1,0 +1,129 @@
+/* @theme: admin.oro; */
+
+.big-numbers-items {
+    margin: side-values(-15px -15px 0);
+
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    overflow: hidden;
+
+    > li {
+        position: relative;
+
+        width: 33.3%;
+        padding: side-values(0 15px);
+        margin: side-values(15px 0 15px -1px);
+
+        text-align: center;
+
+        background: none;
+        border-#{$start}: 1px solid $dashboard-big-numbers-separator-color;
+
+        float: #{$start};
+        display: block;
+        vertical-align: middle;
+
+        &:after {
+            position: absolute;
+            #{$end}: 15px;
+            bottom: -15px;
+
+            width: calc(300% - 30px);
+            height: 15px;
+
+            border-bottom: 1px solid $dashboard-big-numbers-separator-color;
+
+            content: normal;
+        }
+
+        &:first-child {
+            border: 0;
+        }
+
+        &:nth-child(3n):after {
+            content: '';
+        }
+
+        &:last-child:after {
+            content: normal;
+        }
+
+        & > .title {
+            max-width: 100%;
+            padding: 0;
+
+            .mobile-version & {
+                padding: 0;
+            }
+
+            font-weight: normal;
+            font-size: $base-font-size;
+            text-align: #{$start};
+            color: $primary-400;
+
+            display: inherit;
+            margin-bottom: 10px;
+        }
+
+        & > .value {
+            margin-bottom: 15px;
+
+            text-align: #{$start};
+            font-weight: normal;
+            color: $primary-100;
+        }
+
+        & > div.deviation {
+            font-size: 11px;
+            line-height: 1.7;
+            overflow: hidden;
+
+            & > .deviation {
+                float: #{$start};
+
+                &.positive {
+                    color: $dashboard-big-numbers-positive-color;
+                }
+
+                &.negative {
+                    color: $dashboard-big-numbers-negative-color;
+                }
+            }
+
+            & > .date-range {
+                max-width: calc(100% - 70px);
+
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+                float: #{$end};
+                overflow: hidden;
+            }
+        }
+    }
+
+    &.has-1-items {
+        li {
+            width: 100%;
+        }
+    }
+
+    &.has-2-items,
+    &.has-4-items {
+        li {
+            width: 50%;
+        }
+
+        li:nth-child(even):after {
+            width: calc(200% - 30px);
+
+            content: '';
+        }
+
+        li:nth-child(3n):after,
+        li:last-child:after {
+            content: normal;
+        }
+    }
+}

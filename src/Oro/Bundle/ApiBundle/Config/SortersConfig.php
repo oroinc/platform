@@ -60,7 +60,7 @@ class SortersConfig implements EntityConfigInterface
     }
 
     /**
-     * Checks whether the configuration of at least one field exists.
+     * Indicates whether the configuration of at least one sorter exists.
      *
      * @return bool
      */
@@ -70,7 +70,7 @@ class SortersConfig implements EntityConfigInterface
     }
 
     /**
-     * Gets the configuration for all fields.
+     * Gets the configuration for all sorters.
      *
      * @return SorterFieldConfig[] [field name => config, ...]
      */
@@ -80,7 +80,7 @@ class SortersConfig implements EntityConfigInterface
     }
 
     /**
-     * Checks whether the configuration of the sorter exists.
+     * Indicates whether the configuration of the sorter exists.
      *
      * @param string $fieldName
      *

@@ -10,13 +10,13 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EntityObjectSecurityCheckTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
+    private $authorizationChecker;
 
     /** @var EntityObjectSecurityCheck */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -38,9 +38,9 @@ class EntityObjectSecurityCheckTest extends GetProcessorTestCase
         $entity = new Product();
         $config = new EntityDefinitionConfig();
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', $this->identicalTo($entity))
+            ->with('VIEW', self::identicalTo($entity))
             ->willReturn(true);
 
         $this->context->setClassName(get_class($entity));
@@ -57,9 +57,9 @@ class EntityObjectSecurityCheckTest extends GetProcessorTestCase
         $entity = new Product();
         $config = new EntityDefinitionConfig();
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', $this->identicalTo($entity))
+            ->with('VIEW', self::identicalTo($entity))
             ->willReturn(false);
 
         $this->context->setClassName(get_class($entity));
@@ -74,9 +74,9 @@ class EntityObjectSecurityCheckTest extends GetProcessorTestCase
         $config = new EntityDefinitionConfig();
         $config->setAclResource('test_acl_resource');
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('test_acl_resource', $this->identicalTo($entity))
+            ->with('test_acl_resource', self::identicalTo($entity))
             ->willReturn(true);
 
         $this->context->setClassName(get_class($entity));
@@ -94,9 +94,9 @@ class EntityObjectSecurityCheckTest extends GetProcessorTestCase
         $config = new EntityDefinitionConfig();
         $config->setAclResource('test_acl_resource');
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('test_acl_resource', $this->identicalTo($entity))
+            ->with('test_acl_resource', self::identicalTo($entity))
             ->willReturn(false);
 
         $this->context->setClassName(get_class($entity));
@@ -111,7 +111,7 @@ class EntityObjectSecurityCheckTest extends GetProcessorTestCase
         $config = new EntityDefinitionConfig();
         $config->setAclResource('');
 
-        $this->authorizationChecker->expects($this->never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
 
         $this->context->setClassName(get_class($entity));

@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Title\TitleReader;
 
 use Oro\Bundle\NavigationBundle\Tests\Unit\Title\TitleReader\Stub\TitleReaderStub;
 
-class TitleReaderRegistryTest extends \PHPUnit_Framework_TestCase
+class TitleReaderRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TitleReaderRegistry */
     private $registry = [];

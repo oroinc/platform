@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
@@ -38,34 +39,34 @@ class SegmentFilterTest extends OrmTestCase
     const TEST_FIELD_NAME = 't1.id';
     const TEST_PARAM_VALUE = '%test%';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FormFactoryInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
     protected $formFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
-    /** @var DynamicSegmentQueryBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DynamicSegmentQueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $dynamicSegmentQueryBuilder;
 
-    /** @var StaticSegmentQueryBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var StaticSegmentQueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $staticSegmentQueryBuilder;
 
-    /** @var EntityNameProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityNameProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityNameProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendConfigProvider;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
     /** @var SegmentFilter */
     protected $filter;
 
-    /** @var SubQueryLimitHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var SubQueryLimitHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $subqueryLimitHelper;
 
     protected function setUp()
@@ -148,7 +149,12 @@ class SegmentFilterTest extends OrmTestCase
         $segmentQueryBuilderRegistry->addQueryBuilder('dynamic', $this->dynamicSegmentQueryBuilder);
         $this->subqueryLimitHelper = $this->createMock(SubQueryLimitHelper::class);
 
-        $segmentManager = new SegmentManager($this->em, $segmentQueryBuilderRegistry, $this->subqueryLimitHelper);
+        $segmentManager = new SegmentManager(
+            $this->em,
+            $segmentQueryBuilderRegistry,
+            $this->subqueryLimitHelper,
+            new ArrayCache()
+        );
 
         $this->filter = new SegmentFilter(
             $this->formFactory,
@@ -163,7 +169,7 @@ class SegmentFilterTest extends OrmTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getClassMetadata()
     {
@@ -360,7 +366,7 @@ class SegmentFilterTest extends OrmTestCase
     }
 
     /**
-     * @return \Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock
+     * @return \Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock
      */
     protected function getEM()
     {

@@ -1,11 +1,18 @@
-<td colspan="3">
-    <div class="entity-permission-container<% if (fields.length === 0) {%> field-less<% } %>">
-        <div class="pull-left collapse-expand-action-container">
-            <a class="collapse-action" href="#" data-collapsed-title="Expand" data-expanded-title="Collapse" title="Expand"></a>
+<% var labelId = _.uniqueId('label-') %>
+<% var regionId = _.uniqueId('collapse-region-') %>
+<td class="grid-body-cell" colspan="3">
+    <div class="entity-permission-container <% if (fields.length === 0) {%> field-less<% } %>">
+        <div class="collapse-expand-action-container">
+            <a href="#" class="collapse-action collapsed" role="button" title="<%- _.__('Expand') %>"
+                data-collapsed-title="<%- _.__('Expand') %>" data-expanded-title="<%- _.__('Collapse') %>"
+                data-toggle="collapse" data-target="#<%- regionId %>"
+                aria-controls="<%- regionId %>" aria-expanded="false"
+                aria-label="<%- _.__('Expand') + '/' + _.__('Collapse') %>"></a>
+            <div id="<%- labelId %>" class="entity-name"><%- label %></div>
         </div>
-        <div class="entity-name"><%- label %></div>
-        <div class="entity-row-action more-bar-holder dropdown" data-name="row-action"></div>
-        <ul data-name="action-permissions-items" class="action-permissions clearfix"></ul>
-        <% if (fields.length > 0) {%><div class="fields-list clearfix" data-name="fields-list"></div><% } %>
+        <ul data-name="action-permissions-items" class="action-permissions"></ul>
+        <div class="entity-row-action more-bar-holder dropdown--with-arrow" data-name="row-action"></div>
     </div>
+    <div id="<%- regionId %>" class="collapse" data-name="fields-list"
+         role="region" aria-labelledby="<%- labelId %>"></div>
 </td>

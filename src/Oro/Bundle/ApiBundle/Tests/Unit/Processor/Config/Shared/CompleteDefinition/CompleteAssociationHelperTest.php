@@ -10,11 +10,11 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    private $configProvider;
 
     /** @var CompleteAssociationHelper */
-    protected $completeAssociationHelper;
+    private $completeAssociationHelper;
 
     protected function setUp()
     {

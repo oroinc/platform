@@ -6,9 +6,9 @@ use Oro\Bundle\ApiBundle\ApiDoc\PredefinedIdDocumentationProvider;
 use Oro\Bundle\ApiBundle\Request\EntityIdResolverRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class PredefinedIdDocumentationProviderTest extends \PHPUnit_Framework_TestCase
+class PredefinedIdDocumentationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdResolverRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverRegistry */
     private $entityIdResolverRegistry;
 
     /** @var PredefinedIdDocumentationProvider */

@@ -23,7 +23,7 @@
         <div class="widget-content email-form">
             {% block page_container_before_form %}{% endblock %}
             {% if not form.vars.valid and form.vars.errors|length %}
-                <div class="alert alert-error">
+                <div class="alert alert-error" role="alert">
                     <div class="message">
                         {{ form_errors(form) }}
                     </div>
@@ -52,7 +52,11 @@
                         {{ form_row(form.cc) }}
                         {{ form_row(form.bcc) }}
                         {{ form_row(form.subject) }}
-                        {{ form_row(form.template, {'includeNonEntity': true, 'includeSystemTemplates': false}) }}
+
+                        {% if form.template is defined %}
+                            {{ form_row(form.template, {'includeNonEntity': true, 'includeSystemTemplates': false}) }}
+                        {% endif %}
+
                         {{ form_row(form.type) }}
                         {{ form_row(form.body) }}
 

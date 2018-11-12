@@ -2,11 +2,11 @@
 
 .main-menu {
     margin: 0;
-
+    padding: 0;
     font-size: $menu-font-size;
+
     // reset global styles
     list-style: none;
-
     background-color: $menu-background-color;
 
     &__header {
@@ -22,7 +22,7 @@
     }
 
     .dropdown-menu-wrapper {
-        z-index: $zindexDropdown;
+        z-index: $zindex-dropdown;
 
         &.hidden {
             display: none;
@@ -35,7 +35,7 @@
     }
 
     .dropdown-menu {
-        z-index: $zindexFixedNavbar;
+        z-index: $zindex-fixed;
     }
 
     .divider {

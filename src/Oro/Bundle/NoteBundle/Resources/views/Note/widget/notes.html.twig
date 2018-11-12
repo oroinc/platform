@@ -7,19 +7,24 @@
         {% block widget_actions %}
             <div class="widget-actions">
                 {{ UI.clientLink({
+                    'aCss': 'expand-all-button btn-mini',
+                    'label' : 'Expand All'|trans,
+                    'dataAttributes': {'action-name': 'expand_all'}
+                }) }}
+                {{ UI.clientLink({
                     'aCss': 'collapse-all-button btn-mini',
                     'label' : 'Collapse All'|trans,
                     'dataAttributes': {'action-name': 'collapse_all'}
                 }) }}
                 {{ UI.clientLink({
                     'aCss': 'btn refresh-button icons-holder-text',
-                    'iCss': 'fa-refresh',
+                    'iCss': 'action-button-icon fa-refresh',
                     'title' : 'Refresh'|trans,
                     'dataAttributes': {'action-name': 'refresh'}
                 }) }}
                 {{ UI.clientLink({
                     'aCss': 'btn sort-button icons-holder-text',
-                    'iCss': 'fa-arrow-up',
+                    'iCss': 'action-button-icon fa-arrow-up',
                     'title' : 'Descending Order'|trans,
                     'dataAttributes': {
                         'action-name': 'toggle_sorting',

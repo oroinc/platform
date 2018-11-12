@@ -46,7 +46,7 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     /**
      * @param string $name
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getParameterMock($name)
     {
@@ -499,6 +499,87 @@ class QueryBuilderUtilTest extends OrmTestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkIdentifier($invalid);
+    }
+
+    public function testCheckFieldForValidFieldWithoutAlias()
+    {
+        QueryBuilderUtil::checkField('tEs_T_01a');
+    }
+
+    public function testCheckFieldForValidFieldWithAlias()
+    {
+        QueryBuilderUtil::checkField('tEs_T_01a.tEs_T_01a');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCheckFieldForInvalidFieldWithoutAlias()
+    {
+        QueryBuilderUtil::checkField('0_some//');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCheckFieldForInvalidAliasPart()
+    {
+        QueryBuilderUtil::checkField('0_some//.field');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCheckFieldForInvalidFieldPart()
+    {
+        QueryBuilderUtil::checkField('alias.0_some//');
+    }
+
+    public function testCheckPathForValidFieldWithoutAlias()
+    {
+        QueryBuilderUtil::checkPath('tEs_T_01a');
+    }
+
+    public function testCheckPathForValidFieldWithAlias()
+    {
+        QueryBuilderUtil::checkPath('tEs_T_01a.tEs_T_01a');
+    }
+
+    public function testCheckPathForValidNestedField()
+    {
+        QueryBuilderUtil::checkPath('tEs_T_01a.tEs_T_01a.tEs_T_01a');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCheckPathForInvalidFieldWithoutAlias()
+    {
+        QueryBuilderUtil::checkPath('0_some//');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCheckPathForInvalidAliasPart()
+    {
+        QueryBuilderUtil::checkPath('0_some//.field');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCheckPathForInvalidFieldPart()
+    {
+        QueryBuilderUtil::checkPath('alias.0_some//');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCheckPathForInvalidNestedFieldPart()
+    {
+        QueryBuilderUtil::checkPath('alias.field.0_some//');
     }
 
     public function testGetFieldValid()

@@ -17,6 +17,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Adds grid views functionality to datagrids.
+ * Adds to parameters filters and sorters taken from actual grid view.
+ */
 class GridViewsExtension extends AbstractExtension
 {
     const GRID_VIEW_ROOT_PARAM = '_grid_view';
@@ -109,25 +113,24 @@ class GridViewsExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $currentViewId = $this->getCurrentViewId($config->getName());
-        // need to set [initialState][filters] from [state][filters]
-        // before [state][filters] will be set from default grid view
-        $filtersState = $data->offsetGetByPath('[state][filters]', []);
-        $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID, 'filters' => $filtersState]);
-        $this->setDefaultParams($config->getName(), $data);
-        $data->offsetAddToArray('state', ['gridView' => $currentViewId]);
+        $gridName = $config->getName();
+
+        $this->setDefaultParams($gridName);
+
+        $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID]);
+        $data->offsetAddToArray('state', ['gridView' => $this->getCurrentViewId($gridName)]);
 
         $systemGridView = new View(self::DEFAULT_VIEW_ID);
-        $systemGridView->setDefault($this->getDefaultViewId($config->getName()) === null);
+        $systemGridView->setDefault($this->getDefaultViewId($gridName) === null);
         if ($config->offsetGetByPath('[options][gridViews][allLabel]')) {
             $systemGridView->setLabel($this->translator->trans($config['options']['gridViews']['allLabel']));
         }
 
         $currentUser = $this->tokenAccessor->getUser();
-        $gridViews = $this->managerLink->getService()->getAllGridViews($currentUser, $config->getName());
+        $gridViews = $this->managerLink->getService()->getAllGridViews($currentUser, $gridName);
 
         if ($this->eventDispatcher->hasListeners(GridViewsLoadEvent::EVENT_NAME)) {
-            $event = new GridViewsLoadEvent($config->getName(), $gridViews);
+            $event = new GridViewsLoadEvent($gridName, $gridViews);
             $this->eventDispatcher->dispatch(GridViewsLoadEvent::EVENT_NAME, $event);
             $gridViews = $event->getGridViews();
         }
@@ -136,7 +139,7 @@ class GridViewsExtension extends AbstractExtension
             'gridViews',
             [
                 'views'       => $gridViews,
-                'gridName'    => $config->getName(),
+                'gridName'    => $gridName,
                 'permissions' => $this->getPermissions()
             ]
         );
@@ -215,9 +218,8 @@ class GridViewsExtension extends AbstractExtension
      * Added filters and sorters for defined as default grid view for current logged user.
      *
      * @param string         $gridName
-     * @param MetadataObject $data
      */
-    protected function setDefaultParams($gridName, MetadataObject $data)
+    protected function setDefaultParams($gridName)
     {
         $params = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
         if (!isset($params[self::VIEWS_PARAM_KEY])) {
@@ -232,11 +234,6 @@ class GridViewsExtension extends AbstractExtension
                     AppearanceExtension::APPEARANCE_TYPE_PARAM => $defaultGridView->getAppearanceTypeName(),
                     AppearanceExtension::APPEARANCE_DATA_PARAM => $defaultGridView->getAppearanceData()
                 ]);
-                $filtersState = array_merge(
-                    $defaultGridView->getFiltersData(),
-                    $data->offsetGetByPath('[state][filters]', [])
-                );
-                $data->offsetSetByPath('[state][filters]', $filtersState);
             }
         }
         $this->getParameters()->set(ParameterBag::ADDITIONAL_PARAMETERS, $params);

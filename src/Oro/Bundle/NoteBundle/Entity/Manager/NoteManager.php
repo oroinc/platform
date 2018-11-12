@@ -13,6 +13,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * General methods of working with notes
+ */
 class NoteManager
 {
     /** @var EntityManager */
@@ -29,6 +32,9 @@ class NoteManager
 
     /** @var AttachmentProvider */
     protected $attachmentProvider;
+
+    /** @var AttachmentManager */
+    protected $attachmentManager;
 
     /**
      * @param EntityManager                 $em
@@ -67,7 +73,7 @@ class NoteManager
         $qb   = $repo->getAssociatedNotesQueryBuilder($entityClass, $entityId)
             ->orderBy('note.createdAt', QueryBuilderUtil::getSortOrder($sorting));
 
-        $query = $this->aclHelper->apply($qb, 'VIEW', false);
+        $query = $this->aclHelper->apply($qb, 'VIEW', [AclHelper::CHECK_RELATIONS => false]);
 
         return $query->getResult();
     }

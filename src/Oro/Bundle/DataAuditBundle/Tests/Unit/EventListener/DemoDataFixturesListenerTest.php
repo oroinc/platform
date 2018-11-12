@@ -6,9 +6,9 @@ use Oro\Bundle\DataAuditBundle\EventListener\DemoDataFixturesListener;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 
-class DemoDataFixturesListenerTest extends \PHPUnit_Framework_TestCase
+class DemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $listenerManager;
 
     /** @var DemoDataFixturesListener */

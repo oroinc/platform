@@ -1,0 +1,184 @@
+/* @theme: admin.oro; */
+
+.form-horizontal .control-label {
+    text-align: left;
+
+    &.header-tooltips {
+        display: inline;
+        float: none;
+        margin-left: -20px;
+
+        .oro-popover-content {
+            line-height: 20px;
+        }
+    }
+}
+
+.control-group .controls p.control-label {
+    width: auto;
+}
+
+.form-horizontal {
+    // Need refactor when form grids will be improved
+    .modal-body & {
+        .control-group {
+            > .control-label {
+                width: $modal-form-horizontal-control-label-width;
+                min-width: $modal-form-horizontal-control-label-width;
+            }
+
+            .controls {
+                .input,
+                input[type="text"] {
+                    width: $modal-form-horizontal-controls-input-width;
+                    max-width: $modal-form-horizontal-controls-input-width;
+                }
+            }
+        }
+    }
+
+    .control-group {
+        display: flex;
+
+        > .control-label {
+            width: $form-horizontal-control-label-width;
+            font-weight: normal;
+            text-align: #{$end};
+            flex-shrink: 0;
+        }
+
+        .control-label {
+            padding-top: 6px;
+            line-height: 20px;
+
+            .tooltip-icon {
+                margin-#{$end}: $content-padding-small;
+            }
+
+            label {
+                display: inline;
+                position: relative;
+                margin-bottom: 0;
+
+                &.required {
+                    em {
+                        color: $danger-dark;
+                        font-size: 21px;
+                        font-style: normal;
+                        position: absolute;
+                        top: -5px;
+                        #{$end}: -11px;
+                    }
+                }
+
+                &:not(.required) {
+                    em {
+                        display: none;
+                    }
+                }
+            }
+        }
+
+        .controls {
+            margin-#{$start}: $form-horizontal-control-margin-start;
+            text-align: #{$start};
+            flex-grow: 1;
+
+            &:first-child {
+                margin-#{$start}: 206px;
+            }
+
+            &.autocomplete-box {
+                margin-bottom: 10px;
+                margin-top: 10px;
+            }
+
+            .control-label {
+                &.html-property {
+                    overflow: auto;
+                }
+            }
+
+            .control-subgroup {
+                display: inline-block;
+                vertical-align: top;
+                margin-#{$end}: $content-padding-small;
+
+                .controls {
+                    margin-#{$start}: 0;
+                    float: $start;
+                }
+
+                .tooltip-icon {
+                    margin-#{$end}: $content-padding-small;
+                }
+            }
+        }
+
+        &.attribute-row label.control-label {
+            cursor: default;
+            color: $primary-550;
+        }
+
+        &.control-group-datetime {
+            input[type="text"] {
+                &.datepicker-input {
+                    width: 189px;
+                }
+                &.timepicker-input {
+                    width: 100px;
+                }
+            }
+        }
+
+        &.control-group-checkbox {
+            .controls {
+                padding-top: 6px;
+            }
+        }
+
+        &.control-group-choice {
+            .choice-widget-expanded {
+                padding-top: 6px;
+            }
+        }
+    }
+}
+
+.choice-widget-expanded {
+    &__item {
+        &:not(:last-child) {
+            margin-bottom: 4px;
+        }
+    }
+}
+
+.user-fieldset {
+    margin-bottom: 22px;
+
+    span {
+        background-color: #fff;
+        padding: 0 20px 0 0;
+        display: inline-block;
+    }
+}
+
+input[type='radio'] + label,
+input[type='checkbox'] + label {
+    margin-bottom: 2px;
+    display: inline-block;
+}
+
+.form-pass-reset {
+    margin: 0 auto 20px;
+    max-width: 400px;
+    padding: 19px 29px 29px;
+    background: $form-pass-reset-background;
+    border: $form-pass-reset-border;
+    border-radius: $border-radius;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .065);
+}
+
+.form-row {
+    padding: 0 0 $margin-bottom-box/2;
+}

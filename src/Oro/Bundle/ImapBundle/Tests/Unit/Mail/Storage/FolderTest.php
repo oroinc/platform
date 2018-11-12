@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Storage;
 
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 
-class FolderTest extends \PHPUnit_Framework_TestCase
+class FolderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGuessStandartFolderType()
     {

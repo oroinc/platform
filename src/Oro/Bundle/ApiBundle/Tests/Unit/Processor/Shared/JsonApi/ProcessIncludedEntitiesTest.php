@@ -18,10 +18,10 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionProcessorBagInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
     private $processorBag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ErrorCompleterInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ErrorCompleterInterface */
     private $errorCompleter;
 
     /** @var ProcessIncludedEntities */
@@ -62,7 +62,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         );
 
         $expectedError = Error::createValidationError('some error')
-            ->setSource(ErrorSource::createByPropertyPath('/included/0'));
+            ->setSource(ErrorSource::createByPointer('/included/0'));
 
         $actionContext = new CreateContext($this->configProvider, $this->metadataProvider);
         $actionContext->setMetadata(new EntityMetadata());

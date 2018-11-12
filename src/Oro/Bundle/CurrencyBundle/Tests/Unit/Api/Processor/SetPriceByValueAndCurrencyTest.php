@@ -89,7 +89,7 @@ class SetPriceByValueAndCurrencyTest extends FormProcessorTestCase
     /**
      * @param Price|null $price
      *
-     * @return SettablePriceAwareInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return SettablePriceAwareInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createSettablePriceAwareMock(Price $price = null)
     {

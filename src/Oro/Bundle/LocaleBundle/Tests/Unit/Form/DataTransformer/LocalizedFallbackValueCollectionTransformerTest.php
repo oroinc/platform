@@ -14,12 +14,12 @@ use Oro\Component\Testing\Unit\EntityTrait;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit_Framework_TestCase
+class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
      */
     protected $registry;
 

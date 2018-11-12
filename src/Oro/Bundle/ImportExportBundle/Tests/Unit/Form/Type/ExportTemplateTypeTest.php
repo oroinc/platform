@@ -12,7 +12,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 class ExportTemplateTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @var ProcessorRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $processorRegistry;
 

@@ -8,9 +8,9 @@ use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
 /**
  * Tests for ExtendOptionsParser and ExtendOptionsBuilder
  */
-class ExtendOptionsParserTest extends \PHPUnit_Framework_TestCase
+class ExtendOptionsParserTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityMetadataHelper;
 
     /** @var ExtendOptionsParser */

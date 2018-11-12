@@ -1,4 +1,4 @@
 assets:
     css:
         'orodataaudit':
-            - 'bundles/orodataaudit/css/scss/oro.audit.scss'
+            - 'bundles/orodataaudit/css/scss/main.scss'

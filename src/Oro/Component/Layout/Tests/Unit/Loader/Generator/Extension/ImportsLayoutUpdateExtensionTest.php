@@ -8,7 +8,7 @@ use Oro\Component\Layout\Loader\Generator\Extension\ImportsLayoutUpdateExtension
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
-class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
+class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImportsLayoutUpdateExtension */
     protected $extension;

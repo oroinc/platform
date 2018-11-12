@@ -1,16 +1,25 @@
 {% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
 
 {% block list %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
-            <div class="dropdown header-dropdown-shortcut header-utility-dropdown">
-                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" title="{{ 'oro.navigation.shortcuts.title'|trans }}"><i class="fa-share-square"></i></a>
-                <ul class="dropdown-menu">
+            {% set togglerId = 'dropdown-'|uniqid %}
+            <div class="dropdown header-dropdown-shortcut" data-layout="separate"
+                {{ UI.renderPageComponentAttributes({view: 'oronavigation/js/app/views/shortcuts-view'}) }}>
+                <button class="dropdown-toggle dropdown-toggle--no-caret" data-toggle="dropdown" id="{{ togglerId }}"
+                    aria-haspopup="true" aria-expanded="false" aria-label="{{ 'oro.navigation.shortcuts.title'|trans }}"
+                    title="{{ 'oro.navigation.shortcuts.title'|trans }}">
+                    <span class="fa-share-square" aria-hidden="true"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="{{ togglerId }}">
                     <li class="nav-header nav-header-title">{{ 'oro.navigation.shortcuts.title'|trans }}</li>
-                    <li class="dark">
+                    <li class="nav-content">
                         <form>
                             <input type="text"
+                                   class="header-dropdown-shortcut__search"
                                    placeholder="{{ 'oro.navigation.shortcuts.placeholder'|trans }}"
-                                   data-source-url={{ options.source|json_encode|raw }} class="input"
+                                   data-source-url={{ options.source|json_encode|raw }}
+                                   data-role="shortcut-search"
                                    data-entity-class="{{ oro_class_name(app.user, true) }}"
                                    data-entity-id="{{ app.user.id }}"
                             >
@@ -21,7 +30,7 @@
                             </div>
                         </form>
                     </li>
-                    <div class="nav-header">{{ 'oro.navigation.shortcuts.most_used'|trans }}</div>
+                    <li class="nav-header">{{ 'oro.navigation.shortcuts.most_used'|trans }}</li>
                     {{ block('children') }}
                 </ul>
             </div>
@@ -30,6 +39,7 @@
 
 {% block item %}
     {% if item.extras.is_custom_action is defined %}
+        {%- set classes = classes|merge(['dropdown-item']) %}
         {{ block('item_renderer') }}
     {% endif %}
 {% endblock %}

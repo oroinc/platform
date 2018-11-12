@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class RestPlainApiTestCase extends RestApiTestCase
 {
-    const JSON_CONTENT_TYPE = 'application/json';
+    protected const JSON_CONTENT_TYPE = 'application/json';
 
     /**
      * {@inheritdoc}
@@ -30,27 +30,19 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
     }
 
     /**
-     * Sends REST API request.
-     *
-     * @param string $method
-     * @param string $uri
-     * @param array  $parameters
-     * @param array  $server
-     *
-     * @return Response
+     * {@inheritdoc}
      */
-    protected function request($method, $uri, array $parameters = [], array $server = [])
+    protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
-        if (!isset($server['HTTP_X-WSSE'])) {
-            $server = array_replace($server, $this->getWsseAuthHeader());
-        }
+        $this->checkWsseAuthHeader($server);
 
         $this->client->request(
             $method,
             $uri,
             $parameters,
             [],
-            $server
+            $server,
+            $content
         );
 
         return $this->client->getResponse();
@@ -104,8 +96,8 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
                 $content,
                 'Unexpected number of validation errors'
             );
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            throw new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     "%s\nResponse:\n%s",
                     $e->getMessage(),

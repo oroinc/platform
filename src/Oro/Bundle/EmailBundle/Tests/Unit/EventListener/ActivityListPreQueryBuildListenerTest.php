@@ -8,12 +8,12 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\EventListener\ActivityListPreQueryBuildListener;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class ActivityListPreQueryBuildListenerTest extends \PHPUnit_Framework_TestCase
+class ActivityListPreQueryBuildListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActivityListPreQueryBuildListener */
     protected $listener;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
     public function setUp()

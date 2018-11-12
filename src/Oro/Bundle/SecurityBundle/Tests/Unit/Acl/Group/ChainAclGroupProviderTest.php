@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Group;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Group\ChainAclGroupProvider;
 
-class ChainAclGroupProviderTest extends \PHPUnit_Framework_TestCase
+class ChainAclGroupProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructionWithoutProviders()
     {
@@ -16,10 +16,10 @@ class ChainAclGroupProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddProvider()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface $provider1 */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface $provider1 */
         $provider1 = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface $provider2 */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface $provider2 */
         $provider2 = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
 
         $chain = new ChainAclGroupProvider();
@@ -65,11 +65,11 @@ class ChainAclGroupProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param bool $isSupports
      * @param string $group
-     * @return \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface
      */
     protected function getAclGroupProviderMock($isSupports = true, $group = '')
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface $provider */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface $provider */
         $provider = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
         $provider->expects($this->any())
             ->method('supports')

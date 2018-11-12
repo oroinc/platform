@@ -5,7 +5,7 @@ use Composer\Package\PackageInterface;
 use Oro\Bundle\DistributionBundle\Manager\Helper\ChangeSetBuilder;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 
-class ChangeSetBuilderTest extends \PHPUnit_Framework_TestCase
+class ChangeSetBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test
@@ -47,7 +47,7 @@ class ChangeSetBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $name
      * @param string $sourceReference
-     * @return \PHPUnit_Framework_MockObject_MockObject|PackageInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|PackageInterface
      */
     protected function createPackageMock($name, $sourceReference)
     {

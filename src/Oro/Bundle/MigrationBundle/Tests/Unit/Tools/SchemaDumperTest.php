@@ -5,7 +5,7 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Tools;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Tools\SchemaDumper;
 
-class SchemaDumperTest extends \PHPUnit_Framework_TestCase
+class SchemaDumperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var SchemaDumper
@@ -18,7 +18,7 @@ class SchemaDumperTest extends \PHPUnit_Framework_TestCase
     protected $schema;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $twig;
 

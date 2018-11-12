@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 class FilterFactoryStub
 {
     /** @var object|null */
-    protected $filter;
+    private $filter;
 
     /**
      * @param object|null $filter

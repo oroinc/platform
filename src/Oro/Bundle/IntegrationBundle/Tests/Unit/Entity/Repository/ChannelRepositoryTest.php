@@ -6,12 +6,12 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 
-class ChannelRepositoryTest extends \PHPUnit_Framework_TestCase
+class ChannelRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChannelRepository */
     protected $repository;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
     protected function setUp()

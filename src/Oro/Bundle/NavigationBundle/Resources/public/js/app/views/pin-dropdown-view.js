@@ -1,12 +1,10 @@
-define([
-    'jquery',
-    'underscore',
-    'chaplin',
-    'oroui/js/app/views/base/collection-view'
-], function($, _, Chaplin, BaseCollectionView) {
+define(function(require) {
     'use strict';
 
     var DropdownCollectionView;
+    var _ = require('underscore');
+    var Chaplin = require('chaplin');
+    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     var utils = Chaplin.utils;
 
     DropdownCollectionView = BaseCollectionView.extend({

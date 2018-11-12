@@ -17,6 +17,9 @@ use Oro\Bundle\DataGridBundle\Exception\BadMethodCallException;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Allows to create datagrids from ORM queries.
+ */
 class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterface
 {
     const TYPE = 'orm';
@@ -184,13 +187,10 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
      */
     protected function processConfigs(array $config)
     {
-        $this->qb        = $this->configProcessor->processQuery($config);
-        $this->countQb   = $this->configProcessor->processCountQuery($config);
-        if (isset($config['hints'])) {
-            $this->queryHints = $config['hints'];
-        }
-        if (isset($config['count_hints'])) {
-            $this->countQueryHints = $config['count_hints'];
-        }
+        $this->qb = $this->configProcessor->processQuery($config);
+        $this->countQb = $this->configProcessor->processCountQuery($config);
+
+        $this->queryHints = $config['hints'] ?? [];
+        $this->countQueryHints = $config['count_hints'] ?? $this->queryHints;
     }
 }

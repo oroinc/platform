@@ -13,25 +13,25 @@ use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class EntityFieldWriterTest extends \PHPUnit_Framework_TestCase
+class EntityFieldWriterTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configManager;
 
     /**
-     * @var ConfigTranslationHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $translationHelper;
 
     /**
-     * @var EnumSynchronizer|\PHPUnit_Framework_MockObject_MockObject
+     * @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject
      */
     private $enumSynchronizer;
 
     /**
-     * @var EntityFieldStateChecker|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityFieldStateChecker|\PHPUnit\Framework\MockObject\MockObject
      */
     private $stateChecker;
 

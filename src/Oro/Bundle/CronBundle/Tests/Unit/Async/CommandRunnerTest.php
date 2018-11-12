@@ -6,7 +6,7 @@ use Oro\Bundle\CronBundle\Async\CommandRunner;
 use Oro\Bundle\CronBundle\Async\Topics;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
-class CommandRunnerTest extends \PHPUnit_Framework_TestCase
+class CommandRunnerTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldBeConstructedWithAllRequiredArguments()
     {
@@ -36,7 +36,7 @@ class CommandRunnerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | MessageProducerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject | MessageProducerInterface
      */
     private function createProducerMock()
     {

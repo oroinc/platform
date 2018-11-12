@@ -11,20 +11,20 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
+class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var LocalizationManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $localizationManager;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var LanguageCodeFormatter|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageCodeFormatter|\PHPUnit\Framework\MockObject\MockObject */
     protected $languageFormatter;
 
-    /** @var LanguageProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $languageProvider;
 
     /** @var LocalizationChoicesProvider */

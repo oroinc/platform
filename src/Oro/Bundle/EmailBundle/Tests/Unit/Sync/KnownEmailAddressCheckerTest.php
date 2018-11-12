@@ -6,7 +6,7 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
-class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
+class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
 {
     const EMAIL_ADDRESS_PROXY_CLASS = 'Entity\TestEmailAddress';
     const TEST_CONTACT_CLASS = 'Entity\TestContact';
@@ -20,16 +20,16 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
     /** @var KnownEmailAddressChecker */
     private $checker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $emailAddressManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $emailAddressRepository;
 
     protected function setUp()
@@ -377,11 +377,11 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $query
+     * @param \PHPUnit\Framework\MockObject\MockObject $query
      * @param array                                    $emailsToLoad
      * @param string                                   $select
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getLoadEmailAddressesQueryBuilder(
         $query,
@@ -417,7 +417,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $result
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getLoadEmailAddressesQuery($result)
     {

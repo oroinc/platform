@@ -4,9 +4,9 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Extension\DependencyInjectio
 
 use Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension;
 
-class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
+class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     /** @var DependencyInjectionExtension */

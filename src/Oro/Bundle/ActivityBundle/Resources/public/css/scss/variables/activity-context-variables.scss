@@ -1,0 +1,19 @@
+/* @theme: admin.oro; */
+
+$context-item-background: $primary-800 !default;
+$context-item-color: $primary-200 !default;
+$context-item-inner-offset: 6px 12px !default;
+$context-item-border-radius: 16px !default;
+
+$activity-context-item-background: $tag-item-background !default;
+$activity-context-item-color: $tag-item-color !default;
+$activity-context-item-offset: 0 8px 5px 0 !default;
+$activity-context-item-inner-offset: 5px 12px !default;
+$activity-context-item-display: inline-block !default;
+$activity-context-item-font-size: $base-font-size--s !default;
+
+$activity-context-activity-label-font-size: $font-size-base !default;
+$activity-context-activity-label-line-height: $line-height-base !default;
+$activity-context-activity-label-offset: 1px 10px 0 0 !default;
+$activity-context-activity-label-float: left !default;
+$activity-context-activity-label-color: $primary-500 !default;

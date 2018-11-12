@@ -9,24 +9,24 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class EntityIdResolverRegistryTest extends \PHPUnit_Framework_TestCase
+class EntityIdResolverRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdResolverInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverInterface */
     private $resolver1;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdResolverInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverInterface */
     private $resolver2;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdResolverInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverInterface */
     private $resolver3;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdResolverInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverInterface */
     private $resolver4;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdResolverInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverInterface */
     private $resolver5;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
     /** @var EntityIdResolverRegistry */

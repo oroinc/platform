@@ -1,23 +1,55 @@
 {% macro renderAvailableVariablesWidget(entityName, entityChoiceFieldId) %}
+    {% set system = 'oro-email-template-variables-system' %}
+    {% set systemTab = system ~ '-tab' %}
+    {% set entity = 'oro-email-template-variables-entity'%}
+    {% set entityTab = entity ~ '-tab' %}
     <script type="text/template" id="oro-email-template-variables-template">
         <div class="emailtemplate-variables oro-tabs tabbable">
-            <ul class="nav nav-tabs">
-                <li class="active" id="oro-email-template-variables-system-tab">
-                    <a href="javascript:void(0);" data-target="#oro-email-template-variables-system" data-toggle="tab">
-                        {{ 'oro.email.emailtemplate.variables.system' | trans }}
-                    </a>
-                </li>
-                <li id="oro-email-template-variables-entity-tab">
-                    <a href="javascript:void(0);" data-target="#oro-email-template-variables-entity" data-toggle="tab">
-                        {{ 'oro.email.emailtemplate.variables.entity' | trans }}
-                    </a>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div class="variables tab-pane active" id="oro-email-template-variables-system">
-                    <%= variables.system %>
-                </div>
-                <div class="variables tab-pane" id="oro-email-template-variables-entity">
+            <div class="oro-tabs__head">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item" >
+                        <a id="{{ systemTab }}"
+                           href="#{{system }}"
+                           class="nav-link active"
+                           data-target="#{{system }}"
+                           data-toggle="tab"
+                           role="tab"
+                           aria-controls="{{system }}"
+                           aria-selected="true"
+                        >
+                            {{ 'oro.email.emailtemplate.variables.system' | trans }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="{{ entityTab }}"
+                           href="#{{ entity }}"
+                           class="nav-link"
+                           data-target="#{{ entity }}"
+                           data-toggle="tab"
+                           role="tab"
+                           aria-controls="{{ entity }}"
+                           aria-selected="false"
+                        >
+                            {{ 'oro.email.emailtemplate.variables.entity' | trans }}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="oro-tabs__content">
+                <div class="tab-content">
+                    <div id="{{system }}"
+                         class="variables tab-pane active"
+                         role="tabpanel"
+                         aria-labelledby="{{ systemTab }}"
+                    >
+                        <%= variables.system %>
+                    </div>
+                    <div id="{{ entity }}"
+                         class="variables tab-pane"
+                         role="tabpanel"
+                         aria-labelledby="{{ entityTab }}"
+                    >
+                    </div>
                 </div>
             </div>
         </div>
@@ -365,10 +397,11 @@
                     {% endif %}
                 </div>
                 <div class="dropdown link-to-record">
-                    <a class="no-hash dropdown-toggle" href="javascript: void(0);" data-toggle="dropdown">
-                        <i class="fa {{ icon }}"></i> {{ oro_format_filename(attachment.fileName, 11, 4, 5) }}
+                    {% set togglerId = 'dropdown-'|uniqid %}
+                    <a class="no-hash dropdown-toggle dropdown-toggle--no-caret" id="{{ togglerId }}" href="#" role="button" data-toggle="dropdown">
+                        <span class="fa {{ icon }}" aria-hidden="true"></span> {{ oro_format_filename(attachment.fileName, 11, 4, 5) }}
                     </a>
-                    <ul class="dropdown-menu {{ canCopyToRecord ? '' : 'one'}}" role="menu" aria-labelledby="dropdownMenu">
+                    <ul class="dropdown-menu {{ canCopyToRecord ? '' : 'one'}}" role="menu" aria-labelledby="{{ togglerId }}">
                         {% if (isPreviewAvailable) %}
                             <a class="view-image no-hash" tabindex="-1" data-gallery="gallery-{{ galleryUid }}" href="{{ attachmentUrl }}">{{ 'oro.email.attachment.view'|trans }}</a>
                         {% endif %}
@@ -483,7 +516,13 @@
     {% set recipientsCc = [] %}
     {% set recipientsBcc = [] %}
     {% for recipient in email.recipients %}
-        {% set recipientName = oro_get_email_address_name(recipient.name)|oro_html_strip_tags ~ " &lt;" ~ oro_get_email_address(recipient.name)|oro_html_strip_tags ~ "&gt;" %}
+        {% set emailAddressName = oro_get_email_address_name(recipient.name)|oro_html_strip_tags %}
+        {% set emailAddress = oro_get_email_address(recipient.name)|oro_html_strip_tags %}
+        {% if emailAddressName == '' and emailAddress == '' %}
+            {% set recipientName = '' %}
+        {% else %}
+            {% set recipientName = emailAddressName ~ " &lt;" ~ emailAddress ~ "&gt;" %}
+        {% endif %}
         {% if recipient.type == 'to' %}
             {% set recipientsTo = recipientsTo|merge([recipientName])%}
         {% elseif recipient.type == 'cc' %}
@@ -540,38 +579,41 @@
     Render title and buttons for Mailbox configuration
 #}
 {% macro renderMailboxConfigTitleAndButtons(pageTitle, buttons) %}
-    <div class="container-fluid configuration-header clearfix">
-        {% if pageTitle is iterable %}
-            <div class="customer-info customer-simple pull-left">
-                {% for title in pageTitle%}
-                    {% if not loop.last %}
-                        <div class="sub-title">
-                            {% if title is iterable and title.link is defined and title.label is defined %}
-                                <a href="{{ title.link }}">{{ title.label }}</a>
+    <div class="container-fluid page-title">
+        <div class="navigation navbar-extra navbar-extra-right">
+            <div class="row">
+                <div class="pull-left pull-left-extra">
+                    {% if pageTitle is iterable %}
+                        {% for title in pageTitle%}
+                            {% if not loop.last %}
+                                <div class="sub-title">
+                                    {% if title is iterable and title.link is defined and title.label is defined %}
+                                        <a href="{{ title.link }}">{{ title.label }}</a>
+                                    {% else %}
+                                        {{ title }}
+                                    {% endif %}
+                                </div>
+                                <span class="separator">/</span>
                             {% else %}
-                                {{ title }}
+                                <h1 class="page-title__entity-title">
+                                    {% if title is iterable and title.link is defined and title.label is defined %}
+                                        <a href="{{ title.link }}">{{ title.label }}</a>
+                                    {% else %}
+                                        {{ title }}
+                                    {% endif %}
+                                </h1>
                             {% endif %}
-                        </div>
-                        <span class="separator">/</span>
+                        {% endfor %}
                     {% else %}
-                        <h1 class="user-name">
-                            {% if title is iterable and title.link is defined and title.label is defined %}
-                                <a href="{{ title.link }}">{{ title.label }}</a>
-                            {% else %}
-                                {{ title }}
-                            {% endif %}
+                        <h1 class="page-title__entity-title">
+                            {{ pageTitle }}
                         </h1>
                     {% endif %}
-                {% endfor %}
+                </div>
+                <div class="pull-right title-buttons-container">
+                    {{ buttons|raw }}
+                </div>
             </div>
-        {% else %}
-            <h1>
-                {{ pageTitle }}
-            </h1>
-        {% endif %}
-
-        <div class="pull-right title-buttons-container">
-            {{ buttons|raw }}
         </div>
     </div>
 {% endmacro %}

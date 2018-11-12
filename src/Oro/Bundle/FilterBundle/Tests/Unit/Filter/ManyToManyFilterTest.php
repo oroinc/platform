@@ -5,7 +5,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\ManyToManyFilter;
 
-class ManyToManyFilterTest extends \PHPUnit_Framework_TestCase
+class ManyToManyFilterTest extends \PHPUnit\Framework\TestCase
 {
     protected $manyToManyfilter;
 
@@ -61,6 +61,9 @@ class ManyToManyFilterTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($em));
         $qb->expects($this->any())
             ->method('getDqlPart')
+            ->will($this->returnValue([]));
+        $qb->expects($this->any())
+            ->method('getRootAliases')
             ->will($this->returnValue([]));
 
         $expressionBuilder = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder')
@@ -121,6 +124,9 @@ class ManyToManyFilterTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($em));
         $qb->expects($this->any())
             ->method('getDqlPart')
+            ->will($this->returnValue([]));
+        $qb->expects($this->any())
+            ->method('getRootAliases')
             ->will($this->returnValue([]));
 
         $expressionBuilder = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder')

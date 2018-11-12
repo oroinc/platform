@@ -3,26 +3,31 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\FormExtensionInterface;
+use Symfony\Component\Form\FormTypeExtensionInterface;
+use Symfony\Component\Form\FormTypeGuesserInterface;
+use Symfony\Component\Form\FormTypeInterface;
 
-class SwitchableDependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
+class SwitchableDependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $container;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
+    private $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $extension1;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormExtensionInterface */
+    private $extension1;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $extension2;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormExtensionInterface */
+    private $extension2;
 
     /** @var SwitchableDependencyInjectionExtension */
-    protected $switchableExtension;
+    private $switchableExtension;
 
     protected function setUp()
     {
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->extension1 = $this->createMock('Symfony\Component\Form\FormExtensionInterface');
-        $this->extension2 = $this->createMock('Symfony\Component\Form\FormExtensionInterface');
+        $this->container = $this->createMock(ContainerInterface::class);
+        $this->extension1 = $this->createMock(FormExtensionInterface::class);
+        $this->extension2 = $this->createMock(FormExtensionInterface::class);
 
         $this->switchableExtension = new SwitchableDependencyInjectionExtension($this->container);
         $this->switchableExtension->addExtension('extension1', 'extension1_service');
@@ -31,105 +36,105 @@ class SwitchableDependencyInjectionExtensionTest extends \PHPUnit_Framework_Test
 
     public function testDefaultExtension()
     {
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with('extension1_service')
             ->willReturn($this->extension1);
-        $this->extension1->expects($this->once())
+        $this->extension1->expects(self::once())
             ->method('hasType')
             ->willReturn(true);
 
-        $this->assertTrue($this->switchableExtension->hasType('type1'));
+        self::assertTrue($this->switchableExtension->hasType('type1'));
     }
 
     public function testSwitchFormExtension()
     {
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with('extension2_service')
             ->willReturn($this->extension2);
-        $this->extension2->expects($this->once())
+        $this->extension2->expects(self::once())
             ->method('hasType')
             ->willReturn(true);
 
         $this->switchableExtension->switchFormExtension('extension2');
-        $this->assertTrue($this->switchableExtension->hasType('type1'));
+        self::assertTrue($this->switchableExtension->hasType('type1'));
     }
 
     public function testHasType()
     {
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with('extension1_service')
             ->willReturn($this->extension1);
-        $this->extension1->expects($this->once())
+        $this->extension1->expects(self::once())
             ->method('hasType')
             ->with('type1')
             ->willReturn(true);
 
-        $this->assertTrue($this->switchableExtension->hasType('type1'));
+        self::assertTrue($this->switchableExtension->hasType('type1'));
     }
 
     public function testGetType()
     {
-        $type = $this->createMock('Symfony\Component\Form\FormTypeInterface');
+        $type = $this->createMock(FormTypeInterface::class);
 
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with('extension1_service')
             ->willReturn($this->extension1);
-        $this->extension1->expects($this->once())
+        $this->extension1->expects(self::once())
             ->method('getType')
             ->with('type1')
             ->willReturn($type);
 
-        $this->assertSame($type, $this->switchableExtension->getType('type1'));
+        self::assertSame($type, $this->switchableExtension->getType('type1'));
     }
 
     public function testHasTypeExtensions()
     {
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with('extension1_service')
             ->willReturn($this->extension1);
-        $this->extension1->expects($this->once())
+        $this->extension1->expects(self::once())
             ->method('hasTypeExtensions')
             ->with('type1')
             ->willReturn(true);
 
-        $this->assertTrue($this->switchableExtension->hasTypeExtensions('type1'));
+        self::assertTrue($this->switchableExtension->hasTypeExtensions('type1'));
     }
 
     public function testGetTypeExtensions()
     {
         $typeExtensions = [
-            $this->createMock('Symfony\Component\Form\FormTypeExtensionInterface')
+            $this->createMock(FormTypeExtensionInterface::class)
         ];
 
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with('extension1_service')
             ->willReturn($this->extension1);
-        $this->extension1->expects($this->once())
+        $this->extension1->expects(self::once())
             ->method('getTypeExtensions')
             ->with('type1')
             ->willReturn($typeExtensions);
 
-        $this->assertSame($typeExtensions, $this->switchableExtension->getTypeExtensions('type1'));
+        self::assertSame($typeExtensions, $this->switchableExtension->getTypeExtensions('type1'));
     }
 
     public function testGetTypeGuesser()
     {
-        $typeGuesser = $this->createMock('Symfony\Component\Form\FormTypeGuesserInterface');
+        $typeGuesser = $this->createMock(FormTypeGuesserInterface::class);
 
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with('extension1_service')
             ->willReturn($this->extension1);
-        $this->extension1->expects($this->once())
+        $this->extension1->expects(self::once())
             ->method('getTypeGuesser')
             ->willReturn($typeGuesser);
 
-        $this->assertSame($typeGuesser, $this->switchableExtension->getTypeGuesser());
+        self::assertSame($typeGuesser, $this->switchableExtension->getTypeGuesser());
     }
 }

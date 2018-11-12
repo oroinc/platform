@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MassActionDispatcherTest extends \PHPUnit_Framework_TestCase
+class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     const DATAGRID_NAME = 'datagridName';
     const ACTION_NAME = 'actionName';
@@ -42,22 +42,22 @@ class MassActionDispatcherTest extends \PHPUnit_Framework_TestCase
     private static $filters = ['someFilter' => 'data'];
 
     /**
-     * @var MassActionHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var MassActionHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $massActionHelper;
 
     /**
-     * @var Manager|\PHPUnit_Framework_MockObject_MockObject
+     * @var Manager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $manager;
 
     /**
-     * @var MassActionParametersParser|\PHPUnit_Framework_MockObject_MockObject
+     * @var MassActionParametersParser|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $massActionParametersParser;
 
     /**
-     * @var IterableResultFactoryRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var IterableResultFactoryRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $iterableResultFactoryRegistry;
 
@@ -135,7 +135,7 @@ class MassActionDispatcherTest extends \PHPUnit_Framework_TestCase
     /**
      * @param DatasourceInterface $datasource
      * @param DatagridConfiguration|null $gridConfig
-     * @return DatagridInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return DatagridInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createDatagrid(DatasourceInterface $datasource = null, DatagridConfiguration $gridConfig = null)
     {
@@ -145,7 +145,7 @@ class MassActionDispatcherTest extends \PHPUnit_Framework_TestCase
             ->method('mergeKey')
             ->with(OrmFilterExtension::FILTER_ROOT_PARAM, self::$filters);
 
-        /** @var DatagridInterface|\PHPUnit_Framework_MockObject_MockObject $datagrid */
+        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $datagrid */
         $datagrid = $this->createMock(DatagridInterface::class);
         $datagrid
             ->expects($this->once())
@@ -173,7 +173,7 @@ class MassActionDispatcherTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param ActionConfiguration|null $actionConfiguration
-     * @return MassActionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return MassActionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createMassAction(ActionConfiguration $actionConfiguration = null)
     {
@@ -406,7 +406,7 @@ class MassActionDispatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return MassActionResponseInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return MassActionResponseInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function setExpectationsForDispatch(): MassActionResponseInterface
     {
@@ -432,7 +432,7 @@ class MassActionDispatcherTest extends \PHPUnit_Framework_TestCase
             ->with($massAction)
             ->willReturn($handler);
 
-        /** @var IterableResultInterface|\PHPUnit_Framework_MockObject_MockObject $iterableResult */
+        /** @var IterableResultInterface|\PHPUnit\Framework\MockObject\MockObject $iterableResult */
         $iterableResult = $this->createMock(IterableResultInterface::class);
 
         $handler

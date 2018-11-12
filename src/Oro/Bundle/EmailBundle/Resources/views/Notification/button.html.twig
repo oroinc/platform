@@ -17,14 +17,14 @@
         <% } %>
     </div>
     <div class="footer row-fluid">
-        <span class="pull-left from-name">
+        <span class="from-name">
             <% if (linkFromName) { %>
                 <a href="<%- linkFromName %>"><%- fromName %></a>
             <% } else { %>
                 <%- fromName %>
             <% } %>
         </span>
-        <span class="pull-right">
+        <span class="forward-action-wrapper">
             <span class="forward-action">
                 {{- UI.clientLink({
                     'dataUrlRaw': "<%= forwardRoute %>",
@@ -94,21 +94,36 @@
         </span>
     </div>
 </script>
-{% endif %}
-{% if feature_enabled('email') and oro_config_value('oro_email.show_recent_emails_in_user_bar') %}
-<li class="email-notification-menu dropdown"
-    title="{{ 'oro.email.notification.menu_item.hint'|trans }}"
-    data-page-component-options="{{ {
-        'emails': emails,
-        'count': count,
-        'hasMarkAllButton': true,
-        'clankEvent': oro_get_email_clank_event()
-    }|json_encode }}"
-    data-layout="separate">
+
+{% if oro_config_value('oro_email.show_recent_emails_in_user_bar') %}
+<li class="email-notification-menu dropdown" title="{{ 'oro.email.notification.menu_item.hint'|trans }}"
+    {{ UI.renderPageComponentAttributes({
+        module: 'oroemail/js/app/components/user-menu-email-notification-component',
+        options: {
+            listSelector: '.dropdown-menu',
+            iconSelector: '.email-notification-icon',
+            emails: emails,
+            count: count,
+            hasMarkAllButton: true,
+            wsChannel: oro_get_email_ws_event()
+        }
+    }) }}>
     {% if isDesktopVersion() %}
-    <a href="#" class="oro-dropdown-toggle email-notification-icon"></a>
+    {% set togglerId = 'dropdown-'|uniqid %}
+    <a href="#" role="button" id="{{ togglerId }}" data-toggle="dropdown"
+       class="dropdown-toggle dropdown-toggle--no-caret email-notification-icon"
+       title="{{ 'oro.email.menu.user_emails'|trans }}"
+       aria-label="{{ 'oro.email.menu.user_emails'|trans }}" aria-haspopup="true" aria-expanded="false"></a>
+    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="{{ togglerId }}" tabindex="0"></div>
+    <div class="new-email-notification" {{ UI.renderPageComponentAttributes({
+        module: 'oroemail/js/app/components/new-email-message-component'
+    }) }}> {{ 'oro.email.notification.new_email'|trans }}</div>
     {% endif %}
-    <div class="dropdown-menu pull-right" tabindex="0"></div>
-    <div class="new-email-notification"> {{ 'oro.email.notification.new_email'|trans }}</div>
 </li>
+{% else %}
+    <li {{ UI.renderPageComponentAttributes({
+        module: 'oroemail/js/app/components/new-email-flash-message-component'
+    }) }}></li>
+{% endif %}
+
 {% endif %}

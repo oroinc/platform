@@ -101,7 +101,7 @@ class HttpImportMessageProcessorTest extends WebTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionMock()
     {
@@ -109,7 +109,7 @@ class HttpImportMessageProcessorTest extends WebTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|HttpImportHandler
+     * @return \PHPUnit\Framework\MockObject\MockObject|HttpImportHandler
      */
     private function createImportHandlerMock()
     {

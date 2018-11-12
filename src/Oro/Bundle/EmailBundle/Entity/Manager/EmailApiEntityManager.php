@@ -71,33 +71,25 @@ class EmailApiEntityManager extends ApiEntityManager
     protected function getSerializationConfig()
     {
         $config = [
-            'excluded_fields' => ['fromEmailAddress'],
-            'fields'          => [
-                'created'    => [
-                    'result_name' => 'createdAt'
-                ],
-                'importance' => [
-                    'data_transformer' => 'oro_email.email_importance_transformer'
-                ],
-                'fromName'   => [
-                    'result_name' => 'from'
-                ],
-                'recipients' => [
+            'fields'         => [
+                'fromEmailAddress' => ['exclude' => true],
+                'createdAt'        => ['property_path' => 'created'],
+                'importance'       => ['data_transformer' => 'oro_email.email_importance_transformer'],
+                'from'             => ['property_path' => 'fromName'],
+                'recipients'       => [
                     'exclusion_policy' => 'all',
                     'fields'           => [
                         'name' => null,
                         'type' => null
                     ]
                 ],
-                'emailBody'  => [
+                'emailBody'        => [
                     'exclusion_policy' => 'all',
                     'fields'           => [
-                        'bodyContent' => [
-                            'result_name' => 'body'
-                        ],
-                        'bodyIsText'  => [
+                        'body'     => ['property_path' => 'bodyContent'],
+                        'bodyType' => [
                             'data_transformer' => 'oro_email.email_body_type_transformer',
-                            'result_name'      => 'bodyType'
+                            'property_path'    => 'bodyIsText'
                         ]
                     ]
                 ],
@@ -125,8 +117,8 @@ class EmailApiEntityManager extends ApiEntityManager
                     ]
                 ]
             ],
-            'post_serialize'  => function (array &$result) {
-                $this->postSerializeEmail($result);
+            'post_serialize'  => function (array $result) {
+                return $this->postSerializeEmail($result);
             }
         ];
 
@@ -135,8 +127,10 @@ class EmailApiEntityManager extends ApiEntityManager
 
     /**
      * @param array $result
+     *
+     * @return array
      */
-    protected function postSerializeEmail(array &$result)
+    protected function postSerializeEmail(array $result): array
     {
         $result['to']  = [];
         $result['cc']  = [];
@@ -166,5 +160,7 @@ class EmailApiEntityManager extends ApiEntityManager
             $result['folders'] = [$emailUser['folders']];
         }
         unset($result['emailUsers']);
+
+        return $result;
     }
 }

@@ -5,15 +5,15 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\EmbeddedFormBundle\Validator\Constraints\NoTagsValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class NoTagsValidatorTest extends \PHPUnit_Framework_TestCase
+class NoTagsValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $constraint;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $context;
 

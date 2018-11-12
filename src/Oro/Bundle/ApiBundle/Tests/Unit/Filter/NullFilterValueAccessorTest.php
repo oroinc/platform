@@ -5,10 +5,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
 
-class NullFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
+class NullFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var NullFilterValueAccessor */
-    protected $nullFilterValueAccessor;
+    private $nullFilterValueAccessor;
 
     /**
      * {@inheritdoc}
@@ -35,5 +35,10 @@ class NullFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->nullFilterValueAccessor->setDefaultGroupName('filter');
         self::assertNull($this->nullFilterValueAccessor->getDefaultGroupName());
+    }
+
+    public function testGetQueryString()
+    {
+        self::assertSame('', $this->nullFilterValueAccessor->getQueryString());
     }
 }

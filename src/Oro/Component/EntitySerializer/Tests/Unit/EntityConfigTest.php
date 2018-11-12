@@ -5,7 +5,7 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
 
-class EntityConfigTest extends \PHPUnit_Framework_TestCase
+class EntityConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testToArray()
     {
@@ -144,6 +144,20 @@ class EntityConfigTest extends \PHPUnit_Framework_TestCase
         $entityConfig->setMaxResults();
         $this->assertNull($entityConfig->getMaxResults());
         $this->assertEquals([], $entityConfig->toArray());
+    }
+
+    public function testHasMore()
+    {
+        $entityConfig = new EntityConfig();
+        $this->assertFalse($entityConfig->getHasMore());
+
+        $entityConfig->setHasMore(true);
+        $this->assertTrue($entityConfig->getHasMore());
+        $this->assertSame(['has_more' => true], $entityConfig->toArray());
+
+        $entityConfig->setHasMore(false);
+        $this->assertFalse($entityConfig->getHasMore());
+        $this->assertSame([], $entityConfig->toArray());
     }
 
     public function testHints()

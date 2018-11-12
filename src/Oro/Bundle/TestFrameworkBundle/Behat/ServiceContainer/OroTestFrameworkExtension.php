@@ -14,10 +14,11 @@ use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Behat\Testwork\ServiceContainer\ServiceProcessor;
 use Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ArtifactsHandlerInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
-use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroWebDriverCurlService;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
@@ -29,7 +30,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
-use WebDriver\ServiceFactory;
 
 /**
  * Basic behat extension that contains logic which prepare environment while testing, load configuration, etc.
@@ -80,7 +80,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processArtifactHandlers($container);
         $this->processHealthCheckers($container);
         $this->replaceSessionListener($container);
-        $this->setWebDriverCurl($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -100,17 +99,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         /** @var MinkExtension $minkExtension */
         $minkExtension = $extensionManager->getExtension('mink');
         $minkExtension->registerDriverFactory(new OroSelenium2Factory());
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    public function setWebDriverCurl(ContainerBuilder $container)
-    {
-        $curl = new OroWebDriverCurlService();
-        $curl->setLogDir($container->getParameter('kernel.log_dir'));
-
-        ServiceFactory::getInstance()->setService('service.curl', $curl);
     }
 
     /**
@@ -366,6 +354,16 @@ class OroTestFrameworkExtension implements TestworkExtension
                 $requiredOptionalListeners,
                 $processedConfiguration['optional_listeners']['required_for_fixtures'] ?? []
             );
+        }
+
+        $configLoader = new CumulativeConfigLoader(
+            'oro_behat_isolators',
+            new YamlCumulativeFileLoader('Tests/Behat/isolators.yml')
+        );
+
+        foreach (array_reverse($configLoader->load()) as $resource) {
+            $loader = new YamlFileLoader($container, new FileLocator(rtrim($resource->path, 'isolators.yml')));
+            $loader->load('isolators.yml');
         }
 
         $container->getDefinition('oro_element_factory')->replaceArgument(2, $elements);

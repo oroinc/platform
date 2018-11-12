@@ -9,18 +9,18 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationReader;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-class TranslationReaderTest extends \PHPUnit_Framework_TestCase
+class TranslationReaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContextRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextRegistry;
 
-    /** @var LanguageRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $languageRepository;
 
-    /** @var StepExecution|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var StepExecution|\PHPUnit\Framework\MockObject\MockObject */
     protected $stepExecution;
 
-    /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $context;
 
     /** @var TranslationReader */

@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Filter;
 
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * The default implementation of a factory to create filters.
+ */
 class SimpleFilterFactory implements FilterFactoryInterface
 {
     private const SUPPORTED_OPERATORS_OPTION = 'supported_operators';

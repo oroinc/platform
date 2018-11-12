@@ -187,7 +187,7 @@ abstract class AbstractImportExportTest extends WebTestCase
     }
 
     /**
-     * @return SessionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return SessionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createSessionInterfaceMock()
     {

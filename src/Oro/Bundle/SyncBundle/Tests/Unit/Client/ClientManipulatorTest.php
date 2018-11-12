@@ -16,7 +16,7 @@ use Ratchet\Wamp\Topic;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class ClientManipulatorTest extends \PHPUnit_Framework_TestCase
+class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
 {
     use LoggerAwareTraitTestTrait;
 
@@ -25,7 +25,7 @@ class ClientManipulatorTest extends \PHPUnit_Framework_TestCase
     private const CLIENT_STORAGE_TTL = 100;
 
     /**
-     * @var ClientManipulatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ClientManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $decoratedClientManipulator;
 
@@ -35,12 +35,12 @@ class ClientManipulatorTest extends \PHPUnit_Framework_TestCase
     private $clientStorage;
 
     /**
-     * @var DriverInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var DriverInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $storageDriver;
 
     /**
-     * @var UserProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var UserProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $userProvider;
 
@@ -205,7 +205,7 @@ class ClientManipulatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ConnectionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createConnection(): ConnectionInterface
     {

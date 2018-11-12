@@ -8,19 +8,17 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
-class EntityClassToEntityTypeTransformerTest extends \PHPUnit_Framework_TestCase
+class EntityClassToEntityTypeTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $valueNormalizer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
+    private $valueNormalizer;
 
     /** @var EntityClassToEntityTypeTransformer */
-    protected $transformer;
+    private $transformer;
 
     protected function setUp()
     {
-        $this->valueNormalizer = $this->getMockBuilder(ValueNormalizer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
         $this->transformer = new EntityClassToEntityTypeTransformer(
             $this->valueNormalizer
@@ -45,7 +43,7 @@ class EntityClassToEntityTypeTransformerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [null],
-            [''],
+            ['']
         ];
     }
 

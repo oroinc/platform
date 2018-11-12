@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 
-class ChainOwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
+class ChainOwnerTreeProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainOwnerTreeProvider */
     protected $provider;
@@ -123,7 +123,7 @@ class ChainOwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|OwnerTreeProviderInterface
      */
     protected function getProviderMock()
     {

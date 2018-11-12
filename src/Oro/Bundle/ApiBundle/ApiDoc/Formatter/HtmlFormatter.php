@@ -60,9 +60,6 @@ class HtmlFormatter extends AbstractFormatter
     /** @var bool */
     protected $defaultSectionsOpened;
 
-    /** @var bool */
-    protected $enableFormatParameter = true;
-
     /** @var string */
     protected $rootRoute;
 
@@ -193,14 +190,6 @@ class HtmlFormatter extends AbstractFormatter
     }
 
     /**
-     * @param bool $enableFormatParameter
-     */
-    public function setEnableFormatParameter($enableFormatParameter)
-    {
-        $this->enableFormatParameter = $enableFormatParameter;
-    }
-
-    /**
      * @param string $rootRoute
      */
     public function setRootRoute($rootRoute)
@@ -272,7 +261,6 @@ class HtmlFormatter extends AbstractFormatter
             'js'                    => $this->getJs(),
             'motdTemplate'          => $this->motdTemplate,
             'defaultSectionsOpened' => $this->defaultSectionsOpened,
-            'enableFormatParameter' => $this->enableFormatParameter,
             'rootRoute'             => $this->rootRoute ?? RestDocUrlGenerator::ROUTE,
             'views'                 => $this->getViews(),
             'defaultView'           => $this->getDefaultView(),

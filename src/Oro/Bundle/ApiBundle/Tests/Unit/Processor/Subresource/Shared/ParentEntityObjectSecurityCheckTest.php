@@ -9,13 +9,13 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $authorizationChecker;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
+    private $authorizationChecker;
 
     /** @var ParentEntityObjectSecurityCheck */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -36,9 +36,9 @@ class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorTestCas
     {
         $parentEntity = new Product();
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', $this->identicalTo($parentEntity))
+            ->with('VIEW', self::identicalTo($parentEntity))
             ->willReturn(true);
 
         $this->context->setParentClassName(get_class($parentEntity));
@@ -53,9 +53,9 @@ class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorTestCas
     {
         $parentEntity = new Product();
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', $this->identicalTo($parentEntity))
+            ->with('VIEW', self::identicalTo($parentEntity))
             ->willReturn(false);
 
         $this->context->setParentClassName(get_class($parentEntity));

@@ -1,0 +1,719 @@
+/* @theme: admin.oro; */
+
+.filter-container {
+    position: $filter-container-position;
+}
+
+.filter-box {
+    .filter-criteria {
+        position: $filter-box-criteria-position;
+        font-size: $filter-box-criteria-font-size;
+        background-color: $filter-box-criteria-background-color;
+        padding: $filter-box-criteria-inner-offset;
+        display: $filter-box-criteria-display;
+        visibility: $filter-box-criteria-visibility;
+        z-index: $filter-box-criteria-z-index;
+        margin-top: $filter-box-criteria-offset-top;
+        margin-#{$start}: $filter-box-criteria-offset-left;
+        top: $filter-box-criteria-top;
+
+        .btn-group {
+            .btn:not(.filter-update) {
+                border-radius: $filter-box-criteria-btn-group-border-radius;
+                background-color: $filter-box-criteria-btn-group-background-color;
+                border: $filter-box-criteria-btn-group-border;
+                font-weight: $filter-box-criteria-btn-group-font-weight;
+            }
+
+            + .value-field-frame {
+                margin-left: $filter-box-criteria-btn-group-value-field-frame-offset-left;
+            }
+
+            [class^="fa-"] {
+                padding-top: $filter-box-criteria-btn-group-icon-inner-offset-top;
+                vertical-align: $filter-box-criteria-btn-group-icon-vertical-align;
+            }
+        }
+
+        .filter-value {
+            input {
+                margin-bottom: $filter-box-criteria-value-offset-bottom;
+            }
+        }
+
+        .choice-filter,
+        .value-field-frame,
+        .filter-value,
+        .product-price-filter {
+            display: $choice-filter-display;
+            align-items: $choice-filter-align-items;
+        }
+
+        .product-price-unit-filter-separator,
+        .filter-separator {
+            margin: $filter-separator-offset;
+        }
+
+        .input-append,
+        .input-prepend {
+            input,
+            select,
+            .uneditable-input {
+                margin-bottom: $input-append-offset-bottom;
+            }
+
+            > .btn-group {
+                > .dropdown-menu {
+                    min-width: $input-append-btn-group-min-width;
+
+                    a {
+                        padding: $input-append-btn-group-a-inner-offset;
+                    }
+                }
+            }
+        }
+
+        .choice-filter {
+            .btn-group.btn-block {
+                width: $choice-filter-btn-width;
+                float: $choice-filter-btn-float;
+            }
+
+            .value-field-frame {
+                position: $choice-filter-value-field-frame-position;
+                vertical-align: $choice-filter-value-field-frame-vertical-align;
+                width: $choice-filter-value-field-frame-width;
+
+                input[type='text'] {
+                    max-width: $choice-filter-input-max-width;
+                    width: $choice-filter-input-width;
+                    margin-bottom: $choice-filter-input-offset-bottom;
+                }
+
+                .dictionary-filter {
+                    width: $choice-filter-dictionary-width;
+                }
+            }
+        }
+
+        .nav-tabs-oro {
+            &:hover,
+            &:focus {
+                background: $filter-criteria-nav-tabs-oro-hover-background;
+                color: $filter-criteria-nav-tabs-oro-hover-color;
+            }
+
+            .active {
+                &:hover,
+                &:focus {
+                    background: $filter-criteria-nav-tabs-oro-active-background;
+                    color: $filter-criteria-nav-tabs-oro-active-color;
+                }
+            }
+        }
+
+        .tab-content a:not(.ui-slider-handle) {
+            &:hover,
+            &:focus {
+                background: $filter-criteria-tab-content-background;
+            }
+        }
+
+        .btn-group {
+            & + .btn-group {
+                margin-left: $filter-box-criteria-btn-group-offset-left;
+            }
+        }
+
+        .oro-action {
+            width: $filter-box-oro-action-width;
+            margin: $filter-box-oro-action-offset;
+
+            .btn-group {
+                float: $filter-box-oro-action-btn-group-float;
+            }
+
+            .btn {
+                outline: $filter-box-oro-action-btn-outline;
+                position: $filter-box-oro-action-btn-position;
+            }
+        }
+
+        &:focus {
+            outline: $filter-box-criteria-focus-outline;
+        }
+    }
+
+    .selector {
+        width: $filter-box-selector-width;
+
+    }
+
+    .filter-update {
+        margin-left: $filter-update-offset-left;
+    }
+
+    .filter-select-oro {
+        line-height: $filter-select-oro-line-height;
+        width: $filter-select-oro-width; /* need for flexible width at filter grid */
+
+        &-wrapper {
+            margin-bottom: $filter-select-oro-wrapper-offset-bottom;
+
+            .selector {
+                width: $filter-select-oro-wrapper-width;
+
+                span {
+                    width: $filter-select-oro-wrapper-span-width;
+                }
+            }
+        }
+    }
+
+    .filter-item {
+        margin-right: $filter-box-item-offset-right;
+        margin-bottom: $filter-box-item-offset-bottom;
+        position: $filter-box-item-position;
+        display: $filter-box-item-display;
+        vertical-align: $filter-box-item-vertical-align;
+        white-space: $filter-box-item-white-space;
+
+        .loader-frame {
+            padding-left: $filter-box-item-loader-frame-inner-offset-left;
+        }
+
+        .filter-update-empty {
+            margin-left: $filter-update-empty-offset-left;
+        }
+
+        .reset-filter {
+            margin-left: $filter-box-reset-offset-left;
+            display: $filter-box-reset-display;
+            width: $filter-box-reset-width;
+            line-height: $filter-box-reset-line-height;
+            vertical-align: $filter-box-reset-vertical-align;
+
+            [class^="fa-"],
+            [class*=" fa-"] {
+                vertical-align: $filter-box-reset-icon-vertical-align;
+                margin-top: $filter-box-reset-icon-offset-top;
+            }
+
+            &:hover {
+                [class^="fa-"]:before {
+                    color: $filter-box-reset-icon-hover-color;
+                }
+            }
+        }
+
+        .filter-default-value {
+            .reset-filter {
+                display: $filter-default-value-display;
+            }
+        }
+
+        .disable-filter {
+            background-color: $filter-box-disable-background-color;
+            border-bottom-right-radius: $filter-box-disable-border-bottom-right-radius;
+            border-color: $filter-box-disable-border-color;
+            border-style: $filter-box-disable-border-style;
+            border-top-right-radius: $filter-box-disable-border-top-right-radius;
+            border-width: $filter-box-disable-border-width;
+            display: $filter-box-disable-display;
+            font-size: $filter-box-disable-font-size;
+            height: $filter-box-disable-height;
+            line-height: $filter-box-disable-line-height;
+            padding: $filter-box-disable-padding;
+            vertical-align: $filter-box-disable-vertical-align;
+        }
+
+        &.choice-tree-filter {
+            margin-right: $choice-tree-filter-offset-right;
+            margin-bottom: $choice-tree-filter-offset-bottom;
+            max-width: $choice-tree-filter-max-width;
+            min-width: $choice-tree-filter-min-width;
+
+            .select2-container {
+                margin-bottom: $choice-tree-filter-select2-container-offset-bottom;
+            }
+
+            .choice-tree-filter-search {
+                width: $choice-tree-filter-choice-tree-filter-search-width;
+            }
+
+            .buttons {
+                margin-bottom: $choice-tree-filter-buttons-offset-bottom;
+
+                span {
+                    cursor: $choice-tree-filter-buttons-span-cursor;
+                    color: $choice-tree-filter-buttons-span-color;
+                }
+
+                span.active {
+                    color: $choice-tree-filter-buttons-span-active-color;
+                    cursor: $choice-tree-filter-buttons-span-active-cursor;
+                }
+            }
+
+            .list {
+                max-height: $choice-tree-filter-list-max-height;
+                overflow: $choice-tree-filter-list-overflow;
+                margin-bottom: $choice-tree-filter-list-offset-bottom;
+
+                ul {
+                    list-style-type: $choice-tree-filter-list-list-style-type;
+
+                    &:first-child {
+                        margin-left: $choice-tree-filter-list-first-offset-left;
+                    }
+
+                    input {
+                        margin-right: $choice-tree-filter-list-input-offset-right;
+                        margin-top: $choice-tree-filter-list-input-offset-top;
+                        margin-left: $choice-tree-filter-list-input-offset-left;
+                    }
+
+                    label {
+                        padding-left: $choice-tree-filter-list-label-inner-offset-left;
+
+                        &.search-result {
+                            color: $choice-tree-filter-list-search-color;
+                            font-weight: $choice-tree-filter-list-search-font-weight;
+                        }
+                    }
+                }
+            }
+
+            input[name="value"] {
+                display: $choice-tree-filter-value-field-display;
+            }
+        }
+
+        .filter-criteria-selector,
+        .dropdown-toggle.btn {
+            font-weight: $filter-criteria-selector-font-weight;
+        }
+
+        .filter-criteria-selector {
+            padding-right: 30px;
+
+            &:after {
+                position: absolute;
+                right: 14px;
+                top: 50%;
+                margin-top: -2px;
+            }
+        }
+
+        &.open-filter {
+            &:before {
+                content: $open-filter-before-content;
+                background: $open-filter-before-background;
+                width: $open-filter-before-width;
+                height: $open-filter-before-height;
+                position: $open-filter-before-position;
+                left: $open-filter-before-left;
+                bottom: $open-filter-before-bottom;
+                transform: $open-filter-before-transform;
+                box-shadow: $open-filter-before-box-shadow;
+            }
+
+            &:after {
+                border-bottom: $open-filter-after-border-bottom;
+                border-left: $open-filter-after-border-left;
+                border-right: $open-filter-after-border-right;
+                content: $open-filter-after-content;
+                left: $open-filter-after-left;
+                position: $open-filter-after-position;
+                bottom: $open-filter-after-bottom;
+                z-index: $open-filter-after-z-index+ 3;
+            }
+
+            .filter-criteria-selector {
+                background-color: $open-filter-filter-criteria-selector-background-color;
+                box-shadow: $open-filter-filter-criteria-selector-box-shadow;
+            }
+        }
+
+        .divider {
+            background: $filter-item-divider-background;
+            line-height: $filter-item-divider-line-height;
+            font-size: $filter-item-divider-font-size;
+            padding: $filter-item-divider-inner-offset;
+            margin: $filter-item-divider-offset;
+            position: $filter-item-divider-position;
+            top: $filter-item-divider-top;
+        }
+
+        .dropdown-toggle {
+            vertical-align: $filter-item-dropdown-toggle-vertical-align;
+            line-height: $filter-item-dropdown-toggle-line-height;
+            position: $filter-item-dropdown-toggle-position;
+        }
+
+        & > .btn {
+            height: $filter-item-btn-height;
+            font-size: $filter-item-btn-font-size;
+            line-height: $filter-item-btn-line-height;
+            text-transform: $filter-item-btn-text-transform;
+            border: $filter-item-btn-border;
+            background-color: $filter-item-btn-background-color;
+
+            &:hover {
+                background-color: $filter-item-btn-hover-background-color;
+            }
+        }
+    }
+
+    .filter-list {
+        float: $filter-item-filter-list-float;
+        margin: $filter-item-filter-list-offset;
+        position: $filter-item-filter-list-position;
+    }
+
+    .fa-close:before {
+        color: $filter-item-fa-close-color;
+        font-size: $filter-item-fa-close-font-size;
+    }
+
+    .filter-select,
+    .filter-criteria-selector {
+        height: $filter-select-height;
+
+        .disable-filter {
+            margin-left: $filter-select-disable-offset-left;
+        }
+
+        &:not(.filter-default-value) {
+            background-color: $extra-300;
+        }
+    }
+}
+
+.ui-multiselect-checkboxes {
+    overflow-x: $ui-multiselect-checkboxes-overflow-x;
+}
+
+.filter-select {
+    .select-filter-widget {
+        &,
+        &.ui-multiselect {
+            font-weight: $filter-multiselect-font-weight;
+            color: $filter-multiselect-color;
+            padding: $filter-multiselect-inner-offset;
+            background: $filter-multiselect-background;
+            border: $filter-multiselect-border;
+            margin-left: $filter-multiselect-offset-left;
+        }
+    }
+
+    &.filter-default-value .multiselect-filter-widget {
+        display: $filter-multiselect-filter-widget-display;
+    }
+}
+
+.filters-state {
+    color: $filters-state-color;
+    font-size: $filters-state-font-size;
+    padding: $filters-state-inner-offset;
+    line-height: $filters-state-line-height;
+    min-width: $filters-state-min-width;
+    white-space: $filters-state-white-space;
+    overflow: $filters-state-overflow;
+    text-overflow: $filters-state-text-overflow;
+    cursor: $filters-state-cursor;
+
+    .fa-filter {
+        margin-right: $filters-state-icon-offset-right;
+        vertical-align: $filters-state-icon-vertical-align;
+
+        &:before {
+            color: $filters-state-icon-color;
+            font-size: $filters-state-icon-font-size;
+        }
+    }
+
+    .page-title-center & {
+        text-align: $filters-state-page-title-center-text-align;
+        padding-left: $filters-state-page-title-center-inner-offset-left;
+        padding-right: $filters-state-page-title-center-inner-offset-right;
+        height: $filters-state-page-title-center-height;
+    }
+
+    .under-left-block & {
+        padding-left: $filters-state-under-left-block-inner-offset-left;
+        text-align: $filters-state-under-left-block-text-align;
+    }
+}
+
+.filters-state-popover {
+    max-width: $filters-state-popover-max-width;
+}
+
+.filter-select .select-filter-widget .ui-icon {
+    margin-top: $filter-select-offset-top;
+}
+
+.ui-multiselect-menu {
+    &.select-filter-widget {
+        padding: $select-filter-widget-inner-offset;
+
+        ul {
+            max-height: $select-filter-widget-max-height;
+        }
+
+        .ui-multiselect-close {
+            display: $select-filter-widget-close-display;
+        }
+
+        .ui-multiselect-checkboxes {
+            label {
+                white-space: $select-filter-widget-checkboxes-label-white-space;
+                margin: $select-filter-widget-checkboxes-label-offset;
+                padding: $select-filter-widget-checkboxes-label-inner-offset;
+
+                float: $select-filter-widget-checkboxes-label-float;
+            }
+
+            li {
+                font-size: $select-filter-widget-li-font-size;
+                padding: $select-filter-widget-li-inner-offset;
+
+                &:last-child {
+                    padding-bottom: $select-filter-widget-checkboxes-list-offset-vertical;
+                }
+
+                &:after {
+                    content: $select-filter-widget-li-after-content;
+                    display: $select-filter-widget-li-after-display;
+                    clear: $select-filter-widget-li-after-clear;
+                }
+
+                &.hidden-item {
+                    height: $select-filter-widget-li-hidden-item-height;
+                }
+            }
+
+            input[type="checkbox"] {
+                margin: $select-filter-widget-checkboxes-offset;
+            }
+
+            &.fixed-li {
+                li > label {
+                    float: $select-filter-widget-label-float;
+
+                    &.ui-state-hover {
+                        background-image: $select-filter-widget-label-state-hover-background-image;
+                        background-color: $select-filter-widget-label-state-hover-background-color;
+                    }
+
+                    &.ui-state-active {
+                        background-image: $select-filter-widget-label-state-active-background-image;
+                        background-color: $select-filter-widget-label-state-active-background-color;
+                    }
+                }
+            }
+        }
+
+        input[type="search"] {
+            margin: $select-filter-widget-search-offset;
+            width: $select-filter-widget-search-width;
+        }
+
+        .ui-multiselect-header {
+            min-height: $select-filter-widget-checkboxes-list-offset-vertical;
+            padding: $select-filter-widget-header-inner-offset;
+            margin: $select-filter-widget-header-offset;
+
+            & > div {
+                padding: $select-filter-widget-header-child-inner-offset;
+            }
+
+            .ui-helper-reset {
+                display: $select-filter-widget-header-reset-display;
+            }
+        }
+
+        .ui-multiselect-footer {
+            display: $select-filter-widget-footer-display;
+        }
+
+        &:hover {
+            a {
+                color: $link-color-hover;
+            }
+        }
+    }
+}
+
+.filter-items {
+    & > :empty {
+        display: $filter-items-empty-display;
+    }
+
+    &-hint {
+        padding-right: $filter-items-hint-inner-offset-right;
+        position: $filter-items-hint-position;
+
+        .reset-filter-button {
+            position: $reset-filter-button-position;
+            top: $reset-filter-button-top;
+            right: $reset-filter-button-right;
+        }
+    }
+}
+
+.ui-multiselect {
+    &.filter-list {
+        &.ui-state-hover {
+            color: $ui-multiselect-filter-list-color;
+            text-decoration: $ui-multiselect-filter-list-text-decoration;
+        }
+    }
+
+    &.select-filter-widget {
+        .ui-state-hover {
+            text-decoration: $select-filter-widget-text-decoration;
+        }
+    }
+
+    &-single {
+        .ui-multiselect-checkboxes {
+            label {
+                line-height: $ui-multiselect-checkboxes-label-line-height;
+            }
+        }
+    }
+
+    &.select-filter-widget {
+        // Rewrite inline styles for filter manager
+        width: $select-filter-widget-width !important;
+    }
+}
+
+.date-visual-element {
+    width: $date-visual-element-width;
+}
+
+.filter-item-simple {
+    .choice-filter > .dropdown,
+    .filter-select {
+        display: $filter-item-simple-display;
+    }
+
+    .caret {
+        display: $filter-item-simple-display;
+    }
+}
+
+.active-filter {
+    .dropdown,
+    .dropup {
+        &:after {
+            display: $active-filter-display;
+        }
+    }
+
+    .field-select {
+        display: $active-filter-display;
+    }
+}
+
+.ui-multiselect.multiselect-filter-widget span,
+.filter-item .filter-criteria-hint {
+    max-width: $filter-criteria-hint-max-width;
+    display: $filter-criteria-hint-display;
+    text-overflow: $filter-criteria-hint-text-overflow;
+    white-space: $filter-criteria-hint-white-space;
+    overflow: $filter-criteria-hint-overflow;
+    vertical-align: $filter-criteria-hint-vertical-align;
+}
+
+.condition-item {
+    .select2-container.dictionary-filter {
+        display: $select2-container-dictionary-filter-display;
+        max-width: $select2-container-dictionary-filter-max-width;
+    }
+}
+
+.select-field-date-popover {
+    top: $select-field-date-popover-top;
+    right: $select-field-date-popover-right;
+    position: $select-field-date-popover-position;
+
+    .popover {
+        min-width: $select-field-date-popover-min-width;
+    }
+}
+
+.field-condition-date-popover {
+    display: $field-condition-date-popover-display;
+
+    i {
+        cursor: $field-condition-date-popover-cursor;
+        color: $field-condition-date-popover-trigger-color;
+    }
+}
+
+.open-filter {
+    &.oro-drop {
+        .filter-criteria.dropdown-menu {
+            min-width: 170px;
+        }
+    }
+}
+
+.filter-date-range {
+    .filter-separator {
+        display: $filter-date-range-filter-separator-display;
+    }
+
+    .fields-row {
+        display: flex;
+
+        .datefilter {
+            flex-grow: 1;
+        }
+    }
+}
+
+.filter-start-date,
+.filter-end-date {
+    .datetime-visual-element {
+        width: $filter-date-range-datetime-visual-element-width;
+        margin-bottom: $filter-date-range-datetime-visual-element-offset-bottom;
+    }
+
+    .timepicker-input {
+        width: $filter-date-range-timepicker-input-width;
+        margin: $filter-date-range-timepicker-input-offset;
+    }
+}
+
+.number-range-filter {
+    vertical-align: $number-range-filter-vertical-align;
+
+    .filter-start {
+        display: $number-range-filter-field-display;
+
+        input[type='text'] {
+            width: $number-range-filter-field-width;
+        }
+    }
+
+    .filter-end {
+        display: $number-range-filter-field-display;
+
+        input[type='text'] {
+            width: $number-range-filter-field-width;
+        }
+    }
+
+    .filter-separator {
+        position: $number-range-filter-filter-separator-position;
+    }
+}
+
+.datefilter {
+    display: inline-block;
+}

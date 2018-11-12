@@ -6,7 +6,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\Routing\Route;
 
 /**
- * Adds an additional view to ApiDoc annotation if the accotation contains specific view.
+ * Adds an additional view to ApiDoc annotation if the annotation contains specific view.
  */
 class AddApiDocViewAnnotationHandler implements ApiDocAnnotationHandlerInterface
 {

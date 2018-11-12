@@ -3,25 +3,25 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Twig\Parser;
 
 use Oro\Bundle\UIBundle\Twig\Parser\PlaceholderTokenParser;
 
-class PlaceholderTokenParserTest extends \PHPUnit_Framework_TestCase
+class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $parser;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $expressionParser;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $stream;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $compiler;
 

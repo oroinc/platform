@@ -4,7 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\ParentBusinessUnit;
 
-class ParentBusinessUnitTest extends \PHPUnit_Framework_TestCase
+class ParentBusinessUnitTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ParentBusinessUnit */
     protected $constraint;

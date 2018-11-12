@@ -9,25 +9,28 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\EntityWithoutGettersAndSette
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
+class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
+    private $dispatcher;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|PropertyAccessorInterface */
+    private $propertyAccessor;
+
     /** @var AppendRelationshipMapper */
-    protected $mapper;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $dispatcher;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $propertyAccessor;
+    private $mapper;
 
     protected function setUp()
     {
-        $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->propertyAccessor = $this->createMock('Symfony\Component\PropertyAccess\PropertyAccessorInterface');
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
         $this->mapper = new AppendRelationshipMapper($this->propertyAccessor);
     }
 
@@ -36,22 +39,22 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
      * @param bool                $synchronized
      * @param bool                $submitted
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject|Form
      */
-    protected function getForm(FormConfigInterface $config, $synchronized = true, $submitted = true)
+    private function getForm(FormConfigInterface $config, $synchronized = true, $submitted = true)
     {
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+        $form = $this->getMockBuilder(Form::class)
             ->setConstructorArgs([$config])
             ->setMethods(['isSynchronized', 'isSubmitted'])
             ->getMock();
 
-        $form->expects($this->any())
+        $form->expects(self::any())
             ->method('isSynchronized')
-            ->will($this->returnValue($synchronized));
+            ->willReturn($synchronized);
 
-        $form->expects($this->any())
+        $form->expects(self::any())
             ->method('isSubmitted')
-            ->will($this->returnValue($submitted));
+            ->willReturn($submitted);
 
         return $form;
     }
@@ -62,12 +65,12 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $engine = new \stdClass();
         $propertyPath = new PropertyPath('engine');
 
-        $this->propertyAccessor->expects($this->once())
+        $this->propertyAccessor->expects(self::once())
             ->method('getValue')
             ->with($car, $propertyPath)
-            ->will($this->returnValue($engine));
+            ->willReturn($engine);
 
-        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config = new FormConfigBuilder('name', \stdClass::class, $this->dispatcher);
         $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $form = $this->getForm($config);
@@ -76,7 +79,7 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
 
         // Can't use isIdentical() above because mocks always clone their
         // arguments which can't be disabled in PHPUnit 3.6
-        $this->assertSame($engine, $form->getData());
+        self::assertSame($engine, $form->getData());
     }
 
     public function testMapDataToFormsPassesObjectCloneIfNotByReference()
@@ -85,35 +88,35 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $engine = new \stdClass();
         $propertyPath = new PropertyPath('engine');
 
-        $this->propertyAccessor->expects($this->once())
+        $this->propertyAccessor->expects(self::once())
             ->method('getValue')
             ->with($car, $propertyPath)
-            ->will($this->returnValue($engine));
+            ->willReturn($engine);
 
-        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config = new FormConfigBuilder('name', \stdClass::class, $this->dispatcher);
         $config->setByReference(false);
         $config->setPropertyPath($propertyPath);
         $form = $this->getForm($config);
 
         $this->mapper->mapDataToForms($car, [$form]);
 
-        $this->assertNotSame($engine, $form->getData());
-        $this->assertEquals($engine, $form->getData());
+        self::assertNotSame($engine, $form->getData());
+        self::assertEquals($engine, $form->getData());
     }
 
     public function testMapDataToFormsIgnoresEmptyPropertyPath()
     {
         $car = new \stdClass();
 
-        $config = new FormConfigBuilder(null, '\stdClass', $this->dispatcher);
+        $config = new FormConfigBuilder(null, \stdClass::class, $this->dispatcher);
         $config->setByReference(true);
         $form = $this->getForm($config);
 
-        $this->assertNull($form->getPropertyPath());
+        self::assertNull($form->getPropertyPath());
 
         $this->mapper->mapDataToForms($car, [$form]);
 
-        $this->assertNull($form->getData());
+        self::assertNull($form->getData());
     }
 
     public function testMapDataToFormsIgnoresUnmapped()
@@ -121,10 +124,10 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $car = new \stdClass();
         $propertyPath = new PropertyPath('engine');
 
-        $this->propertyAccessor->expects($this->never())
+        $this->propertyAccessor->expects(self::never())
             ->method('getValue');
 
-        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config = new FormConfigBuilder('name', \stdClass::class, $this->dispatcher);
         $config->setByReference(true);
         $config->setMapped(false);
         $config->setPropertyPath($propertyPath);
@@ -132,7 +135,7 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->mapper->mapDataToForms($car, [$form]);
 
-        $this->assertNull($form->getData());
+        self::assertNull($form->getData());
     }
 
     public function testMapDataToFormsSetsDefaultDataIfPassedDataIsNull()
@@ -140,20 +143,20 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $default = new \stdClass();
         $propertyPath = new PropertyPath('engine');
 
-        $this->propertyAccessor->expects($this->never())
+        $this->propertyAccessor->expects(self::never())
             ->method('getValue');
 
-        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config = new FormConfigBuilder('name', \stdClass::class, $this->dispatcher);
         $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $config->setData($default);
 
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+        $form = $this->getMockBuilder(Form::class)
             ->setConstructorArgs([$config])
             ->setMethods(['setData'])
             ->getMock();
 
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('setData')
             ->with($default);
 
@@ -166,19 +169,19 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $doors = new ArrayCollection([new \stdClass()]);
         $propertyPath = new PropertyPath('doors');
 
-        $this->propertyAccessor->expects($this->once())
+        $this->propertyAccessor->expects(self::once())
             ->method('getValue')
             ->with($car, $propertyPath)
-            ->will($this->returnValue($doors));
+            ->willReturn($doors);
 
-        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config = new FormConfigBuilder('name', \stdClass::class, $this->dispatcher);
         $config->setByReference(false);
         $config->setPropertyPath($propertyPath);
         $form = $this->getForm($config);
 
         $this->mapper->mapDataToForms($car, [$form]);
 
-        $this->assertNull($form->getData());
+        self::assertNull($form->getData());
     }
 
     public function testMapFormsToDataWritesBackIfNotByReference()
@@ -187,11 +190,11 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $engine = new \stdClass();
         $propertyPath = new PropertyPath('engine');
 
-        $this->propertyAccessor->expects($this->once())
+        $this->propertyAccessor->expects(self::once())
             ->method('setValue')
             ->with($car, $propertyPath, $engine);
 
-        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config = new FormConfigBuilder('name', \stdClass::class, $this->dispatcher);
         $config->setByReference(false);
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
@@ -206,11 +209,11 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $engine = new \stdClass();
         $propertyPath = new PropertyPath('engine');
 
-        $this->propertyAccessor->expects($this->once())
+        $this->propertyAccessor->expects(self::once())
             ->method('setValue')
             ->with($car, $propertyPath, $engine);
 
-        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config = new FormConfigBuilder('name', \stdClass::class, $this->dispatcher);
         $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
@@ -226,15 +229,15 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $propertyPath = new PropertyPath('engine');
 
         // $car already contains the reference of $engine
-        $this->propertyAccessor->expects($this->once())
+        $this->propertyAccessor->expects(self::once())
             ->method('getValue')
             ->with($car, $propertyPath)
-            ->will($this->returnValue($engine));
+            ->willReturn($engine);
 
-        $this->propertyAccessor->expects($this->never())
+        $this->propertyAccessor->expects(self::never())
             ->method('setValue');
 
-        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config = new FormConfigBuilder('name', \stdClass::class, $this->dispatcher);
         $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
@@ -249,10 +252,10 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $engine = new \stdClass();
         $propertyPath = new PropertyPath('engine');
 
-        $this->propertyAccessor->expects($this->never())
+        $this->propertyAccessor->expects(self::never())
             ->method('setValue');
 
-        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config = new FormConfigBuilder('name', \stdClass::class, $this->dispatcher);
         $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
@@ -268,10 +271,10 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $engine = new \stdClass();
         $propertyPath = new PropertyPath('engine');
 
-        $this->propertyAccessor->expects($this->never())
+        $this->propertyAccessor->expects(self::never())
             ->method('setValue');
 
-        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config = new FormConfigBuilder('name', \stdClass::class, $this->dispatcher);
         $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
@@ -285,10 +288,10 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $car = new \stdClass();
         $propertyPath = new PropertyPath('engine');
 
-        $this->propertyAccessor->expects($this->never())
+        $this->propertyAccessor->expects(self::never())
             ->method('setValue');
 
-        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config = new FormConfigBuilder('name', \stdClass::class, $this->dispatcher);
         $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $config->setData(null);
@@ -303,10 +306,10 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $engine = new \stdClass();
         $propertyPath = new PropertyPath('engine');
 
-        $this->propertyAccessor->expects($this->never())
+        $this->propertyAccessor->expects(self::never())
             ->method('setValue');
 
-        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config = new FormConfigBuilder('name', \stdClass::class, $this->dispatcher);
         $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
@@ -321,10 +324,10 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $engine = new \stdClass();
         $propertyPath = new PropertyPath('engine');
 
-        $this->propertyAccessor->expects($this->never())
+        $this->propertyAccessor->expects(self::never())
             ->method('setValue');
 
-        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config = new FormConfigBuilder('name', \stdClass::class, $this->dispatcher);
         $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
@@ -347,7 +350,7 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $user->addGroup($group2);
         $propertyPath = new PropertyPath('groups');
 
-        $this->propertyAccessor->expects($this->once())
+        $this->propertyAccessor->expects(self::once())
             ->method('getValue')
             ->with($user, $propertyPath)
             ->willReturn($user->getGroups());
@@ -364,7 +367,7 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $expected->add($group1);
         $expected->add($group2);
         $expected->add($group3);
-        $this->assertEquals($expected, $user->getGroups());
+        self::assertEquals($expected, $user->getGroups());
     }
 
     public function testMapFormsToDataElementsShouldBeAddedToCollectionWhenAdderAndRemoverDoNotExist()
@@ -380,7 +383,7 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $user->groups->add($group2);
         $propertyPath = new PropertyPath('groups');
 
-        $this->propertyAccessor->expects($this->exactly(2))
+        $this->propertyAccessor->expects(self::exactly(2))
             ->method('getValue')
             ->with($user, $propertyPath)
             ->willReturn($user->groups);
@@ -397,7 +400,7 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $expected->add($group1);
         $expected->add($group2);
         $expected->add($group3);
-        $this->assertEquals($expected, $user->groups);
+        self::assertEquals($expected, $user->groups);
     }
 
     public function testMapFormsToDataCollectionShouldBeReplacedWhenItDoesNotBelongsRootDataObject()
@@ -417,11 +420,11 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
 
         $groupsFormData = [$group2, $group3];
 
-        $this->propertyAccessor->expects($this->once())
+        $this->propertyAccessor->expects(self::once())
             ->method('getValue')
             ->with($product, $propertyPath)
             ->willReturn($user->getGroups());
-        $this->propertyAccessor->expects($this->once())
+        $this->propertyAccessor->expects(self::once())
             ->method('setValue')
             ->with($product, $propertyPath, $groupsFormData);
 
@@ -450,7 +453,7 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $user->addGroup($group2);
         $propertyPath = new PropertyPath('targets');
 
-        $this->propertyAccessor->expects($this->any())
+        $this->propertyAccessor->expects(self::any())
             ->method('getValue')
             ->with($user, $propertyPath)
             ->willReturn($user->getTargets());
@@ -470,10 +473,10 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $expectedGroups->add($group1);
         $expectedGroups->add($group2);
         $expectedGroups->add($group3);
-        $this->assertEquals($expectedGroups, $user->getGroups());
+        self::assertEquals($expectedGroups, $user->getGroups());
 
         $expectedProducts = new ArrayCollection();
         $expectedProducts->add($product);
-        $this->assertEquals($expectedProducts, $user->getProducts());
+        self::assertEquals($expectedProducts, $user->getProducts());
     }
 }

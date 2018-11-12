@@ -28,3 +28,4 @@ Feature: Check the length of the string after using the "Suggest password" optio
     And I should not see "The password must be at least 8 characters long"
     And I click "Save"
     And I should see "Reset password email has been sent to user" flash message
+    And Email should contains the following "Your password was successfully reset." text

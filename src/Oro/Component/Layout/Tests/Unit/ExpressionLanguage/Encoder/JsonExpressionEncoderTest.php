@@ -8,7 +8,7 @@ use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
-class JsonExpressionEncoderTest extends \PHPUnit_Framework_TestCase
+class JsonExpressionEncoderTest extends \PHPUnit\Framework\TestCase
 {
     public function testEncodeExpr()
     {

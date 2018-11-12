@@ -5,9 +5,9 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\MassActionProviderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class MassActionProviderPassTest extends \PHPUnit_Framework_TestCase
+class MassActionProviderPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder */
     protected $container;
 
     /** @var MassActionProviderPass */

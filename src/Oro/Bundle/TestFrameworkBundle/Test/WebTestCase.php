@@ -72,20 +72,12 @@ abstract class WebTestCase extends BaseWebTestCase
     private static $clientInstance;
 
     /**
-     * @var Client
-     */
-    private static $soapClientInstance;
-
-    /**
      * @var array
      */
     protected static $loadedFixtures = [];
 
     /** @var Client */
     protected $client;
-
-    /** @var Client */
-    protected $soapClient;
 
     /** @var callable */
     private static $resetCallback;
@@ -94,6 +86,11 @@ abstract class WebTestCase extends BaseWebTestCase
      * @var ReferenceRepository
      */
     private static $referenceRepository;
+
+    /**
+     * @var array
+     */
+    private static $afterInitClientMethods = [];
 
     protected function setUp()
     {
@@ -117,7 +114,6 @@ abstract class WebTestCase extends BaseWebTestCase
             $self = $this;
             self::$resetCallback = function () use ($self) {
                 $self->client = null;
-                $self->soapClient = null;
             };
         }
     }
@@ -128,7 +124,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function afterTest()
     {
-        if (self::getDbIsolationPerTestSetting()) {
+        if (self::isDbIsolationPerTest()) {
             $this->rollbackTransaction();
             self::$loadedFixtures = [];
             self::$referenceRepository = null;
@@ -219,7 +215,35 @@ abstract class WebTestCase extends BaseWebTestCase
             self::$clientInstance->setServerParameters($server);
         }
 
+        $hookMethods = self::getAfterInitClientMethods(\get_class($this));
+        foreach ($hookMethods as $method) {
+            $this->$method();
+        }
+
         return $this->client = self::$clientInstance;
+    }
+
+    private static function getAfterInitClientMethods($className)
+    {
+        if (!isset(self::$afterInitClientMethods[$className])) {
+            self::$afterInitClientMethods[$className] = [];
+
+            try {
+                $class = new \ReflectionClass($className);
+
+                foreach ($class->getMethods() as $method) {
+                    if (\preg_match('/@afterInitClient\b/', $method->getDocComment()) > 0) {
+                        \array_unshift(
+                            self::$afterInitClientMethods[$className],
+                            $method->getName()
+                        );
+                    }
+                }
+            } catch (\ReflectionException $e) {
+            }
+        }
+
+        return self::$afterInitClientMethods[$className];
     }
 
     /** {@inheritdoc} */
@@ -279,10 +303,6 @@ abstract class WebTestCase extends BaseWebTestCase
     {
         if (self::$clientInstance) {
             self::$clientInstance = null;
-        }
-
-        if (self::$soapClientInstance) {
-            self::$soapClientInstance = null;
         }
 
         static::ensureKernelShutdown();
@@ -367,11 +387,12 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Get value of dbIsolationPerTest option from annotation of called class
+     * Indicates whether each test is executed in own database transaction.
+     * It is enabled by setting @dbIsolationPerTest annotation for the test class.
      *
      * @return bool
      */
-    private static function getDbIsolationPerTestSetting()
+    protected static function isDbIsolationPerTest()
     {
         $calledClass = get_called_class();
         if (!isset(self::$dbIsolationPerTest[$calledClass])) {
@@ -406,57 +427,8 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     private static function isClassHasAnnotation($className, $annotationName)
     {
-        $annotations = \PHPUnit_Util_Test::parseTestMethodAnnotations($className);
+        $annotations = \PHPUnit\Util\Test::parseTestMethodAnnotations($className);
         return isset($annotations['class'][$annotationName]);
-    }
-
-    /**
-     * @param string $wsdl
-     * @param array $options
-     * @param bool $force
-     *
-     * @return SoapClient
-     * @throws \Exception
-     */
-    protected function initSoapClient($wsdl = null, array $options = [], $force = false)
-    {
-        if (!self::$soapClientInstance || $force) {
-            if ($wsdl === null) {
-                $wsdl = "http://localhost/api/soap";
-            }
-
-            $options = array_merge(
-                [
-                    'location' => $wsdl,
-                    'soap_version' => SOAP_1_2
-                ],
-                $options
-            );
-
-            $client = $this->getClientInstance();
-            if ($options['soap_version'] == SOAP_1_2) {
-                $contentType = 'application/soap+xml';
-            } else {
-                $contentType = 'text/xml';
-            }
-            $client->request('GET', $wsdl, [], [], ['CONTENT_TYPE' => $contentType]);
-            $status = $client->getResponse()->getStatusCode();
-            $wsdl = $client->getResponse()->getContent();
-            if ($status >= 400) {
-                throw new \Exception($wsdl, $status);
-            }
-            //save to file
-            $file = tempnam(sys_get_temp_dir(), date("Ymd") . '_') . '.xml';
-            $fl = fopen($file, 'bw');
-            fwrite($fl, $wsdl);
-            fclose($fl);
-
-            self::$soapClientInstance = new SoapClient($file, $options, $client);
-
-            unlink($file);
-        }
-
-        return $this->soapClient = self::$soapClientInstance;
     }
 
     /**
@@ -672,7 +644,7 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param string $id
      *
-     * @return \PHPUnit_Framework_MockObject_MockBuilder
+     * @return \PHPUnit\Framework\MockObject\MockBuilder
      */
     protected function getServiceMockBuilder($id)
     {
@@ -971,8 +943,8 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function assertResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
     {
         try {
-            \PHPUnit_Framework_TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             if ($statusCode < 400
                 && $response->getStatusCode() >= 400
                 && $response->headers->contains('Content-Type', 'application/json')
@@ -985,14 +957,14 @@ abstract class WebTestCase extends BaseWebTestCase
                             ? json_encode($content['errors'])
                             : $content['errors'];
                     }
-                    $e = new \PHPUnit_Framework_ExpectationFailedException(
+                    $e = new \PHPUnit\Framework\ExpectationFailedException(
                         $e->getMessage()
                         . ' Error message: ' . $content['message']
                         . ($errors ? '. Errors: ' . $errors : ''),
                         $e->getComparisonFailure()
                     );
                 } else {
-                    $e = new \PHPUnit_Framework_ExpectationFailedException(
+                    $e = new \PHPUnit\Framework\ExpectationFailedException(
                         $e->getMessage() . ' Response content: ' . $response->getContent(),
                         $e->getComparisonFailure()
                     );
@@ -1015,7 +987,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $message .= sprintf('Failed asserting response has header "Content-Type: %s":', $contentType);
         $message .= PHP_EOL . $response->headers;
 
-        \PHPUnit_Framework_TestCase::assertTrue($response->headers->contains('Content-Type', $contentType), $message);
+        \PHPUnit\Framework\TestCase::assertTrue($response->headers->contains('Content-Type', $contentType), $message);
     }
 
     /**
@@ -1028,7 +1000,7 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
     {
         $actualIntersect = self::getRecursiveArrayIntersect($actual, $expected);
-        \PHPUnit_Framework_TestCase::assertEquals(
+        \PHPUnit\Framework\TestCase::assertEquals(
             $expected,
             $actualIntersect,
             $message
@@ -1099,18 +1071,6 @@ abstract class WebTestCase extends BaseWebTestCase
     protected function getClient()
     {
         return self::getClientInstance();
-    }
-
-    /**
-     * @return Client
-     */
-    protected function getSoapClient()
-    {
-        if (!self::$soapClientInstance) {
-            throw new \LogicException('Client is not initialized, call "initSoapClient" method first');
-        }
-
-        return self::$soapClientInstance;
     }
 
     /**

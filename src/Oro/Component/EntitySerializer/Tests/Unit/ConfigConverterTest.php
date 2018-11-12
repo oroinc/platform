@@ -4,7 +4,7 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Oro\Component\EntitySerializer\ConfigConverter;
 
-class ConfigConverterTest extends \PHPUnit_Framework_TestCase
+class ConfigConverterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider convertConfigProvider
@@ -38,6 +38,7 @@ class ConfigConverterTest extends \PHPUnit_Framework_TestCase
                     ],
                     'order_by'             => ['field1' => 'DESC'],
                     'max_results'          => 123,
+                    'has_more'             => true,
                     'post_serialize'       => [get_class($this), 'postSerialize1'],
                     'fields'               => [
                         'field1' => [
@@ -57,6 +58,7 @@ class ConfigConverterTest extends \PHPUnit_Framework_TestCase
                             ],
                             'order_by'             => ['field2' => 'DESC'],
                             'max_results'          => 456,
+                            'has_more'             => true,
                             'post_serialize'       => [get_class($this), 'postSerialize2'],
                         ]
                     ]
@@ -71,6 +73,7 @@ class ConfigConverterTest extends \PHPUnit_Framework_TestCase
                     ],
                     'order_by'             => ['field1' => 'DESC'],
                     'max_results'          => 123,
+                    'has_more'             => true,
                     'post_serialize'       => [get_class($this), 'postSerialize1'],
                     'fields'               => [
                         'field1' => [
@@ -90,6 +93,7 @@ class ConfigConverterTest extends \PHPUnit_Framework_TestCase
                             ],
                             'order_by'             => ['field2' => 'DESC'],
                             'max_results'          => 456,
+                            'has_more'             => true,
                             'post_serialize'       => [get_class($this), 'postSerialize2'],
                         ]
                     ]
@@ -154,6 +158,21 @@ class ConfigConverterTest extends \PHPUnit_Framework_TestCase
                         'field1' => []
                     ]
                 ],
+            ],
+            'has_more=false'             => [
+                'config'         => [
+                    'has_more' => false,
+                    'fields'   => [
+                        'field1' => [
+                            'has_more' => false
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'field1' => []
+                    ]
+                ]
             ],
             'post_serialize=null'        => [
                 'config'         => [
@@ -231,10 +250,12 @@ class ConfigConverterTest extends \PHPUnit_Framework_TestCase
 
     public static function postSerialize1(array $item)
     {
+        return $item;
     }
 
     public static function postSerialize2(array $item)
     {
+        return $item;
     }
 
     public static function dataTransformer1($class, $property, $value, $config)

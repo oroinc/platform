@@ -9,9 +9,9 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 
-class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
+class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var NormalizerInterface|DenormalizerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var NormalizerInterface|DenormalizerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $serializer;
 
     /** @var BlockViewNormalizer */

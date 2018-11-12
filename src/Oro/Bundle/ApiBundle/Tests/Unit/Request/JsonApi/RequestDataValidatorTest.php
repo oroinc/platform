@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\RequestDataValidator;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class RequestDataValidatorTest extends \PHPUnit_Framework_TestCase
+class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RequestDataValidator */
     private $validator;
@@ -399,6 +399,16 @@ class RequestDataValidatorTest extends \PHPUnit_Framework_TestCase
                 ['data' => ['type' => 'products'], 'included' => []],
                 'The \'included\' property should not be empty',
                 '/included'
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        'test'
+                    ]
+                ],
+                ['The related resource should be an object'],
+                ['/included/0']
             ],
             [
                 [

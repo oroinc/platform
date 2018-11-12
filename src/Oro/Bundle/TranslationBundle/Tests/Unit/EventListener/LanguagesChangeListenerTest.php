@@ -11,12 +11,12 @@ use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigValueRepository;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 use Oro\Bundle\TranslationBundle\EventListener\LanguagesChangeListener;
 
-class LanguagesChangeListenerTest extends \PHPUnit_Framework_TestCase
+class LanguagesChangeListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var ConfigValueRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigValueRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
     /** @var LanguagesChangeListener */
@@ -28,11 +28,11 @@ class LanguagesChangeListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->repository = $this->createMock(ConfigValueRepository::class);
 
-        /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject $entityManager */
+        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects($this->any())->method('getRepository')->willReturn($this->repository);
 
-        /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $managerRegistry */
+        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $managerRegistry */
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $managerRegistry->expects($this->any())->method('getManagerForClass')->willReturn($entityManager);
 
@@ -113,7 +113,7 @@ class LanguagesChangeListenerTest extends \PHPUnit_Framework_TestCase
      * @param bool $isChanged
      * @param bool $isGlobal
      *
-     * @return ConfigUpdateEvent|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConfigUpdateEvent|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getEvent(array $availableCodes, $isChanged = true, $isGlobal = true)
     {

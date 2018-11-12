@@ -9,12 +9,12 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
-class ContainerListenerTest extends \PHPUnit_Framework_TestCase
+class ContainerListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigMetadataDumperInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigMetadataDumperInterface */
     private $dumper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceProviderInterface */
     private $resourceProvider;
 
     /** @var ContainerListener */
@@ -38,7 +38,7 @@ class ContainerListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param bool $isMasterRequest
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|GetResponseEvent
+     * @return \PHPUnit\Framework\MockObject\MockObject|GetResponseEvent
      */
     private function getEvent($isMasterRequest = true)
     {

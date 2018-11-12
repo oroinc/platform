@@ -9,11 +9,11 @@ use Doctrine\DBAL\Statement;
 use Oro\Bundle\SyncBundle\Periodic\DbPingPeriodic;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 
-class DbPingPeriodicTest extends \PHPUnit_Framework_TestCase
+class DbPingPeriodicTest extends \PHPUnit\Framework\TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
     /** @var DbPingPeriodic */

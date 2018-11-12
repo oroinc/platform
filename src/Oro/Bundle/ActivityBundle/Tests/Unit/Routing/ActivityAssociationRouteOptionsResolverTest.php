@@ -9,12 +9,12 @@ use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\SortableRouteCollection;
 use Symfony\Component\Routing\Route;
 
-class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit_Framework_TestCase
+class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $groupingConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityAliasResolver;
 
     /** @var SortableRouteCollection */

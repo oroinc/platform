@@ -4,10 +4,13 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use Oro\Component\Testing\TempDirExtension;
 
-class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
+class UpdateExtendConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    use TempDirExtension;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $commandExecutor;
 
     /** @var string */
@@ -19,12 +22,9 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->temporaryFilePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'test_options.bin';
-    }
-
-    protected function tearDown()
-    {
-        @\unlink($this->temporaryFilePath);
+        $this->temporaryFilePath = $this->getTempDir('extend_config_migration')
+            . DIRECTORY_SEPARATOR
+            . 'test_options.bin';
     }
 
     public function testGetDescription()

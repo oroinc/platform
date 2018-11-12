@@ -9,12 +9,12 @@ use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 
-class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit_Framework_TestCase
+class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     use LoggerAwareTraitTestTrait;
 
     /**
-     * @var WebsocketClientInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $decoratedClient;
 

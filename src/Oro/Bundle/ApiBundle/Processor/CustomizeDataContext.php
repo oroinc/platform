@@ -3,8 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * The base execution context for processors for "customize_loaded_data" and "customize_form_data" actions.
+ */
 abstract class CustomizeDataContext extends ApiContext
 {
     /** FQCN of a root entity */
@@ -16,8 +18,11 @@ abstract class CustomizeDataContext extends ApiContext
     /** FQCN of a customizing entity */
     const CLASS_NAME = 'class';
 
-    /** @var EntityDefinitionConfig */
-    protected $config;
+    /** @var EntityDefinitionConfig|null */
+    private $rootConfig;
+
+    /** @var EntityDefinitionConfig|null */
+    private $config;
 
     /**
      * Gets FQCN of a root entity.
@@ -86,9 +91,17 @@ abstract class CustomizeDataContext extends ApiContext
      */
     public function getRootConfig()
     {
-        return $this->getPropertyPath()
-            ? $this->config
-            : null;
+        return $this->rootConfig;
+    }
+
+    /**
+     * Sets a configuration of a root entity.
+     *
+     * @param EntityDefinitionConfig|null $config
+     */
+    public function setRootConfig(EntityDefinitionConfig $config = null)
+    {
+        $this->rootConfig = $config;
     }
 
     /**
@@ -98,25 +111,7 @@ abstract class CustomizeDataContext extends ApiContext
      */
     public function getConfig()
     {
-        $config = $this->config;
-        if (null !== $config) {
-            $propertyPath = $this->getPropertyPath();
-            if ($propertyPath) {
-                $path = ConfigUtil::explodePropertyPath($propertyPath);
-                foreach ($path as $fieldName) {
-                    $fieldConfig = $config->getField($fieldName);
-                    $config = null;
-                    if (null !== $fieldConfig) {
-                        $config = $fieldConfig->getTargetEntity();
-                    }
-                    if (null === $config) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        return $config;
+        return $this->config;
     }
 
     /**

@@ -4,7 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Context;
 
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 
-class OroMainContextTest extends \PHPUnit_Framework_TestCase
+class OroMainContextTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider skipWaitProvider
