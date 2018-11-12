@@ -30,11 +30,6 @@
         width: $widget-picker-search-width;
     }
 
-    &__no-results-found {
-        text-align: center;
-        padding-top: 24px;
-    }
-
     &__results {
         display: flex;
         flex-direction: column;

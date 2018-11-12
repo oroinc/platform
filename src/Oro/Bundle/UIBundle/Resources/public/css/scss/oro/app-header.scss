@@ -198,11 +198,12 @@
                             }
                         }
 
-                        .no-result-message {
+                        .no-data {
                             position: absolute;
                             #{$start}: 0;
                             width: 100%;
-                            padding: $header-search-no-result-padding;
+                            padding: $header-search-no-data-padding;
+                            margin: 0;
 
                             background-color: $header-search-dropdown-menu-background;
                             box-shadow: $header-search-suggestion-list-shadow;
@@ -212,7 +213,7 @@
                             display: none;
                         }
 
-                        input.search:not(:focus) + .search-suggestion-list + .no-result-message {
+                        input.search:not(:focus) + .search-suggestion-list + .no-data {
                             display: none !important;
                         }
 

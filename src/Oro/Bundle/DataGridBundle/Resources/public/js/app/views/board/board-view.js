@@ -166,23 +166,26 @@ define(function(require) {
          * Updates no-data block
          */
         updateNoDataBlock: function() {
+            var messageHTML;
+            var grid = this.boardPlugin.main.grid;
             var noDataVisible = this.serverCollection.models.length <= 0;
             if (noDataVisible) {
                 var placeholders = {
-                    entityHint: (
-                        this.boardPlugin.main.grid.entityHint ||
-                        __(this.boardPlugin.main.grid.noDataTranslations.entityHint)).toLowerCase()
+                    entityHint: (grid.entityHint || __(grid.noDataTranslations.entityHint)).toLowerCase()
                 };
 
-                var hints = [];
-
-                hints.push(__(this.boardPlugin.main.grid.noDataTranslations.noEntities));
-                if (!_.isEmpty(this.serverCollection.state.filters)) {
-                    hints.push(__(this.boardPlugin.main.grid.noDataTranslations.noResults, placeholders));
+                if (_.isEmpty(this.serverCollection.state.filters)) {
+                    messageHTML = grid.noDataTemplate({
+                        text: __(grid.noDataTranslations.noEntities, placeholders)
+                    });
+                } else {
+                    messageHTML = grid.noSearchResultsTemplate({
+                        title: __(grid.noDataTranslations.noResultsTitle),
+                        text: __(grid.noDataTranslations.noResults, placeholders)
+                    });
                 }
-                this.$('.no-data').html(this.boardPlugin.main.grid.noDataTemplate({
-                    hints: hints
-                }));
+
+                this.$('.no-data').html(messageHTML);
             }
             this.$el.toggleClass('no-data-visible', noDataVisible);
         },

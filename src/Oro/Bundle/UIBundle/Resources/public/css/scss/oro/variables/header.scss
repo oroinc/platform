@@ -22,7 +22,7 @@ $header-search-suggestion-loader-mask-padding:  6px !default;
 $header-search-suggestion-loader-size:          24px !default;
 $header-search-suggestion-loader-thickness:     5px !default;
 $header-search-suggestion-list-max-height:      402px !default;
-$header-search-no-result-padding:               4px 8px !default;
+$header-search-no-data-padding:                 $no-data-offset !default;
 $header-shortcut-dropdown-width:                310px !default;
 $header-shortcut-dropdown-search-margin-bottom: 6px !default;
 $header-shortcut-typeahead-padding:             8px 0 !default;
