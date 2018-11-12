@@ -4,6 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Acl\Group;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+/**
+ * Chain ACL group provider. Selects group from first supporting provider in chain.
+ */
 class ChainAclGroupProvider implements AclGroupProviderInterface
 {
     /**
@@ -55,12 +58,10 @@ class ChainAclGroupProvider implements AclGroupProviderInterface
      */
     protected function getSupportedProvider()
     {
-        if (!$this->supportedProvider) {
-            foreach ($this->providers as $provider) {
-                if ($provider->supports()) {
-                    $this->supportedProvider = $provider;
-                    break;
-                }
+        foreach ($this->providers as $provider) {
+            if ($provider->supports()) {
+                $this->supportedProvider = $provider;
+                break;
             }
         }
 
