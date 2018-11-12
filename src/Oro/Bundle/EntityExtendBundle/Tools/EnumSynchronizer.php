@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
+use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -263,7 +264,7 @@ class EnumSynchronizer
             ->getQuery()
             ->setHint(
                 Query::HINT_CUSTOM_OUTPUT_WALKER,
-                'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+                TranslationWalker::class
             )
             ->getArrayResult();
     }
@@ -353,12 +354,23 @@ class EnumSynchronizer
         $removes = [];
         foreach ($values as $value) {
             $optionKey = $this->getEnumOptionKey($value->getId(), $options);
+            // If generated id is equal to existing one and generated was prefixed
+            // Then remove existing value and create new one
+            if ($optionKey && !empty($options[$optionKey]['generated'])) {
+                $originalId = $this->generateEnumValueId($options[$optionKey]['label'], []);
+                if ($originalId !== $options[$optionKey]['id']) {
+                    $optionKey = null;
+                }
+            }
+
+            // If existing value was found by option id or label if id was empty - update value
             if ($optionKey !== null) {
                 if ($this->setEnumValueProperties($value, $options[$optionKey])) {
                     $changes[] = $value;
                 }
                 unset($options[$optionKey]);
             } else {
+                // If there is no matching option for existing value - remove value
                 $em->remove($value);
                 $removes[] = $value;
             }
@@ -368,6 +380,7 @@ class EnumSynchronizer
         }
 
         foreach ($options as $option) {
+            // Create new values for options that had no matching value
             $value = $enumRepo->createEnumValue(
                 $option['label'],
                 $option['priority'],
@@ -409,6 +422,7 @@ class EnumSynchronizer
                 $id = $this->getIdByExistingValues($values, $option);
                 if (!$id) {
                     $id = $this->generateEnumValueId($option['label'], $ids);
+                    $option['generated'] = true;
                 }
                 $option['id'] = $id;
             }
