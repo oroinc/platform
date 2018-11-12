@@ -70,10 +70,6 @@ class AclLoadFieldMetadataListenerTest extends \PHPUnit_Framework_TestCase
 
         /** @var \PHPUnit_Framework_MockObject_MockObject $translator */
         $translator = $this->getMockForAbstractClass('Symfony\Component\Translation\TranslatorInterface');
-        $translator->expects($this->any())
-            ->method('trans')
-            ->willReturnArgument(0);
-
         $aclLoadFieldMetadataListener = new AclLoadFieldMetadataListener($configManager, $translator);
         $aclLoadFieldMetadataListener->onLoad($event);
 

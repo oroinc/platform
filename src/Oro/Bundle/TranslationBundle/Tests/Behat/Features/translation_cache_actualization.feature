@@ -1,3 +1,5 @@
+@skip
+# unskip after BAP-17730 will resolved
 Feature: Translation cache actualization
   In order to apply translation changes on the fly (immediately)
   As a User
@@ -6,6 +8,7 @@ Feature: Translation cache actualization
   Scenario: Reset translation for key oro.ui.create_entity
     Given I login as administrator
     When I go to System/Emails/Maintenance Notifications
+    And I reload the page
     Then I should see "No records found"
     When I go to System/Localization/Translations
     And I filter Key as is equal to "oro.datagrid.no.entities"
