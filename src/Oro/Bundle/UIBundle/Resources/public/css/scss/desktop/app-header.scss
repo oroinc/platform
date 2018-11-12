@@ -98,6 +98,10 @@
             margin: $app-header-search-and-shortcuts-margin;
         }
 
+        .header-dropdown-search .dropdown-menu {
+            padding: $desktop-app-header-search-dropdown-menu-padding;
+        }
+
         .dropdown-toggle {
             color: inherit;
             text-align: center;
@@ -118,6 +122,7 @@
         }
 
         .dropdown-menu {
+            padding: $desktop-app-header-dropdown-menu-padding;
             #{$start}: $app-header-search-and-shortcuts-dropdown-start;
 
             @include if-rtl() {
@@ -130,21 +135,13 @@
         }
 
         .nav-header { /* Dropdown smaller section title */
-            padding: $app-header-dropdown-header-v-padding $app-header-dropdown-item-h-padding;
-
-            color: $app-header-color;
             font-size: $app-header-title-font-size;
-            line-height: 1.5;
+            line-height: $app-header-title-line-height;
         }
 
         .nav-header-title { /* Dropdown main title */
             text-transform: $app-header-dropdown-title-text-transform;
             display: block;
-        }
-
-        .nav-content {
-            padding: 0 $app-header-dropdown-item-h-padding;
-            margin: $app-header-dropdown-item-margin;
         }
 
         .select2-container {
@@ -174,6 +171,10 @@
 
         .no-result-message {
             top: $field-size - $input-border-width;
+        }
+
+        .dropdown-item {
+            padding: $desktop-app-header-shortcut-dropdown-item-padding;
         }
     }
 
@@ -247,8 +248,8 @@
 
         .dropdown-menu {
             .divider {
-                border-bottom: 1px solid $primary-900;
-                margin: 4px 0;
+                border-bottom: $desktop-app-header-user-menu-divider-border-bottom;
+                margin: $desktop-app-header-user-menu-divider-margin;
             }
 
             li {
@@ -260,6 +261,8 @@
 
                 a {
                     color: $primary-200;
+                    padding-top: $desktop-app-header-user-menu-item-v-padding;
+                    padding-bottom: $desktop-app-header-user-menu-item-v-padding;
                 }
             }
         }

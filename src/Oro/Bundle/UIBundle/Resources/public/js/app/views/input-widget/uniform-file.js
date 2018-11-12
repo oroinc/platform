@@ -32,7 +32,7 @@ define(function(require) {
             UniformFileInputWidgetView.__super__.initializeWidget.apply(this, arguments);
             if (this.$el.is('.error')) {
                 this.$el.removeClass('error');
-                this.container().addClass('error');
+                this.getContainer().addClass('error');
             }
         },
 
