@@ -79,18 +79,25 @@ class NestedAssociationTest extends RestJsonApiTestCase
 
         $response = $this->post(['entity' => $entityType], $data);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseContains(
             [
-                'type' => $relatedEntityType,
-                'id'   => $relatedEntity1->id
+                'data' => [
+                    'relationships' => [
+                        'relatedEntity' => [
+                            'data' => [
+                                'type' => $relatedEntityType,
+                                'id'   => (string)$relatedEntity1->id
+                            ]
+                        ]
+                    ]
+                ]
             ],
-            $result['data']['relationships']['relatedEntity']['data']
+            $response
         );
 
         // test that the data was created
         $this->getEntityManager()->clear();
-        $entity = $this->getEntityManager()->find(TestEntity::class, (int)$result['data']['id']);
+        $entity = $this->getEntityManager()->find(TestEntity::class, (int)$this->getResourceId($response));
         self::assertEquals(TestRelatedEntity::class, $entity->getRelatedClass());
         self::assertSame($relatedEntity1->id, $entity->getRelatedId());
     }
@@ -216,13 +223,14 @@ class NestedAssociationTest extends RestJsonApiTestCase
             'association' => 'relatedEntity'
         ]);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseContains(
             [
-                'type' => $relatedEntityType,
-                'id'   => (string)$relatedEntity->id
+                'data' => [
+                    'type' => $relatedEntityType,
+                    'id'   => (string)$relatedEntity->id
+                ]
             ],
-            $result['data']
+            $response
         );
     }
 
@@ -243,16 +251,17 @@ class NestedAssociationTest extends RestJsonApiTestCase
             'meta'        => 'title'
         ]);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseContains(
             [
-                'type' => $relatedEntityType,
-                'id'   => (string)$relatedEntity->id,
-                'meta' => [
-                    'title' => 'default default_NotBlank default_NotNull'
+                'data' => [
+                    'type' => $relatedEntityType,
+                    'id'   => (string)$relatedEntity->id,
+                    'meta' => [
+                        'title' => 'default default_NotBlank default_NotNull'
+                    ]
                 ]
             ],
-            $result['data']
+            $response
         );
     }
 
@@ -272,13 +281,14 @@ class NestedAssociationTest extends RestJsonApiTestCase
             'association' => 'relatedEntity'
         ]);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseContains(
             [
-                'type' => $relatedEntityType,
-                'id'   => (string)$relatedEntity->id
+                'data' => [
+                    'type' => $relatedEntityType,
+                    'id'   => (string)$relatedEntity->id
+                ]
             ],
-            $result['data']
+            $response
         );
     }
 

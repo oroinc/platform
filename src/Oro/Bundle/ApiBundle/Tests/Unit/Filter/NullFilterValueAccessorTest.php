@@ -36,4 +36,9 @@ class NullFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $this->nullFilterValueAccessor->setDefaultGroupName('filter');
         self::assertNull($this->nullFilterValueAccessor->getDefaultGroupName());
     }
+
+    public function testGetQueryString()
+    {
+        self::assertSame('', $this->nullFilterValueAccessor->getQueryString());
+    }
 }

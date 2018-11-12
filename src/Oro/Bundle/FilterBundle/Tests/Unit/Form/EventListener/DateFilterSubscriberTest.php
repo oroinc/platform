@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class DateFilterSubsriberTest extends \PHPUnit\Framework\TestCase
+class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DateFilterSubscriber */
     protected $subscriber;
@@ -23,7 +23,7 @@ class DateFilterSubsriberTest extends \PHPUnit\Framework\TestCase
     /** @var DateFilterModifier|\PHPUnit\Framework\MockObject\MockObject */
     protected $modifier;
 
-    private const TIMEZONE = 'Europe/Moscow';
+    private const TIMEZONE = 'Asia/Tokyo';
 
     protected function setUp()
     {

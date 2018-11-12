@@ -68,7 +68,10 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $sortersConfig->getField('id')->setExcluded(true);
 
         $this->prepareFilters();
-        $this->context->getFilterValues()->get('sort')->setSourceKey('sortFilterSourceKey');
+        $sortFilterValue = $this->context->getFilterValues()->get('sort');
+        $sortFilterValue->setSource(
+            FilterValue::createFromSource('sortFilterSourceKey', $sortFilterValue->getPath(), '')
+        );
 
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);

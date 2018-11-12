@@ -4,6 +4,8 @@ namespace Oro\Component\EntitySerializer;
 
 /**
  * Provides a method to convert normalized configuration of the EntityConfig object.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ConfigConverter
 {
@@ -33,6 +35,7 @@ class ConfigConverter
         $this->setHints($result, $config);
         $this->setOrderBy($result, $config);
         $this->setMaxResults($result, $config);
+        $this->setHasMore($result, $config);
         $this->setPostSerializeHandler($result, $config);
         $this->setExcludedFields($result, $config);
         $this->setRenamedFields($result, $config);
@@ -131,6 +134,19 @@ class ConfigConverter
             && null !== $config[ConfigUtil::MAX_RESULTS]
         ) {
             $result->setMaxResults($config[ConfigUtil::MAX_RESULTS]);
+        }
+    }
+
+    /**
+     * @param EntityConfig $result
+     * @param array        $config
+     */
+    protected function setHasMore(EntityConfig $result, array $config)
+    {
+        if (\array_key_exists(ConfigUtil::HAS_MORE, $config)
+            && $config[ConfigUtil::HAS_MORE]
+        ) {
+            $result->setHasMore(true);
         }
     }
 
