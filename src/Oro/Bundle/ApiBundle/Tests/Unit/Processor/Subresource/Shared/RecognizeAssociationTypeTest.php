@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\RecognizeAssociationType;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
-use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +31,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
     public function testProcessWhenEntityClassNameIsAlreadySet()
     {
         $this->subresourcesProvider->expects(self::never())
-            ->method('getSubresources');
+            ->method('getSubresource');
 
         $this->context->setClassName('Test\Class');
         $this->processor->process($this->context);
@@ -59,8 +58,13 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $associationName = 'testAssociation';
 
         $this->subresourcesProvider->expects(self::once())
-            ->method('getSubresources')
-            ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
+            ->method('getSubresource')
+            ->with(
+                $parentEntityClass,
+                $associationName,
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
             ->willReturn(null);
 
         $this->context->setParentClassName($parentEntityClass);
@@ -84,12 +88,15 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $parentEntityClass = 'Test\ParentClass';
         $associationName = 'testAssociation';
 
-        $entitySubresources = new ApiResourceSubresources($parentEntityClass);
-
         $this->subresourcesProvider->expects(self::once())
-            ->method('getSubresources')
-            ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn($entitySubresources);
+            ->method('getSubresource')
+            ->with(
+                $parentEntityClass,
+                $associationName,
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(null);
 
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setAssociationName($associationName);
@@ -115,17 +122,20 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $parentEntityClass = 'Test\ParentClass';
         $associationName = 'testAssociation';
 
-        $entitySubresources = new ApiResourceSubresources($parentEntityClass);
         $associationSubresource = new ApiSubresource();
         $associationSubresource->setIsCollection(true);
         $associationSubresource->setTargetClassName('Test\Class');
         $associationSubresource->setExcludedActions([$this->context->getAction()]);
-        $entitySubresources->addSubresource($associationName, $associationSubresource);
 
         $this->subresourcesProvider->expects(self::once())
-            ->method('getSubresources')
-            ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn($entitySubresources);
+            ->method('getSubresource')
+            ->with(
+                $parentEntityClass,
+                $associationName,
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn($associationSubresource);
 
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setAssociationName($associationName);
@@ -137,16 +147,19 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $parentEntityClass = 'Test\ParentClass';
         $associationName = 'testAssociation';
 
-        $entitySubresources = new ApiResourceSubresources($parentEntityClass);
         $associationSubresource = new ApiSubresource();
         $associationSubresource->setIsCollection(true);
         $associationSubresource->setTargetClassName('Test\Class');
-        $entitySubresources->addSubresource($associationName, $associationSubresource);
 
         $this->subresourcesProvider->expects(self::once())
-            ->method('getSubresources')
-            ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn($entitySubresources);
+            ->method('getSubresource')
+            ->with(
+                $parentEntityClass,
+                $associationName,
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn($associationSubresource);
 
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setAssociationName($associationName);
@@ -167,13 +180,17 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $parentEntityClass = 'Test\ParentClass';
         $associationName = 'testAssociation';
 
-        $entitySubresources = new ApiResourceSubresources($parentEntityClass);
-        $entitySubresources->addSubresource('testAssociation');
+        $associationSubresource = new ApiSubresource();
 
         $this->subresourcesProvider->expects(self::once())
-            ->method('getSubresources')
-            ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn($entitySubresources);
+            ->method('getSubresource')
+            ->with(
+                $parentEntityClass,
+                $associationName,
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn($associationSubresource);
 
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setAssociationName($associationName);
