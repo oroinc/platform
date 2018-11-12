@@ -37,7 +37,7 @@ $danger-lighten: lighten($danger, 40%) !default;       // #fae1dc
 $danger-ultra-light: lighten($danger, 44%) !default;   // #fdf0ee
 $danger-dark: darken($danger, 8%) !default;            // #c7361a
 $danger-darken: desaturate($danger, 24%) !default;     // #c65a44
-$danger-ultra-dark: desaturate($danger, 28%) !default; // #6d1e0e
+$danger-ultra-dark: darken($danger, 28%) !default;     // #6d1e0e
 
 $warning: #f9b700 !default;
 $warning-light: lighten($warning, 48%) !default;     // #fffbef

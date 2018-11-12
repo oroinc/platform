@@ -1,10 +1,5 @@
 /* @theme: admin.oro; */
 
-.label-info,
-.badge-info {
-    background: $secondary-200;
-}
-
 .widget-content > .label-info:first-child {
     margin-bottom: 10px;
 }
@@ -146,44 +141,6 @@ footer {
     border-top: 1px solid $primary-860;
     width: 100%;
     box-sizing: border-box;
-}
-
-.status-disabled,
-.status-unknown {
-    color: #aaa;
-}
-
-.status-enabled {
-    color: #2f8206;
-}
-
-.status-tentatively {
-    color: #a7a50a;
-}
-
-.status-disabled,
-.status-tentatively,
-.status-enabled,
-.status-unknown {
-    margin-#{$start}: 5px;
-    text-shadow: none;
-    padding: side-values(3px 10px 3px 5px);
-
-    [class^="fa-"]:before {
-        font-size: 12px;
-    }
-}
-
-.status-enabled [class^="fa-"]:before {
-    color: #4a9938;
-}
-
-.status-disabled [class^="fa-"]:before {
-    color: #e37878;
-}
-
-.status-unknown [class^="fa-"]:before {
-    color: #aaa;
 }
 
 .holder-height {
