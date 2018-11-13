@@ -187,39 +187,82 @@
         }
 
         .form-horizontal {
-            .control-group {
-                max-width: none;
+            width: 636px;
+            margin: auto;
 
+            .control-group {
                 .controls {
                     .validation-failed {
                         margin-left: 14px;
                     }
+
+                    input,
+                    textarea,
+                    .select2-container,
+                    .validate-group {
+                        width: 100%;
+                        max-width: 100%;
+                    }
+
+                    textarea {
+                        height: 200px;
+                    }
+
+                    .choice-widget-expanded__item {
+                        display: inline-block;
+                        margin-bottom: 0;
+
+                        &:not(:last-child) {
+                            margin-right: 5px;
+                        }
+                    }
+
+                    &:first-child {
+                        margin-left: 120px;
+                    }
+
+                    .dropup {
+                        padding-right: 4px;
+
+                        .attachment-list-popup {
+                            width: 290px;
+                            margin-left: -70px;
+                        }
+                    }
+
+                    .divider {
+                        padding-left: 6px;
+
+                        border-left: 1px solid $primary-700;
+                    }
+                }
+
+                > .control-label {
+                    width: 96px;
                 }
             }
         }
 
-        input[type=radio] {
-            width: auto;
+        .control-group-collection {
+            margin-bottom: 16px;
         }
-    }
-
-    pre.email-body,
-    iframe.email-body,
-    .email-form textarea {
-        height: 200px;
     }
 }
 
 .select2-container.select2-container-multi.taggable-email {
     ul.select2-choices {
-        padding-right: 60px;
+        padding-right: 70px;
     }
 }
 
 .cc-bcc-holder {
     position: absolute;
-    top: 5px;
-    right: 0;
+    top: 0;
+    bottom: 0;
+    right: 8px;
+    line-height: 18px;
+    height: 18px;
+    margin: auto;
 
     .showCc,
     .showBcc {
@@ -671,7 +714,7 @@ span.icon.grid .fa-paperclip {
     margin-right: 16px;
 
     span.filename-label {
-        color: #006acc;
+        color: $secondary;
     }
 
     i.fa-close {
@@ -698,7 +741,7 @@ a.attachment .icon .fa-link {
 }
 
 .control-group .email-body-action {
-    margin-right: 15px;
+    margin-#{$end}: 15px;
 }
 
 .dropdown.link-to-record {
@@ -753,7 +796,9 @@ a.attachment .icon .fa-link {
 }
 
 .email-body-actions .attach-file {
-    font-weight: normal !important;
+    &:after {
+        display: none;
+    }
 }
 
 .attachment-list-popup .attachment-list-content {
