@@ -17,11 +17,10 @@ class PinbarHelpTest extends WebTestCase
     public function testPinbarLocationImageWithBaseUrl()
     {
         $pathToFolder = '/path/to/folder';
-        $webBackendPrefix = $this->getContainer()->getParameter('web_backend_prefix');
         //Emulate subfolder request
         $crawler = $this->client->request(
             'GET',
-            \sprintf('%s/app.php%s/pinbar/help', $pathToFolder, $webBackendPrefix),
+            \sprintf('%s/app.php%s', $pathToFolder, $this->getUrl('oro_pinbar_help')),
             [],
             [],
             [
