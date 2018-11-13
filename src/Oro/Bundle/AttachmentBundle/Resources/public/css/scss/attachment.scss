@@ -2,10 +2,10 @@
 
 .oro_attachment_file {
     border: none;
-    padding: 5px 5px 0 5px;
-    width: 295px;
+    padding: $attachment-item-flex-offset $attachment-item-flex-offset 0 $attachment-item-flex-offset;
+    width: $attachment-item-user-width;
     line-height: 20px;
-    margin-top: 5px;
+    margin-top: $attachment-item-flex-offset;
     margin-bottom: 0;
 
     .removeFile {
@@ -24,8 +24,10 @@
 
         @include fa-icon($fa-var-trash-o);
 
-        &:hover:after {
-            color: #888;
+        &:hover {
+            &:after {
+                color: $primary-550;
+            }
         }
     }
 }
@@ -34,9 +36,9 @@
     max-width: 100%;
 
     .uploader {
-        display: flex;
+        display: $attachment-item-flex;
         align-items: center;
-        max-width: 516px;
+        max-width: $attachment-item-width;
         float: none;
 
         border: none;
@@ -64,8 +66,8 @@
             width: auto;
             padding: 0;
             flex-shrink: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            overflow: $attachment-item-overflow;
+            text-overflow: $attachment-item-text-overflow;
         }
 
         .focus {
@@ -84,28 +86,26 @@
     }
 }
 
-
 .attachment-item {
-    display: flex;
+    display: $attachment-item-flex;
     align-items: center;
-    max-width: 516px;
-    margin: 4px 0 0 0;
+    max-width: $attachment-item-width;
+    margin: $attachment-item-flex-offset 0 0 0;
 
     &__user {
-        max-width: 294px;
+        max-width: $attachment-item-user-width;
     }
 
     &__note {
         margin: 0;
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: $attachment-item-flex-col;
+        align-items: $attachment-item-flex-align-start;
 
         .link-to-record {
-            outline: 1px solid;
             max-width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: $attachment-item-text-white-space;
+            overflow: $attachment-item-overflow;
+            text-overflow: $attachment-item-text-overflow;
 
             .filename {
                 max-width: 100%;
@@ -124,9 +124,9 @@
     .filename {
         max-width: calc(100% - 106px);
 
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        white-space: $attachment-item-text-white-space;
+        overflow: $attachment-item-overflow;
+        text-overflow: $attachment-item-text-overflow;
     }
 
     [class^="fa-"],
@@ -137,12 +137,5 @@
         &:last-child {
             margin: 0 0 0 3px;
         }
-    }
-}
-
-@media only screen and (max-width: $tablet-devices-media-breakpoint) {
-    .attachment-item {
-        margin: 4px 0;
-        width: 100%;
     }
 }

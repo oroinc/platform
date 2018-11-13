@@ -1,0 +1,19 @@
+/* @theme: admin.oro; */
+
+.uploader {
+    &.input-widget-file {
+        .filename {
+            width: 65%;
+        }
+    }
+}
+
+.attachment-item {
+    margin: 4px 0;
+    width: 100%;
+    max-width: 100%;
+
+    &__note {
+        margin: 0;
+    }
+}

@@ -2,7 +2,7 @@
 
 @import "oroui/css/scss/variables";
 
-// mobile resolution
-@import "oroui/css/scss/mobile/variables/layout";
+@import "variables";
 
-@import "./attachment";
+@import "attachment";
+@import "mobile/main";
