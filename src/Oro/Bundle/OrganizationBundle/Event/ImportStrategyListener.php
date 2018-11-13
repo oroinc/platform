@@ -13,6 +13,9 @@ use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Populates imported entities with organization if entity supports it.
+ */
 class ImportStrategyListener implements ImportStrategyListenerInterface
 {
     /** @var ManagerRegistry */
