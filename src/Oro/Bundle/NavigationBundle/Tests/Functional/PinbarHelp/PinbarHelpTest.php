@@ -17,10 +17,11 @@ class PinbarHelpTest extends WebTestCase
     public function testPinbarLocationImageWithBaseUrl()
     {
         $pathToFolder = '/path/to/folder';
+        $webBackendPrefix = $this->getContainer()->getParameter('web_backend_prefix');
         //Emulate subfolder request
         $crawler = $this->client->request(
             'GET',
-            $pathToFolder . '/app.php/admin/pinbar/help',
+            \sprintf('%s/app.php%s/pinbar/help', $pathToFolder, $webBackendPrefix),
             [],
             [],
             [
@@ -29,10 +30,11 @@ class PinbarHelpTest extends WebTestCase
             ]
         );
 
-        $pinbarLocationImage = $crawler->selectImage('Location of the Pinbar icon')->image();
+        $pinbarLocationImageSrc = $crawler->filterXPath('//img[@alt="Location of the Pinbar icon"]')
+            ->attr('src');
         self::assertContains(
             $pathToFolder . '/bundles/oronavigation/images/pinbar-location.jpg',
-            $pinbarLocationImage->getUri()
+            $pinbarLocationImageSrc
         );
     }
 }
