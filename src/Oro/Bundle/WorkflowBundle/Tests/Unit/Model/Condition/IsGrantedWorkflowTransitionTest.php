@@ -1,0 +1,266 @@
+<?php
+
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Condition;
+
+use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Model\Condition\IsGrantedWorkflowTransition;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
+class IsGrantedWorkflowTransitionTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $authorizationChecker;
+
+    /**
+     * @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $tokenAccessor;
+
+    /**
+     * @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $workflowManager;
+
+    /**
+     * @var IsGrantedWorkflowTransition
+     */
+    protected $condition;
+
+    protected function setUp()
+    {
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
+
+        $this->condition = new IsGrantedWorkflowTransition(
+            $this->authorizationChecker,
+            $this->tokenAccessor
+        );
+        $this->condition->setWorkflowManager($this->workflowManager);
+        $this->condition->setContextAccessor(new ContextAccessor());
+    }
+
+    public function testGetName()
+    {
+        $this->assertSame(IsGrantedWorkflowTransition::NAME, $this->condition->getName());
+    }
+
+    /**
+     * @dataProvider wrongOptionsDataProvider
+     * @param array $options
+     * @param string $exceptionMessage
+     */
+    public function testInitializeFail(array $options, $exceptionMessage)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $this->condition->initialize($options);
+    }
+
+    /**
+     * @return array
+     */
+    public function wrongOptionsDataProvider(): array
+    {
+        return [
+            [[], 'Options must have 2 elements, but 0 given.'],
+            [['test'], 'Options must have 2 elements, but 1 given.'],
+            [['test', 'some', 'other'], 'Options must have 2 elements, but 3 given.'],
+            [['', 'step'], 'Transition name must not be empty.'],
+            [['transition', ''], 'Target step name must not be empty.'],
+        ];
+    }
+
+    public function testInitialize()
+    {
+        $options = ['transition', 'step'];
+
+        $this->condition->initialize($options);
+        $this->assertAttributeEquals('transition', 'transitionName', $this->condition);
+        $this->assertAttributeEquals('step', 'targetStepName', $this->condition);
+    }
+
+    public function testEvaluateNoUser()
+    {
+        $context = new WorkflowItem();
+        $context->setEntity(new \stdClass());
+        $context->setEntityClass(\stdClass::class);
+
+        $this->condition->initialize(['transition', 'step']);
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->willReturn(false);
+
+        $this->assertTrue($this->condition->evaluate($context));
+    }
+
+    public function testEvaluatePerformTransitionsDenied()
+    {
+        $entity = new \stdClass();
+        $context = new WorkflowItem();
+        $context->setEntity($entity);
+        $context->setEntityClass(\stdClass::class);
+        $context->setWorkflowName('workflowName');
+        $context->setEntityId(1);
+
+        $this->condition->initialize(['transition', 'step']);
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $objectWrapper = new DomainObjectWrapper(
+            $entity,
+            new ObjectIdentity('workflow', 'workflowName')
+        );
+
+        $this->authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with('PERFORM_TRANSITIONS', $objectWrapper)
+            ->willReturn(false);
+
+        $this->assertFalse($this->condition->evaluate($context));
+    }
+
+    public function testEvaluatePerformTransitionDenied()
+    {
+        $entity = new \stdClass();
+        $context = new WorkflowItem();
+        $context->setEntity($entity);
+        $context->setEntityClass(\stdClass::class);
+        $context->setWorkflowName('workflowName');
+        $context->setEntityId(1);
+
+        /** @var WorkflowStep|\PHPUnit_Framework_MockObject_MockObject $step */
+        $step = $this->createMock(WorkflowStep::class);
+        $step->expects($this->any())
+            ->method('getName')
+            ->willReturn('currentStep');
+        $context->setCurrentStep($step);
+
+        $this->condition->initialize(['transition', 'step']);
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $objectWrapper = new DomainObjectWrapper(
+            $entity,
+            new ObjectIdentity('workflow', 'workflowName')
+        );
+
+        $fieldVote = new FieldVote($objectWrapper, 'transition|currentStep|step');
+
+        $this->authorizationChecker->expects($this->exactly(2))
+            ->method('isGranted')
+            ->withConsecutive(
+                ['PERFORM_TRANSITIONS', $objectWrapper],
+                ['PERFORM_TRANSITION', $fieldVote]
+            )
+            ->willReturnOnConsecutiveCalls(
+                true,
+                false
+            );
+
+        $this->assertFalse($this->condition->evaluate($context));
+    }
+
+    public function testEvaluatePerformTransitionsDeniedForStartTransition()
+    {
+        $entity = new \stdClass();
+        $context = new WorkflowItem();
+        $context->setEntity($entity);
+        $context->setEntityClass(\stdClass::class);
+        $context->setWorkflowName('workflowName');
+
+        $this->condition->initialize(['transition', 'step']);
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $objectWrapper = new DomainObjectWrapper(
+            'workflow:workflowName',
+            new ObjectIdentity('workflow', 'workflowName')
+        );
+
+        $transition = $this->createMock(Transition::class);
+        $transition->expects($this->once())
+            ->method('isStart')
+            ->willReturn(true);
+        $transitionManager = $this->createMock(TransitionManager::class);
+        $transitionManager->expects($this->once())
+            ->method('getTransition')
+            ->with('transition')
+            ->willReturn($transition);
+        $workflow = $this->createMock(Workflow::class);
+        $workflow->expects($this->once())
+            ->method('getTransitionManager')
+            ->willReturn($transitionManager);
+
+        $this->workflowManager->expects($this->once())
+            ->method('getWorkflow')
+            ->with($context)
+            ->willReturn($workflow);
+
+        $this->authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with('PERFORM_TRANSITIONS', $objectWrapper)
+            ->willReturn(false);
+
+        $this->assertFalse($this->condition->evaluate($context));
+    }
+
+    public function testEvaluate()
+    {
+        $entity = new \stdClass();
+        $context = new WorkflowItem();
+        $context->setEntityClass(\stdClass::class);
+        $context->setWorkflowName('workflowName');
+        $context->setEntity($entity);
+        $context->setEntityId(1);
+
+        /** @var WorkflowStep|\PHPUnit_Framework_MockObject_MockObject $step */
+        $step = $this->createMock(WorkflowStep::class);
+        $step->expects($this->any())
+            ->method('getName')
+            ->willReturn('currentStep');
+        $context->setCurrentStep($step);
+
+        $this->condition->initialize(['transition', 'step']);
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $objectWrapper = new DomainObjectWrapper(
+            $entity,
+            new ObjectIdentity('workflow', 'workflowName')
+        );
+
+        $fieldVote = new FieldVote($objectWrapper, 'transition|currentStep|step');
+
+        $this->authorizationChecker->expects($this->exactly(2))
+            ->method('isGranted')
+            ->withConsecutive(
+                ['PERFORM_TRANSITIONS', $objectWrapper],
+                ['PERFORM_TRANSITION', $fieldVote]
+            )
+            ->willReturnOnConsecutiveCalls(
+                true,
+                true
+            );
+
+        $this->assertTrue($this->condition->evaluate($context));
+    }
+}

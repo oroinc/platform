@@ -6,8 +6,7 @@ OroCacheBundle introduces the configuration of the application data cache storag
 
 ## Table of Contents
 
- - [Abstract cache services](#abstract-cache-services)
- - [APC cache](#apc-cache)
+ - [Abstract cache services](#abstract-cache-services) 
  - [Warm up config cache](#warm-up-config-cache)
  - [Caching of Symfony Validation rules](#caching-of-symfony-validation-rules)
 
@@ -43,29 +42,6 @@ services:
 The `oro.cache.abstract.without_memory_cache` service is always declared automatically based on `oro.cache.abstract` service.
 
 Read more about the [caching policy and default implementation](Resources/doc/caching_policy.md).
-
-## APC cache
-
-There is a possibility to use APC cache and few steps should be completed for this.
-
-First of all, APC should be installed and enabled in the system. After this, the production configuration file (`config_prod.yml`) should be updated with the following parameters:
-
-
-``` yaml
-doctrine:
-    orm:
-        auto_mapping: true
-        query_cache_driver:    apc
-        metadata_cache_driver: apc
-        result_cache_driver: apc
-
-services:
-    oro.cache.abstract:
-        abstract:             true
-        class:                Doctrine\Common\Cache\ApcCache
-```
-
-On the last step of the configuration, production cache should be cleared.
 
 ## Warm up config cache
 

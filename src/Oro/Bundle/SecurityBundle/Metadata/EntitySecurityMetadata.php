@@ -4,6 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Metadata;
 
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
 
+/**
+ * Model that contains security metadata for class by security type
+ */
 class EntitySecurityMetadata implements AclClassInfo, \Serializable
 {
     /** @var string */
@@ -29,6 +32,9 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
 
     /** @var array|FieldSecurityMetadata[] */
     protected $fields;
+
+    /** @var bool */
+    protected $translated = false;
 
     /**
      * Constructor
@@ -103,6 +109,17 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     }
 
     /**
+     * @param string $label
+     * @return EntitySecurityMetadata
+     */
+    public function setLabel(string $label)
+    {
+        $this->label = $label;
+
+        return $this;
+    }
+
+    /**
      * Gets permissions
      *
      * @return string[]
@@ -123,6 +140,17 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     }
 
     /**
+     * @param string $description
+     * @return EntitySecurityMetadata
+     */
+    public function setDescription(string $description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getCategory()
@@ -136,6 +164,36 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     public function getFields()
     {
         return $this->fields;
+    }
+
+    /**
+     * @param array $fields
+     * @return EntitySecurityMetadata
+     */
+    public function setFields(array $fields)
+    {
+        $this->fields = $fields;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTranslated(): bool
+    {
+        return $this->translated;
+    }
+
+    /**
+     * @param bool $translated
+     * @return EntitySecurityMetadata
+     */
+    public function setTranslated(bool $translated): self
+    {
+        $this->translated = $translated;
+
+        return $this;
     }
 
     /**

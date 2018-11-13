@@ -175,10 +175,6 @@ class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionM
      */
     protected function getSupportedOwnershipDecisionMaker()
     {
-        if ($this->ownershipDecisionMaker) {
-            return $this->ownershipDecisionMaker;
-        }
-
         foreach ($this->ownershipDecisionMakers as $ownershipDecisionMaker) {
             if ($ownershipDecisionMaker->supports()) {
                 $this->ownershipDecisionMaker = $ownershipDecisionMaker;
