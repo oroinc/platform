@@ -2,10 +2,13 @@
 
 namespace Oro\Component\Testing\Unit;
 
+/**
+ * This trait can be used in unit tests to simplify testing of TWIG extensions.
+ */
 trait TwigExtensionTestCaseTrait
 {
     /**
-     * Rerurns an object that helps to build the dependency injection container for tests.
+     * Returns an object that helps to build the dependency injection container for tests.
      *
      * @return TestContainerBuilder
      */

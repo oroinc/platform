@@ -1042,3 +1042,7 @@ label .popover-body {
         display: block;
     }
 }
+
+.url-actions a.btn {
+    text-transform: none !important;
+}

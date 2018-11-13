@@ -57,6 +57,7 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new Compiler\QueryModifierCompilerPass());
         $container->addCompilerPass(new Compiler\MandatoryFieldProviderCompilerPass());
         $container->addCompilerPass(new Compiler\DocumentationProviderCompilerPass());
+        $container->addCompilerPass(new Compiler\RestRoutesCompilerPass());
         $container->addCompilerPass(
             new LoadApplicableCheckersCompilerPass('oro_api.processor_bag', 'oro.api.processor.applicable_checker')
         );

@@ -146,6 +146,20 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $entityConfig->toArray());
     }
 
+    public function testHasMore()
+    {
+        $entityConfig = new EntityConfig();
+        $this->assertFalse($entityConfig->getHasMore());
+
+        $entityConfig->setHasMore(true);
+        $this->assertTrue($entityConfig->getHasMore());
+        $this->assertSame(['has_more' => true], $entityConfig->toArray());
+
+        $entityConfig->setHasMore(false);
+        $this->assertFalse($entityConfig->getHasMore());
+        $this->assertSame([], $entityConfig->toArray());
+    }
+
     public function testHints()
     {
         $entityConfig = new EntityConfig();
