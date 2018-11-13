@@ -339,6 +339,21 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Then I should not see flash messages
+     *
+     * @param string $flashMessageElement
+     * @param int $timeLimit
+     */
+    public function shouldNotSeeFlashMessages($flashMessageElement = 'Flash Message', $timeLimit = 15)
+    {
+        $flashMessages = $this->spin(function (OroMainContext $context) use ($flashMessageElement) {
+            return $context->findAllElements($flashMessageElement);
+        }, $timeLimit);
+
+        static::assertEmpty($flashMessages);
+    }
+
+    /**
      * @param string $title
      * @param string $flashMessageElement
      * @param string $timeLimit
