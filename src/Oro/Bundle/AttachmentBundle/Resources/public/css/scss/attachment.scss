@@ -84,23 +84,34 @@
     }
 }
 
-.note-attachments {
-    .attachment-item {
-        display: block;
-    }
-}
-
-.control-group {
-    .attachment-item {
-        max-width: 294px;
-    }
-}
 
 .attachment-item {
     display: flex;
     align-items: center;
     max-width: 516px;
     margin: 4px 0 0 0;
+
+    &__user {
+        max-width: 294px;
+    }
+
+    &__note {
+        margin: 0;
+        flex-direction: column;
+        align-items: flex-start;
+
+        .link-to-record {
+            outline: 1px solid;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            .filename {
+                max-width: 100%;
+            }
+        }
+    }
 
     .remove-attachment {
         padding: 0;

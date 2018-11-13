@@ -184,13 +184,12 @@
     }
 
     .thumbnail {
-        background: #eee none repeat scroll 0 0;
-        border: medium none;
-        border-radius: 6px;
-        height: 80px;
-        padding: 0;
-        text-align: center;
+        display: block;
         width: 110px;
+        height: 80px;
+        text-align: center;
+        background: #eee;
+        border-radius: 4px;
     }
 
     .link-to-record {
