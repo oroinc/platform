@@ -15,6 +15,9 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
+/**
+ * Populates imported entities with organization if entity supports it.
+ */
 class ImportStrategyListener implements ImportStrategyListenerInterface
 {
     /** @var ManagerRegistry */
