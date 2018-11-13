@@ -127,11 +127,11 @@ class MapPrimaryFieldTest extends TypeTestCase
     }
 
     /**
-     * @param EntityDefinitionConfig $config
+     * @param EntityDefinitionConfig|null $config
      *
      * @return FormBuilderInterface
      */
-    private function getFormBuilder(EntityDefinitionConfig $config)
+    private function getFormBuilder(?EntityDefinitionConfig $config)
     {
         $this->formContext->setConfig($config);
 
@@ -147,16 +147,16 @@ class MapPrimaryFieldTest extends TypeTestCase
     }
 
     /**
-     * @param EntityDefinitionConfig $config
-     * @param Entity\Account         $data
-     * @param array                  $submittedData
-     * @param array                  $itemOptions
-     * @param string                 $entryType
+     * @param EntityDefinitionConfig|null $config
+     * @param Entity\Account              $data
+     * @param array                       $submittedData
+     * @param array                       $itemOptions
+     * @param string                      $entryType
      *
      * @return FormInterface
      */
     private function processForm(
-        EntityDefinitionConfig $config,
+        ?EntityDefinitionConfig $config,
         Entity\Account $data,
         array $submittedData,
         array $itemOptions = [],
@@ -201,7 +201,127 @@ class MapPrimaryFieldTest extends TypeTestCase
         return $role;
     }
 
-    public function testProcessWhenPrimaryFieldIsNotSubmitted()
+    public function testProcessWithoutConfigShouldWorkAsRegularForm()
+    {
+        $data = new Entity\Account();
+        $role1 = $this->addRole($data, 'role1', false);
+        $role2 = $this->addRole($data, 'role2', true);
+
+        $form = $this->processForm(
+            null,
+            $data,
+            [
+                'enabledRole' => 'role1',
+                'roles'       => [
+                    ['name' => 'role1'],
+                    ['name' => 'role2'],
+                    ['name' => 'role3']
+                ]
+            ]
+        );
+        self::assertTrue($form->isSynchronized());
+        self::assertTrue($form->isValid());
+
+        self::assertFalse($role1->isEnabled());
+        self::assertTrue($role2->isEnabled());
+        self::assertCount(3, $data->getRoles());
+    }
+
+    public function testProcessWithoutAssociationConfigShouldWorkAsRegularForm()
+    {
+        $data = new Entity\Account();
+        $role1 = $this->addRole($data, 'role1', false);
+        $role2 = $this->addRole($data, 'role2', true);
+
+        $form = $this->processForm(
+            new EntityDefinitionConfig(),
+            $data,
+            [
+                'enabledRole' => 'role1',
+                'roles'       => [
+                    ['name' => 'role1'],
+                    ['name' => 'role2']
+                ]
+            ]
+        );
+        self::assertTrue($form->isSynchronized());
+        self::assertTrue($form->isValid());
+
+        self::assertFalse($role1->isEnabled());
+        self::assertTrue($role2->isEnabled());
+    }
+
+    public function testProcessWithoutPrimaryFieldFormFieldShouldWorkAsRegularForm()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->addField('enabledRole');
+        $rolesField = $config->addField('roles');
+        $rolesField->getOrCreateTargetEntity()->addField('name');
+
+        $data = new Entity\Account();
+        $role1 = $this->addRole($data, 'role1', false);
+        $role2 = $this->addRole($data, 'role2', true);
+
+        $formBuilder = $this->getFormBuilder($config);
+        $formBuilder->add(
+            'roles',
+            CollectionType::class,
+            [
+                'by_reference'  => false,
+                'allow_add'     => true,
+                'allow_delete'  => true,
+                'entry_type'    => NameContainerType::class,
+                'entry_options' => ['data_class' => Entity\Role::class]
+            ]
+        );
+        $form = $formBuilder->getForm();
+        $form->setData($data);
+        $form->submit(
+            [
+                'roles' => [
+                    ['name' => 'role1'],
+                    ['name' => 'role2'],
+                    ['name' => 'role3']
+                ]
+            ],
+            false
+        );
+        $this->formValidationHandler->validate($form);
+
+        self::assertTrue($form->isSynchronized());
+        self::assertTrue($form->isValid());
+
+        self::assertFalse($role1->isEnabled());
+        self::assertTrue($role2->isEnabled());
+        self::assertCount(3, $data->getRoles());
+    }
+
+    public function testProcessWithoutAssociationFormFieldShouldWorkAsRegularForm()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->addField('enabledRole');
+        $rolesField = $config->addField('roles');
+        $rolesField->getOrCreateTargetEntity()->addField('name');
+
+        $data = new Entity\Account();
+        $role1 = $this->addRole($data, 'role1', false);
+        $role2 = $this->addRole($data, 'role2', true);
+
+        $formBuilder = $this->getFormBuilder($config);
+        $formBuilder->add('enabledRole', null, ['mapped' => false]);
+        $form = $formBuilder->getForm();
+        $form->setData($data);
+        $form->submit(['enabledRole' => 'role1'], false);
+        $this->formValidationHandler->validate($form);
+
+        self::assertTrue($form->isSynchronized());
+        self::assertTrue($form->isValid());
+
+        self::assertFalse($role1->isEnabled());
+        self::assertTrue($role2->isEnabled());
+    }
+
+    public function testProcessWhenPrimaryFieldAndAssociationAreNotSubmitted()
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -344,7 +464,7 @@ class MapPrimaryFieldTest extends TypeTestCase
         self::assertFalse($role2->isEnabled());
     }
 
-    public function testProcessWhenUnknownValueForPrimaryFieldIsSubmitted()
+    public function testProcessWhenNewValueForPrimaryFieldIsSubmitted()
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -355,15 +475,15 @@ class MapPrimaryFieldTest extends TypeTestCase
         $role1 = $this->addRole($data, 'role1', false);
         $role2 = $this->addRole($data, 'role2', true);
 
-        $form = $this->processForm($config, $data, ['enabledRole' => 'unknown']);
+        $form = $this->processForm($config, $data, ['enabledRole' => 'role3']);
         self::assertTrue($form->isSynchronized());
         self::assertTrue($form->isValid());
 
         $roles = $data->getRoles();
-        self::assertCount(3, $roles);
+        self::assertCount(2, $roles);
         self::assertFalse($role1->isEnabled());
-        self::assertFalse($role2->isEnabled());
-        self::assertTrue($roles[2]->isEnabled());
+        self::assertTrue($role2->isEnabled());
+        self::assertEquals('role3', $role2->getName());
     }
 
     public function testProcessWhenUnknownValueForPrimaryFieldIsSubmittedAndAssociationIsSubmitted()
@@ -424,7 +544,7 @@ class MapPrimaryFieldTest extends TypeTestCase
             'This value is too short. It should have 3 characters or more.',
             $errors[0]->getMessage()
         );
-        self::assertCount(0, $form->get('roles')->get('2')->getErrors(true));
+        self::assertCount(0, $form->get('roles')->getErrors(true));
     }
 
     public function testProcessWhenInvalidValueForPrimaryFieldIsSubmittedAndAssociationIsSubmitted()
