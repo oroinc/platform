@@ -322,4 +322,7 @@ $filter-date-range-filter-separator-display: none !default;
 $number-range-filter-vertical-align: top !default;
 $number-range-filter-field-display: inline-block !default;
 $number-range-filter-field-width: 100px !default;
+$number-range-filter-field-caret-end: 8px !default;
+$number-range-filter-field-caret-top: 50% !default;
+$number-range-filter-field-caret-margin: -$caret-width/2 !default;
 $number-range-filter-filter-separator-position: static !default;

@@ -682,23 +682,58 @@
 .number-range-filter {
     vertical-align: $number-range-filter-vertical-align;
 
-    .filter-start {
+    .filter-box .filter-criteria & {
+        &,
+        .value-field-frame,
+        .filter-value {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .value-field-frame {
+            margin: 0;
+
+            .btn {
+                align-self: flex-end;
+            }
+        }
+    }
+
+    .btn-block,
+    .filter-start,
+    .filter-end {
+        margin-bottom: $input-outer-offset-bottom;
         display: $number-range-filter-field-display;
 
+        .btn,
         input[type='text'] {
             width: $number-range-filter-field-width;
         }
     }
 
-    .filter-end {
-        display: $number-range-filter-field-display;
+    .btn-block {
 
-        input[type='text'] {
-            width: $number-range-filter-field-width;
+        .dropdown-toggle  {
+            padding: $selector-uniform-inner-offset;
+            text-align: #{$start};
+            width: 100%;
+
+            &:after {
+                position: $selector-uniform-arrow-position;
+                #{$end}: $number-range-filter-field-caret-end;
+                top: $number-range-filter-field-caret-top;
+                margin-top: $number-range-filter-field-caret-margin;
+            }
+        }
+
+        .dropdown-menu {
+            min-width: 100%;
         }
     }
 
     .filter-separator {
+        height: 0;
+        overflow: hidden;
         position: $number-range-filter-filter-separator-position;
     }
 }
