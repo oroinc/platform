@@ -77,19 +77,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $this->currentOrg = new Organization();
         $this->currentOrg->setId(2);
 
-        $this->tokenAccessor->expects($this->any())
-            ->method('getUser')
-            ->willReturn($this->currentUser);
-        $this->tokenAccessor->expects($this->any())
-            ->method('hasUser')
-            ->willReturn(true);
-        $this->tokenAccessor->expects($this->any())
-            ->method('getUserId')
-            ->willReturn($this->currentUser->getId());
-        $this->tokenAccessor->expects($this->any())
-            ->method('getOrganization')
-            ->willReturn($this->currentOrg);
-
         $this->ownerChecker = new OwnerChecker(
             $this->doctrineHelper,
             $this->businessUnitManager,
@@ -112,6 +99,8 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $this->ownershipMetadataProvider->expects($this->never())
             ->method('getMetadata');
 
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
+
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
@@ -127,6 +116,8 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
 
         $this->entityOwnerAccessor->expects($this->never())
             ->method('getOwner');
+
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -146,15 +137,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(false);
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('ASSIGN', $this->testEntity)
@@ -167,6 +149,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getOwner')
             ->with($this->testEntity)
             ->willReturn($this->testEntity->getOwner());
+
+        $this->configureDoctrineHelper(false);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -186,15 +171,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(false);
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('ASSIGN', $this->testEntity)
@@ -207,6 +183,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getOwner')
             ->with($this->testEntity)
             ->willReturn($this->testEntity->getOwner());
+
+        $this->configureDoctrineHelper(false);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -226,15 +205,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(false);
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('ASSIGN', $this->testEntity)
@@ -244,6 +214,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getOwner')
             ->with($this->testEntity)
             ->willReturn($this->testEntity->getOwner());
+
+        $this->configureDoctrineHelper(false);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -263,15 +236,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(false);
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('ASSIGN', $this->testEntity)
@@ -284,6 +248,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getOwner')
             ->with($this->testEntity)
             ->willReturn($this->testEntity->getOwner());
+
+        $this->configureDoctrineHelper(false);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -303,15 +270,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(false);
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('ASSIGN', $this->testEntity)
@@ -324,6 +282,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getOwner')
             ->with($this->testEntity)
             ->willReturn($this->testEntity->getOwner());
+
+        $this->configureDoctrineHelper(false);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -343,15 +304,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(false);
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('ASSIGN', $this->testEntity)
@@ -361,6 +313,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getOwner')
             ->with($this->testEntity)
             ->willReturn($this->testEntity->getOwner());
+
+        $this->configureDoctrineHelper(false);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -379,15 +334,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
@@ -400,6 +346,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getOwner')
             ->with($this->testEntity)
             ->willReturn($this->testEntity->getOwner());
+
+        $this->configureDoctrineHelper(true);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -418,15 +367,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
@@ -439,6 +379,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getOwner')
             ->with($this->testEntity)
             ->willReturn($this->testEntity->getOwner());
+
+        $this->configureDoctrineHelper(true);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -457,15 +400,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
@@ -475,6 +409,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getOwner')
             ->with($this->testEntity)
             ->willReturn($this->testEntity->getOwner());
+
+        $this->configureDoctrineHelper(true);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -493,15 +430,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
@@ -514,6 +442,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getOwner')
             ->with($this->testEntity)
             ->willReturn($this->testEntity->getOwner());
+
+        $this->configureDoctrineHelper(true);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -532,15 +463,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
@@ -553,6 +475,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getOwner')
             ->with($this->testEntity)
             ->willReturn($this->testEntity->getOwner());
+
+        $this->configureDoctrineHelper(true);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -571,15 +496,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
@@ -589,6 +505,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getOwner')
             ->with($this->testEntity)
             ->willReturn($this->testEntity->getOwner());
+
+        $this->configureDoctrineHelper(true);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -608,15 +527,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
@@ -635,6 +545,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
                     [$this->testEntity, $this->testEntity->getOrganization()],
                 ]
             );
+
+        $this->configureDoctrineHelper(true);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -654,15 +567,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
@@ -682,6 +586,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
+        $this->configureDoctrineHelper(true);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
+
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
@@ -699,15 +606,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
 
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -728,6 +626,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
+        $this->configureDoctrineHelper(true);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
+
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
@@ -745,15 +646,6 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
 
         $accessLevel = AccessLevel::DEEP_LEVEL;
         $this->addOneShotIsGrantedObserverExpectation($accessLevel);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isNewEntity')
-            ->with($this->testEntity)
-            ->willReturn(true);
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -773,6 +665,9 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
                     [$this->testEntity, $this->testEntity->getOrganization()],
                 ]
             );
+
+        $this->configureDoctrineHelper(true);
+        $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
 
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
@@ -815,5 +710,44 @@ class OwnerCheckerTest extends \PHPUnit_Framework_TestCase
         $this->treeProvider->expects($this->once())
             ->method('getTree')
             ->willReturn($ownerTree);
+    }
+
+    /**
+     * @param User $user
+     * @param Organization $organization
+     */
+    private function configureTokenAccessor(User $user, Organization $organization): void
+    {
+        $this->tokenAccessor->expects($this->any())
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->tokenAccessor->expects($this->any())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $this->tokenAccessor->expects($this->any())
+            ->method('getUserId')
+            ->willReturn($user->getId());
+
+        $this->tokenAccessor->expects($this->any())
+            ->method('getOrganization')
+            ->willReturn($organization);
+    }
+
+    /**
+     * @param bool $isEntityNew
+     */
+    private function configureDoctrineHelper(bool $isEntityNew): void
+    {
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntity')
+            ->with($this->testEntity)
+            ->willReturn(true);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isNewEntity')
+            ->with($this->testEntity)
+            ->willReturn($isEntityNew);
     }
 }
