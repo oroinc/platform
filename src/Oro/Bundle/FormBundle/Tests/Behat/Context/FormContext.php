@@ -44,7 +44,8 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     //@codingStandardsIgnoreStart
     /**
-     * @When /^(?:|I )open select entity popup for field "(?P<fieldName>[\w\s]*)" in form "(?P<formName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )open select entity popup for field "(?P<fieldName>[\w\s]*)" in form
+     *     "(?P<formName>(?:[^"]|\\")*)"$/
      * @When /^(?:|I )open select entity popup for field "(?P<fieldName>[\w\s]*)"$/
      */
     //@codingStandardsIgnoreEnd
@@ -276,6 +277,46 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Check that collection field contain values
+     * Example: Then I should see values in field "Reminders":
+     *            | Value 1 |
+     *            | Value 2 |
+     *
+     * @Then /^(?:|I )should see values in field "(?P<field>(?:[^"]|\\")*)":$/
+     */
+    public function collectionFieldHasValues($field, TableNode $table)
+    {
+        $form = $this->createOroForm();
+        $field = $form->findField($field);
+
+        $value = $field->getValue();
+        $expectedValues = $table->getColumn(0);
+        foreach ($expectedValues as $expectedValue) {
+            self::assertContains($expectedValue, $value);
+        }
+    }
+
+    /**
+     * Check that collection field contain values
+     * Example: Then I should not see values in field "Reminders":
+     *            | Value 1 |
+     *            | Value 2 |
+     *
+     * @Then /^(?:|I )should not see values in field "(?P<field>(?:[^"]|\\")*)":$/
+     */
+    public function collectionFieldHasNoValues($field, TableNode $table)
+    {
+        $form = $this->createOroForm();
+        $field = $form->findField($field);
+
+        $value = $field->getValue();
+        $expectedValues = $table->getColumn(0);
+        foreach ($expectedValues as $expectedValue) {
+            self::assertNotContains($expectedValue, $value);
+        }
+    }
+
+    /**
      * Add new embed form with data
      * Example: And add new address with:
      *            | Primary         | check               |
@@ -424,9 +465,9 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select:$/
      *
-     * @param string    $field
+     * @param string $field
      * @param TableNode $options
-     * @param string    $formName
+     * @param string $formName
      */
     public function shouldSeeTheFollowingOptionsForSelect($field, TableNode $options, $formName = 'OroForm')
     {
@@ -447,9 +488,9 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * @Then /^(?:|I )should not see the following options for "(?P<field>[^"]*)" select:$/
      *
-     * @param string    $field
+     * @param string $field
      * @param TableNode $options
-     * @param string    $formName
+     * @param string $formName
      */
     public function shouldNotSeeTheFollowingOptionsForSelect($field, TableNode $options, $formName = 'OroForm')
     {
@@ -489,7 +530,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @param string $selectField
-     * @param array  $optionLabels
+     * @param array $optionLabels
      */
     protected function assertSelectContainsOptions($selectField, array $optionLabels)
     {
@@ -502,7 +543,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @param string $selectField
-     * @param array  $optionLabels
+     * @param array $optionLabels
      */
     protected function assertSelectNotContainsOptions($selectField, array $optionLabels)
     {
