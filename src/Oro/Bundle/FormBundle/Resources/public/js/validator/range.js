@@ -35,12 +35,12 @@ define(function(require) {
                 message = param.invalidMessage;
             } else if (param.min !== null && normalizedValue < Number(param.min)) {
                 message = param.minMessage;
-                placeholders.limit = param.min;
+                placeholders.limit = numberFormatter.formatDecimal(param.min);
             } else if (param.max !== null && normalizedValue > Number(param.max)) {
                 message = param.maxMessage;
-                placeholders.limit = param.max;
+                placeholders.limit = numberFormatter.formatDecimal(param.max);
             }
-            placeholders.value = value;
+            placeholders.value = numberFormatter.formatDecimal(value);
             return __(message, placeholders);
         }
     ];
