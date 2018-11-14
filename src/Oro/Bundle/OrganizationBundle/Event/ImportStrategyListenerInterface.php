@@ -16,7 +16,6 @@ interface ImportStrategyListenerInterface
 
     /**
      * Clear default organization on doctrine entity manager clear
-     * @return mixed
      */
     public function onClear();
 }
