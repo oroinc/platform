@@ -1,7 +1,6 @@
 /* @theme: admin.oro; */
 
-//$direction: ltr !default;
-$direction: rtl !default;
+$direction: ltr !default;
 
 // Default $direction if not valid
 @if $direction != ltr and $direction != rtl {
