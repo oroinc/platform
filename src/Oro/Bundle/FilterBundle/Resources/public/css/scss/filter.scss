@@ -23,7 +23,13 @@
                 background-color: $filter-box-criteria-btn-group-background-color;
                 border: $filter-box-criteria-btn-group-border;
                 font-weight: $filter-box-criteria-btn-group-font-weight;
+                text-transform: $filter-box-criteria-btn-group-text-transform;
+
+                + .dropdown-menu {
+                    text-transform: $filter-box-criteria-btn-group-text-transform;
+                }
             }
+
 
             + .value-field-frame {
                 margin-left: $filter-box-criteria-btn-group-value-field-frame-offset-left;
@@ -717,6 +723,7 @@
             padding: $selector-uniform-inner-offset;
             text-align: #{$start};
             width: 100%;
+            font-size: $selector-uniform-font-size;
 
             &:after {
                 position: $selector-uniform-arrow-position;
