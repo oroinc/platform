@@ -111,6 +111,23 @@
         color: $input-disabled-color;
         resize: $input-disabled-resize;
     }
+
+    &.error {
+        border-color: $danger-dark;
+
+        .action {
+            border-color: $danger-dark;
+        }
+
+        &.focus,
+        &.hover {
+            border-color: $danger-dark;
+
+            .action {
+                border-color: $danger-dark;
+            }
+        }
+    }
 }
 
 textarea,
