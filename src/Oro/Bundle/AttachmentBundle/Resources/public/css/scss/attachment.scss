@@ -131,11 +131,11 @@
 
     [class^="fa-"],
     [class*="fa-"] {
-        margin-right: 3px;
+        margin-#{$end}: 3px;
         line-height: 21px;
 
         &:last-child {
-            margin: 0 0 0 3px;
+            margin: side-values(0 0 0 3px);
         }
     }
 }

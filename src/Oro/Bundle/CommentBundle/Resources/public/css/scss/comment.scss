@@ -162,10 +162,6 @@
             background:  $comments-thumbnail-background;
             border-radius: $comments-thumbnail-border-radius;
 
-            @media only screen and (max-width: 500px) {
-                display: none; // hide thumbnails on mobile
-            }
-
             .fa {
                 padding-top: $comments-thumbnail-icon-offset;
                 color: $comments-thumbnail-icon-color;
@@ -182,12 +178,6 @@
             .dropdown-menu {
                 .view-image {
                     display: none;
-                }
-
-                @media only screen and (max-width: 500px) {
-                    .view-image {
-                        display: block;
-                    }
                 }
             }
 
