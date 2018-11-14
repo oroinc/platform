@@ -74,6 +74,7 @@ button {
 }
 
 %btn-square {
+    line-height: $btn-square-line-height;
     border-width: $btn-square-border-width;
     border-radius: $btn-square-border-radius;
 }
@@ -291,5 +292,10 @@ input[type="button"] {
                 font-size: $btn-icon-mobile-fa-icon-font-size;
             }
         }
+    }
+
+    %btn-square {
+        line-height: $btn-square-mobile-line-height;
+        border-radius: $btn-square-mobile-border-radius;
     }
 }
