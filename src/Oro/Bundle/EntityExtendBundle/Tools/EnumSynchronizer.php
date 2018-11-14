@@ -18,8 +18,7 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Manage fields enum, update and sync
- *
+ * This class contains logic of enum configuration, options and translations synchronization
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EnumSynchronizer
