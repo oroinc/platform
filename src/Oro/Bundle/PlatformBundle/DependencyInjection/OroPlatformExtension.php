@@ -73,6 +73,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
             $this->mergeConfigIntoOne($container, 'security', reset($securityConfig));
         }
 
+        DbalConfigurationLoader::load($container);
         $this->preparePostgreSql($container);
     }
 

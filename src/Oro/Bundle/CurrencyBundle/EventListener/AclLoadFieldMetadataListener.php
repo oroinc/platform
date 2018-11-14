@@ -86,9 +86,7 @@ class AclLoadFieldMetadataListener
             ) {
                 $fieldsToAdd[$target] = new FieldSecurityMetadata(
                     $target,
-                    $this->translator->trans(
-                        $this->entityConfigProvider->getConfig($className, $fieldName)->get('label')
-                    ),
+                    $this->entityConfigProvider->getConfig($className, $fieldName)->get('label'),
                     ['VIEW', 'CREATE', 'EDIT']
                 );
             }

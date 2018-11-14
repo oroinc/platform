@@ -75,6 +75,11 @@ class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
                 ['oro_logger.cache', 1, $cacheProvider],
             ]);
 
+        $cacheProvider->expects($this->once())
+            ->method('fetch')
+            ->with(Configuration::LOGS_LEVEL_KEY)
+            ->willReturn(false);
+
         $this->config->expects($this->never())->method('get');
 
         $this->container

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
@@ -12,19 +13,24 @@ use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\WorkflowBundle\EventListener\FieldLengthListener;
 use Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_13\CreateEntityRestrictionsTable;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareInterface
+class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareInterface, ConnectionAwareInterface
 {
     /**
      * @var ExtendExtension
      */
     protected $extendExtension;
+
+    /** @var Connection */
+    private $connection;
 
     /**
      * {@inheritdoc}
@@ -32,6 +38,14 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
     public function setExtendExtension(ExtendExtension $extendExtension)
     {
         $this->extendExtension = $extendExtension;
+    }
+
+    /**
+     * @param Connection $connection
+     */
+    public function setConnection(Connection $connection)
+    {
+        $this->connection = $connection;
     }
 
     /**
@@ -73,6 +87,27 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
         $this->addOroWorkflowScopesForeignKeys($schema);
 
         CreateEntityRestrictionsTable::createOroWorkflowEntityRestrictionsTable($schema);
+
+        /**
+         * Change the length of some fields for workflow entities to avoid
+         * "Specified key was too long; max key length is 3072 bytes" error
+         * in case if "utf8mb4" charset is used for MySQL database.
+         * The reason why this code was added is to allow install an application with "utf8mb4" charset,
+         * but avoid to change the database schema during upgrade to a patch release.
+         */
+        if (FieldLengthListener::isFieldLengthCorrectionRequired($this->connection)) {
+            $processTriggerTable = $schema->getTable('oro_process_trigger');
+            $processTriggerTable->getColumn('field')
+                ->setLength(150);
+            $transitionTriggerTable = $schema->getTable('oro_workflow_trans_trigger');
+            $transitionTriggerTable->getColumn('field')
+                ->setLength(150);
+            $restrictionTable = $schema->getTable('oro_workflow_restriction');
+            $restrictionTable->getColumn('field')
+                ->setLength(150);
+            $restrictionTable->getColumn('mode')
+                ->setLength(8);
+        }
 
         $this->addWorkflowFieldsToEmailNotificationTable($schema);
     }

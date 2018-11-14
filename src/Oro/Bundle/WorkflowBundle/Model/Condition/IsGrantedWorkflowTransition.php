@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Condition;
 
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
+use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclExtension;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Component\ConfigExpression\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
-
-use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * Used to perform ACL check for ability to perform transition
@@ -38,9 +39,12 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
     /** @var string */
     protected $targetStepName;
 
+    /** @var WorkflowManager */
+    protected $workflowManager;
+
     /**
      * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
+     * @param TokenAccessorInterface $tokenAccessor
      */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
@@ -48,6 +52,14 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
+    }
+
+    /**
+     * @param WorkflowManager $workflowManager
+     */
+    public function setWorkflowManager(WorkflowManager $workflowManager)
+    {
+        $this->workflowManager = $workflowManager;
     }
 
     /**
@@ -85,17 +97,11 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
      */
     protected function isConditionAllowed($context)
     {
-        /** @var WorkflowItem $context */
-
         if (!$this->tokenAccessor->hasUser()) {
             return true;
         }
 
-        $objectWrapper = new DomainObjectWrapper(
-            $context->getEntity(),
-            new ObjectIdentity('workflow', $context->getWorkflowName())
-        );
-
+        $objectWrapper = $this->getDomainObjectWrapper($context);
         if (!$this->authorizationChecker->isGranted('PERFORM_TRANSITIONS', $objectWrapper)) {
             //performing of transitions is forbidden on workflow level
             return false;
@@ -149,5 +155,29 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
         }
 
         return null;
+    }
+
+    /**
+     * @param WorkflowItem $context
+     * @return DomainObjectWrapper
+     * @throws \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
+     */
+    protected function getDomainObjectWrapper(WorkflowItem $context): DomainObjectWrapper
+    {
+        $entity = $context->getEntity();
+        if ($entity && !$context->getEntityId()) {
+            $workflow = $this->workflowManager->getWorkflow($context);
+            $transition = $workflow->getTransitionManager()->getTransition($this->transitionName);
+            if ($transition && $transition->isStart()) {
+                $entity = ObjectIdentityHelper::encodeIdentityString(
+                    WorkflowAclExtension::NAME,
+                    $context->getWorkflowName()
+                );
+            }
+        }
+        return new DomainObjectWrapper(
+            $entity,
+            new ObjectIdentity('workflow', $context->getWorkflowName())
+        );
     }
 }
