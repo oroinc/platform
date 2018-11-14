@@ -3,13 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\MetaPropertiesConfigExtra;
+use Oro\Bundle\ApiBundle\Filter\FilterNames;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
-use Oro\Bundle\ApiBundle\Processor\Shared\AddMetaPropertyFilter;
 use Oro\Bundle\ApiBundle\Processor\Shared\HandleMetaPropertyFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 
 class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 {
@@ -25,7 +27,15 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
-        $this->processor = new HandleMetaPropertyFilter($this->valueNormalizer);
+        $filterNames = $this->createMock(FilterNames::class);
+        $filterNames->expects(self::any())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
+
+        $this->processor = new HandleMetaPropertyFilter(
+            new FilterNamesRegistry([[$filterNames, null]], new RequestExpressionMatcher()),
+            $this->valueNormalizer
+        );
     }
 
     public function testProcessWhenNoMetaFilterValue()
@@ -45,7 +55,7 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
             ->willReturn(null);
 
         $this->context->setFilterValues(new TestFilterValueAccessor());
-        $this->context->getFilterValues()->set(AddMetaPropertyFilter::FILTER_KEY, $filterValue);
+        $this->context->getFilterValues()->set('meta', $filterValue);
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasConfigExtra(MetaPropertiesConfigExtra::NAME));
@@ -61,7 +71,7 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
             ->willReturn(['test1', 'test2']);
 
         $this->context->setFilterValues(new TestFilterValueAccessor());
-        $this->context->getFilterValues()->set(AddMetaPropertyFilter::FILTER_KEY, $filterValue);
+        $this->context->getFilterValues()->set('meta', $filterValue);
         $this->processor->process($this->context);
 
         $expectedConfigExtra = new MetaPropertiesConfigExtra();

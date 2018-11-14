@@ -7,18 +7,18 @@ namespace Oro\Bundle\ApiBundle\Filter;
  */
 class FilterHelper
 {
-    const PAGE_NUMBER_FIELD_NAME = '__page_number__';
-    const PAGE_SIZE_FIELD_NAME   = '__page_size__';
-    const SORT_FIELD_NAME        = '__sort__';
+    private const PAGE_NUMBER_FIELD_NAME = '__page_number__';
+    private const PAGE_SIZE_FIELD_NAME   = '__page_size__';
+    private const SORT_FIELD_NAME        = '__sort__';
 
     /** @var FilterCollection */
-    protected $filters;
+    private $filters;
 
     /** @var FilterValueAccessorInterface */
-    protected $filterValues;
+    private $filterValues;
 
     /** @var array [field name => [FilterValue|null, filterKey, filter], ...] */
-    protected $filterMap;
+    private $filterMap;
 
     /**
      * @param FilterCollection             $filters
@@ -35,10 +35,10 @@ class FilterHelper
      *
      * @return int|null
      */
-    public function getPageNumber()
+    public function getPageNumber(): ?int
     {
         $result = null;
-        $filterValue = $this->getFilterValue(FilterHelper::PAGE_NUMBER_FIELD_NAME);
+        $filterValue = $this->getFilterValue(self::PAGE_NUMBER_FIELD_NAME);
         if ($filterValue) {
             $result = $filterValue->getValue();
         }
@@ -51,10 +51,10 @@ class FilterHelper
      *
      * @return int|null
      */
-    public function getPageSize()
+    public function getPageSize(): ?int
     {
         $result = null;
-        $filterValue = $this->getFilterValue(FilterHelper::PAGE_SIZE_FIELD_NAME);
+        $filterValue = $this->getFilterValue(self::PAGE_SIZE_FIELD_NAME);
         if ($filterValue) {
             $result = $filterValue->getValue();
         }
@@ -67,10 +67,10 @@ class FilterHelper
      *
      * @return array|null [field name => direction, ...] or NULL
      */
-    public function getOrderBy()
+    public function getOrderBy(): ?array
     {
         $result = null;
-        $filterValue = $this->getFilterValue(FilterHelper::SORT_FIELD_NAME);
+        $filterValue = $this->getFilterValue(self::SORT_FIELD_NAME);
         if ($filterValue) {
             $result = $filterValue->getValue();
         }
@@ -85,7 +85,7 @@ class FilterHelper
      *
      * @return bool|null
      */
-    public function getBooleanFilterValue($fieldName)
+    public function getBooleanFilterValue(string $fieldName): ?bool
     {
         $result = null;
         $filterValue = $this->getFilterValue($fieldName);
@@ -106,7 +106,7 @@ class FilterHelper
      *
      * @return FilterValue|null
      */
-    public function getFilterValue($fieldName)
+    public function getFilterValue(string $fieldName): ?FilterValue
     {
         $this->ensureInitialized();
 
@@ -127,7 +127,7 @@ class FilterHelper
     /**
      * Makes sure that $this->filterMap is initialized.
      */
-    protected function ensureInitialized()
+    private function ensureInitialized(): void
     {
         if (null !== $this->filterMap) {
             return;
