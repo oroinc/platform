@@ -12,6 +12,7 @@
         .title-buttons-container {
             max-width: 100%;
 
+            // All children should have a own font-size
             font-size: 0;
             text-align: #{$end};
 
@@ -36,7 +37,6 @@
             }
 
             .separator-btn {
-                display: inline-block;
                 margin: side-values(0 0 0 $content-padding-small);
             }
         }

@@ -251,20 +251,6 @@
                 border-bottom: $desktop-app-header-user-menu-divider-border-bottom;
                 margin: $desktop-app-header-user-menu-divider-margin;
             }
-
-            li {
-                line-height: 28px;
-
-                &:hover {
-                    background: $primary-900;
-                }
-
-                a {
-                    color: $primary-200;
-                    padding-top: $desktop-app-header-user-menu-item-v-padding;
-                    padding-bottom: $desktop-app-header-user-menu-item-v-padding;
-                }
-            }
         }
     }
 }

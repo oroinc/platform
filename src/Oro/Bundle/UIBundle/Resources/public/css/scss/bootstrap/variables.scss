@@ -78,6 +78,7 @@ $btn-group-divider-color: rgba($primary-inverse, .4);
 
 // Navbar
 $nav-tabs-link-hover-border-color: $primary-750;
+$nav-divider-margin-y: 4px;
 
 // Pagination
 $pagination-padding-x: 12px;
@@ -115,15 +116,20 @@ $caret-width: 4px;
 
 $dropdown-border-width: 0;
 
+$dropdown-spacer: 0;
+$dropdown-min-width: 112px;
+$dropdown-padding-y: 8px;
 $dropdown-item-padding-x: 16px;
-$dropdown-item-padding-y: 3px;
-$dropdown-item-icon-fa-offset: side-values(0 6px 0 0);
-$dropdown-link-color: $primary-300;
+$dropdown-item-padding-y: 2px;
+$dropdown-item-line-height: 1.75;
+$dropdown-item-icon-fa-width: 22px;
+$dropdown-link-color: $primary-200;
 $dropdown-link-hover-color: $primary-300;
 $dropdown-link-hover-bg: $primary-900;
-
 $dropdown-link-active-color: $primary-300;
 $dropdown-link-active-bg: $primary-900;
+
+$dropdown-divider-bg: $primary-860 !default;
 
 $modal-backdrop-bg: $primary-inverse;
 $modal-backdrop-opacity: .9;

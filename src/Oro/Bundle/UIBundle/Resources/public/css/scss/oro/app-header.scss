@@ -22,14 +22,6 @@
     }
 
     .dropdown-menu {
-        > li {
-            line-height: $header-dropdown-menu-li-line-height;
-
-            > a {
-                line-height: $header-dropdown-menu-link-line-height;
-            }
-        }
-
         &:before {
             border: 0 none;
 
