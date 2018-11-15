@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Filter\FilterNames;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultSorting;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -10,6 +12,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 
 class SetDefaultSortingTest extends GetListProcessorTestCase
 {
@@ -20,7 +23,14 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
     {
         parent::setUp();
 
-        $this->processor = new SetDefaultSorting();
+        $filterNames = $this->createMock(FilterNames::class);
+        $filterNames->expects(self::any())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
+        $this->processor = new SetDefaultSorting(
+            new FilterNamesRegistry([[$filterNames, null]], new RequestExpressionMatcher())
+        );
     }
 
     public function testProcessWhenQueryIsAlreadyExist()

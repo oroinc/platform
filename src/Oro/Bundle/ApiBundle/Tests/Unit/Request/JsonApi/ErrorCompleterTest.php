@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
+use Oro\Bundle\ApiBundle\Filter\FilterNames;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -15,6 +17,7 @@ use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\ErrorCompleter;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\HttpFoundation\Response;
 
 class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
@@ -37,7 +40,22 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
         $this->requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
-        $this->errorCompleter = new ErrorCompleter($this->exceptionTextExtractor, $this->valueNormalizer);
+        $filterNames = $this->createMock(FilterNames::class);
+        $filterNames->expects(self::any())
+            ->method('getIncludeFilterName')
+            ->willReturn('include');
+        $filterNames->expects(self::any())
+            ->method('getFieldsFilterTemplate')
+            ->willReturn('fields[%s]');
+
+        $this->errorCompleter = new ErrorCompleter(
+            $this->exceptionTextExtractor,
+            $this->valueNormalizer,
+            new FilterNamesRegistry(
+                [[$filterNames, RequestType::JSON_API]],
+                new RequestExpressionMatcher()
+            )
+        );
     }
 
     public function testCompleteErrorWithoutInnerException()

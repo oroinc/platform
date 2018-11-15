@@ -38,6 +38,7 @@ class OroApiBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new Compiler\ProcessorBagCompilerPass());
+        $container->addCompilerPass(new Compiler\FilterNamesCompilerPass());
         $container->addCompilerPass(new Compiler\FilterFactoryCompilerPass());
         $container->addCompilerPass(new Compiler\FormCompilerPass());
         $container->addCompilerPass(new Compiler\DataTransformerCompilerPass());

@@ -1,14 +1,21 @@
 <?php
 
-namespace Oro\Bundle\ConfigBundle\Tests\Unit\Api\Processor\GetList\JsonApi;
+namespace Oro\Bundle\ConfigBundle\Tests\Unit\Api\Processor\GetList;
 
 use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterNames;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\IncludeFilter;
-use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddFieldsFilter;
-use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddIncludeFilter;
+use Oro\Bundle\ApiBundle\Processor\Shared\AddFieldsFilter;
+use Oro\Bundle\ApiBundle\Processor\Shared\AddIncludeFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
-use Oro\Bundle\ConfigBundle\Api\Processor\GetList\JsonApi\SetDefaultValueForFieldsFilter;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption;
+use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection;
+use Oro\Bundle\ConfigBundle\Api\Processor\GetList\SetDefaultValueForFieldsFilter;
 
 class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
 {
@@ -21,17 +28,40 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
     protected function setUp()
     {
         parent::setUp();
+        $this->context->getRequestType()->add(RequestType::JSON_API);
 
-        $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
-        $this->processor = new SetDefaultValueForFieldsFilter($this->valueNormalizer);
+        $jsonApiFilterNames = $this->createMock(FilterNames::class);
+        $jsonApiFilterNames->expects(self::any())
+            ->method('getFieldsFilterTemplate')
+            ->willReturn('fields[%s]');
+        $jsonApiFilterNames->expects(self::any())
+            ->method('getIncludeFilterName')
+            ->willReturn('include');
+        $defaultFilterNames = $this->createMock(FilterNames::class);
+        $defaultFilterNames->expects(self::any())
+            ->method('getFieldsFilterTemplate')
+            ->willReturn(null);
+        $defaultFilterNames->expects(self::any())
+            ->method('getIncludeFilterName')
+            ->willReturn(null);
+
+        $this->processor = new SetDefaultValueForFieldsFilter(
+            new FilterNamesRegistry(
+                [
+                    [$jsonApiFilterNames, RequestType::JSON_API],
+                    [$defaultFilterNames, null]
+                ],
+                new RequestExpressionMatcher()
+            ),
+            $this->valueNormalizer
+        );
     }
 
     public function testProcessWhenNoFilters()
     {
-        $entityClass = 'Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection';
+        $entityClass = ConfigurationSection::class;
         $entityType = 'configuration';
 
         $this->valueNormalizer->expects($this->exactly(2))
@@ -47,7 +77,7 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
                         $entityType
                     ],
                     [
-                        'Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption',
+                        ConfigurationOption::class,
                         DataType::ENTITY_TYPE,
                         $this->context->getRequestType(),
                         false,
@@ -81,7 +111,7 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
 
     public function testProcessWhenConfigurationSectionFieldsFilterExist()
     {
-        $entityClass = 'Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection';
+        $entityClass = ConfigurationSection::class;
         $entityType = 'configuration';
 
         $configurationSectionFieldsFilter = new FieldsFilter(
@@ -103,7 +133,7 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
                         $entityType
                     ],
                     [
-                        'Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption',
+                        ConfigurationOption::class,
                         DataType::ENTITY_TYPE,
                         $this->context->getRequestType(),
                         false,
@@ -146,7 +176,7 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
 
     public function testProcessWhenConfigurationOptionsFieldsAndIncludeFiltersAlreadyExist()
     {
-        $entityClass = 'Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection';
+        $entityClass = ConfigurationSection::class;
         $entityType = 'configuration';
 
         $configurationOptionsFieldsFilter = new FieldsFilter(
@@ -171,7 +201,7 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
                         $entityType
                     ],
                     [
-                        'Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption',
+                        ConfigurationOption::class,
                         DataType::ENTITY_TYPE,
                         $this->context->getRequestType(),
                         false,
@@ -193,5 +223,20 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
             ],
             iterator_to_array($this->context->getFilters()->getIterator())
         );
+    }
+
+    public function testProcessWhenFieldsAndIncludeFiltersAreNotSupported()
+    {
+        $entityClass = ConfigurationSection::class;
+
+        $this->valueNormalizer->expects($this->never())
+            ->method('normalizeValue');
+
+        $this->context->getRequestType()->clear();
+        $this->context->getRequestType()->add(RequestType::REST);
+        $this->context->setClassName($entityClass);
+        $this->processor->process($this->context);
+
+        $this->assertCount(0, $this->context->getFilters());
     }
 }

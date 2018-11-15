@@ -587,6 +587,7 @@ services:
         arguments:
             - '@oro_api.exception_text_extractor'
             - '@oro_api.value_normalizer'
+            - '@oro_api.filter_names_registry'
         tags:
             - { name: oro.api.error_completer, requestType: json_api }
 
