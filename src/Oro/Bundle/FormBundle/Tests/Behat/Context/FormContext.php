@@ -45,8 +45,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     //@codingStandardsIgnoreStart
     /**
-     * @When /^(?:|I )open select entity popup for field "(?P<fieldName>[\w\s]*)" in form
-     *     "(?P<formName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )open select entity popup for field "(?P<fieldName>[\w\s]*)" in form "(?P<formName>(?:[^"]|\\")*)"$/
      * @When /^(?:|I )open select entity popup for field "(?P<fieldName>[\w\s]*)"$/
      */
     //@codingStandardsIgnoreEnd
@@ -271,7 +270,8 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * Check that collection field contain values
+     * Check that the field contains the following values.
+     *
      * Example: Then I should see values in field "Reminders":
      *            | Value 1 |
      *            | Value 2 |
@@ -291,7 +291,8 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * Check that collection field contain values
+     * Check that the field does not contain the following values.
+     *
      * Example: Then I should not see values in field "Reminders":
      *            | Value 1 |
      *            | Value 2 |

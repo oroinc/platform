@@ -403,7 +403,7 @@ class EnumSynchronizer
     protected function getIdByExistingValues(array $values, array $option)
     {
         foreach ($values as $value) {
-            if (mb_strtolower($value->getName()) === mb_strtolower($option['label'])) {
+            if ($value->getName() === $option['label']) {
                 return $value->getId();
             }
         }
