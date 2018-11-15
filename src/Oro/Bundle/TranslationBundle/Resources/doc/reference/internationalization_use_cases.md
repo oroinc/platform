@@ -5,7 +5,7 @@ There are 3 ways to translate content (text) displayed to a user in Oro applicat
 
 * [Standard Symfony Translator](#standard-symfony-translator)
 * [Translatable Doctrine Extension](#translatable-doctrine-extension)
-* [LocalizedFallbackValue entity from OroLocaleBundle](#localizedfallbackvalue-entity-from-orolocalebundle)
+* [LocalizedFallbackValue Entity from OroLocaleBundle](#localizedfallbackvalue-entity-from-orolocalebundle)
 
 This topic explains when to use each of the three approaches and provides implementation examples. 
 
@@ -22,7 +22,7 @@ To translate labels, use the Translation component, which is one of the main Sym
 Oro application adds the translation functionality on top of Symfony's standard approach which enables modification of
 translations via UI.
 
-To use this approach add the translation file to bundle:
+To use this approach, add the translation file to the bundle:
 **Resources/translations/messages.en.yml**
 ```yml
 oro:
@@ -31,14 +31,14 @@ oro:
            label: Localized value
 ```
 
-Add use the Symfony translator to translate the label in TWIG template:
+Use the Symfony translator to translate a label in the `twig` template:
 **Resources/views/Form/form.html.twig**
 ```twig
 {{ ‘oro.translation.some_field.label’|trans }}
 
 ```
 
-or in the php code:
+or in the `php` code:
 ```php
 <?php
 
@@ -60,29 +60,31 @@ class AcmeController extends Controller
 }
 ```
 
-More information on how to use it is available at [Symfony Documentation](https://symfony.com/doc/current/translation.html).
+More information on how to use it is available in [Symfony Documentation](https://symfony.com/doc/current/translation.html).
 
-## Pros:
+#### Pros:
+* Does not require additional implementation and can be used in Symfony framework out-of-the-box.
 
-## Cons:
+#### Cons:
+* Cannot be applied to translate dynamic content in the application.
 
-Translatable doctrine extension
+Translatable Doctrine Extension
 -------------------------------
 
 Dynamic content is another type of content used in Oro applications. What is displayed in the UI is based on data loaded
 from fixtures into the database and entered by users in the UI. As a rule, this data is based on dictionaries used in
 certain entities.
 
-Examples of such data are the Country and Region fields of the Address entity. There are a number of dictionaries with
-a list of these fields. For instance, these fields must take into account the language selected for the interface in
-cases when users must be able to filter and sort data by Country and Region in a grid with addresses. In this case, use
+Examples of such data are the Country and Region fields which are used in the Address entity. The application has
+dictionaries for each of these entities with all available translations for all translatable fields of these entities
+(into all available languages).
+For instance, these fields must take into account the language selected for the interface in cases when users must be
+able to filter and sort data by Country and Region in a grid with addresses. In this case, use
 [Gedmo/Translatable](http://atlantic18.github.io/DoctrineExtensions/doc/translatable.html).  
+Such fields are displayed in the UI in the selected language. All requests to the database will change in order for the
+translations grid to retrieve data based on the current locale. 
 
-The entity fields translated through `Gedmo/Translatable` are displayed in the UI in the selected language. Filters and
-sorting also happens using the same selected language. In fact, all requests to the database will change in order for
-the translations grid to retrieve data based on the current locale. 
-
-Bellow an example of Entity which must works with `Gedmo/Translatable` for the `name` field of this entity.
+Bellow is an example of an entity which must work with `Gedmo/Translatable` for the `name` field of this entity.
 ```php
 <?php
 
@@ -148,7 +150,7 @@ class Country implements Translatable
 }
 ```
 
-Also `Gedmo/Translatable` requires dictionary which will contains all translations for the original entity:
+Also, `Gedmo/Translatable` requires a dictionary with all translations for the original entity fields:
 ```php
 <?php
 
@@ -172,7 +174,7 @@ class CountryTranslation extends AbstractTranslation
 }
 ```
 
-For the grid to have working translations for entities with `Gedmo` fields, add a hint `HINT_TRANSLATABLE`:
+For the grid to have working translations for entities with `Gedmo` fields, add the `HINT_TRANSLATABLE` hint:
 **Resources/config/oro/datagrids.yml**
 ```yml
 datagrids:
@@ -220,23 +222,27 @@ datagrids:
 In this case, the values in the name field are displayed in the required language, and filtering and sorting for the
 values happens in the selected language.
 
-## Pros:
+#### Pros:
+* Dynamic content in the application can be easily translated.
+* The translatable fields have value related to the actual language of the application.
 
-## Cons:
+#### Cons:
+* The user must switch the current language into the required language in the system configuration to
+fill in the fields with the required values.
+* Translatable fields can have values only for some languages but not for `Localizations`.
 
-LocalizedFallbackValue entity from OroLocaleBundle
+LocalizedFallbackValue Entity from OroLocaleBundle
 --------------------------------------------------
 
 UI language is incorporated into the localization entity. You can have several localizations in the application with the
-same interface language. However, data for different localizations may differ. In addition, the current localization may
-have an assigned parent localization from which the field values are sourced if they are left undefined for the current
-localization. This allows for setting up a flexible translation tree via the UI.
+same interface language. However, data for various localizations may differ.
+In addition, if the current localization is assigned a parent localization then in cases when a field value does not
+exist, it is taken from the parent. This allows for setting up a flexible translation tree via the UI.
  
 To implement this approach, use the
-[LocalizedFallbackValue](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/LocaleBundle/Resources/doc/reference/entities.md#localizedfallbackvalue)
-[entity](../../Entity/LocalizedFallbackValue.php).
+[LocalizedFallbackValue](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/LocaleBundle/Resources/doc/reference/entities.md#localizedfallbackvalue).
 
-To use `LocalizedFallbackValue` for fields into the entity make it is extendable:
+To use `LocalizedFallbackValue` for fields into the entity, make it is extendable:
  ```php
 <?php
 
@@ -292,8 +298,8 @@ class ExtendAcme
 }
 ```
 
-Enable the `Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass` for the entity and the field
-inside bundle class:
+Enable `Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass` for the entity and the field
+inside the bundle class:
 ```php
 <?php
 
@@ -349,8 +355,38 @@ abstract class EX_OroAcmeBundle_Acme extends \Oro\Bundle\LocaleBundle\Model\Exte
 }
 ```
 
+To be able to provide translations in the UI, use the following example of the form type:
+```php
+<?php
+
+namespace Oro\Bundle\AcmeBundle\Form\Type;
+
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+
+class AcmeType extends AbstractType
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->add(
+            'names',
+            LocalizedFallbackValueCollectionType::class,
+            ['label' => 'oro.acme.names.label']
+        );
+    }
+}
+```
+
 To retrieve a name for the `Localization`, it is enough to use the `getName()` method.
 
-## Pros:
+#### Pros:
+* The translatable fields can be translated for each `Localization` available in the application.
+* It is easy to provide values for the `Localizations` in the entity form without changing the actual UI language.
 
-## Cons:
+#### Cons:
+* Translated values cannot be used in the datagrids for filtering and sorting out-of-the-box.
+* Additional implementation is required to render translated values for the actual `Localization`.
