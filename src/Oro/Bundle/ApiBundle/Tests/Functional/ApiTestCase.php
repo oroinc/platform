@@ -227,7 +227,7 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * Loads the response content.
+     * Loads the response content and convert it to an array.
      *
      * @param string $fileName
      * @param string $folderName
@@ -236,13 +236,26 @@ abstract class ApiTestCase extends WebTestCase
      */
     protected function loadYamlData($fileName, $folderName = null)
     {
+        return Yaml::parse($this->loadData($fileName, $folderName));
+    }
+
+    /**
+     * Loads the response content.
+     *
+     * @param string $fileName
+     * @param string $folderName
+     *
+     * @return string
+     */
+    protected function loadData($fileName, $folderName = null)
+    {
         if ($this->isRelativePath($fileName)) {
             $fileName = $this->getTestResourcePath($folderName, $fileName);
         }
         $file = self::getContainer()->get('file_locator')->locate($fileName);
         self::assertTrue(is_file($file), sprintf('File "%s" with expected content not found', $fileName));
 
-        return Yaml::parse(file_get_contents($file));
+        return file_get_contents($file);
     }
 
     /**

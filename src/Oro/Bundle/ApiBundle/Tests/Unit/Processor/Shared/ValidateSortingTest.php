@@ -7,6 +7,8 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Filter\FilterNames;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -18,6 +20,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 
 class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 {
@@ -30,7 +33,16 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->context->setAction('get_list');
 
-        $this->processor = new ValidateSorting($this->doctrineHelper, $this->configProvider);
+        $filterNames = $this->createMock(FilterNames::class);
+        $filterNames->expects(self::any())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
+        $this->processor = new ValidateSorting(
+            $this->doctrineHelper,
+            $this->configProvider,
+            new FilterNamesRegistry([[$filterNames, null]], new RequestExpressionMatcher())
+        );
     }
 
     public function testProcessWhenQueryIsAlreadyBuilt()
@@ -68,7 +80,10 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $sortersConfig->getField('id')->setExcluded(true);
 
         $this->prepareFilters();
-        $this->context->getFilterValues()->get('sort')->setSourceKey('sortFilterSourceKey');
+        $sortFilterValue = $this->context->getFilterValues()->get('sort');
+        $sortFilterValue->setSource(
+            FilterValue::createFromSource('sortFilterSourceKey', $sortFilterValue->getPath(), '')
+        );
 
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);

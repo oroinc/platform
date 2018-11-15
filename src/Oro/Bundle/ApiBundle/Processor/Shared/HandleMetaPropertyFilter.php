@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\MetaPropertiesConfigExtra;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -16,14 +17,19 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class HandleMetaPropertyFilter implements ProcessorInterface
 {
+    /** @var FilterNamesRegistry */
+    private $filterNamesRegistry;
+
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /**
-     * @param ValueNormalizer $valueNormalizer
+     * @param FilterNamesRegistry $filterNamesRegistry
+     * @param ValueNormalizer     $valueNormalizer
      */
-    public function __construct(ValueNormalizer $valueNormalizer)
+    public function __construct(FilterNamesRegistry $filterNamesRegistry, ValueNormalizer $valueNormalizer)
     {
+        $this->filterNamesRegistry = $filterNamesRegistry;
         $this->valueNormalizer = $valueNormalizer;
     }
 
@@ -34,7 +40,10 @@ class HandleMetaPropertyFilter implements ProcessorInterface
     {
         /** @var Context $context */
 
-        $filterValue = $context->getFilterValues()->get(AddMetaPropertyFilter::FILTER_KEY);
+        $filterName = $this->filterNamesRegistry
+            ->getFilterNames($context->getRequestType())
+            ->getMetaPropertyFilterName();
+        $filterValue = $context->getFilterValues()->get($filterName);
         if (null === $filterValue) {
             // meta properties were not requested
             return;

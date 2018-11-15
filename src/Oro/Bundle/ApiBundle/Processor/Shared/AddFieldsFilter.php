@@ -1,9 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -16,23 +17,26 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  * Adds "fields" filters that can be used to specify which fields of primary
  * or related entities should be returned.
  * As this filter has influence on the entity configuration, it is handled by a separate processor.
- * @see \Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleFieldsFilter
+ * @see \Oro\Bundle\ApiBundle\Processor\Shared\HandleFieldsFilter
  */
 class AddFieldsFilter implements ProcessorInterface
 {
-    public const FILTER_KEY                  = 'fields';
-    public const FILTER_KEY_TEMPLATE         = 'fields[%s]';
     public const FILTER_DESCRIPTION_TEMPLATE =
         'A list of fields of \'%s\' entity that will be returned in the response.';
+
+    /** @var FilterNamesRegistry */
+    private $filterNamesRegistry;
 
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
     /**
-     * @param ValueNormalizer $valueNormalizer
+     * @param FilterNamesRegistry $filterNamesRegistry
+     * @param ValueNormalizer     $valueNormalizer
      */
-    public function __construct(ValueNormalizer $valueNormalizer)
+    public function __construct(FilterNamesRegistry $filterNamesRegistry, ValueNormalizer $valueNormalizer)
     {
+        $this->filterNamesRegistry = $filterNamesRegistry;
         $this->valueNormalizer = $valueNormalizer;
     }
 
@@ -43,8 +47,15 @@ class AddFieldsFilter implements ProcessorInterface
     {
         /** @var Context $context */
 
+        $filterNames = $this->filterNamesRegistry->getFilterNames($context->getRequestType());
+        $filterGroupName = $filterNames->getFieldsFilterGroupName();
+        if (!$filterGroupName) {
+            // the "fields" filter is not supported
+            return;
+        }
+
         $filters = $context->getFilters();
-        if ($filters->has(self::FILTER_KEY)) {
+        if ($filters->has($filterGroupName)) {
             // filters have been already set
             return;
         }
@@ -55,23 +66,25 @@ class AddFieldsFilter implements ProcessorInterface
             return;
         }
 
+        $filterTemplate = $filterNames->getFieldsFilterTemplate();
         if ('initialize' === $context->getLastGroup()) {
             // add "fields" filters for the primary entity and all associated entities
             // this is required to display them on the API Sandbox
-            $this->addFiltersForDocumentation($context);
+            $this->addFiltersForDocumentation($context, $filterTemplate);
         } else {
             // add all requested "fields" filters
-            $filterValues = $context->getFilterValues()->getGroup(self::FILTER_KEY);
+            $filterValues = $context->getFilterValues()->getGroup($filterGroupName);
             foreach ($filterValues as $filterValue) {
-                $this->addFilter($filters, $filterValue->getPath());
+                $this->addFilter($filterTemplate, $filters, $filterValue->getPath());
             }
         }
     }
 
     /**
      * @param Context $context
+     * @param string  $filterTemplate
      */
-    private function addFiltersForDocumentation(Context $context): void
+    private function addFiltersForDocumentation(Context $context, string $filterTemplate): void
     {
         $metadata = $context->getMetadata();
         if (null === $metadata) {
@@ -83,7 +96,7 @@ class AddFieldsFilter implements ProcessorInterface
         $requestType = $context->getRequestType();
 
         // the "fields" filter for the primary entity
-        $this->addFilterForEntityClass($filters, $context->getClassName(), $requestType);
+        $this->addFilterForEntityClass($filterTemplate, $filters, $context->getClassName(), $requestType);
 
         // the "fields" filters for associated entities
         $config = $context->getConfig();
@@ -95,32 +108,35 @@ class AddFieldsFilter implements ProcessorInterface
             }
             $targetClasses = $association->getAcceptableTargetClassNames();
             foreach ($targetClasses as $targetClass) {
-                $this->addFilterForEntityClass($filters, $targetClass, $requestType);
+                $this->addFilterForEntityClass($filterTemplate, $filters, $targetClass, $requestType);
             }
         }
     }
 
     /**
+     * @param string           $filterTemplate
      * @param FilterCollection $filters
      * @param string           $entityClass
      * @param RequestType      $requestType
      */
     private function addFilterForEntityClass(
+        string $filterTemplate,
         FilterCollection $filters,
         string $entityClass,
         RequestType $requestType
     ): void {
         $entityType = $this->convertToEntityType($entityClass, $requestType);
         if ($entityType) {
-            $this->addFilter($filters, $entityType);
+            $this->addFilter($filterTemplate, $filters, $entityType);
         }
     }
 
     /**
+     * @param string           $filterTemplate
      * @param FilterCollection $filters
      * @param string           $entityType
      */
-    private function addFilter(FilterCollection $filters, string $entityType): void
+    private function addFilter(string $filterTemplate, FilterCollection $filters, string $entityType): void
     {
         $filter = new FieldsFilter(
             DataType::STRING,
@@ -129,7 +145,7 @@ class AddFieldsFilter implements ProcessorInterface
         $filter->setArrayAllowed(true);
 
         $filters->add(
-            sprintf(self::FILTER_KEY_TEMPLATE, $entityType),
+            sprintf($filterTemplate, $entityType),
             $filter
         );
     }
