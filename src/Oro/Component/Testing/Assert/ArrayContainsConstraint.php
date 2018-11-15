@@ -8,13 +8,13 @@ namespace Oro\Component\Testing\Assert;
 class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
 {
     /** @var array */
-    private $expected;
+    protected $expected;
 
     /** @var bool */
-    private $strict;
+    protected $strict;
 
     /** @var array [[path, message], ...] */
-    private $errors = [];
+    protected $errors = [];
 
     /**
      * @param array $expected The expected array
@@ -77,7 +77,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      * @param mixed    $actual
      * @param string[] $path
      */
-    private function matchArrayContains(array $expected, $actual, array $path)
+    protected function matchArrayContains(array $expected, $actual, array $path)
     {
         if (!$this->isInternalType('array', $actual, $path)) {
             return;
@@ -95,7 +95,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      * @param array $actual
      * @param array $path
      */
-    private function matchAssocArray(array $expected, array $actual, array $path)
+    protected function matchAssocArray(array $expected, array $actual, array $path)
     {
         $lastPathIndex = count($path);
         foreach ($expected as $expectedKey => $expectedValue) {
@@ -112,7 +112,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      * @param array $actual
      * @param array $path
      */
-    private function matchIndexedArray(array $expected, array $actual, array $path)
+    protected function matchIndexedArray(array $expected, array $actual, array $path)
     {
         $processedKeys = []; // [found key => expected key, ...]
         $lastPathIndex = count($path);
@@ -163,7 +163,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      *
      * @return int|null
      */
-    private function tryMatchIndexedElement($expectedValue, array $actual, array $path, array $processedKeys)
+    protected function tryMatchIndexedElement($expectedValue, array $actual, array $path, array $processedKeys)
     {
         $foundKey = null;
         $elementPath = $path;
@@ -190,7 +190,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      * @param mixed    $value
      * @param string[] $path
      */
-    private function matchArrayElement($expectedValue, $value, array $path)
+    protected function matchArrayElement($expectedValue, $value, array $path)
     {
         if (is_array($expectedValue)) {
             $this->matchArrayContains($expectedValue, $value, $path);
@@ -206,7 +206,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      *
      * @return bool
      */
-    private function isInternalType($expectedType, $value, array $path)
+    protected function isInternalType($expectedType, $value, array $path)
     {
         try {
             \PHPUnit\Framework\Assert::assertInternalType($expectedType, $value);
@@ -226,7 +226,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      *
      * @return bool
      */
-    private function isArrayHasKey($key, $array, array $path)
+    protected function isArrayHasKey($key, $array, array $path)
     {
         try {
             \PHPUnit\Framework\Assert::assertArrayHasKey($key, $array);
@@ -246,7 +246,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      *
      * @return bool
      */
-    private function isSame($expected, $actual, array $path)
+    protected function isSame($expected, $actual, array $path)
     {
         try {
             if (is_string($actual) && is_string($expected)) {
@@ -274,7 +274,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      *
      * @return bool
      */
-    private function isAssocArray(array $array)
+    protected function isAssocArray(array $array)
     {
         return array_values($array) !== $array;
     }

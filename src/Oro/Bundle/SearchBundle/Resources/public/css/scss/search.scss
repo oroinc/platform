@@ -26,11 +26,8 @@
 
         input[type="text"] {
             width: 300px;
-        }
 
-        .btn {
-            height: 30px;
-            line-height: 29px;
+            margin-bottom: 0;
         }
     }
 }
@@ -67,17 +64,6 @@
             margin: 2px 0 3px;
         }
     }
-}
-
-.search-no-results {
-    margin: 10px auto;
-    width: 98%;
-    padding: 10px 0;
-    text-align: center;
-    vertical-align: middle;
-    font-size: 16px;
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
 }
 
 .search-grid {

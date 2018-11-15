@@ -1,5 +1,6 @@
 /* @theme: admin.oro; */
 
+@import "bowerassets/font-awesome/scss/_variables";
 @import "../mixins/direction";
 @import "../colors";
 
@@ -37,6 +38,7 @@ $btn-text-transform: uppercase;
 
 $btn-mobile-font-size: 14px;
 $btn-mobile-border-radius: 20px;
+$btn-square-mobile-border-radius: 2px;
 $btn-icon-mobile-fa-icon-font-size: 18px;
 
 $content-title-font-size: 20px;
@@ -63,10 +65,12 @@ $input-btn-mobile-padding-x: 16px;
 $btn-padding-y-mini: 0;
 $btn-padding-x-mini: 16px;
 $btn-line-height: 32px;
+$btn-square-line-height: 28px;
 $btn-line-height-mini: 20px;
 $btn-border-radius-mini: $btn-border-radius;
 
 $btn-mobile-line-height: 40px;
+$btn-square-mobile-line-height: 36px;
 $btn-mobile-padding-y: $input-btn-mobile-padding-y;
 $btn-mobile-padding-x: $input-btn-mobile-padding-x;
 
@@ -75,6 +79,13 @@ $btn-group-divider-color: rgba($primary-inverse, .4);
 
 // Navbar
 $nav-tabs-link-hover-border-color: $primary-750;
+$nav-divider-margin-y: 4px;
+
+//Alert
+$alert-border-radius: 2px;
+$alert-border-width: 1px;
+$alert-padding-y: $content-padding-small / 2;
+$alert-padding-x: $content-padding-small;
 
 // Pagination
 $pagination-padding-x: 12px;
@@ -112,15 +123,20 @@ $caret-width: 4px;
 
 $dropdown-border-width: 0;
 
+$dropdown-spacer: 0;
+$dropdown-min-width: 112px;
+$dropdown-padding-y: 8px;
 $dropdown-item-padding-x: 16px;
-$dropdown-item-padding-y: 3px;
-$dropdown-item-icon-fa-offset: side-values(0 6px 0 0);
-$dropdown-link-color: $primary-300;
+$dropdown-item-padding-y: 2px;
+$dropdown-item-line-height: 1.75;
+$dropdown-item-icon-fa-width: 22px;
+$dropdown-link-color: $primary-200;
 $dropdown-link-hover-color: $primary-300;
 $dropdown-link-hover-bg: $primary-900;
-
 $dropdown-link-active-color: $primary-300;
 $dropdown-link-active-bg: $primary-900;
+
+$dropdown-divider-bg: $primary-860 !default;
 
 $modal-backdrop-bg: $primary-inverse;
 $modal-backdrop-opacity: .9;
@@ -290,5 +306,6 @@ $large-screen:                          1920px;
 // Remove unnecessary default theme colors
 // $theme-colors: map-remove($theme-colors, "info", "light", "dark");
 
+@import "variables/alert";
 @import "variables/buttons";
 @import "variables/badge";

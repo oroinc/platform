@@ -207,18 +207,6 @@
         }
     }
 
-    .filter-select-oro-wrapper {
-        width: auto;
-
-        .selector {
-            width: 100% !important;
-
-            span {
-                width: 100% !important;
-            }
-        }
-    }
-
     .filter-item {
         display: $mobile-filter-item-display !important;
         margin: $mobile-filter-item-offset;

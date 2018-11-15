@@ -7,6 +7,9 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -48,10 +51,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
      */
     private function getFilterValue($path, $value, $operator, $sourceKey)
     {
-        $result = new FilterValue($path, $value, $operator);
-        $result->setSourceKey($sourceKey);
-
-        return $result;
+        return FilterValue::createFromSource($sourceKey, $path, $value, $operator);
     }
 
     /**
@@ -78,6 +78,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
             'prm14!=val14'                       => ['prm14', 'neq', 'val14', 'prm14', 'prm14'],
             'prm15%21=val15'                     => ['prm15', 'neq', 'val15', 'prm15', 'prm15'],
             'prm16%3Dval16'                      => ['prm16', 'eq', 'val16', 'prm16', 'prm16'],
+            'prm17=val%26%3F'                    => ['prm17', 'eq', 'val&?', 'prm17', 'prm17'],
             'page[number]=123'                   => ['page[number]', 'eq', '123', 'number', 'page[number]'],
             'page%5Bsize%5D=456'                 => ['page[size]', 'eq', '456', 'size', 'page[size]'],
             'filter[address.country]=US'         => [
@@ -132,6 +133,54 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $accessor = $this->getRestFilterValueAccessor($request);
+
+        $expectedQueryString =
+            'PRM1=val1'
+            . '&PRM7%5Bneq%5D=val7'
+            . '&empty%5Bprm20%5D%5B%5D=123'
+            . '&empty%5Bprm21%5D%5B%5D=123'
+            . '&empty%5Bprm22%5D%5B%5D%5B%5D=123'
+            . '&empty%5Bprm23%5D%5B%5D%5B%5D=123'
+            . '&filter%5Baddress%5D%5Bcountry%5D=US'
+            . '&filter%5Baddress%5D%5BdefaultRegion%5D=LA'
+            . '&filter%5Baddress%5D%5Bregion%5D=NY'
+            . '&filter%5Baddress%5D%5Bcode%5D=Z123'
+            . '&filter%5Baddress%5D%5Bname%5D=a1'
+            . '&filter%5Baddress%5D%5Btype%5D=billing'
+            . '&page%5Bnumber%5D=123'
+            . '&page%5Bsize%5D=456'
+            . '&prm1=val1'
+            . '&prm10%5Bgt%5D=val10'
+            . '&prm11%5Bgte%5D=val11'
+            . '&prm12%5Bneq%5D=%3Cval12%3E'
+            . '&prm14%5Bneq%5D=val14'
+            . '&prm15%5Bneq%5D=val15'
+            . '&prm16=val16'
+            . '&prm17=val%26%3F'
+            . '&prm2%5Bneq%5D=val2'
+            . '&prm3%5Blt%5D=val3'
+            . '&prm4%5Blte%5D=val4'
+            . '&prm5%5Bgt%5D=val5'
+            . '&prm6%5Bgte%5D=val6'
+            . '&prm7%5Bneq%5D=val7'
+            . '&prm8%5Blt%5D=val8'
+            . '&prm9%5Blte%5D=val9'
+            . '&prm_13=%3Cval13%3E';
+        self::assertEquals(
+            $expectedQueryString,
+            $accessor->getQueryString()
+        );
+        // test that built query string can by parsed and stays the same after that
+        $anotherQueryString = $this
+            ->getRestFilterValueAccessor(Request::create('http://test.com?' . $expectedQueryString))
+            ->getQueryString();
+        $expectedQueryStringParts = explode('&', $expectedQueryString);
+        $anotherQueryStringParts = explode('&', $anotherQueryString);
+        sort($expectedQueryStringParts);
+        sort($anotherQueryStringParts);
+        $expectedQueryString = implode('&', $expectedQueryStringParts);
+        $anotherQueryString = implode('&', $anotherQueryStringParts);
+        self::assertEquals($expectedQueryString, $anotherQueryString);
 
         foreach ($queryStringValues as $itemKey => $itemValue) {
             list($key, $operator, $value, $path, $sourceKey) = $itemValue;
@@ -225,6 +274,22 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
 
         $accessor = $this->getRestFilterValueAccessor($request);
 
+        self::assertEquals(
+            'filter%5Bfield1%5D=val1'
+            . '&filter%5Bfield2%5D%5Bneq%5D=val2'
+            . '&filter%5Bfield3%5D%5Blt%5D=val3'
+            . '&filter%5Bfield4%5D%5Blte%5D=val4'
+            . '&filter%5Bfield5%5D%5Bgt%5D=val5'
+            . '&filter%5Bfield6%5D%5Bgte%5D=val6'
+            . '&prm1=val1'
+            . '&prm2%5Bneq%5D=val2'
+            . '&prm3%5Blt%5D=val3'
+            . '&prm4%5Blte%5D=val4'
+            . '&prm5%5Bgt%5D=val5'
+            . '&prm6%5Bgte%5D=val6',
+            $accessor->getQueryString()
+        );
+
         foreach ($queryStringValues as $itemKey => $itemValue) {
             list($key, $operator, $value, $path, $sourceKey) = $itemValue;
             self::assertTrue($accessor->has($key), sprintf('has - %s', $itemKey));
@@ -261,13 +326,18 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
     public function testParseUrlEncodedQueryStringWithAlternativeSyntaxOfFilters()
     {
         $queryStringValues = [
-            'filter%5Bfield1%5D%5Beq%5D%3Dval1'  => ['filter[field1]', 'eq', 'val1', 'field1', 'filter[field1]']
+            'filter%5Bfield1%5D%5Beq%5D%3Dval1' => ['filter[field1]', 'eq', 'val1', 'field1', 'filter[field1]']
         ];
         $request = Request::create(
             'http://test.com?' . implode('&', array_keys($queryStringValues))
         );
 
         $accessor = $this->getRestFilterValueAccessor($request);
+
+        self::assertEquals(
+            'filter%5Bfield1%5D=val1',
+            $accessor->getQueryString()
+        );
 
         self::assertCount(count($queryStringValues), $accessor->getAll(), 'getAll');
         self::assertEquals(
@@ -287,14 +357,14 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
             'prm1'   => 'val1',
             'prm2'   => ['=' => 'val2'],
             'prm3'   => ['!=' => 'val3'],
-            'prm4'   => ['val4'],
-            'prm5'   => ['=' => ['key' => 'val5']],
+            'prm4'   => null,
+            'prm5'   => ['=' => null],
             'filter' => [
                 'address.country'       => 'US',
                 'address.region'        => ['<>' => 'NY'],
                 'address.defaultRegion' => ['<>' => 'LA'],
-                'path1'                 => ['val1'],
-                'path2'                 => ['=' => ['key' => 'val2']]
+                'path1'                 => null,
+                'path2'                 => ['=' => null]
             ]
         ];
         $request = Request::create(
@@ -304,6 +374,20 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $accessor = $this->getRestFilterValueAccessor($request);
+
+        self::assertEquals(
+            'prm1=val1'
+            . '&prm2=val2'
+            . '&prm3%5Bneq%5D=val3'
+            . '&prm4='
+            . '&prm5='
+            . '&filter%5Baddress%5D%5Bcountry%5D=US'
+            . '&filter%5Baddress%5D%5Bregion%5D%5Bneq%5D=NY'
+            . '&filter%5Baddress%5D%5BdefaultRegion%5D%5Bneq%5D=LA'
+            . '&filter%5Bpath1%5D='
+            . '&filter%5Bpath2%5D=',
+            $accessor->getQueryString()
+        );
 
         self::assertEquals(
             $this->getFilterValue('prm1', 'val1', 'eq', 'prm1'),
@@ -321,12 +405,12 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
             'prm3'
         );
         self::assertEquals(
-            $this->getFilterValue('prm4', ['val4'], 'eq', 'prm4'),
+            $this->getFilterValue('prm4', '', 'eq', 'prm4'),
             $accessor->get('prm4'),
             'prm4'
         );
         self::assertEquals(
-            $this->getFilterValue('prm5', ['key' => 'val5'], 'eq', 'prm5'),
+            $this->getFilterValue('prm5', '', 'eq', 'prm5'),
             $accessor->get('prm5'),
             'prm5'
         );
@@ -346,12 +430,12 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
             'filter[address.defaultRegion]'
         );
         self::assertEquals(
-            $this->getFilterValue('path1', ['val1'], 'eq', 'filter[path1]'),
+            $this->getFilterValue('path1', '', 'eq', 'filter[path1]'),
             $accessor->get('filter[path1]'),
             'filter[path1]'
         );
         self::assertEquals(
-            $this->getFilterValue('path2', ['key' => 'val2'], 'eq', 'filter[path2]'),
+            $this->getFilterValue('path2', '', 'eq', 'filter[path2]'),
             $accessor->get('filter[path2]'),
             'filter[path2]'
         );
@@ -385,13 +469,13 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
                 ),
                 'filter[path1]'                 => $this->getFilterValue(
                     'path1',
-                    ['val1'],
+                    '',
                     'eq',
                     'filter[path1]'
                 ),
                 'filter[path2]'                 => $this->getFilterValue(
                     'path2',
-                    ['key' => 'val2'],
+                    '',
                     'eq',
                     'filter[path2]'
                 )
@@ -428,6 +512,22 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $accessor = $this->getRestFilterValueAccessor($request);
+
+        self::assertEquals(
+            'prm1=val1'
+            . '&prm2%5Bneq%5D=val2'
+            . '&prm3%5Blt%5D=val3'
+            . '&prm4%5Blte%5D=val4'
+            . '&prm5%5Bgt%5D=val5'
+            . '&prm6%5Bgte%5D=val6'
+            . '&filter%5Bfield1%5D=val1'
+            . '&filter%5Bfield2%5D%5Bneq%5D=val2'
+            . '&filter%5Bfield3%5D%5Blt%5D=val3'
+            . '&filter%5Bfield4%5D%5Blte%5D=val4'
+            . '&filter%5Bfield5%5D%5Bgt%5D=val5'
+            . '&filter%5Bfield6%5D%5Bgte%5D=val6',
+            $accessor->getQueryString()
+        );
 
         self::assertEquals(
             $this->getFilterValue('prm1', 'val1', 'eq', 'prm1'),
@@ -511,6 +611,198 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage Expected string value for the filter "prm1", given "integer".
+     */
+    public function testRequestBodyWithNotStringScalarParameterValue()
+    {
+        $requestBody = [
+            'prm1' => 1
+        ];
+
+        $accessor = $this->getRestFilterValueAccessor(
+            Request::create('http://test.com', 'DELETE', $requestBody)
+        );
+        $accessor->getAll();
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage Expected string value for the filter "prm1", given "array".
+     */
+    public function testRequestBodyWithArrayParameterValue()
+    {
+        $requestBody = [
+            'prm1' => []
+        ];
+
+        $accessor = $this->getRestFilterValueAccessor(
+            Request::create('http://test.com', 'DELETE', $requestBody)
+        );
+        $accessor->getAll();
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage Expected string value for the filter "prm1", given "stdClass".
+     */
+    public function testRequestBodyWithWithObjectParameterValue()
+    {
+        $requestBody = [
+            'prm1' => new \stdClass()
+        ];
+
+        $accessor = $this->getRestFilterValueAccessor(
+            Request::create('http://test.com', 'DELETE', $requestBody)
+        );
+        $accessor->getAll();
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage Expected string value for the filter "prm1", given "integer".
+     */
+    public function testRequestBodyWithNotStringScalarParameterValueWithOperator()
+    {
+        $requestBody = [
+            'prm1' => ['neq' => 1]
+        ];
+
+        $accessor = $this->getRestFilterValueAccessor(
+            Request::create('http://test.com', 'DELETE', $requestBody)
+        );
+        $accessor->getAll();
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage Expected string value for the filter "prm1", given "array".
+     */
+    public function testRequestBodyWithArrayParameterValueWithOperator()
+    {
+        $requestBody = [
+            'prm1' => ['neq' => []]
+        ];
+
+        $accessor = $this->getRestFilterValueAccessor(
+            Request::create('http://test.com', 'DELETE', $requestBody)
+        );
+        $accessor->getAll();
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage Expected string value for the filter "prm1", given "stdClass".
+     */
+    public function testRequestBodyWithObjectParameterValueWithOperator()
+    {
+        $requestBody = [
+            'prm1' => ['neq' => new \stdClass()]
+        ];
+
+        $accessor = $this->getRestFilterValueAccessor(
+            Request::create('http://test.com', 'DELETE', $requestBody)
+        );
+        $accessor->getAll();
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage Expected string value for the filter "filter[prm1]", given "integer".
+     */
+    public function testRequestBodyWithNestedParameterAndNotStringScalarParameterValue()
+    {
+        $requestBody = [
+            'filter' => ['prm1' => 1]
+        ];
+
+        $accessor = $this->getRestFilterValueAccessor(
+            Request::create('http://test.com', 'DELETE', $requestBody)
+        );
+        $accessor->getAll();
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage Expected string value for the filter "filter[prm1]", given "array".
+     */
+    public function testRequestBodyWithNestedParameterAndArrayParameterValue()
+    {
+        $requestBody = [
+            'filter' => ['prm1' => []]
+        ];
+
+        $accessor = $this->getRestFilterValueAccessor(
+            Request::create('http://test.com', 'DELETE', $requestBody)
+        );
+        $accessor->getAll();
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage Expected string value for the filter "filter[prm1]", given "stdClass".
+     */
+    public function testRequestBodyWithNestedParameterAndObjectParameterValue()
+    {
+        $requestBody = [
+            'filter' => ['prm1' => new \stdClass()]
+        ];
+
+        $accessor = $this->getRestFilterValueAccessor(
+            Request::create('http://test.com', 'DELETE', $requestBody)
+        );
+        $accessor->getAll();
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage Expected string value for the filter "filter[prm1]", given "integer".
+     */
+    public function testRequestBodyWithNestedParameterAndNotStringScalarParameterValueWithOperator()
+    {
+        $requestBody = [
+            'filter' => ['prm1' => ['neq' => 1]]
+        ];
+
+        $accessor = $this->getRestFilterValueAccessor(
+            Request::create('http://test.com', 'DELETE', $requestBody)
+        );
+        $accessor->getAll();
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage Expected string value for the filter "filter[prm1]", given "array".
+     */
+    public function testRequestBodyWithNestedParameterAndArrayParameterValueWithOperator()
+    {
+        $requestBody = [
+            'filter' => ['prm1' => ['neq' => []]]
+        ];
+
+        $accessor = $this->getRestFilterValueAccessor(
+            Request::create('http://test.com', 'DELETE', $requestBody)
+        );
+        $accessor->getAll();
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage Expected string value for the filter "filter[prm1]", given "stdClass".
+     */
+    public function testRequestBodyWithNestedParameterAndObjectParameterValueWithOperator()
+    {
+        $requestBody = [
+            'filter' => ['prm1' => ['neq' => new \stdClass()]]
+        ];
+
+        $accessor = $this->getRestFilterValueAccessor(
+            Request::create('http://test.com', 'DELETE', $requestBody)
+        );
+        $accessor->getAll();
+    }
+
     public function testFilterFromQueryStringShouldOverrideFilterFromRequestBody()
     {
         $request = Request::create(
@@ -522,45 +814,68 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
 
         self::assertCount(1, $accessor->getAll());
         self::assertEquals($this->getFilterValue('prm1', 'val1', 'eq', 'prm1'), $accessor->get('prm1'));
+
+        self::assertEquals(
+            'prm1=val1',
+            $accessor->getQueryString()
+        );
     }
 
     public function testOverrideExistingFilterValue()
     {
-        $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?prm1=val1'));
+        $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?prm1=oldValue'));
 
-        self::assertEquals($this->getFilterValue('prm1', 'val1', 'eq', 'prm1'), $accessor->get('prm1'));
+        $existingFilterValue = $this->getFilterValue('prm1', 'oldValue', 'eq', 'prm1');
+        self::assertEquals($existingFilterValue, $accessor->get('prm1'));
 
-        $accessor->set('prm1', new FilterValue('prm1', 'val11', 'eq'));
-        self::assertEquals(new FilterValue('prm1', 'val11', 'eq'), $accessor->get('prm1'));
+        $accessor->set('prm1', new FilterValue('prm1', 'newValue', 'eq'));
+
+        $expectedFilterValue = new FilterValue('prm1', 'newValue', 'eq');
+        $expectedFilterValue->setSource($existingFilterValue);
+        self::assertEquals($expectedFilterValue, $accessor->get('prm1'));
         self::assertEquals(
-            ['prm1' => new FilterValue('prm1', 'val11', 'eq')],
+            ['prm1' => $expectedFilterValue],
             $accessor->getAll(),
             'getAll'
         );
         self::assertEquals(
-            ['prm1' => new FilterValue('prm1', 'val11', 'eq')],
+            ['prm1' => $expectedFilterValue],
             $accessor->getGroup('prm1'),
             'getGroup'
+        );
+
+        self::assertEquals(
+            'prm1=oldValue',
+            $accessor->getQueryString()
         );
     }
 
     public function testOverrideExistingGroupedFilterValue()
     {
-        $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?group[path]=val1'));
+        $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?group[path]=oldValue'));
 
-        self::assertEquals($this->getFilterValue('path', 'val1', 'eq', 'group[path]'), $accessor->get('group[path]'));
+        $existingFilterValue = $this->getFilterValue('path', 'oldValue', 'eq', 'group[path]');
+        self::assertEquals($existingFilterValue, $accessor->get('group[path]'));
 
-        $accessor->set('group[path]', new FilterValue('path', 'val11', 'eq'));
-        self::assertEquals(new FilterValue('path', 'val11', 'eq'), $accessor->get('group[path]'));
+        $accessor->set('group[path]', new FilterValue('path', 'neValue', 'eq'));
+
+        $expectedFilterValue = new FilterValue('path', 'neValue', 'eq');
+        $expectedFilterValue->setSource($existingFilterValue);
+        self::assertEquals($expectedFilterValue, $accessor->get('group[path]'));
         self::assertEquals(
-            ['group[path]' => new FilterValue('path', 'val11', 'eq')],
+            ['group[path]' => $expectedFilterValue],
             $accessor->getAll(),
             'getAll'
         );
         self::assertEquals(
-            ['group[path]' => new FilterValue('path', 'val11', 'eq')],
+            ['group[path]' => $expectedFilterValue],
             $accessor->getGroup('group'),
             'getGroup'
+        );
+
+        self::assertEquals(
+            'group%5Bpath%5D=oldValue',
+            $accessor->getQueryString()
         );
     }
 
@@ -580,6 +895,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
             $accessor->getGroup('prm1'),
             'getGroup'
         );
+
+        self::assertEquals(
+            '',
+            $accessor->getQueryString()
+        );
     }
 
     public function testAddNewGroupedFilterValue()
@@ -598,6 +918,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
             $accessor->getGroup('group'),
             'getGroup'
         );
+
+        self::assertEquals(
+            '',
+            $accessor->getQueryString()
+        );
     }
 
     public function testRemoveExistingFilterValueViaSetMethod()
@@ -607,10 +932,15 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($this->getFilterValue('prm1', 'val1', 'eq', 'prm1'), $accessor->get('prm1'));
 
         // test override existing filter value
-        $accessor->set('prm1');
+        $accessor->set('prm1', null);
         self::assertNull($accessor->get('prm1'));
         self::assertCount(0, $accessor->getAll(), 'getAll');
         self::assertCount(0, $accessor->getGroup('prm1'), 'getGroup');
+
+        self::assertEquals(
+            '',
+            $accessor->getQueryString()
+        );
     }
 
     public function testRemoveExistingGroupedFilterValueViaSetMethod()
@@ -620,10 +950,15 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($this->getFilterValue('path', 'val1', 'eq', 'group[path]'), $accessor->get('group[path]'));
 
         // test override existing filter value
-        $accessor->set('group[path]');
+        $accessor->set('group[path]', null);
         self::assertNull($accessor->get('group[path]'));
         self::assertCount(0, $accessor->getAll(), 'getAll');
         self::assertCount(0, $accessor->getGroup('group'), 'getGroup');
+
+        self::assertEquals(
+            '',
+            $accessor->getQueryString()
+        );
     }
 
     public function testRemoveExistingFilterValueViaRemoveMethod()
@@ -637,6 +972,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($accessor->get('prm1'));
         self::assertCount(0, $accessor->getAll(), 'getAll');
         self::assertCount(0, $accessor->getGroup('prm1'), 'getGroup');
+
+        self::assertEquals(
+            '',
+            $accessor->getQueryString()
+        );
     }
 
     public function testRemoveExistingGroupedFilterValueViaRemoveMethod()
@@ -650,6 +990,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($accessor->get('group[path]'));
         self::assertCount(0, $accessor->getAll(), 'getAll');
         self::assertCount(0, $accessor->getGroup('group'), 'getGroup');
+
+        self::assertEquals(
+            '',
+            $accessor->getQueryString()
+        );
     }
 
     public function testDefaultGroup()
@@ -668,14 +1013,18 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($accessor->has('filter2'));
         self::assertTrue($accessor->has('filter[filter2]'));
 
-        $filter1 = new FilterValue('filter1', 'val1', 'eq');
-        $filter1->setSourceKey('filter1');
-        $filter2 = new FilterValue('filter2', 'val2', 'eq');
-        $filter2->setSourceKey('filter[filter2]');
+        $filter1 = FilterValue::createFromSource('filter1', 'filter1', 'val1', 'eq');
+        $filter2 = FilterValue::createFromSource('filter[filter2]', 'filter2', 'val2', 'eq');
 
         self::assertEquals($filter1, $accessor->get('filter1'));
         self::assertNull($accessor->get('filter[filter1]'));
         self::assertEquals($filter2, $accessor->get('filter2'));
         self::assertEquals($filter2, $accessor->get('filter[filter2]'));
+
+        self::assertEquals(
+            'filter1=val1'
+            . '&filter%5Bfilter2%5D=val2',
+            $accessor->getQueryString()
+        );
     }
 }

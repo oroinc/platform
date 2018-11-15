@@ -87,7 +87,7 @@
 
         .widget-header {
             min-height: 44px;
-            padding: 3px 0 2px;
+            padding: $dashboard-widget-header-padding;
 
             display: flex;
 
@@ -133,7 +133,7 @@
             margin: side-values(10px 0 8px 0);
 
             .action-wrapper {
-                padding: 0 2px;
+                padding: $dashboard-action-padding;
                 margin-#{$start}: 14px;
             }
         }
@@ -168,7 +168,7 @@
         }
 
         .row-fluid {
-            padding: 22px 24px;
+            padding: $dashboard-widget-content-padding;
 
             border-top: $dashboard-container-border;
         }
@@ -183,8 +183,11 @@
 
         .widget-config-data {
             margin-#{$end}: 10px;
+            position: relative;
+            top: $dashboard-widget-config-data-shift;
 
-            font-size: $base-font-size - 1px;
+            font-size: $dashboard-widget-config-data-font-size;
+            line-height: $dashboard-widget-config-data-line-height;
 
             color: $dashboard-widget-config-data-color;
         }
@@ -219,7 +222,7 @@
     }
 
     .collapse-expand-action-container {
-        padding: side-values(0 2px 0 6px);
+        padding: $dashboard-action-padding;
     }
 }
 

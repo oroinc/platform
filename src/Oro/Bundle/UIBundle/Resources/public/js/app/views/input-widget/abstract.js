@@ -57,7 +57,7 @@ define(function(require) {
             this.initializeWidget();
 
             if (this.isInitialized()) {
-                this.container().addClass(this.containerClass);
+                this.getContainer().addClass(this.containerClass);
             }
 
             this.$el.trigger('input-widget:init');
@@ -142,7 +142,7 @@ define(function(require) {
          *
          * @returns {jQuery}
          */
-        container: function() {
+        getContainer: function() {
             return this.$container || (this.$container = this.findContainer());
         },
 
@@ -158,7 +158,7 @@ define(function(require) {
          * @param {mixed} width
          */
         width: function(width) {
-            this.container().width(width);
+            this.getContainer().width(width);
         },
 
         /**
@@ -175,11 +175,11 @@ define(function(require) {
         },
 
         hide: function() {
-            this.container().hide();
+            this.getContainer().hide();
         },
 
         show: function() {
-            this.container().show();
+            this.getContainer().show();
         },
 
         _addEvent: function(eventName, callback) {

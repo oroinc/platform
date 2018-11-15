@@ -9,9 +9,12 @@
     }
 
     .navbar-extra > .row {
-        > .title-buttons-container {
-            text-align: #{$end};
+        .title-buttons-container {
             max-width: 100%;
+
+            // All children should have a own font-size
+            font-size: 0;
+            text-align: #{$end};
 
             > .pull-left,
             > .btn-group {
@@ -21,13 +24,21 @@
                 vertical-align: top;
             }
 
+            .btn-group {
+                margin-#{$start}: $content-padding-small;
+
+                .btn-group {
+                    margin-#{$start}: 0;
+                }
+            }
+
             > .pinned-dropdown > .btn-group {
                 text-align: #{$start};
             }
-        }
 
-        .separator-btn {
-            margin-top: 2px;
+            .separator-btn {
+                margin: side-values(0 0 0 $content-padding-small);
+            }
         }
     }
 

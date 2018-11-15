@@ -194,10 +194,6 @@
         }
     }
 
-    .no-data {
-        @include no-data;
-    }
-
     .responsive-block {
         margin-bottom: $activity-responsive-block-offset;
     }

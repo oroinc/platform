@@ -252,7 +252,7 @@ services:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesWithoutIdentifierLoader
         public: false
         arguments:
-            - '@oro_api.action_processor_bag'
+            - '@oro_api.config_provider'
 
     oro_api.listener.update_schema:
         class: Oro\Bundle\ApiBundle\EventListener\ApiSourceListener

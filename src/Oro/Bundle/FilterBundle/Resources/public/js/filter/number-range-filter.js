@@ -108,11 +108,12 @@ define(function(require) {
             NumberRangeFilter.__super__._updateValueField.apply(this, arguments);
 
             var type = this.$(this.criteriaValueSelectors.type).val();
+            var filterEnd = this.$('.filter-separator, .filter-end');
 
             if (this.isApplicable(type)) {
-                this.$('.filter-separator, .filter-end').show();
+                filterEnd.show();
             } else {
-                this.$('.filter-separator, .filter-end').hide();
+                filterEnd.hide();
 
                 this.value.value_end = this.emptyValue.value_end;
                 this._setInputValue(this.criteriaValueSelectors.value_end, this.value.value_end);

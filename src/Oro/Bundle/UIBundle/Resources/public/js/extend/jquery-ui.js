@@ -337,6 +337,20 @@ define(function(require) {
                 });
 
                 this._superApply(arguments);
+            },
+
+            /**
+             * Faster and rough handle class setting method
+             */
+            _setHandleClassName: function() {
+                this._removeClass(this.element.find('.ui-sortable-handle'), 'ui-sortable-handle');
+
+                this._addClass(
+                    this.options.handle ? this.element.find(this.options.handle) : $($.map(this.items, function(item) {
+                        return item.item.get(0);
+                    })),
+                    'ui-sortable-handle'
+                );
             }
         });
     }());

@@ -68,13 +68,7 @@ class AclLoadFieldMetadataListenerTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive(['multicurrency'], ['entity'])
             ->willReturnOnConsecutiveCalls($multicurrencyProvider, $entityProvider);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject $translator */
-        $translator = $this->getMockForAbstractClass('Symfony\Component\Translation\TranslatorInterface');
-        $translator->expects($this->any())
-            ->method('trans')
-            ->willReturnArgument(0);
-
-        $aclLoadFieldMetadataListener = new AclLoadFieldMetadataListener($configManager, $translator);
+        $aclLoadFieldMetadataListener = new AclLoadFieldMetadataListener($configManager);
         $aclLoadFieldMetadataListener->onLoad($event);
 
         $this->assertEquals(
