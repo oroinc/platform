@@ -3,8 +3,12 @@
 namespace Oro\Bundle\FilterBundle\Filter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Exception\LogicException;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 
+/**
+ * Basic number filter which supports multiple operators, for "orm" datasource.
+ */
 class NumberFilter extends AbstractFilter
 {
     /**
@@ -140,6 +144,12 @@ class NumberFilter extends AbstractFilter
         $metadata['arraySeparator'] = $formView->vars['array_separator'];
         $metadata['arrayOperators'] = $formView->vars['array_operators'];
         $metadata['dataType'] = $formView->vars['data_type'];
+
+        if (isset($metadata['formatterOptions']['decimals'])) {
+            $metadata['precision'] = (int)$metadata['formatterOptions']['decimals'];
+        } else {
+            throw new LogicException('Metadata element "formatterOptions" is expected to have "decimals"');
+        }
 
         return $metadata;
     }

@@ -7,8 +7,12 @@ use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
+use Oro\Bundle\SearchBundle\Exception\LogicException;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
+/**
+ * Basic number filter which supports multiple operators, for "search" datasource.
+ */
 class SearchNumberFilter extends AbstractFilter
 {
     /**
@@ -99,6 +103,12 @@ class SearchNumberFilter extends AbstractFilter
         $metadata['arraySeparator'] = $formView->vars['array_separator'];
         $metadata['arrayOperators'] = $formView->vars['array_operators'];
         $metadata['dataType'] = $formView->vars['data_type'];
+
+        if (isset($metadata['formatterOptions']['decimals'])) {
+            $metadata['precision'] = (int)$metadata['formatterOptions']['decimals'];
+        } else {
+            throw new LogicException('Metadata element "formatterOptions" is expected to have "decimals"');
+        }
 
         return $metadata;
     }
