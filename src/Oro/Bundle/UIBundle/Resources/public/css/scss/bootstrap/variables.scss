@@ -1,5 +1,6 @@
 /* @theme: admin.oro; */
 
+@import "bowerassets/font-awesome/scss/_variables";
 @import "../mixins/direction";
 @import "../colors";
 
@@ -79,6 +80,12 @@ $btn-group-divider-color: rgba($primary-inverse, .4);
 // Navbar
 $nav-tabs-link-hover-border-color: $primary-750;
 $nav-divider-margin-y: 4px;
+
+//Alert
+$alert-border-radius: 2px;
+$alert-border-width: 1px;
+$alert-padding-y: $content-padding-small / 2;
+$alert-padding-x: $content-padding-small;
 
 // Pagination
 $pagination-padding-x: 12px;
@@ -299,5 +306,6 @@ $large-screen:                          1920px;
 // Remove unnecessary default theme colors
 // $theme-colors: map-remove($theme-colors, "info", "light", "dark");
 
+@import "variables/alert";
 @import "variables/buttons";
 @import "variables/badge";
