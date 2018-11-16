@@ -310,7 +310,8 @@ class EntityConfig
 
     /**
      * Indicates whether an additional element with
-     * key "_" {@see \Oro\Component\EntitySerializer\ConfigUtil::INFO_RECORD_KEY} and value ['has_more' => true]
+     * key "_" {@see \Oro\Component\EntitySerializer\ConfigUtil::INFO_RECORD_KEY}
+     * and value ['has_more' => true] {@see \Oro\Component\EntitySerializer\ConfigUtil::HAS_MORE}
      * should be added to a collection if it has more records than it was requested.
      *
      * @return string An exclusion strategy, e.g. "none" or "all"
@@ -322,7 +323,8 @@ class EntityConfig
 
     /**
      * Set a flag indicates whether an additional element with
-     * key "_" {@see \Oro\Component\EntitySerializer\ConfigUtil::INFO_RECORD_KEY} and value ['has_more' => true]
+     * key "_" {@see \Oro\Component\EntitySerializer\ConfigUtil::INFO_RECORD_KEY}
+     * and value ['has_more' => true] {@see \Oro\Component\EntitySerializer\ConfigUtil::HAS_MORE}
      * should be added to a collection if it has more records than it was requested.
      *
      * @param bool $hasMore
