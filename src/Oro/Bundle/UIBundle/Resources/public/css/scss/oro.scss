@@ -724,10 +724,6 @@ span.validation-failed {
     }
 }
 
-.control-group {
-    @include clearfix();
-}
-
 .control-group.create-select-entity {
     max-width: inherit;
 }

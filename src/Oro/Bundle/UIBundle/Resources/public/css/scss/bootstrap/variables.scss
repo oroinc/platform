@@ -54,6 +54,8 @@ $content-title-font-size: 20px;
 $content-title-font-weight: bold;
 $content-title-line-height: 1.5;
 
+$label-margin-bottom: 0;
+
 // Buttons + Forms
 //
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
@@ -239,7 +241,7 @@ $logo-background-color:                 #2d333b;
 $header-icon-button-text-color:         #2a313a;
 $header-text-color:                     #cad2da;
 $inline-action-color:                   #94b4c9;
-$inline-action-background:              #edf5fb;
+$inline-action-background:              $secondary-300;
 $cell-selected-background:              $inline-action-background;
 $row-selected-background:               $extra-300;
 $row-highlight-background:              darken($row-selected-background, 2%);
@@ -286,9 +288,14 @@ $info-close:                            $info-dark;
 $tag-item-color:                        $secondary;
 $tag-item-background:                   $secondary-300;
 $tag-my-item-background:                $secondary;
+$tag-item-editable-hover-background:    $secondary;
+$tag-item-edit-hover-alt-background:    $secondary-dark;
+$tag-item-editable-hover-color:         $primary-inverse;
 $tag-item-offset:                       side-values(0 2px 1px 0) !default;
 
 $error-message-balloon-background:      lighten($error-text, 20%);
+
+$hover-transition:                      all 230ms ease-out !default;
 
 // Links
 $link-color:                            $secondary;

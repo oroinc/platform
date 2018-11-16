@@ -1,8 +1,6 @@
 /* @theme: admin.oro; */
 
 .form-horizontal .control-label {
-    text-align: left;
-
     &.header-tooltips {
         display: inline;
         float: none;
@@ -47,10 +45,14 @@
             flex-shrink: 0;
         }
 
-        .control-label {
-            padding-top: 6px;
-            line-height: 20px;
+        &:not(.attribute-row) {
+            .control-label {
+                padding-top: 6px;
+                line-height: 20px;
+            }
+        }
 
+        .control-label {
             .tooltip-icon {
                 margin-#{$end}: $content-padding-small;
             }
@@ -113,11 +115,6 @@
                     margin-#{$end}: $content-padding-small;
                 }
             }
-        }
-
-        &.attribute-row label.control-label {
-            cursor: default;
-            color: $primary-550;
         }
 
         &.control-group-datetime {

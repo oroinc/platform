@@ -1256,7 +1256,8 @@ class OroMainContext extends MinkContext implements
 
             /** @var NodeElement $labelElement */
             foreach ($labels as $labelElement) {
-                $controlLabel = $labelElement->getParent()->find('css', 'div.controls div.control-label');
+                $controlLabel = $labelElement->getParent()
+                    ->find('css', 'div.attribute-item__description div.control-label');
 
                 if ($controlLabel === null) {
                     continue;

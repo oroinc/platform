@@ -2,6 +2,7 @@
 
 .tags-container {
     line-height: 25px;
+    display: inline-block;
 
     &__tag-entry {
         color: $tag-item-color;
@@ -14,10 +15,23 @@
         display: inline-block;
         vertical-align: top;
 
+        transition: $hover-transition;
+
         &:hover,
         &:focus {
             color: $tag-item-color;
             outline-style: none;
+        }
+
+        .inline-actions-element:hover &,
+        .editable:hover & {
+            background-color: $tag-item-editable-hover-background;
+            color: $tag-item-editable-hover-color;
+
+            &:hover,
+            &:focus {
+                background-color: $tag-item-edit-hover-alt-background;
+            }
         }
     }
 
