@@ -357,7 +357,7 @@ class EnumSynchronizer
             $optionKey = $this->getEnumOptionKey($value->getId(), $options);
             // If generated id is equal to existing one and generated was prefixed
             // Then remove existing value and create new one
-            if ($optionKey && !empty($options[$optionKey]['generated'])) {
+            if ($optionKey !== null && !empty($options[$optionKey]['generated'])) {
                 $originalId = $this->generateEnumValueId($options[$optionKey]['label'], []);
                 if ($originalId !== $options[$optionKey]['id']) {
                     $optionKey = null;
@@ -418,16 +418,38 @@ class EnumSynchronizer
     protected function fillOptionIds(array $values, array &$options)
     {
         $ids = [];
+        // Fill existing ids by given option ids or by value ids if labels are equal
         foreach ($options as &$option) {
-            if (!array_key_exists('id', $option) || $option['id'] === null || $option['id'] === '') {
+            if ($this->isEmptyOption($option, 'id')) {
                 $id = $this->getIdByExistingValues($values, $option);
-                if (!$id) {
-                    $id = $this->generateEnumValueId($option['label'], $ids);
-                    $option['generated'] = true;
+                if ($id) {
+                    $option['id'] = $id;
+                    $ids[] = $option['id'];
                 }
-                $option['id'] = $id;
+            } else {
+                $ids[] = $option['id'];
             }
-            $ids[] = $option['id'];
         }
+        unset($option);
+
+        // Generate ids for options without ids
+        foreach ($options as &$option) {
+            if ($this->isEmptyOption($option, 'id')) {
+                $id = $this->generateEnumValueId($option['label'], $ids);
+                $option['generated'] = true;
+                $option['id'] = $id;
+                $ids[] = $option['id'];
+            }
+        }
+    }
+
+    /**
+     * @param array $option
+     * @param string $key
+     * @return bool
+     */
+    protected function isEmptyOption(array $option, $key): bool
+    {
+        return !array_key_exists($key, $option) || $option[$key] === null || $option[$key] === '';
     }
 }
