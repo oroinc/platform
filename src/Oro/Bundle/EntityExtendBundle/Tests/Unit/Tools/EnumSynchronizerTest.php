@@ -742,6 +742,80 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedNewValue, $newValue);
     }
 
+    public function testApplyEnumOptionsOptionsInDifferentCaseForExistingValues()
+    {
+        $enumValueClassName = 'Test\EnumValue';
+        $locale = 'fr';
+
+        $enumOptions = [
+            ['id' => '', 'label' => 'Value', 'priority' => 1, 'is_default' => true],
+            ['id' => '', 'label' => 'value', 'priority' => 2, 'is_default' => false],
+            ['id' => '', 'label' => 'vALUE', 'priority' => 3, 'is_default' => false],
+        ];
+
+        $value1 = new TestEnumValue('value', 'value', 1, true);
+        $value2 = new TestEnumValue('value_1', 'VALUE', 2, false);
+
+        $newValue1 = new TestEnumValue('value_1', 'Value', 1, true);
+        $newValue2 = new TestEnumValue('value_2', 'vALUE', 3, false);
+
+        $values = [$value1, $value2];
+
+        $em = $this->createMock(EntityManager::class);
+        $em->expects($this->once())
+            ->method('beginTransaction');
+        $em->expects($this->once())
+            ->method('commit');
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($enumValueClassName)
+            ->will($this->returnValue($em));
+
+        $enumRepo = $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
+
+        $em->expects($this->once())
+            ->method('remove')
+            ->with($value2);
+        $enumRepo->expects($this->exactly(2))
+            ->method('createEnumValue')
+            ->withConsecutive(
+                ['Value', 1, true, 'value_1'],
+                ['vALUE', 3, false, 'value_2']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $newValue1,
+                $newValue2
+            );
+        $em->expects($this->exactly(2))
+            ->method('persist')
+            ->withConsecutive(
+                [$newValue1],
+                [$newValue2]
+            );
+        $em->expects($this->never())
+            ->method('rollback');
+
+        $em->expects($this->exactly(2))
+            ->method('flush');
+        $this->translationHelper->expects($this->once())
+            ->method('invalidateCache')
+            ->with($locale);
+
+        $this->synchronizer->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
+
+        $expectedValue = new TestEnumValue('value', 'value', 2, false);
+        $expectedValue->setLocale($locale);
+        $this->assertEquals($expectedValue, $value1);
+
+        $expectedNewValue1 = new TestEnumValue('value_1', 'Value', 1, true);
+        $expectedNewValue1->setLocale($locale);
+        $this->assertEquals($expectedNewValue1, $newValue1);
+
+        $expectedNewValue2 = new TestEnumValue('value_2', 'vALUE', 3, false);
+        $expectedNewValue2->setLocale($locale);
+        $this->assertEquals($expectedNewValue2, $newValue2);
+    }
+
     public function testApplyEnumOptionsWithDuplicatedIds()
     {
         $enumValueClassName = 'Test\EnumValue';
