@@ -47,10 +47,6 @@
         float: #{$end};
         margin-#{$end}: -6px;
     }
-    &__action {
-        width: $address-box-action-size;
-        height: $address-box-action-size;
-    }
 
     &__title {
         font-size: $font-size-base;

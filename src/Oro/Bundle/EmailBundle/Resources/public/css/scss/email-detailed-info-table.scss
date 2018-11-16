@@ -1,0 +1,25 @@
+/* @theme: admin.oro; */
+
+.email-detailed-info-table {
+    display: inline-block;
+
+    &__icon {
+        @include fa-icon($email-detailed-info-table-icon, before, true) {
+            margin: 0;
+
+            font-size: $email-detailed-info-table-icon-size;
+            font-weight: normal;
+        }
+    }
+
+    .email-recipients {
+        font-size: $email-detailed-info-table-recipients-font-size;
+    }
+
+    .dropdown-toggle {
+        padding: $email-detailed-info-table-toggle-offset;
+        height: $email-detailed-info-table-toggle-height;
+
+        line-height: $email-detailed-info-table-toggle-height;
+    }
+}

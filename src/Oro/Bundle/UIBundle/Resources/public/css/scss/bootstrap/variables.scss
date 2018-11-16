@@ -36,6 +36,15 @@ $btn-font-weight: bold;
 $btn-font-size: 12px;
 $btn-text-transform: uppercase;
 
+$btn-padding-y-sm: 0;
+$btn-padding-x-sm: 12px;
+$btn-in-group-padding-x-sm: 8px;
+$btn-font-size-sm: $base-font-size--s;
+$btn-icon-font-size-sm: $base-font-size;
+$btn-line-height-sm: 24px;
+$btn-icon-line-height-sm: $btn-line-height-sm - 1px;
+$btn-border-radius-sm: 16px;
+
 $btn-mobile-font-size: 14px;
 $btn-mobile-border-radius: 20px;
 $btn-square-mobile-border-radius: 2px;
@@ -62,12 +71,8 @@ $input-focus-border-color: $secondary;
 $input-btn-mobile-padding-y: 0;
 $input-btn-mobile-padding-x: 16px;
 
-$btn-padding-y-mini: 0;
-$btn-padding-x-mini: 16px;
 $btn-line-height: 32px;
 $btn-square-line-height: 28px;
-$btn-line-height-mini: 20px;
-$btn-border-radius-mini: $btn-border-radius;
 
 $btn-mobile-line-height: 40px;
 $btn-square-mobile-line-height: 36px;

@@ -124,34 +124,6 @@ body {
     }
 }
 
-.customer-without-border-tabs {
-    min-width: 280px;
-    padding-#{$end}: 0;
-    margin-#{$start}: -10px;
-    margin-#{$end}: -10px;
-    width: calc(100% + 20px);
-}
-
-.tab-content {
-    .oro-tabs {
-        margin: 0;
-        box-sizing: border-box;
-        width: 100%;
-
-        .nav-tabs {
-            & > li {
-                & > a {
-                    border-top-width: 1px;
-                }
-            }
-        }
-    }
-
-    .tab-pane {
-        padding: 0 10px;
-    }
-}
-
 .box-type1 {
     margin: 0 $content-padding $content-padding;
     border-radius: 3px;

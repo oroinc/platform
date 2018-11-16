@@ -788,51 +788,7 @@ label .popover-body {
     text-transform: none;
 }
 
-.list-widget.box-type1 {
-    .title {
-        padding-bottom: 0;
-    }
-}
-
 .list-widget .widget-actions-section {
-    a.btn {
-        height: auto;
-        border: 0;
-        box-shadow: none;
-        padding: side-values(0 2px 0 8px);
-
-        .action-button-icon {
-            line-height: initial;
-
-            &:before {
-                font-size: 15px;
-            }
-
-            &:hover {
-                &:before {
-                    opacity: 1;
-                }
-            }
-        }
-    }
-
-    a.btn.disabled,
-    a.btn[disabled] {
-        cursor: not-allowed;
-
-        .action-button-icon {
-            &:before {
-                opacity: .3;
-            }
-
-            &:hover {
-                &:before {
-                    opacity: .3;
-                }
-            }
-        }
-    }
-
     .action-wrapper {
         vertical-align: middle;
 
@@ -840,17 +796,14 @@ label .popover-body {
             margin-#{$start}: 5px;
         }
 
-        .btn-mini {
-            margin-#{$start}: 0;
-            border-radius: 0;
-            font-weight: normal;
-            font-size: $font-size-base;
+        .collapse-all-button,
+        .expand-all-button {
             padding: side-values(0 8px 0 6px);
         }
     }
 
-    .action-wrapper + .action-wrapper .btn-mini {
-        border-left: 1px solid $primary-750;
+    .expand-all-button {
+        border-#{$end}: 1px solid $primary-750;
     }
 }
 
@@ -867,47 +820,7 @@ label .popover-body {
         .actions {
             position: relative;
             float: #{$end};
-            margin-#{$end}: -4px;
             z-index: 99;
-
-            .btn {
-                line-height: 1em;
-                height: auto;
-                border: 0;
-                background: none;
-                box-shadow: none;
-                padding: 0;
-
-                .action-button-icon {
-                    &:before {
-                        opacity: .6;
-                        font-size: 15px;
-                    }
-
-                    &:hover {
-                        &:before {
-                            opacity: 1;
-                        }
-                    }
-                }
-            }
-
-            .btn.disabled,
-            .btn[disabled] {
-                cursor: not-allowed;
-
-                .action-button-icon {
-                    &:before {
-                        opacity: .3;
-                    }
-
-                    &:hover {
-                        &:before {
-                            opacity: .3;
-                        }
-                    }
-                }
-            }
         }
     }
 }

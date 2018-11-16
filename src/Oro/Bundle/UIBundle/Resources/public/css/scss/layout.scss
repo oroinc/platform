@@ -19,6 +19,10 @@
     }
 
     .responsive-block {
+        &:empty {
+            display: none;
+        }
+
         @include responsive-inline-position();
     }
 

@@ -82,7 +82,7 @@
         </ul>
     </div>
     <div class="oro-tabs__content">
-        <div class="tab-content tab-content-without-offset" id="{{ containerAlias }}">
+        <div class="tab-content" id="{{ containerAlias }}">
             {% for tab in tabs %}
                 {% set isActiveTab = activeTabAlias ? activeTabAlias == tab.alias : loop.index == 1 %}
                 <div class="tab-pane{% if isActiveTab %} active{% endif %}" id="{{ tab.alias }}" role="tabpanel" aria-labelledby="{{ tab.alias ~ '-tab' }}">
