@@ -111,17 +111,30 @@
         .logo {
             font-size: $mobile-app-header-organization-logo-font-size;
             color: $app-header-logo-text-color;
+            font-weight: bold;
             margin: 0;
             float: $start;
             line-height: $app-header-height;
             height: $app-header-height;
             white-space: nowrap;
+            max-width: 100%;
 
             .organization-name {
                 color: inherit;
+                text-transform: uppercase;
                 display: inline-block;
-                vertical-align: middle;
+                max-width: $app-header-max-width;
                 @include text-line-truncate($app-header-max-width, true);
+            }
+
+            &.dropdown-toggle {
+                padding-#{$end}: 12px;
+
+                &:after {
+                    vertical-align: initial;
+                    height: 54%;
+                    position: relative;
+                }
             }
         }
 
