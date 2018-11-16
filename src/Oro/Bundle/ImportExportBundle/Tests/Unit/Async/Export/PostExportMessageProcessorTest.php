@@ -51,7 +51,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     private $logger;
 
     /**
-     * @var ExportHandler|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExportHandler|\PHPUnit\Framework\MockObject\MockObject
      */
     private $exportHandler;
 
@@ -77,9 +77,9 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessExceptionsAreHandledDuringMerge()
     {
-        /** @var SessionInterface|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject */
         $session = $this->createMock(SessionInterface::class);
-        /** @var MessageInterface|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject */
         $message = $this->createMock(MessageInterface::class);
         $messageBody = [
             'jobId' => '1',
@@ -138,9 +138,9 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcess()
     {
-        /** @var SessionInterface|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject */
         $session = $this->createMock(SessionInterface::class);
-        /** @var MessageInterface|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject */
         $message = $this->createMock(MessageInterface::class);
         $messageBody = [
             'jobId' => '1',
@@ -184,9 +184,9 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessWhenRecipientUserIdGiven()
     {
-        /** @var SessionInterface|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject */
         $session = $this->createMock(SessionInterface::class);
-        /** @var MessageInterface|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject */
         $message = $this->createMock(MessageInterface::class);
         $messageBody = [
             'jobId' => '1',
