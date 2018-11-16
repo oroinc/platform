@@ -101,6 +101,14 @@ body:not(.login-page) {
                         margin-#{$start}: $content-padding-medium;
                     }
                 }
+
+                &:nth-child(2) {
+                    .inner-grid {
+                        .grid-views {
+                            margin-#{$start}: 0;
+                        }
+                    }
+                }
             }
         }
 
