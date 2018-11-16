@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\InvalidFilterValueKeyException;
@@ -36,25 +37,25 @@ class RegisterDynamicFilters extends RegisterFilters
     /** @var ConfigProvider */
     private $configProvider;
 
-    /** @var string|null */
-    private $filterGroup;
+    /** @var FilterNamesRegistry */
+    private $filterNamesRegistry;
 
     /**
      * @param FilterFactoryInterface $filterFactory
      * @param DoctrineHelper         $doctrineHelper
      * @param ConfigProvider         $configProvider
-     * @param string|null            $filterGroup
+     * @param FilterNamesRegistry    $filterNamesRegistry
      */
     public function __construct(
         FilterFactoryInterface $filterFactory,
         DoctrineHelper $doctrineHelper,
         ConfigProvider $configProvider,
-        ?string $filterGroup = null
+        FilterNamesRegistry $filterNamesRegistry
     ) {
         parent::__construct($filterFactory);
         $this->doctrineHelper = $doctrineHelper;
         $this->configProvider = $configProvider;
-        $this->filterGroup = $filterGroup;
+        $this->filterNamesRegistry = $filterNamesRegistry;
     }
 
     /**
@@ -73,12 +74,15 @@ class RegisterDynamicFilters extends RegisterFilters
 
         $filterCollection = $context->getFilters();
         $allFilterValues = $context->getFilterValues();
+        $filterGroup = $this->filterNamesRegistry
+            ->getFilterNames($context->getRequestType())
+            ->getDataFilterGroupName();
         if ('initialize' === $context->getLastGroup()) {
-            $this->prepareFiltersForDocumentation($filterCollection);
+            $this->prepareFiltersForDocumentation($filterCollection, $filterGroup);
         } else {
             $renameMap = [];
             $knownFilterKeys = [];
-            $filterValues = $this->getFilterValues($allFilterValues);
+            $filterValues = $this->getFilterValues($allFilterValues, $filterGroup);
             foreach ($filterCollection as $filterKey => $filter) {
                 if ($filter instanceof SelfIdentifiableFilterInterface) {
                     try {
@@ -93,15 +97,15 @@ class RegisterDynamicFilters extends RegisterFilters
                         }
                     } catch (InvalidFilterValueKeyException $e) {
                         $actualFilterKey = $filterKey;
-                        if ($this->filterGroup) {
-                            $actualFilterKey = $filterCollection->getGroupedFilterKey($this->filterGroup, $filterKey);
+                        if ($filterGroup) {
+                            $actualFilterKey = $filterCollection->getGroupedFilterKey($filterGroup, $filterKey);
                         }
                         $knownFilterKeys[$actualFilterKey] = true;
                         $renameMap[$filterKey] = null;
                         $context->addError($this->createInvalidFilterValueKeyError($actualFilterKey, $e));
                     }
-                } elseif ($this->filterGroup) {
-                    $groupedFilterKey = $filterCollection->getGroupedFilterKey($this->filterGroup, $filterKey);
+                } elseif ($filterGroup) {
+                    $groupedFilterKey = $filterCollection->getGroupedFilterKey($filterGroup, $filterKey);
                     if ($filter instanceof StandaloneFilterWithDefaultValue
                         || $allFilterValues->has($groupedFilterKey)
                     ) {
@@ -117,19 +121,20 @@ class RegisterDynamicFilters extends RegisterFilters
             $this->renameFilters($filterCollection, $renameMap);
             $this->addDynamicFilters($filterCollection, $filterValues, $knownFilterKeys, $context);
         }
-        if ($this->filterGroup) {
-            $filterCollection->setDefaultGroupName($this->filterGroup);
-            $allFilterValues->setDefaultGroupName($this->filterGroup);
+        if ($filterGroup) {
+            $filterCollection->setDefaultGroupName($filterGroup);
+            $allFilterValues->setDefaultGroupName($filterGroup);
         }
         $context->setProcessed(self::OPERATION_NAME);
     }
 
     /**
      * @param FilterCollection $filterCollection
+     * @param string|null      $filterGroup
      */
-    private function prepareFiltersForDocumentation(FilterCollection $filterCollection): void
+    private function prepareFiltersForDocumentation(FilterCollection $filterCollection, $filterGroup): void
     {
-        if (!$this->filterGroup) {
+        if (!$filterGroup) {
             return;
         }
 
@@ -137,7 +142,7 @@ class RegisterDynamicFilters extends RegisterFilters
         foreach ($filters as $filterKey => $filter) {
             $filterCollection->remove($filterKey);
             $filterCollection->add(
-                $filterCollection->getGroupedFilterKey($this->filterGroup, $filterKey),
+                $filterCollection->getGroupedFilterKey($filterGroup, $filterKey),
                 $filter
             );
         }
@@ -145,13 +150,14 @@ class RegisterDynamicFilters extends RegisterFilters
 
     /**
      * @param FilterValueAccessorInterface $allFilterValues
+     * @param string|null                  $filterGroup
      *
      * @return FilterValue[]
      */
-    private function getFilterValues(FilterValueAccessorInterface $allFilterValues): array
+    private function getFilterValues(FilterValueAccessorInterface $allFilterValues, $filterGroup): array
     {
-        if ($this->filterGroup) {
-            return $allFilterValues->getGroup($this->filterGroup);
+        if ($filterGroup) {
+            return $allFilterValues->getGroup($filterGroup);
         }
 
         return $allFilterValues->getAll();

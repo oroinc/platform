@@ -1,8 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -17,14 +18,19 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class HandleFieldsFilter implements ProcessorInterface
 {
+    /** @var FilterNamesRegistry */
+    private $filterNamesRegistry;
+
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /**
-     * @param ValueNormalizer $valueNormalizer
+     * @param FilterNamesRegistry $filterNamesRegistry
+     * @param ValueNormalizer     $valueNormalizer
      */
-    public function __construct(ValueNormalizer $valueNormalizer)
+    public function __construct(FilterNamesRegistry $filterNamesRegistry, ValueNormalizer $valueNormalizer)
     {
+        $this->filterNamesRegistry = $filterNamesRegistry;
         $this->valueNormalizer = $valueNormalizer;
     }
 
@@ -40,8 +46,16 @@ class HandleFieldsFilter implements ProcessorInterface
             return;
         }
 
+        $filterGroupName = $this->filterNamesRegistry
+            ->getFilterNames($context->getRequestType())
+            ->getFieldsFilterGroupName();
+        if (!$filterGroupName) {
+            // the "fields" filter is not supported
+            return;
+        }
+
         $fields = [];
-        $filterValues = $context->getFilterValues()->getGroup(AddFieldsFilter::FILTER_KEY);
+        $filterValues = $context->getFilterValues()->getGroup($filterGroupName);
         foreach ($filterValues as $filterValue) {
             $fields[$filterValue->getPath()] = (array)$this->valueNormalizer->normalizeValue(
                 $filterValue->getValue(),

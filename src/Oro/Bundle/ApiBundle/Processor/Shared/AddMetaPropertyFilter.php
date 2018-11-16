@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\MetaPropertyFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -15,8 +16,18 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class AddMetaPropertyFilter implements ProcessorInterface
 {
-    public const FILTER_KEY         = 'meta';
     public const FILTER_DESCRIPTION = 'A list of meta properties to be returned. Comma-separated names.';
+
+    /** @var FilterNamesRegistry */
+    private $filterNamesRegistry;
+
+    /**
+     * @param FilterNamesRegistry $filterNamesRegistry
+     */
+    public function __construct(FilterNamesRegistry $filterNamesRegistry)
+    {
+        $this->filterNamesRegistry = $filterNamesRegistry;
+    }
 
     /**
      * {@inheritdoc}
@@ -25,8 +36,11 @@ class AddMetaPropertyFilter implements ProcessorInterface
     {
         /** @var Context $context */
 
+        $filterName = $this->filterNamesRegistry
+            ->getFilterNames($context->getRequestType())
+            ->getMetaPropertyFilterName();
         $filters = $context->getFilters();
-        if ($filters->has(self::FILTER_KEY)) {
+        if ($filters->has($filterName)) {
             // the "meta" filter is already added
             return;
         }
@@ -39,6 +53,6 @@ class AddMetaPropertyFilter implements ProcessorInterface
 
         $filter = new MetaPropertyFilter(DataType::STRING, self::FILTER_DESCRIPTION);
         $filter->setArrayAllowed(true);
-        $filters->add(self::FILTER_KEY, $filter);
+        $filters->add($filterName, $filter);
     }
 }

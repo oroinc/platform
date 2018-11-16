@@ -8,8 +8,10 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
+use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class SetLocationHeaderTest extends FormProcessorTestCase
@@ -48,7 +50,7 @@ class SetLocationHeaderTest extends FormProcessorTestCase
             ->willReturn($this->entityIdTransformer);
 
         $this->processor = new SetLocationHeader(
-            $routes,
+            new RestRoutesRegistry([[$routes, 'rest']], new RequestExpressionMatcher()),
             $this->urlGenerator,
             $this->valueNormalizer,
             $entityIdTransformerRegistry
