@@ -17,7 +17,7 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
     private $formType;
 
     /**
-     * @var NumberFormatter|\PHPUnit_Framework_MockObject_MockObject
+     * @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject
      */
     private $numberFormatter;
 
