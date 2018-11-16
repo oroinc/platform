@@ -34,6 +34,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
      */
     protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
+        $this->checkHateoasHeader($server);
         $this->checkWsseAuthHeader($server);
 
         $this->client->request(

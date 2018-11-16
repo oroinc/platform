@@ -857,6 +857,21 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setHasMore($hasMore)
+    {
+        parent::setHasMore($hasMore);
+        $fields = $this->getFields();
+        foreach ($fields as $field) {
+            $targetConfig = $field->getTargetEntity();
+            if (null !== $targetConfig) {
+                $targetConfig->setHasMore($hasMore);
+            }
+        }
+    }
+
+    /**
      * Gets response status codes.
      *
      * @return StatusCodesConfig|null

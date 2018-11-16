@@ -91,6 +91,29 @@ abstract class RestApiTestCase extends ApiTestCase
     }
 
     /**
+     * @param array $server
+     */
+    protected function checkHateoasHeader(array &$server)
+    {
+        $isHateoasEnabled = false;
+        if (array_key_exists('HTTP_HATEOAS', $server)) {
+            $isHateoasEnabled = (bool)$server['HTTP_HATEOAS'];
+            unset($server['HTTP_HATEOAS']);
+        }
+        if (!$isHateoasEnabled) {
+            $xInclude = '';
+            if (array_key_exists('HTTP_X-Include', $server)) {
+                $xInclude = $server['HTTP_X-Include'];
+            }
+            if ($xInclude) {
+                $xInclude .= ';';
+            }
+            $xInclude .= 'noHateoas';
+            $server['HTTP_X-Include'] = $xInclude;
+        }
+    }
+
+    /**
      * Sends OPTIONS request.
      *
      * @param string $routeName
