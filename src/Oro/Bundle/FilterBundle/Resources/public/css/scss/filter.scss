@@ -17,7 +17,7 @@
         margin-#{$start}: $filter-box-criteria-offset-left;
         top: $filter-box-criteria-top;
 
-        .btn-group {
+        .btn-block {
             .btn:not(.filter-update) {
                 border-radius: $filter-box-criteria-btn-group-border-radius;
                 background-color: $filter-box-criteria-btn-group-background-color;
@@ -38,6 +38,24 @@
             [class^="fa-"] {
                 padding-top: $filter-box-criteria-btn-group-icon-inner-offset-top;
                 vertical-align: $filter-box-criteria-btn-group-icon-vertical-align;
+            }
+
+            .dropdown-toggle  {
+                padding: $selector-uniform-inner-offset;
+                text-align: #{$start};
+                width: 100%;
+                font-size: $selector-uniform-font-size;
+
+                &:after {
+                    position: $selector-uniform-arrow-position;
+                    #{$end}: $number-range-filter-field-caret-end;
+                    top: $number-range-filter-field-caret-top;
+                    margin-top: $number-range-filter-field-caret-margin;
+                }
+            }
+
+            .dropdown-menu {
+                min-width: 100%;
             }
 
             .dropdown-item {
@@ -718,27 +736,6 @@
         .btn,
         input[type='text'] {
             width: $number-range-filter-field-width;
-        }
-    }
-
-    .btn-block {
-
-        .dropdown-toggle  {
-            padding: $selector-uniform-inner-offset;
-            text-align: #{$start};
-            width: 100%;
-            font-size: $selector-uniform-font-size;
-
-            &:after {
-                position: $selector-uniform-arrow-position;
-                #{$end}: $number-range-filter-field-caret-end;
-                top: $number-range-filter-field-caret-top;
-                margin-top: $number-range-filter-field-caret-margin;
-            }
-        }
-
-        .dropdown-menu {
-            min-width: 100%;
         }
     }
 
