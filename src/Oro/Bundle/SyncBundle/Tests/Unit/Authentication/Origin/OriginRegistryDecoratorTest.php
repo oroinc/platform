@@ -8,13 +8,13 @@ use Oro\Bundle\SyncBundle\Authentication\Origin\OriginRegistryDecorator;
 
 class OriginRegistryDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OriginProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OriginProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $originProvider;
 
-    /** @var OriginRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OriginRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $baseOriginRegistry;
 
-    /** @var OriginRegistryDecorator|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OriginRegistryDecorator|\PHPUnit\Framework\MockObject\MockObject */
     private $originRegistryDecorator;
 
     protected function setUp()
