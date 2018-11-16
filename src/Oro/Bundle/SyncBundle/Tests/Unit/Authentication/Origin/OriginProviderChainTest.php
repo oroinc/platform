@@ -7,7 +7,7 @@ use Oro\Bundle\SyncBundle\Authentication\Origin\OriginProviderInterface;
 
 class OriginProviderChainTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OriginProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OriginProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $originProvider;
 
     /** @var OriginProviderChain */

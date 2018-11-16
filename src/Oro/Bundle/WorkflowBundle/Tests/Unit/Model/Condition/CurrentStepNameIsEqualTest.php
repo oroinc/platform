@@ -11,7 +11,7 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class CurrentStepNameIsEqualTest extends \PHPUnit_Framework_TestCase
+class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -21,7 +21,7 @@ class CurrentStepNameIsEqualTest extends \PHPUnit_Framework_TestCase
     /** @var CurrentStepNameIsEqual */
     protected $condition;
 
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowManager;
 
     /**

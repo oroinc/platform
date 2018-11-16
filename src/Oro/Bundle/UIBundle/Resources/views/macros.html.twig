@@ -1309,8 +1309,10 @@
         options - additional options
             - collection_class - Main class for sortable list,
             - add_btn_label - Text label for add item button,
-            - column_label: - Main column label,
+            - column_label - Main column label,
             - column_options_label - Options column label
+            - data_page_component_module - Class for data-page-component-module attribute
+            - show_form_when_empty - Show select box when a form is empty
 #}
 {% macro sortable_list_view(widget, attr = {}, options = {}) %}
     {% if widget.vars.prototype is defined %}
@@ -1320,7 +1322,7 @@
     {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection grid-container' }) %}
 
     {% set id = widget.vars.id ~ '_collection' %}
-    <div class="{{ options.collection_class|default('') }} drag-n-drop-sorting-view" data-page-component-module="oropricing/js/app/components/price-lists-errors-handler">
+    <div class="{{ options.collection_class|default('') }} drag-n-drop-sorting-view" {% if options.data_page_component_module is defined %} data-page-component-module="{{ options.data_page_component_module|escape }}"{% endif %}>
         <div class="drag-n-drop-sorting-view__wrapper row-oro" {{ _self.renderPageComponentAttributes({
             module: 'oroui/js/app/components/view-component',
             options: {
@@ -1346,7 +1348,7 @@
                         {% for child in widget.children %}
                             {{ _self.sortable_list_view_collection_prototype(child, options) }}
                         {% endfor %}
-                    {% elseif options.show_form_when_empty and prototype_html is defined %}
+                    {% elseif options.show_form_when_empty is defined and prototype_html is defined %}
                         {{ prototype_html|replace({(prototype_name): '0'})|raw }}
                     {% endif %}
                     </tbody>
