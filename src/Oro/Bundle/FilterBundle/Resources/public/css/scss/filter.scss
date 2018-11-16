@@ -39,6 +39,10 @@
                 padding-top: $filter-box-criteria-btn-group-icon-inner-offset-top;
                 vertical-align: $filter-box-criteria-btn-group-icon-vertical-align;
             }
+
+            .dropdown-item {
+                line-height: $filter-box-criteria-dropdown-item-line-height;
+            }
         }
 
         .filter-value {
