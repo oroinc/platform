@@ -201,6 +201,7 @@ services:
             - '@oro_api.config_provider'
             - '@oro_api.filter_names_registry'
         tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: -60 }
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -60 }
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: -60 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, priority: -60 }
@@ -370,6 +371,7 @@ services:
             - '@oro_api.value_normalizer'
             - '@oro_api.entity_id_transformer_registry'
         tags:
+            - { name: oro.api.processor, action: get, group: normalize_input, priority: 100 }
             - { name: oro.api.processor, action: get_list, group: normalize_input, priority: 100 }
             - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: 100 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_input, collection: true, priority: 100 }
