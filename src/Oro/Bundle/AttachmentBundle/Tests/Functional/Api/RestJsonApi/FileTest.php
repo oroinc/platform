@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Api;
+namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 
-class FileApiTest extends RestJsonApiTestCase
+class FileTest extends RestJsonApiTestCase
 {
     private static $blankFileContent = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA'
     . '1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=';

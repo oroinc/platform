@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Functional\API;
+namespace Oro\Bundle\UserBundle\Tests\Functional\Api\Rest;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
+use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData;
 
 class RestInvalidUsersTest extends WebTestCase
 {

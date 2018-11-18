@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Functional\API;
+namespace Oro\Bundle\UserBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\UserBundle\Api\Model\UserProfile;
@@ -8,7 +8,7 @@ use Oro\Bundle\UserBundle\Api\Model\UserProfile;
 /**
  * @dbIsolationPerTest
  */
-class RestJsonApiUserProfileTest extends RestJsonApiTestCase
+class UserProfileTest extends RestJsonApiTestCase
 {
     public function testGet()
     {

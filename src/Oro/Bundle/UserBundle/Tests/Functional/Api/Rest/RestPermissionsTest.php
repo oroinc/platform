@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Functional\API;
+namespace Oro\Bundle\UserBundle\Tests\Functional\Api\Rest;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
+use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData;
 
 class RestPermissionsTest extends WebTestCase
 {
@@ -22,7 +22,7 @@ class RestPermissionsTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData']);
+        $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData']);
         $this->em   = $this->getContainer()->get('doctrine.orm.entity_manager');
         $this->user = $this->em->getRepository('OroUserBundle:User')->findOneBy([
             'username' => LoadUserData::USER_NAME

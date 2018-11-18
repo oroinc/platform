@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures;
+namespace Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures;
 
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 

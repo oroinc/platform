@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ConfigBundle\Tests\Functional\Api;
+namespace Oro\Bundle\ConfigBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
-class RestJsonApiConfigurationTest extends RestJsonApiTestCase
+class ConfigurationTest extends RestJsonApiTestCase
 {
     public function testGetConfigurationSections()
     {

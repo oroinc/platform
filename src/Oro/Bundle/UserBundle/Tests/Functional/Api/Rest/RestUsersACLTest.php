@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Functional\API;
+namespace Oro\Bundle\UserBundle\Tests\Functional\Api\Rest;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
+use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData;
 
 class RestUsersACLTest extends WebTestCase
 {
@@ -12,7 +12,7 @@ class RestUsersACLTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-        $this->loadFixtures(array('Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData'));
+        $this->loadFixtures(array('Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData'));
     }
 
     public function testCreateUser()

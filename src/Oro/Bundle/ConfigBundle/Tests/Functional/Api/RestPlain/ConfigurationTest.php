@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ConfigBundle\Tests\Functional\Api;
+namespace Oro\Bundle\ConfigBundle\Tests\Functional\Api\RestPlain;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestPlainApiTestCase;
 
-class RestPlainConfigurationTest extends RestPlainApiTestCase
+class ConfigurationTest extends RestPlainApiTestCase
 {
     public function testGetConfigurationSections()
     {
