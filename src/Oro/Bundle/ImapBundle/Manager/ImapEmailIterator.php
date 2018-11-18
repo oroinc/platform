@@ -104,6 +104,7 @@ class ImapEmailIterator implements \Iterator, \Countable
     public function setConvertErrorCallback(\Closure $callback = null)
     {
         $this->onConvertError = $callback;
+        $this->iterator->setConvertErrorCallback($callback);
     }
 
     /**
