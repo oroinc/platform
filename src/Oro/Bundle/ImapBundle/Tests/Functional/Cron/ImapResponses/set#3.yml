@@ -12,4 +12,4 @@ log_info:
     - 'Found 0 email(s).'
 total: 0
 data: []
-errors: ~
+expectedEmailData: ~
