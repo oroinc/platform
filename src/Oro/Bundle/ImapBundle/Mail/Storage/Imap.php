@@ -3,14 +3,16 @@
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
 use Oro\Bundle\ImapBundle\Exception\InvalidCredentialsException;
+use Oro\Bundle\ImapBundle\Exception\InvalidMessageHeadersException;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
+use Zend\Mail\Exception\ExceptionInterface as ZendMailException;
 use Zend\Mail\Storage\Exception as BaseException;
 
 /**
- * Class Imap
+ * Imap protocol implementation.
  *
  * @package Oro\Bundle\ImapBundle\Mail\Storage
  *
@@ -74,6 +76,9 @@ class Imap extends \Zend\Mail\Storage\Imap
      * @var array
      */
     private $uniqueIds = [];
+
+    /** @var \Closure */
+    private $onConvertError;
 
     /**
      * {@inheritdoc}
@@ -267,6 +272,7 @@ class Imap extends \Zend\Mail\Storage\Imap
      * @param int[] $ids int numbers of messages
      *
      * @return Message[] key = message id
+     * @throws \Exception
      */
     public function getMessages($ids)
     {
@@ -274,7 +280,15 @@ class Imap extends \Zend\Mail\Storage\Imap
 
         $items = $this->protocol->fetch($this->getMessageItems, $ids);
         foreach ($items as $id => $data) {
-            $messages[$id] = $this->createMessageObject($id, $data);
+            try {
+                $messages[$id] = $this->createMessageObject($id, $data);
+            } catch (ZendMailException $e) {
+                if (null !== $this->onConvertError) {
+                    call_user_func($this->onConvertError, $e, $data[self::UID]);
+                } else {
+                    throw $e;
+                }
+            }
         }
 
         return $messages;
@@ -439,15 +453,29 @@ class Imap extends \Zend\Mail\Storage\Imap
             $flags[] = isset(static::$knownFlags[$flag]) ? static::$knownFlags[$flag] : $flag;
         }
 
-        /** @var \Zend\Mail\Storage\Message $message */
-        $message = new $this->messageClass(
-            [
-                'handler' => $this,
-                'id'      => $id,
-                'headers' => $header,
-                'flags'   => $flags
-            ]
-        );
+        try {
+            /** @var \Oro\Bundle\ImapBundle\Mail\Storage\Message $message */
+            $message = new $this->messageClass(
+                [
+                    'handler' => $this,
+                    'id'      => $id,
+                    'headers' => $header,
+                    'flags'   => $flags
+                ]
+            );
+        } catch (InvalidMessageHeadersException $e) {
+            if (null !== $this->onConvertError) {
+                $message = $e->getEmailMessage();
+                $subjectHeader = $message->getHeaders()->get('subject');
+                $subject = $subjectHeader ? $subjectHeader->getFieldValue() : '';
+
+                foreach ($e->getExceptions() as $exception) {
+                    call_user_func($this->onConvertError, $exception, $data[self::UID], $subject);
+                }
+            } else {
+                throw $e;
+            }
+        }
 
         $headers = $message->getHeaders();
         $this->setExtHeaders($headers, $data);
@@ -461,11 +489,23 @@ class Imap extends \Zend\Mail\Storage\Imap
     public function getRawContent($id, $part = null)
     {
         if ($part !== null) {
-            // TODO: implement
             throw new BaseException\RuntimeException('not implemented');
         }
 
         return $this->protocol->fetch(self::BODY_PEEK_TEXT, $id);
+    }
+
+    /**
+     * Sets a callback function to handle message convertation errors.
+     * If this callback set then the iterator will work in fail safe mode
+     * and invalid messages will just skipped.
+     *
+     * @param \Closure|null $callback The callback function.
+     *                                function (\Exception)
+     */
+    public function setConvertErrorCallback(\Closure $callback = null)
+    {
+        $this->onConvertError = $callback;
     }
 
     /**

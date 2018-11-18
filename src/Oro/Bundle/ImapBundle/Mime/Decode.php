@@ -5,13 +5,16 @@
  *
  * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
  */
-namespace Oro\Bundle\EmailBundle\Mime;
+namespace Oro\Bundle\ImapBundle\Mime;
 
 use \Zend\Mime\Decode as BaseDecode;
 use \Zend\Mime\Mime;
 use \Zend\Stdlib\ErrorHandler;
-use Oro\Bundle\EmailBundle\Mail\Headers;
+use Oro\Bundle\ImapBundle\Mail\Headers;
 
+/**
+ * Helper class that converts raw email data.
+ */
 class Decode extends BaseDecode
 {
     /**
@@ -26,7 +29,7 @@ class Decode extends BaseDecode
         $firstline = strtok($message, "\n");
         if (!preg_match('%^[^\s]+[^:]*:%', $firstline)) {
             $headers = array();
-            // TODO: we're ignoring \r for now - is this function fast enough and is it safe to assume noone needs \r?
+            // we're ignoring \r for now - is this function fast enough and is it safe to assume noone needs \r?
             $body = str_replace(array("\r", "\n"), array('', $EOL), $message);
             return;
         }
