@@ -22,6 +22,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
