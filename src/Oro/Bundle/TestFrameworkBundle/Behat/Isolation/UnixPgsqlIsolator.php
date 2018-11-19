@@ -13,6 +13,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
+/**
+ * Restore and backup PostgreSQL database between features
+ */
 final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements IsolatorInterface
 {
     const TIMEOUT = 120;
