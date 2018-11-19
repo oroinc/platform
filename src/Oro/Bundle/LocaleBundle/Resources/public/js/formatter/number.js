@@ -4,7 +4,6 @@ define(function(require) {
     var _ = require('underscore');
     var numeral = require('numeral');
     var localeSettings = require('../locale-settings');
-    var configuration = require('oroconfig/js/configuration');
 
     /**
      * Number Formatter
@@ -77,12 +76,12 @@ define(function(require) {
                 return formattedNumber.replace('%', '');
             },
             replaceCurrency: function(formattedNumber, options) {
-                var currencyLayout = configuration.get('currency-view-type') === 'symbol' ?
+                var currencyLayout = localeSettings.getCurrencyViewType() === 'symbol' ?
                     localeSettings.getCurrencySymbol(options.currency_code) : options.currency_code;
 
-                var isPrepend = configuration.get('is-currency-symbol-prepend');
+                var isPrepend = localeSettings.isCurrencyPrepend();
 
-                if (configuration.get('currency-view-type') !== 'symbol' && isPrepend) {
+                if (localeSettings.getCurrencyViewType() !== 'symbol' && isPrepend) {
                     currencyLayout += '\u00A0';
                 }
 
