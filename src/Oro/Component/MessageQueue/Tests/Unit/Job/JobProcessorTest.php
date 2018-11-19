@@ -737,7 +737,7 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('saveJob');
 
-        /** @var JobConfigurationProviderInterface|\PHPUnit_Framework_MockObject_MockObject $jobConfigurationProvider */
+        /** @var JobConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject $jobConfigurationProvider */
         $jobConfigurationProvider = $this->createMock(JobConfigurationProviderInterface::class);
         $jobConfigurationProvider
             ->expects($this->any())

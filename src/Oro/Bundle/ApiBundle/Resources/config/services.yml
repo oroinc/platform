@@ -563,8 +563,13 @@ services:
     oro_api.rest.document_builder:
         class: Oro\Bundle\ApiBundle\Request\Rest\RestDocumentBuilder
         shared: false
+        arguments:
+            - '@oro_api.value_normalizer'
+            - '@oro_api.entity_id_transformer_registry'
+            - '@logger'
         tags:
             - { name: oro.api.document_builder, requestType: rest&!json_api, priority: -10 }
+            - { name: monolog.logger, channel: api }
 
     oro_api.rest.error_completer:
         class: Oro\Bundle\ApiBundle\Request\Rest\ErrorCompleter
@@ -579,8 +584,10 @@ services:
         arguments:
             - '@oro_api.value_normalizer'
             - '@oro_api.entity_id_transformer_registry'
+            - '@logger'
         tags:
             - { name: oro.api.document_builder, requestType: json_api }
+            - { name: monolog.logger, channel: api }
 
     oro_api.json_api.error_completer:
         class: Oro\Bundle\ApiBundle\Request\JsonApi\ErrorCompleter

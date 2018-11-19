@@ -8,9 +8,9 @@ use Oro\Bundle\SyncBundle\Authentication\Origin\OriginExtractor;
 
 class ApplicationOriginProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
-    /** @var OriginExtractor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OriginExtractor|\PHPUnit\Framework\MockObject\MockObject */
     private $originExtractor;
 
     /** @var ApplicationOriginProvider */
