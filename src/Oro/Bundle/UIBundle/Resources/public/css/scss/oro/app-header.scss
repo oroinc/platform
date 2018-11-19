@@ -22,14 +22,6 @@
     }
 
     .dropdown-menu {
-        > li {
-            line-height: $header-dropdown-menu-li-line-height;
-
-            > a {
-                line-height: $header-dropdown-menu-link-line-height;
-            }
-        }
-
         &:before {
             border: 0 none;
 
@@ -63,11 +55,21 @@
         margin: 0;
 
         list-style: none;
+
+        .nav-header {
+            font-weight: $header-dropdown-menu-header-font-weight;
+            margin-bottom: $header-dropdown-menu-header-margin-bottom;
+        }
     }
 
     &__search-and-shortcuts { // Includes Shortcuts and Search
         .dropdown {
             float: #{$start};
+
+            .nav-header {
+                font-weight: $header-dropdown-menu-header-font-weight;
+                margin-bottom: $header-dropdown-menu-header-margin-bottom;
+            }
 
             /* Header search dropdown */
             &.header-dropdown-search {
@@ -75,10 +77,6 @@
                     min-width: $header-search-dropdown-min-width;
 
                     background-color: $header-search-dropdown-menu-background;
-                }
-
-                > .dropdown-menu {
-                    padding-bottom: 0;
                 }
 
                 .search-form {
@@ -159,6 +157,8 @@
                             .description {
                                 color: $header-search-suggestion-item-description-color;
                                 line-height: $header-search-suggestion-item-description-line-height;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
                             }
 
                             .entity-label {
@@ -190,11 +190,12 @@
                             }
                         }
 
-                        .no-result-message {
+                        .no-data {
                             position: absolute;
                             #{$start}: 0;
                             width: 100%;
-                            padding: $header-search-no-result-padding;
+                            padding: $header-search-no-data-padding;
+                            margin: 0;
 
                             background-color: $header-search-dropdown-menu-background;
                             box-shadow: $header-search-suggestion-list-shadow;
@@ -204,7 +205,7 @@
                             display: none;
                         }
 
-                        input.search:not(:focus) + .search-suggestion-list + .no-result-message {
+                        input.search:not(:focus) + .search-suggestion-list + .no-data {
                             display: none !important;
                         }
 
@@ -222,22 +223,34 @@
             } // Ends &:.header-dropdown-search
 
             &.header-dropdown-shortcut {
-                .header-dropdown-shortcut {
-                    &__search {
-                        width: 100%;
-                    }
+                .header-dropdown-shortcut__search {
+                    width: 100%;
+
+                    margin-bottom: $header-shortcut-dropdown-search-margin-bottom;
                 }
                 .dropdown-menu {
                     width: $header-shortcut-dropdown-width;
 
                     .typeahead {
-                        width: $field-width;
-                        margin-top: -$input-border-width;
+                        width: 100%;
+                        padding: $header-shortcut-typeahead-padding;
+                        border-top-#{$start}-radius: 0;
+                        border-top-#{$end}-radius: 0;
 
                         &:before,
                         &:after {
-                            border: none;
+                            display: none;
                         }
+                    }
+                }
+
+                .nav-content form {
+                    padding: $header-dropdown-item-form-padding;
+                }
+
+                .dropdown-item {
+                    > a {
+                        padding: 0;
                     }
                 }
             }

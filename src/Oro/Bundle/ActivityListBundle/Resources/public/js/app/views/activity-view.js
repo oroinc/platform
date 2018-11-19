@@ -25,7 +25,7 @@ define(function(require) {
             },
             infoBlock: '> .accordion-group > .accordion-body .message .info',
             // commentsBlock is placed in next container after infoBlock
-            commentsBlock: '> .accordion-group > .accordion-body .message > .info + * > .comment',
+            commentsBlock: '> .accordion-group > .accordion-body .activity-item-content > .info + * > .comment',
             commentsCountBlock: '> .accordion-group > .accordion-heading .comment-count .count',
             ignoreHead: false
         },

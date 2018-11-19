@@ -21,10 +21,12 @@
             </div>
             <div class="extra-info">
                 <div class="message-item message">
-                    <b class="message-subject"><%- _.unescape(subject) %></b>
-                    <% if (!_.isUndefined(description) && !_.isEmpty(description)) { %>
-                    - <%= description %>
-                    <% } %>
+                    <div class="message-description">
+                        <b class="message-subject"><%- _.unescape(subject) %></b>
+                        <% if (!_.isUndefined(description) && !_.isEmpty(description)) { %>
+                        - <%= description %>
+                        <% } %>
+                    </div>
                     {% block activityShortMessage %}
                     {% endblock %}
                 </div>
@@ -46,12 +48,14 @@
         <div id="<%- regionId %>" role="region" aria-labelledby="<%- labelId %>" class="accordion-body collapse<% if (!collapsed) { %> show<% } %>">
             <div class="message">
                 {% block activityContent %}
-                    {# Do NOT remove. Placeholder for activity view #}
-                    <div class="info responsive-cell clearfix"></div>
-                    <% if (has_comments && commentable) { %>
-                    <div class="responsive-cell clearfix">
-                        {# placeholder for comments block#}
-                        <div class="comment"></div>
+                    <div class="activity-item-content">
+                        {# Do NOT remove. Placeholder for activity view #}
+                        <div class="info responsive-cell"></div>
+                        <% if (has_comments && commentable) { %>
+                        <div class="responsive-cell">
+                            {# placeholder for comments block#}
+                            <div class="comment"></div>
+                        </div>
                     </div>
                     <% } %>
                 {% endblock %}

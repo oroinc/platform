@@ -23,5 +23,5 @@
     {% set frontendOptions = ['el', 'tabTitle', 'tabIcon'] %}
     <div data-data="{{ favorites|json_encode }}" data-options="{{- navigation.get_options(frontendOptions, options) -}}"></div>
     <ul class="extra-list"></ul>
-    <div class="dot-menu-empty-message">{{ 'oro.navigation.messages.no_items'|trans }}</div>
+    <div class="no-data">{{ 'oro.navigation.messages.no_items'|trans }}</div>
 {% endblock %}

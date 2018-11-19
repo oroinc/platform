@@ -73,3 +73,22 @@
 input[type="text"].hasDatepicker {
     min-width: $form-item-collection-datepicker-field-min-width;
 }
+
+.clearable-input {
+
+    &__container--clear .clearable-input__placeholder-icon {
+        font-size: $icon-font-size;
+        top: ($field-size - $icon-font-size) / -2;
+        width: $field-size;
+        height: $field-size;
+        line-height: $field-size;
+    }
+
+    &__clear {
+        top: ($field-size - $icon-font-size) / -2;
+    }
+
+    &__container > input {
+        padding-#{$end}: $field-size;
+    }
+}
