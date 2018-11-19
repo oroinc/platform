@@ -171,7 +171,11 @@
 .sidebar-widget {
     border-bottom: 1px solid $primary-inverse;
 
-    &__popup,
+    &__popup {
+        display: none;
+        overflow: visible;
+    }
+
     &__content {
         display: none;
         overflow: auto;
@@ -211,31 +215,61 @@
         width: $sidebar-maximized-width;
         box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
 
-        &:before {
-            content: '';
-            position: absolute;
-            border: 5px $sidebar-widget-header-active-bg-color solid;
-            border-bottom-color: transparent;
-            border-right-color: transparent;
-            top: 15px;
+        &_wrapper {
+            &:before {
+                content: '';
+                top: 15px;
+                border: 0 none;
+                background-color: $sidebar-widget-header-active-bg-color;
+                width: 11px;
+                height: 10px;
+                z-index: 1;
+                position: absolute;
+
+            }
+
+            &:after {
+                content: '';
+                display: block;
+                position: absolute;
+                background-color: $sidebar-widget-header-active-bg-color;
+                width: 12px;
+                height: 40px;
+                z-index: 1;
+                pointer-events: none;
+            }
         }
     }
 
     .sidebar.minimized.sidebar-right &.poppedup &__popup {
         #{$end}: 0;
 
-        &:before {
-            transform: rotate($sidebar-right-popup-corner-transform);
-            #{$end}: -5px;
+        &_wrapper {
+            &:before {
+                #{$start}: -6px;
+                transform: rotate(-37deg) skewX(15deg);
+                box-shadow: if-ltr(1px 2px, -2px -2px) 13px 1px rgba(0, 0, 0, .13);
+            }
+
+            &:after {
+                #{$end}: 100%;
+            }
         }
     }
 
     .sidebar.minimized.sidebar-left &.poppedup &__popup {
         #{$start}: 0;
 
-        &:before {
-            transform: rotate($sidebar-left-popup-corner-transform);
-            #{$start}: -5px;
+        &_wrapper {
+            &:before {
+                #{$end}: -6px;
+                transform: rotate(-37deg) skewX(15deg);
+                box-shadow: if-ltr(-2px -2px, 1px 2px) 13px 1px rgba(0, 0, 0, .13);
+            }
+
+            &:after {
+                #{$start}: 100%;
+            }
         }
     }
 
@@ -282,17 +316,10 @@
 
     &__header {
         display: flex;
-        padding: 10px 13px;
+        padding: $sidebar-widget-header-padding;
 
         .dropdown-menu {
             min-width: 115px;
-
-            &:before {
-                content: '';
-                width: 10px;
-                height: 10px;
-                background-color: inherit;
-            }
         }
 
         @include if-rtl() {
@@ -306,7 +333,7 @@
     &__header-icon {
         color: $sidebar-widget-title-color;
         background-color: inherit;
-        padding-#{$end}: 4px;
+        padding-#{$end}: 8px;
     }
 
     &__header-toggle {
@@ -330,7 +357,7 @@
     }
 
     &__header-actions {
-        width: 20px;
+        width: $sidebar-widget-actions-width;
         font-size: 16px;
 
         @include fa-icon($sidebar-icon-actions-widget);

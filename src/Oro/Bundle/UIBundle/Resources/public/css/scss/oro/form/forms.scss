@@ -61,23 +61,6 @@
                 display: inline;
                 position: relative;
                 margin-bottom: 0;
-
-                &.required {
-                    em {
-                        color: $danger-dark;
-                        font-size: 21px;
-                        font-style: normal;
-                        position: absolute;
-                        top: -5px;
-                        #{$end}: -11px;
-                    }
-                }
-
-                &:not(.required) {
-                    em {
-                        display: none;
-                    }
-                }
             }
         }
 
@@ -150,6 +133,12 @@
     }
 }
 
+.form-vertical {
+    .control-group + .control-group {
+        margin-top: $form-container-control-row-space;
+    }
+}
+
 .user-fieldset {
     margin-bottom: 22px;
 
@@ -178,4 +167,23 @@ input[type='checkbox'] + label {
 
 .form-row {
     padding: 0 0 $margin-bottom-box/2;
+}
+
+label {
+    &.required {
+        em {
+            color: $danger-dark;
+            font-size: 21px;
+            font-style: normal;
+            position: absolute;
+            top: -5px;
+            #{$end}: -11px;
+        }
+    }
+
+    &:not(.required) {
+        em {
+            display: none;
+        }
+    }
 }
