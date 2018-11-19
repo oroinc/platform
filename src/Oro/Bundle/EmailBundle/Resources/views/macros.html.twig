@@ -553,16 +553,22 @@
             label: 'Subject'|trans,
             value: email.subject|oro_html_strip_tags
     }] %}
-    <ul class="form-horizontal">
-    {% for item in data %}
-        {% if item.value is not empty %}
-        <li class="control-group">
-            <label class="control-label">{{ item.label|raw }}:</label>
-            <div class="controls {{ item.cssClass is defined ? item.cssClass : '' }}">{{ item.value|raw }}</div>
-        </li>
-        {% endif %}
-    {% endfor %}
-    </ul>
+    <div class="email-detail-info">
+        <table class="email-detail-info__table">
+            {% for item in data %}
+                {% if item.value is not empty %}
+                    <tr class="email-detail-info__tr">
+                        <td class="email-detail-info__td">
+                            <div class="email-detail-info__label">{{ item.label|raw }}:</div>
+                        </td>
+                        <td class="email-detail-info__td">
+                            <div  class="email-detail-info__value {{ item.cssClass is defined ? item.cssClass : '' }}">{{ item.value|raw }}</div>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
 {% endmacro %}
 
 {#

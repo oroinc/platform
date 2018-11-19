@@ -82,6 +82,10 @@
                 border-#{$end}: 0;
                 margin-#{$end}: 0;
             }
+
+            &:empty {
+                display: none;
+            }
         }
     }
 

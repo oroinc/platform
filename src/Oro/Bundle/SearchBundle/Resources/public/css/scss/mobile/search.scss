@@ -22,13 +22,5 @@
     .search-header .search-form {
         clear: both;
         width: 100%;
-
-        .input-append {
-            width: 100%;
-        }
-
-        input[type="text"] {
-            width: calc(100% - 88px);
-        }
     }
 }

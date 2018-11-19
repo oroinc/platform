@@ -11,7 +11,7 @@
 
     &.entity-create-multi-enabled {
         .select2-container {
-            width: 216px;
+            width: 215px;
         }
 
         .dropdown-menu {
@@ -36,8 +36,8 @@
     .btn-group.entity-create-dropdown {
         display: inline-block;
         vertical-align: top;
-        margin-left: 3px;
-        border-radius: 0 4px 4px 0;
+        margin-#{$start}: $content-padding-small / 2;
+        border-radius: corner-values(0 4px 4px 0);
 
         & > .btn {
             font-size: 14px;

@@ -1,0 +1,15 @@
+/* @theme: admin.oro; */
+
+.email-info {
+    .email-actions {
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    .email-full {
+        .email-sent-date {
+            padding-#{$end}: 0;
+            padding-bottom: $email-sent-date-offset;
+        }
+    }
+}
