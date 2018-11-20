@@ -71,6 +71,7 @@ services:
         arguments:
             - '@validator'
             - '@oro_api.customize_form_data_handler'
+            - '@oro_api.form_property_accessor'
 
     oro_api.form.guesser.metadata:
         class: Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser

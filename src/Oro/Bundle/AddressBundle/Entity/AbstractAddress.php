@@ -13,7 +13,7 @@ use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * Address
+ * The base class for address entities.
  *
  * @ORM\MappedSuperclass
  * @ORM\HasLifecycleCallbacks
@@ -783,7 +783,6 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
 
     /**
      * Convert address to string
-     * @todo: Address format must be used here
      *
      * @return string
      */
