@@ -3,13 +3,13 @@
 /**
  * This file is a copy of {@see Zend\Mail\Header\ContentType}
  *
- * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
+
 namespace Oro\Bundle\EmailBundle\Mail\Header;
 
 use \Zend\Mail\Header\ContentType as BaseContentType;
 use \Zend\Mail\Header\Exception\InvalidArgumentException;
-
 use Oro\Bundle\EmailBundle\Mail\Headers;
 
 class ContentType extends BaseContentType
@@ -32,9 +32,9 @@ class ContentType extends BaseContentType
             throw new InvalidArgumentException('Invalid header line for Content-Type string');
         }
 
-        $value  = str_replace(Headers::FOLDING, " ", $value);
+        $value = str_replace(Headers::FOLDING, " ", $value);
         $values = preg_split('#\s*;\s*#', $value);
-        $type   = array_shift($values);
+        $type = array_shift($values);
 
         $header = new static();
         $header->setType($type);
@@ -62,5 +62,19 @@ class ContentType extends BaseContentType
         }
 
         return self::$headers;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setType($type)
+    {
+        $matches = [];
+        if (preg_match('/^[a-z-]+\/[a-z0-9.+-]+/i', $type, $matches)) {
+            $type = $matches[0];
+        }
+        $this->type = $type;
+
+        return $this;
     }
 }

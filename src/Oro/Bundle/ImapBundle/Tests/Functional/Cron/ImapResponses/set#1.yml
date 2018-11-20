@@ -13,4 +13,4 @@ log_info:
     - 'Exit because all origins have been synchronised.'
 total: 0
 data: []
-errors: ~
+expectedEmailData: ~
