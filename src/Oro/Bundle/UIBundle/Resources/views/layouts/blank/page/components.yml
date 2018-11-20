@@ -10,4 +10,3 @@ layout:
             blockType: text
             options:
                 text: 'oro_frontend.copyright'
-                escape: false
