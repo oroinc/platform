@@ -46,7 +46,15 @@ To simplify creation of the functional test for REST API resources that conform 
 | getNewResourceIdFromIncludedSection | Extracts the JSON.API resource identifier from the "included" section of the response. For details, see [Create and Update Related Resources Together with a Primary API Resource](https://oroinc.com/orocrm/doc/current/dev-guide/web-api#create-and-update-related-resources-together-with-a-primary-api-resource). |
 | getRequestData | Converts the given request to an array that can be sent to the server. The given request can be a path to a file that contains the request data or an array with the request data. If the request is a file name, the file should be located in the `requests` directory next to the PHP file that contains the test. |
 | getResponseErrors | Extracts the list of errors from the JSON.API response. For details, see [JSON.API Specification](http://jsonapi.org/format/#errors). |
+| getApiBaseUrl | Returns the base URL for all REST API requests, e.g. `http://localhost/api`. |
 | appendEntityConfig | Appends a configuration of an entity. This method is helpful when you create a general functionality and need to test it for different configurations without creating a test entity for each of them. Please note that the configuration is restored after each test and thus, you do not need to do it manually. |
+
+**Notes**:
+
+ - By default HATEOAS is disabled in functional tests, although it is enabled by default in production
+   and API Sandbox. It was done to avoid cluttering up the tests with HATEOAS links. In case you want to enable
+   HATEOAS for your test, use `HTTP_HATEOAS` server parameter,
+   e.g. `$this->cget(['entity' => 'products']), [], ['HTTP_HATEOAS' => true]`.
 
 ## Load Fixtures
 

@@ -8,17 +8,18 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
+use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 class SetLocationHeaderTest extends FormProcessorTestCase
 {
     private const ITEM_ROUTE_NAME = 'item_route';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface */
-    private $router;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|UrlGeneratorInterface */
+    private $urlGenerator;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
@@ -33,7 +34,7 @@ class SetLocationHeaderTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->router = $this->createMock(RouterInterface::class);
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
         $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
 
@@ -49,8 +50,8 @@ class SetLocationHeaderTest extends FormProcessorTestCase
             ->willReturn($this->entityIdTransformer);
 
         $this->processor = new SetLocationHeader(
-            $routes,
-            $this->router,
+            new RestRoutesRegistry([[$routes, 'rest']], new RequestExpressionMatcher()),
+            $this->urlGenerator,
             $this->valueNormalizer,
             $entityIdTransformerRegistry
         );
@@ -94,7 +95,7 @@ class SetLocationHeaderTest extends FormProcessorTestCase
             ->method('transform')
             ->with($entityId, self::identicalTo($metadata))
             ->willReturn($transformedEntityId);
-        $this->router->expects(self::once())
+        $this->urlGenerator->expects(self::once())
             ->method('generate')
             ->with(
                 self::ITEM_ROUTE_NAME,

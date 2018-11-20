@@ -1,0 +1,59 @@
+/* @theme: admin.oro; */
+
+$alert-min-height: 24px !default;
+$alert-font-size: $base-font-size - 1 !default;
+$alert-line-height: 1.23 !default;
+$alert-text-shadow: none !default;
+$alert-inner-offset: 4px 8px !default;
+$alert-border: 1px solid transparent !default;
+
+$alert-dismissible-inner-offset-right: 30px !default;
+
+$alert-message-text-align: #{$start} !default;
+
+$alert-icon-inner-offset-left: 30px !default;
+$alert-icon-font-family: 'FontAwesome' !default;
+$alert-icon-font-size: $base-font-size + 1 !default;
+$alert-icon-line-height: 1 !default;
+$alert-icon-position: absolute !default;
+$alert-icon-top: 4px !default;
+$alert-icon-left: 8px !default;
+
+$alert-close-font-size: $base-font-size - 1 !default;
+$alert-close-line-height: 1 !default;
+$alert-close-text-shadow: none !default;
+$alert-close-color: inherit !default;
+$alert-close-inner-offset: 5px 8px !default;
+$alert-close-position: absolute !default;
+$alert-close-right: 1px !default;
+$alert-close-opacity: 1 !default;
+$alert-close-hover-color: inherit !default;
+
+$alert-danger-background: $danger-lighten !default;
+$alert-danger-border-color: $danger-lighten !default;
+$alert-danger-color: $danger-ultra-dark !default;
+$alert-danger-close-color: $danger-darken !default;
+$alert-danger-icon-color: $danger-darken !default;
+$alert-danger-icon-content: $fa-var-exclamation-circle !default;
+
+$alert-warning-background: $warning-light !default;
+$alert-warning-border-color: $warning-light !default;
+$alert-warning-color: $warning-darken !default;
+$alert-warning-close-color: $warning-dark !default;
+$alert-warning-icon-color: $warning-dark !default;
+$alert-warning-icon-content: $fa-var-exclamation-triangle !default;
+
+$alert-info-background: $info-lighten !default;
+$alert-info-border-color: $info-lighten !default;
+$alert-info-color: $info-ultra-dark !default;
+$alert-info-close-color: $info-dark !default;
+$alert-info-icon-color: $info-dark !default;
+$alert-info-icon-content: $fa-var-exclamation !default;
+$alert-info-icon-inner-offset-left: 22px !default;
+
+$alert-success-background: $success-ultra-light !default;
+$alert-success-border-color: $success-ultra-light !default;
+$alert-success-color: $success-darken !default;
+$alert-success-close-color: $success-light !default;
+$alert-success-icon-color: $success-light !default;
+$alert-success-icon-content: $fa-var-check !default;

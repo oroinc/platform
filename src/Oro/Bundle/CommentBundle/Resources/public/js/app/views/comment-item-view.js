@@ -4,7 +4,7 @@ define(function(require) {
     var CommentItemView;
     var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('text!../../../templates/comment/comment-item-view.html');
+    var template = require('text!orocomment/templates/comment/comment-item-view.html');
     var dateTimeFormatter = require('orolocale/js/formatter/datetime');
 
     CommentItemView = BaseView.extend({
@@ -21,11 +21,11 @@ define(function(require) {
             'click .item-edit-button': 'onEditCommentClick',
 
             // open/close dropdown on hover
-            'mouseover .dropdown-toggle:not(.file-menu)': function(e) {
+            'mouseenter .more-bar-holder': function(e) {
                 $(e.target).trigger('click');
             },
-            'mouseleave .dropdown-menu:not(.file-menu)': function(e) {
-                $(e.target).parent().find('a.dropdown-toggle').trigger('click');
+            'mouseleave .more-bar-holder': function(e) {
+                this.$('.show > [data-toggle="dropdown"]').trigger('tohide.bs.dropdown');
             }
         },
 

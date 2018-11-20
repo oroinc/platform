@@ -1,0 +1,14 @@
+data:
+    -
+        type: testapientity2
+        id: '{entity21Id}'
+        links:
+            self: '{baseUrl}/testapientity2/{entity21Id}'
+    -
+        type: testapientity2
+        id: '{entity22Id}'
+        links:
+            self: '{baseUrl}/testapientity2/{entity22Id}'
+links:
+    self: '{baseUrl}/testapientity1/{entityId}/relationships/biM2M'
+    related: '{baseUrl}/testapientity1/{entityId}/biM2M'

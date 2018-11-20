@@ -41,6 +41,10 @@
             width: $form-item-collection-select2-width;
         }
     }
+
+    .action-cell {
+        text-align: center;
+    }
 }
 
 .oro-item-collection.not-removable {
@@ -70,48 +74,21 @@ input[type="text"].hasDatepicker {
     min-width: $form-item-collection-datepicker-field-min-width;
 }
 
-.form-horizontal {
-    .controls {
-        padding-top: 7px;
+.clearable-input {
 
-        .controls {
-            padding-top: 0;
-        }
+    &__container--clear .clearable-input__placeholder-icon {
+        font-size: $icon-font-size;
+        top: ($field-size - $icon-font-size) / -2;
+        width: $field-size;
+        height: $field-size;
+        line-height: $field-size;
+    }
 
-        >,
-        .oro-clearfix,
-        .fallback-container {
-            input:not([type=checkbox]):not([type=radio]),
-            textarea,
-            .selector,
-            .select2-container,
-            .input-append {
-                margin-top: -7px; //  input padding + border
+    &__clear {
+        top: ($field-size - $icon-font-size) / -2;
+    }
 
-                + .fallback-status,
-                + .btn:not(.add-on),
-                > .btn:not(.add-on) {
-                    margin-top: -7px;
-                }
-
-            }
-
-            .selector,
-            .select2-container,
-            .input-append,
-            td {
-                input:not([type=checkbox]):not([type=radio]),
-                textarea,
-                .selector,
-                .select2-container {
-                    margin-top: 0;
-                }
-            }
-        }
-
-        .jstree-wrapper {
-            padding-top: 0;
-            min-width: $field-width;
-        }
+    &__container > input {
+        padding-#{$end}: $field-size;
     }
 }

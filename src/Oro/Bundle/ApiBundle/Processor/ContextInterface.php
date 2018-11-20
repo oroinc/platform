@@ -18,7 +18,7 @@ use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 /**
- * Represents an execution context for Data API processors.
+ * Represents an execution context for Data API processors for public actions.
  */
 interface ContextInterface extends ComponentContextInterface
 {
@@ -148,6 +148,68 @@ interface ContextInterface extends ComponentContextInterface
      * @param FilterValueAccessorInterface $accessor
      */
     public function setFilterValues(FilterValueAccessorInterface $accessor);
+
+    /**
+     * Indicates whether the current action processes a master API request
+     * or it is executed as part of another action.
+     *
+     * @return bool
+     */
+    public function isMasterRequest(): bool;
+
+    /**
+     * Sets a flag indicates whether the current action processes a master API request
+     * or it is executed as part of another action.
+     *
+     * @param bool $master
+     */
+    public function setMasterRequest(bool $master): void;
+
+    /**
+     * Indicates whether the current request is CORS request.
+     * @link https://www.w3.org/TR/cors/
+     *
+     * @return bool
+     */
+    public function isCorsRequest(): bool;
+
+    /**
+     * Sets a flag indicates whether the current request is CORS request.
+     * @link https://www.w3.org/TR/cors/
+     *
+     * @param bool $cors
+     */
+    public function setCorsRequest(bool $cors): void;
+
+    /**
+     * Indicates whether HATEOAS is enabled.
+     *
+     * @return bool
+     */
+    public function isHateoasEnabled(): bool;
+
+    /**
+     * Sets a flag indicates whether HATEOAS is enabled.
+     *
+     * @param bool $flag
+     */
+    public function setHateoas(bool $flag);
+
+    /**
+     * Gets a list of records contains an additional information about collections
+     * e.g. "has_more" flag in such record indicates whether a collection has more records than it was requested.
+     *
+     * @return array|null [property path => info record, ...]
+     */
+    public function getInfoRecords(): ?array;
+
+    /**
+     * Sets a list of records contains an additional information about collections
+     * e.g. "has_more" flag in such record indicates whether a collection has more records than it was requested.
+     *
+     * @param array|null $infoRecords [property path => info record, ...]
+     */
+    public function setInfoRecords(?array $infoRecords): void;
 
     /**
      * Checks whether a query is used to get result data exists.

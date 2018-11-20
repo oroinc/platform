@@ -11,6 +11,9 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * The API manager for File entity.
+ */
 class FileApiEntityManager extends ApiEntityManager
 {
     /** @var AuthorizationCheckerInterface */
@@ -65,8 +68,8 @@ class FileApiEntityManager extends ApiEntityManager
             'fields'         => [
                 'owner' => ['fields' => 'id']
             ],
-            'post_serialize' => function (array &$result) {
-                $this->postSerializeFile($result);
+            'post_serialize' => function (array $result) {
+                return $this->postSerializeFile($result);
             }
         ];
 
@@ -75,9 +78,13 @@ class FileApiEntityManager extends ApiEntityManager
 
     /**
      * @param array $result
+     *
+     * @return array
      */
-    protected function postSerializeFile(array &$result)
+    protected function postSerializeFile(array $result): array
     {
         $result['content'] = new FileContentProvider($result['filename'], $this->fileManager);
+
+        return $result;
     }
 }

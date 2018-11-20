@@ -1,9 +1,12 @@
 /* @theme: admin.oro; */
 
 .dashboard-selector-container {
+    text-align: $start !important;
+
     label {
-        padding-top: 4px;
+        padding-top: 6px;
         padding-#{$end}: 10px;
+        margin-bottom: 0;
     }
 
     select {
@@ -26,12 +29,6 @@
                 max-width: 280px;
             }
         }
-    }
-
-    .widget-query-filter .collapse-action {
-        padding-top: 4px;
-
-        display: inline-block;
     }
 }
 
@@ -90,7 +87,7 @@
 
         .widget-header {
             min-height: 44px;
-            padding: 3px 0 2px;
+            padding: $dashboard-widget-header-padding;
 
             display: flex;
 
@@ -136,7 +133,7 @@
             margin: side-values(10px 0 8px 0);
 
             .action-wrapper {
-                padding: 0 2px;
+                padding: $dashboard-action-padding;
                 margin-#{$start}: 14px;
             }
         }
@@ -152,7 +149,7 @@
         }
 
         .widget-title {
-            padding: 6px 0 0;
+            padding: 0;
 
             color: $dashboard-widget-title-color;
             font-size: 18px;
@@ -161,6 +158,8 @@
 
             flex: 1;
             overflow: hidden;
+
+            align-self: center;
 
             &:before {
                 min-height: 40px;
@@ -171,7 +170,7 @@
         }
 
         .row-fluid {
-            padding: 22px 24px;
+            padding: $dashboard-widget-content-padding;
 
             border-top: $dashboard-container-border;
         }
@@ -180,14 +179,17 @@
             margin-top: 0;
 
             .other-scroll-container {
-                margin: 10px 0;
+                margin-bottom: $dashboard-container-other-scroll-container-offset;
             }
         }
 
         .widget-config-data {
             margin-#{$end}: 10px;
+            position: relative;
+            top: $dashboard-widget-config-data-shift;
 
-            font-size: $base-font-size - 1px;
+            font-size: $dashboard-widget-config-data-font-size;
+            line-height: $dashboard-widget-config-data-line-height;
 
             color: $dashboard-widget-config-data-color;
         }
@@ -216,15 +218,13 @@
     }
 
     .dashboard-widget.collapsed {
-        overflow: hidden;
-
         .row-fluid {
             border-top: none;
         }
     }
 
     .collapse-expand-action-container {
-        padding: side-values(0 2px 0 6px);
+        padding: $dashboard-action-padding;
     }
 }
 
@@ -331,14 +331,45 @@
 }
 
 .widget-configuration {
+    .form-horizontal {
+        .control-group {
+            > .control-label {
+                width: $dashboard-widget-configuration-control-label-width;
+                min-width: $dashboard-widget-configuration-control-label-width;
+            }
+        }
+    }
+
     .items-selector-widget {
-        margin-#{$end}: 20px;
+        margin-#{$end}: $content-padding;
+    }
+
+    .widget-title-container {
+        display: flex;
+
+        .control-group {
+            &.control-group-checkbox {
+                > .control-label {
+                    width: $dashboard-widget-title-widget-control-label-width;
+                    min-width: $dashboard-widget-title-widget-control-label-min-width;
+                }
+
+                > .controls {
+                    margin-#{$start}: $dashboard-widget-title-widget-controls-offset-start;
+                }
+            }
+        }
     }
 
     .widget-title-widget {
-        margin-#{$end}: 20px;
+        width: $dashboard-widget-title-widget-width;
+        margin-#{$end}: $content-padding;
+        flex-grow: 1;
+        flex-shrink: 1;
+    }
 
-        float: #{$start};
+    .widget-title-input {
+        width: $dashboard-widget-title-input-width;
     }
 
     .date-range-filter {
@@ -364,10 +395,6 @@
         .control-group .horizontal:nth-of-type(2) .selector {
             margin-top: 10px;
         }
-    }
-
-    .filter-criteria {
-        padding: 0;
     }
 
     .controls .horizontal {
@@ -412,6 +439,17 @@
             max-width: 110px;
         }
     }
+
+    .query-filter-row {
+        .collapse-toggler.collapsed .expanded-text,
+        .collapse-toggler:not(.collapsed) .collapsed-text {
+            display: none;
+        }
+
+        .collapse, .collapsing {
+            margin-top: $dashboard-widget-configuration-collapsed-margin-top;
+        }
+    }
 }
 
 .widget-content.widget-configuration {
@@ -421,25 +459,30 @@
 }
 
 .dashboard-widget-items {
-    margin-bottom: 10px;
+    flex-wrap: wrap;
 
-    .control-group.controls {
-        width: 445px;
+    .controls.items-table-container {
+        margin-#{$start}: $dashboard-configuration-items-table-margin-start;
+        margin-top: $dashboard-configuration-items-table-margin-top;
+        flex-basis: 100%;
     }
 
-    .mobile-version & {
-        .controls {
-            width: initial;
-        }
+    .btn-group + .btn-group {
+        margin-#{$start}: $dashboard-widget-configuration-buttons-space;
+    }
 
-        .action-column {
-            width: 116px;
+    .widget-items-item-row .action-cell {
+        @include clearfix();
 
-            text-align: center;
-        }
+        .btn-icon:not(.btn) {
+            display: block;
+            color: $dashboard-configuration-items-btn-color;
+            float: $start;
 
-        .action-cell .btn {
-            padding: 0 4px;
+            &:active,
+            &:hover {
+                color: $dashboard-configuration-items-btn-active-color;
+            }
         }
     }
 }

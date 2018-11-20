@@ -1,11 +1,11 @@
 /* @theme: admin.oro; */
 
 .inline-actions-element {
-    position: relative;
-    top: -4px;
-    line-height: 19px;
     display: inline-block;
-    margin-bottom: -3px;
+    margin: (-$content-padding-small / 2) (-$content-padding-small);
+    padding: ($content-padding-small / 2) $content-padding-small;
+
+    transition: $hover-transition;
 
     .inline-actions-element_actions {
         visibility: hidden;
@@ -25,22 +25,30 @@
 
     .inline-actions-element_wrapper {
         word-break: break-all;
-        padding: 5px 0 3px;
-        line-height: 24px;
-        margin-right: 2px;
+        display: inline-block;
+    }
+
+    &.truncate {
+        display: inline-flex;
+        .inline-actions-element_wrapper {
+            padding: 0;
+            @include text-line-truncate(200px, true);
+        }
     }
 }
 
 .inline-actions-element_actions {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     vertical-align: top;
     margin: 0 2px;
 
     .btn {
         font: 0/0 a;
-        width: 19px;
-        height: 23px;
+        width: 20px;
+        height: 20px;
         padding: 0;
+        text-align: center;
 
         &,
         &:focus,
@@ -58,6 +66,7 @@
             width: 14px;
             height: 20px;
             margin: 0 1px;
+            line-height: 1;
 
             &:before {
                 font: $base-font-size/26px 'FontAwesome';

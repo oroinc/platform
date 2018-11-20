@@ -553,16 +553,22 @@
             label: 'Subject'|trans,
             value: email.subject|oro_html_strip_tags
     }] %}
-    <ul class="form-horizontal">
-    {% for item in data %}
-        {% if item.value is not empty %}
-        <li class="control-group">
-            <label class="control-label">{{ item.label|raw }}:</label>
-            <div class="controls {{ item.cssClass is defined ? item.cssClass : '' }}">{{ item.value|raw }}</div>
-        </li>
-        {% endif %}
-    {% endfor %}
-    </ul>
+    <div class="email-detail-info">
+        <table class="email-detail-info__table">
+            {% for item in data %}
+                {% if item.value is not empty %}
+                    <tr class="email-detail-info__tr">
+                        <td class="email-detail-info__td">
+                            <div class="email-detail-info__label">{{ item.label|raw }}:</div>
+                        </td>
+                        <td class="email-detail-info__td">
+                            <div  class="email-detail-info__value {{ item.cssClass is defined ? item.cssClass : '' }}">{{ item.value|raw }}</div>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
 {% endmacro %}
 
 {#
@@ -579,38 +585,41 @@
     Render title and buttons for Mailbox configuration
 #}
 {% macro renderMailboxConfigTitleAndButtons(pageTitle, buttons) %}
-    <div class="container-fluid page-title configuration-header">
-        {% if pageTitle is iterable %}
-            <div class="customer-info customer-simple pull-left">
-                {% for title in pageTitle%}
-                    {% if not loop.last %}
-                        <div class="sub-title">
-                            {% if title is iterable and title.link is defined and title.label is defined %}
-                                <a href="{{ title.link }}">{{ title.label }}</a>
+    <div class="container-fluid page-title">
+        <div class="navigation navbar-extra navbar-extra-right">
+            <div class="row">
+                <div class="pull-left pull-left-extra">
+                    {% if pageTitle is iterable %}
+                        {% for title in pageTitle%}
+                            {% if not loop.last %}
+                                <div class="sub-title">
+                                    {% if title is iterable and title.link is defined and title.label is defined %}
+                                        <a href="{{ title.link }}">{{ title.label }}</a>
+                                    {% else %}
+                                        {{ title }}
+                                    {% endif %}
+                                </div>
+                                <span class="separator">/</span>
                             {% else %}
-                                {{ title }}
+                                <h1 class="page-title__entity-title">
+                                    {% if title is iterable and title.link is defined and title.label is defined %}
+                                        <a href="{{ title.link }}">{{ title.label }}</a>
+                                    {% else %}
+                                        {{ title }}
+                                    {% endif %}
+                                </h1>
                             {% endif %}
-                        </div>
-                        <span class="separator">/</span>
+                        {% endfor %}
                     {% else %}
-                        <h1 class="user-name">
-                            {% if title is iterable and title.link is defined and title.label is defined %}
-                                <a href="{{ title.link }}">{{ title.label }}</a>
-                            {% else %}
-                                {{ title }}
-                            {% endif %}
+                        <h1 class="page-title__entity-title">
+                            {{ pageTitle }}
                         </h1>
                     {% endif %}
-                {% endfor %}
+                </div>
+                <div class="pull-right title-buttons-container">
+                    {{ buttons|raw }}
+                </div>
             </div>
-        {% else %}
-            <h1>
-                {{ pageTitle }}
-            </h1>
-        {% endif %}
-
-        <div class="pull-right title-buttons-container">
-            {{ buttons|raw }}
         </div>
     </div>
 {% endmacro %}

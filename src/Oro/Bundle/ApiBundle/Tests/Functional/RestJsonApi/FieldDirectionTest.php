@@ -58,13 +58,13 @@ class FieldDirectionTest extends RestJsonApiTestCase
                 ]
             ]
         );
-        self::assertEquals(
+        $this->assertResponseContains(
             [
                 'meta' => [
                     'name' => 'A name'
                 ]
             ],
-            self::jsonToArray($response->getContent())
+            $response
         );
     }
 
@@ -93,14 +93,14 @@ class FieldDirectionTest extends RestJsonApiTestCase
                 ]
             ]
         );
-        self::assertEquals(
+        $this->assertResponseContains(
             [
                 'meta' => [
                     'name'        => 'A name',
                     'description' => null
                 ]
             ],
-            self::jsonToArray($response->getContent())
+            $response
         );
     }
 

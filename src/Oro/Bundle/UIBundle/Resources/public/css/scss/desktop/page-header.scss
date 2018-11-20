@@ -4,33 +4,44 @@
     padding-#{$end}: 0;
     padding-#{$start}: $content-padding;
 
+    .navbar-extra {
+        margin-bottom: 10px;
+    }
+
     .navbar-extra > .row {
-        > .pull-right {
-            max-width: calc(100% - 180px);
+        .title-buttons-container {
+            max-width: 100%;
 
-            > .title-buttons-container {
-                text-align: #{$end};
+            // All children should have a own font-size
+            font-size: 0;
+            text-align: #{$end};
 
-                > .pull-left,
-                > .btn-group {
-                    text-align: #{$start};
-                    display: inline-block;
+            > .pull-left,
+            > .btn-group {
+                text-align: #{$start};
+                display: inline-block;
+                vertical-align: top;
+
+                .btn {
                     margin-bottom: 4px;
-                    vertical-align: top;
                 }
+            }
 
-                > .pinned-dropdown > .btn-group {
-                    text-align: #{$start};
+            .btn-group {
+                margin-#{$start}: $content-padding-small;
+
+                .btn-group {
+                    margin-#{$start}: 0;
                 }
+            }
+
+            > .pinned-dropdown > .btn-group {
+                text-align: #{$start};
             }
 
             .separator-btn {
-                margin-top: 2px;
+                margin: side-values(0 0 0 $content-padding-small);
             }
-        }
-
-        > .pull-left + .pull-right {
-            max-width: none;
         }
     }
 
@@ -43,21 +54,35 @@
     .navigation {
         .row {
             display: flex;
-            align-items: center;
+            flex-flow: row wrap;
+            justify-content: flex-end;
+
+            > div {
+                margin-bottom: 6px;
+            }
+
+            &.inline-info {
+                flex-wrap: wrap-reverse;
+                > div {
+                    margin-bottom: 0;
+                }
+            }
 
             > .pull-left-extra {
-                width: 100%;
+                flex-grow: 1;
                 margin-#{$start}: 0;
+                text-align: $start;
             }
 
             > .pull-right {
-                max-width: 100%;
                 flex-shrink: 0;
             }
         }
     }
+}
 
-    .customer-content {
+.page-title {
+    &__path {
         .top-row {
             .pull-left {
                 float: none;
@@ -65,30 +90,14 @@
             }
         }
     }
-}
 
-.customer-info {
-    h1 {
-        margin: 0 0 3px;
-
-        &.user-name {
-            margin-#{$end}: 5px;
-        }
-    }
-
-    .sub-title {
-        a {
-            color: $link-color;
-
-            &:hover {
-                color: $link-color-hover;
-            }
-        }
+    &__entity-title {
+        margin-#{$end}: 5px;
     }
 
     .sub-title,
     .separator,
-    .user-name {
+    &__entity-title {
         display: inline;
     }
 }

@@ -220,10 +220,6 @@
         overflow-y: auto;
     }
 
-    .menu-icon {
-        display: none;
-    }
-
     &__scroll {
         position: absolute;
         #{$start}: 0;

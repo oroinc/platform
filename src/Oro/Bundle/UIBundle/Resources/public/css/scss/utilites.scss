@@ -1,0 +1,15 @@
+/* @theme: admin.oro; */
+
+.hide {
+    display: none !important; // override inline styles
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+// extend bootstrap .list-unstyled class
+// link: https://github.com/twbs/bootstrap/blob/v4.1.0/scss/_type.scss#L84
+.list-unstyled {
+    margin-bottom: 0;
+}

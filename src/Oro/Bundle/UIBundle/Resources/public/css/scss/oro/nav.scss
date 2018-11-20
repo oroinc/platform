@@ -67,17 +67,7 @@
     }
 
     &-extra-right {
-        padding-right: $content-padding;
-
-        .title-buttons-container {
-            .btn-group {
-                margin-left: $content-padding-small;
-            }
-
-            .btn-group .btn-group {
-                margin-left: 0;
-            }
-        }
+        padding-#{$end}: $content-padding;
     }
 }
 

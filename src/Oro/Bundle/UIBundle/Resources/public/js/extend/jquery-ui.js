@@ -8,6 +8,10 @@ define(function(require) {
     /* datepicker extend:start */
     (function() {
         var original = {
+            _showDatepicker: $.datepicker.constructor.prototype._showDatepicker,
+            _hideDatepicker: $.datepicker.constructor.prototype._hideDatepicker,
+            _attachments: $.datepicker.constructor.prototype._attachments,
+            _updateDatepicker: $.datepicker.constructor.prototype._updateDatepicker,
             _destroyDatepicker: $.datepicker.constructor.prototype._destroyDatepicker
         };
 
@@ -73,15 +77,11 @@ define(function(require) {
             }
         }
 
-        var _showDatepicker = $.datepicker.constructor.prototype._showDatepicker;
-        var _hideDatepicker = $.datepicker.constructor.prototype._hideDatepicker;
-        var _attachments = $.datepicker.constructor.prototype._attachments;
-
         $.datepicker.constructor.prototype._attachments = function($input, inst) {
             $input
                 .off('click', this._showDatepicker)
                 .click(this._showDatepicker);
-            _attachments.call(this, $input, inst);
+            original._attachments.call(this, $input, inst);
         };
 
         /**
@@ -92,7 +92,7 @@ define(function(require) {
          * @private
          */
         $.datepicker.constructor.prototype._showDatepicker = function(elem) {
-            _showDatepicker.apply(this, arguments);
+            original._showDatepicker.apply(this, arguments);
 
             var input = elem.target || elem;
             var $input = $(input);
@@ -129,6 +129,7 @@ define(function(require) {
          */
         $.datepicker.constructor.prototype._hideDatepicker = function(elem) {
             var input = elem;
+            var dpDiv = $.datepicker._curInst.dpDiv;
 
             if (!elem) {
                 if (!$.datepicker._curInst) {
@@ -145,9 +146,17 @@ define(function(require) {
                     $(this).off(events);
                 });
 
-            _hideDatepicker.apply(this, arguments);
+            dpDiv.trigger('content:remove', dpDiv);
+
+            original._hideDatepicker.apply(this, arguments);
 
             $input.trigger('datepicker:dialogHide');
+        };
+
+        $.datepicker.constructor.prototype._updateDatepicker = function(inst) {
+            original._updateDatepicker.call(this, inst);
+
+            inst.dpDiv.trigger('content:changed', inst.dpDiv);
         };
 
         $.datepicker.constructor.prototype._destroyDatepicker = function() {
@@ -328,6 +337,20 @@ define(function(require) {
                 });
 
                 this._superApply(arguments);
+            },
+
+            /**
+             * Faster and rough handle class setting method
+             */
+            _setHandleClassName: function() {
+                this._removeClass(this.element.find('.ui-sortable-handle'), 'ui-sortable-handle');
+
+                this._addClass(
+                    this.options.handle ? this.element.find(this.options.handle) : $($.map(this.items, function(item) {
+                        return item.item.get(0);
+                    })),
+                    'ui-sortable-handle'
+                );
             }
         });
     }());

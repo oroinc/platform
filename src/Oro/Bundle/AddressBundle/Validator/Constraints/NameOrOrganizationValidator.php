@@ -7,22 +7,25 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * The validator for NameOrOrganization constraint.
+ */
 class NameOrOrganizationValidator extends ConstraintValidator
 {
-    const ALIAS = 'oro_address.validator.name_or_organization';
-
     /**
      * {@inheritdoc}
+     * @param AbstractAddress    $entity
      * @param NameOrOrganization $constraint
      */
     public function validate($entity, Constraint $constraint)
     {
-        if (!$entity) {
+        if (null === $entity) {
             return;
         }
         if (!$entity instanceof AbstractAddress) {
-            throw new UnexpectedTypeException($entity, 'AbstractAddress');
+            throw new UnexpectedTypeException($entity, AbstractAddress::class);
         }
+
         if ((!$entity->getFirstName() || !$entity->getLastName()) && !$entity->getOrganization()) {
             // organization or (first name and last name) should be filled
             $this->context->buildViolation($constraint->firstNameMessage)

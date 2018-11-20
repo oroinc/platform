@@ -1,8 +1,6 @@
 /* @theme: admin.oro; */
 
 .form-horizontal .control-label {
-    text-align: left;
-
     &.header-tooltips {
         display: inline;
         float: none;
@@ -19,49 +17,60 @@
 }
 
 .form-horizontal {
+    // Need refactor when form grids will be improved
+    .modal-body & {
+        .control-group {
+            > .control-label {
+                width: $modal-form-horizontal-control-label-width;
+                min-width: $modal-form-horizontal-control-label-width;
+            }
+
+            .controls {
+                .input,
+                input[type="text"] {
+                    width: $modal-form-horizontal-controls-input-width;
+                    max-width: $modal-form-horizontal-controls-input-width;
+                }
+            }
+        }
+    }
+
     .control-group {
         display: flex;
 
         > .control-label {
-            width: 200px;
-            min-width: 150px;
+            width: $form-horizontal-control-label-width;
             font-weight: normal;
             text-align: #{$end};
+            flex-shrink: 0;
         }
 
-        label.control-label {
-            margin-bottom: 0;
-            padding-top: 9px;
-
-            .desktop-version & + .controls {
-                padding-top: 9px;
-            }
-        }
-
-        .control-label.wrap {
-            padding-top: 6px;
-            line-height: 20px;
-
-            .desktop-version & + .controls {
+        &:not(.attribute-row) {
+            .control-label {
                 padding-top: 6px;
+                line-height: 20px;
             }
+        }
 
+        .control-label {
             .tooltip-icon {
-                margin-right: 5px;
+                margin-#{$end}: $content-padding-small;
             }
 
             label {
                 display: inline;
+                position: relative;
+                margin-bottom: 0;
             }
         }
 
         .controls {
-            margin-#{$start}: 13px;
-
+            margin-#{$start}: $form-horizontal-control-margin-start;
             text-align: #{$start};
+            flex-grow: 1;
 
             &:first-child {
-                margin-#{$start}: 169px;
+                margin-#{$start}: 206px;
             }
 
             &.autocomplete-box {
@@ -78,22 +87,17 @@
             .control-subgroup {
                 display: inline-block;
                 vertical-align: top;
-                margin-right: 8px;
+                margin-#{$end}: $content-padding-small;
 
                 .controls {
-                    margin-left: 0;
-                    float: left;
+                    margin-#{$start}: 0;
+                    float: $start;
                 }
 
                 .tooltip-icon {
-                    margin-right: 5px;
+                    margin-#{$end}: $content-padding-small;
                 }
             }
-        }
-
-        &.attribute-row label.control-label {
-            cursor: default;
-            color: $primary-550;
         }
 
         &.control-group-datetime {
@@ -106,18 +110,32 @@
                 }
             }
         }
+
+        &.control-group-checkbox {
+            .controls {
+                padding-top: 6px;
+            }
+        }
+
+        &.control-group-choice {
+            .choice-widget-expanded {
+                padding-top: 6px;
+            }
+        }
     }
 }
 
-.form-horizontal-large {
-    .control-group {
-        max-width: 100%;
-
-        div.control-label,
-        label.control-label {
-            width: 230px;
-            text-align: right;
+.choice-widget-expanded {
+    &__item {
+        &:not(:last-child) {
+            margin-bottom: 4px;
         }
+    }
+}
+
+.form-vertical {
+    .control-group + .control-group {
+        margin-top: $form-container-control-row-space;
     }
 }
 
@@ -151,14 +169,21 @@ input[type='checkbox'] + label {
     padding: 0 0 $margin-bottom-box/2;
 }
 
-@media only screen and (max-width: 1200px) {
-    .form-horizontal {
-        .control-group {
-            > div.control-label,
-            > label.control-label {
-                width: 150px;
-                min-width: 150px;
-            }
+label {
+    &.required {
+        em {
+            color: $danger-dark;
+            font-size: 21px;
+            font-style: normal;
+            position: absolute;
+            top: -5px;
+            #{$end}: -11px;
+        }
+    }
+
+    &:not(.required) {
+        em {
+            display: none;
         }
     }
 }

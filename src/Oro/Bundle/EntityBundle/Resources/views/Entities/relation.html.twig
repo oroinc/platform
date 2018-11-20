@@ -1,5 +1,5 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-<div class="widget-content grid-widget-content">
+<div class="widget-content">
     {% set gridName = oro_datagrid_build_fullname('entity-relation-grid', entity_name ~ '-' ~  field_name) %}
 
     {% set gridParams = {
@@ -11,10 +11,6 @@
         'field_name': field_name,
         'id': id
     } %}
-
-    <style type="text/css">
-        .grid-widget-content .grid, .grid-widget-content .table{margin-bottom: 0;}
-    </style>
 
     {% block content %}
         {{ dataGrid.renderGrid(gridName, gridParams) }}

@@ -27,8 +27,8 @@
 @import "breadcrumb";
 @import "pagination";
 @import "badge";
+@import "alert";
 // @import "bowerassets/bootstrap/scss/jumbotron";
-@import "bowerassets/bootstrap/scss/alert";
 @import "bowerassets/bootstrap/scss/progress";
 @import "bowerassets/bootstrap/scss/media";
 @import "bowerassets/bootstrap/scss/list-group";
@@ -39,11 +39,3 @@
 @import "bowerassets/bootstrap/scss/carousel";
 @import "bowerassets/bootstrap/scss/utilities";
 @import "bowerassets/bootstrap/scss/print";
-
-.hide {
-    @extend .d-none;
-}
-
-.control-group {
-    @include clearfix();
-}

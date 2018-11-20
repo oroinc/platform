@@ -8,6 +8,8 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterNames;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\InvalidFilterValueKeyException;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
@@ -20,6 +22,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Filter\RequestAwareFilterStub;
 use Oro\Bundle\ApiBundle\Tests\Unit\Filter\SelfIdentifiableFilterStub;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\HttpFoundation\Request;
 
 class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
@@ -38,11 +41,16 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $this->filterFactory = $this->createMock(FilterFactoryInterface::class);
 
+        $filterNames = $this->createMock(FilterNames::class);
+        $filterNames->expects(self::any())
+            ->method('getDataFilterGroupName')
+            ->willReturn('filter');
+
         $this->processor = new RegisterDynamicFilters(
             $this->filterFactory,
             $this->doctrineHelper,
             $this->configProvider,
-            'filter'
+            new FilterNamesRegistry([[$filterNames, null]], new RequestExpressionMatcher())
         );
     }
 
@@ -737,8 +745,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $request = $this->getRequest('filter[target][users]=123');
 
         $filter = new SelfIdentifiableFilterStub('integer');
-        $filterValue = new FilterValue('target.users', '123');
-        $filterValue->setSourceKey('filter[target][users]');
+        $filterValue = FilterValue::createFromSource('filter[target][users]', 'target.users', '123');
         $exception = new InvalidFilterValueKeyException('some error', $filterValue);
         $filter->setFoundFilterKeys($exception);
 

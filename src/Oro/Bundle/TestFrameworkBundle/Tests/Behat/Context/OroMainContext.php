@@ -339,6 +339,21 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Then I should not see flash messages
+     *
+     * @param string $flashMessageElement
+     * @param int $timeLimit
+     */
+    public function shouldNotSeeFlashMessages($flashMessageElement = 'Flash Message', $timeLimit = 15)
+    {
+        $flashMessages = $this->spin(function (OroMainContext $context) use ($flashMessageElement) {
+            return $context->findAllElements($flashMessageElement);
+        }, $timeLimit);
+
+        static::assertEmpty($flashMessages);
+    }
+
+    /**
      * @param string $title
      * @param string $flashMessageElement
      * @param string $timeLimit
@@ -1070,6 +1085,15 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: When I scroll to bottom
+     * @When /^I scroll to bottom/
+     */
+    public function scrollBottom()
+    {
+        $this->getSession()->executeScript('window.scrollTo(0,document.body.scrollHeight);');
+    }
+
+    /**
      * Click on button in modal window
      * Example: Given I click "Edit" in modal window
      * Example: When I click "Save and Close" in modal window
@@ -1148,7 +1172,7 @@ class OroMainContext extends MinkContext implements
 
         self::assertEquals($this->getPage($page . ' View')->getRoute(), $route['_route']);
 
-        $actualEntityTitle = $this->getSession()->getPage()->find('css', 'h1.user-name');
+        $actualEntityTitle = $this->getSession()->getPage()->find('css', 'h1.page-title__entity-title');
         self::assertNotNull($actualEntityTitle, sprintf('Entity title not found on "%s" view page', $page));
         self::assertEquals($entityTitle, $actualEntityTitle->getText());
     }
@@ -1194,7 +1218,7 @@ class OroMainContext extends MinkContext implements
     public function updatedDateMustBeGraterThenCreatedDate()
     {
         /** @var NodeElement[] $records */
-        $records = $this->getSession()->getPage()->findAll('css', 'div.navigation div.customer-content ul li');
+        $records = $this->getSession()->getPage()->findAll('css', 'div.navigation div.page-title__path ul li');
         $createdDate = new \DateTime(
             str_replace('Created At: ', '', $records[0]->getText())
         );
@@ -1216,7 +1240,7 @@ class OroMainContext extends MinkContext implements
     {
         self::assertEquals(
             $owner,
-            $this->getSession()->getPage()->find('css', '.user-info-state li a')->getText()
+            $this->getSession()->getPage()->find('css', '.page-title__entity-info-state li a')->getText()
         );
     }
 
@@ -1256,7 +1280,8 @@ class OroMainContext extends MinkContext implements
 
             /** @var NodeElement $labelElement */
             foreach ($labels as $labelElement) {
-                $controlLabel = $labelElement->getParent()->find('css', 'div.controls div.control-label');
+                $controlLabel = $labelElement->getParent()
+                    ->find('css', 'div.attribute-item__description div.control-label');
 
                 if ($controlLabel === null) {
                     continue;

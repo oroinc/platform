@@ -17,6 +17,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\HateoasMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraCollection;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
@@ -58,8 +59,14 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     const INCLUDE_HEADER = 'X-Include';
 
+    /** indicates whether the current action processes a master API request */
+    const MASTER_REQUEST = 'masterRequest';
+
     /** indicates whether the current request is CORS request */
     const CORS = 'cors';
+
+    /** whether HATEOAS is enabled */
+    const HATEOAS = 'hateoas';
 
     /** @var FilterCollection */
     private $filters;
@@ -88,6 +95,9 @@ class Context extends NormalizeResultContext implements ContextInterface
     /** @var MetadataExtraCollection|null */
     private $metadataExtras;
 
+    /** @var array|null */
+    private $infoRecords;
+
     /**
      * @param ConfigProvider   $configProvider
      * @param MetadataProvider $metadataProvider
@@ -98,7 +108,9 @@ class Context extends NormalizeResultContext implements ContextInterface
         $this->configExtras = new ConfigExtraCollection();
         $this->configProvider = $configProvider;
         $this->metadataProvider = $metadataProvider;
+        $this->set(self::MASTER_REQUEST, false);
         $this->set(self::CORS, false);
+        $this->set(self::HATEOAS, false);
     }
 
     /**
@@ -241,12 +253,24 @@ class Context extends NormalizeResultContext implements ContextInterface
         $this->filterValues = $accessor;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function isMasterRequest(): bool
+    {
+        return $this->get(self::MASTER_REQUEST);
+    }
 
     /**
-     * Indicates whether the current request is CORS request.
-     * @link https://www.w3.org/TR/cors/
-     *
-     * @return bool
+     * {@inheritdoc}
+     */
+    public function setMasterRequest(bool $master): void
+    {
+        $this->set(self::MASTER_REQUEST, $master);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function isCorsRequest(): bool
     {
@@ -254,14 +278,43 @@ class Context extends NormalizeResultContext implements ContextInterface
     }
 
     /**
-     * Sets a flag indicates whether the current request is CORS request.
-     * @link https://www.w3.org/TR/cors/
-     *
-     * @param bool $cors
+     * {@inheritdoc}
      */
     public function setCorsRequest(bool $cors): void
     {
         $this->set(self::CORS, $cors);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isHateoasEnabled(): bool
+    {
+        return (bool)$this->get(self::HATEOAS);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setHateoas(bool $flag)
+    {
+        $this->set(self::HATEOAS, $flag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getInfoRecords(): ?array
+    {
+        return $this->infoRecords;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setInfoRecords(?array $infoRecords): void
+    {
+        $this->infoRecords = $infoRecords;
     }
 
     /**
@@ -508,6 +561,30 @@ class Context extends NormalizeResultContext implements ContextInterface
     }
 
     /**
+     * @param string $entityClass
+     * @param array  $extras
+     *
+     * @return Config
+     */
+    protected function loadEntityConfig($entityClass, array $extras)
+    {
+        $config = $this->configProvider->getConfig(
+            $entityClass,
+            $this->getVersion(),
+            $this->getRequestType(),
+            $extras
+        );
+        if ($this->isHateoasEnabled()) {
+            $definition = $config->getDefinition();
+            if (null !== $definition) {
+                $definition->setHasMore(true);
+            }
+        }
+
+        return $config;
+    }
+
+    /**
      * Loads an entity configuration.
      */
     protected function loadConfig()
@@ -522,12 +599,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         }
 
         try {
-            $config = $this->configProvider->getConfig(
-                $entityClass,
-                $this->getVersion(),
-                $this->getRequestType(),
-                $this->getConfigExtras()
-            );
+            $config = $this->loadEntityConfig($entityClass, $this->getConfigExtras());
             $this->processLoadedConfig($config);
         } catch (\Exception $e) {
             $this->processLoadedConfig(null);
@@ -725,12 +797,16 @@ class Context extends NormalizeResultContext implements ContextInterface
             $metadata = null;
             $config = $this->getConfig();
             if (null !== $config) {
+                $extras = $this->getMetadataExtras();
+                if ($this->isHateoasEnabled()) {
+                    $extras[] = new HateoasMetadataExtra($this->getFilterValues());
+                }
                 $metadata = $this->metadataProvider->getMetadata(
                     $entityClass,
                     $this->getVersion(),
                     $this->getRequestType(),
                     $config,
-                    $this->getMetadataExtras()
+                    $extras
                 );
             }
             $this->processLoadedMetadata($metadata);

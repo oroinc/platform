@@ -2,21 +2,24 @@
 
 .more-bar-holder {
     position: relative;
-
     display: inline-block;
+    line-height: $oro-datagrid-body-cell-line-height;
 
     .dropdown-toggle {
         display: flex;
         align-items: center;
 
         padding: $more-bar-holder-toggle-offset;
-        height: $more-bar-holder-height;
 
         font-size: $more-bar-holder-icon-font-size;
-        line-height: 1;
+        line-height: $more-bar-holder-line-height;
         text-decoration: none;
 
         color: $oro-datagrid-action-cell-color;
+
+        .icon {
+            line-height: inherit;
+        }
 
         // Hide bootstrap arrow
         &:before {
@@ -49,6 +52,10 @@
         // Override bootstrap margin
         margin: 0;
     }
+
+    .launchers-list {
+        padding: $launchers-list-at-dropdown-offset;
+    }
 }
 
 .launchers-list {
@@ -57,6 +64,8 @@
     padding: $launchers-list-offset;
 
     white-space: nowrap;
+
+    @include list-unstyled();
 
     .action {
         display: block;

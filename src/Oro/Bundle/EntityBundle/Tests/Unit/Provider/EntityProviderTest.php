@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
+use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -25,6 +26,9 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $featureChecker;
+
+    /** @var ExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $exclusionProvider;
 
     /**
      * @var Config
@@ -59,7 +63,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->will($this->returnArgument(0));
 
-        $exclusionProvider = $this->createMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
+        $this->exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
 
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
             ->setMethods(['isResourceEnabled'])
@@ -73,7 +77,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
             $translator,
             $this->featureChecker
         );
-        $this->provider->setExclusionProvider($exclusionProvider);
+        $this->provider->setExclusionProvider($this->exclusionProvider);
     }
 
     public function testGetEntity()
@@ -497,5 +501,14 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
         $entityConfig->setValues($values);
 
         return $entityConfig;
+    }
+
+    public function testIsIgnoredEntity()
+    {
+        $this->exclusionProvider->expects($this->once())
+            ->method('isIgnoredEntity')
+            ->willReturn(true);
+
+        $this->assertTrue($this->provider->isIgnoredEntity(\stdClass::class));
     }
 }

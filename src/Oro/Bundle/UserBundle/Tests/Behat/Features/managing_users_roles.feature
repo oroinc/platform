@@ -21,7 +21,7 @@ Feature: Managing users roles
       | Lead        | View:Division      | Create:User          | Edit:User | Delete:User | Assign:User |
       | Language    | View:Business Unit | Create:User          | Edit:User | Assign:User | Translate:User |
       | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
-    And I check "Manage Abandoned Cart Campaigns" entity permission
+    And I check "Access system information" entity permission
     When I save and close form
     Then I should see "Test role"
     And the role has following active permissions:
@@ -30,7 +30,7 @@ Feature: Managing users roles
       | Language    | View:Business Unit | Create:User          | Edit:User | Assign:User | Translate:User |
       | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
     And following capability permissions should be checked:
-      | Manage abandoned cart campaigns |
+      | Access system information |
 
   Scenario: Edit user role
     Given I click "Edit"
@@ -41,7 +41,7 @@ Feature: Managing users roles
       | Contact        | View:Business Unit | Create:Business Unit | Edit:Division | Delete:Division      | Assign:User     |
       | Email Campaign | View:Global        | Create:Division      | Edit:Global   | Assign:Division      | Assign:Division |
       | Task           | View:User          | Create:Business Unit | Edit:User     | Delete:User          | Assign:User     |
-    And I check "Manage Abandoned Cart Campaigns" entity permission
+    And I check "Access system information" entity permission
     And I check "Access job queue" entity permission
     And I check "Access entity management" entity permission
     When I save and close form
@@ -54,7 +54,7 @@ Feature: Managing users roles
       | Lead           | View:Division      | Create:User          | Edit:User     | Delete:User       | Assign:User    |
       | Language       | View:Business Unit | Create:User          | Edit:User     | Assign:User       | Translate:User |
     And following capability permissions should be checked:
-      | Manage abandoned cart campaigns |
+      | Access system information       |
       | Access job queue                |
       | Access entity management        |
 

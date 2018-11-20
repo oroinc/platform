@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
+/**
+ * Model that contains security metadata for field by security type
+ */
 class FieldSecurityMetadata implements \Serializable
 {
     /** @var string */
@@ -72,6 +75,17 @@ class FieldSecurityMetadata implements \Serializable
     public function getLabel()
     {
         return $this->label;
+    }
+
+    /**
+     * @param string $label
+     * @return FieldSecurityMetadata
+     */
+    public function setLabel(string $label)
+    {
+        $this->label = $label;
+
+        return $this;
     }
 
     /**

@@ -8,12 +8,11 @@ use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
-use Oro\Component\Config\Tests\Unit\Fixtures\CopyFixturesToTemp;
+use Oro\Component\Testing\TempDirExtension;
 
 class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CopyFixturesToTemp */
-    private $copier;
+    use TempDirExtension;
 
     /** @var string */
     private $bundleDir;
@@ -23,19 +22,8 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $target = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . 'test_data';
-        $source = realpath(__DIR__ . '/../Fixtures');
-        $this->copier = new CopyFixturesToTemp($target, $source);
-        $this->copier->copy();
-        $this->bundleDir = $target . DIRECTORY_SEPARATOR . 'Bundle' . DIRECTORY_SEPARATOR . 'TestBundle1';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        $this->copier->delete();
+        $tmpDir = $this->copyToTempDir('test_data', realpath(__DIR__ . '/../Fixtures'));
+        $this->bundleDir = $tmpDir . DIRECTORY_SEPARATOR . 'Bundle' . DIRECTORY_SEPARATOR . 'TestBundle1';
     }
 
     public function testLoad()

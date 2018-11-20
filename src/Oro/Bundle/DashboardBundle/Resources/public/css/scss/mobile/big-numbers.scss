@@ -5,7 +5,7 @@
         width: 50% !important;
 
         &:nth-child(even):after {
-            width: calc(200% - 15px);
+            width: calc(200% - 30px);
 
             content: '';
         }

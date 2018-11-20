@@ -241,12 +241,12 @@ class EnumValueListProviderTest extends \PHPUnit\Framework\TestCase
                 'exclusion_policy' => 'all',
                 'hints'            => ['HINT_TRANSLATABLE'],
                 'fields'           => [
-                    'id'       => null,
-                    'name'     => null,
-                    'priority' => [
-                        'result_name' => 'order'
+                    'id'      => null,
+                    'name'    => null,
+                    'order'   => [
+                        'property_path' => 'priority'
                     ],
-                    'default'  => null
+                    'default' => null
                 ]
             ],
             $this->enumValueListProvider->getSerializationConfig($className)

@@ -1,37 +1,40 @@
 <?php
+
 namespace Oro\Bundle\AddressBundle\Form\EventListener;
 
-use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\FormBundle\Entity\PrimaryItem;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * When address is created/updated from single form, it will ensure the rules of one primary address uniqueness
+ * Ensures that a primary address exists and it is only one.
  */
 class FixAddressesPrimarySubscriber implements EventSubscriberInterface
 {
     /**
-     * Property path to collection of all addresses (e.g. 'owner.address' means $address->getOwner()->getAddresses())
+     * The property path to collection of all addresses
+     * (e.g. "owner.addresses" means $address->getOwner()->getAddresses())
      *
      * @var string
      */
-    protected $addressesProperty;
+    private $addressesPropertyPath;
+
+    /** @var PropertyAccessorInterface */
+    private $propertyAccessor;
 
     /**
-     * @var PropertyAccess
+     * @param string                         $addressesPropertyPath
+     * @param PropertyAccessorInterface|null $propertyAccessor
      */
-    protected $addressesAccess;
-
-    /**
-     * @param string $addressesProperty Address property path like "owner.addresses"
-     */
-    public function __construct($addressesProperty)
+    public function __construct(string $addressesPropertyPath, PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->addressesAccess = PropertyAccess::createPropertyAccessor();
-        $this->addressesProperty = $addressesProperty;
+        $this->addressesPropertyPath = $addressesPropertyPath;
+        $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -39,42 +42,76 @@ class FixAddressesPrimarySubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             FormEvents::POST_SUBMIT => 'postSubmit'
-        );
+        ];
     }
 
     /**
-     * Removes empty collection elements.
-     *
      * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {
-        /** @var AbstractTypedAddress $address */
+        /** @var PrimaryItem $address */
         $address = $event->getData();
+        $allAddresses = $this->getAllAddresses($address);
+        if (null === $allAddresses) {
+            return;
+        }
 
-        /** @var AbstractTypedAddress[] $allAddresses */
-        $allAddresses = $this->addressesAccess->getValue($address, $this->addressesProperty);
+        if ($address->isPrimary()) {
+            foreach ($allAddresses as $otherAddress) {
+                $otherAddress->setPrimary(false);
+            }
+            $address->setPrimary(true);
+        } elseif (!$this->hasPrimaryAddress($allAddresses)) {
+            $address->setPrimary(true);
+        }
+    }
 
-        $this->handlePrimary($address, $allAddresses);
+
+    /**
+     * @param PrimaryItem[]|Collection $allAddresses
+     *
+     * @return bool
+     */
+    private function hasPrimaryAddress(Collection $allAddresses): bool
+    {
+        foreach ($allAddresses as $otherAddress) {
+            if ($otherAddress->isPrimary()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
-     * Only one address must be primary.
-     *
      * @param PrimaryItem $address
-     * @param PrimaryItem[] $allAddresses
+     *
+     * @return PrimaryItem[]|Collection|null
      */
-    protected function handlePrimary(PrimaryItem $address, $allAddresses)
+    private function getAllAddresses(PrimaryItem $address): ?Collection
     {
-        if ($address->isPrimary()) {
-            foreach ($allAddresses as $otherAddresses) {
-                $otherAddresses->setPrimary(false);
-            }
-            $address->setPrimary(true);
-        } elseif (count($allAddresses) == 1) {
-            $address->setPrimary(true);
+        $path = explode('.', $this->addressesPropertyPath);
+        $addressesField = array_pop($path);
+        if (count($path) === 0) {
+            throw new InvalidPropertyPathException(sprintf(
+                'The addresses property path "%s" must have at least 2 elements.',
+                $this->addressesPropertyPath
+            ));
         }
+        $addressesOwner = $address;
+        foreach ($path as $fieldName) {
+            $addressesOwner = $this->propertyAccessor->getValue($addressesOwner, $fieldName);
+            if (null === $addressesOwner) {
+                break;
+            }
+        }
+        if (null === $addressesOwner) {
+            return null;
+        }
+
+        return $this->propertyAccessor->getValue($addressesOwner, $addressesField);
     }
 }

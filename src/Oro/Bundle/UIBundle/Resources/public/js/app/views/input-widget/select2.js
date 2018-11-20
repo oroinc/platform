@@ -120,7 +120,7 @@ define(function(require) {
 
         disableKeyboard: function() {
             var select = this.$el;
-            var selectContainer = this.container();
+            var selectContainer = this.getContainer();
             var isSearchHidden = selectContainer.find('.select2-search-hidden').length;
             var minimumResultsForSearch = this.initializeOptions.minimumResultsForSearch;
             var optionsLength = select.find('option').length;

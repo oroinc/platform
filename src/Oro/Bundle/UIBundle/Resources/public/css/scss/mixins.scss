@@ -1,7 +1,8 @@
 /* @theme: admin.oro; */
 @import "mixins/direction";
 @import "mixins/loading";
-@import "mixins/no-data";
+@import "mixins/label";
+@import "mixins/absolute-line-height";
 
 $enable-safe-area: true;
 
@@ -102,39 +103,6 @@ $enable-safe-area: true;
     }
 }
 
-@mixin load-more-items($borderColor: #e5e5e5, $backgroundColor: #fff, $color: #888) {
-    background-color: $backgroundColor;
-    position: relative;
-    text-align: center;
-    cursor: pointer;
-
-    .load-more-label {
-        position: relative;
-        z-index: 1;
-        display: inline;
-        color: $color;
-        background-color: $backgroundColor;
-        padding: 0 5px;
-    }
-
-    &:before,
-    &:after {
-        content: '';
-        position: absolute;
-        display: block;
-        border-bottom: 1px solid $borderColor;
-        width: 100%;
-    }
-
-    &:before {
-        top: calc(25% + 1px);
-    }
-
-    &:after {
-        bottom: calc(25% + 1px);
-    }
-}
-
 @mixin process($loadingImagePath: '../../img/loader-16.gif') {
     position: relative;
 
@@ -175,7 +143,7 @@ $enable-safe-area: true;
         margin-top: -38px;
         #{$start}: 10px;
         border-style: solid;
-        border-color: $error-message-balloon-background transparent;
+        border-color: $danger-ultra-dark transparent;
         border-width: 8px 4px 0;
     }
 
@@ -189,15 +157,16 @@ $enable-safe-area: true;
             bottom: 0;
             padding: side-values(5px 5px 5px 20px);
             border-radius: 4px;
-            background-color: $error-message-balloon-background;
-            color: $danger-ultra-dark;
+            background-color: $danger-ultra-dark;
+            color: $primary-inverse;
 
             &:before {
                 content: "\f00d";
                 display: inline-block;
                 width: 14px;
                 margin-#{$start}: -14px;
-                color: $danger-darken;
+                margin-#{$end}: 2px;
+                color: $primary-inverse;
                 font: normal 1.15em/1em FontAwesome, sans-serif;
             }
         }

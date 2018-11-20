@@ -60,7 +60,6 @@ Example:
 ```
 {@/request}
 
-
 ### update
 
 Edit a specific address record.
@@ -145,6 +144,22 @@ Delete a collection of address records.
 *This field is **required** and must remain defined.*
 
 ### city
+
+#### create
+
+{@inheritdoc}
+
+**The required field**
+
+#### update
+
+{@inheritdoc}
+
+**Please note:**
+
+*This field is **required** and must remain defined.*
+
+### country
 
 #### create
 

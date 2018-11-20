@@ -82,9 +82,10 @@
             }
 
             > .tab-content {
+                position: relative;
                 z-index: 99;
 
-                padding-#{$start}: 16px;
+                padding: $dot-menu-tabs-offset;
                 min-height: $dot-menu-dropdown-min-height;
                 max-height: $dot-menu-dropdown-max-height;
 
@@ -152,11 +153,11 @@
         }
     }
 
-    .dot-menu-empty-message {
-        padding: ($dot-menu-dropdown-min-height / 2 - 10px) 15px 15px;
-
-        text-align: center;
-
-        color: $dot-menu-empty-message-color;
+    .no-data {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: auto;
+        width: 100%;
     }
 }

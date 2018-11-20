@@ -89,6 +89,9 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessWhenGetActionSuccess()
     {
         $getResult = ['key' => 'value'];
@@ -106,6 +109,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $getResponseHeaders = [
             'test-response-header' => 'some response header value'
         ];
+        $getInfoRecords = ['' => ['key' => 'value']];
 
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);
         $getProcessor = $this->createMock(ActionProcessorInterface::class);
@@ -120,11 +124,17 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
+        $this->context->setMasterRequest(true);
+        $this->context->setCorsRequest(true);
+        $this->context->setHateoas(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
 
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
+        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setCorsRequest(false);
+        $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedGetContext->setClassName($this->context->getClassName());
         $expectedGetContext->setId($this->context->getId());
@@ -144,7 +154,8 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
                     $getConfig,
                     $getConfigSections,
                     $getMetadata,
-                    $getResponseHeaders
+                    $getResponseHeaders,
+                    $getInfoRecords
                 ) {
                     self::assertEquals($expectedGetContext, $context);
 
@@ -157,6 +168,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
                     foreach ($getResponseHeaders as $key => $value) {
                         $context->getResponseHeaders()->set($key, $value);
                     }
+                    $context->setInfoRecords($getInfoRecords);
                     $context->setResult($getResult);
                 }
             );
@@ -166,6 +178,9 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $expectedContext = new FormContextStub($this->configProvider, $this->metadataProvider);
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
+        $expectedContext->setMasterRequest(true);
+        $expectedContext->setCorsRequest(true);
+        $expectedContext->setHateoas(true);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedContext->setId($this->context->getId());
         $expectedContext->setClassName($this->context->getClassName());
@@ -178,6 +193,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         foreach ($getResponseHeaders as $key => $value) {
             $expectedContext->getResponseHeaders()->set($key, $value);
         }
+        $expectedContext->setInfoRecords($getInfoRecords);
         $expectedContext->setResult($getResult);
         $expectedContext->setProcessed(LoadNormalizedEntity::OPERATION_NAME);
 

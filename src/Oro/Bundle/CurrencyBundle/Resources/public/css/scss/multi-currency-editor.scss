@@ -84,6 +84,8 @@
     }
 
     .select2-container-active {
+        z-index: $multi-currency-editor-multi-choice-active-z-index;
+
         &:before,
         &:after {
             position: absolute;

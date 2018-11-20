@@ -345,6 +345,7 @@ define(function(require) {
             _.each(subviews, function(view) {
                 this.assignConditionSubview(view);
             }, this);
+            this.$conditionContainer.trigger('content:changed');
         },
 
         _renderCondition: function(criteria, value) {
@@ -416,7 +417,7 @@ define(function(require) {
                 tagName: 'li',
                 label: __('oro.querydesigner.condition_operation'),
                 className: this.CONDITION_OPERATOR_CLASS,
-                buttonClass: 'btn btn-mini',
+                buttonClass: 'btn btn-sm',
                 operations: operations,
                 selectedOperation: operation
             });
@@ -475,6 +476,8 @@ define(function(require) {
             this._updateOperators();
             this._updateContainerClass();
             this._checkValueChange();
+
+            this.$conditionContainer.trigger('content:changed');
         },
 
         /**
@@ -490,6 +493,7 @@ define(function(require) {
             if (parentConditionView) {
                 parentConditionView.unassignConditionSubview(closedConditionView);
             }
+            this.$conditionContainer.trigger('content:changed');
         },
 
         _onCriteriaListMousedown: function() {
