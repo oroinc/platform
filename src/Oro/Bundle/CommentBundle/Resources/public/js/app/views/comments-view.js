@@ -3,10 +3,11 @@ define(function(require) {
 
     var CommentsView;
     var BaseView = require('oroui/js/app/views/base/view');
-    var CommentsHeaderView = require('./comments-header-view');
-    var CommentItemView = require('./comment-item-view');
+    var CommentsHeaderView = require('orocomment/js/app/views/comments-header-view');
+    var CommentsNoDataView = require('orocomment/js/app/views/comments-no-data-view');
+    var CommentItemView = require('orocomment/js/app/views/comment-item-view');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var template = require('text!../../../templates/comment/comments-view.html');
+    var template = require('text!orocomment/templates/comment/comments-view.html');
 
     CommentsView = BaseView.extend({
         template: template,
@@ -51,6 +52,11 @@ define(function(require) {
                 animationDuration: 0,
                 collection: this.collection,
                 itemView: CommentItemView,
+                autoRender: true
+            }));
+            this.subview('noData', new CommentsNoDataView({
+                el: this.$('.comments-view-no-data'),
+                collection: this.collection,
                 autoRender: true
             }));
         },

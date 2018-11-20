@@ -188,11 +188,6 @@
     .grid .entity-row-action {
         padding: $entity-permission-entity-row-action-offset;
     }
-
-    .dropdown-menu-collection__list > li {
-        white-space: nowrap;
-        margin: 0;
-    }
 }
 
 @include media-breakpoint-down(xs) {

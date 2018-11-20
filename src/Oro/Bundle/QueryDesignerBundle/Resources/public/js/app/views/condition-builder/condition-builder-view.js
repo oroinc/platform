@@ -417,7 +417,7 @@ define(function(require) {
                 tagName: 'li',
                 label: __('oro.querydesigner.condition_operation'),
                 className: this.CONDITION_OPERATOR_CLASS,
-                buttonClass: 'btn btn-mini',
+                buttonClass: 'btn btn-sm',
                 operations: operations,
                 selectedOperation: operation
             });

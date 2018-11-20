@@ -6,9 +6,9 @@ use Oro\Component\ChainProcessor\MatchApplicableChecker as BaseMatchApplicableCh
 
 /**
  * {@inheritdoc}
- * Also this applicable checker can checks whether a value in the context
+ * Also this applicable checker can check whether a value in the context
  * is instance of a value of processor's attribute.
- * Such attributes should be marked as "class" attributes.
+ * Such attributes should be marked as "class" related attributes.
  */
 class MatchApplicableChecker extends BaseMatchApplicableChecker
 {

@@ -8,7 +8,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 2px 17px;
+        padding: 2px 18px;
 
         > a {
             padding: 0 !important;
@@ -25,11 +25,16 @@
         font-size: 12px;
         line-height: 15px;
 
-        i {
+        [class^="fa-"] {
             float: left;
-            margin-top: 1px;
             margin-#{$end}: 5px;
             font-size: 13px;
+            line-height: inherit;
+
+            &:before {
+                margin: 0;
+                line-height: inherit;
+            }
         }
     }
 
@@ -42,7 +47,7 @@
             flex-direction: column;
             position: relative;
             border-top: 1px solid $primary-830;
-            padding: 11px 17px;
+            padding: 14px $content-padding-medium 13px;
 
             .mail-icon {
                 @include fa-icon($email-inactive-mail-icon);
@@ -53,8 +58,8 @@
                 line-height: 1;
                 cursor: pointer;
                 position: absolute;
-                #{$end}: 14px;
-                top: 9px;
+                #{$end}: 16px;
+                top: 16px;
             }
 
             .info {
@@ -67,14 +72,16 @@
             }
 
             .body {
-                padding-#{$end}: 26px;
+                padding-#{$end}: 20px;
+
+                font-size: $base-font-size--s + 1px;
             }
 
             .title,
             .empty-subject {
                 color: $email-default-text-color;
                 width: 100%;
-                line-height: 20px;
+                line-height: 16px;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 overflow: hidden;
@@ -85,16 +92,13 @@
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 overflow: hidden;
+                line-height: 1.69;
             }
 
             .footer {
-                font-size: 12px;
-                margin-top: 8px;
-                line-height: 1;
-
-                a {
-                    padding: 0;
-                }
+                font-size: $base-font-size--s;
+                margin-top: 12px;
+                line-height: 1.15;
 
                 .reply-action,
                 .reply-all-action,

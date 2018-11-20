@@ -1,0 +1,19 @@
+/* @theme: admin.oro; */
+
+.label {
+    display: inline-block;
+    max-width: 100%;
+    padding: 0 $badge-padding-x;
+    font-size: $base-font-size--s;
+    border-radius: $border-radius;
+
+    &-large {
+        font-size: $base-font-size;
+    }
+}
+
+@each $color, $values in $label-theme-keys {
+    .label-#{$color} {
+        @include label-custom-variant($values...);
+    }
+}

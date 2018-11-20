@@ -92,6 +92,20 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        render: function() {
+            if (!this.state.expanded) {
+                this.widgetContentContainer.attr('data-layout', 'separate');
+                this.listenToOnce(this, 'expand', function() {
+                    this.widgetContentContainer.removeAttr('data-layout');
+                    this.render();
+                });
+            }
+            return DashboardItemWidget.__super__.render.call(this);
+        },
+
+        /**
          * Initialize widget
          *
          * @param {Object} options

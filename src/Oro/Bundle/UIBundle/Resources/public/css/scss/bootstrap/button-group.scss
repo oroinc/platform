@@ -33,6 +33,14 @@
     .btn-group + .btn-group {
         margin-left: -$btn-group-divider-width;
     }
+
+    > .btn-sm:first-child {
+        padding-#{$end}: $btn-in-group-padding-x-sm;
+    }
+
+    .btn-sm + .btn-sm {
+        padding-#{$start}: $btn-in-group-padding-x-sm;
+    }
 }
 
 // Optional: Group multiple button groups together for a toolbar
@@ -48,7 +56,7 @@
 
 .btn-group {
     > .btn:first-child {
-        margin-left: 0;
+        margin-#{$start}: 0;
     }
 
     // Reset rounded corners

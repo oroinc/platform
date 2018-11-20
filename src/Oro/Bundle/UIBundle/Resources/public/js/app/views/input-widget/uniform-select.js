@@ -37,7 +37,7 @@ define(function(require) {
             UniformSelectInputWidget.__super__.initializeWidget.apply(this, arguments);
             if (this.$el.is('.error:not([multiple])')) {
                 this.$el.removeClass('error');
-                this.container().addClass('error');
+                this.getContainer().addClass('error');
             }
         },
 

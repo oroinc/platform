@@ -1,17 +1,13 @@
 /* @theme: admin.oro; */
 
-.activity-list-widget {
-    .activity-context-activity-list {
-        padding: 0 $horizontal-padding;
-    }
-}
-
 .activity-context-activity {
     display: none;
+
+    @include clearfix();
 }
 
 .activity-context-activity-list {
-    margin-bottom: 5px;
+    margin-bottom: $activity-context-activity-list-offset;
 }
 
 .activity-context-activity-items .context-item {
@@ -19,8 +15,8 @@
     color: $activity-context-item-color;
     display: $activity-context-item-display;
     margin: $activity-context-item-offset;
-    padding: $activity-context-item-inner-offset;
     font-size: $activity-context-item-font-size;
+    line-height: 1;
 }
 
 .cell-context-item,
@@ -56,17 +52,14 @@
 }
 
 .activity-context-activity-label {
-    float: $activity-context-activity-label-float;
+    float: $start;
     margin: $activity-context-activity-label-offset;
-    font-size: $activity-context-activity-label-font-size;
-    line-height: $activity-context-activity-label-line-height;
+
     color: $activity-context-activity-label-color;
 }
 
 .activity-context-activity-items {
-    margin-left: 55px;
-    font-size: 11px;
-    line-height: 14px;
+    margin: $activity-context-activity-items-offset;
 }
 
 .activity-context-activity-block {
@@ -112,23 +105,5 @@
 
     .btn-group.open & {
         box-shadow: none;
-    }
-}
-
-.activity-context-current-item {
-    font-size: 18px;
-    font-weight: bold;
-    color: #666;
-}
-
-.control-group .controls .activity-context-activity-items {
-    padding-top: 5px;
-    margin-left: 0;
-
-    .context-item {
-        color: #777;
-        font-size: 13px;
-        line-height: 20px;
-        padding: 0 2px;
     }
 }

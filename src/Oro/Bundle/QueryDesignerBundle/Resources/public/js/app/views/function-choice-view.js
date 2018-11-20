@@ -123,7 +123,7 @@ define(function(require) {
 
         _disable: function(flag) {
             this.$el.prop('disabled', flag).inputWidget('refresh');
-            var $widgetContainer = this.$el.inputWidget('container');
+            var $widgetContainer = this.$el.inputWidget('getContainer');
             if ($widgetContainer) {
                 $widgetContainer.toggleClass('disabled', flag);
             }

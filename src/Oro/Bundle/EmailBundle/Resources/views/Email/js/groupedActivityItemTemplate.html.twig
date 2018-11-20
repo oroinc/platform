@@ -7,9 +7,9 @@
 
 {% block activityIcon %}
     <% if(is_head && !ignoreHead) { %>
-        <i class="icon-email-thread"></i>
+        <span class="icon-email-thread" aria-hidden="true"></span>
     <% } else { %>
-        <i class="{{ oro_entity_config_value(entityClass, 'icon')|raw }}"></i>
+        <span class="{{ oro_entity_config_value(entityClass, 'icon')|raw }}" aria-hidden="true"></span>
     <% } %>
 {% endblock %}
 
@@ -35,7 +35,7 @@
         { interpolate: /\{\{(.+?)\}\}/g }
     )({
         user: ownerLink,
-        date: '<i class="date">' + updatedAt + '</i>'
+        date: '<span class="date">' + updatedAt + '</span>'
     }) %>
 {% endblock %}
 
@@ -164,6 +164,8 @@
 {% endblock %}
 
 {% block activityContent %}
-    {# Do NOT remove. Placeholder for activity view #}
-    <div class="info <% if (is_head && !ignoreHead) { %>thread<% } %>" id="grouped-entity-<%= data.entityId %>"></div>
+    <div class="activity-item-email-content">
+        {# Do NOT remove. Placeholder for activity view #}
+        <div class="info <% if (is_head && !ignoreHead) { %>thread<% } %>" id="grouped-entity-<%= data.entityId %>"></div>
+    </div>
 {% endblock %}
