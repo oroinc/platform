@@ -106,7 +106,7 @@
 
     &__file-size {
         margin: side-values($attachment-item-file-size-offset);
-        @include text-line-truncate(auto);
+        white-space: nowrap;
     }
 
     .remove-attachment {
@@ -136,6 +136,6 @@
 
 .ui-dialog {
     .attachment-item {
-        max-width: 100%;
+        max-width: $attachment-item-dialog-max-width;
     }
 }
