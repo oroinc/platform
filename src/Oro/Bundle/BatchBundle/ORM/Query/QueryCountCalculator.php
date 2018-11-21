@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\ORM\Query;
 
+use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -9,7 +11,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 
 /**
- * Calculates total count of query records
+ * Calculates total count of query records.
  */
 class QueryCountCalculator
 {
@@ -66,35 +68,58 @@ class QueryCountCalculator
             $result = $paginator->count();
         } else {
             if ($query instanceof Query) {
-                $parserResult = QueryUtil::parseQuery($query);
-                $parameterMappings = $parserResult->getParameterMappings();
-                list($params, $types) = QueryUtil::processParameterMappings($query, $parameterMappings);
-
-                $statement = $query->getEntityManager()->getConnection()->executeQuery(
-                    sprintf('SELECT COUNT(*) FROM (%s) AS e', $query->getSQL()),
-                    $params,
-                    $types
-                );
+                $statement = $this->executeOrmCountQuery($query);
             } elseif ($query instanceof SqlQuery) {
-                $countQuery = clone $query->getQueryBuilder();
-                $statement  = $countQuery->resetQueryParts()
-                    ->select('COUNT(*)')
-                    ->from('(' . $query->getSQL() . ')', 'e')
-                    ->execute();
+                $statement = $this->executeDbalCountQuery($query->getQueryBuilder());
+            } elseif ($query instanceof DbalQueryBuilder) {
+                $statement = $this->executeDbalCountQuery($query);
             } else {
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        'Expected instance of Doctrine\ORM\Query'
-                        . ' or Oro\Component\DoctrineUtils\ORM\SqlQuery, "%s" given',
-                        is_object($query) ? get_class($query) : gettype($query)
-                    )
-                );
+                throw new \InvalidArgumentException(sprintf(
+                    'Expected instance of %s, %s or %s, "%s" given',
+                    Query::class,
+                    SqlQuery::class,
+                    DbalQueryBuilder::class,
+                    is_object($query) ? get_class($query) : gettype($query)
+                ));
             }
 
             $result = $statement->fetchColumn();
         }
 
         return $result ? (int)$result : 0;
+    }
+
+    /**
+     * @param Query $query
+     *
+     * @return Statement
+     */
+    private function executeOrmCountQuery(Query $query)
+    {
+        $parserResult = QueryUtil::parseQuery($query);
+        $parameterMappings = $parserResult->getParameterMappings();
+        list($params, $types) = QueryUtil::processParameterMappings($query, $parameterMappings);
+
+        return $query->getEntityManager()->getConnection()->executeQuery(
+            sprintf('SELECT COUNT(*) FROM (%s) AS count_query', $query->getSQL()),
+            $params,
+            $types
+        );
+    }
+
+    /**
+     * @param DbalQueryBuilder $query
+     *
+     * @return Statement
+     */
+    private function executeDbalCountQuery(DbalQueryBuilder $query)
+    {
+        $countQuery = clone $query;
+
+        return $countQuery->resetQueryParts()
+            ->select('COUNT(*)')
+            ->from('(' . $query->getSQL() . ')', 'count_query')
+            ->execute();
     }
 
     /**
