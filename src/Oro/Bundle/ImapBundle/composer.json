@@ -9,7 +9,7 @@
         "php": "7.1.*",
         "symfony/symfony": "2.8.*, !=2.8.10",
         "oro/log": "dev-master",
-        "zendframework/zend-mail": "2.1.5",
+        "zendframework/zend-mail": "2.10.0",
         "oro/platform-bundle": "dev-master",
         "oro/email-bundle": "dev-master",
         "oro/google-integration-bundle": "dev-master"

@@ -15,7 +15,10 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
-class ImportStrategyListener
+/**
+ * Populates imported entities with organization if entity supports it.
+ */
+class ImportStrategyListener implements ImportStrategyListenerInterface
 {
     /** @var ManagerRegistry */
     protected $registry;
@@ -51,7 +54,7 @@ class ImportStrategyListener
     }
 
     /**
-     * @param StrategyEvent $event
+     * {@inheritdoc}
      */
     public function onProcessAfter(StrategyEvent $event)
     {
@@ -103,7 +106,7 @@ class ImportStrategyListener
     }
 
     /**
-     * Clear default organization on doctrine entity manager clear
+     * {@inheritdoc}
      */
     public function onClear()
     {

@@ -60,7 +60,7 @@
             "symfony/swiftmailer-bundle": "2.3.*",
             "symfony/symfony": "2.8.*, !=2.8.10",
             "twig/extensions": "1.0.1",
-            "zendframework/zend-mail": "2.1.*"
+            "zendframework/zend-mail": "2.10.*"
         },
         "time": "2014-04-28 09:42:03",
         "type": "library",
