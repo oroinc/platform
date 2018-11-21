@@ -153,7 +153,6 @@ define(function(require) {
 
                         if (inheritParentWidth === 'strictly' || offset.width < popper.parentElement.clientWidth) {
                             data.styles.width = popper.parentElement.clientWidth;
-                            data.styles.left = data.styles.left - (popper.parentElement.clientWidth - offset.width);
                         }
 
                         return data;
