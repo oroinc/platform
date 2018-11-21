@@ -484,10 +484,10 @@ define(function(require) {
             if (_.isUndefined(message)) {
                 message = '';
             }
-            this.jsTreeInstance.hide_all();
+            this.$tree.find('>ul').hide();
             this.$tree.append(
                 $('<div />', {
-                    'class': 'search-no-results',
+                    'class': 'no-data',
                     'text': message
                 })
             );

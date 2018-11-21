@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\HateoasMetadataExtra;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -513,6 +514,69 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->context->getParentMetadata());
     }
 
+    public function testLoadParentMetadataWhenHateoasIsEnabled()
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $action = 'update_relationship';
+        $isCollection = true;
+        $parentEntityClass = 'Test\Class';
+        $associationName = 'test';
+
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata();
+        $metadataExtras = [new TestMetadataExtra('extra1')];
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setAction($action);
+        $this->context->setIsCollection($isCollection);
+        $this->context->setParentMetadataExtras($metadataExtras);
+        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setAssociationName($associationName);
+        $this->context->setHateoas(true);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $parentEntityClass,
+                $version,
+                new RequestType([$requestType]),
+                [
+                    new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
+                    new CustomizeLoadedDataConfigExtra(),
+                    new DataTransformersConfigExtra(),
+                    new FilterFieldsConfigExtra(
+                        [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
+                    )
+                ]
+            )
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $parentEntityClass,
+                $version,
+                new RequestType([$requestType]),
+                $config,
+                array_merge($metadataExtras, [new HateoasMetadataExtra($this->context->getFilterValues())])
+            )
+            ->willReturn($metadata);
+
+        // test that metadata are not loaded yet
+        self::assertFalse($this->context->hasParentMetadata());
+
+        self::assertSame($metadata, $this->context->getParentMetadata()); // load metadata
+        self::assertTrue($this->context->hasParentMetadata());
+        self::assertTrue($this->context->has(SubresourceContext::PARENT_METADATA));
+        self::assertSame($metadata, $this->context->get(SubresourceContext::PARENT_METADATA));
+
+        self::assertEquals($config, $this->context->getParentConfig());
+
+        // test that metadata are loaded only once
+        self::assertSame($metadata, $this->context->getParentMetadata());
+    }
+
     public function testLoadParentMetadataWhenNoParentClassName()
     {
         $this->metadataProvider->expects(self::never())
@@ -607,7 +671,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->context->get(SubresourceContext::PARENT_METADATA));
 
         // test remove metadata
-        $this->context->setParentMetadata();
+        $this->context->setParentMetadata(null);
         self::assertFalse($this->context->hasParentMetadata());
     }
 }

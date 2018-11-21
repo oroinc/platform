@@ -74,6 +74,7 @@ button {
 }
 
 %btn-square {
+    line-height: $btn-square-line-height;
     border-width: $btn-square-border-width;
     border-radius: $btn-square-border-radius;
 }
@@ -234,17 +235,13 @@ fieldset:disabled a.btn {
 }
 
 .btn-sm {
-    @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $font-size-sm, $btn-line-height-sm, $btn-border-radius-sm);
-}
+    @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $btn-font-size-sm, $btn-line-height-sm, $btn-border-radius-sm);
 
-.btn-mini {
-    @include button-size(
-        $btn-padding-y-mini,
-        $btn-padding-x-mini,
-        $base-font-size--xs,
-        $btn-line-height-mini,
-        $btn-border-radius-mini
-    );
+    [class^="fa-"],
+    [class*=" fa-"] {
+        font-size: $btn-icon-font-size-sm;
+        line-height: $btn-icon-line-height-sm;
+    }
 }
 
 //
@@ -291,5 +288,20 @@ input[type="button"] {
                 font-size: $btn-icon-mobile-fa-icon-font-size;
             }
         }
+    }
+
+    .btn-sm {
+        @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $btn-font-size-sm, $btn-line-height-sm, $btn-border-radius-sm);
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            font-size: $btn-icon-font-size-sm;
+            line-height: $btn-icon-line-height-sm;
+        }
+    }
+
+    %btn-square {
+        line-height: $btn-square-mobile-line-height;
+        border-radius: $btn-square-mobile-border-radius;
     }
 }

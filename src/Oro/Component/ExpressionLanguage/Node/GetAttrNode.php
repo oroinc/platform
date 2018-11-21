@@ -266,14 +266,9 @@ class GetAttrNode extends Node
     protected function evaluateCollectionItem($functions, $values, $item)
     {
         $name = $this->getNodeAttributeValue($this->nodes['node']);
+        $values[$this->getSingularizeName($name)] = $item;
 
-        return $this->nodes['arguments']
-            ->evaluate(
-                $functions,
-                array_merge($values, [
-                    $this->getSingularizeName($name) => $item,
-                ])
-            );
+        return $this->nodes['arguments']->evaluate($functions, $values);
     }
 
     /**

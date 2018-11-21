@@ -111,6 +111,7 @@
    - [Enable Custom API](./how_to.md#enable-custom-api)
    - [Add a Predefined Identifier for API Resource](./how_to.md#add-a-predefined-identifier-for-api-resource)
    - [Add a Computed Field](./how_to.md#add-a-computed-field)
+   - [Disable HATEOAS](./how_to.md#disable-hateoas)
  - [CORS Configuration](./cors.md)
  - [Testing](./testing.md)
    - [Overview](./testing.md#overview)

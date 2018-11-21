@@ -49,7 +49,7 @@
 {% else %}
     {# Mobile view #}
     {% if organizations|length > 1 %}
-        <div class="nav organization-switcher dropdown">
+        <div class="organization-switcher dropdown">
             {% set togglerId = 'dropdown-'|uniqid %}
             <a id="{{ togglerId }}" href="#" role="button" class="logo dropdown-toggle btn-organization-switcher" data-toggle="dropdown"
                 aria-label="{{ 'oro.security.organization.switch'|trans }}" aria-haspopup="true" aria-expanded="false">

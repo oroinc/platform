@@ -25,6 +25,7 @@ $filter-box-criteria-btn-group-font-weight: normal !default;
 
 $filter-box-criteria-btn-group-icon-inner-offset-top: 2px !default;
 $filter-box-criteria-btn-group-icon-vertical-align: middle !default;
+$filter-box-criteria-btn-group-text-transform: capitalize;
 
 $filter-box-criteria-btn-group-value-field-frame-offset-left: -2px !default;
 
@@ -163,7 +164,7 @@ $select-filter-widget-close-display: none !default;
 
 $select-filter-widget-checkboxes-label-white-space: nowrap !default;
 $select-filter-widget-checkboxes-label-offset: 0 !default;
-$select-filter-widget-checkboxes-label-inner-offset: side-values(2px 15px 1px) !important;
+$select-filter-widget-checkboxes-label-inner-offset: side-values(2px 15px 2px) !important;
 $select-filter-widget-checkboxes-label-float: left !default;
 
 $select-filter-widget-checkboxes-offset: 0 6px 5px 5px !default;
@@ -223,6 +224,8 @@ $filter-item-btn-hover-background-color: $primary-830 !default;
 $filter-item-dropdown-toggle-vertical-align: top !default;
 $filter-item-dropdown-toggle-line-height: 28px !default;
 $filter-item-dropdown-toggle-position: relative !default;
+
+$filter-item-dropdown-menu-min-width: 100% !default;
 
 $filter-item-fa-close-color: #aaa !default;
 $filter-item-fa-close-font-size: 14px !default;
@@ -320,4 +323,7 @@ $filter-date-range-filter-separator-display: none !default;
 $number-range-filter-vertical-align: top !default;
 $number-range-filter-field-display: inline-block !default;
 $number-range-filter-field-width: 100px !default;
+$number-range-filter-field-caret-end: 8px !default;
+$number-range-filter-field-caret-top: 50% !default;
+$number-range-filter-field-caret-margin: -$caret-width/2 !default;
 $number-range-filter-filter-separator-position: static !default;

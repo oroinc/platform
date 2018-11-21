@@ -23,6 +23,7 @@
 
         &.select2-container-active {
             border-color: $select2-container-active-border-color;
+            z-index: $select2-container-active-z-index;
 
             .error &,
             .validation-error & {

@@ -17,9 +17,27 @@ body:not(.login-page) {
 
 .responsive-section {
     .responsive-cell {
-        &:nth-last-child(1),
-        &:nth-last-child(2) {
+        &:nth-last-child(1n),
+        &:nth-last-child(2n) {
             margin-bottom: 0;
+        }
+    }
+
+    &.responsive-big {
+        .responsive-cell {
+            &:not(:only-child) {
+                .responsive-block {
+                    padding-left: 0;
+                    padding-right: 0;
+                }
+            }
+        }
+    }
+
+    &.responsive-small {
+        .responsive-block {
+            padding-left: 0;
+            padding-right: 0;
         }
     }
 }
@@ -99,6 +117,14 @@ body:not(.login-page) {
                     .user-fieldset,
                     .widget-title {
                         margin-#{$start}: $content-padding-medium;
+                    }
+                }
+
+                &:nth-child(2) {
+                    .inner-grid {
+                        .grid-views {
+                            margin-#{$start}: 0;
+                        }
                     }
                 }
             }

@@ -1,0 +1,7 @@
+/* @theme: admin.oro; */
+
+@mixin label-custom-variant($background, $color: color-yiq($background)) {
+    color: $color;
+    background-color: $background;
+    border: 1px solid $background;
+}

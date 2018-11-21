@@ -543,6 +543,7 @@ abstract class RequestActionHandler
         }
         $context->setMasterRequest(true);
         $context->setRequestHeaders($this->getRequestHeaders($request));
+        $context->setHateoas(true);
     }
 
     /**

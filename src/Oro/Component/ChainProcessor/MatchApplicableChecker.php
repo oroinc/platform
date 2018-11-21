@@ -28,7 +28,7 @@ class MatchApplicableChecker extends AbstractMatcher implements ApplicableChecke
      */
     public function addIgnoredAttribute($attribute)
     {
-        $this->ignoredAttributes[] = $attribute;
+        $this->ignoredAttributes[$attribute] = true;
     }
 
     /**

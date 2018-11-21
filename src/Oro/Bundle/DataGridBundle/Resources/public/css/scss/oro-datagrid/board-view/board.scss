@@ -57,6 +57,8 @@
             filter: blur(10px);
 
             content: '';
+
+            pointer-events: none;
         }
 
         &.empty:after {

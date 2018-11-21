@@ -1,0 +1,91 @@
+/* @theme: admin.oro; */
+
+.load-more {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: $load-more-align;
+    padding: $load-more-border-width 0;
+    height: $load-more-decor-size * 3 - $load-more-border-width * 2;
+    margin: $load-more-offset;
+
+    cursor: pointer;
+
+    &:before,
+    &:after {
+        position: absolute;
+        left: 0;
+        right: 0;
+
+        height: $load-more-decor-size;
+
+        border-top:  $load-more-decor-border;
+        border-bottom: $load-more-decor-border;
+
+        content: '';
+    }
+
+    &:before {
+        top: 0;
+    }
+
+    &:after {
+        bottom: 0;
+    }
+
+    &__label {
+        position: relative;
+        z-index: 1;
+
+        display: inline;
+        padding: $load-more-label-offset;
+
+        line-height: 1;
+
+        color: $load-more-label-color;
+        background-color: $load-more-label-background-color;
+    }
+
+    &.process {
+        .load-more__label {
+            font-size: 0;
+
+            &:before {
+                display: inline-block;
+
+                content: '';
+
+                @include loader($load-more-loader-icon-size, $load-more-loader-icon-width);
+            }
+        }
+    }
+
+    &:hover {
+        .load-more__label {
+            color: $load-more-label-color-hover;
+        }
+    }
+
+    &.in-thread {
+        margin: $load-more-in-thread-offset;
+
+        background-color: $load-more-in-thread-background-color;
+
+        &:before {
+            top: -$load-more-border-width;
+
+            border-top-color: $load-more-in-thread-border-color;
+        }
+
+        &:after {
+            bottom: -$load-more-border-width;
+
+            border-bottom-color: $load-more-in-thread-border-color;
+        }
+
+        .load-more__label {
+            background-color: $load-more-in-thread-background-color;
+        }
+    }
+}

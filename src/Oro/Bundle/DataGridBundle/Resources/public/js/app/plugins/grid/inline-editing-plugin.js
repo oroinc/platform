@@ -333,6 +333,9 @@ define(function(require) {
                     // @TODO dix it. Rear case, for some reason inline inline-editing-plugin is already disposed
                     return;
                 }
+                if (this._focusedCell) {
+                    this.highlightCell(this._focusedCell, false);
+                }
                 var index = this.activeEditorComponents.indexOf(editorComponent);
                 if (index !== -1) {
                     this.activeEditorComponents.splice(index, 1);

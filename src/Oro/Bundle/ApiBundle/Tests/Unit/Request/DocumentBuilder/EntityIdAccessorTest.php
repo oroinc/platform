@@ -183,4 +183,27 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
 
         $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
+
+    public function testGetEntityIdWhenSingleEntityIdIsProvidedInsteadOfEntityObject()
+    {
+        $entityId = 123;
+        $metadata = new EntityMetadata();
+        $metadata->setClassName('Test\Entity');
+        $metadata->setIdentifierFieldNames(['id']);
+        $requestType = new RequestType([RequestType::REST]);
+
+        $this->entityIdTransformerRegistry->expects(self::once())
+            ->method('getEntityIdTransformer')
+            ->with($requestType)
+            ->willReturn($this->entityIdTransformer);
+        $this->entityIdTransformer->expects(self::once())
+            ->method('transform')
+            ->with(123, self::identicalTo($metadata))
+            ->willReturn('transformedId');
+
+        self::assertEquals(
+            'transformedId',
+            $this->entityIdAccessor->getEntityId($entityId, $metadata, $requestType)
+        );
+    }
 }
