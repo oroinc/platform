@@ -38,7 +38,9 @@ oro:
         postal_code:
             label:           Zip/Postal Code
             description:     The postal code specified in the address record.
-        region_text.label:   State
+        region_text:
+            label:           State
+            description:     The region name for cases when a country does not have predefined regions.
         street:
             label:           Street
             description:     The street specified in the address record.

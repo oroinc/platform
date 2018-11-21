@@ -5,7 +5,6 @@ parameters:
     oro_address.address.manager.class:      Oro\Bundle\AddressBundle\Entity\Manager\AddressManager
     oro_address.provider.address.class:     Oro\Bundle\AddressBundle\Provider\AddressProvider
     oro_address.provider.phone.class:       Oro\Bundle\AddressBundle\Provider\PhoneProvider
-    oro_address.validator.valid_region.class: Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator
     oro_address.extension.action.type.map.class: Oro\Bundle\AddressBundle\Extension\Action\Actions\MapAction
 
 services:
@@ -36,16 +35,6 @@ services:
         parent: oro_entity.abstract_repository
         arguments:
             - '%oro_address.country.entity.class%'
-
-    oro_address.validator.valid_region:
-        class: '%oro_address.validator.valid_region.class%'
-        tags:
-            - { name: validator.constraint_validator, alias: oro_address_valid_region }
-
-    oro_address.validator.name_or_organization:
-        class: 'Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganizationValidator'
-        tags:
-            - { name: validator.constraint_validator, alias: oro_address.validator.name_or_organization }
 
     oro_address.extension.action.type.map:
         class: '%oro_address.extension.action.type.map.class%'
