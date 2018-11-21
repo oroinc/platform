@@ -35,9 +35,7 @@
                 width: 100%;
             }
 
-            > select {
-                width: calc(100% - 15px);
-            }
+            @include selector-width(100%, 100%);
         }
     }
 

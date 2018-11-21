@@ -72,10 +72,11 @@ $select-multiple-option-checked-color: $primary-400 !default;
 
 $select-multiple-option-active-box-shadow: 0 0 0 32px $input-focus-border-color inset !default;
 
-$select-width: $field-width - 28px !default;
+$select-width: $field-width !default;
 $selector-line-height: $field-size !default;
 $selector-height: $field-size !default;
-$selector-width: 235px !default;
+$selector-width: $field-width !default;
+$selector-max-width: $field-width !default;
 $selector-border: 2px solid $primary-750 !default;
 $selector-background-color: $primary-inverse !default;
 $selector-border-radius: 2px !default;
@@ -94,12 +95,13 @@ $selector-select-color: $primary-200 !default;
 
 $selector-uniform-display: block !default;
 $selector-uniform-box-sizing: border-box !default;
-$selector-uniform-inner-offset: side-values(0 20px 0 6px) !default;
+$selector-uniform-inner-offset: side-values(0 24px 0 6px) !default;
 $selector-uniform-white-space: nowrap !default;
 $selector-uniform-overflow: hidden !default;
 $selector-uniform-text-overflow: ellipsis !default;
 $selector-uniform-position: relative !default;
 $selector-uniform-font-size: 100% !default;
+$selector-uniform-width: 100% !default;
 
 $selector-uniform-arrow-outer-offset: side-values(3px 3px 0 0) !default;
 $selector-uniform-arrow-display: inline-block !default;

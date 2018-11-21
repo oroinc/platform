@@ -2,7 +2,7 @@
 
 .oro-quarter {
     .selector {
-        width: $oro-quarter-width !important;
+        width: $oro-quarter-width;
         min-width: $oro-quarter-min-width;
         float: $oro-quarter-float;
 
@@ -11,11 +11,11 @@
         }
 
         span {
-            width: $oro-quarter-span-width !important;
+            width: $oro-quarter-span-width;
         }
 
         select {
-            width: $oro-quarter-select-width !important;
+            width: $oro-quarter-select-width;
             min-width: $oro-quarter-select-min-width;
         }
     }
@@ -38,7 +38,8 @@
 
     div {
         &.input-widget-select {
-            width: $fallback-container-select-width !important;
+            width: $fallback-container-select-width;
+            max-width: $fallback-container-select-max-width;
 
             span {
                 padding-right: $fallback-container-select-span-inner-offset-right;
