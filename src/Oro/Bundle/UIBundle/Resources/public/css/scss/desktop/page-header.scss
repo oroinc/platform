@@ -20,8 +20,11 @@
             > .btn-group {
                 text-align: #{$start};
                 display: inline-block;
-                margin-bottom: 4px;
                 vertical-align: top;
+
+                .btn {
+                    margin-bottom: 4px;
+                }
             }
 
             .btn-group {

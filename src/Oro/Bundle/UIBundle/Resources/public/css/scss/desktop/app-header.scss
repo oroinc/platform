@@ -73,14 +73,13 @@
         line-height: inherit;
         margin: 0;
         display: inline-block;
-        overflow: hidden;
+        @include text-line-truncate($app-header-max-width, true);
 
         a {
             color: inherit;
             text-transform: uppercase;
             display: inline-block;
-            vertical-align: middle;
-            @include text-line-truncate($app-header-max-width, true);
+            max-width: $app-header-max-width;
 
             [class^="fa-"] {
                 font-size: $app-header-logo-link-font-size;

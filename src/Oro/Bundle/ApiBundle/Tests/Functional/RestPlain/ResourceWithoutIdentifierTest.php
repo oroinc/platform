@@ -178,4 +178,80 @@ class ResourceWithoutIdentifierTest extends RestPlainApiTestCase
         self::assertMethodNotAllowedResponse($response, $expectedAllowedMethods, $method);
         self::assertResponseContentTypeEquals($response, self::JSON_CONTENT_TYPE, $method);
     }
+
+    public function testGetWithStringCustomFilter()
+    {
+        $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
+        $response = $this->request(
+            'GET',
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType]),
+            ['filter1' => 'filter value']
+        );
+
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
+        self::assertResponseContentTypeEquals($response, self::JSON_CONTENT_TYPE);
+        $this->assertResponseContains(
+            [
+                'name' => 'test (filter1 value: filter value)'
+            ],
+            $response
+        );
+    }
+
+    public function testGetWithTypedCustomFilterWithValidValue()
+    {
+        $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
+        $response = $this->request(
+            'GET',
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType]),
+            ['filter2' => '2018-05-25']
+        );
+
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
+        self::assertResponseContentTypeEquals($response, self::JSON_CONTENT_TYPE);
+        $this->assertResponseContains(
+            [
+                'name' => 'test (filter2 value: 25/5/2018)'
+            ],
+            $response
+        );
+    }
+
+    public function testGetWithTypedCustomFilterWithInvalidValue()
+    {
+        $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
+        $response = $this->request(
+            'GET',
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType]),
+            ['filter2' => 'test']
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected date value. Given "test".',
+                'source' => 'filter2'
+            ],
+            $response
+        );
+    }
+
+    public function testGetWithUnknownFilter()
+    {
+        $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
+        $response = $this->request(
+            'GET',
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType]),
+            ['anotherFilter' => 'filter value']
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The filter is not supported.',
+                'source' => 'anotherFilter'
+            ],
+            $response
+        );
+    }
 }

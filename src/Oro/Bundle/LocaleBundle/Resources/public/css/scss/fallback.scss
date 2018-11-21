@@ -129,7 +129,7 @@
 
     .input-append {
         .input-group {
-            margin-right: $fallback-item-value--first-input-group-offset-end;
+            margin-#{$end}: $fallback-item-value--first-input-group-offset-end;
         }
     }
 

@@ -1,8 +1,8 @@
 <div class="comment-title">
     <% if (avatarUrl) { %>
-        <img class="comment-title-avatar" src="<%- avatarUrl %>" />
+        <img class="comment-title-avatar" src="<%- avatarUrl %>">
     <% } else { %>
-        <div class="comment-title-avatar no-avatar" />
+    <div class="comment-title-avatar no-avatar"></div>
     <% } %>
 </div>
 
@@ -26,7 +26,7 @@
             <div class="thumbnail">
             <% if (attachmentThumbnail) { %>
                 <a href="<%- attachmentURL %>" data-gallery="comment-view-<%- relationId %>" class="no-hash" title="<%- attachmentFileName %>">
-                    <span class="thumbnail" style="background: url('<%- attachmentThumbnail %>') 50% 50% no-repeat;"></span>
+                    <div class="thumbnail" style="background: url('<%- attachmentThumbnail %>') 50% 50% no-repeat;"></div>
                 </a>
             <% } else { %>
                     <i class="fa <%- attachmentIcon %> fa-3x"></i>
@@ -58,9 +58,9 @@
     <% if (hasActions) { %>
     <div class="more-bar-holder">
         <% var actionsTogglerId = _.uniqueId('dropdown-') %>
-        <div class="dropdown"><button data-toggle="dropdown" class="btn btn-light dropdown-toggle dropdown-toggle--no-caret" id="<%- actionsTogglerId %>"
+        <div class="dropdown dropdown--with-arrow"><button data-toggle="dropdown" class="comment-actions__trigger btn btn-icon btn-lighter " id="<%- actionsTogglerId %>"
                                  data-placement="left-start" aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('oro.comment.actions_label') %>">
-            <span class="fa fa-ellipsis-h" aria-hidden="true"></span></button>
+            </button>
             <ul class="dropdown-menu launchers-dropdown-menu" role="menu" aria-labelledby="<%- actionsTogglerId %>">
                 <li>
                     <ul class="launchers-list">

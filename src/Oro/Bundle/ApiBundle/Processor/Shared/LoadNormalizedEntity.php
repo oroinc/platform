@@ -79,6 +79,7 @@ class LoadNormalizedEntity implements ProcessorInterface
         $getContext->setVersion($context->getVersion());
         $getContext->getRequestType()->set($context->getRequestType());
         $getContext->setRequestHeaders($context->getRequestHeaders());
+        $getContext->setHateoas($context->isHateoasEnabled());
         $getContext->setClassName($context->getClassName());
         $getContext->setId($context->getId());
         if ($this->reuseExistingEntity && $context->hasResult()) {
@@ -127,6 +128,7 @@ class LoadNormalizedEntity implements ProcessorInterface
                 $responseHeaders->set($key, $value);
             }
 
+            $context->setInfoRecords($getContext->getInfoRecords());
             $context->setResult($getContext->getResult());
         }
     }

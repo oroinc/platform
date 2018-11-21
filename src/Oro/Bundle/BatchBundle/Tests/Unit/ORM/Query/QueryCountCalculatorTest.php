@@ -8,7 +8,6 @@ use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\UnitOfWork;
@@ -73,8 +72,9 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
             ],
             'empty with group by'                    => [
                 'dql'         => 'SELECT e FROM Stub:Entity e GROUP BY e.b',
-                'expectedSql' => 'SELECT COUNT(*)' .
-                    ' FROM (SELECT t0_.a AS a_0, t0_.b AS b_1 FROM  t0_ GROUP BY t0_.b) AS e',
+                'expectedSql' => 'SELECT COUNT(*)'
+                    . ' FROM (SELECT t0_.a AS a_0, t0_.b AS b_1 FROM  t0_ GROUP BY t0_.b)'
+                    . ' AS count_query',
             ],
             'single parameters'                      => [
                 'dql'         => 'SELECT e FROM Stub:Entity e WHERE e.a = :a AND e.b = :b',
@@ -86,7 +86,8 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
             'single parameters (disable walker)'     => [
                 'dql'         => 'SELECT e FROM Stub:Entity e WHERE e.a = :a AND e.b = :b',
                 'expectedSql' => 'SELECT COUNT(*)'
-                    . ' FROM (SELECT t0_.a AS a_0, t0_.b AS b_1 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?) AS e',
+                    . ' FROM (SELECT t0_.a AS a_0, t0_.b AS b_1 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?)'
+                    . ' AS count_query',
                 'sqlParams'   => [1, 2],
                 'types'       => [Type::INTEGER, Type::INTEGER],
                 'queryParams' => ['a' => 1, 'b' => 2],
@@ -103,7 +104,8 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
             'multiple parameters (disable walker)'   => [
                 'dql'         => 'SELECT DISTINCT e.a FROM Stub:Entity e WHERE e.a = :value AND e.b = :value',
                 'expectedSql' => 'SELECT COUNT(*)'
-                    . ' FROM (SELECT DISTINCT t0_.a AS a_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?) AS e',
+                    . ' FROM (SELECT DISTINCT t0_.a AS a_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?)'
+                    . ' AS count_query',
                 'sqlParams'   => [3, 3],
                 'types'       => [Type::INTEGER, Type::INTEGER],
                 'queryParams' => ['value' => 3],
@@ -119,7 +121,8 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
             'positional parameters (disable walker)' => [
                 'dql'         => 'SELECT e.a FROM Stub:Entity e WHERE e.a = ?1 AND e.b = ?0',
                 'expectedSql' => 'SELECT COUNT(*)'
-                    . ' FROM (SELECT t0_.a AS a_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?) AS e',
+                    . ' FROM (SELECT t0_.a AS a_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?)'
+                    . ' AS count_query',
                 'sqlParams'   => [4, 3],
                 'types'       => [Type::INTEGER, Type::INTEGER],
                 'queryParams' => [3, 4],
@@ -163,7 +166,7 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnSelf());
         $dbalQb->expects($this->once())
             ->method('from')
-            ->with('(' . $sql . ')', 'e')
+            ->with('(' . $sql . ')', 'count_query')
             ->will($this->returnSelf());
         $dbalQb->expects($this->once())
             ->method('execute')
@@ -281,7 +284,7 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected instance of Doctrine\ORM\Query or Oro\Component\DoctrineUtils\ORM\SqlQuery, "integer" given
+     * @expectedExceptionMessage Expected instance of Doctrine\ORM\Query, Oro\Component\DoctrineUtils\ORM\SqlQuery or Doctrine\DBAL\Query\QueryBuilder, "integer" given
      */
     // @codingStandardsIgnoreEnd
     public function testCalculateCountForInvalidQueryType()
@@ -292,7 +295,7 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected instance of Doctrine\ORM\Query or Oro\Component\DoctrineUtils\ORM\SqlQuery, "integer" given
+     * @expectedExceptionMessage Expected instance of Doctrine\ORM\Query, Oro\Component\DoctrineUtils\ORM\SqlQuery or Doctrine\DBAL\Query\QueryBuilder, "integer" given
      */
     // @codingStandardsIgnoreEnd
     public function testCalculateCountForInvalidQueryTypeAndUseWalker()

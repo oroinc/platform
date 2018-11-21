@@ -17,7 +17,8 @@ class LocationHeaderTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->post(
             ['entity' => $entityType],
-            ['data' => ['type' => $entityType, 'attributes' => ['name' => 'test']]]
+            ['data' => ['type' => $entityType, 'attributes' => ['name' => 'test']]],
+            ['HTTP_HATEOAS' => true]
         );
         self::assertTrue($response->headers->has('Location'));
         $locationUrl = $this->getUrl(
@@ -26,6 +27,9 @@ class LocationHeaderTest extends RestJsonApiTestCase
             UrlGeneratorInterface::ABSOLUTE_URL
         );
         self::assertEquals($locationUrl, $response->headers->get('Location'));
+        // test that "self" link the same as "Location" header
+        $content = self::jsonToArray($response->getContent());
+        self::assertEquals($locationUrl, $content['data']['links']['self']);
     }
 
     public function testPostShouldNotReturnLocationHeaderIfNotSuccess()

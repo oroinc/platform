@@ -98,8 +98,30 @@
     Parameters:
         title - row title
         data - row data
+        options - addtional options for attribute
 #}
-{% macro renderAttribute(title, data) %}
+{% macro renderAttribute(title, data, options) %}
+    {% set options = {
+        rootClass: null,
+        termClass: null,
+        descriptionClass: null
+    }|merge(options|default({})) %}
+
+    <div class="attribute-item {% if options.rootClass %} {{ options.rootClass }}{% endif %}">
+        <label class="attribute-item__term {% if options.termClass %} {{ options.termClass }}{% endif %}">{{ title }}</label>
+        <div class="attribute-item__description {% if options.descriptionClass %} {{ options.descriptionClass }}{% endif %}">
+            {{ data|raw }}
+        </div>
+    </div>
+{% endmacro %}
+
+{#
+    Render attribute row with custom data block
+    Parameters:
+        title - row title
+        data - row data
+#}
+{% macro renderControlGroup(title, data) %}
     <div class="control-group attribute-row">
         <label class="control-label">{{ title }}</label>
         <div class="controls">
@@ -115,9 +137,38 @@
         data  - property data
         entity - the entitty instance on wich Field ACL should be checked
         fieldName - the name of field on wich Field ACL should be checked
+        options - addtional options for property
 #}
-{% macro renderProperty(title, data, entity = null, fieldName = null) %}
-    {{ _self.renderHtmlProperty(title, data|escape, entity, fieldName) }}
+{% macro renderProperty(title, data, entity = null, fieldName = null, options = {}) %}
+    {{ _self.renderHtmlProperty(title, data|escape, entity, fieldName, options) }}
+{% endmacro %}
+
+{#
+    Render html property block
+    Parameters:
+        title - property title
+        data  - property data
+        entity - the entitty instance on wich Field ACL should be checked
+        fieldName - the name of field on wich Field ACL should be checked
+        options - addtional options for property
+#}
+{% macro renderHtmlProperty(title, data, entity = null, fieldName = null, options = {}) %}
+    {% if entity is defined and fieldName is defined and not is_granted('VIEW', entity, fieldName) %}
+    {% else %}
+        {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>', options) }}
+    {% endif %}
+{% endmacro %}
+
+{#
+    Render property block
+    Parameters:
+        title - property title
+        data  - property data
+        entity - the entitty instance on wich Field ACL should be checked
+        fieldName - the name of field on wich Field ACL should be checked
+#}
+{% macro renderPropertyControlGroup(title, data, entity = null, fieldName = null) %}
+    {{ _self.renderHtmlPropertyControlGroup(title, data|escape, entity, fieldName) }}
 {% endmacro %}
 
 {#
@@ -128,10 +179,10 @@
         entity - the entitty instance on wich Field ACL should be checked
         fieldName - the name of field on wich Field ACL should be checked
 #}
-{% macro renderHtmlProperty(title, data, entity = null, fieldName = null) %}
+{% macro renderHtmlPropertyControlGroup(title, data, entity = null, fieldName = null) %}
     {% if entity is defined and fieldName is defined and not is_granted('VIEW', entity, fieldName) %}
     {% else %}
-        {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+        {{ _self.renderControlGroup(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
     {% endif %}
 {% endmacro %}
 

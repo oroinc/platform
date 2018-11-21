@@ -19,6 +19,7 @@ use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
+ * Handles logic for getting workflow, transitions, workflow items as well as all other related actions
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -530,6 +531,17 @@ class WorkflowManager implements LoggerAwareInterface
             $this->doctrineHelper->getEntityClass($entity),
             $this->doctrineHelper->getSingleEntityIdentifier($entity)
         );
+    }
+
+    /**
+     * @param $entity
+     * @return false|WorkflowItem
+     */
+    public function getFirstWorkflowItemByEntity($entity)
+    {
+        $items = $this->getWorkflowItemsByEntity($entity);
+
+        return \reset($items);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -9,6 +10,9 @@ use Oro\Bundle\ApiBundle\Processor\Shared\SetTotalCountHeader;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
+use Oro\Component\DoctrineUtils\ORM\ResultSetMappingUtil;
+use Oro\Component\DoctrineUtils\ORM\SqlQuery;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Component\EntitySerializer\QueryResolver;
 
 class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
@@ -94,19 +98,21 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessQueryBuilder()
+    public function testProcessOrmQueryBuilder()
     {
         $entityClass = Group::class;
         $config = new EntityDefinitionConfig();
         $totalCount = 123;
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
+        $query->setFirstResult(20);
+        $query->setMaxResults(10);
 
         $this->countQueryBuilderOptimizer->expects(self::once())
             ->method('getCountQueryBuilder')
             ->willReturnCallback(
                 function (QueryBuilder $qb) {
-                    $qb->setMaxResults(10);
+                    $qb->select('e.id');
 
                     return $qb;
                 }
@@ -131,13 +137,15 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessQuery()
+    public function testProcessOrmQuery()
     {
         $entityClass = Group::class;
         $config = new EntityDefinitionConfig();
         $totalCount = 123;
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
+        $query->setFirstResult(20);
+        $query->setMaxResults(10);
 
         $this->queryResolver->expects(self::once())
             ->method('resolveQuery')
@@ -150,6 +158,86 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
 
         $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
         $this->context->setQuery($query->getQuery());
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            $totalCount,
+            $this->context->getResponseHeaders()->get('X-Include-Total-Count')
+        );
+    }
+
+    public function testProcessSqlQueryBuilder()
+    {
+        $config = new EntityDefinitionConfig();
+        $totalCount = 123;
+
+        $rsm = ResultSetMappingUtil::createResultSetMapping($this->em->getConnection()->getDatabasePlatform());
+        $rsm
+            ->addScalarResult('id', 'id')
+            ->addScalarResult('name', 'name');
+        $qb = new SqlQueryBuilder($this->em, $rsm);
+        $qb
+            ->select('e.id AS id, e.name AS name')
+            ->from('group_table', 'e')
+            ->setFirstResult(20)
+            ->setMaxResults(10);
+
+        $this->queryResolver->expects(self::never())
+            ->method('resolveQuery');
+        $this->getDriverConnectionMock($this->em)->expects(self::once())
+            ->method('query')
+            ->willReturnCallback(function ($sql) use ($totalCount) {
+                self::assertEquals(
+                    'SELECT COUNT(*)'
+                    . ' FROM (SELECT e.id AS id, e.name AS name FROM group_table e) count_query',
+                    $sql
+                );
+
+                return $this->createCountStatementMock($totalCount);
+            });
+
+        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->setQuery($qb);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            $totalCount,
+            $this->context->getResponseHeaders()->get('X-Include-Total-Count')
+        );
+    }
+
+    public function testProcessSqlQuery()
+    {
+        $config = new EntityDefinitionConfig();
+        $totalCount = 123;
+
+        $qb = new DbalQueryBuilder($this->em->getConnection());
+        $qb
+            ->select('e.id AS id, e.name AS name')
+            ->from('group_table e')
+            ->setFirstResult(20)
+            ->setMaxResults(10);
+        $query = new SqlQuery($this->em);
+        $query->setQueryBuilder($qb);
+
+        $this->queryResolver->expects(self::never())
+            ->method('resolveQuery');
+        $this->getDriverConnectionMock($this->em)->expects(self::once())
+            ->method('query')
+            ->willReturnCallback(function ($sql) use ($totalCount) {
+                self::assertEquals(
+                    'SELECT COUNT(*)'
+                    . ' FROM (SELECT e.id AS id, e.name AS name FROM group_table e) count_query',
+                    $sql
+                );
+
+                return $this->createCountStatementMock($totalCount);
+            });
+
+        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->setQuery($query);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 

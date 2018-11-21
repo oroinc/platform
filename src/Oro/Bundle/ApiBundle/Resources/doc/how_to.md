@@ -21,6 +21,7 @@
  - [Enable Custom API](#enable-custom-api)
  - [Add a Predefined Identifier for API Resource](#add-a-predefined-identifier-for-api-resource)
  - [Add a Computed Field](#add-a-computed-field)
+ - [Disable HATEOAS](#disable-hateoas)
 
 
 ## Turn on API for an Entity
@@ -991,3 +992,10 @@ services:
         tags:
             - { name: oro.api.processor, action: customize_loaded_data, class: Acme\Bundle\AppBundle\Entity\Product }
 ```
+
+## Disable HATEOAS
+
+It is not possible to disable [HATEOAS](https://restfulapi.net/hateoas/) via a configuration.
+But you can send API request with `noHateoas` value in [X-Include header](./headers.md#existing-x-include-keys)
+to exclude HATEOAS links from a response of a particular request.
+

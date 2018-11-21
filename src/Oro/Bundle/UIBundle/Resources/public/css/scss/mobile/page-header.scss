@@ -132,25 +132,6 @@
     }
 }
 
-.title-buttons-container,
-.ui-dialog-buttonpane .widget-actions {
-    .btn [class*="fa-"].hide-text,
-    .btn-group > .dropdown-menu li [class^="fa-"] {
-        width: 20px;
-        text-align: center;
-
-        &:before {
-            font-size: $base-font-size--l;
-        }
-    }
-
-    .dropdown-toggle {
-        .caret {
-            margin-left: 5px;
-        }
-    }
-}
-
 .title-buttons-container {
     .box-type1 {
         margin: 0;

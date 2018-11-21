@@ -7,6 +7,9 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Iterator for Imap emails.
+ */
 class ImapEmailIterator implements \Iterator, \Countable
 {
     /** @var ImapMessageIterator */
@@ -104,6 +107,7 @@ class ImapEmailIterator implements \Iterator, \Countable
     public function setConvertErrorCallback(\Closure $callback = null)
     {
         $this->onConvertError = $callback;
+        $this->iterator->setConvertErrorCallback($callback);
     }
 
     /**

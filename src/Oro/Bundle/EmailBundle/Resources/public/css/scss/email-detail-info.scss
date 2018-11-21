@@ -1,0 +1,54 @@
+/* @theme: admin.oro; */
+
+.email-detail-info {
+    max-width: $email-detail-info-width;
+    padding: $email-detail-info-offset;
+
+    overflow: auto;
+
+    &__td {
+        padding-bottom: $email-detail-info-td-offset;
+
+        vertical-align: top;
+    }
+
+    &__tr:last-child {
+        .email-detail-info__td {
+            padding-bottom: 0;
+        }
+    }
+
+    &__label {
+        padding-#{$end}: $email-detail-info-label-offset;
+
+        text-align: $end;
+
+        color: $email-detail-info-label-color;
+    }
+
+    &__value {
+        color: $email-detail-info-value-color;
+
+        white-space: nowrap;
+    }
+}
+
+@include media-breakpoint-down(lg) {
+    .email-detail-info {
+        &__value {
+            white-space: normal;
+        }
+    }
+}
+
+@include media-breakpoint-down(md) {
+    .email-detail-info {
+        max-width: $email-detail-info-width-md;
+    }
+}
+
+@include media-breakpoint-down(sm) {
+    .email-detail-info {
+        max-width: $email-detail-info-width-sm;
+    }
+}

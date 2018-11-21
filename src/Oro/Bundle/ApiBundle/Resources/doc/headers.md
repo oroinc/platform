@@ -37,6 +37,12 @@ The following table describes all existing *keys* for `X-Include` header.
     <th>Description</th>
 </tr>
 <tr>
+    <td nowrap>all</td>
+    <td nowrap>noHateoas</td>
+    <td nowrap></td>
+    <td>Removes all HATEOAS related links from the response.</td>
+</tr>
+<tr>
     <td nowrap>get a list of entities</td>
     <td nowrap>totalCount</td>
     <td nowrap>X-Include-Total-Count</td>

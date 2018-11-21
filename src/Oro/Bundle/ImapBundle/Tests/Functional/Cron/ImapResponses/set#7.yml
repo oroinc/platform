@@ -15,8 +15,8 @@ data:
     id: 91
     UID: 123
     INTERNALDATE: 121212
-    flags: []
-    headers: |
+    FLAGS: []
+    BODY[HEADER]: |
         X-Received: by 10.129.163.10 with SMTP id a10mr33514476ywh.242.1469808918056;
          Fri, 29 Jul 2016 09:15:18 -0700 (PDT)
         Received: by 10.13.236.11 with HTTP; Fri, 29 Jul 2016 09:15:17 -0700 (PDT)
@@ -26,4 +26,9 @@ data:
         Subject: test
         To: test email
         Content-Type: multipart/alternative; boundary=94eb2c12a04872ff170538c88ef6"
-errors: ~
+expectedEmailData:
+    subject: test
+    fromName: Test Test <test@test.tst>
+    fromEmailAddress.email: test@test.tst
+    messageId: <CABUX4_0dKWw9sOZMJWCv9nA=NQzM0t7AO9gW0k21_4ux8XhFdA@mail.gmail.com>
+    recipients: ~

@@ -5,12 +5,11 @@ namespace Oro\Bundle\ApiBundle\Request\JsonApi;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
-use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddFieldsFilter;
-use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddIncludeFilter;
 use Oro\Bundle\ApiBundle\Request\AbstractErrorCompleter;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
@@ -28,16 +27,22 @@ class ErrorCompleter extends AbstractErrorCompleter
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
+    /** @var FilterNamesRegistry */
+    private $filterNamesRegistry;
+
     /**
      * @param ExceptionTextExtractorInterface $exceptionTextExtractor
      * @param ValueNormalizer                 $valueNormalizer
+     * @param FilterNamesRegistry             $filterNamesRegistry
      */
     public function __construct(
         ExceptionTextExtractorInterface $exceptionTextExtractor,
-        ValueNormalizer $valueNormalizer
+        ValueNormalizer $valueNormalizer,
+        FilterNamesRegistry $filterNamesRegistry
     ) {
         parent::__construct($exceptionTextExtractor);
         $this->valueNormalizer = $valueNormalizer;
+        $this->filterNamesRegistry = $filterNamesRegistry;
     }
 
     /**
@@ -190,14 +195,15 @@ class ErrorCompleter extends AbstractErrorCompleter
      */
     private function getConfigFilterConstraintParameter(Error $error, RequestType $requestType)
     {
+        $filterNames = $this->filterNamesRegistry->getFilterNames($requestType);
         /** @var NotSupportedConfigOperationException $e */
         $e = ExceptionUtil::getProcessorUnderlyingException($error->getInnerException());
         if (ExpandRelatedEntitiesConfigExtra::NAME === $e->getOperation()) {
-            return AddIncludeFilter::FILTER_KEY;
+            return $filterNames->getIncludeFilterName();
         }
         if (FilterFieldsConfigExtra::NAME === $e->getOperation()) {
             return \sprintf(
-                AddFieldsFilter::FILTER_KEY_TEMPLATE,
+                $filterNames->getFieldsFilterTemplate(),
                 $this->getEntityType($e->getClassName(), $requestType)
             );
         }

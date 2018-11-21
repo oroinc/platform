@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
+use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -20,8 +20,8 @@ class SetLocationHeader implements ProcessorInterface
 {
     public const RESPONSE_HEADER_NAME = 'Location';
 
-    /** @var RestRoutes */
-    private $routes;
+    /** @var RestRoutesRegistry */
+    private $routesRegistry;
 
     /** @var UrlGeneratorInterface */
     private $urlGenerator;
@@ -33,18 +33,18 @@ class SetLocationHeader implements ProcessorInterface
     private $entityIdTransformerRegistry;
 
     /**
-     * @param RestRoutes                  $routes
+     * @param RestRoutesRegistry          $routesRegistry
      * @param UrlGeneratorInterface       $urlGenerator
      * @param ValueNormalizer             $valueNormalizer
      * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
      */
     public function __construct(
-        RestRoutes $routes,
+        RestRoutesRegistry $routesRegistry,
         UrlGeneratorInterface $urlGenerator,
         ValueNormalizer $valueNormalizer,
         EntityIdTransformerRegistry $entityIdTransformerRegistry
     ) {
-        $this->routes = $routes;
+        $this->routesRegistry = $routesRegistry;
         $this->urlGenerator = $urlGenerator;
         $this->valueNormalizer = $valueNormalizer;
         $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
@@ -83,7 +83,7 @@ class SetLocationHeader implements ProcessorInterface
         $entityId = $this->getEntityIdTransformer($requestType)->transform($entityId, $metadata);
 
         $location = $this->urlGenerator->generate(
-            $this->routes->getItemRouteName(),
+            $this->routesRegistry->getRoutes($requestType)->getItemRouteName(),
             ['entity' => $entityType, 'id' => $entityId],
             UrlGeneratorInterface::ABSOLUTE_URL
         );

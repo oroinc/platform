@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Provider\CombinedConfigBag;
 use Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Fixtures;
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -921,6 +922,81 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame(
             $config['cors']['allow_credentials'],
             $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(2)
+        );
+    }
+
+    public function testConfigurationForApiDocViews()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('kernel.environment', false);
+        $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
+
+        $config = [
+            'documentation_path' => 'http://test.com/default_api_docs',
+            'api_doc_views'      => [
+                'view1' => [
+                    'label'        => 'View 1',
+                    'default'      => true,
+                    'request_type' => ['rest', 'json_api'],
+                    'headers'      => [
+                        'Content-Type' => 'application/vnd.api+json',
+                        'X-Include'    => [
+                            ['value' => 'totalCount', 'actions' => ['get_list']],
+                            ['value' => 'forAllActions']
+                        ]
+                    ]
+                ],
+                'view2' => [
+                    'documentation_path' => 'http://test.com/api_docs_for_view2',
+                    'html_formatter'     => 'another_html_formatter',
+                    'sandbox'            => false
+                ],
+                'view3' => []
+            ]
+        ];
+
+        $extension = new OroApiExtension();
+        $extension->load([$config], $container);
+
+        $apiConfig = DependencyInjectionUtil::getConfig($container);
+        self::assertEquals(
+            [
+                'view1' => [
+                    'label'              => 'View 1',
+                    'default'            => true,
+                    'request_type'       => ['rest', 'json_api'],
+                    'documentation_path' => 'http://test.com/default_api_docs',
+                    'html_formatter'     => 'oro_api.api_doc.formatter.html_formatter',
+                    'sandbox'            => true,
+                    'headers'            => [
+                        'Content-Type' => [
+                            ['value' => 'application/vnd.api+json', 'actions' => []]
+                        ],
+                        'X-Include'    => [
+                            ['value' => 'totalCount', 'actions' => ['get_list']],
+                            ['value' => 'forAllActions', 'actions' => []]
+                        ]
+                    ]
+                ],
+                'view2' => [
+                    'default'            => false,
+                    'request_type'       => [],
+                    'documentation_path' => 'http://test.com/api_docs_for_view2',
+                    'html_formatter'     => 'another_html_formatter',
+                    'sandbox'            => false,
+                    'headers'            => []
+                ],
+                'view3' => [
+                    'default'            => false,
+                    'request_type'       => [],
+                    'documentation_path' => 'http://test.com/default_api_docs',
+                    'html_formatter'     => 'oro_api.api_doc.formatter.html_formatter',
+                    'sandbox'            => true,
+                    'headers'            => []
+                ]
+            ],
+            $apiConfig['api_doc_views']
         );
     }
 }

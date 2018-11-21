@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -11,11 +12,23 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * A base class that can be used to create a processor to set default paging for different kind of requests.
+ * Sets default paging for different kind of requests.
+ * The default page number is 1, the default page size is 10.
  */
-abstract class SetDefaultPaging implements ProcessorInterface
+class SetDefaultPaging implements ProcessorInterface
 {
-    const DEFAULT_PAGE_SIZE = 10;
+    private const DEFAULT_PAGE_SIZE = 10;
+
+    /** @var FilterNamesRegistry */
+    private $filterNamesRegistry;
+
+    /**
+     * @param FilterNamesRegistry $filterNamesRegistry
+     */
+    public function __construct(FilterNamesRegistry $filterNamesRegistry)
+    {
+        $this->filterNamesRegistry = $filterNamesRegistry;
+    }
 
     /**
      * {@inheritdoc}
@@ -39,24 +52,25 @@ abstract class SetDefaultPaging implements ProcessorInterface
             return;
         }
 
+        $filterNames = $this->filterNamesRegistry->getFilterNames($context->getRequestType());
         $filters = $context->getFilters();
-        $this->addPageSizeFilter($filters, $pageSize);
-        $this->addPageNumberFilter($filters);
+        $this->addPageSizeFilter($filterNames->getPageSizeFilterName(), $filters, $pageSize);
+        $this->addPageNumberFilter($filterNames->getPageNumberFilterName(), $filters);
     }
 
     /**
+     * @param string           $filterName
      * @param FilterCollection $filters
      */
-    protected function addPageNumberFilter(FilterCollection $filters)
+    protected function addPageNumberFilter(string $filterName, FilterCollection $filters)
     {
         /**
          * "page number" filter must be added after "page size" filter because it depends on this filter
          * @see \Oro\Bundle\ApiBundle\Filter\PageNumberFilter::apply
          */
-        $pageNumberFilterKey = $this->getPageNumberFilterKey();
-        if (!$filters->has($pageNumberFilterKey)) {
+        if (!$filters->has($filterName)) {
             $filters->add(
-                $pageNumberFilterKey,
+                $filterName,
                 new PageNumberFilter(
                     DataType::UNSIGNED_INTEGER,
                     'The page number, starting from 1.',
@@ -65,22 +79,22 @@ abstract class SetDefaultPaging implements ProcessorInterface
             );
         } else {
             // make sure that "page number" filter is added after "page size" filter
-            $pageFilter = $filters->get($pageNumberFilterKey);
-            $filters->remove($pageNumberFilterKey);
-            $filters->add($pageNumberFilterKey, $pageFilter);
+            $pageFilter = $filters->get($filterName);
+            $filters->remove($filterName);
+            $filters->add($filterName, $pageFilter);
         }
     }
 
     /**
+     * @param string           $filterName
      * @param FilterCollection $filters
      * @param int|null         $pageSize
      */
-    protected function addPageSizeFilter(FilterCollection $filters, $pageSize)
+    protected function addPageSizeFilter(string $filterName, FilterCollection $filters, $pageSize)
     {
-        $pageSizeFilterKey = $this->getPageSizeFilterKey();
-        if (!$filters->has($pageSizeFilterKey)) {
+        if (!$filters->has($filterName)) {
             $filters->add(
-                $pageSizeFilterKey,
+                $filterName,
                 new PageSizeFilter(
                     DataType::INTEGER,
                     'The number of items per page.',
@@ -97,14 +111,4 @@ abstract class SetDefaultPaging implements ProcessorInterface
     {
         return self::DEFAULT_PAGE_SIZE;
     }
-
-    /**
-     * @return string
-     */
-    abstract protected function getPageNumberFilterKey();
-
-    /**
-     * @return string
-     */
-    abstract protected function getPageSizeFilterKey();
 }

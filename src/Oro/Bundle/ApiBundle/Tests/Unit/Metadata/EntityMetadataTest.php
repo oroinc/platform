@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
@@ -28,6 +29,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entityMetadata->addField($field1);
         $association1 = new AssociationMetadata('association1');
         $entityMetadata->addAssociation($association1);
+        $entityMetadata->addLink('link1', new ExternalLinkMetadata('url1'));
 
         $entityMetadataClone = clone $entityMetadata;
 
@@ -67,6 +69,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $association1 = new AssociationMetadata('association1');
         $association1->setDataType('testDataType');
         $entityMetadata->addAssociation($association1);
+        $entityMetadata->addLink('link1', new ExternalLinkMetadata('url1'));
 
         self::assertEquals(
             [
@@ -79,6 +82,11 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
                 'meta_properties'          => [
                     'metaProperty1' => [
                         'data_type' => 'testDataType'
+                    ]
+                ],
+                'links'                    => [
+                    'link1' => [
+                        'url_template' => 'url1'
                     ]
                 ],
                 'fields'                   => [
@@ -421,6 +429,32 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entityMetadata->remove('attribute1');
         self::assertFalse($entityMetadata->has('attribute1'));
         self::assertNull($entityMetadata->get('attribute1'));
+    }
+
+    public function testLinks()
+    {
+        $entityMetadata = new EntityMetadata();
+        self::assertCount(0, $entityMetadata->getLinks());
+        self::assertFalse($entityMetadata->hasLink('unknown'));
+        self::assertNull($entityMetadata->getLink('unknown'));
+
+        $link1 = new ExternalLinkMetadata('url1');
+        self::assertSame($link1, $entityMetadata->addLink('link1', $link1));
+        $link2 = new ExternalLinkMetadata('url2');
+        self::assertSame($link2, $entityMetadata->addLink('link2', $link2));
+        self::assertCount(2, $entityMetadata->getLinks());
+
+        self::assertTrue($entityMetadata->hasLink('link1'));
+        self::assertSame($link1, $entityMetadata->getLink('link1'));
+
+        $entityMetadata->removeLink('link1');
+        self::assertCount(1, $entityMetadata->getLinks());
+        self::assertFalse($entityMetadata->hasLink('link1'));
+        self::assertTrue($entityMetadata->hasLink('link2'));
+
+        $entityMetadata->removeLink('link2');
+        self::assertCount(0, $entityMetadata->getLinks());
+        self::assertFalse($entityMetadata->hasLink('link2'));
     }
 
     public function testHasIdentifierFieldsOnlyForEmptyMetadata()

@@ -36,6 +36,15 @@ $btn-font-weight: bold;
 $btn-font-size: 12px;
 $btn-text-transform: uppercase;
 
+$btn-padding-y-sm: 0;
+$btn-padding-x-sm: 12px;
+$btn-in-group-padding-x-sm: 8px;
+$btn-font-size-sm: $base-font-size--s;
+$btn-icon-font-size-sm: $base-font-size;
+$btn-line-height-sm: 24px;
+$btn-icon-line-height-sm: $btn-line-height-sm - 1px;
+$btn-border-radius-sm: 16px;
+
 $btn-mobile-font-size: 14px;
 $btn-mobile-border-radius: 20px;
 $btn-square-mobile-border-radius: 2px;
@@ -44,6 +53,8 @@ $btn-icon-mobile-fa-icon-font-size: 18px;
 $content-title-font-size: 20px;
 $content-title-font-weight: bold;
 $content-title-line-height: 1.5;
+
+$label-margin-bottom: 0;
 
 // Buttons + Forms
 //
@@ -62,12 +73,8 @@ $input-focus-border-color: $secondary;
 $input-btn-mobile-padding-y: 0;
 $input-btn-mobile-padding-x: 16px;
 
-$btn-padding-y-mini: 0;
-$btn-padding-x-mini: 16px;
 $btn-line-height: 32px;
 $btn-square-line-height: 28px;
-$btn-line-height-mini: 20px;
-$btn-border-radius-mini: $btn-border-radius;
 
 $btn-mobile-line-height: 40px;
 $btn-square-mobile-line-height: 36px;
@@ -234,7 +241,7 @@ $logo-background-color:                 #2d333b;
 $header-icon-button-text-color:         #2a313a;
 $header-text-color:                     #cad2da;
 $inline-action-color:                   #94b4c9;
-$inline-action-background:              #edf5fb;
+$inline-action-background:              $secondary-300;
 $cell-selected-background:              $inline-action-background;
 $row-selected-background:               $extra-300;
 $row-highlight-background:              darken($row-selected-background, 2%);
@@ -278,12 +285,9 @@ $info-background:                       $info-lighten;
 $info-border:                           $info-lighten;
 $info-close:                            $info-dark;
 
-$tag-item-color:                        $secondary;
-$tag-item-background:                   $secondary-300;
-$tag-my-item-background:                $secondary;
-$tag-item-offset:                       side-values(0 2px 1px 0) !default;
-
 $error-message-balloon-background:      lighten($error-text, 20%);
+
+$hover-transition:                      all 230ms ease-out !default;
 
 // Links
 $link-color:                            $secondary;
