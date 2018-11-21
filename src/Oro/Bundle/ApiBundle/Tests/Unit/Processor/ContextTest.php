@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\HateoasMetadataExtra;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -24,6 +25,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ContextTest extends \PHPUnit\Framework\TestCase
 {
@@ -701,6 +705,28 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->get('cors'));
     }
 
+    public function testHateoas()
+    {
+        self::assertFalse($this->context->isHateoasEnabled());
+        self::assertFalse($this->context->get('hateoas'));
+
+        $this->context->setHateoas(true);
+        self::assertTrue($this->context->isHateoasEnabled());
+        self::assertTrue($this->context->get('hateoas'));
+    }
+
+    public function testInfoRecords()
+    {
+        self::assertNull($this->context->getInfoRecords());
+
+        $infoRecords = ['' => ['key' => 'value']];
+        $this->context->setInfoRecords($infoRecords);
+        self::assertEquals($infoRecords, $this->context->getInfoRecords());
+
+        $this->context->setInfoRecords(null);
+        self::assertNull($this->context->getInfoRecords());
+    }
+
     public function testConfigExtras()
     {
         self::assertSame([], $this->context->getConfigExtras());
@@ -792,6 +818,61 @@ class ContextTest extends \PHPUnit\Framework\TestCase
                 new RequestType([$requestType]),
                 $config,
                 $metadataExtras
+            )
+            ->willReturn($metadata);
+
+        // test that metadata are not loaded yet
+        self::assertFalse($this->context->hasMetadata());
+
+        self::assertSame($metadata, $this->context->getMetadata()); // load metadata
+        self::assertTrue($this->context->hasMetadata());
+        self::assertTrue($this->context->has(Context::METADATA));
+        self::assertSame($metadata, $this->context->get(Context::METADATA));
+
+        self::assertEquals($config, $this->context->getConfig());
+
+        // test that metadata are loaded only once
+        self::assertSame($metadata, $this->context->getMetadata());
+    }
+
+    public function testLoadMetadataWhenHateoasIsEnabled()
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
+        $configExtras = [
+            new TestConfigSection('section1'),
+            new TestConfigSection('section2')
+        ];
+
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata();
+        $metadataExtras = [new TestMetadataExtra('extra1')];
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setConfigExtras($configExtras);
+        $this->context->setMetadataExtras($metadataExtras);
+        $this->context->setClassName($entityClass);
+        $this->context->setHateoas(true);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $entityClass,
+                $version,
+                new RequestType([$requestType]),
+                $configExtras
+            )
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $entityClass,
+                $version,
+                new RequestType([$requestType]),
+                $config,
+                array_merge($metadataExtras, [new HateoasMetadataExtra($this->context->getFilterValues())])
             )
             ->willReturn($metadata);
 

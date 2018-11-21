@@ -100,7 +100,7 @@ define(function(require) {
          *
          * @property
          */
-        dropdownContainer: 'body',
+        dropdownContainer: null,
 
         /**
          * Select widget menu opened flag
@@ -267,7 +267,14 @@ define(function(require) {
          * @protected
          */
         _initializeSelectWidget: function() {
-            var $dropdownContainer = this._findDropdownFitContainer(this.dropdownContainer) || this.dropdownContainer;
+            var position = {
+                my: 'left top',
+                at: 'left bottom',
+                of: this.$el,
+                collision: 'fit none',
+                within: this._findDropdownFitContainer(this.dropdownContainer) || this.dropdownContainer
+            };
+
             this.selectWidget = new this.MultiselectDecorator({
                 element: this.$(this.inputSelector),
                 parameters: _.extend({
@@ -278,13 +285,7 @@ define(function(require) {
                     selectedText: _.bind(function(numChecked, numTotal, checkedItems) {
                         return this._getSelectedText(checkedItems);
                     }, this),
-                    position: {
-                        my: 'left top',
-                        at: 'left bottom',
-                        of: this.$el,
-                        collision: 'fit none',
-                        within: $dropdownContainer
-                    },
+                    position: position,
                     beforeopen: _.bind(function() {
                         this.selectWidget.onBeforeOpenDropdown();
                     }, this),
@@ -295,7 +296,10 @@ define(function(require) {
                         this._setButtonPressed(this.$(this.containerSelector), true);
                         this._clearChoicesStyle();
                         this.selectDropdownOpened = true;
-                        this.selectWidget.updateDropdownPosition();
+
+                        this.selectWidget.updateDropdownPosition($.extend({}, position, {
+                            within: this._findDropdownFitContainer(this.dropdownContainer) || this.dropdownContainer
+                        }));
                     }, this),
                     refresh: _.bind(function() {
                         this.selectWidget.onRefresh();
@@ -309,7 +313,7 @@ define(function(require) {
                             this.selectDropdownOpened = false;
                         }
                     }, this),
-                    appendTo: this._setDropdownContainer(),
+                    appendTo: this.$el,
                     refreshNotOpened: this.templateTheme !== ''
                 }, this.widgetOptions),
                 contextSearch: this.contextSearch

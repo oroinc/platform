@@ -117,7 +117,7 @@ define([
         },
 
         _initMainContainers: function() {
-            this.$noDataContainer = $('<div class="no-data"><span>' + this.noDataMessage + '</span></div>');
+            this.$noDataContainer = $('<div class="no-data">' + this.noDataMessage + '</div>');
             this.$addressesContainer = $('<div class="map-address-list"/>');
 
             if (!this.$el.find('.map-address-list').length) {

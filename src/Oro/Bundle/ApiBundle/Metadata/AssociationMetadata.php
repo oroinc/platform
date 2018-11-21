@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Metadata;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ToArrayInterface;
 
 /**
  * The metadata for an entity association.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
 {
@@ -33,6 +37,18 @@ class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
     /** @var EntityMetadata|null */
     private $targetMetadata;
 
+    /** @var MetaAttributeMetadata[] */
+    private $metaProperties = [];
+
+    /** @var LinkMetadataInterface[] */
+    private $links = [];
+
+    /** @var MetaAttributeMetadata[] */
+    private $relationshipMetaProperties = [];
+
+    /** @var LinkMetadataInterface[] */
+    private $relationshipLinks = [];
+
     /**
      * Makes a deep copy of the object.
      */
@@ -41,6 +57,10 @@ class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
         if (null !== $this->targetMetadata) {
             $this->targetMetadata = clone $this->targetMetadata;
         }
+        $this->metaProperties = ConfigUtil::cloneObjects($this->metaProperties);
+        $this->links = ConfigUtil::cloneObjects($this->links);
+        $this->relationshipMetaProperties = ConfigUtil::cloneObjects($this->relationshipMetaProperties);
+        $this->relationshipLinks = ConfigUtil::cloneObjects($this->relationshipLinks);
     }
 
     /**
@@ -69,6 +89,22 @@ class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
         }
         if (null !== $this->targetMetadata) {
             $result['target_metadata'] = $this->targetMetadata->toArray();
+        }
+        $metaProperties = ConfigUtil::convertPropertiesToArray($this->metaProperties);
+        if (!empty($metaProperties)) {
+            $result['meta_properties'] = $metaProperties;
+        }
+        $links = ConfigUtil::convertPropertiesToArray($this->links);
+        if (!empty($links)) {
+            $result['links'] = $links;
+        }
+        $relationshipMetaProperties = ConfigUtil::convertPropertiesToArray($this->relationshipMetaProperties);
+        if (!empty($relationshipMetaProperties)) {
+            $result['relationship_meta_properties'] = $relationshipMetaProperties;
+        }
+        $relationshipLinks = ConfigUtil::convertPropertiesToArray($this->relationshipLinks);
+        if (!empty($relationshipLinks)) {
+            $result['relationship_links'] = $relationshipLinks;
         }
 
         return $result;
@@ -266,5 +302,265 @@ class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
     public function setCollapsed($collapsed = true)
     {
         $this->collapsed = $collapsed;
+    }
+
+    /**
+     * Gets metadata for all meta properties that applicable
+     * for the association value or each value of collection valued association.
+     *
+     * @return MetaAttributeMetadata[] [meta property name => MetaAttributeMetadata, ...]
+     */
+    public function getMetaProperties()
+    {
+        return $this->metaProperties;
+    }
+
+    /**
+     * Checks whether metadata of the given meta property that applicable
+     * for the association value or each value of collection valued association exists.
+     *
+     * @param string $metaPropertyName
+     *
+     * @return bool
+     */
+    public function hasMetaProperty($metaPropertyName)
+    {
+        return isset($this->metaProperties[$metaPropertyName]);
+    }
+
+    /**
+     * Gets metadata of a meta property that applicable
+     * for the association value or each value of collection valued association.
+     *
+     * @param string $metaPropertyName
+     *
+     * @return MetaAttributeMetadata|null
+     */
+    public function getMetaProperty($metaPropertyName)
+    {
+        if (!isset($this->metaProperties[$metaPropertyName])) {
+            return null;
+        }
+
+        return $this->metaProperties[$metaPropertyName];
+    }
+
+    /**
+     * Adds metadata of a meta property that applicable
+     * for the association value or each value of collection valued association.
+     *
+     * @param MetaAttributeMetadata $metaProperty
+     *
+     * @return MetaAttributeMetadata
+     */
+    public function addMetaProperty(MetaAttributeMetadata $metaProperty)
+    {
+        $this->metaProperties[$metaProperty->getName()] = $metaProperty;
+
+        return $metaProperty;
+    }
+
+    /**
+     * Removes metadata of a meta property that applicable
+     * for the association value or each value of collection valued association.
+     *
+     * @param string $metaPropertyName
+     */
+    public function removeMetaProperty($metaPropertyName)
+    {
+        unset($this->metaProperties[$metaPropertyName]);
+    }
+
+    /**
+     * Gets metadata for all links that applicable
+     * for the association value or each value of collection valued association.
+     *
+     * @return LinkMetadataInterface[] [link name => LinkMetadataInterface, ...]
+     */
+    public function getLinks()
+    {
+        return $this->links;
+    }
+
+    /**
+     * Checks whether metadata of the given link that applicable
+     * for the association value or each value of collection valued association exists.
+     *
+     * @param string $linkName
+     *
+     * @return bool
+     */
+    public function hasLink($linkName)
+    {
+        return isset($this->links[$linkName]);
+    }
+
+    /**
+     * Gets metadata of a link that applicable
+     * for the association value or each value of collection valued association.
+     *
+     * @param string $linkName
+     *
+     * @return LinkMetadataInterface|null
+     */
+    public function getLink($linkName)
+    {
+        if (!isset($this->links[$linkName])) {
+            return null;
+        }
+
+        return $this->links[$linkName];
+    }
+
+    /**
+     * Adds metadata of a link that applicable
+     * for the association value or each value of collection valued association.
+     *
+     * @param string                $name
+     * @param LinkMetadataInterface $link
+     *
+     * @return LinkMetadataInterface
+     */
+    public function addLink(string $name, LinkMetadataInterface $link)
+    {
+        $this->links[$name] = $link;
+
+        return $link;
+    }
+
+    /**
+     * Removes metadata of a link that applicable
+     * for the association value or each value of collection valued association.
+     *
+     * @param string $linkName
+     */
+    public function removeLink($linkName)
+    {
+        unset($this->links[$linkName]);
+    }
+
+    /**
+     * Gets metadata for all meta properties that applicable for a whole association.
+     *
+     * @return MetaAttributeMetadata[] [meta property name => MetaAttributeMetadata, ...]
+     */
+    public function getRelationshipMetaProperties()
+    {
+        return $this->relationshipMetaProperties;
+    }
+
+    /**
+     * Checks whether metadata of the given meta property that applicable for a whole association exists.
+     *
+     * @param string $metaPropertyName
+     *
+     * @return bool
+     */
+    public function hasRelationshipMetaProperty($metaPropertyName)
+    {
+        return isset($this->relationshipMetaProperties[$metaPropertyName]);
+    }
+
+    /**
+     * Gets metadata of a meta property that applicable for a whole association.
+     *
+     * @param string $metaPropertyName
+     *
+     * @return MetaAttributeMetadata|null
+     */
+    public function getRelationshipMetaProperty($metaPropertyName)
+    {
+        if (!isset($this->relationshipMetaProperties[$metaPropertyName])) {
+            return null;
+        }
+
+        return $this->relationshipMetaProperties[$metaPropertyName];
+    }
+
+    /**
+     * Adds metadata of a meta property that applicable for a whole association.
+     *
+     * @param MetaAttributeMetadata $metaProperty
+     *
+     * @return MetaAttributeMetadata
+     */
+    public function addRelationshipMetaProperty(MetaAttributeMetadata $metaProperty)
+    {
+        $this->relationshipMetaProperties[$metaProperty->getName()] = $metaProperty;
+
+        return $metaProperty;
+    }
+
+    /**
+     * Removes metadata of a meta property that applicable for a whole association.
+     *
+     * @param string $metaPropertyName
+     */
+    public function removeRelationshipMetaProperty($metaPropertyName)
+    {
+        unset($this->relationshipMetaProperties[$metaPropertyName]);
+    }
+
+    /**
+     * Gets metadata for all links that applicable for a whole association.
+     *
+     * @return LinkMetadataInterface[] [link name => LinkMetadataInterface, ...]
+     */
+    public function getRelationshipLinks()
+    {
+        return $this->relationshipLinks;
+    }
+
+    /**
+     * Checks whether metadata of the given link that applicable for a whole association exists.
+     *
+     * @param string $linkName
+     *
+     * @return bool
+     */
+    public function hasRelationshipLink($linkName)
+    {
+        return isset($this->relationshipLinks[$linkName]);
+    }
+
+    /**
+     * Gets metadata of a link that applicable for a whole association.
+     *
+     * @param string $linkName
+     *
+     * @return LinkMetadataInterface|null
+     */
+    public function getRelationshipLink($linkName)
+    {
+        if (!isset($this->relationshipLinks[$linkName])) {
+            return null;
+        }
+
+        return $this->relationshipLinks[$linkName];
+    }
+
+    /**
+     * Adds metadata of a link that applicable for a whole association.
+     *
+     * @param string                $name
+     * @param LinkMetadataInterface $link
+     *
+     * @return LinkMetadataInterface
+     */
+    public function addRelationshipLink(string $name, LinkMetadataInterface $link)
+    {
+        $this->relationshipLinks[$name] = $link;
+
+        return $link;
+    }
+
+    /**
+     * Removes metadata of a link that applicable for a whole association.
+     *
+     * @param string $linkName
+     */
+    public function removeRelationshipLink($linkName)
+    {
+        unset($this->relationshipLinks[$linkName]);
     }
 }

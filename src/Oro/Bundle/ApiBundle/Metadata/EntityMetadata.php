@@ -12,6 +12,7 @@ use Oro\Component\PhpUtils\ReflectionUtil;
  * The metadata for an entity.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class EntityMetadata implements ToArrayInterface
 {
@@ -29,6 +30,9 @@ class EntityMetadata implements ToArrayInterface
 
     /** @var MetaPropertyMetadata[] */
     private $metaProperties = [];
+
+    /** @var LinkMetadataInterface[] */
+    private $links = [];
 
     /** @var FieldMetadata[] */
     private $fields = [];
@@ -55,6 +59,7 @@ class EntityMetadata implements ToArrayInterface
             }
         }
         $this->metaProperties = ConfigUtil::cloneObjects($this->metaProperties);
+        $this->links = ConfigUtil::cloneObjects($this->links);
         $this->fields = ConfigUtil::cloneObjects($this->fields);
         $this->associations = ConfigUtil::cloneObjects($this->associations);
     }
@@ -85,34 +90,21 @@ class EntityMetadata implements ToArrayInterface
         if (!empty($identifiers)) {
             $result['identifiers'] = $identifiers;
         }
-        $metaProperties = $this->convertPropertiesToArray($this->metaProperties);
+        $metaProperties = ConfigUtil::convertPropertiesToArray($this->metaProperties);
         if (!empty($metaProperties)) {
             $result['meta_properties'] = $metaProperties;
         }
-        $fields = $this->convertPropertiesToArray($this->fields);
+        $links = ConfigUtil::convertPropertiesToArray($this->links);
+        if (!empty($links)) {
+            $result['links'] = $links;
+        }
+        $fields = ConfigUtil::convertPropertiesToArray($this->fields);
         if (!empty($fields)) {
             $result['fields'] = $fields;
         }
-        $associations = $this->convertPropertiesToArray($this->associations);
+        $associations = ConfigUtil::convertPropertiesToArray($this->associations);
         if (!empty($associations)) {
             $result['associations'] = $associations;
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param ToArrayInterface[] $properties
-     *
-     * @return array
-     */
-    private function convertPropertiesToArray(array $properties)
-    {
-        $result = [];
-        foreach ($properties as $name => $property) {
-            $data = $property->toArray();
-            unset($data['name']);
-            $result[$name] = $data;
         }
 
         return $result;
@@ -370,7 +362,7 @@ class EntityMetadata implements ToArrayInterface
     }
 
     /**
-     * Renames existing meta property
+     * Renames existing meta property.
      *
      * @param string $oldName
      * @param string $newName
@@ -383,6 +375,69 @@ class EntityMetadata implements ToArrayInterface
             $metadata->setName($newName);
             $this->addMetaProperty($metadata);
         }
+    }
+
+    /**
+     * Gets metadata for all links.
+     *
+     * @return LinkMetadataInterface[] [link name => LinkMetadataInterface, ...]
+     */
+    public function getLinks()
+    {
+        return $this->links;
+    }
+
+    /**
+     * Checks whether metadata of the given link exists.
+     *
+     * @param string $linkName
+     *
+     * @return bool
+     */
+    public function hasLink($linkName)
+    {
+        return isset($this->links[$linkName]);
+    }
+
+    /**
+     * Gets metadata of a link.
+     *
+     * @param string $linkName
+     *
+     * @return LinkMetadataInterface|null
+     */
+    public function getLink($linkName)
+    {
+        if (!isset($this->links[$linkName])) {
+            return null;
+        }
+
+        return $this->links[$linkName];
+    }
+
+    /**
+     * Adds metadata of a link.
+     *
+     * @param string                $name
+     * @param LinkMetadataInterface $link
+     *
+     * @return LinkMetadataInterface
+     */
+    public function addLink(string $name, LinkMetadataInterface $link)
+    {
+        $this->links[$name] = $link;
+
+        return $link;
+    }
+
+    /**
+     * Removes metadata of a link.
+     *
+     * @param string $linkName
+     */
+    public function removeLink($linkName)
+    {
+        unset($this->links[$linkName]);
     }
 
     /**

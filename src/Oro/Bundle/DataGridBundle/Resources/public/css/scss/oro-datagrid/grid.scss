@@ -152,6 +152,7 @@
         }
     }
 
+    &.row-edit-mode,
     &:hover {
         background-color: $oro-datagrid-cell-background-hover;
     }

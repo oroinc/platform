@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Component\ChainProcessor\ToArrayInterface;
 use Oro\Component\EntitySerializer\ConfigUtil as BaseConfigUtil;
 
 /**
@@ -144,10 +145,17 @@ class ConfigUtil extends BaseConfigUtil
     public const COLLECTION = 'collection';
 
     /**
+     * a key inside a record contains an additional information about a collection of primary objects
+     * that is used to specify the current page number
+     * @see \Oro\Component\EntitySerializer\ConfigUtil::INFO_RECORD_KEY
+     */
+    public const PAGE_NUMBER = 'page_number';
+
+    /**
      * Gets a native PHP array representation of each object in a given array.
      *
-     * @param object[] $objects
-     * @param bool     $treatEmptyAsNull
+     * @param ToArrayInterface[] $objects
+     * @param bool               $treatEmptyAsNull
      *
      * @return array
      */
@@ -161,6 +169,25 @@ class ConfigUtil extends BaseConfigUtil
             } elseif ($treatEmptyAsNull) {
                 $result[$key] = null;
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Gets a native PHP array representation of each property object in a given array.
+     *
+     * @param ToArrayInterface[] $properties
+     *
+     * @return array
+     */
+    public static function convertPropertiesToArray(array $properties)
+    {
+        $result = [];
+        foreach ($properties as $name => $property) {
+            $data = $property->toArray();
+            unset($data['name']);
+            $result[$name] = $data;
         }
 
         return $result;

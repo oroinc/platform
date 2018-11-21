@@ -6,6 +6,8 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Filter\FilterNames;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
@@ -15,6 +17,7 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 
 class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
 {
@@ -30,7 +33,16 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
 
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
-        $this->processor = new CorrectSortValue($this->doctrineHelper, $this->valueNormalizer);
+        $filterNames = $this->createMock(FilterNames::class);
+        $filterNames->expects(self::any())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
+        $this->processor = new CorrectSortValue(
+            $this->doctrineHelper,
+            $this->valueNormalizer,
+            new FilterNamesRegistry([[$filterNames, null]], new RequestExpressionMatcher())
+        );
     }
 
     /**

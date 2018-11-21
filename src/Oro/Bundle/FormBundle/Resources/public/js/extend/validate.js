@@ -69,7 +69,7 @@ define(function(require) {
      */
     function getErrorTarget(element) {
         var $target = $(validationBelongs(element));
-        var $widgetContainer = $target.inputWidget('container');
+        var $widgetContainer = $target.inputWidget('getContainer');
         if ($widgetContainer) {
             $target = $widgetContainer;
         }

@@ -7,7 +7,7 @@
         margin-top: $note-item-margin-top;
 
         .list-item {
-            padding: $content-padding-medium;
+            padding: $note-message-list-item-offset;
             display: inline-block;
 
             .visual {
@@ -31,6 +31,7 @@
                     margin-top: $note-avatar-margin-vertical;
                     text-align: center;
                     line-height: $note-avatar-size;
+                    color: $note-avatar-color;
                 }
             }
 
@@ -158,7 +159,7 @@
             .accordion-body {
                 .message {
                     display: none;
-                    padding-top: $content-padding-small;
+                    padding-top: $content-padding-small / 2;
                     overflow-x: auto;
                 }
 

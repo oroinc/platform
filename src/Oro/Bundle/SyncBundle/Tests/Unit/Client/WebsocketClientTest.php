@@ -16,7 +16,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
     /** @var WampClientFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $wampClientFactory;
 
-    /** @var ClientAttributes|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ClientAttributes|\PHPUnit\Framework\MockObject\MockObject */
     private $clientAttributes;
 
     /** @var TicketProviderInterface|\PHPUnit\Framework\MockObject\MockObject */

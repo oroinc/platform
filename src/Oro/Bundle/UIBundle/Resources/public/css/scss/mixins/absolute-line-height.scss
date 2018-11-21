@@ -1,0 +1,14 @@
+/* @theme: admin.oro; */
+
+@function absolute-line-height($font-size, $line-height: 1.2) {
+    $line-unit: unit($line-height);
+    $line-value: $line-height / ($line-height * 0 + 1);
+
+    @if $line-unit == "" or $line-unit == "em" {
+        @return $line-value * $font-size;
+    } @else if $line-unit == "%"  {
+        @return ($line-value / 100) * $font-size;
+    } @else {
+        @return $line-height;
+    }
+}

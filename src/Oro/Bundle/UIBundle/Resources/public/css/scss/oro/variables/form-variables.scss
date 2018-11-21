@@ -9,7 +9,7 @@ $input-inner-offset: 4px 6px !default;
 $input-box-shadow: none !default;
 $input-font-family: $font-family-sans-serif !default;
 $input-color: $primary-200 !default;
-$input-outer-offset-bottom: 10px !default;
+$input-outer-offset-bottom: 8px !default;
 $input-control-group-outer-offset-bottom: 0 !default;
 $input-box-sizing: border-box !default;
 $input-outline: none !default;
@@ -72,7 +72,7 @@ $select-multiple-option-checked-color: $primary-400 !default;
 
 $select-multiple-option-active-box-shadow: 0 0 0 32px $input-focus-border-color inset !default;
 
-$select-width: $field-width - 15px !default;
+$select-width: $field-width - 28px !default;
 $selector-line-height: $field-size !default;
 $selector-height: $field-size !default;
 $selector-width: 235px !default;
@@ -94,11 +94,12 @@ $selector-select-color: $primary-200 !default;
 
 $selector-uniform-display: block !default;
 $selector-uniform-box-sizing: border-box !default;
-$selector-uniform-inner-offset: side-values(0 5px 0 8px) !default;
+$selector-uniform-inner-offset: side-values(0 20px 0 6px) !default;
 $selector-uniform-white-space: nowrap !default;
 $selector-uniform-overflow: hidden !default;
 $selector-uniform-text-overflow: ellipsis !default;
 $selector-uniform-position: relative !default;
+$selector-uniform-font-size: 100% !default;
 
 $selector-uniform-arrow-outer-offset: side-values(3px 3px 0 0) !default;
 $selector-uniform-arrow-display: inline-block !default;
