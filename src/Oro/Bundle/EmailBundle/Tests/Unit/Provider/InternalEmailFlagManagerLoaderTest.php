@@ -50,9 +50,9 @@ class InternalEmailFlagManagerLoaderTest extends \PHPUnit\Framework\TestCase
 
     public function testSelect()
     {
-        /** @var EmailFolder|\PHPUnit_Framework_MockObject_MockObject $emailFolder */
+        /** @var EmailFolder|\PHPUnit\Framework\MockObject\MockObject $emailFolder */
         $emailFolder = $this->createMock(EmailFolder::class);
-        /** @var OroEntityManager|\PHPUnit_Framework_MockObject_MockObject $em */
+        /** @var OroEntityManager|\PHPUnit\Framework\MockObject\MockObject $em */
         $em = $this->createMock(OroEntityManager::class);
 
         $this->assertInstanceOf(InternalEmailFlagManager::class, $this->loader->select($emailFolder, $em));

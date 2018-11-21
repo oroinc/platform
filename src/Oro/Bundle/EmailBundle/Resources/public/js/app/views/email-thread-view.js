@@ -16,13 +16,13 @@ define(function(require) {
 
         events: {
             'click .email-view-toggle-all': 'onToggleAllClick',
-            'click .email-load-more': 'onLoadMoreClick',
+            'click [data-role="email-load-more"]': 'onLoadMoreClick',
             'shown.bs.dropdown .email-detailed-info-table.dropdown': 'onDetailedInfoOpen'
         },
 
         selectors: {
             emailItem: '.email-info',
-            loadMore: '.email-load-more',
+            loadMore: '[data-role="email-load-more"]',
             toggleAll: '.email-view-toggle-all'
         },
 

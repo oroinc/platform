@@ -119,6 +119,7 @@ define(function(require) {
                 delay: constants.WIDGET_SORT_DELAY,
                 revert: true,
                 tolerance: 'pointer',
+                handle: '[data-role="sidebar-widget-icon"]',
                 start: function(event, ui) {
                     var model = this.collection.get(ui.item.data('cid'));
                     if (model) {

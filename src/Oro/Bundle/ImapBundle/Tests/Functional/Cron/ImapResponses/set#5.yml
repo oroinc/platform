@@ -7,4 +7,4 @@ log_info:
     - 'An email origin was not found.'
 total: 0
 data: []
-errors: ~
+expectedEmailData: ~

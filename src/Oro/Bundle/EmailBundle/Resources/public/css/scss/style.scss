@@ -187,39 +187,82 @@
         }
 
         .form-horizontal {
-            .control-group {
-                max-width: none;
+            width: 636px;
+            margin: auto;
 
+            .control-group {
                 .controls {
                     .validation-failed {
                         margin-left: 14px;
                     }
+
+                    input,
+                    textarea,
+                    .select2-container,
+                    .validate-group {
+                        width: 100%;
+                        max-width: 100%;
+                    }
+
+                    textarea {
+                        height: 200px;
+                    }
+
+                    .choice-widget-expanded__item {
+                        display: inline-block;
+                        margin-bottom: 0;
+
+                        &:not(:last-child) {
+                            margin-right: 5px;
+                        }
+                    }
+
+                    &:first-child {
+                        margin-left: 120px;
+                    }
+
+                    .dropup {
+                        padding-right: 4px;
+
+                        .attachment-list-popup {
+                            width: 290px;
+                            margin-left: -70px;
+                        }
+                    }
+
+                    .divider {
+                        padding-left: 6px;
+
+                        border-left: 1px solid $primary-700;
+                    }
+                }
+
+                > .control-label {
+                    width: 96px;
                 }
             }
         }
 
-        input[type=radio] {
-            width: auto;
+        .control-group-collection {
+            margin-bottom: 16px;
         }
-    }
-
-    pre.email-body,
-    iframe.email-body,
-    .email-form textarea {
-        height: 200px;
     }
 }
 
 .select2-container.select2-container-multi.taggable-email {
     ul.select2-choices {
-        padding-right: 60px;
+        padding-right: 70px;
     }
 }
 
 .cc-bcc-holder {
     position: absolute;
-    top: 5px;
-    right: 0;
+    top: 0;
+    bottom: 0;
+    right: 8px;
+    line-height: 18px;
+    height: 18px;
+    margin: auto;
 
     .showCc,
     .showBcc {
@@ -232,13 +275,6 @@
     }
 }
 
-.icon-email-thread {
-    background: url(../../img/icon-email-thread.png);
-    width: 21px;
-    height: 18px;
-    display: inline-block;
-}
-
 .icon.grid {
     display: inline-block;
 
@@ -247,26 +283,6 @@
 
 span.icon.grid .fa-paperclip {
     font-size: 21px;
-}
-
-.thread-view {
-    .email-load-more {
-        border-bottom: 1px solid #e5e5e5;
-
-        @include load-more-items(#e5e5e5, #f5f5f5, #888);
-
-        &.process {
-            .load-more-label {
-                @include process('../../../oroui/img/loader-16.gif');
-
-                &:after {
-                    background-color: #f5f5f5;
-                    background-position: center center;
-                    padding-left: 10px;
-                }
-            }
-        }
-    }
 }
 
 .email-thread-action-panel {
@@ -281,101 +297,94 @@ span.icon.grid .fa-paperclip {
 }
 
 .email-info {
-    border-bottom: 1px solid #e5e5e5;
+    .email-header {
+        padding: $email-header-offset;
 
-    &:last-child {
-        border-bottom: none;
+        @include clearfix();
     }
 
     .email-recipient {
         white-space: nowrap;
     }
 
-    .email-participants {
-        margin-right: 150px;
+    .email-actions {
+        float: $end;
+
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+
+        color: $email-actions-color;
     }
 
-    .email-sent-date {
-        display: inline-block;
-        float: #{$end};
-        padding: 5px 18px;
-
-        text-align: #{$end};
-
-        color: $primary-550;
+    .email-contexts-targets {
+        float: $start;
+        padding-#{$end}: $email-actions-offset;
     }
 
     .comment-count {
-        margin-right: 5px;
+        margin-#{$end}: $email-comment-count-offset;
+
+        @include fa-icon($email-comment-count-icon);
     }
 
     .email-has-attachment {
-        font-size: 1.3em;
-        margin-right: .5em;
+        margin-#{$end}: $email-attachmen-offset;
+
+        @include fa-icon($email-attachment-icon)
     }
 
     .email-content {
-        padding: 0 15px 10px;
-        margin: 0;
+        @include clearfix();
     }
 
     .email-view-toggle {
         cursor: pointer;
-        display: inline-block;
-        padding: 10px 15px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    &:only-child {
-        .email-view-toggle {
-            padding: 0 0 10px;
-        }
-
-        .email-content {
-            padding: 0 0 10px;
-        }
+        padding: $email-view-toggle-offset;
     }
 
     .email-recipients {
-        color: #888;
+        color: $email-recipients-color;
+
     }
 
     .email-short {
-        background-color: #f5f5f5;
+        padding: $email-short-padding;
 
-        .email-recipients {
-            font-style: italic;
+        background-color: $email-short-background-color;
+        border-bottom: $email-short-border;
+        color: $email-short-color;
+
+        .email-sent-date {
+            margin-bottom: $email-short-sent-date-margin;
+
+            @include clearfix();
+        }
+
+        .email-author {
+            font-weight: $email-short-author-font-weight;
+
+            color: $email-short-author-color;
+        }
+
+        .comment-date {
+            float: $end;
+
+            font-size: $email-short-comment-date-font-size;
         }
 
         .email-body {
-            color: #888;
-            margin: 2px 150px 0 0;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-
-            &:after {
-                content: '\2026';
-            }
-        }
-
-        .email-sent-date {
-            padding: 11px 0;
-            color: #888;
-            font-style: normal;
+            @include text-line-truncate()
         }
     }
 
     .email-full {
         display: none;
 
+        @include clearfix();
+
         .email-author {
             font-weight: bold;
-        }
-
-        .email-view-toggle {
-            padding-bottom: 9px;
         }
 
         .email-body {
@@ -386,9 +395,39 @@ span.icon.grid .fa-paperclip {
                 overflow: auto;
             }
         }
+
+        .email-sent-date {
+            padding-#{$end}: $email-sent-date-offset;
+        }
+    }
+
+    // first short email
+    &:first-child:not(.in) {
+        padding-top: $email-info-short-first-offset;
+    }
+
+    // next full email after short email or load-more button
+    & + &.in {
+        padding-top: $email-info-opened-first-offset;
+    }
+
+    // next full email after load-more button
+    @at-root .load-more + .email-info.in {
+        padding-top: $email-info-opened-first-offset;
     }
 
     &.in {
+        padding-bottom: $email-info-in-offset;
+
+        @at-root .list-item:last-child .email-info.in:last-child {
+            padding-bottom: 0;
+        }
+
+        &:not(:only-child):not(:last-child) {
+
+            border-bottom: 1px solid $email-info-in-border-color;
+        }
+
         .email-short {
             display: none;
         }
@@ -536,129 +575,6 @@ span.icon.grid .fa-paperclip {
     }
 }
 
-.responsive-section {
-    .email-content {
-        .responsive-cell {
-            padding-left: 0;
-            padding-right: 15px;
-            margin-bottom: 0 !important; /* overrides activity list widget styles */
-        }
-
-        .responsive-cell:only-child,
-        .responsive-cell:last-child {
-            padding-right: 0;
-        }
-    }
-
-    &.responsive-small {
-        .responsive-cell {
-            padding-right: 0;
-        }
-    }
-
-    &.responsive-small {
-        .email-content {
-            .responsive-cell:not(:last-child) {
-                margin-bottom: 20px !important; /* overrides activity list widget styles */
-            }
-        }
-    }
-}
-
-.accordion-body .email-info {
-    &:last-child .email-content {
-        padding-bottom: 0;
-    }
-}
-
-.email-detailed-info-table {
-    display: inline-block;
-
-    .dropdown-toggle {
-        cursor: pointer;
-        font-size: 14px;
-        color: #b3b3b3;
-        padding: 0 3px;
-
-        &:hover {
-            color: #888;
-        }
-    }
-
-    .dropdown-menu {
-        padding: 8px 10px 2px 0;
-        margin-left: -16px;
-        margin-top: 3px;
-
-        &:before {
-            content: '';
-            display: inline-block;
-            border-left: 7px solid transparent;
-            border-right: 7px solid transparent;
-            border-bottom: 7px solid #ccc;
-            border-bottom-color: rgba(0, 0, 0, .2);
-            position: absolute;
-            top: -7px;
-            left: 19px;
-        }
-
-        &:after {
-            content: '';
-            display: inline-block;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-bottom: 6px solid #fff;
-            position: absolute;
-            top: -6px;
-            left: 20px;
-        }
-
-        &.fixed-width .controls {
-            white-space: normal;
-        }
-
-        ul {
-            margin: 0;
-            list-style: none;
-        }
-
-        .form-horizontal .control-group {
-            margin-bottom: 0;
-
-            label.control-label {
-                width: 70px;
-            }
-
-            .controls {
-                margin-left: 80px;
-            }
-        }
-    }
-
-    .control-group {
-        label.control-label,
-        .controls {
-            color: #777;
-            margin-bottom: 5px;
-            padding-top: .3px;
-            line-height: 1.4em;
-            white-space: nowrap;
-
-            b {
-                color: #444;
-            }
-        }
-
-        label.control-label {
-            width: 70px;
-        }
-
-        .controls {
-            margin-left: 80px;
-        }
-    }
-}
-
 .forged-required label em {
     color: #c30b25;
     font-size: 15px;
@@ -671,7 +587,7 @@ span.icon.grid .fa-paperclip {
     margin-right: 16px;
 
     span.filename-label {
-        color: #006acc;
+        color: $secondary;
     }
 
     i.fa-close {
@@ -698,7 +614,7 @@ a.attachment .icon .fa-link {
 }
 
 .control-group .email-body-action {
-    margin-right: 15px;
+    margin-#{$end}: 15px;
 }
 
 .dropdown.link-to-record {
@@ -753,7 +669,9 @@ a.attachment .icon .fa-link {
 }
 
 .email-body-actions .attach-file {
-    font-weight: normal !important;
+    &:after {
+        display: none;
+    }
 }
 
 .attachment-list-popup .attachment-list-content {

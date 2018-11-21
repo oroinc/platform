@@ -36,7 +36,7 @@ define(function(require) {
                 '<div class="dropleft">' +
                     '<a class="dropdown-toggle" href="#" role="button" id="<%- togglerId %>" data-toggle="dropdown" ' +
                         'aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>">' +
-                        '<span class="fa-ellipsis-h" aria-hidden="true"></span>' +
+                        '<span class="icon fa-ellipsis-h" aria-hidden="true"></span>' +
                     '</a>' +
                     '<ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu" ' +
                         'aria-labelledby="<%- togglerId %>"></ul>' +

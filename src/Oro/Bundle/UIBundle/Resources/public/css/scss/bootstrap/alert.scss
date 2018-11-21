@@ -1,0 +1,117 @@
+/* @theme: admin.oro; */
+@import "bowerassets/bootstrap/scss/alert";
+
+.alert {
+    min-height: $alert-min-height;
+    font-size: $alert-font-size;
+    line-height: $alert-line-height;
+    text-shadow: $alert-text-shadow;
+
+    .message {
+        text-align: $alert-message-text-align;
+    }
+
+    .close {
+        font-size: $alert-close-font-size;
+        line-height: $alert-close-line-height;
+        text-shadow: $alert-close-text-shadow;
+        color: $alert-close-color;
+        padding: $alert-close-inner-offset;
+        position: $alert-close-position;
+        #{$end}: $alert-close-right;
+        opacity: $alert-close-opacity;
+
+        &:hover {
+            color: $alert-close-hover-color;
+        }
+    }
+
+    &-icon {
+        padding-left: $alert-icon-inner-offset-left;
+
+        &:before {
+            font-family: $alert-icon-font-family;
+            font-size: $alert-icon-font-size;
+            line-height: $alert-icon-line-height;
+            position: $alert-icon-position;
+            top: $alert-icon-top;
+            #{$start}: $alert-icon-left;
+        }
+    }
+
+    &-dismissible {
+        padding-right: $alert-dismissible-inner-offset-right;
+    }
+
+    &-danger,
+    &-error {
+        background: $alert-danger-background;
+        color: $alert-danger-color;
+        border-color: $alert-danger-border-color;
+
+        .close {
+            color: $alert-danger-close-color;
+        }
+
+        &.alert-icon {
+            &:before {
+                content: $alert-danger-icon-content;
+                color: $alert-danger-icon-color;
+            }
+        }
+    }
+
+    &-process,
+    &-warning {
+        background: $alert-warning-background;
+        color: $alert-warning-color;
+        border-color: $alert-warning-border-color;
+
+        .close {
+            color: $alert-warning-close-color;
+        }
+
+        &.alert-icon {
+            &:before {
+                content: $alert-warning-icon-content;
+                color: $alert-warning-icon-color;
+            }
+        }
+    }
+
+    &-info {
+        background: $alert-info-background;
+        color: $alert-info-color;
+        border-color: $alert-info-border-color;
+
+        .close {
+            color: $alert-info-close-color;
+        }
+
+        &.alert-icon {
+            padding-left: $alert-info-icon-inner-offset-left;
+
+            &:before {
+                content: $alert-info-icon-content;
+                color: $alert-info-icon-color;
+            }
+        }
+    }
+
+    &-success {
+        background: $alert-success-background;
+        color: $alert-success-color;
+        border-color: $alert-success-border-color;
+
+        .close {
+            color: $alert-success-close-color;
+        }
+
+        &.alert-icon {
+            &:before {
+                content: $alert-success-icon-content;
+                color: $alert-success-icon-color;
+            }
+        }
+    }
+}
