@@ -422,7 +422,9 @@ class EnumSynchronizer
      */
     protected function fillOptionIds(array $values, array &$options)
     {
-        $ids = [];
+        $ids = array_map(function (AbstractEnumValue $value) {
+            return $value->getId();
+        }, $values);
         // Fill existing ids by given option ids or by value ids if labels are equal
         foreach ($options as &$option) {
             if ($this->isEmptyOption($option, 'id')) {
