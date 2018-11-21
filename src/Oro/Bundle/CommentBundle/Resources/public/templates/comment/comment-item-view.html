@@ -22,7 +22,7 @@
     <div class="comment-body"><%= message %></div>
     <% if (attachmentURL) { %>
     <div class="comment-attachments">
-        <div class="attachment-item attachment-item__note">
+        <div class="attachment-item attachment-item--note">
             <div class="thumbnail">
             <% if (attachmentThumbnail) { %>
                 <a href="<%- attachmentURL %>" data-gallery="comment-view-<%- relationId %>" class="no-hash" title="<%- attachmentFileName %>">
@@ -34,7 +34,7 @@
             </div>
             <div class="dropdown link-to-record">
                 <% var attachmentTogglerId = _.uniqueId('dropdown-') %>
-                <a class="no-hash dropdown-toggle dropdown-toggle--no-caret file-menu filename" id="<%- attachmentTogglerId %>" href="#" role="button"
+                <a class="no-hash dropdown-toggle dropdown-toggle--no-caret file-menu attachment-item__filename" id="<%- attachmentTogglerId %>" href="#" role="button"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="fa <%- attachmentIcon %>" aria-hidden="true"></span> <%- attachmentFileName %>
                 </a>

@@ -16,7 +16,7 @@
             <label class="control-label">
                 {{ 'Attachment'|trans }}
             </label>
-            <div class="attachment-item attachment-item__note">
+            <div class="attachment-item attachment-item--note">
                 <div class="thumbnail">
                     {% if attachment.attachmentThumbnail  %}
                         <a href="{{ attachment.attachmentURL }}" data-gallery="note-view-{{ entity.id }}" class="no-hash" title="{{ attachment.attachmentFileName }}">
@@ -28,7 +28,7 @@
                 </div>
                 <div class="dropdown link-to-record">
                     {% set togglerId = 'dropdown-'|uniqid %}
-                    <a id="{{ togglerId }}" class="no-hash filename dropdown-toggle dropdown-toggle--no-caret file-menu" href="#" role="button" data-toggle="dropdown"
+                    <a id="{{ togglerId }}" class="no-hash attachment-item__filename dropdown-toggle dropdown-toggle--no-caret file-menu" href="#" role="button" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false">
                         <span class="fa {{ attachment.attachmentIcon }}" aria-hidden="true"></span> {{ attachment.attachmentFileName }}
                     </a>
