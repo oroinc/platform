@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroHiddenNumberType;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
@@ -23,10 +24,10 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->numberFormatter = $this->createMock(NumberFormatter::class);
         $this->formType = new OroHiddenNumberType($this->numberFormatter);
+
+        parent::setUp();
 
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -52,7 +53,7 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
             ->with(\NumberFormatter::GROUPING_USED)
             ->willReturn(true);
 
-        $form = $this->factory->create($this->formType);
+        $form = $this->factory->create(OroHiddenNumberType::class);
         $form->setData('12345.67890');
 
         self::assertSame('12.345,679', $form->createView()->vars['value']);
@@ -68,7 +69,7 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
             ->with(\NumberFormatter::GROUPING_USED)
             ->willReturn(false);
 
-        $form = $this->factory->create($this->formType);
+        $form = $this->factory->create(OroHiddenNumberType::class);
         $form->setData('12345.67890');
 
         self::assertSame('12345.679', $form->createView()->vars['value']);
@@ -113,6 +114,21 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
                     'grouping' => false,
                 ],
             ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    OroHiddenNumberType::class => $this->formType
+                ],
+                []
+            ),
         ];
     }
 }
