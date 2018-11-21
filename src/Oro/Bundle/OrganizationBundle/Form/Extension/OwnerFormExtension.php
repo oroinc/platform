@@ -442,7 +442,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                     array_merge(
                         [
                             'class'                => BusinessUnit::class,
-                            'property'             => 'name',
+                            'choice_label'         => 'name',
                             'query_builder'        => function (BusinessUnitRepository $repository) use ($user) {
                                 $qb = $repository->createQueryBuilder('bu');
                                 $qb->andWhere($qb->expr()->isMemberOf(':user', 'bu.users'));
