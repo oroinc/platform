@@ -38,8 +38,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class OwnerFormExtension
- * Dependently on given entity metadata adds user or business unit owned field to a form and a set of events to handle them
+ * Dependently on entity metadata adds user or business unit owned field to a form and a set of events to handle them
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OwnerFormExtension extends AbstractTypeExtension
