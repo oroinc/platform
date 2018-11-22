@@ -263,14 +263,6 @@ select[multiple] {
     }
 }
 
-@-moz-document url-prefix() {
-    .selector {
-        span {
-            line-height: ($selector-select-line-height + 2px);
-        }
-    }
-}
-
 .add-on {
     vertical-align: $add-on-vertical-align;
 }
