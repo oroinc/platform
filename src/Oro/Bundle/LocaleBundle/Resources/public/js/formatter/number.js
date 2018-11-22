@@ -79,7 +79,7 @@ define(function(require) {
                 var currencyLayout = localeSettings.getCurrencyViewType() === 'symbol' ?
                     localeSettings.getCurrencySymbol(options.currency_code) : options.currency_code;
 
-                var isPrepend = localeSettings.isCurrencyPrepend();
+                var isPrepend = localeSettings.isCurrencySymbolPrepend();
 
                 if (localeSettings.getCurrencyViewType() !== 'symbol' && isPrepend) {
                     currencyLayout += '\u00A0';
