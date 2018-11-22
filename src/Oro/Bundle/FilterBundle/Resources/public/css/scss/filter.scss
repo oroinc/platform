@@ -350,10 +350,6 @@
             position: $filter-item-dropdown-toggle-position;
         }
 
-        .dropdown-menu {
-            min-width: $filter-item-dropdown-menu-min-width !important;
-        }
-
         & > .btn {
             height: $filter-item-btn-height;
             font-size: $filter-item-btn-font-size;
@@ -731,10 +727,6 @@
                 top: $number-range-filter-field-caret-top;
                 margin-top: $number-range-filter-field-caret-margin;
             }
-        }
-
-        .dropdown-menu {
-            min-width: 100%;
         }
     }
 

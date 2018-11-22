@@ -146,14 +146,15 @@ define(function(require) {
                 config.positionFixed = true;
                 config.modifiers.computeStyle = {
                     fn: function(data, options) {
-                        Popper.Defaults.modifiers.computeStyle.fn(data, options);
-
                         var popper = data.instance.popper;
                         var offset = data.offsets.popper;
 
                         if (inheritParentWidth === 'strictly' || offset.width < popper.parentElement.clientWidth) {
-                            data.styles.width = popper.parentElement.clientWidth;
+                            popper.style.width = popper.parentElement.clientWidth + 'px';
+                            _.extend(data.offsets.popper, _.pick(popper.parentElement.getBoundingClientRect(), 'left', 'right', 'width'));
                         }
+
+                        Popper.Defaults.modifiers.computeStyle.fn(data, options);
 
                         return data;
                     }
