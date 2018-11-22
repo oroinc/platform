@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var _  = require('underscore');
-    var $  = require('jquery');
+    var _ = require('underscore');
+    var $ = require('jquery');
     var mediator = require('oroui/js/mediator');
     var persistentStorage = require('oroui/js/persistent-storage');
 
