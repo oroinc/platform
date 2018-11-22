@@ -87,7 +87,7 @@
     }
 
     .action {
-        border-left: $input-border-width solid $input-border-color;
+        border-#{$start}: $input-border-width solid $input-border-color;
     }
 
     &.focus,

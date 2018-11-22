@@ -4,6 +4,7 @@
     margin-top: $attachment-file-offset-top;
     padding: $attachment-file-inner-offset;
     line-height: 1.3;
+    text-align: #{$start};
 
     @include text-line-truncate($attachment-section-width);
 
@@ -98,10 +99,6 @@
 
     &__filename {
         @include text-line-truncate(auto);
-
-        img {
-            text-indent: -9999px;
-        }
     }
 
     &__file-size {
