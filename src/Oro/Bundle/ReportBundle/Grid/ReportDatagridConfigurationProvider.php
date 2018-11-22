@@ -5,7 +5,6 @@ namespace Oro\Bundle\ReportBundle\Grid;
 use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
-use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
 use Oro\Bundle\ReportBundle\Entity\Report;
@@ -37,28 +36,20 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
     private $reportCacheManager;
 
     /**
-     * @var SystemAwareResolver
-     */
-    protected $resolver;
-
-    /**
      * @param ReportDatagridConfigurationBuilder $builder
      * @param ManagerRegistry                    $doctrine
      * @param Cache                              $reportCacheManager
-     * @param SystemAwareResolver                $resolver
      * @param string                             $prefixCacheKey
      */
     public function __construct(
         ReportDatagridConfigurationBuilder $builder,
         ManagerRegistry $doctrine,
         Cache $reportCacheManager,
-        SystemAwareResolver $resolver,
         $prefixCacheKey
     ) {
         $this->builder  = $builder;
         $this->doctrine = $doctrine;
         $this->reportCacheManager = $reportCacheManager;
-        $this->resolver = $resolver;
         $this->prefixCacheKey = $prefixCacheKey;
     }
 
@@ -83,7 +74,7 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
             $this->reportCacheManager->save($cacheKey, $config);
         }
 
-        return $this->resolver->resolve($gridName, $config);
+        return $config;
     }
 
     /**
