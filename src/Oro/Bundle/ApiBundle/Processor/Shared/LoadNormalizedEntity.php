@@ -79,6 +79,7 @@ class LoadNormalizedEntity implements ProcessorInterface
         $getContext->setVersion($context->getVersion());
         $getContext->getRequestType()->set($context->getRequestType());
         $getContext->setRequestHeaders($context->getRequestHeaders());
+        $getContext->setHateoas($context->isHateoasEnabled());
         $getContext->setClassName($context->getClassName());
         $getContext->setId($context->getId());
         if ($this->reuseExistingEntity && $context->hasResult()) {
@@ -105,8 +106,9 @@ class LoadNormalizedEntity implements ProcessorInterface
             }
         } else {
             $context->setConfigExtras($getContext->getConfigExtras());
-            if ($getContext->hasConfig()) {
-                $context->setConfig($getContext->getConfig());
+            $getConfig = $getContext->getConfig();
+            if (null !== $getConfig) {
+                $context->setConfig($getConfig);
             }
             $getConfigSections = $getContext->getConfigSections();
             foreach ($getConfigSections as $configSection) {
@@ -115,16 +117,18 @@ class LoadNormalizedEntity implements ProcessorInterface
                 }
             }
 
-            if ($getContext->hasMetadata()) {
-                $context->setMetadata($getContext->getMetadata());
+            $getMetadata = $getContext->getMetadata();
+            if (null !== $getMetadata) {
+                $context->setMetadata($getMetadata);
             }
 
-            $getResponseHeaders = $getContext->getResponseHeaders();
             $responseHeaders = $context->getResponseHeaders();
+            $getResponseHeaders = $getContext->getResponseHeaders();
             foreach ($getResponseHeaders as $key => $value) {
                 $responseHeaders->set($key, $value);
             }
 
+            $context->setInfoRecords($getContext->getInfoRecords());
             $context->setResult($getContext->getResult());
         }
     }

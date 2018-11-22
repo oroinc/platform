@@ -1,0 +1,13 @@
+/* @theme: admin.oro; */
+
+$more-bar-holder-toggle-offset: $oro-datagrid-body-cell-inner-offset !default;
+$more-bar-holder-icon-font-size: 15px !default;
+$more-bar-holder-line-height: absolute-line-height($oro-datagrid-font-size, $oro-datagrid-body-cell-line-height);
+
+$launchers-dropdown-menu-offset: 0 10px !default;
+
+$launchers-list-offset: 5px 0 !default;
+$launchers-list-at-dropdown-offset: 6px 0 !default;
+$launchers-list-action-color: $primary-700 !default;
+$launchers-list-action-color-hover: $primary-700 !default;
+$launchers-list-action-size: 26px !default;

@@ -1,0 +1,76 @@
+/* @theme: admin.oro; */
+
+.entity-create-or-select-container {
+    .entity-create-btn,
+    .entity-create-btn[disabled],
+    .entity-create-btn[disabled]:active {
+        padding: 0 6px;
+        margin-left: 3px;
+        height: 30px;
+    }
+
+    &.entity-create-multi-enabled {
+        .select2-container {
+            width: 215px;
+        }
+
+        .dropdown-menu {
+            li button {
+                padding: 2px 12px;
+                display: block;
+                clear: both;
+                font-weight: normal;
+                text-align: left;
+                white-space: nowrap;
+                background-color: transparent;
+                border: none;
+                margin: 0;
+                min-width: 100%;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: normal;
+            }
+        }
+    }
+
+    .btn-group.entity-create-dropdown {
+        display: inline-block;
+        vertical-align: top;
+        margin-#{$start}: $content-padding-small / 2;
+        border-radius: corner-values(0 4px 4px 0);
+
+        & > .btn {
+            font-size: 14px;
+        }
+    }
+}
+
+.entity-create-enabled {
+    .input-prepend .select2-container,
+    .input-append .select2-container {
+        width: 228px;
+    }
+}
+
+.entity-field-path {
+    > * {
+        &:before {
+            content: '/';
+            display: inline;
+            padding: 0 3px;
+        }
+
+        &:first-child {
+            &:before {
+                display: none;
+            }
+        }
+
+        &:last-child {
+            &:before {
+                content: '>';
+                font-weight: normal;
+            }
+        }
+    }
+}

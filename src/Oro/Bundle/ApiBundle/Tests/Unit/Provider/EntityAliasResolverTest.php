@@ -5,7 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasResolver;
-use Oro\Bundle\ApiBundle\Provider\EntityOverrideProvider;
+use Oro\Bundle\ApiBundle\Provider\MutableEntityOverrideProvider;
+use Oro\Bundle\EntityBundle\Exception\DuplicateEntityAliasException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 use Psr\Log\LoggerInterface;
@@ -15,7 +16,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasLoader */
     private $loader;
 
-    /** @var EntityOverrideProvider */
+    /** @var MutableEntityOverrideProvider */
     private $entityOverrideProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|Cache */
@@ -30,7 +31,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->loader = $this->createMock(EntityAliasLoader::class);
-        $this->entityOverrideProvider = new EntityOverrideProvider(['Test\Entity2' => 'Test\Entity1']);
+        $this->entityOverrideProvider = new MutableEntityOverrideProvider(['Test\Entity2' => 'Test\Entity1']);
         $this->cache = $this->createMock(Cache::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
@@ -39,7 +40,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
             $this->entityOverrideProvider,
             $this->cache,
             $this->logger,
-            true
+            ['api.yml']
         );
     }
 
@@ -240,5 +241,33 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
             'entity1_plural_alias',
             $this->entityAliasResolver->getPluralAlias('Test\Entity2')
         );
+    }
+
+    public function testShouldCreateCorrectStorage()
+    {
+        $this->expectException(DuplicateEntityAliasException::class);
+        $this->expectExceptionMessage(
+            'The alias "alias" cannot be used for the entity "Test\Entity2" because it is already '
+            . 'used for the entity "Test\Entity1". To solve this problem you can '
+            . 'use "entity_aliases" section in "Resources/config/oro/api.yml", '
+            . 'use "entity_aliases" or "entity_alias_exclusions" section in "Resources/config/oro/entity.yml" or '
+            . 'create a service to provide aliases for conflicting classes and register it '
+            . 'with "oro_entity.alias_provider" tag in DI container.'
+        );
+
+        $this->cache->expects(self::once())
+            ->method('fetch')
+            ->with('entity_aliases')
+            ->willReturn(false);
+        $this->loader->expects(self::once())
+            ->method('load')
+            ->willReturnCallback(
+                function (EntityAliasStorage $storage) {
+                    $storage->addEntityAlias('Test\Entity1', new EntityAlias('alias', 'plural_alias'));
+                    $storage->addEntityAlias('Test\Entity2', new EntityAlias('alias', 'plural_alias'));
+                }
+            );
+
+        $this->entityAliasResolver->getAll();
     }
 }

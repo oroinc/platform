@@ -1,0 +1,30 @@
+/* @theme: admin.oro; */
+
+$jstree-wrapper-position: relative !default;
+$jstree-wrapper-min-height: 200px !default;
+$jstree-wrapper-inner-offset: 10px 0 !default;
+$jstree-wrapper-width: 100% !default;
+
+$jstree-wrapper-title-display: flex !default;
+$jstree-wrapper-title-align-items: center !default;
+$jstree-wrapper-title-justify-content: space-between !default;
+
+$jstree-wrapper-label-display: flex !default;
+$jstree-wrapper-label-offset-top: 6px !default;
+$jstree-wrapper-label-offset-bottom: 8px !default;
+
+$jstree-wrapper-label-expanded-jstree-actions-display: inline-block !default;
+
+$jstree-wrapper-text-font-size: 18px !default;
+$jstree-wrapper-text-font-weight: bold !default;
+$jstree-wrapper-text-cursor: pointer !default;
+$jstree-wrapper-text-color: $primary-200 !default;
+
+$jstree-wrapper-checkbox-display: none !default;
+
+$jstree-wrapper-jstree-offset: 8px 0 !default;
+$jstree-wrapper-jstree-outline: none !default;
+
+$content-with-sidebar-jstree-wrapper-inner-offset: 0 $content-padding !default;
+$sidebar-container-content-with-sidebar-jstree-wrapper-overflow: auto !default;
+

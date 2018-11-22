@@ -1,0 +1,12 @@
+/* @theme: admin.oro; */
+
+$attribute-item-offset: 0 0 10px;
+
+$attribute-item-term-width: 40%;
+$attribute-item-term-max-width: 140px;
+$attribute-item-term-text-align: #{$start};
+
+$attribute-item-full-description-offset-bottom: $content-padding-medium;
+
+$attribute-item-description-offset-start: $content-padding-medium + $content-padding-small;
+$attribute-item-description-word-break: break-word;

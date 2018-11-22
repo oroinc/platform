@@ -40,9 +40,6 @@ class DetailedLogsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->config = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->nestedHandler = $this->getMockBuilder(HandlerInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $this->container = $this->getMockBuilder(ContainerInterface::class)->disableOriginalConstructor()->getMock();
         $this->container->expects($this->any())
@@ -51,7 +48,6 @@ class DetailedLogsHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         $this->handler = new DetailedLogsHandler();
-        $this->handler->setHandler($this->nestedHandler);
         $this->handler->setContainer($this->container);
     }
 
@@ -59,6 +55,12 @@ class DetailedLogsHandlerTest extends \PHPUnit\Framework\TestCase
     {
         /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cacheProvider */
         $cacheProvider = $this->getMockBuilder(CacheProvider::class)->getMock();
+
+        $cacheProvider->expects($this->once())
+            ->method('fetch')
+            ->with(Configuration::LOGS_LEVEL_KEY)
+            ->willReturn(false);
+
         $this->container
             ->expects($this->once())
             ->method('get')
@@ -77,14 +79,10 @@ class DetailedLogsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->handler->isHandling(['level' => Logger::WARNING]));
     }
 
-    public function testIsHandlingWithCache()
+    private function configureMethods()
     {
         /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cacheProvider */
         $cacheProvider = $this->getMockBuilder(CacheProvider::class)->getMock();
-        $cacheProvider->expects($this->once())
-            ->method('contains')
-            ->with(Configuration::LOGS_LEVEL_KEY)
-            ->willReturn(true);
 
         $cacheProvider->expects($this->once())
             ->method('fetch')
@@ -101,7 +99,60 @@ class DetailedLogsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->config->expects($this->never())->method('get');
         $this->container->expects($this->never())->method('hasParameter');
         $this->container->expects($this->never())->method('getParameter');
+    }
+
+    public function testIsHandlingWithCache()
+    {
+        $this->configureMethods();
 
         $this->assertTrue($this->handler->isHandling(['level' => Logger::WARNING]));
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Trying to execute method `Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler::write` which requires Handler to be set.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testHandleException()
+    {
+        $this->configureMethods();
+
+        $record = [
+            'message' => 'Some error message',
+            'context' => [],
+            'level' => Logger::WARNING,
+            'level_name' => Logger::WARNING,
+            'channel' => 'chanelName',
+            'datetime' => new \DateTime(),
+            'extra' => [],
+        ];
+
+        $this->handler->handle($record);
+    }
+
+    public function testHandle()
+    {
+        $this->configureMethods();
+
+        $record = [
+            'message' => 'Some error message',
+            'context' => [],
+            'level' => Logger::WARNING,
+            'level_name' => Logger::WARNING,
+            'channel' => 'chanelName',
+            'datetime' => new \DateTime(),
+            'extra' => [],
+        ];
+
+        $this->nestedHandler = $this->getMockBuilder(HandlerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->nestedHandler->expects($this->once())
+            ->method('handle');
+
+        $this->handler->setHandler($this->nestedHandler);
+        $this->handler->handle($record);
     }
 }

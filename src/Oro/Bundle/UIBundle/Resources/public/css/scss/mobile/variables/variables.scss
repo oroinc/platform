@@ -1,0 +1,22 @@
+/* @theme: admin.oro; */
+
+$accordion-heading-background-color: $primary-900;
+$content-padding: 16px;
+$content-padding-medium: 8px;
+$content-padding-small: $content-padding-medium / 2;
+$horizontal-padding: $content-padding;
+$vertical-padding: $content-padding;
+$top-padding: $content-padding;
+$bottom-padding: $content-padding;
+$margin-bottom-box: $content-padding;
+$base-font-size: 14px;
+$width-body-page-mobile: 320px;
+
+$base-font-size--xl: $base-font-size * 1.7145; // ~24px
+$base-font-size--l: $base-font-size * 1.25; // ~18px
+$base-font-size--s: $base-font-size * .85; // ~12px
+$base-font-size--m: $base-font-size * 1.15; // ~16px
+
+$headerHeight: 54px;
+
+$oro-mobile-header-zindex: 9999;

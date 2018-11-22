@@ -34,6 +34,7 @@ define(function(require) {
             expanded: false,
             hideDefaultLabel: true,
             fallbackWidth: 180,
+            statusActiveClass: 'active',
             selectors: {
                 status: '.fallback-status',
                 item: '.fallback-item',
@@ -46,15 +47,15 @@ define(function(require) {
             },
             icons: {
                 'new': {
-                    html: '<i class="fa-folder-o"></i>',
+                    html: '<span class="fa-language"></span>',
                     event: 'expandChildItems'
                 },
                 'edited': {
-                    html: '<i class="fa-folder"></i>',
+                    html: '<span class="fa-language"></span>',
                     event: 'expandChildItems'
                 },
                 'save': {
-                    html: '<i class="fa-folder-open"></i>',
+                    html: '<span class="fa-language"></span>',
                     event: 'collapseChildItems'
                 }
             }
@@ -322,7 +323,7 @@ define(function(require) {
          * @param {Boolean} enable
          */
         enableDisableFallback: function($fallback, enable) {
-            var $fallbackContainer = $fallback.inputWidget('container');
+            var $fallbackContainer = $fallback.inputWidget('getContainer');
 
             if (enable) {
                 $fallback.removeAttr('disabled');
@@ -506,7 +507,8 @@ define(function(require) {
 
             this.$el.find(this.options.selectors.status)
                 .html(icon.html)
-                .find('i').click(_.bind(this[icon.event], this));
+                .one('click' + this.eventNamespace(), _.bind(this[icon.event], this))
+                .toggleClass(this.options.statusActiveClass, this.options.expanded);
 
             var $defaultLabel = this.$el.find(this.options.selectors.defaultItem)
                 .find(this.options.selectors.itemLabel);

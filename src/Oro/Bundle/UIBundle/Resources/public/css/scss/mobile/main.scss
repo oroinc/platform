@@ -3,10 +3,10 @@
 .mobile-version {
     @import "variables";
     @import "app-header";
+    @import "attribute-item";
     @import "clearfix";
-    @import "dashboard";
+    @import "content-sidebar";
     @import "dialog";
-    @import "filter";
     @import "form";
     @import "layout";
     @import "form-description";
@@ -14,10 +14,13 @@
     @import "main-menu";
     @import "modal";
     @import "page-header";
-    @import "content-sidebar";
-    @import "scrollspy";
+    @import "accordion";
     @import "flash-messages";
     @import "inline-actions";
     @import "select2";
     @import "jstree";
+    @import "tables";
+    @import "scrollspy";
+    @import "popover";
+    @import "widget-picker";
 }

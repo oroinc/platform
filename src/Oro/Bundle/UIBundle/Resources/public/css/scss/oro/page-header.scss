@@ -1,0 +1,120 @@
+.page-title {
+    .top-row {
+        @include clearfix();
+    }
+
+    .nav {
+        margin: 0;
+    }
+
+    .sub-title {
+        font-size: $base-font-size--xl;
+        color: $primary-200;
+        display: inline-block;
+        margin-bottom: 3px;
+    }
+
+    .separator {
+        padding: 0 3px;
+        color: $primary-700;
+        font-size: $base-font-size--xl;
+    }
+
+    &__entity-title {
+        margin: side-values(0 10px 3px 0);
+        min-height: 15px;
+        display: inline-block;
+        float: none !important;
+        font-size: $base-font-size--xl;
+        font-weight: normal;
+    }
+
+    &__icon {
+        float: #{$start};
+        top: -2px;
+        position: relative;
+        width: $page-title-icon-offset;
+
+        &:empty {
+            @include fa-icon($page-title-icon, 'before', true) {
+                display: inline-block;
+                color: $primary-750;
+                margin-top: -7px;
+                font-size: $page-title-icon-size;
+                height: $page-title-icon-size;
+            }
+        }
+
+        img {
+            margin-top: 2px;
+            border-radius: $page-title-icon-border-radius;
+            width: $page-title-icon-size;
+        }
+    }
+
+    &__path {
+        line-height: 18px;
+        padding-top: 2px;
+    }
+
+    &__entity-info-state {
+        margin-#{$start}: 30px;
+    }
+
+    .inline,
+    .inline-decorate {
+        margin: 0;
+        padding: 0;
+
+        color: $primary-550;
+        list-style: none;
+
+        li {
+            padding: side-values(0 8px 0 0);
+            margin: side-values(0 2px 2px 0);
+            border-#{$end}: 1px solid $primary-700;
+            font-size: $base-font-size--s;
+            line-height: 14px;
+            display: inline-block;
+
+            &:last-child {
+                padding-#{$end}: 0;
+                border-#{$end}: 0;
+                margin-#{$end}: 0;
+            }
+
+            &:empty {
+                display: none;
+            }
+        }
+    }
+
+    > .navigation {
+        @include clearfix();
+    }
+}
+
+.customer-info-actions {
+    background-color: $primary-860;
+    border-bottom: 1px solid $additional-ultra-light;
+
+    .alert {
+        margin-bottom: 0;
+    }
+
+    .btn .caret {
+        margin-top: 10px;
+    }
+
+    .btn-group > .disable-filter {
+        height: 21px;
+        line-height: 21px;
+        padding: 3px 2px 0;
+    }
+}
+
+.pull-right.title-buttons-container {
+    > .pull-left {
+        float: none;
+    }
+}

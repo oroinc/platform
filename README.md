@@ -1,4 +1,4 @@
-# The OroPlatform
+# OroPlatform
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/oroinc/platform/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/oroinc/platform/?branch=master) [![Travis CI build status](https://travis-ci.org/oroinc/platform.svg?branch=master)](https://travis-ci.org/oroinc/platform)
 

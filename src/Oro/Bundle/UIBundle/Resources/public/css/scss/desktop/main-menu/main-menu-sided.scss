@@ -4,7 +4,7 @@
     position: relative;
 
     float: left;
-    width: 230px;
+    width: $menu-side-width;
     height: 100%;
     padding-bottom: 45px;
 
@@ -15,6 +15,7 @@
 
         .title {
             @include text-line-truncate();
+            display: block;
         }
 
         a {
@@ -23,6 +24,7 @@
     }
 
     .accordion-group {
+        width: $menu-side-width;
         margin-bottom: 0;
 
         border: none;
@@ -30,18 +32,19 @@
 
         .menu {
             margin: 0;
+            padding: 0;
 
             .title,
             .accordion-toggle {
                 color: $menu-item-text-color;
 
-                &::before {
+                &:before {
                     content: '';
 
                     display: inline-block;
                     height: 16px;
                     min-width: 16px;
-                    margin-right: 8px;
+                    margin-#{$end}: 8px;
 
                     font-weight: normal;
                     line-height: 1;
@@ -56,16 +59,14 @@
             .accordion-toggle {
                 font-weight: bold;
 
-                @include fa-icon($fa-var-angle-right);
-
-                &::before {
-                    transform: rotate(90deg);
+                @include fa-icon(if-ltr($menu-icon-right, $menu-icon-left), before, true) {
+                    transform: if-ltr(rotate(90deg), rotate(-90deg));
                 }
 
                 &.collapsed {
                     font-weight: normal;
 
-                    &::before {
+                    &:before {
                         transform: rotate(0);
                     }
                 }
@@ -73,7 +74,7 @@
 
             .title {
                 display: block;
-                padding: 7px 15px;
+                padding: 8px 15px;
 
                 &:hover {
                     background-color: $menu-background-color-active;
@@ -84,7 +85,7 @@
                     $selector: '&-level-' + $i;
 
                     #{$selector} {
-                        padding-left: $menu-title-offset *1px;
+                        padding-#{$start}: $menu-title-offset *1px;
                     }
 
                     $menu-title-offset: $menu-title-offset + 24;
@@ -116,15 +117,14 @@
     // First level
     .accordion-toggle.title-level-1 {
         position: relative;
-
-        padding: 12px 22px 12px 24px;
+        padding: side-values(12px 22px 12px 24px);
 
         background-color: $menu-dropdown-background-color-active;
         color: $menu-item-first-level-text-color;
 
         .menu-icon {
             min-width: 16px;
-            margin-right: 8px;
+            margin-#{$end}: 8px;
             margin-left: 0;
 
             text-align: center;
@@ -140,21 +140,15 @@
     }
 
     .scroller {
+        position: relative;
+
         height: calc(100% - #{$menu-header-height});
 
-        box-sizing: content-box;
-
-        overflow: auto;
-
-        direction: rtl;
-
-        > * {
-            direction: ltr;
-        }
+        overflow: hidden;
     }
 
     &.minimized {
-        width: 80px;
+        width: $menu-side-width-minimized;
 
         .unclickable {
             display: block;
@@ -167,6 +161,8 @@
         // First level
         .dropdown-level-1 {
             text-align: center;
+
+            width: $menu-side-width-minimized;
 
             .dropdown-menu {
 
@@ -211,7 +207,50 @@
         }
     }
 
-    .menu-icon {
-        display: none;
+    .main-menu {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+
+        width: 100%;
+        padding-#{$end}: 25px;
+
+        box-sizing: content-box;
+
+        overflow-y: auto;
+    }
+
+    &__scroll {
+        position: absolute;
+        #{$start}: 0;
+        z-index: 1;
+
+        width: 100%;
+        height: $menu-placeholder-size;
+
+        background-color: $menu-dropdown-background-color-active;
+
+        opacity: .85;
+
+        @extend %main-menu-trigger;
+
+        &:first-child {
+            top: 0;
+
+            @include fa-icon($menu-icon-up);
+        }
+
+        &:last-child {
+            bottom: 0;
+
+            @include fa-icon($menu-icon-down);
+        }
+
+        &:hover,
+        &:focus {
+            background-color: $menu-dropdown-background-color-light-active;
+
+            opacity: 1;
+        }
     }
 }

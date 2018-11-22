@@ -5,12 +5,11 @@ namespace Oro\Bundle\ApiBundle\Request\JsonApi;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
-use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddFieldsFilter;
-use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddIncludeFilter;
 use Oro\Bundle\ApiBundle\Request\AbstractErrorCompleter;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
@@ -28,16 +27,22 @@ class ErrorCompleter extends AbstractErrorCompleter
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
+    /** @var FilterNamesRegistry */
+    private $filterNamesRegistry;
+
     /**
      * @param ExceptionTextExtractorInterface $exceptionTextExtractor
      * @param ValueNormalizer                 $valueNormalizer
+     * @param FilterNamesRegistry             $filterNamesRegistry
      */
     public function __construct(
         ExceptionTextExtractorInterface $exceptionTextExtractor,
-        ValueNormalizer $valueNormalizer
+        ValueNormalizer $valueNormalizer,
+        FilterNamesRegistry $filterNamesRegistry
     ) {
         parent::__construct($exceptionTextExtractor);
         $this->valueNormalizer = $valueNormalizer;
+        $this->filterNamesRegistry = $filterNamesRegistry;
     }
 
     /**
@@ -71,27 +76,11 @@ class ErrorCompleter extends AbstractErrorCompleter
                 $error->setSource();
             } else {
                 list($normalizedPropertyPath, $path, $pointerPrefix) = $this->normalizePropertyPath($propertyPath);
-
-                $pointer = [];
-                if (\in_array($normalizedPropertyPath, $metadata->getIdentifierFieldNames(), true)) {
-                    $pointer[] = JsonApiDoc::ID;
-                } elseif (\array_key_exists($normalizedPropertyPath, $metadata->getFields())) {
-                    if ($metadata->hasIdentifierFields()) {
-                        $pointer = [JsonApiDoc::ATTRIBUTES, $normalizedPropertyPath];
-                    } else {
-                        $pointer = [$normalizedPropertyPath];
-                    }
-                } elseif (\array_key_exists($path[0], $metadata->getAssociations())) {
-                    if ($metadata->hasIdentifierFields()) {
-                        $pointer = $this->getAssociationPointer($path, $metadata->getAssociation($path[0]));
-                    } else {
-                        $pointer = [$normalizedPropertyPath];
-                    }
-                } else {
+                $pointer = $this->getPointer($metadata, $normalizedPropertyPath, $path);
+                if (empty($pointer)) {
                     $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));
                     $error->setSource();
-                }
-                if (!empty($pointer)) {
+                } else {
                     $dataSection = $metadata->hasIdentifierFields()
                         ? JsonApiDoc::DATA
                         : JsonApiDoc::META;
@@ -120,6 +109,35 @@ class ErrorCompleter extends AbstractErrorCompleter
         }
 
         return [$normalizedPropertyPath, $path, $pointerPrefix];
+    }
+
+    /**
+     * @param EntityMetadata $metadata
+     * @param string         $normalizedPropertyPath
+     * @param string[]       $path
+     *
+     * @return string[]
+     */
+    private function getPointer(EntityMetadata $metadata, $normalizedPropertyPath, array $path)
+    {
+        $pointer = [];
+        if (\in_array($normalizedPropertyPath, $metadata->getIdentifierFieldNames(), true)) {
+            $pointer[] = JsonApiDoc::ID;
+        } elseif (\array_key_exists($normalizedPropertyPath, $metadata->getFields())) {
+            if ($metadata->hasIdentifierFields()) {
+                $pointer = [JsonApiDoc::ATTRIBUTES, $normalizedPropertyPath];
+            } else {
+                $pointer = [$normalizedPropertyPath];
+            }
+        } elseif (\array_key_exists($path[0], $metadata->getAssociations())) {
+            if ($metadata->hasIdentifierFields()) {
+                $pointer = $this->getAssociationPointer($path, $metadata->getAssociation($path[0]));
+            } else {
+                $pointer = [$normalizedPropertyPath];
+            }
+        }
+
+        return $pointer;
     }
 
     /**
@@ -177,14 +195,15 @@ class ErrorCompleter extends AbstractErrorCompleter
      */
     private function getConfigFilterConstraintParameter(Error $error, RequestType $requestType)
     {
+        $filterNames = $this->filterNamesRegistry->getFilterNames($requestType);
         /** @var NotSupportedConfigOperationException $e */
         $e = ExceptionUtil::getProcessorUnderlyingException($error->getInnerException());
         if (ExpandRelatedEntitiesConfigExtra::NAME === $e->getOperation()) {
-            return AddIncludeFilter::FILTER_KEY;
+            return $filterNames->getIncludeFilterName();
         }
         if (FilterFieldsConfigExtra::NAME === $e->getOperation()) {
             return \sprintf(
-                AddFieldsFilter::FILTER_KEY_TEMPLATE,
+                $filterNames->getFieldsFilterTemplate(),
                 $this->getEntityType($e->getClassName(), $requestType)
             );
         }

@@ -13,6 +13,10 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Writes all postponed entries to a file and creates a retry job for processing.
+ * Sets the number of attempts and delay time
+ */
 class PostponedRowsHandler
 {
     const MAX_ATTEMPTS = 30;
@@ -117,10 +121,18 @@ class PostponedRowsHandler
         $jobRunner->createDelayed(
             sprintf('%s:postponed:%s', $currentJob->getRootJob()->getName(), $attempts),
             function (JobRunner $jobRunner, Job $child) use ($body, $fileName, $attempts) {
-                $body['fileName'] = $fileName;
+                $body = array_merge($body, [
+                    'jobId' => $child->getId(),
+                    'attempts' => $attempts,
+                    'fileName' => $fileName,
+                ]);
+
+                if (array_key_exists('options', $body) && !array_key_exists('incremented_read', $body['options'])) {
+                    $body['options']['incremented_read'] = false;
+                }
                 $message = new Message();
                 $message->setDelay(static::DELAY_SECONDS);
-                $message->setBody(array_merge($body, ['jobId' => $child->getId(), 'attempts' => $attempts]));
+                $message->setBody($body);
                 $this->messageProducer->send(Topics::HTTP_IMPORT, $message);
             }
         );

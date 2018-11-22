@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
@@ -10,11 +9,10 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\Exception;
 
 /**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * Provides utility methods to work with manageable doctrine ORM entities.
  */
 class DoctrineHelper
 {
@@ -68,7 +66,7 @@ class DoctrineHelper
     {
         // check if we can use getId method to fast get the identifier
         if (method_exists($entity, 'getId')) {
-            // @todo This code doesn't support composite keys.
+            // This code doesn't support composite keys. See BAP-8835
             return ['id' => $entity->getId()];
         }
 
@@ -89,23 +87,6 @@ class DoctrineHelper
         $identifierValues = $this->getEntityMetadata($entity)->getIdentifierValues($entity);
 
         return count($identifierValues) === 0;
-    }
-
-    /**
-     * Gets the root entity alias of the query.
-     *
-     * @param QueryBuilder $qb
-     * @param bool         $throwException
-     *
-     * @return string|null
-     *
-     * @throws Exception\InvalidEntityException
-     *
-     * @deprecated since 1.9. Use QueryUtils::getSingleRootAlias instead
-     */
-    public function getSingleRootAlias(QueryBuilder $qb, $throwException = true)
-    {
-        return QueryUtils::getSingleRootAlias($qb, $throwException);
     }
 
     /**
@@ -432,48 +413,6 @@ class DoctrineHelper
         return $this
             ->getEntityMetadata($entityClass)
             ->newInstance();
-    }
-
-    /**
-     * Calculates the page offset
-     *
-     * @param int $page  The page number
-     * @param int $limit The maximum number of items per page
-     *
-     * @return int
-     *
-     * @deprecated since 1.9. Use QueryUtils::getPageOffset instead
-     */
-    public function getPageOffset($page, $limit)
-    {
-        return QueryUtils::getPageOffset($page, $limit);
-    }
-
-    /**
-     * Applies the given joins for the query builder
-     *
-     * @param QueryBuilder $qb
-     * @param array|null   $joins
-     *
-     * @deprecated since 1.9. Use QueryUtils::applyJoins instead
-     */
-    public function applyJoins(QueryBuilder $qb, $joins)
-    {
-        QueryUtils::applyJoins($qb, $joins);
-    }
-
-    /**
-     * Checks the given criteria and converts them to Criteria object if needed
-     *
-     * @param Criteria|array|null $criteria
-     *
-     * @return Criteria
-     *
-     * @deprecated since 1.9. Use QueryUtils::normalizeCriteria instead
-     */
-    public function normalizeCriteria($criteria)
-    {
-        return QueryUtils::normalizeCriteria($criteria);
     }
 
     /**

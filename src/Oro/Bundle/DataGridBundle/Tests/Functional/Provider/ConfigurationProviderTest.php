@@ -24,19 +24,17 @@ class ConfigurationProviderTest extends WebTestCase
         $provider = new ConfigurationProvider($resolver, $cache);
         $config = $provider->getRawConfiguration($dataGriName);
         $this->assertNotEmpty($config);
-        $this->assertTrue($cache->contains(ConfigurationProvider::LOADED_FLAG));
 
         // Delete single grid config from cache
-        $cacheKey = $dataGriName . '_' . ConfigurationProvider::CACHE_POSTFIX;
-        $this->assertTrue($cache->contains($cacheKey));
-        $cache->delete($cacheKey);
-        $this->assertFalse($cache->contains($cacheKey));
+        $this->assertTrue($cache->contains($dataGriName));
+        $cache->delete($dataGriName);
+        $this->assertFalse($cache->contains($dataGriName));
 
         // Create new provider instance to bypass caching in local variable and force config loading logic
         $newProvider = new ConfigurationProvider($resolver, $cache);
         // Try to load configuration again and check that it is loaded correctly
         $reloadedConfig = $newProvider->getRawConfiguration($dataGriName);
-        $this->assertTrue($cache->contains($cacheKey));
+        $this->assertTrue($cache->contains($dataGriName));
         $this->assertEquals($config, $reloadedConfig);
     }
 

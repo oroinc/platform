@@ -1,61 +1,106 @@
-.inline-editor-wrapper.multi-currency-editor {
-  &.multi-currency-editor__single-currency {
-    min-width: 168px;
-    .inline-editor__fields.input-append>.add-on {
-      min-width: initial;
-      padding-left: 9px;
-      padding-right: 9px;
-      display: inline-block;
+/* @theme: admin.oro; */
+
+.multi-currency-editor {
+    &.multi-currency-editor__single-currency {
+        min-width: $multi-currency-editor-single-width;
+
+        .add-on {
+            display: flex;
+            align-items: center;
+            height: auto;
+            min-width: initial;
+            padding-#{$start}: $multi-currency-editor-single-offset;
+            padding-#{$end}: $multi-currency-editor-single-offset;
+            margin-#{$start}: -$input-border-width;
+
+            border: $multi-currency-editor-single-border;
+            background-color: $multi-currency-editor-single-color;
+        }
+
+        .inline-editor__actions {
+            #{$start}: 100%;
+            #{$end}: auto;
+            margin-#{$start}: -$input-border-width;
+        }
     }
+
+    &.multi-currency-editor__multi-currency {
+        min-width: $multi-currency-editor-multi-width;
+
+        .add-on {
+            display: none;
+        }
+
+        .select2-choice {
+            padding-#{$end}: $multi-currency-editor-multi-choice-offset;
+
+            &:after {
+                display: none;
+            }
+        }
+
+        .select2-container {
+            width: auto;
+        }
+
+        .select2-container-active {
+            &:after {
+                #{$start}: $multi-currency-editor-multi-choice-offset;
+            }
+        }
+    }
+
     .inline-editor__actions {
-      background-color: #fff;
-      border: 1px solid #ddd;
-      border-left-width: 0;
-      padding-left: 3px;
-      left: 100%;
-      right: initial;
-      width: 52px;
+        bottom: 0;
+        z-index: auto;
+
+        display: flex;
+        padding: 0;
+
+        background: $multi-currency-editor-multi-actions-color;
+        border: $multi-currency-editor-multi-actions-border;
     }
-    .inline-editor__action-item {
-      height: 28px;
+
+    .inline-editor__fields {
+        display: flex;
+        margin: 0;
+
+        input[type="text"] {
+            text-align: #{$end} !important; // Rewrite hard selectors
+            padding-#{$end}: $multi-currency-editor-multi-fields-offset !important; // Rewrite hard selectors
+        }
     }
-  }
-  &.multi-currency-editor__multi-currency {
-    min-width: 240px;
-    .inline-editor__fields.input-append>.add-on {
-      display: none;
+
+    .form-control {
+        &.error,
+        &:focus {
+            position: relative;
+            z-index: 1;
+        }
     }
-    .select2-choice {
-      padding-right: 52px;
-      .select2-arrow {
-        right: 60px;
-      }
-      &:after {
-        content: '';
-        display: block;
-        position: absolute;
-        height: 100%;
-        width: 1px;
-        background-color: #ddd;
-        right: 52px;
-        top: 0;
-      }
-    }
-    .select2-dropdown-open .select2-choice {
-      &:after {
-        background-color: #aaa;
-      };
-    }
+
     .select2-container {
-      border-radius: 0;
-      width: auto;
+        margin-#{$start}: -$input-border-width;
     }
-  }
-  .inline-editor__fields {
-    display: flex;
-  }
-  input[name=value] {
-    text-align: right;
-    padding-right: 6px;
-  }
+
+    .select2-container-active {
+        z-index: $multi-currency-editor-multi-choice-active-z-index;
+
+        &:before,
+        &:after {
+            position: absolute;
+            top: -$input-border-width;
+            bottom: -$input-border-width;
+            z-index: 1;
+
+            width: $input-border-width;
+            background-color: $multi-currency-editor-multi-choice-active;
+
+            content: '';
+        }
+
+        &:before {
+            #{$start}: -$input-border-width;
+        }
+    }
 }

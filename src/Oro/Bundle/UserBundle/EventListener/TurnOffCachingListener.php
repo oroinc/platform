@@ -35,6 +35,10 @@ class TurnOffCachingListener
         }
 
         $response = $event->getResponse();
+        if ($response->isCacheable()) {
+            return;
+        }
+
         $response->headers->set('Expires', '0');
         $response->headers->set('Pragma', 'no-cache');
         $response->headers->addCacheControlDirective('no-cache', true);

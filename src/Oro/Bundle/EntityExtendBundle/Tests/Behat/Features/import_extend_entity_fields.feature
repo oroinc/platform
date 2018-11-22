@@ -1,7 +1,8 @@
 @regression
 @ticket-BAP-16397
 @ticket-BB-14555
-
+# Unskip after BAP-17458
+@skip
 Feature: Import extend entity fields
   In order to effectively manage extend fields for entities
   As an Administrator
@@ -142,7 +143,7 @@ Feature: Import extend entity fields
       | Myand4               | string | label value 4 | no                   | 0                   |
       | koko                 | string | label value 5 | no                   | 0                   |
       | LOREM                | string | label value 6 | no                   | 0                   |
-      | Sunset               | string | label value 7 | no                   | 0                   |
+      | SunSet               | string | label value 7 | no                   | 0                   |
     When I import file
     Then Email should contains the following "Errors: 0 processed: 6, read: 6, added: 6, updated: 0, replaced: 0" text
     When I reload the page
@@ -156,13 +157,13 @@ Feature: Import extend entity fields
     And I should see "label value 5" in grid
     And I should see LOREM in grid
     And I should see "label value 6" in grid
-    And I should see Sunset in grid
+    And I should see SunSet in grid
     And I should see "label value 7" in grid
     And I should see "Update schema"
     When I click update schema
     Then I should see Schema updated flash message
 
-  Scenario: It should be impossible to import attributes with correct names
+  Scenario: It should be impossible to import attributes with incorrect names
     Given I filter Name as is equal to "User"
     And click View User in grid
     And I fill template with data:
@@ -217,7 +218,7 @@ Feature: Import extend entity fields
     And I should not see "FieldText Label updated"
     And I should not see "Update schema"
 
-  Scenario: It should be possible to updated columns with same name
+  Scenario: It should be possible to updated columns with the same name
     Given I fill template with data:
       | fieldName          | type   | entity.label            | datagrid.show_filter | datagrid.is_visible |
       | correct_field_name | bigint | FieldText Label updated | no                   | 0                   |

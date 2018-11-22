@@ -1,2 +1,7 @@
-<div class="widget-picker-search"></div>
-<div class="widget-picker-containers"></div>
+<div class="widget-picker__filter" data-role="widget-picker-filter"></div>
+<div class="widget-picker__container" data-role="widget-picker-container">
+    <div class="widget-picker__results" data-role="widget-picker-results"></div>
+    <div class="no-data" data-role="widget-picker-no-results-found">
+        <%- _.__('oro.ui.widget_picker.filter.search_no_found') %>
+    </div>
+</div>

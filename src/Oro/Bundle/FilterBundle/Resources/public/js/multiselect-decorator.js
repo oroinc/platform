@@ -124,7 +124,9 @@ define([
          * Action on multiselect widget refresh
          */
         onRefresh: function() {
-            this.getWidget().find('.ui-multiselect-checkboxes').addClass('fixed-li');
+            var widget = this.getWidget();
+            widget.find('.ui-multiselect-checkboxes').addClass('fixed-li');
+            widget.inputWidget('seekAndCreate');
         },
 
         /**
@@ -177,8 +179,9 @@ define([
          * @param functionName
          * @return {Object}
          */
-        multiselect: function(parameters) {
-            return this.element.multiselect(parameters);
+        multiselect: function() {
+            var elem = this.element;
+            return elem.multiselect.apply(elem, arguments);
         },
 
         /**
@@ -187,15 +190,16 @@ define([
          * @param functionName
          * @return {Object}
          */
-        multiselectfilter: function(functionName) {
-            return this.element.multiselectfilter(functionName);
+        multiselectfilter: function() {
+            var elem = this.element;
+            return elem.multiselectfilter.apply(elem, arguments);
         },
 
         /**
          *  Set dropdown position according to button element
          */
-        updateDropdownPosition: function() {
-            this.multiselect('updatePos');
+        updateDropdownPosition: function(position) {
+            this.multiselect('updatePos', position);
         }
     };
 

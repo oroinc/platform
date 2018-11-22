@@ -1,0 +1,115 @@
+/* @theme: admin.oro; */
+
+.form-horizontal .query-designer-form {
+    @include clearfix();
+
+    .control-group {
+        float: #{$start};
+        min-height: $query-designer-control-group-min-height;/* @TODO temporary solution, will be fixed in CRM-2025 */
+
+        label.control-label,
+        .control-label.wrap {
+            width: auto;
+            margin-#{$start}: $query-designer-controls-margin-start;
+            min-width: $query-designer-control-label-min-width;/* @TODO temporary solution, will be fixed in CRM-2025 */
+        }
+
+        .controls {
+            margin-#{$start}: $query-designer-controls-margin-start;
+            float: #{$start};
+        }
+    }
+
+    .select2-container {
+        width: $query-designer-select2-container-width !important;
+    }
+    input.label-text {
+        width: $query-designer-label-text-width;
+    }
+    .function-selector .controls select {
+        width: $query-designer-function-selector-width;
+    }
+    .sorting-selector .controls select {
+        width: $query-designer-sorting-selector-width;
+    }
+    .filter-box {
+        padding: $query-designer-filter-box-padding;
+        background: $query-designer-filter-box-background;
+
+        > .btn-group {
+            margin: 0;
+        }
+
+        .filter-item {
+            padding: 0;
+
+            > .btn {
+                border-top-#{$end}-radius: $query-designer-filter-item-border-radius;
+                border-bottom-#{$end}-radius: $query-designer-filter-item-border-radius;
+            }
+
+            .filter-select .select-filter-widget,
+            .filter-criteria-hint {
+                font-weight: normal;
+            }
+        }
+    }
+
+    .submit-cancel-buttons .btn-group {
+        margin-#{$start}: $query-designer-submit-cancel-buttons-margin-start;
+    }
+}
+
+.query-designer-grid-container {
+    .grid {
+        th {
+            font-size: $query-designer-grid-th-font-size;
+        }
+        .label-column,
+        .label-cell {
+            width: $query-designer-grid-label-cell-width;
+        }
+        .function-column,
+        .function-cell {
+            width: $query-designer-grid-function-cell-width;
+        }
+        .sorting-column,
+        .sorting-cell {
+            width: $query-designer-grid-sorting-cell-width;
+        }
+        .label-cell {
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .index-column,
+        .index-cell {
+            width: $query-designer-grid-index-cell-width;
+        }
+        .action-cell {
+            white-space: nowrap;
+        }
+        .action-column,
+        .action-cell {
+            width: $query-designer-grid-action-cell-width;
+        }
+    }
+
+    i.fa-list {
+        cursor: move;
+        cursor: -moz-grab;
+        cursor: -webkit-grab;
+        font-size: $query-designer-list-icon-font-size;
+    }
+}
+.query-designer-columns-grid-container {
+    .grid {
+        .action-column,
+        .action-cell {
+            width: $query-designer-columns-grid-action-cell-width;
+        }
+    }
+
+    tbody tr {
+        cursor: default;
+    }
+}

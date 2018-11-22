@@ -56,3 +56,28 @@ services:
             - 'oro_sync.maintenance'
         tags:
             - { name: gos_web_socket.topic }
+
+    oro_sync.authentication.origin.origin_provider_chain:
+        class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginProviderChain
+        public: false
+
+    oro_sync.authentication.origin.application_origin_provider:
+        class: Oro\Bundle\SyncBundle\Authentication\Origin\ApplicationOriginProvider
+        public: false
+        arguments:
+            - '@oro_config.global'
+            - '@oro_sync.authentication.origin.extractor'
+        tags:
+            - { name: oro_sync.origin_provider }
+
+    oro_sync.authentication.origin.origin_registry_decorator:
+        decorates: gos_web_socket.origins.registry
+        class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginRegistryDecorator
+        public: false
+        arguments:
+            - '@oro_sync.authentication.origin.origin_registry_decorator.inner'
+            - '@oro_sync.authentication.origin.origin_provider_chain'
+
+    oro_sync.authentication.origin.extractor:
+        class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginExtractor
+        public: false

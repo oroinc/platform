@@ -10,7 +10,8 @@ use Symfony\Component\HttpFoundation\Response;
  * Adds possible status codes for the following actions executed in scope of REST API:
  * "get_list", "get", "update", "create", "delete", "delete_list",
  * "get_subresource", "update_subresource", "add_subresource", "delete_subresource",
- * "get_relationship", "update_relationship", "add_relationship", "delete_relationship".
+ * "get_relationship", "update_relationship", "add_relationship", "delete_relationship"
+ * and "options".
  * By performance reasons it is done in one processor.
  */
 class CompleteStatusCodes extends AbstractCompleteStatusCodes
@@ -63,6 +64,9 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
                 break;
             case ApiActions::DELETE_RELATIONSHIP:
                 $this->addStatusCodesForDeleteRelationship($statusCodes);
+                break;
+            case ApiActions::OPTIONS:
+                $this->addStatusCodesForOptions($statusCodes);
                 break;
         }
         
@@ -382,6 +386,30 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
             $statusCodes,
             Response::HTTP_FORBIDDEN,
             'Returned when no permissions to update the relationship'
+        );
+    }
+
+    /**
+     * Adds status codes for "options" action
+     *
+     * @param StatusCodesConfig $statusCodes
+     */
+    protected function addStatusCodesForOptions(StatusCodesConfig $statusCodes)
+    {
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_OK,
+            'Returned when successful'
+        );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_BAD_REQUEST,
+            'Returned when the request data is not valid'
+        );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_NOT_FOUND,
+            'Returned when the entity is not found'
         );
     }
 }

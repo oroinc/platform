@@ -222,7 +222,11 @@ class Select2Entity extends Element implements ClearableInterface
      */
     public function openSelectEntityPopup($force = false)
     {
-        $entitySelectButton = $this->getParent()->getParent()->find('css', '.entity-select-btn');
+        $entitySelect = $this->getParent()->getParent();
+        $entitySelectButton = $entitySelect->find('css', '.entity-select-btn');
+        $this->spin(function () use ($entitySelect) {
+            return $entitySelect->find('css', '.select2-container');
+        }, 10);
         $entitySelectButton->focus();
         if ($entitySelectButton->isVisible()) {
             if ($force) {
@@ -246,7 +250,7 @@ class Select2Entity extends Element implements ClearableInterface
     /**
      * @return string|null
      */
-    public function getChosenValue()
+    public function getValue()
     {
         $span = $this->getParent()->find('css', 'span.select2-chosen');
 

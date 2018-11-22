@@ -32,7 +32,7 @@ class EntityOverrideTest extends RestJsonApiTestCase
 
     /**
      * @param string[]   $expectedEntities The list of expected entity reference names
-     * @param Collection $association      The associaation value
+     * @param Collection $association      The association value
      */
     private function assertToManyAssociation(array $expectedEntities, Collection $association)
     {
@@ -955,6 +955,21 @@ class EntityOverrideTest extends RestJsonApiTestCase
             ['entity' => 'testapioverrideclassowners'],
             ['filter' => ['id' => (string)$entityIdToDelete]]
         );
+
+        self::assertNull($this->getEntityManager()->find(TestOverrideClassOwner::class, $entityIdToDelete));
+    }
+
+    public function testDeleteListWithTotalAndDeletedCountsOfOverriddenEntities()
+    {
+        $entityIdToDelete = $this->getReference('owner_1')->id;
+        $response = $this->cdelete(
+            ['entity' => 'testapioverrideclassowners'],
+            ['filter' => ['id' => (string)$entityIdToDelete]],
+            ['HTTP_X-Include' => 'totalCount;deletedCount']
+        );
+
+        self::assertEquals(1, $response->headers->get('X-Include-Total-Count'), 'totalCount');
+        self::assertEquals(1, $response->headers->get('X-Include-Deleted-Count'), 'deletedCount');
 
         self::assertNull($this->getEntityManager()->find(TestOverrideClassOwner::class, $entityIdToDelete));
     }

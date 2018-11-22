@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
-use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
@@ -10,6 +9,10 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Converts a date range configuration of a dashboard widget
+ * to a representation that can be used to filter data and vise versa.
+ */
 class FilterDateRangeConverter extends ConfigValueConverterAbstract
 {
     const MIN_DATE = '1900-01-01';
@@ -22,9 +25,6 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
 
     /** @var TranslatorInterface */
     protected $translator;
-
-    /** @var DateHelper */
-    protected $dateHelper;
 
     /** @var array */
     protected static $valueTypesStartVarsMap = [
@@ -59,18 +59,15 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
      * @param DateTimeFormatter   $formatter
      * @param Compiler            $dateCompiler
      * @param TranslatorInterface $translator
-     * @param DateHelper          $dateHelper
      */
     public function __construct(
         DateTimeFormatter $formatter,
         Compiler $dateCompiler,
-        TranslatorInterface $translator,
-        DateHelper $dateHelper
+        TranslatorInterface $translator
     ) {
         $this->formatter    = $formatter;
         $this->dateCompiler = $dateCompiler;
         $this->translator   = $translator;
-        $this->dateHelper   = $dateHelper;
     }
 
     /**
@@ -108,6 +105,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             }
             if ($end) {
                 $end->setTime(23, 59, 59);
+                $end->setTime(0, 0, 0)->modify('1 day');
             }
             if ($start) {
                 $start->setTime(0, 0, 0);
@@ -127,7 +125,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             $prevEnd = clone $end;
             $prevEnd->sub($diff);
             $prevStart->setTime(0, 0, 0);
-            $prevEnd->setTime(23, 59, 59);
+            $prevEnd->setTime(0, 0, 0)->modify('1 day');
 
             $dateData['prev_start'] = $prevStart;
             $dateData['prev_end']   = $prevEnd;
@@ -243,7 +241,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
                 $end->modify($modify);
             }
             $start->setTime(0, 0, 0);
-            $end->setTime(23, 59, 59);
+            $end->setTime(0, 0, 0)->modify('1 day');
             if ($cretePreviousPeriod) {
                 $prevStart  = clone $start;
                 $prevModify = static::$valueTypesStartVarsMap[$value['type']]['modify_previous_start'];
@@ -255,7 +253,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
                     $prevEnd->modify($modify);
                 }
                 $prevStart->setTime(0, 0, 0);
-                $prevEnd->setTime(23, 59, 59);
+                $prevEnd->setTime(0, 0, 0)->modify('1 day');
             }
         }
         if ($value['type'] === AbstractDateFilterType::TYPE_ALL_TIME) {

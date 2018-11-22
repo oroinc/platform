@@ -1,7 +1,5 @@
 /* @theme: admin.oro; */
 
-@import 'bowerassets/font-awesome/scss/variables';
-
 [class^="fa-"],
 [class*=" fa-"] {
     display: inline-block;
@@ -20,7 +18,7 @@
         &:before {
             padding: 0;
             text-indent: 0;
-            font-size: 14px;
+            font-size: $icon-font-size;
             line-height: 1.3em;
             font-family: FontAwesome;
         }

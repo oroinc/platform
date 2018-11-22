@@ -5,7 +5,6 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var ModalView = require('oroui/js/modal');
-    var template = require('tpl!oroui/templates/standart-confirmation.html');
 
     /**
      * Standart confirmation dialog
@@ -15,9 +14,6 @@ define(function(require) {
      * @extends oroui.ModalView
      */
     StandartConfirmationView = ModalView.extend({
-
-        /** @property {String} */
-        template: template,
 
         /** @property {String} */
         className: 'modal oro-modal-normal',

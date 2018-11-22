@@ -1,0 +1,244 @@
+/* @theme: admin.oro; */
+
+/* Login + Forgot Password */
+.login-page {
+    background: url(../../img/background.jpg) no-repeat 50% 50% #fff;
+    background-size: cover;
+    height: 100%;
+    min-height: 280px;
+    overflow: visible;
+
+    .app-page {
+        &__central-panel {
+            > .container {
+                width: auto;
+                display: flex;
+            }
+        }
+    }
+}
+
+.form-wrapper {
+    max-width: 515px;
+    min-height: 100vh;
+    background: rgba(255, 255, 255, .8);
+    padding: 30px 0;
+    display: flex;
+    flex-direction: column;
+
+    &__title {
+        display: none;
+    }
+
+    &__inner {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        margin: 0 auto;
+        padding: 0 65px;
+        min-width: 100%;
+    }
+}
+
+.form-signin {
+    width: 100%;
+
+    &__footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-left: 93px;
+
+        &--forgot {
+            padding-left: 0;
+        }
+
+        &--reset {
+            padding-left: 155px;
+        }
+    }
+
+    &__oauth {
+        padding: 24px 0 0 93px;
+    }
+
+    &__section {
+        max-width: 380px;
+        margin: 0 auto;
+    }
+
+    &__roles {
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    &__roles-item {
+        display: inline-block;
+        margin: 8px 0;
+    }
+
+    &__info {
+        margin: 30px 0;
+
+        .alert {
+            padding: 8px 35px;
+        }
+    }
+
+    .title-box {
+        color: $primary-200;
+        margin: 0 0 27px;
+        text-align: left;
+
+        .divider-vertical {
+            float: left;
+            background: url(../../img/vertical-divider.png) no-repeat;
+            width: 2px;
+            height: 28px;
+            margin: 0 10px 0;
+        }
+
+        .oro-title {
+            float: left;
+            font-size: 22px;
+            line-height: 28px;
+            margin: 0;
+            text-shadow: 1px 1px 1px #000;
+
+            a {
+                color: #fff;
+            }
+        }
+
+        .title {
+            font: bold 18px/1 $font-family-sans-serif;
+            color: $primary-200;
+            margin: 0;
+        }
+    }
+
+    .input-field-group {
+        margin-bottom: 5px;
+    }
+
+    .input-prepend {
+        width: 100%;
+        display: flex;
+        align-items: center;
+    }
+
+    .oro-hint {
+        margin: 0 0 14px;
+    }
+
+    .add-on {
+        background: none;
+        width: 93px;
+        text-align: right;
+        color: $primary-200;
+        padding: 0 25px 0 0;
+        border: none;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+        &:-ms-input-placeholder {
+            color: #999;
+        }
+    }
+
+    .organization-selector-arrow {
+        position: relative;
+        top: 8px;
+        left: -15px;
+        margin-right: -9px;
+        z-index: 5;
+    }
+
+    .add-on {
+        & + input[type="text"],
+        & + input[type="password"],
+        & + select {
+            width: calc(100% - 93px);
+        }
+
+        & + select {
+            display: inline-block;
+            height: 34px;
+            width: 225px;
+            padding: 0;
+        }
+    }
+
+    .forgot-pass {
+        float: left;
+        font-weight: bold;
+        margin: 9px 10px 0 0;
+    }
+
+    .oro-forgot-password {
+        min-width: 270px;
+
+        input {
+            width: 100%;
+        }
+    }
+
+    .oro-remember-me {
+        margin-bottom: 15px;
+        padding-left: 93px;
+    }
+
+    .extra-btn-large {
+        height: 32px;
+        line-height: 32px;
+        min-width: 95px;
+        float: left;
+    }
+
+    .extra-submit {
+        float: right;
+    }
+
+    fieldset {
+        margin: 0 0 25px;
+    }
+
+    span.validation-failed {
+        margin: 0 0 14px 14px;
+    }
+}
+
+.form-reset {
+    .form-buttons {
+        margin-top: 10px;
+    }
+
+    .add-on {
+        width: 155px;
+
+        & + input[type="text"],
+        & + input[type="password"],
+        & + select {
+            width: calc(100% - 178px);
+        }
+    }
+}
+
+.form-two-factor {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+        width: calc(100% - 24px);
+    }
+}
+
+.login-copyright {
+    font-size: 12px;
+    color: #b3b3b3;
+    text-align: center;
+    padding: 0 16px;
+}

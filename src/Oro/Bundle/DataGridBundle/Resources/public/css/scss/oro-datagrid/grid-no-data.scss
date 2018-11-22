@@ -1,0 +1,23 @@
+/* @theme: admin.oro; */
+
+.no-data {
+    display: none;
+}
+
+&.no-data-visible {
+    .toolbar,
+    .filter-box,
+    .board-body,
+    .board-header,
+    .grid-scrollable-container {
+        display: none;
+    }
+
+    .no-data {
+        display: block;
+    }
+
+    .loading-mask {
+        display: block;
+    }
+}

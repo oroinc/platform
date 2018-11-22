@@ -1,0 +1,100 @@
+/* @theme: admin.oro; */
+
+$mobile-filter-box-background-color: inherit !default;
+$mobile-filter-box-border-bottom-width: 0 !default;
+
+$mobile-filter-box-ui-dialog-inner-offset: 0 !default;
+
+$mobile-filter-box-criteria-offset-left: auto !default;
+
+$mobile-filter-box-dropdown-offset-left: auto !default;
+$mobile-filter-box-dropdown-offset-right: auto !default;
+$mobile-filter-box-dropdown-width: 100% !default;
+
+$mobile-filter-box-dropdown-toggle-text-align: center !default;
+$mobile-filter-box-dropdown-toggle-width: 100% !default;
+$mobile-filter-box-dropdown-toggle-background-color: $primary-900 !default;
+$mobile-filter-box-dropdown-toggle-border-color: $primary-900 !default;
+$mobile-filter-box-dropdown-toggle-font-size: 14px !default;
+
+$mobile-filter-box-dropdown-toggle-before-content: $fa-var-filter !default;
+$mobile-filter-box-dropdown-toggle-before-offset: 0 7px 0 -7px !default;
+$mobile-filter-box-dropdown-toggle-before-width: 16px !default;
+$mobile-filter-box-dropdown-toggle-before-font-size: $base-font-size--l !default;
+$mobile-filter-box-dropdown-toggle-before-display: inline-block !default;
+
+$mobile-filter-box-reset-all-filter-icon: $fa-var-times !default;
+$mobile-filter-box-reset-all-filter-display: none !default;
+$mobile-filter-box-reset-all-filter-position: absolute !default;
+$mobile-filter-box-reset-all-filter-top: 2px !default;
+$mobile-filter-box-reset-all-filter-end: 16px !default;
+
+$mobile-filter-box-reset-all-icon-font-size: $base-font-size--m !default;
+$mobile-filter-box-reset-all-icon-color: $primary-700 !default;
+
+$mobile-filter-box-filters-exist-background-color: $extra-300 !default;
+$mobile-filter-box-filters-exist-border-color: $extra-300 !default;
+
+$mobile-filter-box-dropdown-menu-inner-offset: 10px !default;
+$mobile-filter-box-dropdown-menu-offset: 10px auto 0 !default;
+$mobile-filter-box-dropdown-menu-max-width: 506px !default;
+$mobile-filter-box-dropdown-menu-width: 100% !default;
+
+$mobile-filter-box-dropdown-menu-before-border-bottom: 8px solid rgba(0, 0, 0, .2) !default;
+$mobile-filter-box-dropdown-menu-before-border-left: 8px solid transparent !default;
+$mobile-filter-box-dropdown-menu-before-border-right: 8px solid transparent !default;
+$mobile-filter-box-dropdown-menu-before-content: '' !default;
+$mobile-filter-box-dropdown-menu-before-display: inline-block !default;
+$mobile-filter-box-dropdown-menu-before-left: 50% !default;
+$mobile-filter-box-dropdown-menu-before-offset-left: -8px !default;
+$mobile-filter-box-dropdown-menu-before-position: absolute !default;
+$mobile-filter-box-dropdown-menu-before-top: -8px !default;
+
+$mobile-filter-box-dropdown-menu-after-border-bottom: 7px solid #fff !default;
+$mobile-filter-box-dropdown-menu-after-border-left: 7px solid transparent !default;
+$mobile-filter-box-dropdown-menu-after-border-right: 7px solid transparent !default;
+$mobile-filter-box-dropdown-menu-after-content: '' !default;
+$mobile-filter-box-dropdown-menu-after-display: inline-block !default;
+$mobile-filter-box-dropdown-menu-after-left: 50% !default;
+$mobile-filter-box-dropdown-menu-after-offset-left: -7px !default;
+$mobile-filter-box-dropdown-menu-after-position: absolute !default;
+$mobile-filter-box-dropdown-menu-after-top: -7px !default;
+
+$mobile-filter-item-display: block !default;
+$mobile-filter-item-offset: 0 0 16px !default;
+
+$mobile-filter-box-dropdown-menu-breakpoint-left: 50% !default;
+$mobile-filter-box-dropdown-menu-breakpoint-offset-left: -253px !default;
+
+$mobile-filter-box-width: 100% !default;
+$mobile-filter-box-height: 40px !default;
+$mobile-filter-box-text-transform: none !default;
+$mobile-filter-box-text-text-align: left !default;
+$mobile-filter-box-font-size: $base-font-size--m !default;
+$mobile-filter-box-line-height: 36px !default;
+
+$mobile-filter-box-product-price-filter-display: block !default;
+$mobile-filter-box-choice-filter-float: none !default;
+
+$mobile-choice-filter-inner-offset-bottom: 48px !default;
+$mobile-choice-filter-value-inner-offset-bottom: $mobile-choice-filter-inner-offset-bottom !default;
+
+$mobile-filter-update-display: block !default;
+$mobile-filter-update-width: 100% !default;
+$mobile-filter-update-max-width: 256px !default;
+$mobile-filter-update-offset: 8px auto 0 !default;
+$mobile-filter-update-height: 40px !default;
+$mobile-filter-update-border-radius: 20px !default;
+$mobile-filter-update-font-size: 14px !default;
+
+$mobile-filter-box-ui-dialog-content-inner-offset: 60px 16px !default;
+$mobile-filter-box-ui-dialog-content-height: 100vh !default;
+
+$mobile-filter-criteria-selector-inner-end-offset: 50px !default;
+$mobile-filter-criteria-selector-hint-inner-end-offset: 40px !default;
+$mobile-reset-filter-end: 38px !default;
+
+$mobile-filter-box-ui-dialog-buttonpane-position: fixed !default;
+$mobile-filter-box-ui-dialog-buttonpane-bottom: 0 !default;
+$mobile-filter-box-ui-dialog-buttonpane-left: 0 !default;
+$mobile-filter-box-ui-dialog-buttonpane-right: 0 !default;

@@ -25,7 +25,7 @@ define(function(require) {
             },
             infoBlock: '> .accordion-group > .accordion-body .message .info',
             // commentsBlock is placed in next container after infoBlock
-            commentsBlock: '> .accordion-group > .accordion-body .message > .info + * > .comment',
+            commentsBlock: '> .accordion-group > .accordion-body .activity-item-content > .info + * > .comment',
             commentsCountBlock: '> .accordion-group > .accordion-heading .comment-count .count',
             ignoreHead: false
         },
@@ -37,8 +37,11 @@ define(function(require) {
             'click .transition-item': 'onTransition',
             'click .item-edit-button': 'onEdit',
             'click .item-remove-button': 'onDelete',
-            'click .accordion-toggle': 'onToggle',
-            'click .accordion-heading': 'onAccordionHeaderClick'
+            'click [data-toggle="collapse"]': 'onToggle',
+            'click .accordion-heading': 'onAccordionHeaderClick',
+            'click .activity-actions > .dropdown-menu': 'onActionClick',
+            'mouseover .activity-actions > [data-toggle="dropdown"]': 'showActionsDropdown',
+            'mouseleave .activity-actions': 'hideActionsDropdown'
         },
         listen: {
             'addedToParent': function() {
@@ -105,15 +108,9 @@ define(function(require) {
 
         render: function() {
             ActivityView.__super__.render.apply(this, arguments);
-            this.$('.dropdown-toggle.activity-item').on('mouseover', function() {
-                $(this).trigger('click');
-            });
-            this.$('.dropdown-menu.activity-item').on('mouseleave', function() {
-                $(this).parent().find('a.dropdown-toggle').trigger('click');
-            });
-            if (this.$('.dropdown-menu.activity-item li').children().length === 0) {
-                this.$('.dropdown-menu.activity-item').hide();
-                this.$('.dropdown-toggle.activity-item').text('');
+            if (this.$('.activity-actions > .dropdown-menu li').children().length === 0) {
+                this.$('.activity-actions > .dropdown-menu').hide();
+                this.$('.activity-actions > [data-toggle="dropdown"]').text('');
             }
             this.initLayout();
             return this;
@@ -155,6 +152,22 @@ define(function(require) {
             this.toggle();
         },
 
+        onActionClick: function(e) {
+            this.$('.activity-actions > .dropdown-menu').trigger('tohide.bs.dropdown');
+        },
+
+        showActionsDropdown: function(e) {
+            if (!this.$('.activity-actions > [data-toggle="dropdown"]').parent().hasClass('show')) {
+                this.$('.activity-actions > [data-toggle="dropdown"]').dropdown('toggle');
+            }
+        },
+
+        hideActionsDropdown: function(e) {
+            if (this.$('.activity-actions > [data-toggle="dropdown"]').parent().hasClass('show')) {
+                this.$('.activity-actions > [data-toggle="dropdown"]').dropdown('toggle');
+            }
+        },
+
         toggle: function() {
             if (!this.options.ignoreHead && this.model.get('is_head')) {
                 this.model.collection.trigger('toViewGroup', this.model);
@@ -164,7 +177,7 @@ define(function(require) {
         },
 
         getAccorditionToggle: function() {
-            return this.$('> .accordion-group > .accordion-heading .accordion-toggle');
+            return this.$('> .accordion-group > .accordion-heading [data-toggle="collapse"]');
         },
 
         getAccorditionBody: function() {

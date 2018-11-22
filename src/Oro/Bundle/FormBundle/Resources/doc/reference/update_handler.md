@@ -89,5 +89,5 @@ Among usual arguments there are two most valuable from the point of reuse.
  ```
  
  The separating of responsibilities above (such as division of usual controller update process parts) is a powerful 
- feature that might help you to use all Oro Platform based functionality easier.
+ feature that might help you to use all OroPlatform-based functionality easier.
   

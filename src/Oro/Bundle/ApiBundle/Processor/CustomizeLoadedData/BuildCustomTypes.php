@@ -22,10 +22,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class BuildCustomTypes implements ProcessorInterface
 {
     /** @var AssociationManager */
-    protected $associationManager;
+    private $associationManager;
 
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /**
      * @param AssociationManager $associationManager
@@ -64,7 +64,7 @@ class BuildCustomTypes implements ProcessorInterface
      *
      * @return array
      */
-    protected function processCustomTypes(array $data, EntityDefinitionConfig $config, $entityClass)
+    private function processCustomTypes(array $data, EntityDefinitionConfig $config, string $entityClass): array
     {
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
@@ -110,7 +110,7 @@ class BuildCustomTypes implements ProcessorInterface
      *
      * @return string[]|null
      */
-    protected function getAssociationOwnerPath(EntityDefinitionFieldConfig $field)
+    private function getAssociationOwnerPath(EntityDefinitionFieldConfig $field)
     {
         $propertyPath = $field->getPropertyPath();
         if (!$propertyPath) {
@@ -133,7 +133,7 @@ class BuildCustomTypes implements ProcessorInterface
      *
      * @return array|null
      */
-    protected function buildExtendedAssociation(array $data, $entityClass, $associationType, $associationKind)
+    private function buildExtendedAssociation(array $data, $entityClass, $associationType, $associationKind)
     {
         switch ($associationType) {
             case RelationType::MANY_TO_ONE:
@@ -165,7 +165,7 @@ class BuildCustomTypes implements ProcessorInterface
      *
      * @return array [target entity class => target field name, ...]
      */
-    protected function getAssociationTargets($entityClass, $associationType, $associationKind)
+    private function getAssociationTargets($entityClass, $associationType, $associationKind)
     {
         $resolvedEntityClass = $this->doctrineHelper->resolveManageableEntityClass($entityClass);
         if ($resolvedEntityClass) {
@@ -186,7 +186,7 @@ class BuildCustomTypes implements ProcessorInterface
      *
      * @return array|null
      */
-    protected function buildManyToOneExtendedAssociation(array $data, array $associationTargets)
+    private function buildManyToOneExtendedAssociation(array $data, array $associationTargets)
     {
         $result = null;
         foreach ($associationTargets as $entityClass => $fieldName) {
@@ -206,7 +206,7 @@ class BuildCustomTypes implements ProcessorInterface
      *
      * @return array
      */
-    protected function buildManyToManyExtendedAssociation(array $data, array $associationTargets)
+    private function buildManyToManyExtendedAssociation(array $data, array $associationTargets)
     {
         $result = [];
         foreach ($associationTargets as $entityClass => $fieldName) {
@@ -227,7 +227,7 @@ class BuildCustomTypes implements ProcessorInterface
      *
      * @return array
      */
-    protected function buildMultipleManyToOneExtendedAssociation(array $data, array $associationTargets)
+    private function buildMultipleManyToOneExtendedAssociation(array $data, array $associationTargets)
     {
         $result = [];
         foreach ($associationTargets as $entityClass => $fieldName) {
@@ -246,7 +246,7 @@ class BuildCustomTypes implements ProcessorInterface
      *
      * @return bool
      */
-    protected function isNestedObject($dataType)
+    private function isNestedObject($dataType)
     {
         return DataType::isNestedObject($dataType) || DataType::isNestedAssociation($dataType);
     }
@@ -258,7 +258,7 @@ class BuildCustomTypes implements ProcessorInterface
      *
      * @return array|null
      */
-    protected function buildNestedObject(
+    private function buildNestedObject(
         array $data,
         EntityDefinitionConfig $config,
         EntityDefinitionConfig $parentConfig
@@ -297,7 +297,7 @@ class BuildCustomTypes implements ProcessorInterface
      *
      * @return mixed
      */
-    protected function getChildData(array $data, $propertyPath)
+    private function getChildData(array $data, $propertyPath)
     {
         $result = $data;
         $path = ConfigUtil::explodePropertyPath($propertyPath);

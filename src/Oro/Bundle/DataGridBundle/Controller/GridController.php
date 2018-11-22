@@ -23,6 +23,9 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
+/**
+ * Provides the ability to control of the Grid
+ */
 class GridController extends Controller
 {
     /**
@@ -153,6 +156,7 @@ class GridController extends Controller
         $this->getMessageProducer()->send(Topics::PRE_EXPORT, [
             'format' => $format,
             'parameters' => $parameters,
+            'notificationTemplate' => 'datagrid_export_result',
         ]);
 
         return new JsonResponse([

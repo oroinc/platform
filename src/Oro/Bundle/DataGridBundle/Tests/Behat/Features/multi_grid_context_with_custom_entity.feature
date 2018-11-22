@@ -20,7 +20,7 @@ Feature: Multi grid context with custom entity
     And I fill form with:
       | Field name | Name   |
       | Type       | String |
-    And I press "Continue"
+    And I click "Continue"
     And I save and close form
     Then I should see "Field saved" flash message
     And I should see "Update Schema"
@@ -45,7 +45,7 @@ Feature: Multi grid context with custom entity
     And I click "Add Context"
     Then I should see "Test Record"
     When I select "Account" context
-    Then I should see "no records found"
+    Then I should see "There are no accounts"
     When I select "Test Entity" context
     Then I should see "Test Record"
     And close ui dialog
@@ -56,13 +56,13 @@ Feature: Multi grid context with custom entity
     When I fill form with:
       | To      | test@local.com |
       | Subject | Test email     |
-    And press "Send"
+    And click "Send"
     Then I should see "The email was sent"
     And I click "view" on first row in grid
     And I click "Add Context"
     Then I should see "Test Record"
     When I select "Account" context
-    Then I should see "no records found"
+    Then I should see "There are no accounts"
     When I select "Test Entity" context
     Then I should see "Test Record"
     And close ui dialog

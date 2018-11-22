@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestPlain;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\SkippedEntitiesProvider;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestPlainApiTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @group regression
@@ -34,13 +35,13 @@ class GetAndDeleteTest extends RestPlainApiTestCase
             'GET',
             $this->getUrl($this->getListRouteName(), ['entity' => $entityType, 'limit' => 1])
         );
-        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
+        self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get list');
 
         $id = $this->getFirstEntityId($entityClass, self::jsonToArray($response->getContent()));
         if (null !== $id) {
             // test "get" request
             if (!in_array(ApiActions::GET, $excludedActions, true)) {
-                $this->checkGetRequest($entityType, $id, 200);
+                $this->checkGetRequest($entityType, $id, Response::HTTP_OK);
             }
             // test "delete" request
             if (!in_array(ApiActions::DELETE, $excludedActions, true)) {
@@ -73,7 +74,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
             'GET',
             $this->getUrl($this->getListRouteName(), ['entity' => $entityType, 'limit' => 1])
         );
-        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
+        self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get list');
 
         $content = self::jsonToArray($response->getContent());
         if (!empty($content)) {
@@ -86,7 +87,12 @@ class GetAndDeleteTest extends RestPlainApiTestCase
                         ['entity' => $entityType, $idFieldName => $content[0][$idFieldName]]
                     )
                 );
-                self::assertApiResponseStatusCodeEquals($response, [204, 403], $entityType, 'delete_list');
+                self::assertApiResponseStatusCodeEquals(
+                    $response,
+                    [Response::HTTP_NO_CONTENT, Response::HTTP_FORBIDDEN],
+                    $entityType,
+                    'delete_list'
+                );
             }
         }
     }
@@ -102,12 +108,12 @@ class GetAndDeleteTest extends RestPlainApiTestCase
             'DELETE',
             $this->getUrl($this->getItemRouteName(), ['entity' => $entityType, 'id' => $id])
         );
-        if ($response->getStatusCode() !== 204) {
+        if ($response->getStatusCode() !== Response::HTTP_NO_CONTENT) {
             // process delete errors
-            self::assertEquals(403, $response->getStatusCode());
+            self::assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
         } elseif (!in_array(ApiActions::GET, $excludedActions, true)) {
             // check if entity was really deleted
-            $this->checkGetRequest($entityType, $id, 404);
+            $this->checkGetRequest($entityType, $id, Response::HTTP_NOT_FOUND);
         }
     }
 

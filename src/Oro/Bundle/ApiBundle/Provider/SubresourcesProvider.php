@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\CollectSubresourcesContext;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
+use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
@@ -68,5 +69,29 @@ class SubresourcesProvider
         $this->resourcesCache->saveSubresources($version, $requestType, array_values($subresources));
 
         return $subresources[$entityClass] ?? null;
+    }
+
+    /**
+     * Gets a sub-resource for the given association available through a given Data API version.
+     *
+     * @param string      $entityClass     The FQCN of an entity
+     * @param string      $associationName The name of an association
+     * @param string      $version         The Data API version
+     * @param RequestType $requestType     The request type, for example "rest", "soap", etc.
+     *
+     * @return ApiResourceSubresources|null
+     */
+    public function getSubresource(
+        string $entityClass,
+        string $associationName,
+        string $version,
+        RequestType $requestType
+    ): ?ApiSubresource {
+        $subresources = $this->getSubresources($entityClass, $version, $requestType);
+        if (null === $subresources) {
+            return null;
+        }
+
+        return $subresources->getSubresource($associationName);
     }
 }

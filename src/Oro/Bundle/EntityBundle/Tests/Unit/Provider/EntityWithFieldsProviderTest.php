@@ -137,4 +137,102 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
             $this->provider->getFields(false, false, true, true, true, true)
         );
     }
+
+    public function testGetFieldsForEntity()
+    {
+        $className = 'Test\Entity';
+        $withVirtualFields = true;
+        $withUnidirectional = true;
+        $withRelations = true;
+        $applyExclusions = true;
+        $translate = true;
+
+        $entity = [
+            'name'         => $className,
+            'label'        => 'Item',
+            'plural_label' => 'Items'
+        ];
+        $fields = [
+            [
+                'name'  => 'field1',
+                'type'  => 'string',
+                'label' => 'Field 1'
+            ]
+        ];
+
+        $this->entityProvider->expects($this->once())
+            ->method('getEnabledEntity')
+            ->with($className, $applyExclusions, $translate)
+            ->willReturn($entity);
+        $this->fieldProvider->expects($this->once())
+            ->method('getFields')
+            ->with(
+                $className,
+                $withRelations,
+                $withVirtualFields,
+                false,
+                $withUnidirectional,
+                $applyExclusions,
+                $translate
+            )
+            ->willReturn($fields);
+
+        $result = $this->provider->getFieldsForEntity(
+            $className,
+            $withVirtualFields,
+            $withUnidirectional,
+            $withRelations,
+            $applyExclusions,
+            $translate
+        );
+
+        $this->assertEquals(
+            [
+                'name'         => $className,
+                'label'        => 'Item',
+                'plural_label' => 'Items',
+                'fields'       => [
+                    [
+                        'name'  => 'field1',
+                        'type'  => 'string',
+                        'label' => 'Field 1'
+                    ]
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testGetFieldsForEntityWithRoutes()
+    {
+        $className = 'Test\Entity';
+
+        $this->entityProvider->expects($this->once())
+            ->method('getEnabledEntity')
+            ->with($className, true, true)
+            ->willReturn(['name' => $className]);
+
+        $this->fieldProvider->expects($this->once())
+            ->method('getFields')
+            ->with($className, true, false, false, false, true, true)
+            ->willReturn(['field1' => []]);
+
+        $this->configHelper->expects($this->once())
+            ->method('getAvailableRoutes')
+            ->with($className)
+            ->willReturn(['routeName' => 'routeValue']);
+
+        $this->assertEquals(
+            [
+                'name'   => $className,
+                'fields' => [
+                    'field1' => []
+                ],
+                'routes' => [
+                    'routeName' => 'routeValue'
+                ]
+            ],
+            $this->provider->getFieldsForEntity($className, false, false, true, true, true, true)
+        );
+    }
 }

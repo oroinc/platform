@@ -1,0 +1,110 @@
+/* @theme: admin.oro; */
+
+.more-bar-holder {
+    position: relative;
+    display: inline-block;
+    line-height: $oro-datagrid-body-cell-line-height;
+
+    .dropdown-toggle {
+        display: flex;
+        align-items: center;
+
+        padding: $more-bar-holder-toggle-offset;
+
+        font-size: $more-bar-holder-icon-font-size;
+        line-height: $more-bar-holder-line-height;
+        text-decoration: none;
+
+        color: $oro-datagrid-action-cell-color;
+
+        .icon {
+            line-height: inherit;
+        }
+
+        // Hide bootstrap arrow
+        &:before {
+            content: none;
+        }
+    }
+
+    .dropdown {
+        display: inline-block;
+    }
+
+    .dropdown-toggle:hover {
+        text-decoration: none;
+    }
+
+    &:hover {
+        .dropdown-toggle {
+            color: $oro-datagrid-action-cell-color-hover;
+        }
+    }
+}
+
+.launchers-dropdown-menu {
+    min-width: $oro-datagrid-action-size;
+    // Override bootstrap margin
+    margin: 0;
+    padding: $launchers-dropdown-menu-offset;
+
+    &.show {
+        // Override bootstrap margin
+        margin: 0;
+    }
+
+    .launchers-list {
+        padding: $launchers-list-at-dropdown-offset;
+    }
+}
+
+.launchers-list {
+    display: block;
+    margin: 0;
+    padding: $launchers-list-offset;
+
+    white-space: nowrap;
+
+    @include list-unstyled();
+
+    .action {
+        display: block;
+        min-width: $oro-datagrid-action-size;
+
+        color: $launchers-list-action-color;
+
+        &:active,
+        &:hover {
+            color: $primary-400;
+        }
+
+        &.mode-text-only,
+        &.mode-icon-text {
+            line-height: $launchers-list-action-size;
+            height: $launchers-list-action-size;
+        }
+
+        &.mode-icon-only {
+            line-height: $oro-datagrid-action-size;
+            height: $oro-datagrid-action-size;
+        }
+    }
+
+    .icon {
+        margin: 0;
+
+        font-size: $more-bar-holder-icon-font-size;
+    }
+}
+
+.launcher-item {
+    float: none !important; // Undo Bootstrap styles
+
+    text-align: left;
+
+    &.mode-icon-only {
+        display: table-cell;
+
+        text-align: center;
+    }
+}

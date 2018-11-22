@@ -1,25 +1,13 @@
 /* @theme: admin.oro; */
 
 @mixin responsive-inline-position() {
-    float: left;
+    float: #{$start};
     width: 50%;
 }
 
 @mixin responsive-block-position() {
     float: none;
     width: 100%;
-}
-
-.responsive-section {
-    .inner-grid {/* todo: when it needs to upgrade to bootstrap4, check negative margins */
-        margin: -#{$contentPadding} -#{$contentPadding} #{$contentPadding} 0;
-    }
-
-    .responsive-cell {
-        .inner-grid {
-            margin: -#{$contentPadding} -#{$contentPadding} #{$contentPadding} -#{$contentPadding};
-        }
-    }
 }
 
 // by default, huge screen, cells: inline, blocks: inline
@@ -31,23 +19,50 @@
     }
 
     .responsive-block {
+        &:empty {
+            display: none;
+        }
+
         @include responsive-inline-position();
     }
-}
 
-// big screen, cells: inline, blocks: wrapped
-.responsive-section.responsive-big {
-    .responsive-cell:not(:only-child) {
-        .responsive-block {
+    .responsive-cell,
+    .responsive-block {
+        &:only-child {
             @include responsive-block-position();
         }
     }
-}
 
-// medium screen, cells: wrapped (if there are blocks), blocks: inline
-.responsive-section.responsive-medium {
-    &:not(.responsive-section-no-blocks) {
+    &.responsive-big {
         .responsive-cell {
+            &:not(:only-child) {
+                .responsive-block {
+                    @include responsive-block-position();
+                }
+            }
+        }
+    }
+
+    &.responsive-medium {
+        &:not(.responsive-section-no-blocks) {
+            .responsive-cell {
+                @include responsive-block-position();
+            }
+
+            // remove horizontal separator if cells are wrapped
+            .row-fluid.row-fluid-divider {
+                background: none;
+            }
+        }
+
+        .responsive-block {
+            @include responsive-inline-position();
+        }
+    }
+
+    &.responsive-small {
+        .responsive-cell,
+        .responsive-block {
             @include responsive-block-position();
         }
 
@@ -55,31 +70,6 @@
         .row-fluid.row-fluid-divider {
             background: none;
         }
-    }
-
-    .responsive-block {
-        @include responsive-inline-position();
-    }
-}
-
-// small screen, cells: wrapped, blocks: wrapped
-.responsive-section.responsive-small {
-    .responsive-cell,
-    .responsive-block {
-        @include responsive-block-position();
-    }
-
-    // remove horizontal separator if cells are wrapped
-    .row-fluid.row-fluid-divider {
-        background: none;
-    }
-}
-
-// the only cell and the only block -- with 100%;
-.responsive-section {
-    .responsive-cell:only-child,
-    .responsive-block:only-child {
-        @include responsive-block-position();
     }
 }
 
@@ -104,56 +94,78 @@
     }
 
     .cms-page__figure_right {
-        float: right;
-        margin-left: 20px;
+        float: #{$end};
+        margin-#{$start}: 20px;
     }
 
     .cms-page__figure_left {
-        float: left;
-        margin-right: 20px;
+        float: #{$start};
+        margin-#{$end}: 20px;
     }
 }
 
-.container-fluid > .responsive-section {
-    margin: 0 -#{$horizontalPadding};
-    padding-right: $horizontalPadding;
+.container-fluid {
+    > .responsive-section {
+        &:not(.responsive-small) {
+            .responsive-cell {
+                &:first-child {
+                    padding-#{$end}: $horizontal-padding;
+                }
 
-    .scrollspy-title {
-        margin-left: 0;
+                &:last-child {
+                    padding-#{$start}: $horizontal-padding;
+                }
+
+                &:only-child {
+                    padding-#{$end}: 0;
+                    padding-#{$start}: 0;
+                }
+            }
+        }
+
+        &.responsive-medium {
+            &:not(.responsive-section-no-blocks) {
+                .responsive-cell {
+                    padding-#{$start}: 0;
+                    padding-#{$end}: 0;
+                }
+            }
+        }
+
+        &.responsive-small {
+            .responsive-cell {
+                padding-#{$end}: 0;
+
+                &:not(:last-child) {
+                    margin-bottom: 16px;
+                }
+            }
+        }
+
+        .responsive-cell {
+            &:only-child {
+                padding-#{$end}: 0;
+            }
+        }
     }
-
-    .responsive-cell {
-        padding-left: $horizontalPadding;
-    }
-
-    .responsive-cell:first-child {
-        padding-right: $horizontalPadding;
-    }
-
-    &.responsive-medium:not(.responsive-section-no-blocks) .responsive-cell,
-    &.responsive-small .responsive-cell,
-    .responsive-cell:only-child {
-        margin-top: 7px;
-        padding-right: 0;
-    }
-}
-
-body.backdrop:before {
-    position: absolute;
-    content: "";
-    display: block;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background: rgba(0, 0, 0, .1);
-    z-index: 9999;
 }
 
 body.backdrop {
     .select2-drop,
     #ui-datepicker-div {
         z-index: 10001 !important;
+    }
+
+    &:before {
+        position: absolute;
+        content: "";
+        display: block;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        #{$start}: 0;
+        background: rgba(0, 0, 0, .1);
+        z-index: 9999;
     }
 }
 
@@ -204,23 +216,23 @@ body.backdrop {
 }
 
 .oro-page {
-    border-top: 1px solid $pageBorderColor;
-    background: $pageSidebarBackgroundColor;
-    border-bottom: 1px solid $pageBorderColor;
+    border-top: 1px solid $page-border-color;
+    background: $page-sidebar-background-color;
+    border-bottom: 1px solid $page-border-color;
 
     .oro-page-sidebar {
         width: 236px;
-        margin-right: -1px;
-        float: left;
-        border-right: 1px solid $pageBorderColor;
-        border-bottom: 1px solid $pageBorderColor;
-        background: $pageSidebarBackgroundColor;
+        margin-#{$end}: -1px;
+        float: #{$start};
+        border-#{$end}: 1px solid $page-border-color;
+        border-bottom: 1px solid $page-border-color;
+        background: $page-sidebar-background-color;
     }
 
     .oro-page-body {
-        float: right;
+        float: #{$end};
         width: calc(100% - 235px);
-        border-left: 1px solid $pageBorderColor;
+        border-#{$start}: 1px solid $page-border-color;
         padding: 10px;
         background-color: #fff;
         overflow: hidden;
@@ -236,8 +248,8 @@ body.backdrop {
             > .dropdown-menu {
                 @include oro-page-menu-items;
 
-                top: none;
-                left: none;
+                top: auto;
+                #{$start}: none;
                 position: relative;
                 border: none;
                 box-shadow: none;

@@ -131,7 +131,8 @@ define(function(require) {
             var dialog = new WidgetPickerModal({
                 dashboard: this,
                 dashboardId: this.options.dashboardId,
-                targetColumn: targetColumn
+                targetColumn: targetColumn,
+                allowOk: false
             });
             dialog.open();
         },

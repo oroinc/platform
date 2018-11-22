@@ -9,6 +9,7 @@ use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Oro\Component\Routing\RouteCollectionUtil;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -106,7 +107,7 @@ trait ApiDocExtractorTrait
         foreach ($routes as $route) {
             if (!$route instanceof Route) {
                 throw new \InvalidArgumentException(
-                    sprintf('All elements of $routes must be instances of Route. "%s" given', gettype($route))
+                    \sprintf('All elements of $routes must be instances of Route. "%s" given', gettype($route))
                 );
             }
 
@@ -117,14 +118,18 @@ trait ApiDocExtractorTrait
                 if (null !== $annotation) {
                     $this->apiDocAnnotationHandler->handle($annotation, $route);
                     $views = $annotation->getViews();
-                    if ((in_array($view, $views, true) || (empty($views) && ApiDoc::DEFAULT_VIEW === $view))
-                        && !in_array($annotation->getSection(), $excludeSections, true)
+                    if ((\in_array($view, $views, true) || (empty($views) && ApiDoc::DEFAULT_VIEW === $view))
+                        && !\in_array($annotation->getSection(), $excludeSections, true)
                     ) {
                         $element = ['annotation' => $this->extractData($annotation, $route, $method)];
                         $resource = $this->getRouteResource($annotation, $route);
                         if ($resource) {
                             $element['resource'] = $resource;
                             $resources[] = $resource;
+                        }
+                        $action = $this->getRouteAction($route);
+                        if ($action) {
+                            $element['action'] = $action;
                         }
                         $array[] = $element;
                     }
@@ -165,9 +170,9 @@ trait ApiDocExtractorTrait
      */
     protected function doAddResources(array &$array, array $resources)
     {
-        rsort($resources);
+        \rsort($resources);
         foreach ($array as $index => $element) {
-            if (array_key_exists('resource', $element)) {
+            if (\array_key_exists('resource', $element)) {
                 continue;
             }
 
@@ -175,7 +180,7 @@ trait ApiDocExtractorTrait
             $path = $element['annotation']->getRoute()->getPath();
 
             foreach ($resources as $resource) {
-                if (0 === strpos($path, $resource) || $resource === $element['annotation']->getResource()) {
+                if (0 === \strpos($path, $resource) || $resource === $element['annotation']->getResource()) {
                     $array[$index]['resource'] = $resource;
 
                     $hasResource = true;
@@ -195,15 +200,15 @@ trait ApiDocExtractorTrait
     protected function doSortAnnotations(array &$array)
     {
         $methodOrder = [
-            'HEAD'    => 1,
-            'OPTIONS' => 2,
-            'GET'     => 3,
-            'POST'    => 4,
-            'PUT'     => 5,
-            'PATCH'   => 6,
-            'DELETE'  => 7,
+            Request::METHOD_HEAD    => 1,
+            Request::METHOD_OPTIONS => 2,
+            Request::METHOD_GET     => 3,
+            Request::METHOD_POST    => 4,
+            Request::METHOD_PUT     => 5,
+            Request::METHOD_PATCH   => 6,
+            Request::METHOD_DELETE  => 7
         ];
-        usort(
+        \usort(
             $array,
             function ($a, $b) use ($methodOrder) {
                 $resourceA = $a['resource'];
@@ -223,10 +228,10 @@ trait ApiDocExtractorTrait
                         return $methodA > $methodB ? 1 : -1;
                     }
 
-                    return strcmp($routeA->getPath(), $routeB->getPath());
+                    return \strcmp($routeA->getPath(), $routeB->getPath());
                 }
 
-                return strcmp($resourceA, $resourceB);
+                return \strcmp($resourceA, $resourceB);
             }
         );
     }
@@ -246,7 +251,7 @@ trait ApiDocExtractorTrait
         $resource = $annotation->getResource();
         if (!$resource) {
             // remove format from routes used for resource grouping
-            $resource = str_replace('.{_format}', '', $route->getPath());
+            $resource = \str_replace('.{_format}', '', $route->getPath());
         }
 
         return $resource;
@@ -269,5 +274,15 @@ trait ApiDocExtractorTrait
         }
 
         return $order;
+    }
+
+    /**
+     * @param Route $route
+     *
+     * @return string|null
+     */
+    protected function getRouteAction(Route $route)
+    {
+        return $route->getDefault('_action');
     }
 }

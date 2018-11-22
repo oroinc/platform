@@ -56,5 +56,10 @@ config:
         'oro/filter/multiselect-originfolder-filter': 'bundles/oroemail/js/filter/multiselect-originfolder-filter.js'
 
         'oroemail/sidebar_widgets/recent_emails/js/widget': 'bundles/oroemail/sidebar_widgets/recent_emails/js/widget.js'
+
+    map:
+        '*':
+            'oro/filter/email-string-filter': 'oro/filter/choice-filter'
+
     appmodules:
         - oroemail/js/app/modules/email-module

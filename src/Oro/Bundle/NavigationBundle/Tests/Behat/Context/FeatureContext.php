@@ -36,6 +36,22 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * @When I Create Divider
+     */
+    public function iCreateDivider()
+    {
+        $this->pressActionButton('Create Divider');
+    }
+
+    /**
+     * @When I Create Menu Item
+     */
+    public function iCreateMenuItem()
+    {
+        $this->pressActionButton('Create Menu Item');
+    }
+
+    /**
      * Assert that menu on left side
      *
      * @Then menu must be on left side
@@ -120,7 +136,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function clickBarsIcon()
     {
-        $this->getPage()->find('css', 'i.fa-bars')->click();
+        $this->getPage()->find('css', '.dot-menu > a')->click();
     }
 
     /**
@@ -502,5 +518,24 @@ class FeatureContext extends OroFeatureContext implements
     private function getMainMenu()
     {
         return $this->createElement('MainMenu');
+    }
+
+    /**
+     * Choose from list: Create Menu Item, Create Divider etc. on the menus page
+     * Select button from list and pressed
+     *
+     * @param string $locator
+     */
+    private function pressActionButton($locator)
+    {
+        $this->elementFactory->createElement('Create Menu Item DropDown')->click();
+
+        $link = $this->getPage()->findLink($locator);
+
+        self::assertNotNull($link, sprintf('Can\'t find "%s" form action links', $locator));
+
+        if ($link->isVisible()) {
+            $link->click();
+        }
     }
 }

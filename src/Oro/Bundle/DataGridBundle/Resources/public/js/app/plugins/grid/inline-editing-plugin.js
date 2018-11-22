@@ -180,10 +180,14 @@ define(function(require) {
                 events: splitEventsList.generateDeclaration(),
 
                 delayedIconRender: function() {
-                    if (!this.$el.find('> [data-role="edit"]').length) {
-                        this.$el.append('<i data-role="edit" ' +
-                            'class="fa-pencil skip-row-click hide-text inline-editor__edit-action"' +
-                            'title="' + __('Edit') + '">' + __('Edit') + '</i>');
+                    if (!this.$('[data-role="edit"]').length) {
+                        this.$el.append('<span class="inline-editor-edit-action">' +
+                            '<button data-role="edit" ' +
+                                    'class="inline-actions-btn skip-row-click hide-text"' +
+                                    'title="' + __('Edit') + '">' +
+                                '<span class="fa-pencil" aria-hidden="true"></span>' +
+                            '</button>' +
+                        '</span>');
                         this.$el.attr('title', inlineEditingPlugin.helpMessage);
                     }
                 },
@@ -328,6 +332,9 @@ define(function(require) {
                 if (this.disposed) {
                     // @TODO dix it. Rear case, for some reason inline inline-editing-plugin is already disposed
                     return;
+                }
+                if (this._focusedCell) {
+                    this.highlightCell(this._focusedCell, false);
                 }
                 var index = this.activeEditorComponents.indexOf(editorComponent);
                 if (index !== -1) {

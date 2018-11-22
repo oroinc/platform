@@ -117,6 +117,13 @@ class ResourceWithoutIdentifierTest extends RestJsonApiTestCase
         );
     }
 
+    public function testOptions()
+    {
+        $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
+        $response = $this->options($this->getListRouteName(), ['entity' => $entityType]);
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH, POST, DELETE');
+    }
+
     public function testNotAllowedMethodsItemHandler()
     {
         $this->appendEntityConfig(
@@ -130,10 +137,9 @@ class ResourceWithoutIdentifierTest extends RestJsonApiTestCase
             true
         );
 
-        $this->assertNotAllowedMethod('PATCH', 'GET, POST');
-        $this->assertNotAllowedMethod('DELETE', 'GET, POST');
-        $this->assertNotAllowedMethod('OPTIONS', 'GET, POST');
-        $this->assertNotAllowedMethod('HEAD', 'GET, POST');
+        $this->assertNotAllowedMethod('PATCH', 'OPTIONS, GET, POST');
+        $this->assertNotAllowedMethod('DELETE', 'OPTIONS, GET, POST');
+        $this->assertNotAllowedMethod('HEAD', 'OPTIONS, GET, POST');
     }
 
     public function testNotAllowedMethodsListHandler()
@@ -149,10 +155,9 @@ class ResourceWithoutIdentifierTest extends RestJsonApiTestCase
             true
         );
 
-        $this->assertNotAllowedMethod('POST', 'GET, PATCH');
-        $this->assertNotAllowedMethod('DELETE', 'GET, PATCH');
-        $this->assertNotAllowedMethod('OPTIONS', 'GET, PATCH');
-        $this->assertNotAllowedMethod('HEAD', 'GET, PATCH');
+        $this->assertNotAllowedMethod('POST', 'OPTIONS, GET, PATCH');
+        $this->assertNotAllowedMethod('DELETE', 'OPTIONS, GET, PATCH');
+        $this->assertNotAllowedMethod('HEAD', 'OPTIONS, GET, PATCH');
     }
 
     public function testNotAllowedMethodsWhenGetActionIsExcluded()
@@ -167,9 +172,8 @@ class ResourceWithoutIdentifierTest extends RestJsonApiTestCase
             true
         );
 
-        $this->assertNotAllowedMethod('GET', 'PATCH, POST, DELETE');
-        $this->assertNotAllowedMethod('OPTIONS', 'PATCH, POST, DELETE');
-        $this->assertNotAllowedMethod('HEAD', 'PATCH, POST, DELETE');
+        $this->assertNotAllowedMethod('GET', 'OPTIONS, PATCH, POST, DELETE');
+        $this->assertNotAllowedMethod('HEAD', 'OPTIONS, PATCH, POST, DELETE');
     }
 
     /**
@@ -186,5 +190,85 @@ class ResourceWithoutIdentifierTest extends RestJsonApiTestCase
 
         self::assertMethodNotAllowedResponse($response, $expectedAllowedMethods, $method);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE, $method);
+    }
+
+    public function testGetWithStringCustomFilter()
+    {
+        $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
+        $response = $this->request(
+            'GET',
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType]),
+            ['filter[filter1]' => 'filter value']
+        );
+
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        $this->assertResponseContains(
+            [
+                'meta' => [
+                    'name' => 'test (filter1 value: filter value)'
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetWithTypedCustomFilterWithValidValue()
+    {
+        $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
+        $response = $this->request(
+            'GET',
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType]),
+            ['filter[filter2]' => '2018-05-25']
+        );
+
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        $this->assertResponseContains(
+            [
+                'meta' => [
+                    'name' => 'test (filter2 value: 25/5/2018)'
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetWithTypedCustomFilterWithInvalidValue()
+    {
+        $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
+        $response = $this->request(
+            'GET',
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType]),
+            ['filter[filter2]' => 'test']
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected date value. Given "test".',
+                'source' => ['parameter' => 'filter[filter2]']
+            ],
+            $response
+        );
+    }
+
+    public function testGetWithUnknownFilter()
+    {
+        $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
+        $response = $this->request(
+            'GET',
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType]),
+            ['filter[anotherFilter]' => 'filter value']
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The filter is not supported.',
+                'source' => ['parameter' => 'filter[anotherFilter]']
+            ],
+            $response
+        );
     }
 }

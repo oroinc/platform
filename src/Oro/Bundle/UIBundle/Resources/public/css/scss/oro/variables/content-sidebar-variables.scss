@@ -1,0 +1,65 @@
+/* @theme: admin.oro; */
+
+// Main variables
+$content-sidebar-header-height: 55px !default;
+$content-sidebar-horizontal-padding: $content-padding !default;
+$content-sidebar-width: 320px !default;
+$content-sidebar-minimized-width: 48px !default;
+$content-sidebar-resizable-area-color: #ddd !default;
+$content-sidebar-content-min-width: 288px !default;
+
+// Component variables
+$content-sidebar-sidebar-display: flex !default;
+$content-sidebar-sidebar-flex-direction: column !default;
+$content-sidebar-sidebar-background: $primary-900 !default;
+$content-sidebar-sidebar-border-radius: 4px !default;
+
+$content-sidebar-sidebar-position: relative !default;
+$content-sidebar-sidebar-flex-shrink: 0 !default;
+$content-sidebar-sidebar-width: $content-sidebar-width !default;
+
+$content-sidebar-sidebar-not-ui-resizable-resizing-transition: width .3s !default;
+
+$content-sidebar-minimized-offset-inner-left: 0 !default;
+$content-sidebar-minimized-width: $content-sidebar-minimized-width !default;
+
+$content-sidebar-resizable-area-position: absolute !default;
+$content-sidebar-resizable-area-top: 0 !default;
+$content-sidebar-resizable-area-right: 0 !default;
+$content-sidebar-resizable-area-width: 10px !default;
+$content-sidebar-resizable-area-height: 100% !default;
+$content-sidebar-resizable-area-border-right: 3px solid $content-sidebar-resizable-area-color !default;
+$content-sidebar-resizable-area-touch-action: none !default;
+$content-sidebar-resizable-area-cursor: ew-resize !default;
+$content-sidebar-resizable-area-opacity: 0 !default;
+$content-sidebar-resizable-area-transition: opacity 150ms linear !default;
+$content-sidebar-resizable-area-visibility: hidden !default;
+$content-sidebar-hover-resizable-area-opacity: 1 !default;
+
+$content-sidebar-items-offset-inner: 0 $content-sidebar-horizontal-padding !default;
+
+$content-sidebar-jstree-offset: 8px -#{$content-sidebar-horizontal-padding} -#{$content-sidebar-horizontal-padding} !default;
+
+$content-sidebar-display: flex !default;
+$content-sidebar-justify-content: space-between !default;
+$content-sidebar-align-items: center !default;
+$content-sidebar-height: $content-sidebar-header-height !default;
+$content-sidebar-offset-inner: $content-padding-medium $content-sidebar-horizontal-padding !default;
+
+$content-sidebar-minimized-offset-inner: 5px 18px 4px !default;
+
+$content-sidebar-controls-float: right !default;
+
+$content-sidebar-control-display: inline-block !default;
+$content-sidebar-control-cursor: pointer !default;
+
+$content-sidebar-control-i-display: block !default;
+$content-sidebar-control-i-padding: 12px 0 !default;
+$content-sidebar-control-i-color: $primary-400 !default;
+$content-sidebar-control-i-font-size: 16px !default;
+
+$content-sidebar-container-display: flex !default;
+$content-sidebar-container-offset-left: null !default;
+$content-sidebar-container-flex: 1 1 auto !default;
+
+$content-sidebar-form-horizontal-offset-inner: $content-sidebar-horizontal-padding 0 !default;

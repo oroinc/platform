@@ -1,4 +1,9 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/variables";
 @import "oroui/css/scss/mixins";
+@import "variables";
+
 @import "role/permissions-grid";
 @import "role/capabilities";
 
@@ -7,10 +12,6 @@
     line-height: 1.2em;
     vertical-align: baseline;
     padding: 4px 12px;
-}
-
-.control-group.api-block label.control-label-api-key {
-    padding-top: 9px;
 }
 
 form.change-password-form {

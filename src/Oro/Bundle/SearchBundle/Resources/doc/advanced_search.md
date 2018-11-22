@@ -1,15 +1,13 @@
 API advanced search
 ====================
 
-REST and SOAP APIs allow to create advanced search queries.
+REST API allow to create advanced search queries.
 
 Parameters for APIs requests:
 
  - **query** - search string
 
 REST API url: http://domail.com/api/rest/latest/search/advanced
-
-SOAP function name: advancedSearch
 
 REST API work with get request only.
 

@@ -13,7 +13,10 @@ define(function(require) {
         autoRender: true,
 
         events: {
-            change: 'onChange'
+            'change': 'onChange',
+            'focus [data-role="shortcut-search"]': 'onFocus',
+            'hide.bs.dropdown': 'onDropdownHide',
+            'click .nav-content': 'stopPropagation'
         },
 
         data: {},
@@ -52,13 +55,14 @@ define(function(require) {
             if (!$input.data('typeahead')) {
                 this.initTypeahead();
             }
+
             this.initLayout();
 
             return this;
         },
 
         getTypeaheadInput: function() {
-            return this.$('.input');
+            return this.$('[data-role="shortcut-search"]');
         },
 
         initTypeahead: function() {
@@ -125,8 +129,11 @@ define(function(require) {
                                 .attr('title', __(config.label))
                                 .attr('data-page-component-module', 'oroui/js/app/components/widget-component')
                                 .attr('data-page-component-options', JSON.stringify(options))
-                                .html('<i class="' + config.iCss + ' hide-text">' + item.key + '</i>' +
-                                    that.highlighter(item.key));
+                                .html(that.highlighter(item.key));
+
+                            if (config.iCss) {
+                                view.prepend('<i class="' + config.iCss + ' hide-text">' + item.key + '</i>');
+                            }
                         } else {
                             view = $(that.options.item).attr('data-value', item.key);
                             view.find('a').html(that.highlighter(item.key));
@@ -138,7 +145,8 @@ define(function(require) {
                     items.first().addClass('active');
                     this.$menu.html(items);
                     return this;
-                }, click: function(e) {
+                },
+                click: function(e) {
                     e.stopPropagation();
                     e.preventDefault();
                     if (!this.$menu.find('.active').data('isDialog')) {
@@ -178,16 +186,29 @@ define(function(require) {
         onChange: function() {
             var $input = this.getTypeaheadInput();
             var key = $input.val();
-            var dataItem;
-            $input.val('');
-            if (!_.isUndefined(this.data[key])) {
-                dataItem = this.data[key];
+            var dataItem = this.data[key];
+
+            if (dataItem !== void 0) {
+                $input.val('').inputWidget('refresh');
+
                 if (!dataItem.dialog) {
                     $input.closest('form').attr('action', dataItem.url).submit();
                 } else {
                     $input.parent().find('li.active > a').click();
                 }
             }
+        },
+
+        onFocus: function() {
+            this.getTypeaheadInput().typeahead('lookup');
+        },
+
+        onDropdownHide: function() {
+            this.getTypeaheadInput().val('').inputWidget('refresh');
+        },
+
+        stopPropagation: function(e) {
+            e.stopPropagation();
         }
     });
 

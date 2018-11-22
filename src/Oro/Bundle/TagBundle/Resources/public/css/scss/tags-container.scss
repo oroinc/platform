@@ -1,0 +1,84 @@
+/* @theme: admin.oro; */
+
+.tags-container {
+    display: inline-block;
+
+    .tags-cell & {
+        display: block;
+        margin: side-values(-$tag-item-inner-offset-vertical 0);
+    }
+
+    &__tag-entry {
+        color: $tag-item-color;
+        background-color: $tag-item-background;
+        border-radius: $tag-item-border-radius;
+        font-size: $tag-item-font-size;
+        padding: $tag-item-inner-offset;
+        margin: $tag-item-offset;
+        display: inline-block;
+        vertical-align: top;
+        line-height: $tag-item-line-height;
+        transition: $hover-transition;
+        height: $tag-item-height;
+
+        &:hover,
+        &:focus {
+            color: $tag-item-color;
+            outline-style: none;
+        }
+
+        .inline-actions-element:hover &,
+        .editable:hover & {
+            background-color: $tag-item-editable-hover-background;
+            color: $tag-item-editable-hover-color;
+
+            &:hover,
+            &:focus {
+                background-color: $tag-item-edit-hover-alt-background;
+            }
+        }
+    }
+
+    &__tag-entry_is-my {
+        background-color: $tag-item-background;
+    }
+}
+
+.tags-form-select-editor {
+    min-width: 100px;
+
+    .select2-container {
+        height: auto;
+    }
+
+    .select2-choices {
+        max-height: 40vh;
+        min-width: 130px;
+        overflow: auto;
+
+        .select2-search-choice {
+            font-size: 11px;
+            line-height: 12px;
+            padding: 5px 20px 5px 8px;
+            color: $tag-item-color;
+            background: $tag-item-background;
+            border: 0 none;
+            border-radius: 10px;
+            box-shadow: none;
+            margin-left: 4px;
+            margin-bottom: 0;
+
+            .select2-search-choice-close {
+                top: 6px;
+
+                &:before {
+                    color: $tag-item-color;
+                }
+            }
+
+            &.select2-locked {
+                padding: 4px 5px 3px 6px !important;
+            }
+        }
+    }
+}

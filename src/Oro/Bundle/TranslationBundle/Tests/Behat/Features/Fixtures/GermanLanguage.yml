@@ -1,0 +1,6 @@
+Oro\Bundle\TranslationBundle\Entity\Language:
+    german_lang:
+        code: 'de_DE'
+        enabled: true
+        organization: '@organization'
+        owner: '@admin'

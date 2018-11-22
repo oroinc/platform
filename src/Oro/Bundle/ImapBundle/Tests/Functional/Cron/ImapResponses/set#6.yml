@@ -1,0 +1,37 @@
+id: sync_selected_origin_with_undisclosed_recipients
+description: Sync selected origin with one folder and one simple email with undisclosed recipients
+params:
+    --id: origin_two
+log_info:
+    - 'Finding an email origin (id:'
+    - 'Found " ()" email origin. Id: '
+    - 'Get folders enabled for sync...'
+    - 'Got 1 folder(s)'
+    - 'The folder "Folder 1" is selected.'
+    - 'Previous max email UID "0"'
+    - 'Found 1 email(s).'
+    - 'Error occurred while trying to process email "test" (UID: 123). Unable to parse the header "To". Reason: "The input is not a valid email address. Use the basic format local-part@hostname".'
+total: 1
+data:
+    id: 91
+    UID: 123
+    INTERNALDATE: 121212
+    FLAGS: []
+    BODY[HEADER]: |
+        X-Received: by 10.129.163.10 with SMTP id a10mr33514476ywh.242.1469808918056;
+         Fri, 29 Jul 2016 09:15:18 -0700 (PDT)
+        Received: by 10.13.236.11 with HTTP; Fri, 29 Jul 2016 09:15:17 -0700 (PDT)
+        From: Test Test <test@test.tst>
+        Date: Fri, 29 Jul 2016 19:15:17 +0300
+        Message-ID: <CABUX4_0dKWw9sOZMJWCv9nA=NQzM0t7AO9gW0k21_4ux8XhFdA@mail.gmail.com>
+        Subject: test
+        To: <undisclosed-recipients:;>
+        Bcc: Test1 Test1 <test1@test.tst>
+        Content-Type: multipart/alternative; boundary=94eb2c12a04872ff170538c88ef6"
+expectedEmailData:
+    subject: test
+    fromName: Test Test <test@test.tst>
+    fromEmailAddress.email: test@test.tst
+    recipients.0.type: bcc
+    recipients.0.name: Test1 Test1 <test1@test.tst>
+    messageId: <CABUX4_0dKWw9sOZMJWCv9nA=NQzM0t7AO9gW0k21_4ux8XhFdA@mail.gmail.com>

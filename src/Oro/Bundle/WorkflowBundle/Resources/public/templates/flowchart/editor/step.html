@@ -2,22 +2,23 @@
 <div class="jsplumb-source jsplumb-source-top-right"></div>
 <div class="jsplumb-source jsplumb-source-bottom-right"></div>
 <div class="jsplumb-source jsplumb-source-bottom-left"></div>
-<span class="step-label">
+<div class="step-label">
     <%- label %>
     <% if (!_is_start) { %>
-    <span class="dropdown-toggle" data-toggle="dropdown">
-        <i class="fa-sort-desc"></i>
+    <% var togglerId = _.uniqueId('dropdown-') %>
+    <span role="button" id="<%- togglerId %>" class="dropdown-toggle" data-toggle="dropdown"
+       aria-label="<%- _.__('oro.workflow.flowchart.step.actions_label') %>" aria-haspopup="true" aria-expanded="false">
     </span>
-    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+    <ul class="dropdown-menu" role="menu" aria-labelledby="<%- togglerId %>">
         <li class="first">
-            <a class="workflow-step-edit" href="#edit-step"><i class="fa-pencil-square-o" aria-hidden="true"></i><%= _.__('Edit') %></a>
+            <a class="workflow-step-edit" href="#edit-step"><span class="fa-pencil-square-o" aria-hidden="true"></span><%- _.__('Edit') %></a>
         </li>
         <li>
-            <a class="workflow-step-clone" href="#clone-step"><i class="fa-files-o" aria-hidden="true"></i><%= _.__('Clone') %></a>
+            <a class="workflow-step-clone" href="#clone-step"><span class="fa-files-o" aria-hidden="true"></span><%- _.__('Clone') %></a>
         </li>
         <li>
-            <a class="workflow-step-delete" href="#delete-step"><i class="fa-trash-o" aria-hidden="true"></i><%= _.__('Delete') %></a>
+            <a class="workflow-step-delete" href="#delete-step"><span class="fa-trash-o" aria-hidden="true"></span><%- _.__('Delete') %></a>
         </li>
     </ul>
     <% } %>
-</span>
+</div>

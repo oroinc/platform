@@ -32,10 +32,6 @@ define([
                     this.expand();
                 }
             },
-            'click .default-actions-container .move-action': function(event) {
-                event.preventDefault();
-                this.onMove();
-            },
             'click .default-actions-container .remove-action': function(event) {
                 event.preventDefault();
                 this.onRemoveFromDashboard();
@@ -93,6 +89,20 @@ define([
             }
 
             DashboardItemWidget.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        render: function() {
+            if (!this.state.expanded) {
+                this.widgetContentContainer.attr('data-layout', 'separate');
+                this.listenToOnce(this, 'expand', function() {
+                    this.widgetContentContainer.removeAttr('data-layout');
+                    this.render();
+                });
+            }
+            return DashboardItemWidget.__super__.render.call(this);
         },
 
         /**
@@ -227,14 +237,6 @@ define([
          */
         isCollapsed: function() {
             return !this.state.expanded;
-        },
-
-        /**
-         * Triggering move action
-         */
-        onMove: function() {
-            this.trigger('move', this.$el, this);
-            mediator.trigger('widget:dashboard:move:' + this.getWid(), this.$el, this);
         },
 
         /**

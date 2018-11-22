@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * The registry that allows to get the Data API resources configuratin bag
+ * The registry that allows to get the Data API resources configuration bag
  * for a specific request type.
  */
 class ConfigBagRegistry

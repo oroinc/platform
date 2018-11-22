@@ -34,11 +34,64 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
+    public function testProcessWithNotArrayData()
+    {
+        $requestData = [
+            'data'     => 'test',
+            'included' => [
+                [
+                    'type' => 'groups',
+                    'id'   => 'included_group_1'
+                ]
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+    }
+
+    public function testProcessWithNotArrayIncludedData()
+    {
+        $requestData = [
+            'data' => [
+                'type' => 'users'
+            ],
+            'included' => 'test'
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+    }
+
+    public function testProcessWithNotArrayIncludedDataItem()
+    {
+        $requestData = [
+            'data' => [
+                'type' => 'users'
+            ],
+            'included' => [
+                'test'
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [$this->createValidationError(0)],
+            $this->context->getErrors()
+        );
+    }
+
     /**
      * @expectedException \LogicException
      * @expectedExceptionMessage The "data" section must exist in the request data.
      */
-    public function testProcessIncludedDataWithoutPrimatyData()
+    public function testProcessIncludedDataWithoutPrimaryData()
     {
         $requestData = [
             'included' => [
@@ -386,6 +439,114 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         );
     }
 
+    public function testProcessRelationshipWithoutData()
+    {
+        $requestData = [
+            'data'     => [
+                'type' => 'users',
+                'id'   => 'user_1'
+            ],
+            'included' => [
+                [
+                    'type'          => 'groups',
+                    'id'            => 'included_group_1',
+                    'relationships' => [
+                        'user' => ['type' => 'users', 'id' => 'user_1']
+                    ]
+                ]
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [$this->createValidationError(0)],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessRelationshipWithoutDataButEntityHasOtherValidRelationship()
+    {
+        $requestData = [
+            'data'     => [
+                'type' => 'users',
+                'id'   => 'user_1'
+            ],
+            'included' => [
+                [
+                    'type'          => 'groups',
+                    'id'            => 'included_group_1',
+                    'relationships' => [
+                        'user1' => ['type' => 'users', 'id' => 'user_1'],
+                        'user2' => [
+                            'data' => ['type' => 'users', 'id' => 'user_1']
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+    }
+
+    public function testProcessRelationshipWithInvalidData()
+    {
+        $requestData = [
+            'data'     => [
+                'type' => 'users',
+                'id'   => 'user_1'
+            ],
+            'included' => [
+                [
+                    'type'          => 'groups',
+                    'id'            => 'included_group_1',
+                    'relationships' => [
+                        'user' => ['data' => 'invalid']
+                    ]
+                ]
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [$this->createValidationError(0)],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessRelationshipWithInvalidDataButEntityHasOtherValidRelationship()
+    {
+        $requestData = [
+            'data'     => [
+                'type' => 'users',
+                'id'   => 'user_1'
+            ],
+            'included' => [
+                [
+                    'type'          => 'groups',
+                    'id'            => 'included_group_1',
+                    'relationships' => [
+                        'user1' => ['data' => 'invalid'],
+                        'user2' => [
+                            'data' => ['type' => 'users', 'id' => 'user_1']
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+    }
+
     /**
      * @param int $includedObjectIndex
      *
@@ -396,6 +557,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         $error = Error::createValidationError(
             Constraint::REQUEST_DATA,
             'The entity should have a relationship with the primary entity'
+            . ' and this should be explicitly specified in the request'
         );
         $error->setSource(
             ErrorSource::createByPointer(sprintf('/included/%s', $includedObjectIndex))

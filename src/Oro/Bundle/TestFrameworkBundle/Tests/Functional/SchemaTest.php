@@ -78,7 +78,7 @@ class SchemaTest extends WebTestCase
                 'CREATE INDEX request_create_idx ON orocrm_contactus_request (created_at, id)',
                 'CREATE INDEX mageorder_created_idx ON orocrm_magento_order (created_at, id)',
                 'CREATE INDEX magecustomer_rev_name_idx ON orocrm_magento_customer (last_name, first_name, id)',
-                'CREATE INDEX magecart_updated_idx ON orocrm_magento_cart (updatedAt, id)',
+                'CREATE INDEX magecart_updated_idx ON orocrm_magento_cart (updatedAt, id)'
             ],
         ];
 

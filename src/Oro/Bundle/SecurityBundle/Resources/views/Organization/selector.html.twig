@@ -11,24 +11,28 @@
 
 {% if isDesktopVersion() %}
     {% if organizations|length > 1 %}
-        <div class="nav logo-wrapper dropdown header-utility-dropdown">
+        <div class="nav logo-wrapper dropdown">
             {{ UI.app_logo(organization_name) }}
             {{ _self.organization_name_and_logo(organization_name) }}
-            <i class="fa-caret-down dropdown-toggle btn-organization-switcher" data-toggle="dropdown"></i>
-            <ul class="dropdown-menu dropdown-organization-switcher">
+            {% set togglerId = 'dropdown-'|uniqid %}
+            <span id="{{ togglerId }}" class="dropdown-toggle btn-organization-switcher" data-toggle="dropdown"
+                  role="button" aria-label="{{ 'oro.security.organization.switch'|trans }}" aria-haspopup="true" aria-expanded="false"></span>
+            <ul class="dropdown-menu dropdown-organization-switcher" role="menu" aria-labelledby="{{ togglerId }}">
                 {% for organization in organizations %}
                     <li>
                         {% if curr_organization and curr_organization.getId() == organization.id %}
-                        <span class="selected"><b>{{ organization.name }}</b></span>
+                        <span class="dropdown-item-text selected" aria-selected="true"><b>{{- organization.name|trim -}}</b></span>
                         {% else %}
                         <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}"
-                           class="organization-switcher no-hash">
-                            {{- organization.name -}}
+                           class="dropdown-item organization-switcher no-hash">
+                            {{- organization.name|trim -}}
                         </a>
                         {% endif %}
                     </li>
                     {% if not loop.last %}
-                    <li class="divider"><span></span></li>
+                    <li>
+                        <div class="dropdown-divider"></div>
+                    </li>
                     {% endif %}
                 {% endfor %}
             </ul>
@@ -45,17 +49,18 @@
 {% else %}
     {# Mobile view #}
     {% if organizations|length > 1 %}
-        <div class="nav organization-switcher dropdown">
-            <h1 class="logo dropdown-toggle" data-toggle="dropdown">
-                <a href="javascript: void(0);">
-                    {{- organization_name -}}
-                </a>
-                <i class="fa-caret-down btn-organization-switcher"></i>
-            </h1>
-            <ul class="dropdown-menu">
+        <div class="organization-switcher dropdown">
+            {% set togglerId = 'dropdown-'|uniqid %}
+            <a id="{{ togglerId }}" href="#" role="button" class="logo dropdown-toggle btn-organization-switcher" data-toggle="dropdown"
+                aria-label="{{ 'oro.security.organization.switch'|trans }}" aria-haspopup="true" aria-expanded="false">
+                <span class="organization-name">{{- organization_name -}}</span>
+            </a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="{{ togglerId }}">
                 {% for organization in organizations %}
-                    <li {% if curr_organization and curr_organization.getId() == organization.id %}class="current"{% endif %}>
-                        <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}" class="no-hash">
+                    {% set is_current_organization = curr_organization and curr_organization.getId() == organization.id %}
+                    <li {% if is_current_organization %}class="current"{% endif %}>
+                        <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}" class="dropdown-item no-hash"
+                           {% if is_current_organization %}aria-selected="true"{% endif %}>
                             {{- organization.name -}}
                         </a>
                     </li>
@@ -67,7 +72,7 @@
         </script>
     {% else %}{# if organizations|length == 1 #}
         <h1 class="logo">
-            <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}">
+            <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}" class="organization-name">
                 {{- organization_name -}}
             </a>
         </h1>
@@ -76,11 +81,11 @@
 
 {% macro organization_name_and_logo(organization_name) %}
     {% if organization_name|length %}
-        <h1 class="logo logo-text">
-            <a href="{{ path('oro_default') }}" title="{{ organization_name }}">
+        <div class="logo logo-text">
+            <a href="{{ path('oro_default') }}" title="{{ organization_name }}" class="organization-name">
                 {{- organization_name -}}
             </a>
-        </h1>
+        </div>
     {% else %}
         <span class="logo-placeholder"></span>
     {% endif %}

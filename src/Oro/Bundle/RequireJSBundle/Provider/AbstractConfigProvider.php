@@ -8,6 +8,9 @@ use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * The base class for RequireJS configuration providers.
+ */
 abstract class AbstractConfigProvider implements ConfigProviderInterface
 {
     /**
@@ -77,11 +80,14 @@ abstract class AbstractConfigProvider implements ConfigProviderInterface
      */
     protected function getConfigs()
     {
-        if (!$this->cache->contains($this->getCacheKey())) {
-            $this->cache->save($this->getCacheKey(), $this->collectConfigs());
+        $cacheKey = $this->getCacheKey();
+        $configs = $this->cache->fetch($cacheKey);
+        if (false === $configs) {
+            $configs = $this->collectConfigs();
+            $this->cache->save($cacheKey, $configs);
         }
 
-        return $this->cache->fetch($this->getCacheKey());
+        return $configs;
     }
 
     /**

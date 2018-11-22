@@ -1,0 +1,21 @@
+/* @theme: admin.oro; */
+
+@import 'bowerassets/bootstrap/scss/badge';
+
+.badge {
+    [class^="fa-"],
+    [class*=" fa-"] {
+        margin-#{$end}: $badge-icon-offset;
+    }
+}
+
+.badge-pill {
+    font-size: $badge-font-size;
+    line-height: 1.23;
+}
+
+@each $color, $values in $badge-theme-keys {
+    .badge-#{$color} {
+        @include badge-custom-variant($values...);
+    }
+}

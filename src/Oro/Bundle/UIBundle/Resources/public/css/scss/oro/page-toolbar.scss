@@ -1,0 +1,21 @@
+/* @theme: admin.oro; */
+
+.page-toolbar {
+    padding: 0;
+    min-height: $page-toolbar-min-height;
+    background-color: $page-toolbar-background-color;
+    display: flex;
+    align-items: center;
+
+    &_bookmark-buttons {
+        flex-shrink: 0;
+    }
+
+    &_breadcrumb {
+        margin-#{$end}: auto;
+    }
+
+    &_before-content-addition {
+        flex-shrink: 0;
+    }
+}

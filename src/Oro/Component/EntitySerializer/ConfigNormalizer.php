@@ -22,48 +22,6 @@ class ConfigNormalizer
     }
 
     /**
-     * @param array $config
-     *
-     * @return array
-     *
-     * @deprecated since 1.9. Use 'exclude' attribute for a field instead of 'excluded_fields' for an entity
-     */
-    protected function applyExcludedFieldsConfig(array $config)
-    {
-        $excludedFields = ConfigUtil::getArrayValue($config, 'excluded_fields');
-        unset($config['excluded_fields']);
-        foreach ($excludedFields as $field) {
-            $fieldConfig = ConfigUtil::getFieldConfig($config, $field);
-            if (!ConfigUtil::isExclude($fieldConfig)) {
-                $fieldConfig[ConfigUtil::EXCLUDE] = true;
-                $config[ConfigUtil::FIELDS][$field] = $fieldConfig;
-            }
-        }
-
-        return $config;
-    }
-
-    /**
-     * @param array  $config
-     * @param array  $fieldConfig
-     * @param string $field
-     *
-     * @return mixed
-     *
-     * @deprecated since 1.9. Use `property_path` attribute instead of 'result_name'
-     */
-    protected function applyResultNameConfig(array &$config, array &$fieldConfig, $field)
-    {
-        $fieldConfig[ConfigUtil::PROPERTY_PATH] = $field;
-        unset($config[ConfigUtil::FIELDS][$field]);
-
-        $field = $fieldConfig['result_name'];
-        unset($fieldConfig['result_name']);
-
-        return $field;
-    }
-
-    /**
      * Remembers the current config state before it will be normalized
      *
      * @param array $config
@@ -72,17 +30,6 @@ class ConfigNormalizer
      */
     protected function preNormalizeConfig(array $config)
     {
-        // @deprecated since 1.9. Use 'exclude' attribute for a field instead of 'excluded_fields' for an entity
-        if (array_key_exists('excluded_fields', $config)) {
-            $config = $this->applyExcludedFieldsConfig($config);
-        }
-
-        // @deprecated since 1.9. Use 'order_by' attribute instead of 'orderBy'
-        if (array_key_exists('orderBy', $config)) {
-            $config[ConfigUtil::ORDER_BY] = $config['orderBy'];
-            unset($config['orderBy']);
-        }
-
         if (array_key_exists(ConfigUtil::FIELDS, $config)) {
             if (is_string($config[ConfigUtil::FIELDS])) {
                 // expands 'fields' => 'field_name' to its full definition
@@ -103,11 +50,6 @@ class ConfigNormalizer
                 foreach ($fields as $field) {
                     $fieldConfig = $config[ConfigUtil::FIELDS][$field];
                     if (null !== $fieldConfig) {
-                        // @deprecated since 1.9. Use `property_path` attribute instead of 'result_name'
-                        if (isset($fieldConfig['result_name'])) {
-                            $field = $this->applyResultNameConfig($config, $fieldConfig, $field);
-                        }
-
                         if (ConfigUtil::isExclude($fieldConfig)) {
                             $excludedFields[] = $field;
                         }

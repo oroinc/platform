@@ -6,6 +6,9 @@ use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
 
+/**
+ * This class is responsible to get configurable permissions.
+ */
 class ConfigurablePermissionProvider
 {
     const CACHE_ID = 'configurable_permissions';
@@ -61,11 +64,13 @@ class ConfigurablePermissionProvider
      */
     private function getConfigurablePermissionsData()
     {
-        if (!$this->cache->contains(self::CACHE_ID)) {
-            $this->buildCache();
+        $configuration = $this->cache->fetch(self::CACHE_ID);
+        if (false === $configuration) {
+            $configuration = $this->configurationProvider->getConfiguration();
+            $this->cache->save(self::CACHE_ID, $configuration);
         }
 
-        return $this->cache->fetch(self::CACHE_ID);
+        return $configuration;
     }
 
     /**

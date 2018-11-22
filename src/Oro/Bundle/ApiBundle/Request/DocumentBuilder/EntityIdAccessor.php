@@ -46,6 +46,12 @@ class EntityIdAccessor
 
         $idFieldNames = $metadata->getIdentifierFieldNames();
         $idFieldNamesCount = \count($idFieldNames);
+
+        if (null !== $entity && !\is_array($entity) && !\is_object($entity) && $idFieldNamesCount === 1) {
+            $fieldName = \reset($idFieldNames);
+            $entity = [$fieldName => $entity];
+        }
+
         if ($idFieldNamesCount === 1) {
             $fieldName = \reset($idFieldNames);
             if (!$this->propertyAccessor->hasProperty($entity, $fieldName)) {

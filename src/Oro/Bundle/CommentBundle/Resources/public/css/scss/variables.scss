@@ -1,0 +1,42 @@
+/* @theme: admin.oro; */
+
+$comment-view-header-offset: 24px 0 12px 0 !default;
+
+$comment-view-title-font-size: 14px !default;
+$comment-view-title-font-weight: bold !default;
+
+$comment-view-base-offset: 10px !default;
+
+$comment-view-content-offset: 10px !default;
+$comment-view-attachment-item-offset: 5px !default;
+
+$comments-block-offset: 12px !default;
+$comments-block-color: $primary-200 !default;
+
+$comments-avatar-placeholder-color: $primary-750 !default;
+$comments-avatar-placeholder-icon: $fa-var-user-circle !default;
+$comments-block-title-size: 32px !default;
+
+$comments-block-avatar-radius: 50% !default;
+
+$comments-block-author-info-offset: 6px !default;
+
+$comments-block-content-offset: side-values(0 16px 12px 16px) !default;
+$comments-block-paragraph-offset:side-values(0 0 22px 0) !default;
+$comments-block-paragraph-last-offset:side-values(0 0 16px 0) !default;
+
+$comments-block-body-color: $primary !default;
+
+$comments-comment-action-size: 22px !default;
+$comments-comment-actions-icon: $fa-var-ellipsis-h !default;
+$comments-comment-action-font-size: 16px !default;
+
+$comments-thumbnail-width: 110px !default;
+$comments-thumbnail-height: 80px !default;
+$comments-thumbnail-background: $primary-830 !default;
+$comments-thumbnail-border-radius: $border-radius !default;
+$comments-thumbnail-icon-offset: 20px !default;
+$comments-thumbnail-icon-color: $primary-inverse !default;
+
+$comments-thumbnail-icon-record-color: $primary-200 !default;
+$comments-thumbnail-icon-record-font-size: 15px !default;

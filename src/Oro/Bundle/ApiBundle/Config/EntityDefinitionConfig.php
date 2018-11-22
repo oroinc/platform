@@ -107,7 +107,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     }
 
     /**
-     * Checks whether the configuration of at least one field exists.
+     * Indicates whether the configuration of at least one field exists.
      *
      * @return bool
      */
@@ -381,7 +381,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /**
      * Indicates whether the name of ACL resource is set explicitly.
      *
-     * @return string
+     * @return bool
      */
     public function hasAclResource()
     {
@@ -853,6 +853,21 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
         } else {
             $maxResults = (int)$maxResults;
             $this->items[ConfigUtil::MAX_RESULTS] = $maxResults >= 0 ? $maxResults : -1;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setHasMore($hasMore)
+    {
+        parent::setHasMore($hasMore);
+        $fields = $this->getFields();
+        foreach ($fields as $field) {
+            $targetConfig = $field->getTargetEntity();
+            if (null !== $targetConfig) {
+                $targetConfig->setHasMore($hasMore);
+            }
         }
     }
 

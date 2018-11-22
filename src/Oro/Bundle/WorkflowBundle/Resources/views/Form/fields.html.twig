@@ -16,12 +16,12 @@
 
 {% block oro_workflow_replacement_row %}
     {% if form.vars.errors|length > 0 %}
-        <div class="alert alert-error">
+        <div class="alert alert-error" role="alert">
             {{ form_errors(form) }}
         </div>
     {% endif %}
 
-    <div class="alert workflow-deactivation-message">
+    <div class="alert workflow-deactivation-message" role="alert">
         <div class="message">
             {% if workflowsToDeactivation %}
                 <p>

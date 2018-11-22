@@ -1,0 +1,131 @@
+/* @theme: admin.oro; */
+
+&.board-appearance {
+    .sorting {
+        display: block;
+    }
+}
+
+.board {
+    background-color: $oro-datagrid-board-background-color;
+}
+
+.board-body {
+    position: relative;
+
+    padding: 0;
+
+    overflow: auto;
+}
+
+.board-columns-container {
+    display: flex;
+}
+
+.board-header {
+    display: flex;
+}
+
+.board-column-header {
+    flex: 1;
+    text-transform: uppercase;
+    padding: $oro-datagrid-board-column-header-offset;
+
+    font-size: $oro-datagrid-board-column-header-font-size;
+    font-weight: bold;
+    text-align: center;
+
+    border-top-#{$start}-radius: $oro-datagrid-radius;
+    border-top-#{$end}-radius: $oro-datagrid-radius;
+}
+
+&.with-floating-header {
+    .board-column-header {
+        position: relative;
+
+        &:after {
+            position: absolute;
+            top: 100%;
+            #{$end}: 0;
+            #{$start}: 0;
+            z-index: 2;
+
+            height: 20px;
+            margin: 0 $oro-datagrid-base-offset;
+
+            background-image: $oro-datagrid-board-column-header-blur;
+            filter: blur(10px);
+
+            content: '';
+
+            pointer-events: none;
+        }
+
+        &.empty:after {
+            content: none;
+        }
+    }
+}
+
+.board-column-header,
+.board-column {
+    /* these items should have same min-width and margins */
+    min-width: $oro-datagrid-board-column-width;
+    margin-#{$start}: $oro-datagrid-board-column-offset;
+
+    background-color: $oro-datagrid-board-column-header-background-color;
+
+    &:first-child {
+        margin-#{$start}: 0;
+    }
+}
+
+.board-column {
+    flex: 1;
+    min-height: 45px;
+    padding: 0 $oro-datagrid-base-offset;
+
+    &.drag-over {
+        background: $oro-datagrid-board-column-drag-background;
+    }
+}
+
+.board-card-placeholder {
+    margin-top: $oro-datagrid-base-offset;
+    padding: $oro-datagrid-placeholder-offset;
+
+    border-radius: $oro-datagrid-radius;
+    background: $oro-datagrid-placeholder-background;
+    border: $oro-datagrid-placeholder-border;
+}
+
+.board-column-title {
+    @include text-line-truncate();
+}
+
+.board-body-loading-message {
+    padding: $oro-datagrid-base-offset + 2px 0;
+
+    display: none;
+
+    background-color: $oro-datagrid-board-loading-message-background-color;
+
+    &:before {
+        display: block;
+        margin: 0 auto;
+
+        content: '';
+
+        @include loader($oro-datagrid-loader-size, $oro-datagrid-loader-width);
+    }
+
+    @at-root .loading-more .board-body-loading-message {
+        display: block;
+    }
+}
+
+@media print {
+    .board-body {
+        max-height: none !important;
+    }
+}

@@ -1,0 +1,174 @@
+/* @theme: admin.oro; */
+
+$btn-fa-icon-font-size: $base-font-size--m - 1 !default;
+$btn-fa-icon-line-height: $btn-line-height - 2 !default;
+$btn-fa-icon-vertical-align: middle !default;
+
+$btn-not-btn-icon-fa-offset: side-values(0 $content-padding-small 0 0) !default;
+$btn-not-btn-icon-end-fa-offset: side-values(0 0 0 $content-padding-small) !default;
+
+$btn-icon-width: 32px !default;
+$btn-icon-height: 32px !default;
+$btn-icon-mobile-width: 40px !default;
+$btn-icon-mobile-height: 40px !default;
+$btn-icon-position: relative !default;
+$btn-icon-inner-offset: 0 !default;
+$btn-icon-text-indent: -9999px !default;
+$btn-icon-gold-color: $warning !default;
+
+$btn-icon-fa-offset: 0 !default;
+$btn-icon-fa-text-indent: 0 !default;
+$btn-icon-fa-line-height: 1 !default;
+$btn-icon-fa-position: absolute !default;
+$btn-icon-fa-top: 50% !default;
+$btn-icon-fa-left: 50% !default;
+$btn-icon-fa-transform: translate(-50%, -50%) !default;
+
+$btn-icon-dropdown-toggle-width: 44px !default;
+
+$btn-icon-dropdown-toggle-after-position: absolute !default;
+$btn-icon-dropdown-toggle-after-top: 50% !default;
+$btn-icon-dropdown-toggle-after-right: 8px !default;
+$btn-icon-dropdown-toggle-after-transform: translate(0, -50%) !default;
+
+$btn-icon-dropdown-toggle-fa-left: 8px !default;
+$btn-icon-dropdown-toggle-fa-transform: translate(0, -50%) !default;
+
+/* Style for button without theme modificator */
+$btn-theme: (
+    'background': $primary-830,
+    'border': $primary-830,
+    'color': $primary-400,
+    'hover-color': $primary-400,
+    'active-color': $primary-400,
+    'active-box-shadow': inset 0 2px 3px 2px rgba(0, 0, 0, .21)
+) !default;
+
+$btn-theme-light: (
+    'background': transparent,
+    'border': transparent,
+    'color': $primary-400,
+    'hover-background': transparent,
+    'hover-border': transparent,
+    'hover-color': $primary-500,
+    'active-background': transparent,
+    'active-border': transparent,
+    'active-color': $primary-500,
+    'active-box-shadow': none,
+    'disabled-opacity': .25
+) !default;
+
+$btn-theme-lighter: (
+    'background': transparent,
+    'border': transparent,
+    'color': $primary-700,
+    'hover-background': transparent,
+    'hover-border': transparent,
+    'hover-color': $primary-500,
+    'active-background': transparent,
+    'active-border': transparent,
+    'active-color': $primary-500,
+    'active-box-shadow': none,
+    'disabled-opacity': .25
+) !default;
+
+$btn-theme-primary: (
+    'background': $secondary,
+    'border': $secondary
+) !default;
+
+$btn-theme-info: (
+    'background': $secondary,
+    'border': $secondary
+) !default;
+
+$btn-theme-success: (
+    'background': $success,
+    'border': $success
+) !default;
+
+$btn-theme-warning: (
+    'background': $warning,
+    'border': $warning
+) !default;
+
+$btn-theme-danger: (
+    'background': $danger,
+    'border': $danger
+) !default;
+
+$btn-theme-dark: (
+    'background': $additional,
+    'border': $additional
+) !default;
+
+$btn-theme-keys: () !default;
+$btn-theme-keys: map-merge(
+    (
+        'light': $btn-theme-light,
+        'lighter': $btn-theme-lighter,
+        'primary': $btn-theme-primary,
+        'info': $btn-theme-info,
+        'success': $btn-theme-success,
+        'warning': $btn-theme-warning,
+        'danger': $btn-theme-danger,
+        'dark': $btn-theme-dark,
+    ),
+    $btn-theme-keys
+);
+
+$btn-theme-square-default: (
+    'background': $primary-inverse,
+    'border': $primary-750,
+    'color': $primary-200,
+    'hover-background': $primary-900,
+    'hover-border': $primary-750,
+    'hover-color': $primary-500,
+    'active-background': $primary-900,
+    'active-border': $primary-750,
+    'active-color': $primary-500,
+    'active-box-shadow': inset 0 2px 3px 2px rgba(0, 0, 0, .21),
+    'disabled-opacity': .25
+) !default;
+
+$btn-theme-square-keys: () !default;
+$btn-theme-square-keys: map-merge(
+    (
+        'default': $btn-theme-square-default,
+        'light': $btn-theme-light,
+        'lighter': $btn-theme-lighter,
+    ),
+    $btn-theme-square-keys
+);
+
+$btn-brand-google-base-color: #dc4e41 !default;
+$btn-brand-google-padding-left: 40px !default;
+
+$btn-brand-google-before-content: '\f0d5' !default;
+$btn-brand-google-before-font-family: 'FontAwesome' !default;
+$btn-brand-google-before-font-size: 16px !default;
+$btn-brand-google-before-position: absolute !default;
+$btn-brand-google-before-top: 50% !default;
+$btn-brand-google-before-left: 16px !default;
+$btn-brand-google-before-transform: translate(0, -50%) !default;
+
+$btn-brand-google: (
+    'background': $btn-brand-google-base-color,
+    'border': $btn-brand-google-base-color,
+    'color': $primary-inverse,
+    'hover-background': darken($btn-brand-google-base-color, 5%),
+    'hover-border': darken($btn-brand-google-base-color, 5%),
+    'hover-color': $primary-inverse,
+    'active-background': lighten($btn-brand-google-base-color, 25%),
+    'active-border': darken($btn-brand-google-base-color, 5%),
+    'active-color': darken($btn-brand-google-base-color, 5%),
+    'active-box-shadow': none
+) !default;
+
+$btn-brand-keys: () !default;
+$btn-brand-keys: map-merge(
+    (
+        'google': $btn-brand-google
+    ),
+    $btn-brand-keys
+);

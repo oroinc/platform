@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
@@ -15,11 +16,12 @@ use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Component\EntitySerializer\QueryResolver;
+use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
  * Calculates the total number of records and sets it
- * to "X-Include-Total-Count" response header,
- * in case if it was requested by "X-Include: totalCount" request header.
+ * to "X-Include-Total-Count" response header
+ * if it was requested by "X-Include: totalCount" request header.
  */
 class SetTotalCountHeader implements ProcessorInterface
 {
@@ -34,7 +36,7 @@ class SetTotalCountHeader implements ProcessorInterface
 
     /**
      * @param CountQueryBuilderOptimizer $countQueryOptimizer
-     * @param QueryResolver $queryResolver
+     * @param QueryResolver              $queryResolver
      */
     public function __construct(
         CountQueryBuilderOptimizer $countQueryOptimizer,
@@ -115,7 +117,9 @@ class SetTotalCountHeader implements ProcessorInterface
         if ($query instanceof QueryBuilder) {
             $countQuery = $this->countQueryBuilderOptimizer
                 ->getCountQueryBuilder($query)
-                ->getQuery();
+                ->getQuery()
+                ->setMaxResults(null)
+                ->setFirstResult(null);
             $this->resolveQuery($countQuery, $config);
         } elseif ($query instanceof Query) {
             $countQuery = $this->cloneQuery($query)
@@ -141,7 +145,40 @@ class SetTotalCountHeader implements ProcessorInterface
             ));
         }
 
-        return QueryCountCalculator::calculateCount($countQuery);
+        return $this->executeCountQuery($countQuery);
+    }
+
+    /**
+     * @param $countQuery
+     *
+     * @return int
+     */
+    private function executeCountQuery($countQuery)
+    {
+        if ($countQuery instanceof Query) {
+            $paginator = new Paginator($countQuery);
+            $paginator->setUseOutputWalkers(false);
+
+            // the result-set mapping is not relevant and should be rebuilt
+            // because the query will be changed by Doctrine\ORM\Tools\Pagination\Paginator
+            // unfortunately the reflection is the only way to clear the result-set mapping
+            $resultSetMappingProperty = ReflectionUtil::getProperty(
+                new \ReflectionClass($countQuery),
+                '_resultSetMapping'
+            );
+            if (null === $resultSetMappingProperty) {
+                throw new \LogicException(sprintf(
+                    'The "_resultSetMapping" property does not exist in %s.',
+                    get_class($countQuery)
+                ));
+            }
+            $resultSetMappingProperty->setAccessible(true);
+            $resultSetMappingProperty->setValue($countQuery, null);
+
+            return $paginator->count();
+        }
+
+        return QueryCountCalculator::calculateCount($countQuery, false);
     }
 
     /**

@@ -33,9 +33,16 @@ class Account
      */
     protected $roles;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="Contact", inversedBy="accounts")
+     * @ORM\JoinTable(name="account_to_contact")
+     */
+    protected $contacts;
+
     public function __construct()
     {
         $this->roles = new ArrayCollection();
+        $this->contacts = new ArrayCollection();
     }
 
     /**
@@ -95,6 +102,44 @@ class Account
     {
         if ($this->roles->contains($role)) {
             $this->roles->removeElement($role);
+        }
+    }
+
+    /**
+     * @return Collection|Contact[]
+     */
+    public function getContacts()
+    {
+        return $this->contacts;
+    }
+
+    /**
+     * @param Contact $contact
+     */
+    public function addContact(Contact $contact)
+    {
+        if (!$this->getContacts()->contains($contact)) {
+            $this->getContacts()->add($contact);
+            $contact->addAccount($this);
+        }
+    }
+
+    /**
+     * @param Collection $contacts
+     */
+    public function setContacts(Collection $contacts)
+    {
+        $this->contacts = $contacts;
+    }
+
+    /**
+     * @param Contact $contact
+     */
+    public function removeContact(Contact $contact)
+    {
+        if ($this->getContacts()->contains($contact)) {
+            $this->getContacts()->removeElement($contact);
+            $contact->removeAccount($this);
         }
     }
 }

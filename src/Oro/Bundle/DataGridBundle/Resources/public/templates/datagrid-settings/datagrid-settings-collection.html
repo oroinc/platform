@@ -1,0 +1,28 @@
+<div class="table-header-wrapper" data-role="datagrid-settings-table-header-wrapper">
+    <table class="table-hover table table-condensed">
+        <thead>
+        <tr>
+            <th><span><%= _.__('oro.datagrid.settings.column.name') %></span></th>
+            <% if (addSorting) { %>
+            <th><span><%= _.__('oro.datagrid.settings.column.sort') %></span></th>
+            <% } %>
+            <th><span><%= _.__('oro.datagrid.settings.column.show') %></span></th>
+        </tr>
+        </thead>
+    </table>
+</div>
+<div class="table-wrapper" data-role="datagrid-settings-table-wrapper">
+    <table class="table-hover table table-condensed">
+        <thead class="thead-sizing">
+        <tr>
+            <th><span><%= _.__('oro.datagrid.settings.column.name') %></span></th>
+            <% if (addSorting) { %>
+            <th><span><%= _.__('oro.datagrid.settings.column.sort') %></span></th>
+            <% } %>
+            <th><span><%= _.__('oro.datagrid.settings.column.show') %></span></th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+<div class="datagrid-settings-no-columns"><span><%= _.__('oro.datagrid.settings.empty_list') %></span></div>

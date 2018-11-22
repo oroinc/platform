@@ -49,14 +49,14 @@ class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $this->metadataHelper->expects($this->any())
-            ->method('getEntityClassByTableName')
+            ->method('getEntityClassesByTableName')
             ->willReturnCallback(
                 function ($tableName) {
                     if ($tableName === 'acme_test') {
-                        return 'Acme\TestBundle\Entity\Test';
+                        return ['Acme\TestBundle\Entity\Test'];
                     }
 
-                    return 'Oro\Bundle\ActivityListBundle\Entity\ActivityList';
+                    return ['Oro\Bundle\ActivityListBundle\Entity\ActivityList'];
                 }
             );
 
@@ -110,14 +110,14 @@ class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
             ->willReturn('acme_test');
 
         $entityMetadataHelper->expects($this->any())
-            ->method('getEntityClassByTableName')
+            ->method('getEntityClassesByTableName')
             ->willReturnCallback(
                 function ($tableName) {
                     if ($tableName === 'acme_test') {
-                        return 'Acme\TestBundle\Entity\Test';
+                        return ['Acme\TestBundle\Entity\Test'];
                     }
 
-                    return 'Oro\Bundle\ActivityListBundle\Entity\ActivityList';
+                    return ['Oro\Bundle\ActivityListBundle\Entity\ActivityList'];
                 }
             );
 

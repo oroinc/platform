@@ -1,6 +1,12 @@
 /* @theme: admin.oro; */
 
 .list-bar-wrapper {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+    flex-basis: 0;
+    min-width: $pin-item-show-more-menu-width;
+
     .pin-holder {
         position: relative;
 
@@ -13,13 +19,12 @@
                 color: $pin-item-outdated-hover-color;
             }
         }
-
     }
 
     .btn-close {
         position: absolute;
         top: 50%;
-        right: 6px;
+        #{$end}: 6px;
         width: 14px;
         height: 14px;
         display: block;
@@ -50,7 +55,7 @@
     display: none; // don't show dropbox by default
     position: absolute;
     top: 0;
-    margin-left: -20px;
+    margin-#{$start}: -$pin-item-show-more-menu-width;
     height: 100%;
 
     &:before {
@@ -58,18 +63,18 @@
         display: block;
         position: absolute;
         top: 0;
-        right: 100%;
+        #{$end}: 100%;
         height: 100%;
         width: 32px;
-        background-image: linear-gradient(to left, $app-header-bg-color, transparent);
+        background-image: $pin-show-more-gradient;
         pointer-events: none;
     }
 
-    a.dropdown-toggle {
+    .dropdown-toggle {
         position: relative;
         background-color: $app-header-bg-color;
         color: $pin-item-close-color;
-        width: 20px;
+        width: $pin-item-show-more-menu-width;
         font-size: $app-header-icon-font-size;
         display: inline-block;
         text-align: center;
@@ -80,24 +85,39 @@
         }
     }
 
+    .dropdown-menu {
+        #{$start}: auto;
+        #{$end}: $pin-item-show-more-menu-offset;
+
+        &:before {
+            #{$start}: auto;
+            #{$end}: $pin-item-show-more-menu-arrow-end;
+        }
+    }
+
     ul {
         list-style: none;
         margin: 0;
+        @include if-ltr() {
+            right: 0;
+            left: auto;
+        }
     }
 
     li {
-        &.active a {
-            font-weight: bold;
+        &.active {
+            a {
+                font-weight: bold;
+            }
         }
 
         a {
-            padding: 7px 26px 7px 13px;
+            padding: side-values(7px 26px 7px 13px);
         }
     }
 }
 
 .list-bar {
-    padding-right: 20px;
     overflow: hidden;
 
     ul {
@@ -106,6 +126,7 @@
         list-style: none;
         display: block;
         white-space: nowrap;
+
         &:empty {
             display: none;
         }
@@ -116,7 +137,7 @@
         text-align: left;
         line-height: inherit;
         position: relative;
-        padding: 0 22px 0 8px;
+        padding: side-values(0 22px 0 8px);
 
         &.active {
             background-color: $pin-item-active-bg-color;
@@ -144,5 +165,10 @@
         color: inherit;
         font-size: 12px;
         line-height: 20px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        overflow: hidden;
+        vertical-align: middle;
     }
 }

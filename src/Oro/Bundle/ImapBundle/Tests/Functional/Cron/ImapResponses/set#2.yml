@@ -9,4 +9,4 @@ log_info:
     - 'Got 0 folder(s)'
 total: 0
 data: []
-errors: ~
+expectedEmailData: ~

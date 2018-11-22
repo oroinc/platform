@@ -10,13 +10,14 @@ define(function(require) {
     var STATE_STORAGE_KEY = 'main-menu-state';
     var MAXIMIZED_STATE = 'maximized';
     var MINIMIZED_STATE = 'minimized';
-    var BROWSER_SCROLL_SIZE = mediator.execute('layout:scrollbarWidth');
+    var ENTER_KEY_CODE = 13;
 
     $.widget('oroui.desktopSideMenu', $.oroui.sideMenu, {
         options: {
             menuSelector: '#main-menu',
             innerMenuSelector: '.menu:eq(0)',
-            innerMenItemClassName: 'menu-item'
+            innerMenuItemClassName: 'menu-item',
+            invisibleClassName: 'invisible'
         },
 
         overlay: null,
@@ -24,6 +25,8 @@ define(function(require) {
         dropdownIndex: null,
 
         timeout: 50,
+
+        timer: null,
 
         /**
          * Do initial changes
@@ -41,16 +44,31 @@ define(function(require) {
             this.listener
                 .listenTo(mediator, 'layout:reposition', _.debounce(this.onChangeReposition, this.timeout).bind(this));
 
-            this.$mainiMenu = this.element.find(this.options.menuSelector);
+            this.$menu = this.element.find(this.options.menuSelector);
+            this.$menuScrollContent = this.element.find('.nav-multilevel');
+            this.$scrollHandles = this.element.find('[data-role="scroll-trigger"]');
+            this.scrollStep = this.getScrollStep();
 
-            this._on(this.element, {'click .dropdown-level-1': this.onMenuOpen});
+            this._on(this.element, {
+                'click .dropdown-level-1': this.onMenuOpen,
+                'keydown [data-role="scroll-trigger"]': this.onMenuScroll,
+                'mousedown [data-role="scroll-trigger"]': this.onMenuHoldScroll,
+                'mouseup [data-role="scroll-trigger"]': this.undoMenuHoldScroll,
+                'mouseout [data-role="scroll-trigger"]': this.undoMenuHoldScroll,
+                'transitionend .accordion': function() {
+                    mediator.trigger('layout:reposition');
+                }
+            });
+            this._on(this.$menuScrollContent, {
+                scroll: _.debounce(this.toggleScrollTriggers, this.timeout)
+            });
 
             this.overlay = new SideMenuOverlay();
             this.overlay.render();
-            this.$mainiMenu.after(this.overlay.$el);
+            this.$menu.after(this.overlay.$el);
 
-            $(document).on('focusout.side-menu-focusout', _.debounce(function() {
-                if (!$.contains(this.$mainiMenu.parent()[0], document.activeElement)) {
+            $(document).on('focusout' + this.eventNamespace, _.debounce(function() {
+                if (!$.contains(this.$menu.parent()[0], document.activeElement)) {
                     this.overlay.trigger('leave-focus');
                 }
             }.bind(this), this.timeout));
@@ -83,6 +101,7 @@ define(function(require) {
             );
             this._update();
             mediator.trigger('layout:adjustHeight');
+            this.scrollStep = this.getScrollStep();
         },
 
         /**
@@ -97,20 +116,52 @@ define(function(require) {
             delete this.overlay;
             delete this.dropdownIndex;
 
-            $(document).off('.side-menu-focusout');
+            $(document).off(this.eventNamespace);
         },
 
         /**
          * Change sidebar width for minimized state
          */
         onChangeReposition: function() {
-            this.element.css('width', '');
+            this.toggleScrollTriggers();
+        },
 
-            if (this.element.hasClass('minimized')) {
-                if (this.$mainiMenu[0].offsetWidth > this.$mainiMenu[0].clientWidth) {
-                    this.element.css('width', this.element.outerWidth() + BROWSER_SCROLL_SIZE);
-                }
+        /**
+         * Show / hide scroll handles
+         */
+        toggleScrollTriggers: function() {
+            var bottomPosition = _.reduce(this.$menuScrollContent.children(), function(result, item) {
+                return result + $(item).outerHeight();
+            }, 0);
+            var scrollContentHeight = this.$menuScrollContent.outerHeight();
+            var scrollTop = this.$menuScrollContent.scrollTop();
+
+            this.$scrollHandles.removeClass(this.options.invisibleClassName);
+
+            if (scrollContentHeight >= bottomPosition) {
+                this.$scrollHandles.addClass(this.options.invisibleClassName);
+                return;
             }
+
+            this.$scrollHandles
+                .filter('[data-direction="up"]')
+                .toggleClass(this.options.invisibleClassName,
+                    scrollTop === 0
+                );
+
+            this.$scrollHandles
+                .filter('[data-direction="down"]')
+                .toggleClass(
+                    this.options.invisibleClassName,
+                    scrollTop >= bottomPosition - scrollContentHeight
+                );
+        },
+
+        /**
+         * @returns {number}
+         */
+        getScrollStep: function() {
+            return Math.ceil(this.$menuScrollContent.children().first().outerHeight());
         },
 
         /**
@@ -132,6 +183,10 @@ define(function(require) {
             } else {
                 var $menu = $(event.currentTarget).find(this.options.innerMenuSelector);
 
+                if (!$menu.length) {
+                    return;
+                }
+
                 this.overlay
                     .setTitle(
                         $(event.currentTarget)
@@ -145,6 +200,48 @@ define(function(require) {
             }
 
             this.dropdownIndex = index;
+        },
+
+        /**
+         * Handle menu scroll action
+         *
+         * @param {Event} event
+         */
+        onMenuScroll: function(event) {
+            if (typeof event.keyCode === 'number' && event.keyCode !== ENTER_KEY_CODE) {
+                return;
+            }
+
+            this.toggleScrollTriggers();
+
+            switch ($(event.currentTarget).data('direction')) {
+                case 'up':
+                    this.$menuScrollContent.scrollTop(this.$menuScrollContent.scrollTop() - this.scrollStep);
+                    break;
+                case 'down':
+                    this.$menuScrollContent.scrollTop(this.$menuScrollContent.scrollTop() + this.scrollStep);
+                    break;
+            }
+        },
+
+        /**
+         * Undo scroll
+         */
+        undoMenuHoldScroll: function() {
+            clearInterval(this.timer);
+        },
+
+        /**
+         * Handle menu hold scroll action
+         *
+         * @param {Event} event
+         */
+        onMenuHoldScroll: function(event) {
+            this.onMenuScroll(event);
+
+            this.timer = setInterval(function() {
+                this.onMenuScroll(event);
+            }.bind(this), 150);
         },
 
         /**
@@ -196,19 +293,17 @@ define(function(require) {
                         $menuItem.children().last().remove();
                     }
 
-                    if (!$menuItem.hasClass('divider')) {
-                        if (parentIndex) {
-                            uniqueGroupIndex = (parentGroupIndex ? parentGroupIndex : parentIndex) + ';' + uniqueIndex;
-                            $menuItem.attr('data-related-groups', uniqueGroupIndex);
-                        }
-
-                        $menuItem
-                            .attr('data-index', uniqueIndex)
-                            .attr('data-original-text', $menuItem.text())
-                            .addClass(self.options.innerMenItemClassName);
-
-                        collection.push($menuItem[0]);
+                    if (parentIndex) {
+                        uniqueGroupIndex = (parentGroupIndex ? parentGroupIndex : parentIndex) + ';' + uniqueIndex;
+                        $menuItem.attr('data-related-groups', uniqueGroupIndex);
                     }
+
+                    $menuItem
+                        .attr('data-index', uniqueIndex)
+                        .attr('data-original-text', $menuItem.text())
+                        .addClass(self.options.innerMenuItemClassName);
+
+                    collection.push($menuItem[0]);
 
                     if ($nestedMenuItem) {
                         createFlatStructure(

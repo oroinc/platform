@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\HateoasMetadataExtra;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -24,6 +25,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ContextTest extends \PHPUnit\Framework\TestCase
 {
@@ -681,17 +685,57 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($accessor, $this->context->getFilterValues());
     }
 
+    public function testMasterRequest()
+    {
+        self::assertFalse($this->context->isMasterRequest());
+        self::assertFalse($this->context->get('masterRequest'));
+
+        $this->context->setMasterRequest(true);
+        self::assertTrue($this->context->isMasterRequest());
+        self::assertTrue($this->context->get('masterRequest'));
+    }
+
+    public function testCorsRequest()
+    {
+        self::assertFalse($this->context->isCorsRequest());
+        self::assertFalse($this->context->get('cors'));
+
+        $this->context->setCorsRequest(true);
+        self::assertTrue($this->context->isCorsRequest());
+        self::assertTrue($this->context->get('cors'));
+    }
+
+    public function testHateoas()
+    {
+        self::assertFalse($this->context->isHateoasEnabled());
+        self::assertFalse($this->context->get('hateoas'));
+
+        $this->context->setHateoas(true);
+        self::assertTrue($this->context->isHateoasEnabled());
+        self::assertTrue($this->context->get('hateoas'));
+    }
+
+    public function testInfoRecords()
+    {
+        self::assertNull($this->context->getInfoRecords());
+
+        $infoRecords = ['' => ['key' => 'value']];
+        $this->context->setInfoRecords($infoRecords);
+        self::assertEquals($infoRecords, $this->context->getInfoRecords());
+
+        $this->context->setInfoRecords(null);
+        self::assertNull($this->context->getInfoRecords());
+    }
+
     public function testConfigExtras()
     {
         self::assertSame([], $this->context->getConfigExtras());
-        self::assertNull($this->context->get(Context::CONFIG_EXTRAS));
 
         $configExtra = new TestConfigExtra('test');
 
         $configExtras = [$configExtra];
         $this->context->setConfigExtras($configExtras);
         self::assertEquals($configExtras, $this->context->getConfigExtras());
-        self::assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
 
         self::assertTrue($this->context->hasConfigExtra('test'));
         self::assertSame($configExtra, $this->context->getConfigExtra('test'));
@@ -702,22 +746,18 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $configExtras[]     = $anotherConfigExtra;
         $this->context->addConfigExtra($anotherConfigExtra);
         self::assertEquals($configExtras, $this->context->getConfigExtras());
-        self::assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
 
         unset($configExtras[0]);
         $configExtras = array_values($configExtras);
         $this->context->removeConfigExtra('test');
         self::assertEquals($configExtras, $this->context->getConfigExtras());
-        self::assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
 
         // test remove of non existing extra
         $this->context->removeConfigExtra('test');
         self::assertEquals($configExtras, $this->context->getConfigExtras());
-        self::assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
 
         $this->context->setConfigExtras([]);
         self::assertSame([], $this->context->getConfigExtras());
-        self::assertNull($this->context->get(Context::CONFIG_EXTRAS));
     }
 
     /**
@@ -778,6 +818,61 @@ class ContextTest extends \PHPUnit\Framework\TestCase
                 new RequestType([$requestType]),
                 $config,
                 $metadataExtras
+            )
+            ->willReturn($metadata);
+
+        // test that metadata are not loaded yet
+        self::assertFalse($this->context->hasMetadata());
+
+        self::assertSame($metadata, $this->context->getMetadata()); // load metadata
+        self::assertTrue($this->context->hasMetadata());
+        self::assertTrue($this->context->has(Context::METADATA));
+        self::assertSame($metadata, $this->context->get(Context::METADATA));
+
+        self::assertEquals($config, $this->context->getConfig());
+
+        // test that metadata are loaded only once
+        self::assertSame($metadata, $this->context->getMetadata());
+    }
+
+    public function testLoadMetadataWhenHateoasIsEnabled()
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
+        $configExtras = [
+            new TestConfigSection('section1'),
+            new TestConfigSection('section2')
+        ];
+
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata();
+        $metadataExtras = [new TestMetadataExtra('extra1')];
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setConfigExtras($configExtras);
+        $this->context->setMetadataExtras($metadataExtras);
+        $this->context->setClassName($entityClass);
+        $this->context->setHateoas(true);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $entityClass,
+                $version,
+                new RequestType([$requestType]),
+                $configExtras
+            )
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $entityClass,
+                $version,
+                new RequestType([$requestType]),
+                $config,
+                array_merge($metadataExtras, [new HateoasMetadataExtra($this->context->getFilterValues())])
             )
             ->willReturn($metadata);
 
@@ -939,36 +1034,33 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     public function testMetadataExtras()
     {
         self::assertSame([], $this->context->getMetadataExtras());
-        self::assertNull($this->context->get(Context::METADATA_EXTRAS));
 
         $metadataExtras = [new TestMetadataExtra('test')];
         $this->context->setMetadataExtras($metadataExtras);
         self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
-        self::assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
 
         self::assertTrue($this->context->hasMetadataExtra('test'));
         self::assertFalse($this->context->hasMetadataExtra('another'));
 
+        self::assertSame($metadataExtras[0], $this->context->getMetadataExtra('test'));
+        self::assertNull($this->context->getMetadataExtra('another'));
+
         $anotherMetadataExtra = new TestMetadataExtra('another');
-        $metadataExtras[]     = $anotherMetadataExtra;
+        $metadataExtras[] = $anotherMetadataExtra;
         $this->context->addMetadataExtra($anotherMetadataExtra);
         self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
-        self::assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
 
         unset($metadataExtras[0]);
         $metadataExtras = array_values($metadataExtras);
         $this->context->removeMetadataExtra('test');
         self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
-        self::assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
 
         // test remove of non existing extra
         $this->context->removeMetadataExtra('test');
         self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
-        self::assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
 
         $this->context->setMetadataExtras([]);
         self::assertSame([], $this->context->getMetadataExtras());
-        self::assertNull($this->context->get(Context::METADATA_EXTRAS));
     }
 
     public function testMetadataExtrasWhenActionExistsInContext()
@@ -976,15 +1068,9 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $action = 'test_action';
         $this->context->setAction($action);
 
-        self::assertNull($this->context->get(Context::METADATA_EXTRAS));
-
         self::assertEquals(
             [new ActionMetadataExtra($action)],
             $this->context->getMetadataExtras()
-        );
-        self::assertEquals(
-            [new ActionMetadataExtra($action)],
-            $this->context->get(Context::METADATA_EXTRAS)
         );
 
         // test that ActionMetadataExtra is not added twice

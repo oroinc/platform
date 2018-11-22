@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\Context;
 
 /**
- * Represents a context for processors of "normalize_value" action.
+ * The execution context for processors for "normalize_value" action.
  */
 class NormalizeValueContext extends Context
 {

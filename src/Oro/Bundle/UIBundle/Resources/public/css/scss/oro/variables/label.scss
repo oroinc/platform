@@ -1,0 +1,26 @@
+/* @theme: admin.oro; */
+
+$label-theme-success: (
+    'background': $success-ultra-light,
+    'color': $success-darken
+) !default;
+
+$label-theme-info: (
+    'background': $info,
+    'color': $primary-inverse
+) !default;
+
+$label-theme-warning: (
+    'background': $warning-light,
+    'color': $warning-darken
+) !default;
+
+$label-theme-keys: () !default;
+$label-theme-keys: map-merge(
+    (
+        'success': $label-theme-success,
+        'info': $label-theme-info,
+        'warning': $label-theme-warning
+    ),
+    $label-theme-keys
+);

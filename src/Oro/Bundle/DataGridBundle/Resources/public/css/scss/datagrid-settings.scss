@@ -1,0 +1,315 @@
+/* @theme: admin.oro; */
+
+.datagrid-settings {
+    &:not(:last-child) {
+        margin-right: 4px;
+    }
+
+    a.action.btn.dropdown-toggle {
+        margin-right: 0;
+    }
+
+    &.dropdown,
+    &.dropup {
+        display: inline-block;
+    }
+
+    .dropdown-menu {
+        cursor: default;
+        text-align: left;
+        font-weight: normal;
+        padding: 22px $content-padding 25px;
+        border-color: #ccc;
+        min-width: 300px;
+
+        .close {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+        }
+    }
+
+    &__title {
+        font-size: $datagrid-settings-title-font-size;
+        line-height: $datagrid-settings-title-line-height;
+        margin: $datagrid-settings-title-offset;
+        font-weight: 700;
+    }
+
+    &__tabs {
+        border-bottom: none;
+    }
+
+    &__wrapper {
+        width: 262px;
+
+        .ui-sortable-placeholder {
+            border-top: 3px solid transparent;
+        }
+
+        .column-filter-match {
+            text-decoration: underline;
+        }
+
+        .nav-tabs {
+            .nav-link {
+                padding-#{$end}: 9px;
+            }
+        }
+
+        .dropup &,
+        .dropup-area & {
+            .dropdown-menu {
+                top: auto;
+                bottom: 0;
+
+                &:before {
+                    top: auto;
+                    bottom: 6px;
+                }
+
+                &:after {
+                    top: auto;
+                    bottom: 7px;
+                }
+            }
+
+            .datagrid-settings-right-flap {
+                top: 0;
+                bottom: 27px;
+            }
+        }
+
+        td {
+            &.title-cell {
+                white-space: nowrap;
+
+                overflow: hidden;
+                text-overflow: ellipsis;
+
+                max-width: 148px;
+
+                padding-#{$start}: 16px;
+                padding-#{$end}: 0;
+            }
+
+            &.visibility-cell {
+                text-align: left;
+                padding-#{$start}: 16px;
+                padding-#{$end}: 16px;
+            }
+
+            &.sort-cell {
+                padding-#{$start}: 16px;
+                padding-#{$end}: 16px;
+                white-space: nowrap;
+                text-align: left;
+
+                .btn.move-up,
+                .btn.move-down {
+                    padding: 0;
+
+                    [class^="fa-"] {
+                        margin: 0;
+                    }
+                }
+            }
+        }
+
+        tr {
+            &.sortable-placeholder {
+                td {
+                    height: 0;
+                    padding-top: 0;
+                    padding-bottom: 0;
+                    border-top: 0 none;
+                }
+            }
+
+            &.renderable {
+                td {
+                    background: $row-highlight-background;
+                }
+
+                &:hover {
+                    td {
+                        background: $row-selected-background;
+                    }
+                }
+            }
+
+            &:first-child .btn.move-up,
+            &:last-child .btn.move-down {
+                cursor: default;
+                background-image: none;
+                opacity: .65;
+                box-shadow: none;
+            }
+        }
+
+        .table {
+            border-radius: 3px 3px 0 0;
+            overflow: hidden;
+            margin-bottom: 0;
+
+            label {
+                margin-bottom: 0;
+            }
+
+            input[type='checkbox'] {
+                margin-bottom: 3px;
+            }
+        }
+
+        .table-header-wrapper {
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            margin: 9px 0 0;
+
+            .table {
+                th {
+                    padding: 4px 16px;
+                }
+            }
+        }
+
+        .table-wrapper {
+            border-bottom-left-radius: 3px;
+            border-bottom-right-radius: 3px;
+            border-top: none;
+            max-height: 2000px;
+            overflow: auto;
+            overflow-x: hidden;
+            margin: 0;
+
+            .thead-sizing {
+                display: table-header-group;
+                visibility: hidden;
+            }
+
+            .table {
+                margin-top: -1px;
+
+                th {
+                    padding: 0 16px;
+                    overflow: hidden;
+
+                    span {
+                        padding: 0;
+                        line-height: 0;
+                    }
+                }
+            }
+        }
+    }
+
+    &-title {
+        font-size: $base-font-size--l;
+        line-height: $base-font-size--l;
+        font-weight: bold;
+        margin-bottom: -3px;
+    }
+
+    &-hint {
+        font-size: $base-font-size--s;
+        color: $btn-text-color;
+    }
+
+    &-filter {
+        .datagrid-settings-renderable-tab {
+            &:not(:last-of-type) {
+                margin-right: 3px;
+
+                &:after {
+                    content: '';
+                    width: 1px;
+                    height: 12px;
+                    margin: 0 0 0 4px;
+                    background: $primary-700;
+                    display: inline-block;
+                }
+            }
+
+            &.active {
+                pointer-events: none;
+                color: $primary-200;
+            }
+        }
+    }
+
+    &-search {
+        margin: 15px 0 12px 0;
+        position: relative;
+
+        input {
+            margin: 0;
+            width: 100%;
+            padding: 4px 8px;
+        }
+
+        &.empty:after {
+            content: "\f002";
+            font-family: FontAwesome;
+            font-size: $base-font-size * 1.15;
+            color: lighten($btn-text-color, 15%);
+            position: absolute;
+            top: 50%;
+            margin-top: -12px;
+            right: 10px;
+            z-index: 0;
+        }
+
+        > .clear {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            margin-top: -10px;
+            z-index: 1;
+            font-size: $base-font-size * 1.15;
+            font-weight: bold;
+            line-height: 20px;
+            color: lighten($btn-text-color, 15%);
+
+            &:hover {
+                color: $btn-text-color;
+            }
+        }
+
+        &.empty > .clear {
+            display: none;
+        }
+    }
+
+    &-actions {
+        position: relative;
+        top: -10px;
+        line-height: 0;
+
+        .disabled {
+            color: lighten($btn-text-color, 35%);
+            pointer-events: none;
+        }
+
+        .hide-action {
+            display: none;
+        }
+    }
+
+    &-no-columns {
+        margin-top: 10px;
+        text-align: center;
+        font-size: 14px;
+        padding: 20px;
+        background: $primary-900;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
+
+    &-right-flap {
+        position: absolute;
+        left: 100%;
+        width: 22px;
+        top: 27px;
+        bottom: 0;
+    }
+}

@@ -32,7 +32,7 @@ class ResourceDocParserRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSouldReturnResourceDocParserIfItExistsForSpecificRequestType()
+    public function testShouldReturnResourceDocParserIfItExistsForSpecificRequestType()
     {
         $registry = $this->getResourceDocParserRegistry([
             ['resourceDocParser1', 'rest&json_api'],
@@ -52,7 +52,7 @@ class ResourceDocParserRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSouldReturnDefaultResourceDocParserIfNoParserForSpecificRequestType()
+    public function testShouldReturnDefaultResourceDocParserIfNoParserForSpecificRequestType()
     {
         $registry = $this->getResourceDocParserRegistry([
             ['resourceDocParser1', 'rest&json_api'],
@@ -76,7 +76,7 @@ class ResourceDocParserRegistryTest extends \PHPUnit\Framework\TestCase
      * @expectedException \LogicException
      * @expectedExceptionMessage Cannot find a resource documentation parser for the request "another".
      */
-    public function testSouldThrowExceptionIfNoResourceDocParserForSpecificRequestTypeAndNoDefaultParser()
+    public function testShouldThrowExceptionIfNoResourceDocParserForSpecificRequestTypeAndNoDefaultParser()
     {
         $registry = $this->getResourceDocParserRegistry([
             ['resourceDocParser1', 'rest&json_api']

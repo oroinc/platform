@@ -109,13 +109,29 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
-     * Click on button "Reset" in modal window and skip wait ajax
+     * Click on button "Reset" in modal window or reset page and skip wait ajax
      *
      * @When /^(?:|I )confirm reset password$/
      */
     public function iConfirmResetPassword()
     {
-        $this->oroMainContext->pressButtonInModalWindow('Reset');
+        $modalWindow = $this->oroMainContext->getPage()->findVisible('css', 'div.modal, div[role="dialog"]');
+        if ($modalWindow) {
+            $this->oroMainContext->pressButtonInModalWindow('Reset');
+        } else {
+            $this->oroMainContext->pressButton('Request');
+        }
+
+        // need to be skiped ajax wait, because we have redirect to login page and no ajax requests
+        $this->oroMainContext->applySkipWait();
+    }
+
+    /**
+     * @When /^(?:|I )confirm login$/
+     */
+    public function iConfirmLogin()
+    {
+        $this->oroMainContext->pressButton('Log in');
 
         // need to be skiped ajax wait, because we have redirect to login page and no ajax requests
         $this->oroMainContext->applySkipWait();

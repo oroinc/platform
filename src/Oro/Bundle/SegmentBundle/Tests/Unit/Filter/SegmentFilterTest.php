@@ -366,7 +366,7 @@ class SegmentFilterTest extends OrmTestCase
     }
 
     /**
-     * @return \Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock
+     * @return \Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock
      */
     protected function getEM()
     {

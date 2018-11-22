@@ -12,4 +12,4 @@ OroUserBundle enables user management in the Oro applications and provides the a
 - group management
 - authentication
 - authorization
-- REST and SOAP API for manage users, roles and groups
+- REST API for manage users, roles and groups

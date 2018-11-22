@@ -3,7 +3,7 @@
 namespace Oro\Component\ChainProcessor;
 
 /**
- * A base implementation of the execution context of processors.
+ * A base implementation of an execution context for processors.
  */
 class Context extends ParameterBag implements ContextInterface
 {

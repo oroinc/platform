@@ -139,7 +139,6 @@ This class is the central access point to entity configuration functionality. It
  - Events::CREATE_FIELD        - This event occurs when a new configurable field is found and its configuration attributes are loaded, but before they are stored in a database.
  - Events::UPDATE_FIELD        - This event occurs when default values of configuration attributes of existing field are merged with existing configuration data, but before they are stored in a database.
  - Events::RENAME_FIELD        - This event occurs when the name of existing field is being changed.
- - Events::AFTER_REMOVE_FIELD  - This event occurs after the field is deleted.
  - Events::PRE_FLUSH           - This event occurs before changes of configuration data is flushed into a database.
  - Events::POST_FLUSH          - This event occurs after all changes of configuration data is flushed into a database.
 

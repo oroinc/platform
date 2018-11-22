@@ -1,0 +1,307 @@
+/* @theme: admin.oro; */
+
+button {
+    // Opinionated: add "hand" cursor to non-disabled .btn elements
+    &:not(:disabled):not(.disabled) {
+        cursor: pointer;
+    }
+}
+
+.btn {
+    display: inline-block;
+    font-weight: $btn-font-weight;
+    text-align: center;
+    text-transform: $btn-text-transform;
+    white-space: nowrap;
+    vertical-align: middle;
+    user-select: none;
+    border: $btn-border-width solid transparent;
+
+    @if ($btn-theme) {
+        @include button-custom-variant($btn-theme...);
+    }
+
+    @include button-size($btn-padding-y, $btn-padding-x, $btn-font-size, $btn-line-height, $btn-border-radius);
+    @include transition($btn-transition);
+
+    // Share hover and focus styles
+    @include hover-focus {
+        text-decoration: none;
+    }
+
+    &:focus,
+    &.focus {
+        outline: 0;
+    }
+
+    // Disabled comes first so active can properly restyle
+    &.disabled,
+    &:disabled {
+        opacity: $btn-disabled-opacity;
+
+        @include box-shadow(none);
+    }
+
+    // Opinionated: add "hand" cursor to non-disabled .btn elements
+    &:not(:disabled):not(.disabled) {
+        cursor: pointer;
+    }
+
+    &:not(:disabled):not(.disabled):active,
+    &:not(:disabled):not(.disabled).active {
+        background-image: none;
+
+        @include box-shadow($btn-active-box-shadow);
+
+        &:focus {
+            @include box-shadow($btn-focus-box-shadow, $btn-active-box-shadow);
+        }
+    }
+
+    [class*="fa-"] {
+        font-size: $btn-fa-icon-font-size;
+        line-height: $btn-fa-icon-line-height;
+        vertical-align: $btn-fa-icon-vertical-align;
+    }
+
+    &:not(.btn-icon) [class*="fa-"] {
+        margin: $btn-not-btn-icon-fa-offset;
+    }
+
+    &.icon-end:not(.btn-icon) [class^="fa-"] {
+        margin: $btn-not-btn-icon-end-fa-offset;
+    }
+}
+
+%btn-square {
+    line-height: $btn-square-line-height;
+    border-width: $btn-square-border-width;
+    border-radius: $btn-square-border-radius;
+}
+
+// Future-proof disabling of clicks on `<a>` elements
+a.btn.disabled,
+fieldset:disabled a.btn {
+    pointer-events: none;
+}
+
+//
+// Alternate buttons
+//
+@each $color, $values in $btn-theme-keys {
+    .btn-#{$color} {
+        @include button-custom-variant($values...);
+    }
+}
+
+@each $color, $values in $btn-theme-square-keys {
+    .btn-square-#{$color} {
+        @extend %btn-square;
+        @include button-custom-variant($values...);
+    }
+}
+
+.btn-icon {
+    width: $btn-icon-width;
+    height: $btn-icon-height;
+    padding: $btn-icon-inner-offset;
+    position: $btn-icon-position;
+    text-indent: $btn-icon-text-indent;
+
+    [class^="fa-"],
+    [class*=" fa-"] {
+        margin: $btn-icon-fa-offset;
+        text-indent: $btn-icon-fa-text-indent;
+        line-height: $btn-icon-fa-line-height;
+        position: $btn-icon-fa-position;
+        top: $btn-icon-fa-top;
+        left: $btn-icon-fa-left;
+        transform: $btn-icon-fa-transform;
+    }
+
+    &.dropdown-toggle:not(.dropdown-toggle--no-caret) {
+        width: $btn-icon-dropdown-toggle-width;
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            #{$start}: $btn-icon-dropdown-toggle-fa-left;
+            transform: $btn-icon-dropdown-toggle-fa-transform;
+        }
+
+        &:after {
+            position: $btn-icon-dropdown-toggle-after-position;
+            top: $btn-icon-dropdown-toggle-after-top;
+            #{$end}: $btn-icon-dropdown-toggle-after-right;
+            transform: $btn-icon-dropdown-toggle-after-transform;
+        }
+    }
+
+    &.gold-icon {
+        color: $btn-icon-gold-color;
+    }
+}
+
+//
+// Link buttons
+//
+// Make a button look and behave like a link
+.btn-link {
+    font-weight: $font-weight-normal;
+    color: $link-color;
+    background-color: transparent;
+    border-color: transparent;
+    text-transform: none;
+    padding: 0;
+
+    @include hover {
+        color: $link-hover-color;
+        text-decoration: $link-hover-decoration;
+        background-color: transparent;
+        border-color: transparent;
+    }
+
+    &:focus,
+    &.focus {
+        text-decoration: $link-hover-decoration;
+        border-color: transparent;
+        box-shadow: none;
+    }
+
+    &:disabled,
+    &.disabled {
+        color: $btn-link-disabled-color;
+        pointer-events: none;
+    }
+
+    &:not(:disabled):not(.disabled):active,
+    &:not(:disabled):not(.disabled).active,
+    .show > &.dropdown-toggle {
+        background-color: transparent;
+        border-color: transparent;
+        box-shadow: none;
+    }
+}
+
+.btn-action {
+    color: $primary-700 !important;
+    font-size: 20px;
+    padding: 0 5px !important;
+
+    &:hover {
+        text-decoration: none !important;
+    }
+}
+
+.btn-process {
+    position: relative;
+
+    &:after {
+        content: '';
+        background: transparent url(../../img/loader-16.gif) no-repeat center left;
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background-size: 12px 12px;
+        right: -20px;
+        top: 50%;
+        margin-top: -6px;
+    }
+}
+
+.btn-brand {
+    &-google {
+        @include button-custom-variant($btn-brand-google...);
+
+        padding-#{$start}: $btn-brand-google-padding-left;
+        position: relative;
+
+        &:before {
+            content: $btn-brand-google-before-content;
+            font-family: $btn-brand-google-before-font-family;
+            font-size: $btn-brand-google-before-font-size;
+            position: $btn-brand-google-before-position;
+            top: $btn-brand-google-before-top;
+            #{$start}: $btn-brand-google-before-left;
+            transform: $btn-brand-google-before-transform;
+        }
+    }
+}
+
+//
+// Button Sizes
+//
+.btn-lg {
+    @include button-size($btn-padding-y-lg, $btn-padding-x-lg, $font-size-lg, $btn-line-height-lg, $btn-border-radius-lg);
+}
+
+.btn-sm {
+    @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $btn-font-size-sm, $btn-line-height-sm, $btn-border-radius-sm);
+
+    [class^="fa-"],
+    [class*=" fa-"] {
+        font-size: $btn-icon-font-size-sm;
+        line-height: $btn-icon-line-height-sm;
+    }
+}
+
+//
+// Block button
+//
+.btn-block {
+    display: block;
+    width: 100%;
+
+    // Vertically space out multiple block buttons
+    + .btn-block {
+        margin-top: $btn-block-spacing-y;
+    }
+}
+
+// Specificity overrides
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+    &.btn-block {
+        width: 100%;
+    }
+}
+
+.mobile-version {
+    .btn {
+        @include button-size(
+            $btn-mobile-padding-y,
+            $btn-mobile-padding-x,
+            $btn-mobile-font-size,
+            $btn-mobile-line-height,
+            $btn-mobile-border-radius
+        );
+    }
+
+    .btn-icon {
+        width: $btn-icon-mobile-width;
+        height: $btn-icon-mobile-height;
+        padding: $btn-icon-inner-offset;
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            &:before {
+                font-size: $btn-icon-mobile-fa-icon-font-size;
+            }
+        }
+    }
+
+    .btn-sm {
+        @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $btn-font-size-sm, $btn-line-height-sm, $btn-border-radius-sm);
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            font-size: $btn-icon-font-size-sm;
+            line-height: $btn-icon-line-height-sm;
+        }
+    }
+
+    %btn-square {
+        line-height: $btn-square-mobile-line-height;
+        border-radius: $btn-square-mobile-border-radius;
+    }
+}

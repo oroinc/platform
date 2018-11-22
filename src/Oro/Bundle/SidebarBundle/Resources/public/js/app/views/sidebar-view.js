@@ -4,6 +4,7 @@ define(function(require) {
     var SidebarView;
 
     require('jquery-ui');
+    var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
@@ -41,6 +42,11 @@ define(function(require) {
                 autoExpandVerticalScroll: 3,
                 updateOnContentResize: true,
                 updateOnImageLoad: false
+            },
+            callbacks: {
+                whileScrolling: function() {
+                    $(this).trigger('mCSB.scroll');
+                }
             }
         },
 
@@ -113,6 +119,7 @@ define(function(require) {
                 delay: constants.WIDGET_SORT_DELAY,
                 revert: true,
                 tolerance: 'pointer',
+                handle: '[data-role="sidebar-widget-icon"]',
                 start: function(event, ui) {
                     var model = this.collection.get(ui.item.data('cid'));
                     if (model) {
@@ -196,7 +203,8 @@ define(function(require) {
             var widgetAddView = new WidgetPickerModal({
                 sidebarPosition: this.model.get('position'),
                 availableWidgets: this.getAvailableWidgets(),
-                widgetCollection: this.collection
+                widgetCollection: this.collection,
+                allowOk: false
             });
 
             widgetAddView.open();

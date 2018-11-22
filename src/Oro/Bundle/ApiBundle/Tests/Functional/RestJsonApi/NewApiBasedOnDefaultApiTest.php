@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadEnumsData;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
+use Symfony\Component\HttpFoundation\Response;
 
 class NewApiBasedOnDefaultApiTest extends RestJsonApiTestCase
 {
@@ -37,11 +38,11 @@ class NewApiBasedOnDefaultApiTest extends RestJsonApiTestCase
     /**
      * {@inheritdoc}
      */
-    protected function request($method, $uri, array $parameters = [], array $server = [])
+    protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
         $server['HTTP_X-Test-Request-Type'] = 'test_override';
 
-        return parent::request($method, $uri, $parameters, $server);
+        return parent::request($method, $uri, $parameters, $server, $content);
     }
 
     public function testCustomEntity()
@@ -113,7 +114,7 @@ class NewApiBasedOnDefaultApiTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
     }
 
     public function testRegularEntityWithCustomAlias()

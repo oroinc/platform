@@ -30,27 +30,20 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
     }
 
     /**
-     * Sends REST API request.
-     *
-     * @param string $method
-     * @param string $uri
-     * @param array  $parameters
-     * @param array  $server
-     *
-     * @return Response
+     * {@inheritdoc}
      */
-    protected function request($method, $uri, array $parameters = [], array $server = [])
+    protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
-        if (!isset($server['HTTP_X-WSSE'])) {
-            $server = array_replace($server, $this->getWsseAuthHeader());
-        }
+        $this->checkHateoasHeader($server);
+        $this->checkWsseAuthHeader($server);
 
         $this->client->request(
             $method,
             $uri,
             $parameters,
             [],
-            $server
+            $server,
+            $content
         );
 
         return $this->client->getResponse();

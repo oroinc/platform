@@ -17,6 +17,8 @@
 "View more...": "View more..."
 "All": "All"
 "Any": "Any"
+"Expand": "Expand"
+"Collapse": "Collapse"
 "Expand All": "Expand All"
 "Collapse All": "Collapse All"
 "Ascending Order": "Ascending order - Click to sort in descending order"
@@ -132,6 +134,14 @@ oro:
                 source.label: 'Selected items'
                 target.label: 'Move to'
                 confirm_slug_change.title: 'Create 301 Redirect from old to new URLs'
+        navbar:
+            toggler_label: 'Maximize/minimize menu'
+            scroll_up_label: 'Scroll menu up'
+            scroll_down_label: 'Scroll menu down'
+        loading: 'Loading...'
+        page_loading: 'Page loading...'
+        button:
+            copy_to_clipboard.label: 'Copy to Clipboard'
 'Click to go back': 'Click to go back'
 'Show more': 'Show more'
 'Show less': 'Show less'

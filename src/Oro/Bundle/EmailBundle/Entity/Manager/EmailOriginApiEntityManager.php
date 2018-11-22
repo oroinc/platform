@@ -4,6 +4,9 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
+/**
+ * The API manager for EmailOrigin entity.
+ */
 class EmailOriginApiEntityManager extends ApiEntityManager
 {
     /** @var array */
@@ -19,16 +22,11 @@ class EmailOriginApiEntityManager extends ApiEntityManager
             'disable_partial_load' => true,
             'hints'                => ['HINT_FILTER_BY_CURRENT_USER'],
             'fields'               => [
-                'id'                => null,
-                '__discriminator__' => [
-                    'result_name' => 'type'
-                ],
-                '__class__'         => [
-                ],
-                'isActive'          => [
-                    'result_name' => 'active'
-                ],
-                'folders'           => [
+                'id'        => null,
+                'type'      => ['property_path' => '__discriminator__'],
+                '__class__' => [],
+                'active'    => ['property_path' => 'isActive'],
+                'folders'   => [
                     'exclusion_policy' => 'all',
                     'fields'           => [
                         'id'          => null,
@@ -39,8 +37,8 @@ class EmailOriginApiEntityManager extends ApiEntityManager
                     ]
                 ]
             ],
-            'post_serialize'       => function (array &$result) {
-                $this->postSerializeEmailOrigin($result);
+            'post_serialize'       => function (array $result) {
+                return $this->postSerializeEmailOrigin($result);
             }
         ];
 
@@ -53,8 +51,10 @@ class EmailOriginApiEntityManager extends ApiEntityManager
 
     /**
      * @param array $result
+     *
+     * @return array
      */
-    protected function postSerializeEmailOrigin(array &$result)
+    protected function postSerializeEmailOrigin(array $result): array
     {
         $properties = [];
         foreach ($this->getEmailOriginProperties($result['__class__']) as $prop) {
@@ -64,6 +64,8 @@ class EmailOriginApiEntityManager extends ApiEntityManager
         $result['properties'] = $properties;
 
         unset($result['__class__']);
+
+        return $result;
     }
 
     /**
@@ -77,7 +79,7 @@ class EmailOriginApiEntityManager extends ApiEntityManager
             $metadata     = $this->getMetadata();
             $parentFields = $metadata->getFieldNames();
 
-            // @todo: need to find a better way to exclude a password
+            // exclude a password
             $parentFields[] = 'password';
 
             $this->emailOriginProperties = [];

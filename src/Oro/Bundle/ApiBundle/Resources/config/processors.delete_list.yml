@@ -51,7 +51,7 @@ services:
             - '@oro_security.acl.annotation_provider'
             - DELETE
         tags:
-            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -90 }
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -250 }
 
     #
     # load_data

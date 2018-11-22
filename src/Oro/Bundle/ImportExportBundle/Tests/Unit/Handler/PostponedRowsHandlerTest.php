@@ -9,7 +9,7 @@ use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\MessageQueue\Job\ExtensionInterface;
+use Oro\Component\MessageQueue\Job\Extension\ExtensionInterface;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -124,6 +124,33 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
                 'oro.importexport.import.postponed_rows',
                 ['%postponedRows%' => 2]
             );
+        $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
+    }
+
+    public function testPostponeWithIncrementedReadOption()
+    {
+        $this->jobProcessor
+            ->method('findOrCreateChildJob')
+            ->willReturn($this->currentJob);
+
+        $expectedMessage = new Message();
+        $expectedMessage->setBody([
+            'jobId' => 1,
+            'attempts' => 1,
+            'fileName' => '',
+            'options' => ['incremented_read' => false]
+        ]);
+        $expectedMessage->setDelay(PostponedRowsHandler::DELAY_SECONDS);
+        $this->messageProducer->expects($this->once())
+            ->method('send')
+            ->with(
+                Topics::HTTP_IMPORT,
+                $expectedMessage
+            );
+
+        $result = [];
+        $body = ['attempts' => 0, 'options' => []];
+
         $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
     }
 }

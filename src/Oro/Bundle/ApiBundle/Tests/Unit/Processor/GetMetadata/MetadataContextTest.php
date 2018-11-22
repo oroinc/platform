@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
 
 class MetadataContextTest extends \PHPUnit\Framework\TestCase
 {
@@ -51,18 +52,20 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($config, $this->context->getConfig());
     }
 
-    public function testHasExtraAndGetExtras()
+    public function testExtras()
     {
-        $extra = $this->createMock(MetadataExtraInterface::class);
-        $extra->expects(self::any())
-            ->method('getName')
-            ->willReturn('test');
+        self::assertSame([], $this->context->getExtras());
+        self::assertFalse($this->context->hasExtra('test'));
 
-        $this->context->setExtras([$extra]);
-        self::assertEquals([$extra], $this->context->getExtras());
-
+        $extras = [new TestMetadataExtra('test')];
+        $this->context->setExtras($extras);
+        self::assertEquals($extras, $this->context->getExtras());
         self::assertTrue($this->context->hasExtra('test'));
         self::assertFalse($this->context->hasExtra('another'));
+
+        $this->context->setExtras([]);
+        self::assertSame([], $this->context->getExtras());
+        self::assertFalse($this->context->hasExtra('test'));
     }
 
     public function testSetExtras()

@@ -56,7 +56,18 @@ define(function(require) {
         className: 'oro-datagrid',
 
         /** @property */
-        noDataTemplate: _.template('<span><%= hint %><span>'),
+        noDataTemplate: require('tpl!orodatagrid/templates/datagrid/no-data.html'),
+
+        noSearchResultsTemplate: require('tpl!orodatagrid/templates/datagrid/no-search-results.html'),
+
+        /** @property {Object} */
+        noDataTranslations: {
+            entityHint: 'oro.datagrid.entityHint',
+            noColumns: 'oro.datagrid.no.columns',
+            noEntities: 'oro.datagrid.no.entities',
+            noResults: 'oro.datagrid.no.results',
+            noResultsTitle: 'oro.datagrid.no.results_title'
+        },
 
         /** @property {Object} */
         selectors: {
@@ -110,9 +121,9 @@ define(function(require) {
             toolbarOptions: {
                 addResetAction: true,
                 addRefreshAction: true,
-                addColumnManager: true,
+                addDatagridSettingsManager: true,
                 addSorting: false,
-                columnManager: {
+                datagridSettings: {
                     addSorting: true
                 },
                 placement: {
@@ -125,14 +136,16 @@ define(function(require) {
                     launcherOptions: {
                         label: __('oro_datagrid.action.refresh'),
                         className: 'btn refresh-action',
-                        iconClassName: 'fa-repeat'
+                        iconClassName: 'fa-repeat',
+                        launcherMode: 'icon-only'
                     }
                 },
                 resetAction: {
                     launcherOptions: {
                         label: __('oro_datagrid.action.reset'),
                         className: 'btn reset-action',
-                        iconClassName: 'fa-refresh'
+                        iconClassName: 'fa-refresh',
+                        launcherMode: 'icon-only'
                     }
                 }
             },
@@ -656,7 +669,7 @@ define(function(require) {
          * @private
          */
         _createToolbar: function(options) {
-            var ComponentConstructor = this.collection.options.modules.columnManagerComponentCustom || null;
+            var ComponentConstructor = this.collection.options.modules.datagridSettingsComponentCustom || null;
             var toolbar;
             var sortActions = this.sortActions;
             var toolbarOptions = {
@@ -707,10 +720,12 @@ define(function(require) {
                 var action = new SelectDataAppearanceAction({
                     datagrid: this,
                     launcherOptions: {
-                        items: this.toolbarOptions.availableApperances,
+                        label: __('oro_datagrid.action.appearance'),
+                        items: this.toolbarOptions.availableAppearances,
                         attributes: {
-                            'data-drop-secondary-location': 'left'
-                        }
+                            'data-placement': 'bottom-end'
+                        },
+                        className: 'btn btn-icon data-appearance-selector'
                     },
                     order: 700
                 });
@@ -1098,16 +1113,26 @@ define(function(require) {
          * Define no data block.
          */
         _defineNoDataBlock: function() {
+            var messageHTML;
             var placeholders = {
-                entityHint: (this.entityHint || __('oro.datagrid.entityHint')).toLowerCase()
+                entityHint: (this.entityHint || __(this.noDataTranslations.entityHint)).toLowerCase()
             };
-            var message = _.isEmpty(this.collection.state.filters)
-                ? 'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
-            message = this.noColumnsFlag ? 'oro.datagrid.no.columns' : message;
 
-            this.$(this.selectors.noDataBlock).html($(this.noDataTemplate({
-                hint: __(message, placeholders).replace('\n', '<br />')
-            })));
+            if (this.noColumnsFlag || _.isEmpty(this.collection.state.filters)) {
+                var translation = this.noColumnsFlag
+                    ? this.noDataTranslations.noColumns : this.noDataTranslations.noEntities;
+
+                messageHTML = this.noDataTemplate({
+                    text: __(translation, placeholders)
+                });
+            } else {
+                messageHTML = this.noSearchResultsTemplate({
+                    title: __(this.noDataTranslations.noResultsTitle),
+                    text: __(this.noDataTranslations.noResults, placeholders)
+                });
+            }
+
+            this.$(this.selectors.noDataBlock).html(messageHTML);
         },
 
         /**

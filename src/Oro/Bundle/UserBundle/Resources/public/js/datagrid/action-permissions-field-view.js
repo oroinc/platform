@@ -11,7 +11,7 @@ define(function(require) {
 
         animationDuration: 0,
 
-        className: 'field-permission-container clearfix',
+        className: 'field-permission-container',
 
         template: require('tpl!orouser/templates/datagrid/action-permissions-field-view.html'),
 

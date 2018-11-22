@@ -1,0 +1,71 @@
+/* @theme: admin.oro; */
+
+$checkbox-line-height: 1em !default;
+$checkbox-display: inline-block !default;
+$checkbox-vertical-align: middle !default;
+$checkbox-position: relative !default;
+
+$checkbox-controls-offset-top: 12px !default;
+
+$checkbox-sibling-outer-offset-start: 8px !default;
+
+$checkbox-icon-display: block !default;
+$checkbox-icon-height: 16px !default;
+$checkbox-icon-width: 16px !default;
+$checkbox-icon-border: 2px solid $primary-750 !default;
+$checkbox-icon-background-color: $primary-inverse !default;
+$checkbox-icon-border-radius: 3px !default;
+$checkbox-icon-cursor: pointer !default;
+$checkbox-icon-position: relative !default;
+$checkbox-icon-color: $primary-inverse !default;
+
+$checkbox-icon-marker-position: absolute !default;
+$checkbox-icon-marker-top: 50% !default;
+$checkbox-icon-marker-start: 50% !default;
+$checkbox-icon-marker-transform: translate(if-ltr(-50%, 50%), -50%) !default;
+$checkbox-icon-marker-font-size: 14px !default;
+$checkbox-icon-marker-line-height: 1 !default;
+$checkbox-icon-marker-font-family: FontAwesome !default;
+
+$checkbox-icon-circle-border-radius: 50% !default;
+$checkbox-icon-circle-marker-outer-offset: 0 !default;
+$checkbox-icon-circle-marker-display: block !default;
+$checkbox-icon-circle-marker-width: 8px !default;
+$checkbox-icon-circle-marker-height: 8px !default;
+
+$checkbox-icon-size-l-width: 24px !default;
+$checkbox-icon-size-l-height: 24px !default;
+
+$checkbox-input-position: absolute !default;
+$checkbox-input-z-index: 100 !default;
+$checkbox-input-display: none !default;
+
+$checkbox-icon-border-color: $secondary !default;
+$checkbox-icon-border-shadow-size: 5px !default;
+$checkbox-icon-checked-background-color: $secondary !default;
+$checkbox-icon-checked-border-color: $secondary !default;
+
+$checkbox-icon-circle-checked-background-color: transparent !default;
+$checkbox-icon-circle-checked-border-color: $secondary !default;
+
+$checkbox-icon-circle-point-checked-background-color: $secondary !default;
+
+$checkbox-icon-disabled-background-color: $secondary !default;
+
+$checkbox-icon-indeterminate-background-color: $secondary !default;
+$checkbox-icon-indeterminate-border-color: $secondary !default;
+
+$checkbox-checked-icon: $fa-var-check !default;
+$checkbox-indeterminate-icon: $fa-var-minus !default;
+$checkbox-circle-checked-icon: "" !default;
+
+$checkbox-disabled-opacity: .5 !default;
+$checkbox-disabled-background-color: $primary-900 !default;
+$checkbox-disabled-pointer-events: none !default;
+
+$checkbox-text-outer-offset-start: 4px !default;
+$checkbox-text-vertical-align: middle !default;
+$checkbox-text-empty-display: none !default;
+$checkbox-label-empty-offset-top: 7px !default;
+
+$checkbox-shift-offset: $checkbox-icon-width + 8px !default;

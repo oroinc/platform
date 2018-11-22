@@ -6,6 +6,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Insert additional dependencies to translator service.
+ */
 class TranslatorDependencyPass implements CompilerPassInterface
 {
     /**
@@ -33,6 +36,11 @@ class TranslatorDependencyPass implements CompilerPassInterface
         $translatorDef->addMethodCall(
             'setTranslationDomainProvider',
             [new Reference('oro_translation.provider.translation_domain')]
+        );
+
+        $translatorDef->addMethodCall(
+            'setEventDispatcher',
+            [new Reference('event_dispatcher')]
         );
 
         $isInstalled = $container->hasParameter('installed') && $container->getParameter('installed');

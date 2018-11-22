@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Fixtures;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 class TypedAddressOwner
 {
-    /**
-     * @var TypedAddress[]
-     */
+    /** @var Collection */
     protected $addresses;
 
     /**
@@ -14,14 +15,15 @@ class TypedAddressOwner
      */
     public function __construct(array $addresses)
     {
+        $this->addresses = new ArrayCollection();
         foreach ($addresses as $address) {
             $address->setOwner($this);
-            $this->addresses[] = $address;
+            $this->addresses->add($address);
         }
     }
 
     /**
-     * @return TypedAddress[]
+     * @return TypedAddress[]|Collection
      */
     public function getAddresses()
     {

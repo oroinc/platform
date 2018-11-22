@@ -175,7 +175,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $container->setDefinition(self::API_DOC_HTML_FORMATTER_SERVICE, $compositeHtmlFormatterDef);
         $compositeHtmlFormatterDef->setPublic($isPublicService);
 
-        // configure formatters accorting to views config
+        // configure formatters according to views config
         $htmlFormatters = [];
         $views = $this->getApiDocViews($container);
         foreach ($views as $name => $view) {

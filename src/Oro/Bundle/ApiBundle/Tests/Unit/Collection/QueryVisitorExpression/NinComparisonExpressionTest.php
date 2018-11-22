@@ -7,26 +7,33 @@ use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NinComparisonExpression;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class NinComparisonExpressionTest extends \PHPUnit\Framework\TestCase
 {
     public function testWalkComparisonExpression()
     {
         $expression = new NinComparisonExpression();
-        $expressionVisitor = new QueryExpressionVisitor();
-        $fieldName = 'e.test';
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+        $field = 'e.test';
+        $expr = 'LOWER(e.test)';
         $parameterName = 'test_1';
         $value = [1, 2, 3];
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
-            $fieldName,
+            $field,
+            $expr,
             $parameterName,
             $value
         );
 
         self::assertEquals(
-            new Func($fieldName . ' NOT IN', [':' . $parameterName]),
+            new Func($expr . ' NOT IN', [':' . $parameterName]),
             $result
         );
         self::assertEquals(

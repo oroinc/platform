@@ -1,45 +1,72 @@
+/* @theme: admin.oro; */
+
 .inline-editable-wrapper:not(:hover) {
-  &.save-success .inline-actions-element {
-    background: $cellSuccessBackground;
-    @include inline-actions-element-outline($cellSuccessBackground);
-    &:after {
-      position: relative;
-      font-family: 'FontAwesome';
-      content: '\f00c';
-      font-size: 15px;
-      line-height: 22px;
-      height: 22px;
-      padding: 0 4px;
-      color: $cellSuccessColor;
+    &.save-success .inline-actions-element {
+        background: $cell-success-background;
+
+        .inline-actions-element_actions {
+            display: none;
+        }
     }
-    .inline-actions-element_actions {
-      display: none;
+
+    &.save-fail .inline-actions-element {
+        background: $cell-error-background;
+
+        .inline-actions-element_actions {
+            display: none;
+        }
     }
-  }
-  &.save-fail .inline-actions-element {
-    background: $cellErrorBackground;
-    @include inline-actions-element-outline($cellErrorBackground);
-    .inline-actions-element_actions {
-      display: none;
-    }
-  }
 }
+
 .inline-editable-wrapper {
-  &.loading .inline-actions-element {
-    background: $cellLoadingBackground;
-    @include inline-actions-element-outline($cellLoadingBackground);
-    &:after {
-      background: url('../../../../bundles/oroui/img/loader-16.gif') no-repeat center center transparent;
-      display: block !important;
-      content: "";
-      position: absolute;
-      top: 0;
-      right: 1px;
-      width: 24px;
-      height: 24px;
+    &.loading {
+        .inline-actions-element {
+            background: $cell-loading-background;
+
+            &:before {
+                position: absolute;
+                top: $inline-editable-wrapper-loading-top;
+                #{$end}: $inline-editable-wrapper-loading-end;
+
+                display: block;
+
+                content: '';
+
+                @include loader($inline-editable-wrapper-loading-size, $inline-editable-wrapper-loading-width);
+            }
+
+            &:hover .inline-actions-element_actions {
+                visibility: hidden;
+            }
+        }
     }
-    &:hover .inline-actions-element_actions {
-      visibility: hidden !important;
+}
+
+.inline-actions-btn {
+    padding: $inline-actions-btn-offset;
+
+    font-size: $base-font-size--m;
+    line-height: inherit;
+
+    border-width: 0;
+    background-color: transparent;
+    color: $inline-actions-btn-color;
+
+    cursor: pointer;
+
+    &:hover {
+        color: $inline-actions-btn-color-hover;
     }
-  }
+
+    &--size-s {
+        padding: $inline-actions-btn-s-offset;
+    }
+
+    @at-root .has-error .inline-actions-btn  {
+        color: $inline-actions-btn-color-error;
+
+        &:hover {
+            color: $inline-actions-btn-color-error;
+        }
+    }
 }

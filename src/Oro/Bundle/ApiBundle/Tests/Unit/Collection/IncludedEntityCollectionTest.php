@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 
 class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
 {
@@ -23,7 +24,7 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
     public function testShouldSetPrimaryEntityId()
     {
         $this->collection->setPrimaryEntityId('Test\Class', '123');
-        self::assertAttributeSame(['Test\Class', '123', null], 'primaryEntity', $this->collection);
+        self::assertAttributeSame(['Test\Class', '123', null, null], 'primaryEntity', $this->collection);
     }
 
     public function testShouldIsPrimaryEntityReturnFalseIfPrimaryEntityIdIsNotSet()
@@ -62,7 +63,7 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
      */
     public function testShouldSetPrimaryEntityThrowExceptionIfPrimaryEntityIdIsNotSetYet()
     {
-        $this->collection->setPrimaryEntity(new \stdClass());
+        $this->collection->setPrimaryEntity(new \stdClass(), null);
     }
 
     public function testShouldSetPrimaryEntity()
@@ -70,17 +71,24 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'Test\Class';
         $entityId = '123';
         $entity = new \stdClass();
+        $metadata = new EntityMetadata();
         $this->collection->setPrimaryEntityId($entityClass, $entityId);
-        $this->collection->setPrimaryEntity($entity);
-        self::assertAttributeSame([$entityClass, $entityId, $entity], 'primaryEntity', $this->collection);
+        $this->collection->setPrimaryEntity($entity, $metadata);
+        self::assertAttributeSame(
+            [$entityClass, $entityId, $entity, $metadata],
+            'primaryEntity',
+            $this->collection
+        );
     }
 
     public function testShouldBePossibleToGetAlreadySetPrimaryEntity()
     {
         $entity = new \stdClass();
+        $metadata = new EntityMetadata();
         $this->collection->setPrimaryEntityId('Test\Class', '123');
-        $this->collection->setPrimaryEntity($entity);
+        $this->collection->setPrimaryEntity($entity, $metadata);
         self::assertSame($entity, $this->collection->getPrimaryEntity());
+        self::assertSame($metadata, $this->collection->getPrimaryEntityMetadata());
     }
 
     public function testShouldAddEntity()
@@ -163,7 +171,7 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->collection->contains($entityClass, $entityId));
     }
 
-    public function testShouldBeIteratable()
+    public function testShouldBeIterable()
     {
         $entity = new \stdClass();
         $entityClass = 'Test\Class';

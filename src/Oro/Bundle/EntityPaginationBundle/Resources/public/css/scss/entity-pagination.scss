@@ -1,49 +1,35 @@
-#entity-pagination {
-  float: right;
-  .pagination {
-    margin: 4px 0 0;
-    line-height: 0;
-    ul {
-      box-shadow: none;
-      >li {
-        >a {
-          font-weight: normal;
-          padding: 1px 10px;
-          color: #666;
-          background: #f7f7f7 linear-gradient(to bottom, #fdfdfd, #efefef) repeat-x;
-          &:hover, &:focus {
-            background: #fafafa linear-gradient(to bottom,#fdfdfd,#f5f5f5);
-          }
-          &:active {
-            background: #ebebeb linear-gradient(to bottom,#e7e7e7,#f2f2f2);
-          }
+/* @theme: admin.oro; */
+
+.entity-pagination {
+    display: flex;
+    align-items: baseline;
+    line-height: $entity-pagination-line-height;
+
+    .pagination .page-link {
+        padding: $entity-pagination-page-link-padding;
+        line-height: 1;
+
+        [class*="fa-"]{
+            padding: $entity-pagination-arrow-icon-padding;
+
+            &:before {
+                font-size: $entity-pagination-arrow-icon-font-size;
+            }
         }
-        &.disabled {
-          a, a:active, a:hover, a:focus {
-            background-image: linear-gradient(to bottom, #fdfdfd, #efefef);
-            box-shadow: none;
-            pointer-events: none;
-            opacity: 0.65;
-          }
-        }
-      }
     }
-    div.pagination-current {
-      float: left;
-      height: 24px;
-      min-width: 30px;
-      padding: 6px;
-      text-align: center;
-      line-height: 10px;
-      border: 1px solid #ddd;
-      border-left: none;
-      background-color:  #f7f7f7;
-      &:hover {
-        cursor: default;
-      }
+
+    .page-current {
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        line-height: 1;
+        width: $entity-pagination-page-current-width;
+        color: $entity-pagination-page-current-color;
     }
-  }
-  .dib.pagination-total {
-    line-height: 24px;
-  }
+
+    &_total {
+        margin-#{$start}: $entity-pagination-total-margin-start;
+        color: $entity-pagination-total-color;
+        font-size: $entity-pagination-total-font-size;
+    }
 }

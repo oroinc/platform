@@ -1,0 +1,54 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/oro/variables";
+
+$dashboard-container-border: 1px solid $primary-860 !default;
+
+$dashboard-container-title-background-color: $primary-inverse !default;
+
+$dashboard-action-icon: $fa-var-minus-square-o !default;
+$dashboard-action-icon-collapsed: $fa-var-plus-square-o !default;
+$dashboard-action-padding: 0 6px !default;
+$dashboard-wrapper-bg: $primary-900 !default;
+$dashboard-widget-bg: $primary-inverse !default;
+$dashboard-widget-border-color: $primary-inverse !default;
+$dashboard-widget-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05) !default;
+$dashboard-widget-header-padding: 4px 0 3px !default;
+$dashboard-widget-title-color: $primary-400 !default;
+$dashboard-widget-content-padding: 24px !default;
+$dashboard-widget-config-data-color: $primary-550 !default;
+$dashboard-widget-config-data-font-size: $base-font-size - 1px !default;
+$dashboard-widget-config-data-line-height: 1.31 !default;
+$dashboard-widget-config-data-shift: 4px !default;
+$dashboard-widget-placeholder-background: $primary-860 !default;
+$dashboard-widget-placeholder-border: 2px dashed $primary-700 !default;
+$dashboard-widget-placeholder-color: $primary-600 !default;
+$dashboard-widget-configuration-border: 1px solid $primary-750 !default;
+$dashboard-widget-configuration-collapsed-margin-top: 10px !default;
+$dashboard-configuration-items-table-margin-start: $form-horizontal-control-label-width + $form-horizontal-control-margin-start !default;
+$dashboard-configuration-items-table-margin-top: $form-container-control-row-space !default;
+$dashboard-configuration-items-btn-color: $primary-700 !default;
+$dashboard-configuration-items-btn-active-color: $primary-400 !default;
+$dashboard-widget-configuration-buttons-space: 8px !default;
+
+$dashboard-widget-title-widget-width: 150px !default;
+$dashboard-widget-configuration-control-label-width: 140px !default;
+$dashboard-widget-title-widget-control-label-width: auto !default;
+$dashboard-widget-title-widget-control-label-min-width: 0 !default;
+$dashboard-widget-title-widget-controls-offset-start: $content-padding-small !default;
+$dashboard-widget-title-input-width: 100% !default;
+
+$dashboard-big-numbers-separator-color: $primary-830 !default;
+$dashboard-big-numbers-positive-color: $success-dark !default;
+$dashboard-big-numbers-negative-color: $danger-dark !default;
+$dashboard-big-numbers-one-column-gate: 400px !default;
+$dashboard-big-numbers-two-column-gate: 600px !default;
+
+$dashboard-launchpad-icon-bg: $primary-900 !default;
+$dashboard-launchpad-icon-color: $primary-600 !default;
+$dashboard-launchpad-icon-active-color: $primary-400 !default;
+$dashboard-launchpad-active-underline-color: $secondary !default;
+$dashboard-launchpad-label-color: $primary-200 !default;
+$dashboard-launchpad-bold-label-color: $primary-300 !default;
+
+$dashboard-container-other-scroll-container-offset: 10px !default;

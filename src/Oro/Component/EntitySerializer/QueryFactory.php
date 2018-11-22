@@ -49,6 +49,11 @@ class QueryFactory
         $query = $qb->getQuery();
         $this->queryResolver->resolveQuery($query, $config);
 
+        $limit = $qb->getMaxResults();
+        if (null !== $limit && $config->getHasMore() && $query->getMaxResults() === $limit) {
+            $query->setMaxResults($limit + 1);
+        }
+
         return $query;
     }
 
@@ -117,6 +122,10 @@ class QueryFactory
     public function getRelatedItemsIds($associationMapping, $entityIds, EntityConfig $config)
     {
         $limit = $config->getMaxResults();
+        if (null !== $limit && $config->getHasMore()) {
+            $limit++;
+        }
+
         if ($limit > 0 && count($entityIds) > 1) {
             $rows = $this->getRelatedItemsUnionAllQuery($associationMapping, $entityIds, $config, $limit)
                 ->getQuery()

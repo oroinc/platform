@@ -1,13 +1,12 @@
-define([
-    'backbone',
-    'underscore',
-    'backgrid',
-    'oro/datagrid/cell/action-cell',
-    'orodatagrid/js/datagrid/header-cell/action-header-cell'
-], function(Backbone, _, Backgrid, ActionCell, ActionHeaderCell) {
+define(function(require) {
     'use strict';
 
     var ActionColumn;
+    var Backbone = require('backbone');
+    var _ = require('underscore');
+    var Backgrid = require('backgrid');
+    var ActionCell = require('oro/datagrid/cell/action-cell');
+    var ActionHeaderCell = require('orodatagrid/js/datagrid/header-cell/action-header-cell');
 
     /**
      * Column of grid that contains row actions
