@@ -18,6 +18,8 @@ class ChangeLengthOfFields implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $queries->addPreQuery(new CheckDataLengthOfFields());
+
         $processTriggerTable = $schema->getTable('oro_process_trigger');
         $processTriggerTable->getColumn('field')
             ->setLength(150);
