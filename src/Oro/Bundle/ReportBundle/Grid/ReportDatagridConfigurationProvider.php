@@ -82,7 +82,7 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
             $this->reportCacheManager->save($cacheKey, $config);
         }
 
-        return $this->resolver->resolve($gridName, $config);
+        return $config;
     }
 
     /**
