@@ -12,7 +12,9 @@
             <% // this is already escaped in the title template %>
             <%= title %>
         </div>
-        <div class="grid-views-dropdown dropdown-menu" aria-labelledby="<%- gridViewTogglerId %>">
+
+        <% iconClass = _.filter(choices, function(choice) {return choice.icon !== false}).length ? ' has-icons' : '' %>
+        <div class="grid-views-dropdown dropdown-menu<%-iconClass %>" aria-labelledby="<%- gridViewTogglerId %>">
             <% _.each(choices, function (choice) { %>
                 <a class="grid-views-item dropdown-item" href="#" role="button" data-value="<%- choice.value %>">
                     <% if (choice.icon) { %>
