@@ -19,16 +19,15 @@
 
         .btn-block {
             .btn:not(.filter-update) {
-                @include button-custom-variant($filter-box-criteria-btn-group-color-styles...);
+                border-radius: $filter-box-criteria-btn-group-border-radius;
+                border: $filter-box-criteria-btn-group-border;
+                font-weight: $filter-box-criteria-btn-group-font-weight;
+                text-transform: $filter-box-criteria-btn-group-text-transform;
 
                 + .dropdown-menu {
                     text-transform: $filter-box-criteria-btn-group-text-transform;
                 }
 
-                border-radius: $filter-box-criteria-btn-group-border-radius;
-                border: $filter-box-criteria-btn-group-border;
-                font-weight: $filter-box-criteria-btn-group-font-weight;
-                text-transform: $filter-box-criteria-btn-group-text-transform;
             }
 
 

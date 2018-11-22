@@ -31,11 +31,6 @@ $filter-box-criteria-btn-group-text-transform: capitalize;
 
 $filter-box-criteria-btn-group-value-field-frame-offset-left: -2px !default;
 
-$filter-box-criteria-btn-group-color-styles: map-values(map-merge($btn-theme-square-default, (
-    'background': $filter-box-criteria-btn-group-background-color,
-    'border': $filter-box-criteria-btn-group-border-color
-))) !default;
-
 $filter-criteria-nav-tabs-oro-hover-background: #efefef !default;
 $filter-criteria-nav-tabs-oro-hover-color: #444 !default;
 $filter-criteria-nav-tabs-oro-active-background: #fff !default;
