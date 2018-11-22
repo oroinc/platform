@@ -44,7 +44,6 @@ $select2-chosen-height: 28px !default;
 $select2-chosen-icon-height: 16px !default;
 $select2-chosen-icon-offset-left: -3px !default;
 $select2-chosen-icon-vertical-align: middle !default;
-$select2-chosen-icon-float: left !default;
 
 $select2-chosen-result-entry-display: inline !default;
 $select2-chosen-result-entry-font-style: italic !default;
@@ -195,15 +194,19 @@ $select2-result-with-children-font-weight: bold !default;
 $select2-result-hide-display: none !default;
 $select2-result-em-font-style: normal !default;
 
-$select2-result-label-inner-offset: 4px 7px 4px !default;
+$select2-result-label-inner-offset: 2px 8px 2px !default;
 $select2-result-label-offset: 0 !default;
 $select2-result-label-cursor: pointer !default;
-$select2-result-label-min-height: 1em !default;
+$select2-result-label-min-height: 28px !default;
+$select2-result-label-line-height: $btn-line-height-sm !default;
 $select2-result-label-user-select: none !default;
 $select2-result-label-color: $primary-200 !default;
 
 $select2-result-label-img-offset-right: 5px !default;
 $select2-result-label-img-offset-left: 2px !default;
+
+$select2-result-label-icon-size:  $dropdown-item-icon-fa-size !default;
+$select2-result-label-icon-offset: $dropdown-item-icon-fa-offset !default;
 
 $select2-result-highlighted-background: $primary-900 !default;
 $select2-result-highlighted-em-background: transparent !default;
