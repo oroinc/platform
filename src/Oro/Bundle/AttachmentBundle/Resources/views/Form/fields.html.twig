@@ -1,6 +1,6 @@
 {% block oro_file_widget %}
     {% spaceless %}
-        <div>
+        <div class="control-group control-group--column">
             {{ form_widget(form.file) }}
             {% if form_errors(form.file) %}
                 <div style="clear:both; float:left">
@@ -49,7 +49,7 @@
 
 {% block oro_image_widget %}
     {% spaceless %}
-        <div>
+        <div class="control-group control-group--column">
             {%  if form.vars.name == 'attachment'  %}
                 <div class="attachment-file">
                     {% set jsonParams = '{"initializeOptions":{"fileDefaultHtml":"' ~ "Attach file:"|trans  ~ '" ,"fileButtonHtml":"' ~ "Upload"|trans  ~ '"}}' %}

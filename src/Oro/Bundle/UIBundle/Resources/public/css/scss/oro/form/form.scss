@@ -55,14 +55,17 @@
     Uploader uniform
 **/
 .uploader {
+    float: $uploader-float;
+
+    color: $uploader-color;
     border-radius: $uploader-border-radius;
     background-color: $uploader-background-color;
     border: $input-border-width solid $input-border-color;
     height: $uploader-height;
-    line-height: $uploader-line-height;
-    float: $uploader-float;
+    width: $uploader-width;
+
     white-space: $uploader-white-space;
-    color: $uploader-color;
+    line-height: $uploader-line-height;
     font-family: $uploader-font-family;
 
     input {
@@ -378,9 +381,15 @@ select[multiple] {
     }
 }
 
-.form-horizontal .control-group {
-    margin: 0;
-    max-width: 800px;
+.form-horizontal {
+    .control-group {
+        margin: 0;
+        max-width: 800px;
+
+        &--column {
+            flex-direction: column;
+        }
+    }
 }
 
 .form-container,
@@ -388,6 +397,10 @@ select[multiple] {
     .control-group {
         &:not(:last-of-type) {
             margin: 0 0 $form-container-control-row-space;
+        }
+
+        &--column:not(:last-of-type) {
+            margin: 0;
         }
     }
 }
