@@ -19,7 +19,7 @@
 
         .btn-block {
             .btn:not(.filter-update) {
-                @include button-custom-variant($filter-box-criteria-btn-group-color-styles);
+                @include button-custom-variant($filter-box-criteria-btn-group-color-styles...);
 
                 + .dropdown-menu {
                     text-transform: $filter-box-criteria-btn-group-text-transform;
