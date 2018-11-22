@@ -17,9 +17,27 @@ body:not(.login-page) {
 
 .responsive-section {
     .responsive-cell {
-        &:nth-last-child(1),
-        &:nth-last-child(2) {
+        &:nth-last-child(1n),
+        &:nth-last-child(2n) {
             margin-bottom: 0;
+        }
+    }
+
+    &.responsive-big {
+        .responsive-cell {
+            &:not(:only-child) {
+                .responsive-block {
+                    padding-left: 0;
+                    padding-right: 0;
+                }
+            }
+        }
+    }
+
+    &.responsive-small {
+        .responsive-block {
+            padding-left: 0;
+            padding-right: 0;
         }
     }
 }
@@ -71,7 +89,6 @@ body:not(.login-page) {
     }
 }
 
-
 .layout-content {
     > .scrollable-container {
         padding-#{$start}: $content-padding;
@@ -89,6 +106,49 @@ body:not(.login-page) {
         margin-#{$end}: -$content-padding;
         padding-#{$start}: $content-padding;
         padding-#{$end}: $content-padding;
+    }
+}
+
+.container-fluid {
+    > .responsive-section {
+        &:not(.responsive-small) {
+            .responsive-cell {
+                &:first-child {
+                    .user-fieldset,
+                    .widget-title {
+                        margin-#{$start}: $content-padding-medium;
+                    }
+                }
+
+                &:nth-child(2) {
+                    .inner-grid {
+                        .grid-views {
+                            margin-#{$start}: 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        &.responsive-medium {
+            &:not(.responsive-section-no-blocks) {
+                .responsive-cell {
+                    .user-fieldset,
+                    .widget-title {
+                        margin-#{$start}: $content-padding-medium;
+                    }
+                }
+            }
+        }
+
+        &.responsive-small {
+            .responsive-cell {
+                .user-fieldset,
+                .widget-title {
+                    margin-#{$start}: $content-padding-medium;
+                }
+            }
+        }
     }
 }
 

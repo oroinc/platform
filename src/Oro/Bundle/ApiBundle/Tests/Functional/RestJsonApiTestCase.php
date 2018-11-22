@@ -37,9 +37,13 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
+        $this->checkHateoasHeader($server);
+        $this->checkWsseAuthHeader($server);
+
         if (!empty($parameters['filter'])) {
             foreach ($parameters['filter'] as $key => $filter) {
                 $filter = self::processTemplateData($filter);
@@ -48,11 +52,19 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                         foreach ($filter as $k => $v) {
                             if (is_array($v)) {
                                 $filter[$k] = implode(',', $v);
+                            } elseif (is_bool($v)) {
+                                $filter[$k] = $v ? '1' : '0';
+                            } elseif (!is_string($v)) {
+                                $filter[$k] = (string)$v;
                             }
                         }
                     } else {
                         $filter = implode(',', $filter);
                     }
+                } elseif (is_bool($filter)) {
+                    $filter = $filter ? '1' : '0';
+                } elseif (!is_string($filter)) {
+                    $filter = (string)$filter;
                 }
                 $parameters['filter'][$key] = $filter;
             }
@@ -67,12 +79,6 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                 $uri .= $separator . $filters;
             }
             unset($parameters['filters']);
-        }
-
-        if (!array_key_exists('HTTP_X-WSSE', $server)) {
-            $server = array_replace($server, $this->getWsseAuthHeader());
-        } elseif (!$server['HTTP_X-WSSE']) {
-            unset($server['HTTP_X-WSSE']);
         }
 
         $this->client->request(
@@ -633,39 +639,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         $content = self::jsonToArray($response->getContent());
         $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
 
-        self::assertArrayContains($expectedContent, $content);
-
-        // test the primary data collection count and order
-        if (!empty($expectedContent[JsonApiDoc::DATA])) {
-            $expectedData = $expectedContent[JsonApiDoc::DATA];
-            if (is_array($expectedData) && isset($expectedData[0][JsonApiDoc::TYPE])) {
-                $expectedItems = $this->getResponseDataItems($expectedData);
-                $actualItems = $this->getResponseDataItems($content[JsonApiDoc::DATA]);
-                self::assertSame(
-                    $expectedItems,
-                    $actualItems,
-                    'Failed asserting the primary data collection items count and order.'
-                );
-            }
-        }
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return array [['type' => entity type, 'id' => entity id], ...]
-     */
-    private function getResponseDataItems(array $data)
-    {
-        $result = [];
-        foreach ($data as $item) {
-            $result[] = [
-                JsonApiDoc::TYPE => $item[JsonApiDoc::TYPE],
-                JsonApiDoc::ID   => $item[JsonApiDoc::ID]
-            ];
-        }
-
-        return $result;
+        self::assertThat($content, new JsonApiDocContainsConstraint($expectedContent, false));
     }
 
     /**
@@ -807,7 +781,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                 $data[JsonApiDoc::ID] = sprintf('<toString(@%s->%s)>', $referenceId, $entityIdFieldName);
                 if (isset($data[JsonApiDoc::ATTRIBUTES])) {
                     $attributes = $data[JsonApiDoc::ATTRIBUTES];
-                    $dateFields = ['createdAt', 'updatedAt', 'created', 'updated'];
+                    $dateFields = ['createdAt', 'updatedAt'];
                     foreach ($dateFields as $field) {
                         if (isset($attributes[$field])) {
                             $data[JsonApiDoc::ATTRIBUTES][$field] = sprintf(

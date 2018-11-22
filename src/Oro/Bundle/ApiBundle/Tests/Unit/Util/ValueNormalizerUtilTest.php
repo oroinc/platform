@@ -32,6 +32,9 @@ class ValueNormalizerUtilTest extends \PHPUnit\Framework\TestCase
             ['Test\InvalidArgumentException', null, 'invalid argument exception'],
             ['Test\InvalidArgumentException', 'Exception', 'invalid argument exception'],
             ['Test\Invalid_Argument_Exception', 'Exception', 'invalid argument exception'],
+            ['Test\invalid_argument_exception', 'Exception', 'invalid argument exception'],
+            ['Test\Invalid__Argument__Exception', 'Exception', 'invalid argument exception'],
+            ['Test\invalid__argument__exception', 'Exception', 'invalid argument exception'],
             ['Test\IOException', 'Exception', 'io exception'],
             ['Test\AnotherPHPException', 'Exception', 'another php exception']
         ];

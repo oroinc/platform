@@ -1,8 +1,6 @@
 /* @theme: admin.oro; */
 
 .inner-permissions-grid {
-    margin-top: 16px;
-
     .oro-datagrid {
         margin: 0;
     }
@@ -13,19 +11,21 @@
     }
 
     .grid-header-cell:first-child {
-        width: 160px;
+        width: $role-collapse-action-container-width + $capabilities-offset; // plus grid-header inner offset
     }
 
     .collapse-expand-action-container {
         display: flex;
         align-items: center;
-        width: $role-collapse-expand-action-container-width - 7;
+        flex-shrink: 0;
+        width: $role-collapse-action-container-width;
 
         .collapse-action {
-            margin-#{$end}: 16px;
+            margin-#{$end}: $inner-permissions-grid-collapse-action-offset;
 
             font-size: $role-capability-icon-size;
             text-align: center;
+            line-height: 1;
 
             color: $role-capability-icon-expand-color;
 
@@ -38,20 +38,22 @@
     }
 
     .entity-name {
-        font-weight: bold;
+        padding-#{$end}: $inner-permissions-grid-entity-name-offset;
+
+        font-weight: $inner-permissions-grid-entity-name-weight;
     }
 
     .entity-row-action {
-        position: relative;
+        margin-#{$start}: auto;
     }
 
     .fields-list {
         > :first-child {
-            margin-top: 8px;
+            margin-top: $inner-permissions-grid-fields-list-offset;
         }
 
         > :last-child {
-            margin-bottom: 8px;
+            margin-bottom: $inner-permissions-grid-fields-list-offset;
         }
     }
 
@@ -60,11 +62,11 @@
     }
 
     .role-permissions-action-launcher {
-        max-height: 24px;
+        max-height: $inner-permissions-grid-launcher-min-height;
     }
 
     .grid-header-cell-label {
-        min-width: $role-collapse-expand-action-container-width;
+        min-width: $role-collapse-action-container-width;
     }
 }
 .field-less .collapse-action {
@@ -75,8 +77,16 @@
     display: flex;
     justify-content: flex-start;
 
+    padding: $entity-permission-container-offset 0;
+
     .action-permissions {
         flex-grow: 1;
+        flex-wrap: wrap;
+    }
+
+    + .collapsing,
+    + .collapse {
+        padding-top: $entity-permission-collapse-offset; // datagrid row bottom offset
     }
 }
 
@@ -90,19 +100,22 @@
     @include clearfix();
 
     &__item {
-        width: 160px;
-        margin-#{$end}: 15px;
+        width: $action-permissions-item-width;
+        padding-#{$end}: $action-permissions-item-offset;
 
         .dropdown-toggle {
-            cursor: pointer;
             position: relative;
+
+            vertical-align: middle;
+
+            cursor: pointer;
 
             &:hover,
             &.active {
                 @include fa-icon($role-capability-icon-action, after, true) {
                     position: absolute;
                     top: 2px;
-                    #{$end}: 4px;
+                    #{$end}: 0;
 
                     // Reset Bootstrap styles
                     width: auto;
@@ -119,18 +132,21 @@
     }
 
     &__item-wrapper {
-        padding-#{$end}: 20px;
+        display: inline-block;
+        padding-#{$end}: $action-permissions-item-wrapper-offset;
         max-width: 100%;
-
-        float: #{$start};
 
         color: $role-capability-item-color;
 
         overflow: hidden;
-
-        text-overflow: ellipsis;
-
         white-space: nowrap;
+
+        vertical-align: middle;
+
+        &.readonly {
+            padding-top: $entity-permission-container-offset;
+            padding-bottom: $entity-permission-container-offset;
+        }
     }
 
     &__item-wrapper--no-access {
@@ -143,39 +159,21 @@
 
     &__label {
         display: inline-block;
-        overflow: hidden;
+        vertical-align: middle;
 
-        text-overflow: ellipsis;
-
-        vertical-align: bottom;
+        @include text-line-truncate($action-permissions-label-trim-width, true);
     }
 
+    &__value,
     &__dropdown-toggle {
+        display: inline-block;
+        vertical-align: middle;
+
+        @include text-line-truncate($action-permissions-toggle-trim-width, true);
+
         &:focus {
             font-weight: normal;
         }
-    }
-}
-
-.field-permission-container {
-    margin-#{$start}: $role-collapse-expand-action-container-offset;
-    padding: 12px 0;
-
-    border-top: 1px solid $general-border-color;
-
-    &:first-child {
-        margin-top: 4px;
-
-        border-top: 0 none;
-    }
-
-    .field-name {
-        float: #{$start};
-        width: $role-collapse-expand-action-container-width - $role-collapse-expand-action-container-offset;
-    }
-
-    .action-permissions {
-        margin-#{$start}: 20px;
     }
 }
 
@@ -188,11 +186,18 @@
 
 .dropdown-menu__role-permissions-action {
     .grid .entity-row-action {
-        padding: 5px 0;
+        padding: $entity-permission-entity-row-action-offset;
     }
+}
 
-    .dropdown-menu-collection__list > li {
-        white-space: nowrap;
-        margin: 0;
+@include media-breakpoint-down(xs) {
+    .inner-permissions-grid {
+        .grid-header-cell:first-child {
+            width: $inner-permissions-grid-grid-header-cell-xs-width + $capabilities-offset;
+        }
+
+        .collapse-expand-action-container {
+            width: $inner-permissions-grid-grid-header-cell-xs-width;
+        }
     }
 }

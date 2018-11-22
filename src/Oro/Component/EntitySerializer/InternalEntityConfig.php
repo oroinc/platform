@@ -6,10 +6,10 @@ namespace Oro\Component\EntitySerializer;
  * This class is used by EntitySerializer instead of EntityConfig
  * and allows caching intermediate data related to an entity.
  */
-class InternalEntityConfig extends EntityConfig
+final class InternalEntityConfig extends EntityConfig
 {
     /** @var array */
-    protected $cache = [];
+    private $cache = [];
 
     /**
      * {@inheritdoc}

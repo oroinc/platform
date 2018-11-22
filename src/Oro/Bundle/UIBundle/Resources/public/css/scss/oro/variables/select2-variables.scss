@@ -20,6 +20,7 @@ $select2-container-input-append-width: 264px !default;
 $select2-container-input-append-max-width: 264px !default;
 
 $select2-container-active-border-color: $secondary !default;
+$select2-container-active-z-index: 1 !default;
 $select2-container-open-border-color: $primary-750 !default;
 
 $select2-choice-display: block !default;
@@ -63,6 +64,7 @@ $select2-choice-image-offset-left: -2px !default;
 $select2-choice-image-offset-right: 2px !default;
 $select2-choice-image-display: block !default;
 $select2-choice-image-float: left !default;
+$select2-choice-image-border-radius: $select2-choice-image-max-width !default;
 
 $select2-choice-span-display: block !default;
 $select2-choice-span-overflow: hidden !default;
@@ -79,16 +81,18 @@ $select2-container-overflow: hidden !default;
 
 $select2-search-choice-background: $primary-830 !default;
 $select2-search-choice-font-size: $base-font-size--s !default;
-$select2-search-choice-line-height: 1 !default;
+$select2-search-choice-line-height: 14px !default;
 $select2-search-choice-color: $primary-400 !default;
-$select2-search-choice-inner-offset: 4px 20px 4px 8px !default;
-$select2-search-choice-offset: 4px !default;
+$select2-search-choice-border-radius: 2px !default;
+$select2-search-choice-inner-offset-vertical: 4px !default;
+$select2-search-choice-inner-offset-horizontal: 8px !default;
+$select2-search-choice-offset: 3px !default;
 $select2-search-choice-position: relative !default;
 $select2-search-choice-box-sizing: border-box !default;
-$select2-search-choice-float: left !default;
+$select2-search-choice-float: $start !default;
 $select2-search-choice-list-style: none !default;
 
-$select2-search-choice-select2-locked-inner-offset: 4px 8px !default;
+$select2-search-choice-select2-locked-inner-offset: 5px 8px !default;
 
 $select2-search-choice-img-offset-top: -2px !default;
 $select2-search-choice-img-offset-bottom: -2px !default;
@@ -98,11 +102,13 @@ $select2-search-choice-img-offset-height: 16px !default;
 
 $select2-search-field-inner-offset: 0 !default;
 $select2-search-field-float: left !default;
-$select2-search-field-height: 28px !default;
-$select2-search-field-line-height: 28px !default;
+$select2-search-field-height: auto !default;
+$select2-search-field-line-height: $select2-search-choice-line-height + (2 * $select2-search-choice-inner-offset-vertical) !default;
 $select2-search-field-background-color: transparent !default;
 $select2-search-field-offset-bottom: 0 !default;
+$select2-search-field-inner-offset: 0 !default;
 $select2-search-field-border: none !default;
+$select2-search-field-top-offset: -3px !default;
 
 $select2-search-field-offset: 0 !default;
 $select2-search-field-inner-offset: 0 !default;
@@ -122,7 +128,7 @@ $select2-search-choice-close-outline: 0 !default;
 $select2-search-choice-close-z-index: 1 !default;
 
 $select2-search-multi-choices-list-style: none !default;
-$select2-search-multi-choices-offset: 0 !default;
+$select2-search-multi-choices-offset: 3px !default;
 $select2-search-multi-choices-inner-offset: 0 !default;
 $select2-search-multi-choices-height: auto !default;
 $select2-search-multi-choices-overflow: hidden !default;
@@ -131,7 +137,7 @@ $select2-search-multi-choice-close-display: block !default;
 $select2-search-multi-choice-close-width: 12px !default;
 $select2-search-multi-choice-close-height: 12px !default;
 $select2-search-multi-choice-close-right: 3px !default;
-$select2-search-multi-choice-close-top: 1px !default;
+$select2-search-multi-choice-close-top: 2px !default;
 
 $select2-search-choice-close-icon: "\f00d" !default;
 $select2-search-choice-close-icon-font-size: $base-font-size--m !default;
@@ -165,7 +171,8 @@ $select2-search-position: relative !default;
 $select2-search-z-index: 10000 !default;
 $select2-search-white-space: nowrap !default;
 
-$select2-search-input-width: 100% !default;
+// !important for override default input width
+$select2-search-input-width: 100% !important !default;
 
 $select2-results-max-height: 300px !default;
 $select2-results-inner-offset: 8px !default;
@@ -173,6 +180,8 @@ $select2-results-offset: 0 !default;
 $select2-results-position: relative !default;
 $select2-results-overflow-x: hidden !default;
 $select2-results-overflow-y: auto !default;
+
+$select2-results-image-border-radius: 16px !default;
 
 $select2-results-sub-offset: 0 !default;
 $select2-results-sub-inner-offset-left: 0 !default;

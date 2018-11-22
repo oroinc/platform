@@ -44,8 +44,9 @@
 
     &__search-icon {
         position: absolute;
-        #{$end}: 8px;
         top: 0;
+        #{$end}: 8px;
+        bottom: 0;
         padding: 4px;
 
         background-color: transparent;
@@ -68,10 +69,6 @@
         margin: 0;
 
         box-sizing: border-box;
-    }
-
-    &__no-result {
-        margin: 8px 0;
     }
 
     &__title {

@@ -67,9 +67,9 @@ define(function(require) {
         },
 
         template: _.template([
-            '<div class="dropdown-menu-collection__fallback" data-name="fallback"><%= fallbackText %></div>',
-            '<div class="dropdown-menu-collection__loading" data-name="loading"><%= loadingText %></div>',
-            '<ul class="dropdown-menu-collection__list" data-name="list" role="menu"></ul>'
+            '<div class="dropdown-item" data-name="fallback"><%= fallbackText %></div>',
+            '<div class="dropdown-item" data-name="loading"><%= loadingText %></div>',
+            '<ul class="list-unstyled" data-name="list" role="menu"></ul>'
         ].join('')),
 
         /**
@@ -103,7 +103,7 @@ define(function(require) {
 
         itemView: BaseView.extend({// eslint-disable-line oro/named-constructor
             tagName: 'li',
-            template: _.template('<a href="#" data-value="<%= id %>"><%= text %></a>')
+            template: _.template('<a href="#" class="dropdown-item" data-value="<%= id %>"><%= text %></a>')
         }),
 
         onItemClick: function(e) {

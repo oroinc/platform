@@ -73,6 +73,12 @@ button {
     }
 }
 
+%btn-square {
+    line-height: $btn-square-line-height;
+    border-width: $btn-square-border-width;
+    border-radius: $btn-square-border-radius;
+}
+
 // Future-proof disabling of clicks on `<a>` elements
 a.btn.disabled,
 fieldset:disabled a.btn {
@@ -88,6 +94,13 @@ fieldset:disabled a.btn {
     }
 }
 
+@each $color, $values in $btn-theme-square-keys {
+    .btn-square-#{$color} {
+        @extend %btn-square;
+        @include button-custom-variant($values...);
+    }
+}
+
 .btn-icon {
     width: $btn-icon-width;
     height: $btn-icon-height;
@@ -99,9 +112,10 @@ fieldset:disabled a.btn {
     [class*=" fa-"] {
         margin: $btn-icon-fa-offset;
         text-indent: $btn-icon-fa-text-indent;
+        line-height: $btn-icon-fa-line-height;
         position: $btn-icon-fa-position;
         top: $btn-icon-fa-top;
-        #{$start}: $btn-icon-fa-left;
+        left: $btn-icon-fa-left;
         transform: $btn-icon-fa-transform;
     }
 
@@ -168,6 +182,16 @@ fieldset:disabled a.btn {
     }
 }
 
+.btn-action {
+    color: $primary-700 !important;
+    font-size: 20px;
+    padding: 0 5px !important;
+
+    &:hover {
+        text-decoration: none !important;
+    }
+}
+
 .btn-process {
     position: relative;
 
@@ -211,17 +235,13 @@ fieldset:disabled a.btn {
 }
 
 .btn-sm {
-    @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $font-size-sm, $btn-line-height-sm, $btn-border-radius-sm);
-}
+    @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $btn-font-size-sm, $btn-line-height-sm, $btn-border-radius-sm);
 
-.btn-mini {
-    @include button-size(
-        $btn-padding-y-mini,
-        $btn-padding-x-mini,
-        $base-font-size--xs,
-        $btn-line-height-mini,
-        $btn-border-radius-mini
-    );
+    [class^="fa-"],
+    [class*=" fa-"] {
+        font-size: $btn-icon-font-size-sm;
+        line-height: $btn-icon-line-height-sm;
+    }
 }
 
 //
@@ -243,5 +263,45 @@ input[type="reset"],
 input[type="button"] {
     &.btn-block {
         width: 100%;
+    }
+}
+
+.mobile-version {
+    .btn {
+        @include button-size(
+            $btn-mobile-padding-y,
+            $btn-mobile-padding-x,
+            $btn-mobile-font-size,
+            $btn-mobile-line-height,
+            $btn-mobile-border-radius
+        );
+    }
+
+    .btn-icon {
+        width: $btn-icon-mobile-width;
+        height: $btn-icon-mobile-height;
+        padding: $btn-icon-inner-offset;
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            &:before {
+                font-size: $btn-icon-mobile-fa-icon-font-size;
+            }
+        }
+    }
+
+    .btn-sm {
+        @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $btn-font-size-sm, $btn-line-height-sm, $btn-border-radius-sm);
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            font-size: $btn-icon-font-size-sm;
+            line-height: $btn-icon-line-height-sm;
+        }
+    }
+
+    %btn-square {
+        line-height: $btn-square-mobile-line-height;
+        border-radius: $btn-square-mobile-border-radius;
     }
 }

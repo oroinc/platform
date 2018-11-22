@@ -85,11 +85,11 @@
 
 {% block choice_widget_expanded %}
     {% spaceless %}
-        {% set attr = attr|merge({'class': attr.class is defined ? attr.class ~ ' horizontal' : 'horizontal'}) %}
+        {% set attr = attr|merge({'class': attr.class is defined ? attr.class ~ ' horizontal choice-widget-expanded' : 'horizontal choice-widget-expanded'}) %}
         {% set attr = attr|merge({'class': attr.class ~ ' validate-group'}) %}
         <div {{ block('widget_container_attributes') }}>
             {% for child in form %}
-                <div class="oro-clearfix">
+                <div class="choice-widget-expanded__item">
                     {{ form_widget(child) }}
                     {{ form_label(child, null, {'raw_label' : raw_label is defined ? raw_label : false, 'translatable_label' : translatable_options is defined ? translatable_options : true }) }}
                 </div>

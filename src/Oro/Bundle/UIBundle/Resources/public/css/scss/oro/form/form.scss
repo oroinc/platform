@@ -20,6 +20,7 @@
     &:focus {
         box-shadow: $input-focus-box-shadow;
         border-color: $input-focus-border-color;
+        z-index: 1;
 
         &:invalid {
             &:focus {
@@ -64,6 +65,10 @@
     color: $uploader-color;
     font-family: $uploader-font-family;
 
+    input {
+        width: $uploader-input-inner-width;
+    }
+
     .filename,
     .action {
         height: $uploader-action-height;
@@ -75,7 +80,7 @@
     }
 
     .filename {
-        width: $uploader-filename-width;
+        @include text-line-truncate($uploader-filename-width);
     }
 
     .action {
@@ -99,6 +104,13 @@
             border-color: $uploader-action-active-border-color;
         }
     }
+
+    &.disabled {
+        border-color: $input-disabled-border-color;
+        background-color: $input-disabled-background-color;
+        color: $input-disabled-color;
+        resize: $input-disabled-resize;
+    }
 }
 
 textarea,
@@ -117,8 +129,43 @@ input[type="search"],
 input[type="tel"],
 input[type="color"],
 .uneditable-input,
-.selector {
+.selector,
+select[multiple] {
     @extend .input;
+}
+
+/*
+    Select multiple
+ */
+select[multiple] {
+    height: $select-multiple-height !important;
+    padding: $select-multiple-inner-offset;
+
+    option {
+        padding: $select-multiple-option-inner-offset;
+        border-radius: $select-multiple-option-border-radius;
+        font-size: $select-multiple-option-font-size;
+        color: $select-multiple-option-color;
+
+        &:not(:last-child) {
+            margin-bottom: $select-multiple-option-not-last-offset-bottom;
+        }
+
+        &:checked {
+            box-shadow: $select-multiple-option-checked-box-shadow;
+            color: $select-multiple-option-checked-color !important;
+        }
+    }
+
+    &:focus {
+        option {
+            &:active,
+            &::selection,
+            &:checked {
+                box-shadow: $select-multiple-option-active-box-shadow;
+            }
+        }
+    }
 }
 
 /* Select */
@@ -224,8 +271,10 @@ input[type="color"],
         height: $add-on-height;
         width: $add-on-height;
         line-height: $add-on-line-height;
+        text-align: center;
         padding: $add-on-inner-offset;
         display: inline-block;
+        flex-shrink: 0;
 
         input[type='checkbox'],
         input[type='radio'] {
@@ -256,19 +305,28 @@ input[type="color"],
 
     .input-append & {
         border-radius: $add-on-append-border-radius;
-        margin-left: $add-on-append-offset-left;
+        margin-#{$start}: $add-on-append-offset-left;
 
         &:not(:first-of-type) {
-            margin-left: $add-on-append-outer-offset-left;
+            margin-#{$start}: $add-on-append-outer-offset-left;
         }
     }
 
     .input-prepend & {
         border-radius: $add-on-prepend-border-radius;
-        margin-right: $add-on-prepend-offset-right;
+        margin-#{$end}: $add-on-prepend-offset-right;
 
         &:not(:last-of-type) {
-            margin-right: $add-on-prepend-outer-offset-right;
+            margin-#{$end}: $add-on-prepend-outer-offset-right;
+        }
+    }
+}
+
+.input-append,
+.input-prepend {
+    &.collection-element-primary {
+        .add-on {
+            background: $primary-900;
         }
     }
 }
@@ -308,16 +366,25 @@ input[type="color"],
     max-width: 800px;
 }
 
-.form-container .control-group {
-    margin: 0 0 10px;
+.form-container,
+.form-horizontal {
+    .control-group {
+        &:not(:last-of-type) {
+            margin: 0 0 $form-container-control-row-space;
+        }
+    }
 }
 
 /* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
 .controls {
-    select {
+    select:not([multiple]) {
         width: $select-width;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
     }
 }
+
 // Need refactor
 // ie, chrome, safari
 input[type=number]::-webkit-inner-spin-button,
@@ -374,4 +441,37 @@ input[type='text'].hasDatepicker.ui-datepicker-dialog-is-below:focus,
 
 .timepicker-dialog-is-below.timepicker-error + span.validation-failed:after {
     left: 128px;
+}
+
+.clearable-input {
+
+    &__container {
+        position: relative;
+    }
+
+    &__placeholder-icon {
+        display: none;
+    }
+
+    &__container--clear .clearable-input__placeholder-icon {
+        color: $btn-text-color;
+        display: block;
+        position: absolute;
+        #{$end}: 0;
+        text-align: center;
+        pointer-events: none;
+    }
+
+    &__clear {
+        [class^="fa-"] {
+            @include fa-icon($fa-var-close);
+        }
+
+        position: absolute;
+        #{$end}: 0;
+    }
+
+    &__container--clear .clearable-input__clear {
+        display: none;
+    }
 }

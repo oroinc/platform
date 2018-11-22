@@ -6,12 +6,10 @@ use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
-use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Makes sure that the association name exists in the context.
@@ -64,7 +62,12 @@ class RecognizeAssociationType implements ProcessorInterface
      */
     private function setAssociationType(SubresourceContext $context, string $associationName): void
     {
-        $subresource = $this->getSubresource($context, $associationName);
+        $subresource = $this->subresourcesProvider->getSubresource(
+            $context->getParentClassName(),
+            $associationName,
+            $context->getVersion(),
+            $context->getRequestType()
+        );
         if (null === $subresource) {
             $context->addError(
                 Error::createValidationError(
@@ -95,26 +98,5 @@ class RecognizeAssociationType implements ProcessorInterface
 
         $context->setClassName($targetClassName);
         $context->setIsCollection($subresource->isCollection());
-    }
-
-    /**
-     * @param SubresourceContext $context
-     * @param string             $associationName
-     *
-     * @return ApiSubresource|null
-     */
-    private function getSubresource(SubresourceContext $context, string $associationName): ?ApiSubresource
-    {
-        $entitySubresources = $this->subresourcesProvider->getSubresources(
-            $context->getParentClassName(),
-            $context->getVersion(),
-            $context->getRequestType()
-        );
-
-        if (null === $entitySubresources) {
-            return null;
-        }
-
-        return $entitySubresources->getSubresource($associationName);
     }
 }

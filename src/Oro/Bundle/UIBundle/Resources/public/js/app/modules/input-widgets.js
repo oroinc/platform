@@ -7,6 +7,7 @@ define(function(require) {
     var Select2InputWidget = require('oroui/js/app/views/input-widget/select2');
     var NumberInputWidget = require('oroui/js/app/views/input-widget/number');
     var CheckboxInputWidget = require('oroui/js/app/views/input-widget/checkbox');
+    var ClearableInputWidget = require('oroui/js/app/views/input-widget/clearable');
 
     InputWidgetManager.addWidget('uniform-select', {
         selector: 'select:not(.no-uniform):not([multiple])',
@@ -30,7 +31,12 @@ define(function(require) {
     });
 
     InputWidgetManager.addWidget('checkbox', {
-        selector: 'input[type="checkbox"]:not(.invisible),input[type="radio"]:not(.invisible)',
+        selector: 'input[type="checkbox"]:not(.invisible, .hide),input[type="radio"]:not(.invisible, .hide)',
         Widget: CheckboxInputWidget
+    });
+
+    InputWidgetManager.addWidget('clearable', {
+        selector: 'input[data-clearable]',
+        Widget: ClearableInputWidget
     });
 });

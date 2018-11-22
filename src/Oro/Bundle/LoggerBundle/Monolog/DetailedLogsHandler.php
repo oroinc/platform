@@ -59,6 +59,15 @@ class DetailedLogsHandler extends AbstractProcessingHandler implements Container
      */
     protected function write(array $record)
     {
+        if (!$this->handler) {
+            throw new \LogicException(
+                \sprintf(
+                    "Trying to execute method `%s` which requires Handler to be set.",
+                    __METHOD__
+                )
+            );
+        }
+
         $this->handler->handle($record);
     }
 

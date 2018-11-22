@@ -15,12 +15,13 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection, priority: -25 }
 
-    oro_config.api.get_list.json_api.set_default_value_for_fields_filter:
-        class: Oro\Bundle\ConfigBundle\Api\Processor\GetList\JsonApi\SetDefaultValueForFieldsFilter
+    oro_config.api.get_list.set_default_value_for_fields_filter:
+        class: Oro\Bundle\ConfigBundle\Api\Processor\GetList\SetDefaultValueForFieldsFilter
         arguments:
+            - '@oro_api.filter_names_registry'
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection, requestType: json_api, priority: -205 }
+            - { name: oro.api.processor, action: get_list, group: initialize, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection, priority: -205 }
 
     oro_config.api.get_list.load_configuration_sections:
         class: Oro\Bundle\ConfigBundle\Api\Processor\GetList\LoadConfigurationSections

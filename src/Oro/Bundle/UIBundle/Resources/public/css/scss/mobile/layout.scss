@@ -14,6 +14,12 @@ body {
     }
 }
 
+.page-toolbar {
+    min-height: 0;
+    justify-content: center;
+    background-color: $mobile-page-toolbar-background-color;
+}
+
 .mobile-hide {
     display: none;
     width: 0;
@@ -35,8 +41,6 @@ body {
 .scrollspy.container-fluid,
 .page-title + [data-bound-component*="datagrid"],
 .page-title + .product-container {
-    margin-top: -10px;
-
     .content-with-sidebar--container {
         padding: 0;
     }
@@ -55,16 +59,60 @@ body {
     &:only-child {
         padding: 0;
     }
-
-    .form-horizontal {
-        padding: $content-padding 0;
-    }
 }
 
-.container-fluid > .responsive-section {
-    .responsive-cell,
-    .responsive-cell:only-child {
-        padding: 0 $content-padding;
+.container-fluid {
+    > .responsive-section {
+        .responsive-cell,
+        .responsive-cell:only-child {
+            padding: 0 $content-padding;
+        }
+
+        &:not(.responsive-small) {
+            .responsive-cell {
+                margin-bottom: 0;
+
+                &:not(:only-child) {
+                    float: #{$start};
+                    width: 50%;
+                }
+
+                &:first-child {
+                    padding-#{$start}: $content-padding;
+                    padding-#{$end}: 24px;
+                }
+
+                &:last-child {
+                    padding-#{$start}: 24px;
+                    padding-#{$end}: 0;
+                }
+
+                &:only-child {
+                    padding-#{$start}: $content-padding;
+                }
+
+                .inner-grid {
+                    margin-#{$start}: -$content-padding;
+
+                    .grid-views {
+                        margin-#{$start}: $content-padding;
+                    }
+                }
+            }
+        }
+
+        &.responsive-small {
+            .responsive-cell {
+                &,
+                &:only-child {
+                    padding: 0;
+                }
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
     }
 }
 
@@ -76,46 +124,12 @@ body {
     }
 }
 
-.responsive-section {
-    .inner-grid {
-        margin: -#{$content-padding} 0 $content-padding;
-    }
-}
-
-.customer-without-border-tabs {
-    min-width: 280px;
-    padding-#{$end}: 0;
-    margin-#{$start}: -10px;
-    margin-#{$end}: -10px;
-    width: calc(100% + 20px);
-}
-
-.tab-content {
-    .oro-tabs {
-        margin: 0;
-        box-sizing: border-box;
-        width: 100%;
-
-        .nav-tabs {
-            & > li {
-                & > a {
-                    border-top-width: 1px;
-                }
-            }
-        }
-    }
-
-    .tab-pane {
-        padding: 0 10px;
-    }
-}
-
 .box-type1 {
     margin: 0 $content-padding $content-padding;
     border-radius: 3px;
 
     .title {
-        padding-bottom: $content-padding;
+        padding-bottom: 10px;
     }
 
     .calendar-container {
@@ -124,7 +138,7 @@ body {
 }
 
 .responsive-cell {
-    margin-bottom: 15px;
+    margin-bottom: $content-padding;
 
     .tab-content {
         .box-type1 {
@@ -240,6 +254,58 @@ form > .layout-content {
             .oro-page-body {
                 width: 100%;
                 overflow: hidden;
+            }
+        }
+    }
+}
+
+.oro-address-collection.oro-item-collection {
+    & > div {
+        margin: 21px 0 20px;
+        padding: 16px 24px;
+    }
+}
+
+@media screen and (min-width: $tablet-devices-media-breakpoint) {
+    .container-fluid {
+        > .responsive-section {
+            &.responsive-small {
+                .responsive-cell {
+                    margin-bottom: 0;
+
+                    &:not(:only-child) {
+                        float: #{$start};
+                        width: 50%;
+                    }
+
+                    &:first-child {
+                        padding-left: $content-padding;
+                        padding-right: 24px;
+                    }
+
+                    &:last-child {
+                        padding-left: 24px;
+                        padding-right: 0;
+                    }
+
+                    &:only-child {
+                        padding-left: $content-padding;
+                    }
+
+                    .inner-grid {
+                        margin-#{$start}: -$content-padding;
+
+                        .grid-views {
+                            margin-#{$start}: $content-padding;
+                        }
+                    }
+                }
+
+                .row-fluid {
+                    &.row-fluid-divider {
+                        background: url(../../img/vertical-separator.png) repeat-y 50% 0;
+                    }
+                }
             }
         }
     }

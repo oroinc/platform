@@ -7,6 +7,9 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Psr\Log\LoggerAwareTrait;
 
+/**
+ * Iterator for Imap messages.
+ */
 class ImapMessageIterator implements \Iterator, \Countable
 {
     use LoggerAwareTrait;
@@ -87,6 +90,21 @@ class ImapMessageIterator implements \Iterator, \Countable
     public function setBatchCallback(\Closure $callback = null)
     {
         $this->onBatchLoaded = $callback;
+    }
+
+    /**
+     * Sets a callback function to handle message convertation errors.
+     * If this callback set then the iterator will work in fail safe mode
+     * and invalid messages will just skipped.
+     *
+     * @param \Closure|null $callback The callback function.
+     *                                function (\Exception)
+     */
+    public function setConvertErrorCallback(\Closure $callback = null)
+    {
+        if (null !== $callback) {
+            $this->imap->setConvertErrorCallback($callback);
+        }
     }
 
     /**

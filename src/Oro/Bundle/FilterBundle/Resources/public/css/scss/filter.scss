@@ -14,6 +14,7 @@
         visibility: $filter-box-criteria-visibility;
         z-index: $filter-box-criteria-z-index;
         margin-top: $filter-box-criteria-offset-top;
+        margin-#{$start}: $filter-box-criteria-offset-left;
         top: $filter-box-criteria-top;
 
         .btn-group {
@@ -22,7 +23,13 @@
                 background-color: $filter-box-criteria-btn-group-background-color;
                 border: $filter-box-criteria-btn-group-border;
                 font-weight: $filter-box-criteria-btn-group-font-weight;
+                text-transform: $filter-box-criteria-btn-group-text-transform;
+
+                + .dropdown-menu {
+                    text-transform: $filter-box-criteria-btn-group-text-transform;
+                }
             }
+
 
             + .value-field-frame {
                 margin-left: $filter-box-criteria-btn-group-value-field-frame-offset-left;
@@ -51,14 +58,6 @@
         .product-price-unit-filter-separator,
         .filter-separator {
             margin: $filter-separator-offset;
-        }
-
-        input[type="text"],
-        input[type="datetime"],
-        input[type="date"] {
-            & + .dropdown-menu-calendar {
-                margin-top: $dropdown-menu-calendar-offset-top;
-            }
         }
 
         .input-append,
@@ -160,21 +159,13 @@
     }
 
     .filter-select-oro {
-        height: $filter-select-oro-height;
         line-height: $filter-select-oro-line-height;
         width: $filter-select-oro-width; /* need for flexible width at filter grid */
+        padding: $selector-uniform-inner-offset;
+        border: $selector-border;
 
         &-wrapper {
-            width: $filter-select-oro-wrapper-width;
-            margin-bottom: $filter-select-oro-wrapper-offset-bottom;
-
-            .selector {
-                width: $filter-select-oro-wrapper-width;
-
-                span {
-                    width: $filter-select-oro-wrapper-span-width;
-                }
-            }
+            margin-bottom: $input-outer-offset-bottom;
         }
     }
 
@@ -356,6 +347,11 @@
         .dropdown-toggle {
             vertical-align: $filter-item-dropdown-toggle-vertical-align;
             line-height: $filter-item-dropdown-toggle-line-height;
+            position: $filter-item-dropdown-toggle-position;
+        }
+
+        .dropdown-menu {
+            min-width: $filter-item-dropdown-menu-min-width !important;
         }
 
         & > .btn {
@@ -483,7 +479,12 @@
             }
 
             li {
+                font-size: $select-filter-widget-li-font-size;
                 padding: $select-filter-widget-li-inner-offset;
+
+                &:last-child {
+                    padding-bottom: $select-filter-widget-checkboxes-list-offset-vertical;
+                }
 
                 &:after {
                     content: $select-filter-widget-li-after-content;
@@ -523,6 +524,7 @@
         }
 
         .ui-multiselect-header {
+            min-height: $select-filter-widget-checkboxes-list-offset-vertical;
             padding: $select-filter-widget-header-inner-offset;
             margin: $select-filter-widget-header-offset;
 
@@ -575,14 +577,6 @@
     &.select-filter-widget {
         .ui-state-hover {
             text-decoration: $select-filter-widget-text-decoration;
-        }
-    }
-
-    &-single {
-        .ui-multiselect-checkboxes {
-            label {
-                line-height: $ui-multiselect-checkboxes-label-line-height;
-            }
         }
     }
 
@@ -668,6 +662,14 @@
     .filter-separator {
         display: $filter-date-range-filter-separator-display;
     }
+
+    .fields-row {
+        display: flex;
+
+        .datefilter {
+            flex-grow: 1;
+        }
+    }
 }
 
 .filter-start-date,
@@ -679,30 +681,70 @@
 
     .timepicker-input {
         width: $filter-date-range-timepicker-input-width;
-        margin: $filter-date-range-timepicker-input-offset;
+        margin: 0 0 $input-outer-offset-bottom 0;
     }
 }
 
 .number-range-filter {
     vertical-align: $number-range-filter-vertical-align;
 
-    .filter-start {
+    .filter-box .filter-criteria & {
+        &,
+        .value-field-frame,
+        .filter-value {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .value-field-frame {
+            margin: 0;
+
+            .btn {
+                align-self: flex-end;
+            }
+        }
+    }
+
+    .btn-block,
+    .filter-start,
+    .filter-end {
+        margin-bottom: $input-outer-offset-bottom;
         display: $number-range-filter-field-display;
 
+        .btn,
         input[type='text'] {
             width: $number-range-filter-field-width;
         }
     }
 
-    .filter-end {
-        display: $number-range-filter-field-display;
+    .btn-block {
 
-        input[type='text'] {
-            width: $number-range-filter-field-width;
+        .dropdown-toggle  {
+            padding: $selector-uniform-inner-offset;
+            text-align: #{$start};
+            width: 100%;
+            font-size: $selector-uniform-font-size;
+
+            &:after {
+                position: $selector-uniform-arrow-position;
+                #{$end}: $number-range-filter-field-caret-end;
+                top: $number-range-filter-field-caret-top;
+                margin-top: $number-range-filter-field-caret-margin;
+            }
+        }
+
+        .dropdown-menu {
+            min-width: 100%;
         }
     }
 
     .filter-separator {
+        height: 0;
+        overflow: hidden;
         position: $number-range-filter-filter-separator-position;
     }
+}
+
+.datefilter {
+    display: inline-block;
 }

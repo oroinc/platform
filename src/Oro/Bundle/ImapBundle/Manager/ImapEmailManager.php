@@ -19,6 +19,8 @@ use Zend\Mail\Headers;
 use Zend\Mail\Storage\Exception as MailException;
 
 /**
+ * Manager that simplify work with IMAP server and emails that was received throw IMAP server.
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -209,9 +211,17 @@ class ImapEmailManager
                 ->setRefs($this->getReferences($headers, 'References'))
                 ->setXMessageId($this->getString($headers, 'X-GM-MSG-ID'))
                 ->setXThreadId($this->getString($headers, 'X-GM-THR-ID'))
-                ->setMessageId($this->getMessageId($headers, 'Message-ID'))
                 ->setMultiMessageId($this->getMultiMessageId($headers, 'Message-ID'))
                 ->setAcceptLanguageHeader($this->getAcceptLanguage($headers));
+
+            $messageId = $this->getMessageId($headers, 'Message-ID');
+            // Some messages can have no 'Message-ID' header. In this case calculate the id from Received header.
+            if ($messageId === '') {
+                $header = $headers->get('Received');
+                $header->rewind();
+                $messageId = md5($header->current()->getFieldValue());
+            }
+            $email->setMessageId($messageId);
 
             foreach ($this->getRecipients($headers, 'To') as $val) {
                 $email->addToRecipient($val);

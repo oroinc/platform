@@ -56,25 +56,7 @@ class SerializationHelper
      */
     public function postSerialize(array $item, $handler, array $context)
     {
-        // @deprecated since 1.9. New signature of 'post_serialize' callback is
-        // function (array $item, array $context) : array
-        // Old signature was function (array &$item) : void
-        // The following implementation supports both new and old signature of the callback
-        // Remove this implementation when a support of old signature will not be required
-        if ($handler instanceof \Closure) {
-            $handleResult = $handler($item, $context);
-            if (null !== $handleResult) {
-                $item = $handleResult;
-            }
-        } else {
-            $item = call_user_func($handler, $item, $context);
-        }
-
-        /* New implementation, uncomment it when a support of old signature will not be required
-        $item = call_user_func($handler, $item, $context);
-        */
-
-        return $item;
+        return $handler($item, $context);
     }
 
     /**

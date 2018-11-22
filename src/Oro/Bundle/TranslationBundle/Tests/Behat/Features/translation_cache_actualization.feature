@@ -6,7 +6,8 @@ Feature: Translation cache actualization
   Scenario: Reset translation for key oro.ui.create_entity
     Given I login as administrator
     When I go to System/Emails/Maintenance Notifications
-    Then I should see "No records found"
+    And I reload the page
+    Then I should see "There are no entities"
     When I go to System/Localization/Translations
     And I filter Key as is equal to "oro.datagrid.no.entities"
     And I edit first record from grid:

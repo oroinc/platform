@@ -4,6 +4,10 @@
     display: flex;
     align-items: center;
 
+    .inner-grid & {
+        margin: $oro-datagrid-inner-grid-views-offset;
+    }
+
     .grid-views-toogler {
         display: flex;
         align-items: center;
@@ -13,6 +17,8 @@
         margin: $oro-datagrid-grid-views-title-offset;
 
         font-size: $oro-datagrid-grid-views-title-font-size;
+        font-weight: $oro-datagrid-grid-views-title-font-weight;
+        line-height: $oro-datagrid-grid-views-title-line-height;
     }
 
     .edited-label {
@@ -48,6 +54,18 @@
         max-width: $oro-datagrid-grid-views-dropdown-width;
     }
 
+    .grid-views-item {
+        padding: $oro-datagrid-grid-views-item-offset;
+
+        @include clearfix();
+    }
+
+    .grid-views-choice-icon {
+        float: #{$start};
+
+        line-height: $font-size-base * $line-height-base;
+    }
+
     .grid-views-choice {
         display: inline-block;
         max-height: ($font-size-base * $line-height-base) * 2; // two rows
@@ -73,20 +91,6 @@
     }
 
     .oro-subtitle {
-        @include text-line-truncate(600px, true);
-    }
-}
-
-.views-group {
-    &__btn {
-        color: $primary-100;
-        padding: 0;
-    }
-}
-
-.actions-group {
-    &__btn {
-        text-transform: none;
-        padding: 0;
+        @include text-line-truncate($oro-datagrid-grid-views-title-width, true);
     }
 }

@@ -2,8 +2,6 @@
 
 .content-with-sidebar {
     &--container {
-        margin: $content-sidebar-container-mobile-offset;
-
         @include safe-area-offset(padding, 0);
 
         .scrollspy.container-fluid {

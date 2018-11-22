@@ -1,4 +1,5 @@
 ## 3.1.0
+
 ### Added
 #### ApiBundle
 * Enable filters for to-many associations. The following operators are implemented: `=` (`eq`), `!=` (`neq`), `*` (`exists`), `!*` (`neq_or_null`), `~` (`contains`) and `!~` (`not_contains`).
@@ -29,19 +30,32 @@
 * Removed `Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper::applyAclToCriteria` method. Please use `apply` method with Doctrine Query or Query builder instead.
 #### DatagridBundle
 * Removed all logic related with column manager. The logic of column manager was transformed and expanded in [Datagrid Settings](./src/Oro/Bundle/DataGridBundle/Resources/doc/frontend/datagrid_settings.md)
+#### EntitySerializer Component
+* Removed `excluded_fields` deprecated configuration attribute for an entity. Use `exclude` attribute for a field instead.
+* Removed `result_name` deprecated configuration attribute for a field. Use `property_path` attribute instead.
+* Removed `orderBy` deprecated configuration attribute. Use `order_by` attribute instead.
+* Removed deprecated signature `function (array &$item) : void` of post serialization handler that can be specified in `post_serialize` configuration attribute. Use `function (array $item, array $context) : array` instead.
 
 ### Changed
+#### AddressBundle
+* Changes in `/api/addresses` REST API resource:
+    - the attribute `created` was renamed to `createdAt`
+    - the attribute `updated` was renamed to `updatedAt`
 #### ApiBundle
 * By default processors for `customize_loaded_data` action are executed only for primary and included entities. Use `identifier_only: true` tag attribute if your processor should be executed for relationships.
 * `finish_submit` event for `customize_form_data` action was renamed to `post_validate` and new `pre_validate` event was added.
 #### UIBundle
-* Changed all UI of backoffice 
+* Changed all UI of backoffice
 * Updated version of bootstrap from 2.3.0 to 4.1.1
 * All global JS Views and Components are defined in the HTML through data attributes.
 * Change target and name of a layout event. Now `layout` triggers `initLayout` event on DOM element instead `layoutInit` on `mediator`
 #### SecurityBundle
 * `Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper::apply` method logic was changed to support Access rules.
 * `oro_security.encoder.mcrypt` service was changed to `oro_security.encoder.default`.
+#### TagBundle
+* Changes in `/api/taxonomies` REST API resource:
+    - the attribute `created` was renamed to `createdAt`
+    - the attribute `updated` was renamed to `updatedAt`
 #### MessageQueue Component
 * In case when message processor specified in message not found this message will be rejected and exception will be thrown. 
 

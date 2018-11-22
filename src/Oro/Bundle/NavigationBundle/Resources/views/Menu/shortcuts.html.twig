@@ -20,6 +20,8 @@
                                    placeholder="{{ 'oro.navigation.shortcuts.placeholder'|trans }}"
                                    data-source-url={{ options.source|json_encode|raw }}
                                    data-role="shortcut-search"
+                                   data-clearable
+                                   data-placeholder-icon="fa-search"
                                    data-entity-class="{{ oro_class_name(app.user, true) }}"
                                    data-entity-id="{{ app.user.id }}"
                             >

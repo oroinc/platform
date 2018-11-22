@@ -62,7 +62,7 @@ class DateTimePicker extends Element
      */
     protected function getMonthPicker()
     {
-        return $this->findVisible('css', '.ui-datepicker-month');
+        return $this->getDatePickerHeader()->find('css', '.ui-datepicker-month');
     }
 
     /**
@@ -70,7 +70,15 @@ class DateTimePicker extends Element
      */
     protected function getYearPicker()
     {
-        return $this->findVisible('css', '.ui-datepicker-year');
+        return $this->getDatePickerHeader()->find('css', '.ui-datepicker-year');
+    }
+
+    /**
+     * @return NodeElement|null
+     */
+    protected function getDatePickerHeader()
+    {
+        return $this->findVisible('css', '.ui-datepicker-header');
     }
 
     /**

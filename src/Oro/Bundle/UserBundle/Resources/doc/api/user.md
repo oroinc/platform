@@ -143,15 +143,21 @@ Delete a collection of user records.
 
 An array of email addresses.
 
-Format of data: [{"email": first@email.com}, {"email": second@email.com}]
+The **email** property is a string contains an email address.
+
+Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}\]**
 
 #### create, update
 
 An array of email addresses.
 
-Format of data: [{"email": first@email.com}, {"email": second@email.com}]
+The **email** property is a string contains an email address.
 
-Data should contain full collection of email addresses of the business customer.
+Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}\]**
+
+**Please note:**
+
+*Data should contain all of email addresses of the user.*
 
 ### username
 

@@ -1,0 +1,10 @@
+/* @theme: admin.oro; */
+
+.currency-select-enabled {
+    .input-append,
+    .base-currency {
+        .selector {
+            min-width: $currency-select-enabled-base-currency-selector-min-width;
+        }
+    }
+}

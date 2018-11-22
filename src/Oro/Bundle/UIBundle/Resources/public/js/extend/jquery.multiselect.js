@@ -77,11 +77,13 @@ define([
         /**
          * Process position update for menu element
          */
-        updatePos: function() {
-            var isShown = this.menu.is(':visible');
-            this.position();
+        updatePos: function(position) {
+            var menu = this.widget();
+            var isShown = menu.is(':visible');
+
+            menu.position(position);
             if (isShown) {
-                this.menu.show();
+                menu.show();
             }
         },
 

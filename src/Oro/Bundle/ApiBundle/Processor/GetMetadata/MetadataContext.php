@@ -117,6 +117,25 @@ class MetadataContext extends ApiContext
     }
 
     /**
+     * Gets additional metadata if it was requested.
+     *
+     * @param string $extraName
+     *
+     * @return MetadataExtraInterface|null
+     */
+    public function getExtra($extraName)
+    {
+        $result = null;
+        foreach ($this->extras as $extra) {
+            if ($extra->getName() === $extraName) {
+                $result = $extra;
+                break;
+            }
+        }
+
+        return $result;
+    }
+    /**
      * Gets a list of requested additional metadata.
      *
      * @return MetadataExtraInterface[]

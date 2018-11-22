@@ -17,7 +17,7 @@ class UserRoleForm extends Form
         $entityRow = $this->getEntityRow($entity);
         $actionRow = $this->getActionRow($entityRow, $action);
         $this->getDriver()->waitForAjax();
-        $levels = $actionRow->findAll('css', 'ul.dropdown-menu-collection__list li a');
+        $levels = $actionRow->findAll('css', '.dropdown-menu li a');
         $availableLevels = [];
 
         /** @var NodeElement $level */

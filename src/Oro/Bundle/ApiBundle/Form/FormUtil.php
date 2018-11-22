@@ -37,7 +37,7 @@ class FormUtil
     }
 
     /**
-     * Adds an error to a form.
+     * Adds a general error to a form.
      *
      * @param FormInterface $form
      * @param string        $errorMessage
@@ -55,6 +55,28 @@ class FormUtil
             $violation = new ConstraintViolation($errorMessage, null, [], '', $propertyPath, '');
             $form->addError(self::createFormError($violation));
         }
+    }
+
+    /**
+     * Adds an error to a form.
+     *
+     * @param FormInterface $form
+     * @param string        $errorType
+     * @param string        $errorMessage
+     * @param string|null   $propertyPath
+     */
+    public static function addNamedFormError(
+        FormInterface $form,
+        string $errorType,
+        string $errorMessage,
+        string $propertyPath = null
+    ): void {
+        self::addFormConstraintViolation(
+            $form,
+            new NamedValidationConstraint($errorType),
+            $errorMessage,
+            $propertyPath
+        );
     }
 
     /**

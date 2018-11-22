@@ -12,9 +12,10 @@
     $active-color: color-yiq($active-background),
     $active-box-shadow: null,
     $focus-border: null,
-    $disabled-color: color-yiq($background),
+    $disabled-color: $color,
     $disabled-background-color: $background,
-    $disabled-border-color: $border
+    $disabled-border-color: $border,
+    $disabled-opacity: null
 ) {
     color: $color;
 
@@ -48,6 +49,7 @@
         color: $disabled-color;
         background-color: $disabled-background-color;
         border-color: $disabled-border-color;
+        opacity: $disabled-opacity;
     }
 
     &:not(:disabled):not(.disabled):active,

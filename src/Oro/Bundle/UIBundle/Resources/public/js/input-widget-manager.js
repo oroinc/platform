@@ -235,7 +235,7 @@ define(function(require) {
          *     $('#container').inputWidget('seekAndCreate'); //create widgets in container
          *     $('#container').inputWidget('seekAndDestroy'); //destroys widgets in container
          *     $(':input').inputWidget('refresh'); //update widget, for example after input value change
-         *     $(':input:first').inputWidget('container'); //get widget root element
+         *     $(':input:first').inputWidget('getContainer'); //get widget root element
          *     $(':input').inputWidget('width', 100); //set widget width
          *     $(':input').inputWidget('dispose'); //destroy widgets and dispose widget instance
          *
