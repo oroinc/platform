@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v2_5;
 
+use Doctrine\DBAL\Connection;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
-use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 
 class CheckDataLengthOfFields implements MigrationQuery, ConnectionAwareInterface
