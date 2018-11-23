@@ -375,51 +375,58 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $updates = [];
         if ($this->allUpdates->contains($em)) {
             foreach ($this->allUpdates[$em] as $entity) {
-                $changeSet = $this->allUpdates[$em][$entity];
-                $update = $this->processUpdate($em, $entity, $changeSet);
-                if (!$update) {
-                    continue;
-                }
-
-                $updates[] = $update;
-            }
-        }
-
-        if (!$this->additionalEntityChangesStorage->hasEntityUpdates($em)) {
-            return $updates;
-        }
-
-        $additionalUpdates = $this->additionalEntityChangesStorage->getEntityUpdates($em);
-        foreach ($additionalUpdates as $entity) {
-            $changeSet = $additionalUpdates->offsetGet($entity);
-            $additionalUpdate = $this->processUpdate($em, $entity, $changeSet);
-            if (!$additionalUpdate) {
-                continue;
-            }
-
-            foreach ($updates as $key => $existingUpdate) {
-                if ($existingUpdate['entity_id'] === $additionalUpdate['entity_id']
-                    && $existingUpdate['entity_class'] === $additionalUpdate['entity_class']) {
-                    $existingUpdateForMerge = &$updates[$key];
-
-                    break;
+                $update = $this->processUpdate($em, $entity, $this->allUpdates[$em][$entity]);
+                if ($update) {
+                    $updates[] = $update;
                 }
             }
-
-            if (!empty($existingUpdateForMerge)) {
-                $existingUpdateForMerge['change_set'] = array_merge(
-                    $existingUpdateForMerge['change_set'],
-                    $additionalUpdate['change_set']
-                );
-            } else {
-                $updates[] = $additionalUpdate;
-            }
-
-            unset($existingUpdateForMerge);
         }
-        $this->additionalEntityChangesStorage->clear($em);
+
+        if ($this->additionalEntityChangesStorage->hasEntityUpdates($em)) {
+            $additionalUpdates = $this->additionalEntityChangesStorage->getEntityUpdates($em);
+            foreach ($additionalUpdates as $entity) {
+                $additionalUpdate = $this->processUpdate($em, $entity, $additionalUpdates->offsetGet($entity));
+                if ($additionalUpdate) {
+                    $existingUpdateKey = $this->findUpdate($updates, $additionalUpdate);
+                    if (null === $existingUpdateKey) {
+                        $updates[] = $additionalUpdate;
+                    } elseif (!empty($additionalUpdate['change_set'])) {
+                        if (empty($updates[$existingUpdateKey]['change_set'])) {
+                            $updates[$existingUpdateKey]['change_set'] = $additionalUpdate['change_set'];
+                        } else {
+                            $updates[$existingUpdateKey]['change_set'] = array_merge(
+                                $updates[$existingUpdateKey]['change_set'],
+                                $additionalUpdate['change_set']
+                            );
+                        }
+                    }
+                }
+            }
+            $this->additionalEntityChangesStorage->clear($em);
+        }
 
         return $updates;
+    }
+
+    /**
+     * @param array $updates
+     * @param array $additionalUpdate
+     *
+     * @return int|null The key of the found update or NULL
+     */
+    private function findUpdate(array $updates, array $additionalUpdate)
+    {
+        $foundKey = null;
+        foreach ($updates as $key => $update) {
+            if ($update['entity_id'] === $additionalUpdate['entity_id']
+                && $update['entity_class'] === $additionalUpdate['entity_class']
+            ) {
+                $foundKey = $key;
+                break;
+            }
+        }
+
+        return $foundKey;
     }
 
     /**

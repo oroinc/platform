@@ -83,8 +83,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'entities_updated' => [
                 [
                     'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => 1,
-                    'change_set' => [],
+                    'entity_id' => 1
                 ]
             ],
             'entities_deleted' => [],
@@ -97,11 +96,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
                             null,
                             [
                                 'inserted' => [
-                                    [
-                                        'entity_class' => TestAuditDataOwner::class,
-                                        'entity_id' => 1,
-                                        'change_set' => [],
-                                    ]
+                                    ['entity_class' => TestAuditDataOwner::class, 'entity_id' => 1]
                                 ],
                                 'deleted' => [],
                                 'changed' => [],
@@ -219,11 +214,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'entities_inserted' => [],
             'entities_updated' => [],
             'entities_deleted' => [
-                [
-                    'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => 123,
-                    'change_set' => [],
-                ]
+                ['entity_class' => TestAuditDataOwner::class, 'entity_id' => 123]
             ],
             'collections_updated' => [],
         ]);
@@ -255,11 +246,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'entities_inserted' => [],
             'entities_updated' => [],
             'entities_deleted' => [
-                [
-                    'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => 123,
-                    'change_set' => [],
-                ]
+                ['entity_class' => TestAuditDataOwner::class, 'entity_id' => 123]
             ],
             'collections_updated' => [],
         ]);
@@ -306,8 +293,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'entities_deleted' => [
                 [
                     'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => 345,
-                    'change_set' => [],
+                    'entity_id' => 345
                 ]
             ],
             'collections_updated' => [],
@@ -562,20 +548,9 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'entities_inserted' => [],
             'entities_updated' => [],
             'entities_deleted' => [
-                [
-                    'entity_id' => 123,
-                    'change_set' => []
-                ],
-                [
-                    'entity_class' => null,
-                    'entity_id' => 123,
-                    'change_set' => []
-                ],
-                [
-                    'entity_class' => '',
-                    'entity_id' => 123,
-                    'change_set' => []
-                ]
+                ['entity_id' => 123],
+                ['entity_class' => null, 'entity_id' => 123],
+                ['entity_class' => '', 'entity_id' => 123]
             ],
             'collections_updated' => []
         ]);
@@ -598,15 +573,8 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'entities_inserted' => [],
             'entities_updated' => [],
             'entities_deleted' => [
-                [
-                    'entity_class' => TestAuditDataOwner::class,
-                    'change_set' => []
-                ],
-                [
-                    'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => null,
-                    'change_set' => []
-                ]
+                ['entity_class' => TestAuditDataOwner::class],
+                ['entity_class' => TestAuditDataOwner::class, 'entity_id' => null]
             ],
             'collections_updated' => []
         ]);

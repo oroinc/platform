@@ -233,7 +233,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                     'change_set'   => [
                         'stringProperty' => [null, 'aString']
                     ],
-                    'additional_fields' => ['field' => 'value'],
+                    'additional_fields' => ['field' => 'value']
                 ]
             ],
             'entities_deleted'    => [],
@@ -266,7 +266,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                     'change_set'   => [
                         'stringProperty' => ['aString', 'anotherString']
                     ],
-                    'additional_fields' => ['field_array' => ['value' => 1]],
+                    'additional_fields' => ['field_array' => ['value' => 1]]
                 ]
             ],
             'collections_updated' => []
@@ -296,8 +296,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                 [
                     'entity_class' => get_class($owner),
                     'entity_id'    => $removedOwnerId,
-                    'change_set'   => [],
-                    'additional_fields' => ['date' => '2017-11-10T10:00:00+0000'],
+                    'additional_fields' => ['date' => '2017-11-10T10:00:00+0000']
                 ]
             ],
             'entities_updated'    => [],
@@ -326,9 +325,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
             'entities_updated'    => [
                 [
                     'entity_class' => get_class($owner),
-                    'entity_id'    => $owner->getId(),
-                    'change_set'   => [],
-                    'additional_fields' => [],
+                    'entity_id'    => $owner->getId()
                 ]
             ],
             'collections_updated' => [
@@ -343,16 +340,14 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                                     [
                                         'entity_class' => get_class($toBeAddedChild),
                                         'entity_id'    => $toBeAddedChild->getId(),
-                                        'change_set'   => [],
-                                        'additional_fields' => ['id' => 2],
+                                        'additional_fields' => ['id' => 2]
                                     ]
                                 ],
                                 'deleted'  => [],
                                 'changed'  => []
                             ]
                         ]
-                    ],
-                    'additional_fields' => [],
+                    ]
                 ]
             ]
         ]);
@@ -379,9 +374,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
             'entities_updated'    => [
                 [
                     'entity_class' => get_class($owner),
-                    'entity_id'    => $owner->getId(),
-                    'change_set'   => [],
-                    'additional_fields' => [],
+                    'entity_id'    => $owner->getId()
                 ]
             ],
             'collections_updated' => [
@@ -396,16 +389,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                                 'deleted'  => [
                                     [
                                         'entity_class' => get_class($toBeRemovedChild),
-                                        'entity_id'    => $toBeRemovedChild->getId(),
-                                        'change_set'   => [],
-                                        'additional_fields' => [],
+                                        'entity_id'    => $toBeRemovedChild->getId()
                                     ]
                                 ],
                                 'changed'  => []
                             ]
                         ]
-                    ],
-                    'additional_fields' => [],
+                    ]
                 ]
             ]
         ]);
@@ -440,17 +430,14 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                                 'inserted' => [
                                     [
                                         'entity_class' => get_class($toBeAddedOwner),
-                                        'entity_id'    => $toBeAddedOwner->getId(),
-                                        'change_set'   => [],
-                                        'additional_fields' => [],
+                                        'entity_id'    => $toBeAddedOwner->getId()
                                     ]
                                 ],
                                 'deleted'  => [],
                                 'changed'  => []
                             ]
                         ]
-                    ],
-                    'additional_fields' => [],
+                    ]
                 ]
             ]
         ]);
@@ -487,16 +474,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                                 'deleted'  => [
                                     [
                                         'entity_class' => get_class($toBeRemovedOwner),
-                                        'entity_id'    => $toBeRemovedOwner->getId(),
-                                        'change_set'   => [],
-                                        'additional_fields' => [],
+                                        'entity_id'    => $toBeRemovedOwner->getId()
                                     ]
                                 ],
                                 'changed'  => []
                             ]
                         ]
-                    ],
-                    'additional_fields' => [],
+                    ]
                 ]
             ]
         ]);
@@ -526,15 +510,9 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                     'change_set'   => [
                         'child' => [
                             null,
-                            [
-                                'entity_class' => get_class($toBeSetChild),
-                                'entity_id'    => $toBeSetChild->getId(),
-                                'change_set'   => [],
-                                'additional_fields' => [],
-                            ]
+                            ['entity_class' => get_class($toBeSetChild), 'entity_id' => $toBeSetChild->getId()]
                         ]
-                    ],
-                    'additional_fields' => [],
+                    ]
                 ]
             ],
             'collections_updated' => []
@@ -565,16 +543,10 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                     'entity_id'    => $owner->getId(),
                     'change_set'   => [
                         'child' => [
-                            [
-                                'entity_class' => get_class($toBeUnsetChild),
-                                'entity_id'    => $toBeUnsetChild->getId(),
-                                'change_set'   => [],
-                                'additional_fields' => [],
-                            ],
+                            ['entity_class' => get_class($toBeUnsetChild), 'entity_id' => $toBeUnsetChild->getId()],
                             null
                         ]
-                    ],
-                    'additional_fields' => [],
+                    ]
                 ]
             ],
             'collections_updated' => []
@@ -622,15 +594,9 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                     'change_set'   => [
                         'ownerManyToOne' => [
                             null,
-                            [
-                                'entity_class' => get_class($toBeSetChild),
-                                'entity_id'    => $toBeSetChild->getId(),
-                                'change_set'   => [],
-                                'additional_fields' => [],
-                            ]
+                            ['entity_class' => get_class($toBeSetChild), 'entity_id' => $toBeSetChild->getId()]
                         ]
-                    ],
-                    'additional_fields' => [],
+                    ]
                 ]
             ],
             'collections_updated' => []
@@ -661,16 +627,10 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                     'entity_id'    => $owner->getId(),
                     'change_set'   => [
                         'ownerManyToOne' => [
-                            [
-                                'entity_class' => get_class($toBeUnsetChild),
-                                'entity_id'    => $toBeUnsetChild->getId(),
-                                'change_set'   => [],
-                                'additional_fields' => [],
-                            ],
+                            ['entity_class' => get_class($toBeUnsetChild), 'entity_id' => $toBeUnsetChild->getId()],
                             null
                         ]
-                    ],
-                    'additional_fields' => [],
+                    ]
                 ]
             ],
             'collections_updated' => []
@@ -701,15 +661,9 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                     'change_set'   => [
                         'ownerManyToOne' => [
                             null,
-                            [
-                                'entity_class' => get_class($child),
-                                'entity_id'    => $child->getId(),
-                                'change_set'   => [],
-                                'additional_fields' => [],
-                            ]
+                            ['entity_class' => get_class($child), 'entity_id' => $child->getId()]
                         ]
-                    ],
-                    'additional_fields' => [],
+                    ]
                 ]
             ],
             'collections_updated' => [
@@ -721,19 +675,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                             null,
                             [
                                 'inserted' => [
-                                    [
-                                        'entity_class' => get_class($owner),
-                                        'entity_id'    => $owner->getId(),
-                                        'change_set'   => [],
-                                        'additional_fields' => [],
-                                    ]
+                                    ['entity_class' => get_class($owner), 'entity_id' => $owner->getId()]
                                 ],
                                 'deleted'  => [],
                                 'changed'  => []
                             ]
                         ]
-                    ],
-                    'additional_fields' => [],
+                    ]
                 ]
             ]
         ]);
@@ -763,16 +711,10 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                     'entity_id'    => $owner->getId(),
                     'change_set'   => [
                         'ownerManyToOne' => [
-                            [
-                                'entity_class' => get_class($child),
-                                'entity_id'    => $child->getId(),
-                                'change_set'   => [],
-                                'additional_fields' => [],
-                            ],
+                            ['entity_class' => get_class($child), 'entity_id' => $child->getId()],
                             null
                         ]
-                    ],
-                    'additional_fields' => [],
+                    ]
                 ]
             ],
             'collections_updated' => [
@@ -785,18 +727,12 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                             [
                                 'inserted' => [],
                                 'deleted'  => [
-                                    [
-                                        'entity_class' => get_class($owner),
-                                        'entity_id'    => $owner->getId(),
-                                        'change_set'   => [],
-                                        'additional_fields' => [],
-                                    ]
+                                    ['entity_class' => get_class($owner), 'entity_id' => $owner->getId()]
                                 ],
                                 'changed'  => []
                             ]
                         ]
-                    ],
-                    'additional_fields' => [],
+                    ]
                 ]
             ]
         ]);
@@ -977,8 +913,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
             [
                 'entity_class' => TestAuditDataOwner::class,
                 'entity_id' => $entity->getId(),
-                'change_set' => $additionalChanges,
-                'additional_fields' => [],
+                'change_set' => $additionalChanges
             ]
         ];
         $this->assertEquals($expectedEntitiesUpdated, $additionalMessage['message']->getBody()['entities_updated']);
@@ -1011,8 +946,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
             [
                 'entity_class' => TestAuditDataOwner::class,
                 'entity_id' => $entity->getId(),
-                'change_set' => array_merge(['stringProperty' => ['string', 'new string']], $additionalChanges),
-                'additional_fields' => [],
+                'change_set' => array_merge(['stringProperty' => ['string', 'new string']], $additionalChanges)
             ]
         ];
         $this->assertEquals($expectedEntitiesUpdated, $additionalMessage['message']->getBody()['entities_updated']);

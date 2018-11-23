@@ -118,7 +118,7 @@ class EntityChangesToAuditEntryConverter
                 $auditEntryClass,
                 $auditFieldClass,
                 $entityMetadata,
-                $entityChange['change_set']
+                $entityChange['change_set'] ?? []
             );
 
             if (empty($fields)) {
@@ -158,7 +158,7 @@ class EntityChangesToAuditEntryConverter
                 $needFlush = true;
             }
 
-            if (isset($entityChange['additional_fields']) && !empty($entityChange['additional_fields'])) {
+            if (!empty($entityChange['additional_fields'])) {
                 $auditEntry->setAdditionalFields($entityChange['additional_fields']);
                 $needFlush = true;
             }
@@ -218,7 +218,7 @@ class EntityChangesToAuditEntryConverter
                 $auditDefaultAction
             );
 
-            if (isset($entityChange['additional_fields']) && !empty($entityChange['additional_fields'])) {
+            if (!empty($entityChange['additional_fields'])) {
                 $audit->setAdditionalFields($entityChange['additional_fields']);
             }
 
