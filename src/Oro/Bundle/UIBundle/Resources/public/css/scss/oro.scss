@@ -881,18 +881,23 @@ label .popover-body {
 .collapse-block {
     [data-collapse-container] {
         position: relative;
-        overflow: hidden;
+
         max-height: round($font-size-base * $line-height-base * 3);
+
+        overflow: hidden;
     }
 
     &.overflows [data-collapse-container]:after {
-        content: '';
-        display: block;
         position: absolute;
         bottom: 0;
+
+        display: block;
         height: round($font-size-base * $line-height-base);
         width: 100%;
+
         background-image: linear-gradient(to top, $primary-inverse, rgba($primary-inverse, 0.1));
+
+        content: '';
         pointer-events: none;
     }
 
