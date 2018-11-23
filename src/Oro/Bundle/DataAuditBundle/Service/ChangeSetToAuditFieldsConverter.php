@@ -10,6 +10,10 @@ use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * This converter is a part of EntityChangesToAuditEntryConverter and it is intended to process field changes.
+ * @see \Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter
+ */
 class ChangeSetToAuditFieldsConverter
 {
     /** @var AuditEntityMapper */
@@ -21,29 +25,30 @@ class ChangeSetToAuditFieldsConverter
     /** @var EntityNameProvider */
     private $entityNameProvider;
 
+    /** @var AuditRecordValidator */
+    private $auditRecordValidator;
+
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
     /**
-     * @param AuditEntityMapper   $auditEntityMapper
-     * @param AuditConfigProvider $configProvider
-     * @param EntityNameProvider  $entityNameProvider
+     * @param AuditEntityMapper        $auditEntityMapper
+     * @param AuditConfigProvider      $configProvider
+     * @param EntityNameProvider       $entityNameProvider
+     * @param AuditRecordValidator     $auditRecordValidator
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         AuditEntityMapper $auditEntityMapper,
         AuditConfigProvider $configProvider,
-        EntityNameProvider $entityNameProvider
+        EntityNameProvider $entityNameProvider,
+        AuditRecordValidator $auditRecordValidator,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->auditEntityMapper = $auditEntityMapper;
         $this->configProvider = $configProvider;
         $this->entityNameProvider = $entityNameProvider;
-    }
-
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     */
-    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
-    {
+        $this->auditRecordValidator = $auditRecordValidator;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -63,12 +68,10 @@ class ChangeSetToAuditFieldsConverter
             }
         }
 
-        if ($this->eventDispatcher) {
-            $auditEntryFieldClass = $this->auditEntityMapper->getAuditEntryFieldClassForAuditEntry($auditEntryClass);
-            $event = new CollectAuditFieldsEvent($auditEntryFieldClass, $changeSet, $fields);
-            $this->eventDispatcher->dispatch(CollectAuditFieldsEvent::NAME, $event);
-            $fields = $event->getFields();
-        }
+        $auditEntryFieldClass = $this->auditEntityMapper->getAuditEntryFieldClassForAuditEntry($auditEntryClass);
+        $event = new CollectAuditFieldsEvent($auditEntryFieldClass, $changeSet, $fields);
+        $this->eventDispatcher->dispatch(CollectAuditFieldsEvent::NAME, $event);
+        $fields = $event->getFields();
 
         return $fields;
     }
@@ -124,19 +127,12 @@ class ChangeSetToAuditFieldsConverter
 
             $field->calculateNewValue();
         } elseif (isset($entityMetadata->associationMappings[$fieldName])) {
-            $newName = $new
-                ? $this->entityNameProvider->getEntityName($auditEntryClass, $new['entity_class'], $new['entity_id'])
-                : null;
-            $oldName = $old
-                ? $this->entityNameProvider->getEntityName($auditEntryClass, $old['entity_class'], $old['entity_id'])
-                : null;
-
             $fields[$fieldName] = $this->createAuditFieldEntity(
                 $auditEntryClass,
                 $fieldName,
                 'text',
-                $newName,
-                $oldName
+                $this->getEntityName($auditEntryClass, $new),
+                $this->getEntityName($auditEntryClass, $old)
             );
         } else {
             $fields[$fieldName] = $this->createAuditFieldEntity(
@@ -157,13 +153,14 @@ class ChangeSetToAuditFieldsConverter
     private function processInsertions($auditEntryClass, $changeSet, AbstractAuditField $field)
     {
         foreach ($changeSet['inserted'] as $entity) {
-            $entityClass = $entity['entity_class'];
-            $entityId = $entity['entity_id'];
-            $field->addEntityAddedToCollection(
-                $entityClass,
-                $entityId,
-                $this->entityNameProvider->getEntityName($auditEntryClass, $entityClass, $entityId)
-            );
+            $entityName = $this->getEntityName($auditEntryClass, $entity);
+            if ($entityName) {
+                $field->addEntityAddedToCollection(
+                    $entity['entity_class'],
+                    $entity['entity_id'],
+                    $entityName
+                );
+            }
         }
     }
 
@@ -176,13 +173,14 @@ class ChangeSetToAuditFieldsConverter
     {
         if ($changeSet['deleted']) {
             foreach ($changeSet['deleted'] as $entity) {
-                $entityClass = $entity['entity_class'];
-                $entityId = $entity['entity_id'];
-                $field->addEntityRemovedFromCollection(
-                    $entityClass,
-                    $entityId,
-                    $this->entityNameProvider->getEntityName($auditEntryClass, $entityClass, $entityId)
-                );
+                $entityName = $this->getEntityName($auditEntryClass, $entity);
+                if ($entityName) {
+                    $field->addEntityRemovedFromCollection(
+                        $entity['entity_class'],
+                        $entity['entity_id'],
+                        $entityName
+                    );
+                }
             }
         }
     }
@@ -196,13 +194,14 @@ class ChangeSetToAuditFieldsConverter
     {
         if ($changeSet['changed']) {
             foreach ($changeSet['changed'] as $entity) {
-                $entityClass = $entity['entity_class'];
-                $entityId = $entity['entity_id'];
-                $field->addEntityChangedInCollection(
-                    $entityClass,
-                    $entityId,
-                    $this->entityNameProvider->getEntityName($auditEntryClass, $entityClass, $entityId)
-                );
+                $entityName = $this->getEntityName($auditEntryClass, $entity);
+                if ($entityName) {
+                    $field->addEntityChangedInCollection(
+                        $entity['entity_class'],
+                        $entity['entity_id'],
+                        $entityName
+                    );
+                }
             }
         }
     }
@@ -226,5 +225,24 @@ class ChangeSetToAuditFieldsConverter
         $auditEntryFieldClass = $this->auditEntityMapper->getAuditEntryFieldClassForAuditEntry($auditEntryClass);
 
         return new $auditEntryFieldClass($field, $dataType, $newValue, $oldValue);
+    }
+
+    /**
+     * @param string     $auditEntryClass
+     * @param array|null $entity
+     *
+     * @return string|null
+     */
+    private function getEntityName($auditEntryClass, $entity)
+    {
+        if (!$entity || !$this->auditRecordValidator->validateAuditRecord($entity)) {
+            return null;
+        }
+
+        return $this->entityNameProvider->getEntityName(
+            $auditEntryClass,
+            $entity['entity_class'],
+            $entity['entity_id']
+        );
     }
 }

@@ -122,6 +122,12 @@ services:
             - '@doctrine'
             - '@oro_entity.entity_name_resolver'
 
+    oro_dataaudit.converter.record_validator:
+        class: 'Oro\Bundle\DataAuditBundle\Service\AuditRecordValidator'
+        public: false
+        arguments:
+            - '@logger'
+
     oro_dataaudit.converter.change_set_to_audit_fields:
         class: 'Oro\Bundle\DataAuditBundle\Service\ChangeSetToAuditFieldsConverter'
         public: false
@@ -129,8 +135,8 @@ services:
             - '@oro_dataaudit.loggable.audit_entity_mapper'
             - '@oro_dataaudit.audit_config_provider'
             - '@oro_dataaudit.entity_name_provider'
-        calls:
-            - [setEventDispatcher, ['@event_dispatcher']]
+            - '@oro_dataaudit.converter.record_validator'
+            - '@event_dispatcher'
 
     oro_dataaudit.converter.entity_changes_to_audit_entry:
         class: 'Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter'
@@ -140,9 +146,8 @@ services:
             - '@oro_dataaudit.audit_config_provider'
             - '@oro_dataaudit.entity_name_provider'
             - '@oro_dataaudit.set_new_audit_version'
+            - '@oro_dataaudit.converter.record_validator'
             - '@oro_dataaudit.converter.change_set_to_audit_fields'
-        calls:
-            - ['setLogger',  ["@logger"]]
 
     oro_dataaudit.async.audit_changed_entities:
         class: 'Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor'
