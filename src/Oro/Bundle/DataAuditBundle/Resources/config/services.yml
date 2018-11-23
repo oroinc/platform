@@ -130,6 +130,7 @@ services:
             - '@oro_dataaudit.audit_config_provider'
             - '@oro_dataaudit.entity_name_provider'
         calls:
+            - [setLogger,  ['@logger']]
             - [setEventDispatcher, ['@event_dispatcher']]
 
     oro_dataaudit.converter.entity_changes_to_audit_entry:
@@ -142,7 +143,7 @@ services:
             - '@oro_dataaudit.set_new_audit_version'
             - '@oro_dataaudit.converter.change_set_to_audit_fields'
         calls:
-            - ['setLogger',  ["@logger"]]
+            - [setLogger,  ['@logger']]
 
     oro_dataaudit.async.audit_changed_entities:
         class: 'Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor'
