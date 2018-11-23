@@ -118,7 +118,7 @@ class EmailActivityEntityControllerTest extends WebTestCase
             'importance' => 'low',
             'body'       => 'Test body',
             'bodyType'   => 'text',
-            'receivedAt' => '2015-06-19 12:17:51'
+            'receivedAt' => '2015-06-19T12:17:51Z'
         ];
 
         // Create new email
