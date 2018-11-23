@@ -14,7 +14,7 @@ $filter-box-criteria-top: auto !default;
 $filter-box-criteria-offset-left: -9999px !default;
 $filter-box-criteria-focus-outline: none !default;
 
-$filter-box-field-max-width: 294px !default;
+$filter-box-field-max-width: $field-width !default;
 
 $filter-box-criteria-btn-group-offset-left: 0 !default;
 

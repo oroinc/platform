@@ -95,7 +95,7 @@ $selector-select-color: $primary-200 !default;
 
 $selector-uniform-display: block !default;
 $selector-uniform-box-sizing: border-box !default;
-$selector-uniform-inner-offset: side-values(0 24px 0 6px) !default;
+$selector-uniform-inner-offset: side-values(0 $content-padding 0 6px) !default;
 $selector-uniform-white-space: nowrap !default;
 $selector-uniform-overflow: hidden !default;
 $selector-uniform-text-overflow: ellipsis !default;
