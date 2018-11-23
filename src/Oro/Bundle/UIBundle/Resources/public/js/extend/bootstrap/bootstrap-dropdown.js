@@ -151,7 +151,12 @@ define(function(require) {
 
                         if (inheritParentWidth === 'strictly' || offset.width < popper.parentElement.clientWidth) {
                             popper.style.width = popper.parentElement.clientWidth + 'px';
-                            _.extend(data.offsets.popper, _.pick(popper.parentElement.getBoundingClientRect(), 'left', 'right', 'width'));
+                            _.extend(data.offsets.popper, _.pick(
+                                popper.parentElement.getBoundingClientRect(),
+                                'left',
+                                'right',
+                                'width')
+                            );
                         }
 
                         Popper.Defaults.modifiers.computeStyle.fn(data, options);
