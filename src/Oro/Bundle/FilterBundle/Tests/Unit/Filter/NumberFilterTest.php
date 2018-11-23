@@ -385,7 +385,6 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
             'data_name' => 'field_name',
             'options' => [],
             'lazy' => false,
-            'precision' => 0,
             'formatterOptions' => [
                 'decimals' => 0,
                 'grouping' => false

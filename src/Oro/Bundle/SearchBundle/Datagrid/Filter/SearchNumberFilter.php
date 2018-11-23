@@ -104,12 +104,6 @@ class SearchNumberFilter extends AbstractFilter
         $metadata['arrayOperators'] = $formView->vars['array_operators'];
         $metadata['dataType'] = $formView->vars['data_type'];
 
-        if (isset($metadata['formatterOptions']['decimals'])) {
-            $metadata['precision'] = (int)$metadata['formatterOptions']['decimals'];
-        } else {
-            throw new LogicException('Metadata element "formatterOptions" is expected to have "decimals"');
-        }
-
         return $metadata;
     }
 
