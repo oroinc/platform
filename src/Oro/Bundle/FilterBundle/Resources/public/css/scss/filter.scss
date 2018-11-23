@@ -53,10 +53,6 @@
                     margin-top: $number-range-filter-field-caret-margin;
                 }
             }
-
-            .dropdown-menu {
-                min-width: 100%;
-            }
         }
 
         .filter-value {
@@ -366,10 +362,6 @@
             vertical-align: $filter-item-dropdown-toggle-vertical-align;
             line-height: $filter-item-dropdown-toggle-line-height;
             position: $filter-item-dropdown-toggle-position;
-        }
-
-        .dropdown-menu {
-            min-width: $filter-item-dropdown-menu-min-width;
         }
 
         & > .btn {
