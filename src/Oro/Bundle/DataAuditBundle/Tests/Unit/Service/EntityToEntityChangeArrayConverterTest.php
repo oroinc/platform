@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\DataAuditBundle\Service\EntityToEntityChangeArrayConverter;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\EntityAdditionalFields;
@@ -106,20 +106,18 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit_Framework_TestCase
      */
     private function getEntityManager()
     {
-        $property = $this->createMock(\ReflectionProperty::class);
-        $property->expects($this->once())
-            ->method('getValue')
-            ->willReturn(1);
-
-        $classMetadata = $this->createMock(ClassMetadataInfo::class);
-        $classMetadata->expects($this->once())
-            ->method('getSingleIdReflectionProperty')
-            ->willReturn($property);
-
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->once())
-            ->method('getClassMetadata')
-            ->willReturn($classMetadata);
+        $em->expects($this->any())
+            ->method('contains')
+            ->willReturn(false);
+
+        $uow = $this->createMock(UnitOfWork::class);
+        $em->expects($this->any())
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
+        $uow->expects($this->any())
+            ->method('getEntityIdentifier')
+            ->willReturn(['id' => 1]);
 
         return $em;
     }

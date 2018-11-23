@@ -432,26 +432,17 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     }
 
     /**
-     * @param object $entity
-     * @param array $changeSet
-     * @return null|array
+     * @param EntityManager $entityManager
+     * @param object        $entity
+     * @param array         $changeSet
+     *
+     * @return array|null
      */
     private function processUpdate(EntityManager $entityManager, $entity, array $changeSet)
     {
         $update = $this->convertEntityToArray($entityManager, $entity, $changeSet);
-        if ($update['entity_id']) {
-            return $update;
-        }
 
-        $this->logger->error(
-            sprintf(
-                'The entity %s has an empty id. Possibly $entity->setId(null) was executed',
-                $update['entity_class']
-            ),
-            ['entity' => $entity, 'update' => $update]
-        );
-
-        return null;
+        return $update['entity_id'] ? $update : null;
     }
 
     /**
@@ -520,6 +511,14 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
      */
     private function convertEntityToArray(EntityManager $em, $entity, array $changeSet)
     {
-        return $this->entityToArrayConverter->convertEntityToArray($em, $entity, $changeSet);
+        $result = $this->entityToArrayConverter->convertEntityToArray($em, $entity, $changeSet);
+        if (null === $result['entity_id']) {
+            $this->logger->error(
+                sprintf('The entity "%s" has an empty id.', $result['entity_class']),
+                ['entity' => $entity, 'convertedEntity' => $result]
+            );
+        }
+
+        return $result;
     }
 }
