@@ -4,21 +4,15 @@ namespace Oro\Bundle\DataAuditBundle\Service;
 use Doctrine\DBAL\Types\Type as DbalType;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAuditField;
-use Oro\Bundle\DataAuditBundle\Event\CollectAuditFieldsEvent;
-use Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * This converter is a part of EntityChangesToAuditEntryConverter and it is intended to process field changes.
  * @see \Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter
  */
-class ChangeSetToAuditFieldsConverter
+class ChangeSetToAuditFieldsConverter implements ChangeSetToAuditFieldsConverterInterface
 {
-    /** @var AuditEntityMapper */
-    private $auditEntityMapper;
-
     /** @var AuditConfigProvider */
     private $configProvider;
 
@@ -28,56 +22,50 @@ class ChangeSetToAuditFieldsConverter
     /** @var AuditRecordValidator */
     private $auditRecordValidator;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
     /**
-     * @param AuditEntityMapper        $auditEntityMapper
-     * @param AuditConfigProvider      $configProvider
-     * @param EntityNameProvider       $entityNameProvider
-     * @param AuditRecordValidator     $auditRecordValidator
-     * @param EventDispatcherInterface $eventDispatcher
+     * @param AuditConfigProvider  $configProvider
+     * @param EntityNameProvider   $entityNameProvider
+     * @param AuditRecordValidator $auditRecordValidator
      */
     public function __construct(
-        AuditEntityMapper $auditEntityMapper,
         AuditConfigProvider $configProvider,
         EntityNameProvider $entityNameProvider,
-        AuditRecordValidator $auditRecordValidator,
-        EventDispatcherInterface $eventDispatcher
+        AuditRecordValidator $auditRecordValidator
     ) {
-        $this->auditEntityMapper = $auditEntityMapper;
         $this->configProvider = $configProvider;
         $this->entityNameProvider = $entityNameProvider;
         $this->auditRecordValidator = $auditRecordValidator;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
-     * @param string        $auditEntryClass The class name of the audit entity
-     * @param ClassMetadata $entityMetadata  The metadata of the audited entity
-     * @param array         $changeSet       The changed data
-     *
-     * @return AbstractAuditField[]
+     * {@inheritdoc}
      */
-    public function convert($auditEntryClass, ClassMetadata $entityMetadata, array $changeSet)
-    {
+    public function convert(
+        string $auditEntryClass,
+        string $auditFieldClass,
+        ClassMetadata $entityMetadata,
+        array $changeSet
+    ): array {
         $fields = [];
         foreach ($changeSet as $fieldName => $change) {
             if ($this->configProvider->isAuditableField($entityMetadata->name, $fieldName)) {
-                $this->convertChangeSet($auditEntryClass, $entityMetadata, $fieldName, $change, $fields);
+                $this->convertChangeSet(
+                    $auditEntryClass,
+                    $auditFieldClass,
+                    $entityMetadata,
+                    $fieldName,
+                    $change,
+                    $fields
+                );
             }
         }
-
-        $auditEntryFieldClass = $this->auditEntityMapper->getAuditEntryFieldClassForAuditEntry($auditEntryClass);
-        $event = new CollectAuditFieldsEvent($auditEntryFieldClass, $changeSet, $fields);
-        $this->eventDispatcher->dispatch(CollectAuditFieldsEvent::NAME, $event);
-        $fields = $event->getFields();
 
         return $fields;
     }
 
     /**
      * @param string        $auditEntryClass
+     * @param string        $auditFieldClass
      * @param ClassMetadata $entityMetadata
      * @param string        $fieldName
      * @param array         $change
@@ -85,6 +73,7 @@ class ChangeSetToAuditFieldsConverter
      */
     private function convertChangeSet(
         $auditEntryClass,
+        $auditFieldClass,
         ClassMetadata $entityMetadata,
         $fieldName,
         $change,
@@ -108,7 +97,7 @@ class ChangeSetToAuditFieldsConverter
             }
 
             $fields[$fieldName] = $this->createAuditFieldEntity(
-                $auditEntryClass,
+                $auditFieldClass,
                 $fieldName,
                 $fieldType,
                 $new,
@@ -119,7 +108,7 @@ class ChangeSetToAuditFieldsConverter
             array_key_exists('inserted', $new) &&
             array_key_exists('deleted', $new)
         ) {
-            $field = $this->createAuditFieldEntity($auditEntryClass, $fieldName, 'collection');
+            $field = $this->createAuditFieldEntity($auditFieldClass, $fieldName, 'collection');
             $fields[$fieldName] = $field;
             $this->processInsertions($auditEntryClass, $new, $field);
             $this->processDeleted($auditEntryClass, $new, $field);
@@ -128,7 +117,7 @@ class ChangeSetToAuditFieldsConverter
             $field->calculateNewValue();
         } elseif (isset($entityMetadata->associationMappings[$fieldName])) {
             $fields[$fieldName] = $this->createAuditFieldEntity(
-                $auditEntryClass,
+                $auditFieldClass,
                 $fieldName,
                 'text',
                 $this->getEntityName($auditEntryClass, $new),
@@ -136,7 +125,7 @@ class ChangeSetToAuditFieldsConverter
             );
         } else {
             $fields[$fieldName] = $this->createAuditFieldEntity(
-                $auditEntryClass,
+                $auditFieldClass,
                 $fieldName,
                 'text',
                 (string)$new,
@@ -207,7 +196,7 @@ class ChangeSetToAuditFieldsConverter
     }
 
     /**
-     * @param string $auditEntryClass
+     * @param string $auditFieldClass
      * @param string $field
      * @param string $dataType
      * @param mixed  $newValue
@@ -216,15 +205,13 @@ class ChangeSetToAuditFieldsConverter
      * @return AbstractAuditField
      */
     private function createAuditFieldEntity(
-        $auditEntryClass,
+        $auditFieldClass,
         $field,
         $dataType,
         $newValue = null,
         $oldValue = null
     ) {
-        $auditEntryFieldClass = $this->auditEntityMapper->getAuditEntryFieldClassForAuditEntry($auditEntryClass);
-
-        return new $auditEntryFieldClass($field, $dataType, $newValue, $oldValue);
+        return new $auditFieldClass($field, $dataType, $newValue, $oldValue);
     }
 
     /**

@@ -67,27 +67,28 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     /** @var \SplObjectStorage */
     private $allTokens;
 
-    /**
-     * @var AdditionalEntityChangesToAuditStorage
-     */
+    /** @var AdditionalEntityChangesToAuditStorage */
     private $additionalEntityChangesStorage;
 
     /**
-     * @param MessageProducerInterface           $messageProducer
-     * @param TokenStorageInterface              $tokenStorage
-     * @param EntityToEntityChangeArrayConverter $entityToArrayConverter
-     * @param AuditConfigProvider                $auditConfigProvider
-     * @param LoggerInterface                    $logger
+     * @param MessageProducerInterface              $messageProducer
+     * @param TokenStorageInterface                 $tokenStorage
+     * @param AdditionalEntityChangesToAuditStorage $additionalEntityChangesStorage
+     * @param EntityToEntityChangeArrayConverter    $entityToArrayConverter
+     * @param AuditConfigProvider                   $auditConfigProvider
+     * @param LoggerInterface                       $logger
      */
     public function __construct(
         MessageProducerInterface $messageProducer,
         TokenStorageInterface $tokenStorage,
+        AdditionalEntityChangesToAuditStorage $additionalEntityChangesStorage,
         EntityToEntityChangeArrayConverter $entityToArrayConverter,
         AuditConfigProvider $auditConfigProvider,
         LoggerInterface $logger
     ) {
         $this->messageProducer = $messageProducer;
         $this->tokenStorage = $tokenStorage;
+        $this->additionalEntityChangesStorage = $additionalEntityChangesStorage;
         $this->entityToArrayConverter = $entityToArrayConverter;
         $this->auditConfigProvider = $auditConfigProvider;
         $this->logger = $logger;
@@ -105,15 +106,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     public function setEnabled($enabled = true)
     {
         $this->enabled = $enabled;
-    }
-
-    /**
-     * @param AdditionalEntityChangesToAuditStorage $additionalEntityChangesStorage
-     */
-    public function setAdditionalEntityChangesStorage(
-        AdditionalEntityChangesToAuditStorage $additionalEntityChangesStorage
-    ) {
-        $this->additionalEntityChangesStorage = $additionalEntityChangesStorage;
     }
 
     /**

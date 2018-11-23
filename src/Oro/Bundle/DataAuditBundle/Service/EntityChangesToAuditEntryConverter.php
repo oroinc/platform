@@ -37,7 +37,7 @@ class EntityChangesToAuditEntryConverter
     /** @var AuditRecordValidator */
     private $auditRecordValidator;
 
-    /** @var ChangeSetToAuditFieldsConverter */
+    /** @var ChangeSetToAuditFieldsConverterInterface */
     private $changeSetToAuditFieldsConverter;
 
     /**
@@ -49,13 +49,13 @@ class EntityChangesToAuditEntryConverter
     private $entityMetadataCache = [];
 
     /**
-     * @param ManagerRegistry                 $doctrine
-     * @param AuditEntityMapper               $auditEntityMapper
-     * @param AuditConfigProvider             $configProvider
-     * @param EntityNameProvider              $entityNameProvider
-     * @param SetNewAuditVersionService       $setNewAuditVersionService
-     * @param AuditRecordValidator            $auditRecordValidator
-     * @param ChangeSetToAuditFieldsConverter $changeSetToAuditFieldsConverter
+     * @param ManagerRegistry                          $doctrine
+     * @param AuditEntityMapper                        $auditEntityMapper
+     * @param AuditConfigProvider                      $configProvider
+     * @param EntityNameProvider                       $entityNameProvider
+     * @param SetNewAuditVersionService                $setNewAuditVersionService
+     * @param AuditRecordValidator                     $auditRecordValidator
+     * @param ChangeSetToAuditFieldsConverterInterface $changeSetToAuditFieldsConverter
      */
     public function __construct(
         ManagerRegistry $doctrine,
@@ -64,7 +64,7 @@ class EntityChangesToAuditEntryConverter
         EntityNameProvider $entityNameProvider,
         SetNewAuditVersionService $setNewAuditVersionService,
         AuditRecordValidator $auditRecordValidator,
-        ChangeSetToAuditFieldsConverter $changeSetToAuditFieldsConverter
+        ChangeSetToAuditFieldsConverterInterface $changeSetToAuditFieldsConverter
     ) {
         $this->doctrine = $doctrine;
         $this->auditEntityMapper = $auditEntityMapper;
@@ -99,6 +99,7 @@ class EntityChangesToAuditEntryConverter
     ) {
         $needFlush = false;
         $auditEntryClass = $this->auditEntityMapper->getAuditEntryClass($this->getEntityByReference($user));
+        $auditFieldClass = $this->auditEntityMapper->getAuditEntryFieldClassForAuditEntry($auditEntryClass);
         /** @var EntityManagerInterface $auditEntityManager */
         $auditEntityManager = $this->doctrine->getManagerForClass($auditEntryClass);
         foreach ($entityChanges as $entityChange) {
@@ -115,6 +116,7 @@ class EntityChangesToAuditEntryConverter
             $entityMetadata = $this->getEntityMetadata($entityClass);
             $fields = $this->changeSetToAuditFieldsConverter->convert(
                 $auditEntryClass,
+                $auditFieldClass,
                 $entityMetadata,
                 $entityChange['change_set']
             );
