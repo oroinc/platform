@@ -2,26 +2,41 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Validator;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\DefinitionQueryConstraint;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 /**
  * This validator check if the columns and entity classes are available to be used in query designer.
  */
 class DefinitionQueryValidator extends ConstraintValidator
 {
-    /** @var EntityWithFieldsProvider */
+    /**
+     * @deprecated since 2.6. Will be removed in 3.1
+     * @var EntityWithFieldsProvider
+     */
     protected $fieldsProvider;
 
     /**
+     * @deprecated since 2.6. Will be removed in 3.1
      * @var array The local cache of available in query designer entities and fields
      */
     protected $availableEntityFields;
+
+    /**
+     * @var ConfigProvider
+     */
+    private $entityConfigProvider;
+
+    /**
+     * @var EntityFieldProvider
+     */
+    private $fieldProvider;
 
     /**
      * DefinitionQueryValidator constructor.
@@ -35,6 +50,22 @@ class DefinitionQueryValidator extends ConstraintValidator
     }
 
     /**
+     * @param ConfigProvider $entityConfigProvider
+     */
+    public function setEntityConfigProvider(ConfigProvider $entityConfigProvider)
+    {
+        $this->entityConfigProvider = $entityConfigProvider;
+    }
+
+    /**
+     * @param EntityFieldProvider $fieldProvider
+     */
+    public function setFieldProvider(EntityFieldProvider $fieldProvider)
+    {
+        $this->fieldProvider = $fieldProvider;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
@@ -43,12 +74,10 @@ class DefinitionQueryValidator extends ConstraintValidator
             return;
         }
 
-        $this->availableEntityFields = $this->fieldsProvider->getFields(true, true);
-
         $rootClass = $value->getEntity();
 
         // validate if the root class is accessible
-        if (!$this->isClassAvailable($rootClass)) {
+        if (!$this->entityConfigProvider->hasConfig($rootClass)) {
             $this->addClassViolation($rootClass, $constraint);
             return;
         }
@@ -64,9 +93,6 @@ class DefinitionQueryValidator extends ConstraintValidator
         foreach ($fieldsIdentifiers as $fieldIdentifier) {
             $this->validateIdentityString($rootClass, $fieldIdentifier, $constraint);
         }
-
-        // clear the local cache to avoid side effects
-        $this->availableEntityFields = [];
     }
 
     /**
@@ -81,24 +107,42 @@ class DefinitionQueryValidator extends ConstraintValidator
         foreach ($joinIdentifiers as $identifier) {
             $fieldClass = $fieldHelper->getEntityClassName($identifier);
             $fieldName = $fieldHelper->getFieldName($identifier);
+            $joinFields = $this->fieldProvider->getFields($fieldClass, true, true);
 
             // Check if class is Accessible
-            if ($fieldClass !== $rootClass && !$this->isClassAvailable($fieldClass)) {
+            if ($fieldClass !== $rootClass && !$joinFields) {
                 $this->addClassViolation($fieldClass, $constraint);
                 continue;
             }
 
             // Check if field is Accessible
-            if (!$this->isColumnAvailable($fieldClass, $fieldName)) {
+            if (!$this->isColumnAccessible($fieldName, $joinFields)) {
                 $this->addColumnViolation($fieldClass, $fieldName, $constraint);
             }
         }
     }
 
     /**
+     * @param string $columnName
+     * @param array $fields
+     * @return bool
+     */
+    protected function isColumnAccessible($columnName, array $fields)
+    {
+        $foundFieldDefinition = array_filter(
+            $fields,
+            function ($a) use ($columnName) {
+                return $a['name'] === $columnName;
+            }
+        );
+
+        return !empty($foundFieldDefinition);
+    }
+
+    /**
      * @param string $className
      * @param string $columnName
-     *
+     * @deprecated since 2.6. Will be removed in 3.1
      * @return bool
      */
     protected function isColumnAvailable($className, $columnName)
@@ -115,7 +159,7 @@ class DefinitionQueryValidator extends ConstraintValidator
 
     /**
      * @param string $className
-     *
+     * @deprecated since 2.6. Will be removed in 3.1
      * @return bool
      */
     protected function isClassAvailable($className)

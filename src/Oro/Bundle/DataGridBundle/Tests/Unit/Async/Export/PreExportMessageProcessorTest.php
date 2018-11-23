@@ -119,19 +119,19 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo($dependentJobContext));
 
         $user = $this->createUserStub();
-        $user->expects($this->once())
+        $user->expects($this->any())
             ->method('getId')
             ->willReturn(1);
         $user->expects($this->once())
             ->method('getEmail');
 
         $token = $this->createTokenMock();
-        $token->expects($this->exactly(2))
+        $token->expects($this->any())
             ->method('getUser')
             ->willReturn($user);
 
         $tokenStorage = $this->createTokenStorageMock();
-        $tokenStorage->expects($this->exactly(2))
+        $tokenStorage->expects($this->any())
             ->method('getToken')
             ->willReturn($token);
 

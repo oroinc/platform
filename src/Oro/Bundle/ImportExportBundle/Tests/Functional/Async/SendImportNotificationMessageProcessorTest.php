@@ -115,6 +115,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
                         'downloadLogUrl' => '',
                     ],
                 ],
+                'recipientUserId' => 1,
                 'contentType' => 'text/html',
                 'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT,
             ]
@@ -179,6 +180,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
                         'downloadLogUrl' => '',
                     ],
                 ],
+                'recipientUserId' => 1,
                 'contentType' => 'text/html',
                 'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT,
             ]

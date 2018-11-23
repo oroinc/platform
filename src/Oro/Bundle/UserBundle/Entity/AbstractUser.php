@@ -548,7 +548,7 @@ abstract class AbstractUser implements
     /**
      * Get organization
      *
-     * @return OrganizationInterface
+     * @return OrganizationInterface|Organization
      */
     public function getOrganization()
     {

@@ -14,6 +14,9 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 
+/**
+ * Abstract form type for date filter forms.
+ */
 abstract class AbstractDateFilterType extends AbstractType
 {
     const TYPE_BETWEEN     = 1;
@@ -30,6 +33,9 @@ abstract class AbstractDateFilterType extends AbstractType
     const TYPE_THIS_YEAR    = 11;
     const TYPE_ALL_TIME     = 12;
 
+    /**
+     * @var array
+     */
     public static $valueTypes = [
         self::TYPE_TODAY,
         self::TYPE_THIS_WEEK,
@@ -161,8 +167,7 @@ abstract class AbstractDateFilterType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $widgetOptions                = ['firstDay' => 0];
-        $view->vars['widget_options'] = array_merge($widgetOptions, $options['widget_options']);
+        $view->vars['widget_options'] = $options['widget_options'];
         $view->vars['date_parts']     = $options['date_parts'];
         $view->vars['date_vars']      = $options['date_vars'];
     }

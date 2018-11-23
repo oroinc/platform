@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Knp\Menu\MenuFactory;
+use Knp\Menu\MenuItem;
 
 use Psr\Log\LoggerInterface;
 
@@ -10,7 +11,7 @@ use Doctrine\Common\Cache\CacheProvider;
 
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -75,7 +76,9 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildOptionsWithResourceId($options, $isAllowed)
     {
-        $this->mockToken();
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
@@ -86,7 +89,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($isAllowed));
 
         $item = $this->factory->createItem('test', $options);
-        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
+        $this->assertInstanceOf(MenuItem::class, $item);
         $this->assertEquals($isAllowed, $item->getExtra('isAllowed'));
     }
 
@@ -139,14 +142,16 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildOptionsWithoutLoggedUser($options, $isAllowed)
     {
-        $this->mockToken();
+        $this->tokenAccessor->expects($this->any())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
         $this->tokenAccessor->expects($this->any())
             ->method('hasUser')
             ->willReturn(false);
 
         $item = $this->factory->createItem('test', $options);
 
-        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
+        $this->assertInstanceOf(MenuItem::class, $item);
         $this->assertEquals($isAllowed, $item->getExtra('isAllowed'));
     }
 
@@ -179,7 +184,9 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $options = ['route' => 'no-route'];
 
-        $this->mockToken();
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
@@ -193,8 +200,8 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('isClassMethodGranted');
 
         $item = $this->factory->createItem('test', $options);
-        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
-        $this->assertEquals(AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY, $item->getExtra('isAllowed'));
+        $this->assertInstanceOf(MenuItem::class, $item);
+        $this->assertTrue($item->getExtra('isAllowed'));
     }
 
     public function testBuildOptionsAlreadyProcessed()
@@ -205,7 +212,8 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->mockToken();
+        $this->tokenAccessor->expects($this->never())
+            ->method('getToken');
         $this->tokenAccessor->expects($this->never())
             ->method('hasUser');
 
@@ -220,13 +228,15 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testDefaultPolicyOverride(array $options, $expected)
     {
-        $this->mockToken();
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
 
         $item = $this->factory->createItem('test', $options);
-        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
+        $this->assertInstanceOf(MenuItem::class, $item);
         $this->assertEquals($expected, $item->getExtra('isAllowed'));
     }
 
@@ -236,18 +246,56 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     public function aclPolicyProvider()
     {
         return [
-            [[], AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY],
-            [['extras' => []], AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY],
-            [['extras' => [AclAwareMenuFactoryExtension::ACL_POLICY_KEY => true]], true],
-            [['extras' => [AclAwareMenuFactoryExtension::ACL_POLICY_KEY => false]], false],
+            [[], true],
+            [['extras' => []], true],
+            [['extras' => ['acl_policy' => true]], true],
+            [['extras' => ['acl_policy' => false]], false],
+        ];
+    }
+
+    /**
+     * @dataProvider emptyUriProvider
+     */
+    public function testBuildOptionsWithEmptyUri($uri)
+    {
+        $options = ['uri' => $uri];
+
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $this->router->expects($this->never())
+            ->method('match');
+
+        $this->classAuthorizationChecker->expects($this->never())
+            ->method('isClassMethodGranted');
+
+        $this->logger->expects($this->never())
+            ->method('debug');
+
+        $item = $this->factory->createItem('test', $options);
+        $this->assertInstanceOf(MenuItem::class, $item);
+        $this->assertTrue($item->getExtra('isAllowed'));
+    }
+
+    public function emptyUriProvider()
+    {
+        return [
+            [''],
+            ['#']
         ];
     }
 
     public function testBuildOptionsWithUnknownUri()
     {
-        $options = ['uri' => '#'];
+        $options = ['uri' => 'unknown'];
 
-        $this->mockToken();
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
@@ -261,11 +309,33 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->logger->expects($this->once())
             ->method('debug')
-            ->with('Route not found', ['pathinfo' => '#']);
+            ->with('Route not found', ['pathinfo' => 'unknown']);
 
         $item = $this->factory->createItem('test', $options);
-        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
-        $this->assertEquals(AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY, $item->getExtra('isAllowed'));
+        $this->assertInstanceOf(MenuItem::class, $item);
+        $this->assertTrue($item->getExtra('isAllowed'));
+    }
+
+    public function testBuildOptionsWithEmptyRoute()
+    {
+        $options = ['route' => ''];
+
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $this->router->expects($this->never())
+            ->method('getGenerator');
+
+        $this->classAuthorizationChecker->expects($this->never())
+            ->method('isClassMethodGranted');
+
+        $item = $this->factory->createItem('test', $options);
+        $this->assertInstanceOf(MenuItem::class, $item);
+        $this->assertTrue($item->getExtra('isAllowed'));
     }
 
     /**
@@ -276,7 +346,9 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildOptionsWithRoute($options, $isAllowed, $callsCount)
     {
-        $this->mockToken();
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
@@ -289,7 +361,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertClassAuthorizationCheckerCalls($isAllowed, $callsCount);
 
         $item = $this->factory->createItem('test', $options);
-        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
+        $this->assertInstanceOf(MenuItem::class, $item);
         $this->assertEquals($isAllowed, $item->getExtra('isAllowed'));
     }
 
@@ -324,7 +396,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
                 ['uri' => '#', 'route' => 'route_name'], false, 1
             ],
             'default with route and controller without delimiter' => [
-                ['uri' => '#', 'route' => 'test'], AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY, 0
+                ['uri' => '#', 'route' => 'test'], true, 0
             ],
         ];
     }
@@ -339,7 +411,9 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $class = 'controller';
         $method = 'action';
 
-        $this->mockToken();
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
@@ -354,7 +428,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($isAllowed));
 
         $item = $this->factory->createItem('test', $options);
-        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
+        $this->assertInstanceOf(MenuItem::class, $item);
         $this->assertEquals($isAllowed, $item->getExtra('isAllowed'));
     }
 
@@ -377,8 +451,10 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $options = ['extras' => ['acl_resource_id' => 'resource_id']];
 
-        $this->mockToken();
-        $this->tokenAccessor->expects($this->any())
+        $this->tokenAccessor->expects($this->exactly(2))
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
+        $this->tokenAccessor->expects($this->exactly(2))
             ->method('hasUser')
             ->willReturn(true);
 
@@ -390,7 +466,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         for ($i = 0; $i < 2; $i++) {
             $item = $this->factory->createItem('test', $options);
             $this->assertTrue($item->getExtra('isAllowed'));
-            $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
+            $this->assertInstanceOf(MenuItem::class, $item);
         }
 
         $this->assertAttributeCount(1, 'existingACLChecks', $this->factoryExtension);
@@ -405,8 +481,10 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $options = ['route' => 'route_name'];
 
-        $this->mockToken();
-        $this->tokenAccessor->expects($this->any())
+        $this->tokenAccessor->expects($this->exactly(2))
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
+        $this->tokenAccessor->expects($this->exactly(2))
             ->method('hasUser')
             ->willReturn(true);
 
@@ -419,12 +497,12 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
 
         $item = $this->factory->createItem('test', $options);
         $this->assertTrue($item->getExtra('isAllowed'));
-        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
+        $this->assertInstanceOf(MenuItem::class, $item);
 
         $options['new_key'] = 'new_value';
         $item = $this->factory->createItem('test', $options);
         $this->assertTrue($item->getExtra('isAllowed'));
-        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
+        $this->assertInstanceOf(MenuItem::class, $item);
 
         $this->assertAttributeCount(1, 'existingACLChecks', $this->factoryExtension);
         $this->assertAttributeEquals(['controller::action' => true], 'existingACLChecks', $this->factoryExtension);
@@ -442,14 +520,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn(null);
 
         $item = $this->factory->createItem('test', $options);
-        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
-        $this->assertEquals(AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY, $item->getExtra('isAllowed'));
-    }
-
-    private function mockToken()
-    {
-        $this->tokenAccessor->expects($this->any())
-            ->method('getToken')
-            ->willReturn($this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
+        $this->assertInstanceOf(MenuItem::class, $item);
+        $this->assertTrue($item->getExtra('isAllowed'));
     }
 }

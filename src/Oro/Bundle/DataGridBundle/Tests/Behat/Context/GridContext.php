@@ -5,8 +5,10 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\DateTimePicker;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridInterface;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools;
@@ -328,7 +330,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And number of records should be 34
      *
      * @Given number of records should be :number
-     * @Given /^number of records in "(?P<gridName>[\w\s]+)" should be (?P<number>(?:|zero|one|two|\d+))$/
+     * @Given /^number of records in "(?P<gridName>[\w\s]+)"( grid)? should be (?P<number>(?:|zero|one|two|\d+))$/
      * @Given /^there (?:|are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in grid$/
      */
     public function numberOfRecordsShouldBe($number, $gridName = null)
@@ -598,6 +600,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @When /^(?:|when )(?:|I )sort grid by (?P<field>(?:|[\w\s]*(?<!again)))(?:| again)$/
      * @When /^(?:|when )(?:|I )sort "(?P<gridName>[\w\s]+)" by (?P<field>(?:|[\w\s]*(?<!again)))(?:| again)$/
+     * @When /^(?:|I )sort "(?P<gridName>[\w\s]+)" by "(?P<field>.*)"(?:| again)$/
      * @When /^(?:|I )sort grid by "(?P<field>.*)"(?:| again)$/
      */
     public function sortGridBy($field, $gridName = null)
@@ -730,8 +733,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Then Zyta Zywiec must be first record
      * Example: And John Doe must be first record
      *
-     * @Then /^(?P<content>[\w\s]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record$/
-     * @Then /^(?P<content>[\w\s]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record in "(?P<gridName>[\w\s]+)"$/
+     * @Then /^(?P<content>[\w\d\s]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record$/
+     * @Then /^(?P<content>[\w\d\s]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record in "(?P<gridName>[\w\s]+)"$/
      */
     public function assertRowContent($content, $rowNumber, $gridName = null)
     {
@@ -741,7 +744,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @Then /^I should see that "(?P<content>([\w\s]+))" is in (?P<rowNum>([\d]+)) row$/
+     * @Then /^I should see that "(?P<content>([^"]+))" is in (?P<rowNum>([\d]+)) row$/
      */
     public function assertRowContentInTable($content, $rowNum)
     {
@@ -759,7 +762,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Then I should see "Priority" in "Warehouse" table
      * Example: Then I should not see "Apple" in "Basket" table
      *
-     * @Then /^I should (?P<type>(?:|see|not see)) "(?P<content>[\w\s]+)" in "(?P<tableContent>[\w\s]+)" table$/
+     * @Then /^I should (?P<type>(?:|see|not see)) "(?P<content>.+)" in "(?P<tableContent>[\w\s]+)" table$/
      */
     public function assertContentInTable($type, $content, $tableContent)
     {
@@ -802,19 +805,29 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|is empty|is not empty))$/
      * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)"$/
+     * @When /^(?:|I )filter "(?P<filterName>.+)" as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)"$/
      * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)"$/
      * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid$/
+     * @When /^(?:|I )filter (?P<filterName>.+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid ?(?P<strictly>strictly)$/
      *
      * @param string $filterName
      * @param string $type
      * @param string $value
      * @param string $filterGridName
+     * @param string $strictly
      */
     //@codingStandardsIgnoreEnd
-    public function applyStringFilter($filterName, $type, $value = null, $filterGridName = 'Grid')
-    {
+    public function applyStringFilter(
+        $filterName,
+        $type,
+        $value = null,
+        $filterGridName = 'Grid',
+        string $strictly = ''
+    ) {
         /** @var GridFilterStringItem $filterItem */
-        $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('GridFilterStringItem', $filterName);
+        $filterItem = $this
+            ->getGridFilters($filterGridName)
+            ->getFilterItem('GridFilterStringItem', $filterName, $strictly === 'strictly');
 
         $filterItem->open();
         $filterItem->selectType($type);
@@ -825,12 +838,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     //@codingStandardsIgnoreStart
     /**
      * Filter grid by choice filter
-     * Example: When I filter Status as Is Any Of "Option 1"
-     * Example: And filter Step as Is not Any Of "Option 2"
+     * Example: When I choose filter for Status as Is Any Of "Option 1"
+     * Example: And I choose filter for Step as Is not Any Of "Option 2"
      *
-     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of)) "(?P<value>[\w\s\,\.\_\%]+)"$/
-     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of)) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)"$/
-     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of)) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid$/
+     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of|is any of|is not any of)) "(?P<value>[\w\s\,\.\_\%]+)"$/
+     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of|is any of|is not any of)) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of|is any of|is not any of)) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid$/
      *
      * @param string $filterName
      * @param string $type
@@ -880,6 +893,44 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Asserts header in datepicker.
+     *
+     * Example: Then I should see following header in "Datepicker" filter:
+     *             | S | M | T | W | T | F | S |
+     *
+     * @Then /^(?:|I )should see following header in "(?P<filterName>[^"]+)" filter:$/
+     * @Then /^(?:|I )should see following header in "(?P<filterName>[^"]+)" filter in "(?P<filterGridName>[\w\s]+)":$/
+     *
+     * @param string $filterName
+     * @param TableNode $table
+     * @param string $filterGridName
+     */
+    public function iShouldSeeFollowingHeaderInDateTimeFilter(
+        string $filterName,
+        TableNode $table,
+        $filterGridName = 'Grid'
+    ) {
+        $data = $table->getRows();
+        self::assertNotEmpty($data);
+
+        /** @var GridFilterDateTimeItem $filterItem */
+        $filterItem = $this->getGridFilters($filterGridName)
+            ->getFilterItem($filterGridName . 'FilterDateTimeItem', $filterName);
+
+        $filterItem->open();
+        $filterItem->selectType('equals');
+
+        /** @var DateTimePicker $input */
+        $input = $filterItem->findVisible('css', '.datepicker-input');
+        $input = $this->elementFactory->wrapElement('DateTimePicker', $input);
+
+        self::assertTrue($input->isVisible());
+        self::assertEquals(reset($data), $input->getHeader());
+
+        $filterItem->close();
+    }
+
+    /**
      * Check checkboxes in multiple select filter
      * Example: When I check "Task, Email" in Activity Type filter
      *
@@ -923,9 +974,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Reset filter
      * Example: And I reset Activity Type filter
      *
-     * @When /^(?:|I )reset (?P<filterName>[\w\s]+) filter$/
-     * @When /^(?:|I )reset "(?P<filterName>[\w\s]+)" filter in grid$/
-     * @When /^(?:|I )reset "(?P<filterName>[\w\s]+)" filter in "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )reset (?P<filterName>[\w\s\:\(\)\#]+) filter$/
+     * @When /^(?:|I )reset "(?P<filterName>[^"]+)" filter in grid$/
+     * @When /^(?:|I )reset "(?P<filterName>[^"]+)" filter in "(?P<filterGridName>[\w\s]+)"$/
      *
      * @param string $filterName
      * @param string $filterGridName
@@ -937,8 +988,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @When /^(?:|I )reset "(?P<filterName>[\w\s\:]+)" filter$/
-     * @When /^(?:|I )reset "(?P<filterName>[\w\s\:]+)" filter on grid "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )reset "(?P<filterName>[\w\s\:\(\)\#\/]+)" filter$/
+     * @When /^(?:|I )reset "(?P<filterName>[\w\s\:\(\)\#\/]+)" filter on grid "(?P<filterGridName>[\w\s]+)"$/
      *
      * @param string $filterName
      * @param string $filterGridName
@@ -1015,8 +1066,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Asserts that no record with provided content in grid
      * Example: And there is no "Glorious workflow" in grid
      *
-     * @Then /^there is no "(?P<record>[\w\s\%]+)" in grid$/
-     * @Then /^there is no "(?P<record>[\w\s\%]+)" in "(?P<gridName>[\w\s]+)"/
+     * @Then /^there is no "(?P<record>[^"]*)" in grid$/
+     * @Then /^there is no "(?P<record>[^"]*)" in "(?P<gridName>[\w\s]+)"/
      * @param string $record
      */
     public function thereIsNoInGrid($record, $gridName = null)
@@ -1081,11 +1132,20 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function actionsForRowExist($content, TableNode $table, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
+        /** @var GridRow $row */
         $row = $grid->getRowByContent($content);
 
-        foreach ($table as $item) {
-            // Grid Row will assert us if action does not exists
-            $row->getActionLink(reset($item));
+        $actions = array_map(
+            function (Element $action) {
+                return $action->getText() ?: $action->getAttribute('title');
+            },
+            $row->getActionLinks()
+        );
+
+        $rows = array_column($table->getRows(), 0);
+
+        foreach ($rows as $item) {
+            self::assertContains($item, $actions);
         }
     }
 
@@ -1103,6 +1163,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iShouldSeeOnlyFollowingActionsForRow($number, TableNode $table, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
+        /** @var GridRow $row */
         $row = $grid->getRowByNumber($number);
 
         $actions = array_map(
@@ -1128,11 +1189,20 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function actionsForRowNotExist($content, TableNode $table, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
+        /** @var GridRow $row */
         $row = $grid->getRowByContent($content);
 
-        foreach ($table as $item) {
-            $action = $row->findActionLink(ucfirst(reset($item)));
-            self::assertNull($action, "$action still exists for $content row");
+        $actions = array_map(
+            function (Element $action) {
+                return $action->getText() ?: $action->getAttribute('title');
+            },
+            $row->getActionLinks()
+        );
+
+        $rows = array_column($table->getRows(), 0);
+
+        foreach ($rows as $item) {
+            self::assertNotContains($item, $actions);
         }
     }
 
@@ -1491,7 +1561,7 @@ TEXT;
     public function recordsInGridShouldBe($count, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
-        $gridRows = $grid->findAll('css', 'tbody tr');
+        $gridRows = $grid->findAll('css', 'table.grid > tbody > tr');
 
         self::assertCount((int)$count, $gridRows);
     }
@@ -1536,14 +1606,32 @@ TEXT;
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement($grid->getMappedChildElementName('GridFiltersButton'))->open();
+        $filtersButton = $grid->getMappedChildElementName('GridFiltersButton');
+        if ($grid->getElements($filtersButton)) {
+            $grid->getElement($filtersButton)->open();
+        }
+
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
+        // Actually element "GridFilterManager" points to all filter dropdowns, so we have to find out
+        // which one is the actual filter manager dropdown.
+        $filterDropdowns = $grid->getElements($grid->getMappedChildElementName('GridFilterManager'));
+        $filterDropdowns = array_filter($filterDropdowns, function (Element $element) {
+            return $element->isVisible();
+        });
+
+        $filterManager =  array_shift($filterDropdowns);
+        self::assertNotNull($filterManager, 'Filter manager dropdown was not found');
+
         /** @var GridFilterManager $filterManager */
-        $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->checkColumnFilter($filter);
-        $filterManager->close();
+
+        try {
+            $filterManager->close();
+        } catch (\Exception $e) {
+            $filterButton->click();
+        }
     }
 
     /**
@@ -1558,14 +1646,23 @@ TEXT;
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement($grid->getMappedChildElementName('GridFiltersButton'))->open();
+        $filtersButton = $grid->getMappedChildElementName('GridFiltersButton');
+        if ($grid->getElements($filtersButton)) {
+            $grid->getElement($filtersButton)->open();
+        }
+
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
         /** @var GridFilterManager $filterManager */
         $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->uncheckColumnFilter($filter);
-        $filterManager->close();
+
+        try {
+            $filterManager->close();
+        } catch (\Exception $e) {
+            $filterButton->click();
+        }
     }
 
     /**
@@ -1759,7 +1856,7 @@ TEXT;
     }
 
     /**
-     * Example: I should see next rows in "Discounts" table:
+     * Example: I should see next rows in "Discounts" table
      *   | Description | Discount |
      *   | Amount      | -$2.00   |
      *
@@ -1838,5 +1935,35 @@ TEXT;
             $this->getGrid($gridName)->getRowByContent($content)->hasMassActionCheckbox(),
             sprintf('Grid row with "%s" content has mass action checkbox in it', $content)
         );
+    }
+
+    /**
+     * Example: I should see next options in "Some select element":
+     *   | Please select |
+     *   | Option A      |
+     *   | Option B      |
+     *
+     * @Then /^(?:|I )should see next options in "(?P<selectElementName>[\w\s]+)"/
+     * @param TableNode $expectedTableNode
+     * @param string $selectElementName
+     */
+    public function iShouldSeeNextOptionsInSelect(TableNode $expectedTableNode, $selectElementName)
+    {
+        $selectElement = $this->createElement($selectElementName);
+        /** @var Element[] $optionElements */
+        $optionElements = $selectElement->findAll('css', 'option');
+        $optionValues = [];
+
+        foreach ($optionElements as $optionElement) {
+            $optionValues[] = trim($optionElement->getText()); //Removes spaces at the beginning
+        }
+        $expectedRows = $expectedTableNode->getRows();
+        foreach ($expectedRows as $rowKey => $expectedRow) {
+            self::assertContains(
+                $expectedRow[0],
+                $optionValues,
+                sprintf('There is no such sorting option: "%s"', $expectedRow[0])
+            );
+        }
     }
 }

@@ -2,8 +2,6 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
-use Oro\Component\MessageQueue\Client\Message;
-use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
 use Oro\Component\MessageQueue\Provider\NullJobConfigurationProvider;
@@ -11,8 +9,8 @@ use Oro\Component\MessageQueue\Provider\NullJobConfigurationProvider;
 /**
  * JobProcessor is a main class responsible for processing jobs, shifting it's responsibilities to other classes
  * is quite difficult and would make it less readable.
+ *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
- * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class JobProcessor
@@ -201,8 +199,6 @@ class JobProcessor
         $job->setJobProgress(0);
         $this->jobStorage->saveJob($job);
 
-        $this->sendCalculateJobStatusMessage($job, true);
-
         return $job;
     }
 
@@ -230,8 +226,6 @@ class JobProcessor
 
         $this->jobStorage->saveJob($job);
         $this->updateJobLastActiveAtAndSave($job->getRootJob());
-
-        $this->sendCalculateJobStatusMessage($job);
     }
 
     /**
@@ -258,8 +252,6 @@ class JobProcessor
         $job->setStoppedAt(new \DateTime());
         $this->jobStorage->saveJob($job);
         $this->updateJobLastActiveAtAndSave($job->getRootJob());
-
-        $this->sendCalculateJobStatusMessage($job, true);
     }
 
     /**
@@ -318,8 +310,6 @@ class JobProcessor
 
         $this->jobStorage->saveJob($job);
         $this->updateJobLastActiveAtAndSave($job->getRootJob());
-
-        $this->sendCalculateJobStatusMessage($job, true);
     }
 
     /**
@@ -344,8 +334,6 @@ class JobProcessor
         $job->setStatus(Job::STATUS_FAILED_REDELIVERED);
         $this->jobStorage->saveJob($job);
         $this->updateJobLastActiveAtAndSave($job->getRootJob());
-
-        $this->sendCalculateJobStatusMessage($job);
     }
 
     /**
@@ -376,8 +364,6 @@ class JobProcessor
 
         $this->jobStorage->saveJob($job);
         $this->updateJobLastActiveAtAndSave($job->getRootJob());
-
-        $this->sendCalculateJobStatusMessage($job, true);
     }
 
     /**
@@ -446,22 +432,6 @@ class JobProcessor
     }
 
     /**
-     * @param Job  $job
-     * @param bool $calculateProgress
-     */
-    private function sendCalculateJobStatusMessage($job, $calculateProgress = false)
-    {
-        $message = ['jobId' => $job->getId()];
-        if ($calculateProgress) {
-            $message['calculateProgress'] = true;
-        }
-        $this->producer->send(
-            Topics::CALCULATE_ROOT_JOB_STATUS,
-            new Message($message, MessagePriority::HIGH)
-        );
-    }
-
-    /**
      * @return string[]
      */
     private function getNotStartedJobStatuses()
@@ -475,5 +445,27 @@ class JobProcessor
     private function getActiveJobStatuses()
     {
         return [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED];
+    }
+
+    /**
+     * Finds root non interrupted and non stale job by name and given statuses.
+     *
+     * @param string $jobName
+     * @param array $statuses
+     *
+     * @return Job|null
+     */
+    public function findNotStaleRootJobyJobNameAndStatuses($jobName, array $statuses)
+    {
+        $currentRootJob = $this->findRootJobByJobNameAndStatuses($jobName, $statuses);
+        if ($currentRootJob) {
+            if ($this->isJobStale($currentRootJob)) {
+                $this->staleRootJobAndChildren($currentRootJob);
+            } else {
+                return $currentRootJob;
+            }
+        }
+
+        return null;
     }
 }

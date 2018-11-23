@@ -56,6 +56,10 @@ class UpdateConfigCommand extends ContainerAwareCommand
         $dumper = $this->getContainer()->get('oro_entity_extend.tools.dumper');
         //Force provider to return configs for attribute extend entities if argument is passed
         if ($input->getOption('attributes-only')) {
+            @trigger_error(
+                'attributes-only option is deprecated since version 2.6 and will be removed in 3.1.',
+                E_USER_DEPRECATED
+            );
             $this->getContainer()
                 ->get('oro_entity_config.provider.extend_entity_config_provider')
                 ->enableAttributesOnly();

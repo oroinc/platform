@@ -81,3 +81,12 @@ services:
             - '@service_container'
         tags:
             - { name: twig.extension }
+
+    oro_reminder.model.template_email_notification:
+         class: Oro\Bundle\ReminderBundle\Model\Email\TemplateEmailNotification
+         decorates: oro_reminder.model.email_notification
+         priority: 255
+         arguments:
+             - '@doctrine.orm.entity_manager'
+             - '@oro_entity_config.provider.reminder'
+             - '@oro_entity.entity_name_resolver'

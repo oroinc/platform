@@ -6,8 +6,11 @@ use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
@@ -22,7 +25,10 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
+use Oro\Bundle\EntityExtendBundle\Validator\Constraints\FieldNameLength;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
+use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider;
+use Oro\Bundle\FormBundle\Form\Extension\JsValidationExtension;
 use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
@@ -70,6 +76,7 @@ class FieldTypeTest extends TypeTestCase
         ],
     ];
 
+    /** @var array */
     protected $expectedChoicesView;
 
     protected function setUp()
@@ -144,17 +151,9 @@ class FieldTypeTest extends TypeTestCase
         return $expectedChoicesView;
     }
 
-    protected function tearDown()
-    {
-        unset(
-            $this->type,
-            $this->configManager,
-            $this->translator,
-            $this->fieldTypeProvider,
-            $this->expectedChoicesView
-        );
-    }
-
+    /**
+     * @return array
+     */
     protected function getExtensions()
     {
         $validator = new Validator(
@@ -165,6 +164,16 @@ class FieldTypeTest extends TypeTestCase
 
         $select2ChoiceType = new Select2Type('choice');
 
+        /** @var ConstraintsProvider $constraintsProvider */
+        $constraintsProvider = $this->createMock(ConstraintsProvider::class);
+        $constraintsProvider->expects($this->any())
+            ->method('getFormConstraints')
+            ->willReturnCallback(
+                function (FormInterface $form) {
+                    return $form->getName() === 'fieldName' ? ['NotBlank' => new NotBlank()] : [];
+                }
+            );
+
         return [
             new PreloadedExtension(
                 [
@@ -173,7 +182,8 @@ class FieldTypeTest extends TypeTestCase
                 [
                     'form'   => [
                         new DataBlockExtension(),
-                        new FormTypeValidatorExtension($validator)
+                        new FormTypeValidatorExtension($validator),
+                        new JsValidationExtension($constraintsProvider)
                     ],
                     'choice' => [
                         new TranslatableChoiceTypeExtension()
@@ -186,6 +196,34 @@ class FieldTypeTest extends TypeTestCase
     public function testName()
     {
         $this->assertEquals('oro_entity_extend_field_type', $this->type->getName());
+    }
+
+    public function testFinishView()
+    {
+        $fieldNameView = new FormView();
+        $fieldNameView->vars['attr']['data-validation'] = '{}';
+
+        $view = new FormView();
+        $view->children['fieldName'] = $fieldNameView;
+
+        /** @var $form FormInterface|\PHPUnit\Framework\MockObject\MockObject */
+        $form = $this->createMock(FormInterface::class);
+
+        $this->type->finishView($view, $form, []);
+
+        $this->assertEquals(
+            [
+                'data-validation' => \json_encode(
+                    [
+                        FieldNameLength::class => [
+                            'min' => FieldNameLength::MIN_LENGTH,
+                            'max' => 22, //will be returned by generator
+                        ]
+                    ]
+                )
+            ],
+            $fieldNameView->vars['attr']
+        );
     }
 
     public function testType()

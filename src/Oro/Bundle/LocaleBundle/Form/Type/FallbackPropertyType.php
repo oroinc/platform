@@ -99,20 +99,6 @@ class FallbackPropertyType extends AbstractType
                 return $choices;
             }
         );
-
-        $resolver->setNormalizer(
-            'choice_label',
-            function (Options $options) {
-                $choices = $options->offsetGet('choices');
-
-                if ($choices) {
-                    return function ($choice, $key) use ($choices) {
-                        return $key;
-                    };
-                }
-                return;
-            }
-        );
     }
 
     /**
@@ -122,11 +108,9 @@ class FallbackPropertyType extends AbstractType
     {
         if ($options['localization']) {
             $view->vars['attr']['data-localization'] = $options['localization'];
-            $view->vars['attr']['test-localization'] = $options['localization'];
         }
         if ($options['parent_localization']) {
             $view->vars['attr']['data-parent-localization'] = $options['parent_localization'];
-            $view->vars['attr']['test-parent-localization'] = $options['parent_localization'];
         }
     }
 }

@@ -49,6 +49,41 @@ class Form extends Element
         }
     }
 
+    /**
+     * @param string $label
+     * @param string $value
+     * @throws ElementNotFoundException
+     */
+    public function typeInField($label, $value)
+    {
+        $field = null;
+        if (isset($this->options['mapping'][$label])) {
+            $field = $this->findField($this->options['mapping'][$label]);
+        }
+
+        if (null === $field) {
+            $field = $this->getPage()->find('named', ['field', $label]);
+        }
+
+        if (null === $field && $this->elementFactory->hasElement($label)) {
+            // try to find field among defined elements
+            $field = $this->elementFactory->createElement($label);
+        }
+
+        if (null === $field) {
+            throw new ElementNotFoundException(
+                $this->getDriver(),
+                'form field',
+                'id|name|label|value|placeholder',
+                $label
+            );
+        }
+
+        self::assertTrue($field->isVisible(), "Field with '$label' was found, but it not visible");
+
+        $this->getDriver()->typeIntoInput($field->getXpath(), $value);
+    }
+
     public function assertFields(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
@@ -219,9 +254,13 @@ class Form extends Element
                 return $sndParent->find('css', 'input[type=checkbox]');
             } elseif ($sndParent->hasClass('control-group-choice')) {
                 return $this->elementFactory->wrapElement('GroupChoiceField', $sndParent->find('css', '.controls'));
-            } elseif ($field = $sndParent->find('css', '#'.$label->getAttribute('for'))) {
+            } elseif ($label->getAttribute('for')
+                && $field = $sndParent->find('css', '#'.$label->getAttribute('for'))
+            ) {
                 return $field;
-            } elseif ($field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))) {
+            } elseif ($label->getAttribute('for')
+                && $field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))
+            ) {
                 return $field;
             } else {
                 self::fail(sprintf('Find label "%s", but can\'t determine field type', $locator));
@@ -357,9 +396,10 @@ class Form extends Element
      * Retrieves validation error message text for provided field name
      *
      * @param string $fieldName
+     * @param bool $ensureFieldHasErrors
      * @return array
      */
-    public function getAllFieldValidationErrors($fieldName)
+    public function getAllFieldValidationErrors($fieldName, $ensureFieldHasErrors = true)
     {
         if (isset($this->options['mapping'][$fieldName])) {
             $field = $this->findField($this->options['mapping'][$fieldName]);
@@ -379,7 +419,9 @@ class Form extends Element
             )
         ), $errorSpans);
 
-        self::assertNotEmpty($errorSpans, "Field $fieldName has no validation errors");
+        if ($ensureFieldHasErrors) {
+            self::assertNotEmpty($errorSpans, "Field $fieldName has no validation errors");
+        }
 
         return array_map(function (NodeElement $error) {
             return $error->getText();

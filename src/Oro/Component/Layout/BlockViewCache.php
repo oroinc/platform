@@ -47,14 +47,11 @@ class BlockViewCache implements BlockViewCacheInterface
     public function fetch(ContextInterface $context)
     {
         $hash = $context->getHash();
+        $value = $this->cache->fetch($hash);
 
-        if ($this->cache->contains($hash)) {
-            $cached = $this->cache->fetch($hash);
-
-            return $this->serializer->deserialize($cached, BlockView::class, JsonEncoder::FORMAT);
-        } else {
-            return null;
-        }
+        return false !== $value
+            ? $this->serializer->deserialize($value, BlockView::class, JsonEncoder::FORMAT)
+            : null;
     }
 
     /**

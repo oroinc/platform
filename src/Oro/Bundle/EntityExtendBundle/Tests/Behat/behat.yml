@@ -9,6 +9,8 @@ oro_behat_extension:
         - OroEntityExtendBundle::FeatureContext
         - OroFormBundle::FormContext
         - OroSecurityBundle::ACLContext
+        - OroConfigBundle::FeatureContext
+        - OroLocaleBundle::LocalizationContext
         - OroImportExportBundle::ImportExportContext:
             - '@oro_entity.entity_alias_resolver'
             - '@oro_importexport.processor.registry'
@@ -34,3 +36,10 @@ oro_behat_extension:
     Bidirectional:
       selector: 'select[data-name="field__bidirectional"]'
       class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity
+
+    EntityConfigForm:
+      selector: "form[name='oro_entity_config_type']"
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Option First: 'oro_entity_config_type[enum][enum_options][0][label]'

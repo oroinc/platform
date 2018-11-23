@@ -2,24 +2,27 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\From;
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Psr\Log\LoggerInterface;
-
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserManager;
-
 /**
  * Handle User forms
  */
 class UserHandler extends AbstractUserHandler
 {
+    public const INVITE_USER_TEMPLATE = 'invite_user';
+
     /** @var DelegatingEngine */
     protected $templating;
 
@@ -40,6 +43,9 @@ class UserHandler extends AbstractUserHandler
 
     /** @var ConfigManager */
     protected $userConfigManager;
+
+    /** @var TemplateEmailManager */
+    private $templateEmailManager;
 
     /**
      * @param FormInterface $form
@@ -71,6 +77,14 @@ class UserHandler extends AbstractUserHandler
         $this->flashBag = $flashBag;
         $this->translator = $translator;
         $this->logger = $logger;
+    }
+
+    /**
+     * @param TemplateEmailManager $templateEmailManager
+     */
+    public function setTemplateEmailManager(TemplateEmailManager $templateEmailManager)
+    {
+        $this->templateEmailManager = $templateEmailManager;
     }
 
     /**
@@ -176,6 +190,27 @@ class UserHandler extends AbstractUserHandler
         $senderEmail = $this->userConfigManager->get('oro_notification.email_notification_sender_email');
         $senderName = $this->userConfigManager->get('oro_notification.email_notification_sender_name');
 
+        if ($this->templateEmailManager) {
+            $this->templateEmailManager->sendTemplateEmail(
+                From::emailAddress($senderEmail, $senderName),
+                [$user],
+                new EmailTemplateCriteria(self::INVITE_USER_TEMPLATE, User::class),
+                ['user' => $user, 'password' => $plainPassword]
+            );
+        } else {
+            $this->sendEmail($senderEmail, $senderName, $user, $plainPassword);
+        }
+    }
+
+    /**
+     * @param string $senderEmail
+     * @param null|string $senderName
+     * @param User $user
+     * @param string $plainPassword
+     * @deprecated since 2.6, will be removed in 3.1
+     */
+    private function sendEmail(string $senderEmail, ?string $senderName, User $user, string $plainPassword)
+    {
         $message = \Swift_Message::newInstance()
             ->setSubject('Invite user')
             ->setFrom($senderEmail, $senderName)

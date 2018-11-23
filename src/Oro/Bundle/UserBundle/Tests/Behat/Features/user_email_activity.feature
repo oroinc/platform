@@ -1,5 +1,7 @@
 @ticket-BAP-10957
 @automatically-ticket-tagged
+@skip
+# unskip after BAP-16764 will resolved
 
 Feature: User email activity
   In order to have ability send email to user
@@ -16,7 +18,7 @@ Scenario: Send email
   And I go to System/User Management/Users
   And click view Audrey in grid
   And follow "More actions"
-  And press "Send email"
+  And click "Send email"
   And fill form with:
     | Subject  | Work for you                                                    |
     | To       | [Audrey, Pitt]                                                  |
@@ -25,7 +27,7 @@ Scenario: Send email
 # todo: Uncomment by resolve BAP-11089
 #  And add email attachments "email-attachment.jpg, email-attachment2.jpg, email-attachment3.jpg"
 #  And delete email-attachment2.jpg attachment
-  When press "Send"
+  When click "Send"
   Then I should see "The email was sent" flash message
   And should see "Work for you" email in activity list
 
@@ -44,7 +46,7 @@ Scenario: Response email
   Given I go to System/User Management/Users
   And click view Audrey in grid
   And I click "Reply" on "Work for you" in activity list
-  When I press "Send"
+  When I click "Send"
   Then email "Work for you" should have thread icon
   When I collapse "Work for you" in activity list
   Then email thread "Work for you" should have two emails
@@ -64,7 +66,7 @@ Scenario: Forward email
   Given shouldn't see "Fwd: Re: Work for you" email in activity list
   When I click "Forward" on "Work for you" in activity list
   And I fill in "To" with "Bruce"
-  And press "Send"
+  And click "Send"
   Then should see "Fwd: Re: Work for you" email in activity list
 
 Scenario: Delete contexts

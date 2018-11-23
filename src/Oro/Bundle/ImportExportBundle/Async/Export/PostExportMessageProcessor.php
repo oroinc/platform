@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
+use Oro\Component\MessageQueue\Transport\Exception\Exception;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -49,6 +50,11 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
      * @var ConfigManager
      */
     private $configManager;
+
+    /**
+     * @var int
+     */
+    private $recipientUserId;
 
     /**
      * @param ExportHandler $exportHandler
@@ -116,10 +122,10 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         }
 
         if ($fileName !== null) {
-            $summary = $this->importExportResultSummarizer
-                ->processSummaryExportResultForNotification($job, $fileName);
+            $summary = $this->importExportResultSummarizer->processSummaryExportResultForNotification($job, $fileName);
 
-            $this->sendNotification($body['email'], $summary);
+            $this->recipientUserId = $body['recipientUserId'] ?? null;
+            $this->sendEmailNotification($body['email'], $summary, $body['notificationTemplate'] ?? null);
 
             $this->logger->info('Sent notification email.');
         }
@@ -138,8 +144,22 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
     /**
      * @param string $toEmail
      * @param array $summary
+     *
+     * @throws Exception
      */
     protected function sendNotification($toEmail, array $summary)
+    {
+        $this->sendEmailNotification($toEmail, $summary);
+    }
+
+    /**
+     * @param string $toEmail
+     * @param array $summary
+     * @param string $notificationTemplate
+     *
+     * @throws Exception
+     */
+    protected function sendEmailNotification($toEmail, array $summary, $notificationTemplate = null)
     {
         $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
         $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
@@ -149,8 +169,12 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
             'toEmail' => $toEmail,
             'body' => $summary,
             'contentType' => 'text/html',
-            'template' => ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
+            'template' => $notificationTemplate ?? ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
         ];
+
+        if ($this->recipientUserId) {
+            $message['recipientUserId'] = $this->recipientUserId;
+        }
 
         $this->producer->send(
             NotificationTopics::SEND_NOTIFICATION_EMAIL,

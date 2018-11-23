@@ -150,7 +150,7 @@ class WorkflowAwareCacheRetrievingTest extends \PHPUnit_Framework_TestCase
             ->with(WorkflowDefinition::class)
             ->willReturn($repository);
 
-        $this->cache->expects($this->once())->method('contains')->with($cacheKey)->willReturn(false);
+        $this->cache->expects($this->once())->method('fetch')->with($cacheKey)->willReturn(false);
         $this->cache->expects($this->once())->method('save')->with($cacheKey, $classes);
     }
 
@@ -163,7 +163,6 @@ class WorkflowAwareCacheRetrievingTest extends \PHPUnit_Framework_TestCase
     {
         $this->doctrineHelper->expects($this->once())->method('getEntityClass')->willReturn(get_class($entity));
 
-        $this->cache->expects($this->once())->method('contains')->with($cacheKey)->willReturn(true);
         $this->cache->expects($this->once())->method('fetch')->with($cacheKey)->willReturn($classes);
     }
 }

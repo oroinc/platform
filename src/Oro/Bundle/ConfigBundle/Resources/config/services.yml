@@ -147,6 +147,7 @@ services:
             - '@validator'
 
     oro_config.cache.doctrine_metadata:
+        deprecated: The "%service_id%" service is never used and will be removed in 3.1
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'doctrine_metadata_config' ] ]

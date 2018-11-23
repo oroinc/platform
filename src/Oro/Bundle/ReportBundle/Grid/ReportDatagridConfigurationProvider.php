@@ -76,9 +76,8 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
     {
         $cacheKey = $this->getCacheKey($gridName);
 
-        if ($this->reportCacheManager->contains($cacheKey)) {
-            $config = $this->reportCacheManager->fetch($cacheKey);
-        } else {
+        $config = $this->reportCacheManager->fetch($cacheKey);
+        if (false === $config) {
             $config = $this->prepareConfiguration($gridName);
             $this->reportCacheManager->save($cacheKey, $config);
         }

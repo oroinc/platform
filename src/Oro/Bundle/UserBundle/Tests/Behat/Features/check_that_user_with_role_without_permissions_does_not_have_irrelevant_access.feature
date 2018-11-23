@@ -7,7 +7,7 @@ Feature: Check that user with role without permissions does not have irrelevant 
   Scenario: Creation of the Role without permissions
     Given I login as administrator
     And go to System/ User Management/ Roles
-    And I press "Create Role"
+    And I click "Create Role"
     And I fill form with:
       | Role | Bare Role |
     When I save and create new form
@@ -15,7 +15,7 @@ Feature: Check that user with role without permissions does not have irrelevant 
 
   Scenario: Create new User and assign only Role without permissions
     Given go to System/ User Management/ Users
-    And press "Create User"
+    And click "Create User"
     And I fill "User Form" with:
       | Username            | userName       |
       | Password            | Pa$$w0rd       |
@@ -36,7 +36,7 @@ Feature: Check that user with role without permissions does not have irrelevant 
     And I fill "Login Form" with:
       | Username | userName |
       | Password | Pa$$w0rd |
-    When I press "Log in"
+    When I click "Log in"
     Then I should be on Admin Dashboard page
 
   Scenario: Check that user without permissions does not see standard navigation menu item

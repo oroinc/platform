@@ -23,20 +23,19 @@ class QueryExpressionCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $visitorServiceDef = DependencyInjectionUtil::findDefinition(
+        $compositeExpressions = $this->getExpressions(
             $container,
-            self::QUERY_EXPRESSION_VISITOR_FACTORY_SERVICE_ID
+            self::COMPOSITE_EXPRESSION_TAG,
+            self::COMPOSITE_EXPRESSION_TYPE
         );
-
-        if (null === $visitorServiceDef) {
-            return;
-        }
-
-        // register expressions
-        $visitorServiceDef->setArguments([
-            $this->getExpressions($container, self::COMPOSITE_EXPRESSION_TAG, self::COMPOSITE_EXPRESSION_TYPE),
-            $this->getExpressions($container, self::COMPARISON_EXPRESSION_TAG, self::COMPARISON_EXPRESSION_OPERATOR)
-        ]);
+        $comparisonExpressions = $this->getExpressions(
+            $container,
+            self::COMPARISON_EXPRESSION_TAG,
+            self::COMPARISON_EXPRESSION_OPERATOR
+        );
+        $container->getDefinition(self::QUERY_EXPRESSION_VISITOR_FACTORY_SERVICE_ID)
+            ->replaceArgument(0, $compositeExpressions)
+            ->replaceArgument(1, $comparisonExpressions);
     }
 
     /**

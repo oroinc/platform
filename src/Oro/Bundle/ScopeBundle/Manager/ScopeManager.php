@@ -12,6 +12,8 @@ use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 /**
+ * Creates / finds scopes and scope criteria.
+ *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ScopeManager
@@ -378,7 +380,7 @@ class ScopeManager
     protected function getFields()
     {
         if ($this->fields === null) {
-            $this->fields = $this->getEntityFieldProvider()->getRelations(Scope::class);
+            $this->fields = $this->getEntityFieldProvider()->getRelations(Scope::class, false, true, false);
         }
 
         return $this->fields;

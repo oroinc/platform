@@ -2,14 +2,11 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
-use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Job\DuplicateJobException;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobStorage;
-use Oro\Component\MessageQueue\Job\Topics;
-use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
 
 /**
@@ -33,19 +30,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->messageProducer = $this->createMock(MessageProducer::class);
 
         $this->jobProcessor = new JobProcessor($this->jobStorage, $this->messageProducer);
-    }
-
-    /**
-     * @param array $message
-     */
-    private function assertCalculateRootJobStatusMessageSent(array $message)
-    {
-        $this->messageProducer->expects(self::once())
-            ->method('send')
-            ->with(
-                Topics::CALCULATE_ROOT_JOB_STATUS,
-                new Message($message, MessagePriority::HIGH)
-            );
     }
 
     public function testCreateRootJobShouldThrowIfOwnerIdIsEmpty()
@@ -261,8 +245,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->with(12345)
             ->willReturn($job);
 
-        $this->assertCalculateRootJobStatusMessageSent(['jobId' => 12345, 'calculateProgress' => true]);
-
         $result = $this->jobProcessor->findOrCreateChildJob('job-name', $job);
 
         self::assertSame($job, $result);
@@ -305,6 +287,9 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->jobProcessor->startChildJob($job);
     }
 
+    /**
+     * @return array
+     */
     public function getStatusThatCanRun()
     {
         return [
@@ -314,7 +299,10 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string $jobStatus
      * @dataProvider getStatusThatCanRun
+     *
+     * @param string $jobStatus
      */
     public function testStartJobShouldUpdateJobWithRunningStatusAndStartAtTime($jobStatus)
     {
@@ -330,8 +318,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('findJobById')
             ->with(12345)
             ->willReturn($job);
-
-        $this->assertCalculateRootJobStatusMessageSent(['jobId' => 12345]);
 
         $this->jobProcessor->startChildJob($job);
 
@@ -385,8 +371,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->with(12345)
             ->willReturn($job);
 
-        $this->assertCalculateRootJobStatusMessageSent(['jobId' => 12345, 'calculateProgress' => true]);
-
         $this->jobProcessor->successChildJob($job);
 
         self::assertEquals(Job::STATUS_SUCCESS, $job->getStatus());
@@ -438,8 +422,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('findJobById')
             ->with(12345)
             ->willReturn($job);
-
-        $this->assertCalculateRootJobStatusMessageSent(['jobId' => 12345, 'calculateProgress' => true]);
 
         $this->jobProcessor->failChildJob($job);
 
@@ -493,8 +475,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->with(12345)
             ->willReturn($job);
 
-        $this->assertCalculateRootJobStatusMessageSent(['jobId' => 12345, 'calculateProgress' => true]);
-
         $this->jobProcessor->cancelChildJob($job);
 
         self::assertEquals(Job::STATUS_CANCELLED, $job->getStatus());
@@ -537,8 +517,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('findJobById')
             ->with(1234)
             ->willReturn($childJob);
-
-        $this->assertCalculateRootJobStatusMessageSent(['jobId' => 1234, 'calculateProgress' => true]);
 
         $this->jobProcessor->interruptRootJob($rootJob, true);
 
@@ -642,8 +620,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->with(12345)
             ->willReturn($job);
 
-        $this->assertCalculateRootJobStatusMessageSent(['jobId' => 12345]);
-
         $this->jobProcessor->failAndRedeliveryChildJob($job);
 
         self::assertEquals(Job::STATUS_FAILED_REDELIVERED, $job->getStatus());
@@ -708,5 +684,71 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('findRootJobByOwnerIdAndJobName');
 
         return $jobConfigurationProvider;
+    }
+
+    /**
+     * @param Job|null $job
+     * @param bool $expectedResult
+     * @dataProvider getIsRootJobExistsAndNotStaleProvider
+     */
+    public function testIsRootJobExistsAndNotStale($job, $expectedResult)
+    {
+        $this->jobStorage
+            ->expects($this->once())
+            ->method('findRootJobByJobNameAndStatuses')
+            ->with('job-name', [])
+            ->willReturn($job);
+
+        static::assertEquals(
+            $expectedResult,
+            $this->jobProcessor->findNotStaleRootJobyJobNameAndStatuses('job-name', [])
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function getIsRootJobExistsAndNotStaleProvider()
+    {
+        $rootJob = new Job();
+        $rootJob->setId(1);
+        $rootJob->setChildJobs([]);
+
+        return [
+            'job not found' => [
+                'job' => null,
+                'expectedResult' => null
+            ],
+            'job not stale' => [
+                'job' => $rootJob,
+                'expectedResult' => $rootJob
+            ]
+        ];
+    }
+
+    public function testIsRootJobExistsAndNotStaleIfJobStale()
+    {
+        $rootJob = new Job();
+        $rootJob->setId(1);
+        $rootJob->setChildJobs([]);
+
+        $this->jobStorage
+            ->expects($this->once())
+            ->method('findRootJobByJobNameAndStatuses')
+            ->willReturn($rootJob);
+        $this->jobStorage
+            ->expects($this->once())
+            ->method('saveJob');
+
+        /** @var JobConfigurationProviderInterface|\PHPUnit_Framework_MockObject_MockObject $jobConfigurationProvider */
+        $jobConfigurationProvider = $this->createMock(JobConfigurationProviderInterface::class);
+        $jobConfigurationProvider
+            ->expects($this->any())
+            ->method('getTimeBeforeStaleForJobName')
+            ->will($this->returnValue(0));
+
+        $this->jobProcessor->setJobConfigurationProvider($jobConfigurationProvider);
+
+        static::assertNull($this->jobProcessor->findNotStaleRootJobyJobNameAndStatuses('job-name', []));
     }
 }

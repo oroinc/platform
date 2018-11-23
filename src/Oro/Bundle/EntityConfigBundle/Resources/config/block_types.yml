@@ -3,6 +3,8 @@ services:
         class: 'Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeTextType'
         arguments:
             - '@oro_entity_config.manager.attribute_manager'
+        calls:
+            - [setAttributeConfigurationProvider, ['@oro_entity_config.provider.attribute_configuration']]
         tags:
              - { name: layout.block_type, alias: attribute_text }
 

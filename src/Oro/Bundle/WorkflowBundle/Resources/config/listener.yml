@@ -1,4 +1,9 @@
 services:
+    oro_workflow.listener.field_length:
+        class: Oro\Bundle\WorkflowBundle\EventListener\FieldLengthListener
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata, connection: default }
+
     oro_workflow.listener.process_data_serialize:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\ProcessDataSerializeListener'
         arguments:

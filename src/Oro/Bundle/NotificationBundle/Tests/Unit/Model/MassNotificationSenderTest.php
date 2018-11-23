@@ -2,19 +2,28 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Model;
 
+use Doctrine\Common\Proxy\Proxy;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
+use Oro\Bundle\NotificationBundle\DependencyInjection\Configuration;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
-use Oro\Bundle\NotificationBundle\Model\MassNotification;
+use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
+use Oro\Bundle\NotificationBundle\Model\TemplateMassNotification;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     const TEST_SENDER_EMAIL = 'admin@example.com';
     const TEST_SENDER_NAME  = 'sender name';
     const TEMPLATE_NAME     = 'test template';
@@ -86,12 +95,8 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
 
     public function testSendToActiveUsersWithEmptySender()
     {
-        $body = "Test Body";
-        $subject = "Test Subject";
-        $userRecipients = [
-            ['name' => 'test1', 'email' => 'test1@test.com'],
-            ['name' => 'test2', 'email' => 'test2@test.com']
-        ];
+        $body = 'Test Body';
+        $subject = 'Test Subject';
 
         $this->cm->expects($this->any())
             ->method('get')
@@ -102,53 +107,60 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
                 ['oro_notification.mass_notification_template', false, false, null, self::TEMPLATE_NAME]
             ]));
 
-        $this->entityManager->expects($this->exactly(2))
+        $this->entityManager->expects($this->exactly(3))
             ->method('getRepository')
-            ->withConsecutive(['OroUserBundle:User'], ['OroEmailBundle:EmailTemplate'])
-            ->willReturnOnConsecutiveCalls($this->userRepository, $this->templateRepository);
+            ->withConsecutive(
+                ['OroUserBundle:User'],
+                ['OroEmailBundle:EmailTemplate'],
+                ['OroEmailBundle:EmailTemplate']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->userRepository,
+                $this->templateRepository,
+                $this->templateRepository
+            );
 
-        $template = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
-        $template->expects($this->once())->method('getType')->willReturn('html');
-        $template->expects($this->once())->method('getContent')->willReturn('test content');
-        $template->expects($this->once())->method('getSubject')->willReturn('subject');
+        $template = $this->getEntity(EmailTemplate::class, [
+            'type' => 'html',
+            'content' => 'test content',
+            'subject' => 'subject',
+        ]);
 
         $this->templateRepository->expects($this->once())
             ->method('findByName')
             ->with(self::TEMPLATE_NAME)
             ->willReturn($template);
 
-        $this->dqlNameFormatter->expects($this->once())
-            ->method('getFormattedNameDQL')
-            ->willReturn('ConcatExpression');
-
-        $query = $this->createMock('Doctrine\ORM\AbstractQuery');
-        $query->expects($this->any())
-            ->method('getResult')
-            ->willReturn($userRecipients);
-
-        $queryBuilder = $this->createMock('Doctrine\ORM\QueryBuilder');
-        $queryBuilder->expects($this->once())
-            ->method('andWhere')
-            ->with('u.enabled = :enabled')
-            ->willReturnSelf();
-        $queryBuilder->expects($this->once())
-            ->method('setParameter')
-            ->with('enabled', true);
-        $queryBuilder->expects($this->once())
-            ->method('getQuery')
-            ->willReturn($query);
+        $recipient1 = ['id' => 333, 'email' => 'test1@test.com'];
+        $recipient2 = ['id' => 777, 'email' => 'test2@test.com'];
+        $recipient1Proxy = $this->createMock(Proxy::class);
+        $recipient2Proxy = $this->createMock(Proxy::class);
+        $this->entityManager->expects($this->exactly(2))
+            ->method('getReference')
+            ->withConsecutive(
+                [User::class, $recipient1['id']],
+                [User::class, $recipient2['id']]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $recipient1Proxy,
+                $recipient2Proxy
+            );
         $this->userRepository->expects($this->once())
-            ->method('getPrimaryEmailsQb')
-            ->with('ConcatExpression')
-            ->willReturn($queryBuilder);
+            ->method('findEnabledUserEmails')
+            ->willReturn([$recipient1, $recipient2]);
 
         $this->massNotificationParams = [
             'sender_name'      => self::TEST_SENDER_NAME,
             'sender_email'     => self::TEST_SENDER_EMAIL,
-            'recipients'       => ['test1@test.com', 'test2@test.com'],
+            'recipients'       => [
+                new EmailAddressWithContext($recipient1['email'], $recipient1Proxy),
+                new EmailAddressWithContext($recipient2['email'], $recipient2Proxy),
+            ],
+            'recipient_emails' => [$recipient1['email'], $recipient2['email']],
             'template_type'    => 'html',
             'template_content' => 'test content',
-            'template_subject' => $subject
+            'template_subject' => $subject,
+            'template_criteria' => new EmailTemplateCriteria(self::TEMPLATE_NAME)
         ];
         $this->manager->expects($this->once())
             ->method('process')
@@ -162,11 +174,15 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $this->entityPool->expects($this->once())
             ->method('persistAndFlush')
             ->with($this->entityManager);
+        $this->templateRepository->expects($this->once())
+            ->method('isExist')
+            ->with(new EmailTemplateCriteria(self::TEMPLATE_NAME))
+            ->willReturn(true);
 
         self::assertEquals(2, $this->sender->send($body, $subject));
     }
 
-    public function testSendToConfigEmailsWithEmtpyTemplate()
+    public function testSendToConfigEmailsWithEmptyTemplate()
     {
         $body = "Test Body";
         $subject = null;
@@ -180,7 +196,7 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
                 ['oro_notification.mass_notification_recipients', false, false, null, $configRecipients],
                 ['oro_notification.mass_notification_template', false, false, null, self::TEMPLATE_NAME]
             ]));
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects($this->exactly(2))
             ->method('getRepository')
             ->with('OroEmailBundle:EmailTemplate')
             ->will($this->returnValue($this->templateRepository));
@@ -189,13 +205,19 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEMPLATE_NAME)
             ->willReturn(null);
 
+        $recipientEmails = explode(';', $configRecipients);
         $this->massNotificationParams = [
             'sender_name'      => $senderName,
             'sender_email'     => $senderEmail,
-            'recipients'       => explode(';', $configRecipients),
+            'recipients'       => [
+                new EmailAddressWithContext(reset($recipientEmails)),
+                new EmailAddressWithContext(end($recipientEmails)),
+            ],
+            'recipient_emails'  => $recipientEmails,
             'template_type'    => 'txt',
             'template_content' => sprintf("{{ %s }}", MassNotificationSender::MAINTENANCE_VARIABLE),
-            'template_subject' => $subject
+            'template_subject' => $subject,
+            'template_criteria' => new EmailTemplateCriteria(Configuration::DEFAULT_MASS_NOTIFICATION_TEMPLATE),
         ];
 
         $this->manager->expects($this->once())
@@ -206,6 +228,10 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
                 null,
                 [MassNotificationSender::MAINTENANCE_VARIABLE => $body]
             );
+        $this->templateRepository->expects($this->once())
+            ->method('isExist')
+            ->with(new EmailTemplateCriteria(self::TEMPLATE_NAME))
+            ->willReturn(false);
 
         self::assertEquals(2, $this->sender->send($body, $subject, $senderEmail, $senderName));
     }
@@ -218,14 +244,16 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
     {
         $params = $this->massNotificationParams;
 
-        /** @var MassNotification $massNotification */
+        /** @var TemplateMassNotification $massNotification */
         $massNotification = current($massNotifications);
         self::assertEquals($params['sender_name'], $massNotification->getSenderName());
         self::assertEquals($params['sender_email'], $massNotification->getSenderEmail());
-        self::assertEquals($params['recipients'], $massNotification->getRecipientEmails());
+        self::assertEquals($params['template_criteria'], $massNotification->getTemplateCriteria());
+        self::assertEquals($params['recipients'], $massNotification->getRecipients());
+        self::assertEquals($params['recipient_emails'], $massNotification->getRecipientEmails());
 
         $template = $massNotification->getTemplate();
-        self::assertTrue($template instanceof EmailTemplateInterface);
+        self::assertInstanceOf(EmailTemplateInterface::class, $template);
         self::assertEquals($params['template_type'], $template->getType());
         self::assertEquals($params['template_content'], $template->getContent());
         self::assertEquals($params['template_subject'], $template->getSubject());

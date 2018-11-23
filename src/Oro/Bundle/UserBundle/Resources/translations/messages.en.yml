@@ -379,6 +379,7 @@ oro:
             groups:
                 user_settings.title: User Settings
                 password_complexity_rules.title: Password restrictions
+                email_settings.title: Email Settings
             fields:
                 password_min_length.label: Minimal password length
                 password_numbers.label: Require a number
@@ -389,6 +390,9 @@ oro:
                     tooltip: >
                         Special chars: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space
                 send_password_in_invitation_email.label: 'Send plain text password in invitation emails'
+                case_insensitive_email_addresses_enabled:
+                    label: 'Case-Insensitive Email Addresses'
+                    tooltip: 'If this option is enabled, the letter case will be ignored when comparing email addresses. For example, john.doe@example.com and John.Doe@example.com will be considered equal.'
         mass_actions:
             enable_users:
                 success_message: '%count% user(s) were enabled'

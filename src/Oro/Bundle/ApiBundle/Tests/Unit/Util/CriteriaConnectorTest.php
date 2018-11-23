@@ -2,16 +2,24 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
+use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
+use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AndCompositeExpression;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EqComparisonExpression;
+use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NeqComparisonExpression;
+use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NotCompositeExpression;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\OrCompositeExpression;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
 use Oro\Bundle\ApiBundle\Util\CriteriaNormalizer;
 use Oro\Bundle\ApiBundle\Util\CriteriaPlaceholdersResolver;
+use Oro\Bundle\ApiBundle\Util\OptimizeJoinsDecisionMaker;
+use Oro\Bundle\ApiBundle\Util\OptimizeJoinsFieldVisitorFactory;
+use Oro\Bundle\ApiBundle\Util\RequireJoinsDecisionMaker;
+use Oro\Bundle\ApiBundle\Util\RequireJoinsFieldVisitorFactory;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class CriteriaConnectorTest extends OrmRelatedTestCase
@@ -33,11 +41,24 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $entityClassResolver = new EntityClassResolver($this->doctrine);
         $this->criteria = new Criteria($entityClassResolver);
         $this->expressionVisitorFactory = new QueryExpressionVisitorFactory(
-            ['OR' => new OrCompositeExpression()],
-            ['=' => new EqComparisonExpression()]
+            [
+                'NOT' => new NotCompositeExpression(),
+                'AND' => new AndCompositeExpression(),
+                'OR'  => new OrCompositeExpression()
+            ],
+            [
+                '='  => new EqComparisonExpression(),
+                '<>' => new NeqComparisonExpression()
+            ]
         );
         $criteriaNormalizer = new CriteriaNormalizer();
         $criteriaNormalizer->setDoctrineHelper($this->doctrineHelper);
+        $criteriaNormalizer->setRequireJoinsFieldVisitorFactory(
+            new RequireJoinsFieldVisitorFactory(new RequireJoinsDecisionMaker())
+        );
+        $criteriaNormalizer->setOptimizeJoinsFieldVisitorFactory(
+            new OptimizeJoinsFieldVisitorFactory(new OptimizeJoinsDecisionMaker())
+        );
         $this->criteriaConnector = new CriteriaConnector(
             $criteriaNormalizer,
             new CriteriaPlaceholdersResolver(),
@@ -57,7 +78,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     }
 
     /**
-     * @param $expectedDql
+     * @param string $expectedDql
      */
     protected function assertQuery($expectedDql)
     {
@@ -109,6 +130,18 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         return $dql;
     }
 
+    /**
+     * @param string $field
+     * @param string $operator
+     * @param mixed  $value
+     *
+     * @return Comparison
+     */
+    private static function comparison($field, $operator, $value)
+    {
+        return new Comparison($field, $operator, $value);
+    }
+
     public function testOrderBy()
     {
         $this->criteria->orderBy(['id' => Criteria::ASC, 'category.name' => Criteria::ASC]);
@@ -132,7 +165,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     public function testWhere()
     {
         $this->criteria->andWhere(
-            $this->criteria->expr()->orX(
+            $this->criteria->expr()->andX(
                 $this->criteria->expr()->eq('category.name', 'test_category'),
                 $this->criteria->expr()->eq('groups.name', 'test_group')
             )
@@ -142,14 +175,14 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             'SELECT e FROM Test:User e'
             . ' INNER JOIN e.category category'
             . ' INNER JOIN e.groups groups'
-            . ' WHERE category.name = :category_name OR groups.name = :groups_name'
+            . ' WHERE category.name = :category_name AND groups.name = :groups_name'
         );
     }
 
     public function testWhereByAssociation()
     {
         $this->criteria->andWhere(
-            $this->criteria::expr()->orX(
+            $this->criteria::expr()->andX(
                 $this->criteria::expr()->eq('category', 'test_category'),
                 $this->criteria::expr()->eq('groups', 'test_group')
             )
@@ -159,7 +192,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             'SELECT e FROM Test:User e'
             . ' INNER JOIN e.category category'
             . ' INNER JOIN e.groups groups'
-            . ' WHERE e.category = :category OR e.groups = :groups'
+            . ' WHERE e.category = :category AND e.groups = :groups'
         );
     }
 
@@ -289,7 +322,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $this->criteria->addLeftJoin('products', '{root}.products');
         $this->criteria->addLeftJoin('products.category', '{products}.category');
         $this->criteria->andWhere(
-            $this->criteria->expr()->orX(
+            $this->criteria->expr()->andX(
                 $this->criteria->expr()->eq('{root}.name', 'test_user'),
                 $this->criteria->expr()->eq('{category}.name', 'test_category'),
                 $this->criteria->expr()->eq('{products.category}.name', 'test_category')
@@ -301,7 +334,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             . ' LEFT JOIN e.category alias1'
             . ' LEFT JOIN e.products alias2'
             . ' LEFT JOIN alias2.category alias3'
-            . ' WHERE e.name = :e_name OR alias1.name = :alias1_name OR alias3.name = :alias3_name'
+            . ' WHERE e.name = :e_name AND alias1.name = :alias1_name AND alias3.name = :alias3_name'
         );
     }
 

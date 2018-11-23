@@ -7,13 +7,16 @@ use Knp\Menu\ItemInterface;
 
 use Psr\Log\LoggerInterface;
 
+use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
 
+/**
+ * Disallows menu items that related to routes disabled by ACL.
+ */
 class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 {
     /**#@+
@@ -86,13 +89,12 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 
         $options['extras']['isAllowed'] = self::DEFAULT_ACL_POLICY;
 
-        if ($this->getOptionValue($options, ['check_access']) === false) {
+        if ($this->getOption($options, 'check_access') === false) {
             return $options;
         }
 
         if ($this->skipAccessCheck($options)) {
-            $isAllowed = (bool) $this->getOptionValue($options, ['extras', 'show_non_authorized'], false);
-            $options['extras']['isAllowed'] = $isAllowed;
+            $options['extras']['isAllowed'] = (bool)$this->getExtraOption($options, 'show_non_authorized', false);
 
             return $options;
         }
@@ -101,15 +103,17 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             return $options;
         }
 
-        if (array_key_exists(self::ACL_RESOURCE_ID_KEY, $options['extras'])) {
-            $options['extras']['isAllowed'] = $this->isGranted($options);
+        $aclResourceId = $this->getExtraOption($options, self::ACL_RESOURCE_ID_KEY);
+        if ($aclResourceId) {
+            $options['extras']['isAllowed'] = $this->isGranted($aclResourceId);
 
             return $options;
         }
 
-        $isAllowed = $options['extras']['isAllowed'];
-        $options['extras']['isAllowed'] = $this->getOptionValue($options, ['extras', self::ACL_POLICY_KEY], $isAllowed);
-        $options['extras']['isAllowed'] = $this->isRouteAvailable($options);
+        $options['extras']['isAllowed'] = $this->isRouteAvailable(
+            $options,
+            $this->getExtraOption($options, self::ACL_POLICY_KEY, $options['extras']['isAllowed'])
+        );
 
         return $options;
     }
@@ -120,7 +124,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     protected function alreadyDenied(array $options)
     {
-        return $this->getOptionValue($options, ['extras', 'isAllowed']) === false;
+        return $this->getExtraOption($options, 'isAllowed') === false;
     }
 
     /**
@@ -130,18 +134,18 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     private function skipAccessCheck(array $options)
     {
-        return !$this->getOptionValue($options, ['check_access_not_logged_in'])
-        && !$this->tokenAccessor->hasUser();
+        return
+            !$this->getOption($options, 'check_access_not_logged_in')
+            && !$this->tokenAccessor->hasUser();
     }
 
     /**
-     * @param array $options
+     * @param string $aclResourceId
      *
      * @return bool
      */
-    private function isGranted(array $options)
+    private function isGranted($aclResourceId)
     {
-        $aclResourceId = $this->getOptionValue($options, ['extras', self::ACL_RESOURCE_ID_KEY]);
         if (array_key_exists($aclResourceId, $this->existingACLChecks)) {
             return $this->existingACLChecks[$aclResourceId];
         }
@@ -154,109 +158,125 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 
     /**
      * @param array $options
+     * @param bool  $defaultValue
      *
      * @return bool
      */
-    private function isRouteAvailable(array $options)
+    private function isRouteAvailable(array $options, $defaultValue)
     {
-        $routeInfo = $this->getRouteInfo($options);
-        if (!$routeInfo) {
-            return $this->getOptionValue($options, ['extras', 'isAllowed']);
+        $controller = $this->getController($options);
+        if (!$controller) {
+            return $defaultValue;
         }
 
-        if (array_key_exists($routeInfo['key'], $this->existingACLChecks)) {
-            return $this->existingACLChecks[$routeInfo['key']];
+        if (array_key_exists($controller, $this->existingACLChecks)) {
+            return $this->existingACLChecks[$controller];
         }
 
-        $isAllowed = $this->classAuthorizationChecker
-            ->isClassMethodGranted($routeInfo['controller'], $routeInfo['action']);
-        $this->existingACLChecks[$routeInfo['key']] = $isAllowed;
+        $parts = explode(self::CONTROLLER_ACTION_DELIMITER, $controller);
+        if (count($parts) !== 2) {
+            return $defaultValue;
+        }
+
+        $isAllowed = $this->classAuthorizationChecker->isClassMethodGranted($parts[0], $parts[1]);
+        $this->existingACLChecks[$controller] = $isAllowed;
 
         return $isAllowed;
     }
 
     /**
-     * Get route information based on MenuItem options
-     *
      * @param array $options
      *
-     * @return array
+     * @return string|null
      */
-    private function getRouteInfo(array $options)
+    private function getController(array $options)
     {
-        $key = null;
-        if (array_key_exists('route', $options)) {
-            $route = $this->getRouteDefaults($options['route']);
-
-            if (array_key_exists(self::ROUTE_CONTROLLER_KEY, $route)) {
-                $key = $route[self::ROUTE_CONTROLLER_KEY];
-            }
-        } elseif (array_key_exists('uri', $options)) {
-            try {
-                $routeInfo = $this->router->match($options['uri']);
-
-                $key = $routeInfo[self::ROUTE_CONTROLLER_KEY];
-            } catch (ResourceNotFoundException $e) {
-                $this->logger->debug($e->getMessage(), ['pathinfo' => $options['uri']]);
-            }
+        if (!empty($options['route'])) {
+            return $this->getControllerByRouteName($options['route']);
+        }
+        if (!empty($options['uri'])) {
+            return $this->getControllerByUri($options['uri']);
         }
 
-        if (!$key) {
-            return [];
-        }
-
-        $info = explode(self::CONTROLLER_ACTION_DELIMITER, $key);
-        if (count($info) === 2) {
-            return [
-                'controller' => $info[0],
-                'action' => $info[1],
-                'key' => $key
-            ];
-        }
-
-        return [];
+        return null;
     }
 
     /**
      * @param string $routeName
      *
-     * @return array
+     * @return string|null
      */
-    private function getRouteDefaults($routeName)
+    private function getControllerByRouteName($routeName)
     {
         if (!$this->declaredRoutes) {
             $generator = $this->router->getGenerator();
-            $reflectionClass = new \ReflectionClass($generator);
 
+            $reflectionClass = new \ReflectionClass($generator);
             $property = $reflectionClass->getProperty('declaredRoutes');
             $property->setAccessible(true);
 
-            $declaredRoutes = $property->getValue($generator);
-
-            $this->declaredRoutes = $declaredRoutes;
+            $this->declaredRoutes = $property->getValue($generator);
         }
 
-        if (array_key_exists($routeName, $this->declaredRoutes) && isset($this->declaredRoutes[$routeName][1])) {
-            return $this->declaredRoutes[$routeName][1];
+        if (!empty($this->declaredRoutes[$routeName][1][self::ROUTE_CONTROLLER_KEY])) {
+            return $this->declaredRoutes[$routeName][1][self::ROUTE_CONTROLLER_KEY];
         }
 
-        return [];
+        return null;
     }
 
     /**
-     * @param array $options
-     * @param array $keys
-     * @param mixed $default
+     * @param string $uri
+     *
+     * @return string|null
+     */
+    private function getControllerByUri($uri)
+    {
+        if ('#' !== $uri) {
+            try {
+                $route = $this->router->match($uri);
+
+                return $route[self::ROUTE_CONTROLLER_KEY];
+            } catch (RoutingException $e) {
+                $this->logger->debug($e->getMessage(), ['pathinfo' => $uri]);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array  $options
+     * @param string $key
+     * @param mixed  $default
      *
      * @return mixed
      */
-    private function getOptionValue(array $options, array $keys, $default = null)
+    private function getOption(array $options, $key, $default = null)
     {
-        $key = array_shift($keys);
-        if (!array_key_exists($key, $options)) {
-            return $default;
+        if (array_key_exists($key, $options)) {
+            return $options[$key];
         }
 
-        return $keys ? $this->getOptionValue($options[$key], $keys, $default) : $options[$key];
+        return $default;
+    }
+
+    /**
+     * @param array  $options
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    private function getExtraOption(array $options, $key, $default = null)
+    {
+        if (array_key_exists('extras', $options)) {
+            $extras = $options['extras'];
+            if (array_key_exists($key, $extras)) {
+                return $extras[$key];
+            }
+        }
+
+        return $default;
     }
 }

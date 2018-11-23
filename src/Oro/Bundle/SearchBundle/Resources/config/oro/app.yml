@@ -9,7 +9,7 @@ doctrine:
                 user:     %database_user%
                 password: %database_password%
                 options:  %database_driver_options%
-                charset:  UTF8
+                charset:  %database_charset%
     orm:
         entity_managers:
             search:
@@ -21,6 +21,10 @@ doctrine:
                 metadata_cache_driver:
                     type: service
                     id:   oro_search.cache.doctrine_metadata
+                query_cache_driver:
+                    type: service
+                    id:   oro_search.cache.doctrine_query
+
 fos_rest:
     exception:
         messages:

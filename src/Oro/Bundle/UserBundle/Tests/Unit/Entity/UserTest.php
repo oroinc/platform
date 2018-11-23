@@ -4,7 +4,6 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
-
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -77,13 +76,6 @@ class UserTest extends AbstractUserTest
         $user->removeGroup($group);
 
         $this->assertFalse($user->hasRole($role));
-    }
-
-    public function testCallbacks()
-    {
-        $user = $this->getUser();
-        $user->beforeSave();
-        $this->assertInstanceOf('\DateTime', $user->getCreatedAt());
     }
 
     public function testStatuses()
@@ -174,6 +166,15 @@ class UserTest extends AbstractUserTest
             ['updatedAt', new \DateTime()],
             ['salt', md5('user')],
         ];
+    }
+
+    public function testBeforeSave()
+    {
+        $user = $this->getUser();
+        $user->beforeSave();
+        $this->assertInstanceOf(\DateTime::class, $user->getCreatedAt());
+        $this->assertInstanceOf(\DateTime::class, $user->getUpdatedAt());
+        $this->assertEquals(0, $user->getLoginCount());
     }
 
     public function testPreUpdateUnChanged()
@@ -429,5 +430,13 @@ class UserTest extends AbstractUserTest
         $result = $user->getOrganizations(true);
         $this->assertCount(1, $result);
         $this->assertSame($result->first(), $organization);
+    }
+
+    public function testSetEmailGetEmailLowercase()
+    {
+        $user = $this->getUser();
+        $user->setEmail('John.Doe@example.org');
+
+        $this->assertEquals('john.doe@example.org', $user->getEmailLowercase());
     }
 }

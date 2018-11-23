@@ -7,6 +7,9 @@ filters:
         requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
         type: 'integer or array or range'
         operators: '=,!='
+    'filter[staff]':
+        requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
+        type: 'integer or array or range'
     'fields[businessunits]':
         requirement: '.+'
     'include':

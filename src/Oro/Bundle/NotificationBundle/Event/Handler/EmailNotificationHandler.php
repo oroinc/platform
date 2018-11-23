@@ -59,11 +59,12 @@ class EmailNotificationHandler implements EventHandlerInterface
      */
     protected function getEmailNotificationAdapter(NotificationEvent $event, EmailNotification $notification)
     {
-        return new EmailNotificationAdapter(
+        return new TemplateEmailNotificationAdapter(
             $event->getEntity(),
             $notification,
             $this->em,
-            $this->propertyAccessor
+            $this->propertyAccessor,
+            $event->getDispatcher()
         );
     }
 }

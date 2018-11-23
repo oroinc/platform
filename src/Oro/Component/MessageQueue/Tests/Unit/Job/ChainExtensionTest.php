@@ -2,6 +2,7 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Oro\Component\MessageQueue\Job\AbstractExtension;
 use Oro\Component\MessageQueue\Job\ChainExtension;
 use Oro\Component\MessageQueue\Job\ExtensionInterface;
 use Oro\Component\MessageQueue\Job\Job;
@@ -84,5 +85,45 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($job, true);
 
         $this->chainExtension->onPostCreateDelayed($job, true);
+    }
+
+    public function testOnCancel()
+    {
+        $job = new Job();
+
+        $supportedExtension = $this->createMock(AbstractExtension::class);
+        $unsupportedExtension = $this->getMockBuilder(\stdClass::class)
+            ->setMethods(['onCancel'])
+            ->getMock();
+
+        $supportedExtension->expects($this->once())
+            ->method('onCancel')
+            ->with($job);
+
+        $unsupportedExtension->expects($this->never())
+            ->method('onCancel');
+
+        $chainExtension = new ChainExtension([$supportedExtension, $unsupportedExtension]);
+        $chainExtension->onCancel($job);
+    }
+
+    public function testOnError()
+    {
+        $job = new Job();
+
+        $supportedExtension = $this->createMock(AbstractExtension::class);
+        $unsupportedExtension = $this->getMockBuilder(\stdClass::class)
+            ->setMethods(['onError'])
+            ->getMock();
+
+        $supportedExtension->expects($this->once())
+            ->method('onError')
+            ->with($job);
+
+        $unsupportedExtension->expects($this->never())
+            ->method('onError');
+
+        $chainExtension = new ChainExtension([$supportedExtension, $unsupportedExtension]);
+        $chainExtension->onError($job);
     }
 }

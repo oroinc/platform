@@ -15,6 +15,9 @@ use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
 
+/**
+ * Class that provides possibility to collect and receive metadata for classes and their fields by security type
+ */
 class EntitySecurityMetadataProvider
 {
     const ACL_SECURITY_TYPE = 'ACL';
@@ -103,6 +106,7 @@ class EntitySecurityMetadataProvider
     public function getEntities($securityType = self::ACL_SECURITY_TYPE)
     {
         $this->ensureMetadataLoaded($securityType);
+        $this->translateMetadata($this->localCache[$securityType]);
 
         return array_values($this->localCache[$securityType]);
     }
@@ -163,6 +167,7 @@ class EntitySecurityMetadataProvider
         if ($result === true) {
             return new EntitySecurityMetadata();
         }
+        $this->translateMetadata([$result]);
 
         return $result;
     }
@@ -208,14 +213,7 @@ class EntitySecurityMetadataProvider
                 )
             ) {
                 $label = $this->entityConfigProvider->getConfig($className)->get('label');
-                if ($label) {
-                    $label = $this->translator->trans($label);
-                }
-
                 $description = $securityConfig->get('description');
-                if ($description) {
-                    $description = $this->translator->trans($description);
-                }
                 $permissions = $this->getPermissionsList($securityConfig);
 
                 $data[$className] = new EntitySecurityMetadata(
@@ -266,7 +264,7 @@ class EntitySecurityMetadataProvider
 
                 $fields[$fieldName] = new FieldSecurityMetadata(
                     $fieldName,
-                    $this->translator->trans($this->getFieldLabel($classMetadata, $fieldName)),
+                    $this->getFieldLabel($classMetadata, $fieldName),
                     $permissions
                 );
             }
@@ -274,10 +272,6 @@ class EntitySecurityMetadataProvider
             $event = new LoadFieldsMetadata($className, $fields);
             $this->eventDispatcher->dispatch(LoadFieldsMetadata::NAME, $event);
             $fields = $event->getFields();
-
-            uasort($fields, function (FieldSecurityMetadata $a, FieldSecurityMetadata $b) {
-                return strcmp($a->getLabel(), $b->getLabel());
-            });
         }
 
         return $fields;
@@ -326,5 +320,42 @@ class EntitySecurityMetadataProvider
         }
 
         return $permissions;
+    }
+
+    /**
+     * @param array|EntitySecurityMetadata[] $classMetadataArray
+     */
+    protected function translateMetadata(array $classMetadataArray)
+    {
+        foreach ($classMetadataArray as $classMetadata) {
+            if ($classMetadata->isTranslated()) {
+                continue;
+            }
+
+            if ($classMetadata->getLabel()) {
+                $classMetadata->setLabel($this->translator->trans($classMetadata->getLabel()));
+            }
+            if ($classMetadata->getDescription()) {
+                $classMetadata->setDescription($this->translator->trans($classMetadata->getDescription()));
+            }
+
+            $fieldMetadataArray = $classMetadata->getFields();
+            if (!$fieldMetadataArray) {
+                continue;
+            }
+
+            foreach ($fieldMetadataArray as $fieldMetadata) {
+                if (!$fieldMetadata->getLabel()) {
+                    continue;
+                }
+                $fieldMetadata->setLabel($this->translator->trans($fieldMetadata->getLabel()));
+            }
+
+            uasort($fieldMetadataArray, function (FieldSecurityMetadata $a, FieldSecurityMetadata $b) {
+                return strcmp($a->getLabel(), $b->getLabel());
+            });
+            $classMetadata->setFields($fieldMetadataArray);
+            $classMetadata->setTranslated(true);
+        }
     }
 }

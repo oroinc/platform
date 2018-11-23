@@ -10,7 +10,6 @@ use Oro\Bundle\NotificationBundle\Async\Topics as NotifcationTopics;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Util\JSON;
 
 class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
 {
@@ -147,6 +146,7 @@ class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
             'fromName' => $this->configManager->get('oro_notification.email_notification_sender_name'),
             'toEmail' => $user->getEmail(),
             'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_ERROR,
+            'recipientUserId' => $user->getId(),
             'body' => [
                 'originFileName' => $body['originFileName'],
                 'error' =>  'The import file could not be imported due to a fatal error. ' .

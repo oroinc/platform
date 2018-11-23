@@ -52,6 +52,11 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     private $doctrine;
 
     /**
+     * @var int
+     */
+    private $recipientUserId;
+
+    /**
      * @param MessageProducerInterface $producer
      * @param LoggerInterface $logger
      * @param JobStorage $jobStorage
@@ -96,6 +101,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
             return self::REJECT;
         }
 
+        $this->recipientUserId = null;
         if (! isset($body['notifyEmail']) || ! $body['notifyEmail']) {
             $user = $this->doctrine->getRepository(User::class)->find($body['userId']);
             if (! $user instanceof User) {
@@ -105,6 +111,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
 
                 return self::REJECT;
             }
+            $this->recipientUserId = $user->getId();
             $notifyEmail = $user->getEmail();
         } else {
             $notifyEmail = $body['notifyEmail'];
@@ -147,6 +154,10 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
             'contentType' => 'text/html',
             'template' => $template,
         ];
+
+        if ($this->recipientUserId) {
+            $message['recipientUserId'] = $this->recipientUserId;
+        }
 
         $this->producer->send(
             NotificationTopics::SEND_NOTIFICATION_EMAIL,

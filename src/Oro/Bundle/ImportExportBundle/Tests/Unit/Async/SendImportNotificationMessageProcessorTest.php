@@ -199,6 +199,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
                     'toEmail' => $user->getEmail(),
                     'body' => ['data' => 'summary import information'],
                     'contentType' => 'text/html',
+                    'recipientUserId' => 1,
                     'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT,
                 ])
             );

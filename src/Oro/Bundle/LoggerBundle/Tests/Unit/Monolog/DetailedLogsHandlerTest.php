@@ -62,12 +62,23 @@ class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
     {
         /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cacheProvider */
         $cacheProvider = $this->getMockBuilder(CacheProvider::class)->getMock();
+
+        $cacheProvider->expects($this->once())
+            ->method('fetch')
+            ->with(Configuration::LOGS_LEVEL_KEY)
+            ->willReturn(false);
+
         $this->container
             ->expects($this->once())
             ->method('get')
             ->willReturnMap([
                 ['oro_logger.cache', 1, $cacheProvider],
             ]);
+
+        $cacheProvider->expects($this->once())
+            ->method('fetch')
+            ->with(Configuration::LOGS_LEVEL_KEY)
+            ->willReturn(false);
 
         $this->config->expects($this->never())->method('get');
 
@@ -84,10 +95,6 @@ class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
     {
         /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cacheProvider */
         $cacheProvider = $this->getMockBuilder(CacheProvider::class)->getMock();
-        $cacheProvider->expects($this->once())
-            ->method('contains')
-            ->with(Configuration::LOGS_LEVEL_KEY)
-            ->willReturn(true);
 
         $cacheProvider->expects($this->once())
             ->method('fetch')

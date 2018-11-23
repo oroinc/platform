@@ -9,6 +9,7 @@ class FiltersConfigLoader extends AbstractConfigLoader
     /** @var array */
     protected $fieldMethodMap = [
         FilterFieldConfig::EXCLUDE     => 'setExcluded',
+        FilterFieldConfig::COLLECTION  => 'setIsCollection',
         FilterFieldConfig::ALLOW_ARRAY => 'setArrayAllowed',
         FilterFieldConfig::ALLOW_RANGE => 'setRangeAllowed',
     ];

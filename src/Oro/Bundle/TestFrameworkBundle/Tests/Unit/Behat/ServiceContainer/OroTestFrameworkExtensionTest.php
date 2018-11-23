@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\ServiceContainer;
 
 use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
-use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroWebDriverCurlService;
 use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\KernelStub;
 use Psr\Log\NullLogger;
@@ -15,7 +14,10 @@ use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var string */
     protected static $path1;
+
+    /** @var string */
     protected static $path2;
 
     /**
@@ -85,6 +87,9 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_test', $extension->getConfigKey());
     }
 
+    /**
+     * @return array
+     */
     public function processBundleAutoloadProvider()
     {
         return [
@@ -300,6 +305,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array $config
      * @return array
      */
     private function processConfig(array $config = [])
@@ -318,22 +324,21 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
     {
         self::delTree(self::$path1);
         self::delTree(self::$path2);
-        $log = sys_get_temp_dir().DIRECTORY_SEPARATOR.OroWebDriverCurlService::LOG_FILE;
-        if (is_file($log)) {
-            unlink($log);
-        }
     }
 
+    /**
+     * @param $dir
+     */
     public static function delTree($dir)
     {
         if (!is_dir($dir)) {
             return;
         }
 
-        $files = array_diff(scandir($dir), array('.','..'));
+        $files = array_diff(scandir($dir), ['.','..']);
         foreach ($files as $file) {
             (is_dir("$dir/$file")) ? self::delTree("$dir/$file") : unlink("$dir/$file");
         }
-        return rmdir($dir);
+        rmdir($dir);
     }
 }

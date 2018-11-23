@@ -11,6 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
@@ -83,6 +84,30 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * @param string $title
+     *
+     * @return WorkflowDefinition|null
+     */
+    private function getWorkflowDefinitionByTitle(string $title): WorkflowDefinition
+    {
+        /* @var $translationHelper WorkflowTranslationHelper */
+        $translationHelper = $this->getContainer()->get('oro_workflow.helper.translation');
+
+        /* @var $workflowRegistry WorkflowRegistry */
+        $doctrineHelper = $this->getContainer()->get('oro_entity.doctrine_helper');
+        $workflowDefinitionRepository = $doctrineHelper->getEntityRepositoryForClass(WorkflowDefinition::class);
+
+        $workflowDefinitions = array_filter(
+            $workflowDefinitionRepository->findAll(),
+            function (WorkflowDefinition $workflow) use ($translationHelper, $title) {
+                return $title === $translationHelper->findTranslation($workflow->getLabel());
+            }
+        );
+
+        return $workflowDefinitions ? reset($workflowDefinitions) : null;
+    }
+
+    /**
      * Asserts that provided workflow permissions allowed on role view page
      *
      * Example: Then the role has following active workflow permissions:
@@ -109,6 +134,78 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
                     $value,
                     "Failed asserting that workflow permission $expected equals $value for $workflowName"
                 );
+            }
+        }
+    }
+
+    /**
+     * @Given /^complete workflow fixture loading$/
+     */
+    public function completeWorkflowFixtureLoading()
+    {
+        $container = $this->getContainer();
+
+        $cache = $container->get('oro_workflow.cache.entity_aware');
+        $cache->invalidateActiveRelated();
+
+        $provider = $container->get('oro_translation.provider.translation_domain');
+        $provider->clearCache();
+
+        $translator = $container->get('translator.default');
+        $translator->rebuildCache();
+
+        $dumper = $container->get('oro_translation.js_dumper');
+        $dumper->dumpTranslations();
+    }
+
+    /**
+     * @Given /^(?:I )?activate "(?P<workflowTitle>[^"]*)" workflow$/
+     *
+     * @param string $workflowTitle
+     */
+    public function activateWorkflow(string $workflowTitle): void
+    {
+        $workflowDefinition = $this->getWorkflowDefinitionByTitle($workflowTitle);
+
+        self::assertNotNull($workflowDefinition, sprintf('Workflow %s was not found', $workflowTitle));
+
+        $helper = $this->getContainer()->get('oro_workflow.helper.workflow_deactivation');
+
+        try {
+            $workflowsToDeactivate = $helper->getWorkflowsToDeactivation($workflowDefinition)
+                ->map(
+                    function (Workflow $workflow) {
+                        return $workflow->getName();
+                    }
+                )->getValues();
+
+            $this->deactivateWorkflows($workflowsToDeactivate);
+        } catch (WorkflowException $e) {
+            $workflowDefinition = null;
+        }
+
+        self::assertNotEmpty($workflowDefinition, sprintf('Workflow %s could not be activated', $workflowTitle));
+
+        $this->getContainer()->get('oro_workflow.registry.workflow_manager')->getManager()
+            ->activateWorkflow($workflowDefinition->getName());
+    }
+
+    /**
+     * @param array $workflowNames
+     *
+     * @return array
+     * @throws WorkflowException
+     */
+    private function deactivateWorkflows(array $workflowNames): void
+    {
+        $workflowManager = $this->getContainer()->get('oro_workflow.registry.workflow_manager')->getManager();
+
+        foreach ($workflowNames as $workflowName) {
+            if ($workflowName && $workflowManager->isActiveWorkflow($workflowName)) {
+                $workflow = $workflowManager->getWorkflow($workflowName);
+
+                $workflowManager->resetWorkflowData($workflow->getName());
+                $workflowManager->deactivateWorkflow($workflow->getName());
             }
         }
     }

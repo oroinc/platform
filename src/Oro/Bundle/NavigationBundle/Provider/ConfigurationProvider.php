@@ -117,10 +117,11 @@ class ConfigurationProvider
     private function ensureConfigurationLoaded()
     {
         if (count($this->rawConfiguration) === 0) {
-            if (!$this->cache->contains(self::CACHE_KEY)) {
+            $configuration = $this->cache->fetch(self::CACHE_KEY);
+            if (false === $configuration) {
                 $this->loadConfiguration();
             } else {
-                $this->rawConfiguration = $this->cache->fetch(self::CACHE_KEY);
+                $this->rawConfiguration = $configuration;
             }
         }
 

@@ -48,6 +48,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'value' => false,
                     'scope' => 'app'
                 ],
+                'case_insensitive_email_addresses_enabled' => [
+                    'value' => false,
+                    'scope' => 'app'
+                ],
             ],
             'reset' => [
                 'ttl' => 86400

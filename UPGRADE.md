@@ -1,3 +1,11 @@
+## FROM any previous version to 2.6.0
+* In case if an existing MySQL database have to be converted to `utf8mb4` charset, the following SQL script should be executed before the conversion:
+```sql
+ALTER TABLE oro_process_trigger CHANGE field field VARCHAR(150) DEFAULT NULL;
+ALTER TABLE oro_workflow_trans_trigger CHANGE field field VARCHAR(150) DEFAULT NULL;
+ALTER TABLE oro_workflow_restriction CHANGE field field VARCHAR(150) NOT NULL, CHANGE mode mode VARCHAR(8) NOT NULL;
+```
+
 ## FROM 2.5.0 to 2.6.0
 * Changed minimum required php version to 7.1
 

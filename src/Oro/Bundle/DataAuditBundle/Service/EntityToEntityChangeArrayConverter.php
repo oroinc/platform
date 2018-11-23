@@ -89,7 +89,7 @@ class EntityToEntityChangeArrayConverter
             foreach ($value as $key => $item) {
                 $sanitized[$key] = $this->convertFieldValue($em, $item);
             }
-        } elseif (is_object($value)) {
+        } elseif (!is_scalar($value)) {
             $sanitized = null;
         }
 

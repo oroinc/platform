@@ -243,7 +243,7 @@ class EntityFieldWriter implements ItemWriterInterface
                     $result[$key] = $opts;
                 }
             } elseif (isset($opts['label'])) {
-                $labelKey = strtolower(trim($opts['label']));
+                $labelKey = trim($opts['label']);
                 if (empty($processedLabels[$labelKey])) {
                     $processedLabels[$labelKey] = true;
                     $result[$key] = $opts;

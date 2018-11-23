@@ -101,13 +101,13 @@ services:
 
     oro_entity_config.config_cache_impl:
         public: false
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [setNamespace, [ 'oro_entity_config' ] ]
 
     oro_entity_config.model_cache_impl:
         public: false
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [setNamespace, [ 'oro_entity_config_model' ] ]
 
@@ -381,6 +381,14 @@ services:
             - '@oro_entity_config.provider.attribute'
         tags:
             - { name: layout.data_provider, alias: attribute_config }
+
+    oro_entity_config.layout.data_provider.attribute_groups_tabs_options_provider:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\DataProvider\AttributeGroupsTabsOptionsProvider'
+        arguments:
+            - '@oro_entity_config.attribute_render_registry'
+            - '@oro_locale.helper.localization'
+        tags:
+            - { name: layout.data_provider, alias: attribute_groups_tabs_options_provider }
 
     oro_entity_config.layout.data_provider.attachment_config_provider:
         class: 'Oro\Bundle\EntityConfigBundle\Layout\DataProvider\ConfigProvider'

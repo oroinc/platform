@@ -369,7 +369,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
         ];
     }
 
-    public function testSortersByRenamedIdField()
+    public function testSortersByRenamedField()
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -380,6 +380,9 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                 ],
                 'renamedIdField' => [
                     'property_path' => 'field2'
+                ],
+                'renamedField'   => [
+                    'property_path' => 'field3'
                 ],
                 'field10'        => [
                     'property_path' => 'realField10'
@@ -394,6 +397,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
             'fields'           => [
                 'field1'  => null,
                 'field2'  => null,
+                'field3'  => null,
                 'field10' => [
                     'property_path' => 'sorterField10'
                 ],
@@ -416,6 +420,9 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                     ],
                     'renamedIdField' => [
                         'property_path' => 'field2'
+                    ],
+                    'renamedField'   => [
+                        'property_path' => 'field3'
                     ],
                     'field10'        => [
                         'property_path' => 'sorterField10'

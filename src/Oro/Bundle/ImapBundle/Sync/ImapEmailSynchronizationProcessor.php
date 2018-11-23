@@ -178,12 +178,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $emails->setLogger($this->logger);
         $emails->setBatchSize(self::READ_BATCH_SIZE);
         $emails->setConvertErrorCallback(
-            function (\Exception $e) use (&$invalid) {
+            function (\Exception $e, $messageUID = '', $messageSubject = '') use (&$invalid) {
                 $invalid++;
-                $this->logger->error(
-                    sprintf('Error occurred while trying to process email: %s', $e->getMessage()),
-                    ['exception' => $e]
-                );
+                $this->logException($e, $messageUID, $messageSubject);
             }
         );
 
@@ -640,5 +637,25 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     {
         return false === $this->getSettings()->isForceMode()
             && time() - $this->processStartTime > self::MAX_ORIGIN_SYNC_TIME;
+    }
+
+    /**
+     * @param \Exception $e
+     * @param string $messageUID
+     * @param string $messageSubject
+     */
+    private function logException(\Exception $e, $messageUID = '', $messageSubject = '')
+    {
+        if ($messageUID) {
+            $messageString = sprintf(
+                'Error occurred while trying to process email %s (UID: %s). %s',
+                $messageSubject ? sprintf('"%s"', $messageSubject) : '',
+                $messageUID,
+                $e->getMessage()
+            );
+        } else {
+            $messageString = sprintf('Error occurred while trying to process email: %s', $e->getMessage());
+        }
+        $this->logger->error($messageString, ['exception' => $e]);
     }
 }

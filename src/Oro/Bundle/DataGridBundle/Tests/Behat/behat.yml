@@ -74,7 +74,7 @@ oro_behat_extension:
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem
 
     GridColumnManagerButton:
-      selector: 'div.column-manager.dropdown a'
+      selector: 'div.column-manager.dropdown > a'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridColumnManager:
@@ -90,7 +90,7 @@ oro_behat_extension:
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterManager
 
     GridColumnManagerTable:
-      selector: 'div.column-manager-table'
+      selector: 'div.column-manager-table > div.table-wrapper > table'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Table
 
     MultipleChoice:
@@ -121,7 +121,7 @@ oro_behat_extension:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridToolbarActionReset:
-        selector: 'div.toolbar div.actions-panel .refresh-action'
+        selector: 'div.toolbar div.actions-panel .reset-action'
         class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridToolBarTools:

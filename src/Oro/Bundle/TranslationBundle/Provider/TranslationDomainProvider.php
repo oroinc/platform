@@ -8,6 +8,9 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 
+/**
+ * This class is responsible to get available translation domains.
+ */
 class TranslationDomainProvider
 {
     const AVAILABLE_DOMAINS_NODE = 'availableDomains';
@@ -80,12 +83,12 @@ class TranslationDomainProvider
             return;
         }
 
-        if ($this->cache->contains(self::AVAILABLE_DOMAINS_NODE)) {
-            $this->availableDomains = (array)$this->cache->fetch(self::AVAILABLE_DOMAINS_NODE);
-        } else {
-            $this->availableDomains = $this->getTranslationKeyRepository()->findAvailableDomains();
-            $this->cache->save(self::AVAILABLE_DOMAINS_NODE, $this->availableDomains);
+        $availableDomains = $this->cache->fetch(self::AVAILABLE_DOMAINS_NODE);
+        if (false === $availableDomains) {
+            $availableDomains = $this->getTranslationKeyRepository()->findAvailableDomains();
+            $this->cache->save(self::AVAILABLE_DOMAINS_NODE, $availableDomains);
         }
+        $this->availableDomains = $availableDomains;
     }
 
     /**

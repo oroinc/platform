@@ -34,10 +34,11 @@ class TimezoneType extends AbstractType
     {
         $cacheKey = 'timezones';
         if ($this->cache) {
-            if ($this->cache->contains($cacheKey)) {
-                self::$timezones = $this->cache->fetch($cacheKey);
-            } else {
+            $timezones = $this->cache->fetch($cacheKey);
+            if (false === $timezones) {
                 $this->cache->save($cacheKey, self::getTimezones());
+            } else {
+                self::$timezones = $timezones;
             }
         }
 

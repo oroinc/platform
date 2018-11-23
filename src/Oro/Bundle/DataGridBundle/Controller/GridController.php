@@ -140,6 +140,7 @@ class GridController extends Controller
 
         $this->getMessageProducer()->send(Topics::PRE_EXPORT, [
             'format' => $format,
+            'notificationTemplate' => 'datagrid_export_result',
             'parameters' => [
                 'gridName' => $gridName,
                 'gridParameters' => $gridParameters,

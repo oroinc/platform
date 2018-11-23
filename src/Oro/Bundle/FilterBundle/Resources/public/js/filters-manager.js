@@ -127,8 +127,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        listen: {
-            'datagrid:metadata-loaded mediator': 'updateFilters'
+        constructor: function FiltersManager() {
+            FiltersManager.__super__.constructor.apply(this, arguments);
         },
 
         /**
@@ -183,6 +183,17 @@ define(function(require) {
             }
 
             FiltersManager.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        delegateListeners: function() {
+            if (!_.isEmpty(this.filters)) {
+                this.listenTo(mediator, 'datagrid:metadata-loaded', this.updateFilters);
+            }
+
+            return FiltersManager.__super__.delegateListeners.apply(this, arguments);
         },
 
         /**
@@ -625,7 +636,9 @@ define(function(require) {
          * @protected
          */
         _refreshSelectWidget: function() {
-            this.selectWidget.multiselect('refresh');
+            if (this.selectWidget) {
+                this.selectWidget.multiselect('refresh');
+            }
         },
 
         /**

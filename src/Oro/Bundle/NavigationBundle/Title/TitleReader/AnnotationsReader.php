@@ -9,6 +9,9 @@ use Symfony\Component\Routing\Router;
 
 use Oro\Bundle\NavigationBundle\Annotation\TitleTemplate;
 
+/**
+ * Reads page titles from TitleTemplate annotations of controllers.
+ */
 class AnnotationsReader implements ReaderInterface
 {
     const CACHE_KEY = 'controller_classes';
@@ -65,8 +68,9 @@ class AnnotationsReader implements ReaderInterface
      */
     public function getControllerClasses()
     {
-        if ($this->cache->contains(self::CACHE_KEY)) {
-            return $this->cache->fetch(self::CACHE_KEY);
+        $classes = $this->cache->fetch(self::CACHE_KEY);
+        if (false !== $classes) {
+            return $classes;
         }
 
         $classes = [];

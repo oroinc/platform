@@ -19,6 +19,7 @@ services:
         decorates: akeneo_batch.job_repository
 
     oro_batch.cache.doctrine_metadata:
-        parent: oro.cache.abstract
+        public: false
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [ setNamespace, [ 'doctrine_metadata_batch' ] ]

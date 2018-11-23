@@ -50,6 +50,12 @@ class ExtendColumn extends Column
             if ($oroOptions instanceof OroOptions) {
                 $oroOptions = $oroOptions->toArray();
             }
+            if (!isset($options['type'])
+                && !isset($oroOptions[ExtendOptionsManager::TYPE_OPTION])
+                && null !== $this->getType()
+            ) {
+                $oroOptions[ExtendOptionsManager::TYPE_OPTION] = $this->getType()->getName();
+            }
             $this->extendOptionsManager->setColumnOptions($this->tableName, $this->getName(), $oroOptions);
             unset($options[OroOptions::KEY]);
         }

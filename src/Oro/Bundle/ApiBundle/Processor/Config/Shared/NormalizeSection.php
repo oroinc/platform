@@ -65,7 +65,7 @@ abstract class NormalizeSection implements ProcessorInterface
                     }
                 } else {
                     $definitionFieldName = $definition->findFieldNameByPropertyPath($fieldName);
-                    if (in_array($definitionFieldName, $definition->getIdentifierFieldNames(), true)) {
+                    if ($definitionFieldName) {
                         $propertyPath = $definition->getField($definitionFieldName)->getPropertyPath();
                         if ($propertyPath) {
                             $field->setPropertyPath($propertyPath);

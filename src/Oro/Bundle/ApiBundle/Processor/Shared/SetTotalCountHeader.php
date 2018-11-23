@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -14,7 +15,6 @@ use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
-use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 
 /**
@@ -148,7 +148,10 @@ class SetTotalCountHeader implements ProcessorInterface
             );
         }
 
-        return QueryCountCalculator::calculateCount($countQuery);
+        $paginator = new Paginator($countQuery);
+        $paginator->setUseOutputWalkers(false);
+
+        return $paginator->count();
     }
 
     /**

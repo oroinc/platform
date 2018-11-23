@@ -52,7 +52,7 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
 
         $this->cache
             ->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(AnnotationsReader::CACHE_KEY)
             ->willReturn(false);
 
@@ -93,12 +93,6 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
 
         $this->cache
             ->expects($this->once())
-            ->method('contains')
-            ->with(AnnotationsReader::CACHE_KEY)
-            ->willReturn(true);
-
-        $this->cache
-            ->expects($this->once())
             ->method('fetch')
             ->with(AnnotationsReader::CACHE_KEY)
             ->willReturn($classes);
@@ -120,12 +114,6 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
         $routeName = 'test_route';
 
         $classes = [$routeName => AnnotationsReaderTest::class . '::testGetTitleEmpty'];
-
-        $this->cache
-            ->expects($this->once())
-            ->method('contains')
-            ->with(AnnotationsReader::CACHE_KEY)
-            ->willReturn(true);
 
         $this->cache
             ->expects($this->once())
@@ -152,12 +140,6 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
 
         $this->cache
             ->expects($this->once())
-            ->method('contains')
-            ->with(AnnotationsReader::CACHE_KEY)
-            ->willReturn(true);
-
-        $this->cache
-            ->expects($this->once())
             ->method('fetch')
             ->with(AnnotationsReader::CACHE_KEY)
             ->willReturn($classes);
@@ -174,12 +156,6 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
         $routeName = 'test_route';
 
         $classes = [$routeName => 'WrongControllerAndMethod'];
-
-        $this->cache
-            ->expects($this->once())
-            ->method('contains')
-            ->with(AnnotationsReader::CACHE_KEY)
-            ->willReturn(true);
 
         $this->cache
             ->expects($this->once())

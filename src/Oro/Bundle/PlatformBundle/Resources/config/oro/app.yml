@@ -10,7 +10,7 @@ doctrine:
                 user:     %database_user%
                 password: %database_password%
                 options:  %database_driver_options%
-                charset:  UTF8
+                charset:  %database_charset%
             session:
                 driver:   %database_driver%
                 host:     %database_host%
@@ -19,7 +19,7 @@ doctrine:
                 user:     %database_user%
                 password: %database_password%
                 options:  %database_driver_options%
-                charset:  UTF8
+                charset:  %database_charset%
             config:
                 driver:   %database_driver%
                 host:     %database_host%
@@ -28,7 +28,7 @@ doctrine:
                 user:     %database_user%
                 password: %database_password%
                 options:  %database_driver_options%
-                charset:  UTF8
+                charset:  %database_charset%
     orm:
         default_entity_manager:      default
         auto_generate_proxy_classes: %kernel.debug%
@@ -46,9 +46,15 @@ doctrine:
                 metadata_cache_driver:
                     type: service
                     id:   doctrine.metadata.cache
+                query_cache_driver:
+                    type: service
+                    id:   doctrine.query.cache
             config:
                 connection: config
                 mappings: ~
                 metadata_cache_driver:
                     type: service
                     id:   doctrine.metadata.cache.config
+                query_cache_driver:
+                    type: service
+                    id:   doctrine.query.cache.config

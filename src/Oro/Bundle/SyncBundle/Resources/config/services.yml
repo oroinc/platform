@@ -18,6 +18,8 @@ services:
         calls:
             - ['setLogger', ['@logger']]
             - ['setTicketProvider', ['@oro_sync.authentication.ticket_provider']]
+            - ['setClientFactory', ['@oro_sync.wamp.websocket_client_factory']]
+            - ['setClientAttributes', ['@oro_sync.wamp.websocket_client_attributes']]
         tags:
             - { name: monolog.logger, channel: oro_wamp }
 
@@ -142,3 +144,19 @@ services:
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_sync_auth_tickets' ]]
+
+    oro_sync.wamp.websocket_client_factory:
+        class: Oro\Bundle\SyncBundle\Wamp\WebSocketClientFactory
+        public: false
+        arguments:
+            - '@oro_sync.authentication.ticket_provider'
+
+    oro_sync.wamp.websocket_client_attributes:
+        class: Oro\Bundle\SyncBundle\Wamp\WebSocketClientAttributes
+        public: false
+        arguments:
+            - '%websocket_backend_host%'
+            - '%websocket_backend_port%'
+            - '%websocket_backend_path%'
+            - '%websocket_backend_transport%'
+            - '%websocket_backend_ssl_context_options%'

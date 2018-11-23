@@ -4,13 +4,27 @@ namespace Oro\Bundle\NotificationBundle\Model;
 
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 
-class EmailNotification implements EmailNotificationInterface
+class EmailNotification implements EmailNotificationInterface, SenderAwareEmailNotificationInterface
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $recipientEmails;
 
-    /** @var EmailTemplateInterface */
+    /**
+     * @var EmailTemplateInterface
+     */
     protected $template;
+
+    /**
+     * @var string|null
+     */
+    private $senderEmail;
+
+    /**
+     * @var string|null
+     */
+    private $senderName;
 
     /**
      * @param EmailTemplateInterface $template
@@ -64,5 +78,43 @@ class EmailNotification implements EmailNotificationInterface
     public function addRecipientEmail($recipientEmail)
     {
         $this->recipientEmails[] = $recipientEmail;
+    }
+
+    /**
+     * @param null|string $senderEmail
+     * @return EmailNotification
+     */
+    public function setSenderEmail(?string $senderEmail): EmailNotification
+    {
+        $this->senderEmail = $senderEmail;
+
+        return $this;
+    }
+
+    /**
+     * @param null|string $senderName
+     * @return EmailNotification
+     */
+    public function setSenderName(?string $senderName): EmailNotification
+    {
+        $this->senderName = $senderName;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSenderEmail(): ?string
+    {
+        return $this->senderEmail;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getSenderName(): ?string
+    {
+        return $this->senderName;
     }
 }
