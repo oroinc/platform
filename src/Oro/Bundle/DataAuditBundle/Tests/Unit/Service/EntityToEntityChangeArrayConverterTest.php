@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\DataAuditBundle\Service\EntityToEntityChangeArrayConverter;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\EntityAdditionalFields;
 
@@ -27,10 +27,11 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
 
         $expected = [
             'entity_class' => EntityAdditionalFields::class,
-            'entity_id' => 1,
-            'change_set' => $expectedChangeSet,
-            'additional_fields' => []
+            'entity_id' => 1
         ];
+        if (!empty($expectedChangeSet)) {
+            $expected['change_set'] = $expectedChangeSet;
+        }
 
         $converted = $this->converter->convertEntityToArray($em, new EntityAdditionalFields(), $changeSet);
 
@@ -58,8 +59,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
 
         $converted = $this->converter->convertEntityToArray($em, new EntityAdditionalFields(), []);
 
-        $this->assertArrayHasKey('additional_fields', $converted);
-        $this->assertEmpty($converted['additional_fields']);
+        $this->assertArrayNotHasKey('additional_fields', $converted);
     }
 
     public function testEmptyAdditionalFieldsWhenEntityDoesNotImplementInterface()
@@ -68,8 +68,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
 
         $converted = $this->converter->convertEntityToArray($em, new \stdClass(), []);
 
-        $this->assertArrayHasKey('additional_fields', $converted);
-        $this->assertEmpty($converted['additional_fields']);
+        $this->assertArrayNotHasKey('additional_fields', $converted);
     }
 
     /**
@@ -125,23 +124,18 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
      */
     private function getEntityManager()
     {
-        $property = $this->createMock(\ReflectionProperty::class);
-        $property->expects($this->once())
-            ->method('getValue')
-            ->willReturn(1);
-
-        $classMetadata = $this->createMock(ClassMetadataInfo::class);
-        $classMetadata->expects($this->once())
-            ->method('getSingleIdReflectionProperty')
-            ->willReturn($property);
-
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->once())
-            ->method('getClassMetadata')
-            ->willReturn($classMetadata);
         $em->expects($this->any())
             ->method('contains')
             ->willReturn(false);
+
+        $uow = $this->createMock(UnitOfWork::class);
+        $em->expects($this->any())
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
+        $uow->expects($this->any())
+            ->method('getEntityIdentifier')
+            ->willReturn(['id' => 1]);
 
         return $em;
     }

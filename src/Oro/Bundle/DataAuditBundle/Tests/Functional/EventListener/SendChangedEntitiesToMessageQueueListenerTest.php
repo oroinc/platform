@@ -951,4 +951,74 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         ];
         $this->assertEquals($expectedEntitiesUpdated, $additionalMessage['message']->getBody()['entities_updated']);
     }
+
+    public function testShouldSendUpdatedEntityWithIdFromUnitOfWorkInsteadOfIdFromEntityObject()
+    {
+        $em = $this->getEntityManager();
+
+        $owner = new TestAuditDataOwner();
+        $owner->setStringProperty('aString');
+        $owner->setAdditionalFields(['field_array' => ['value' => 1]]);
+        $em->persist($owner);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $updatedOwnerId = $owner->getId();
+        $owner->setStringProperty('anotherString');
+
+        // remove ID from entity object to test that ID will be got from UnitOfWork
+        $owner->setId(null);
+
+        $em->flush();
+
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [],
+            'entities_updated'    => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $updatedOwnerId,
+                    'change_set'   => [
+                        'stringProperty' => ['aString', 'anotherString']
+                    ],
+                    'additional_fields' => ['field_array' => ['value' => 1]]
+                ]
+            ],
+            'collections_updated' => []
+        ]);
+    }
+
+    public function testShouldSendDeletedEntityWithIdFromUnitOfWorkInsteadOfIdFromEntityObject()
+    {
+        $em = $this->getEntityManager();
+
+        $owner = new TestAuditDataOwner();
+        $owner->setStringProperty('aString');
+        $owner->setAdditionalFields([
+            'date' => new \DateTime('2017-11-10 10:00:00', new \DateTimeZone('Europe/London'))
+        ]);
+        $em->persist($owner);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $removedOwnerId = $owner->getId();
+        // remove ID from entity object to test that ID will be got from UnitOfWork
+        $owner->setId(null);
+
+        $em->remove($owner);
+        $em->flush();
+
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $removedOwnerId,
+                    'additional_fields' => ['date' => '2017-11-10T10:00:00+0000']
+                ]
+            ],
+            'entities_updated'    => [],
+            'collections_updated' => []
+        ]);
+    }
 }

@@ -107,12 +107,21 @@ class EntityToEntityChangeArrayConverter
      * @param EntityManagerInterface $em
      * @param object $entity
      *
-     * @return int|string
+     * @return int|string|null
      */
     private function getEntityId(EntityManagerInterface $em, $entity)
     {
-        return $em->getClassMetadata(ClassUtils::getClass($entity))
-            ->getSingleIdReflectionProperty()
-            ->getValue($entity);
+        $id = $em->getUnitOfWork()->getEntityIdentifier($entity);
+        if (empty($id)) {
+            return null;
+        }
+        if (count($id) > 1) {
+            throw new \LogicException(sprintf(
+                'The entity "%s" has a composite identifier. The data audit does not support such identifiers.',
+                ClassUtils::getClass($entity)
+            ));
+        }
+
+        return reset($id);
     }
 }
