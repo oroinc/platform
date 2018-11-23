@@ -9,7 +9,7 @@ doctrine:
                 user:     '%database_user%'
                 password: '%database_password%'
                 options:  '%database_driver_options%'
-                charset:  UTF8
+                charset:  '%database_charset%'
     orm:
         entity_managers:
             batch:
