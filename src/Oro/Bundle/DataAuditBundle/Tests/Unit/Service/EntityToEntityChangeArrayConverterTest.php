@@ -134,8 +134,8 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
             ->method('getUnitOfWork')
             ->willReturn($uow);
         $uow->expects($this->any())
-            ->method('getEntityIdentifier')
-            ->willReturn(['id' => 1]);
+            ->method('getSingleIdentifierValue')
+            ->willReturn(1);
 
         return $em;
     }
