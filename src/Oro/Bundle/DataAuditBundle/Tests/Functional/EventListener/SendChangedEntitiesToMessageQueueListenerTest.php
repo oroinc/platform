@@ -1001,10 +1001,16 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                     'entity_id'    => null,
                     'change_set' => [
                         'ownerManyToOne' => [
-                            ['entity_class' => get_class($child), 'entity_id' => $child->getId()],
+                            [
+                                'entity_class' => get_class($child),
+                                'entity_id' => $child->getId(),
+                                'change_set' => [],
+                                'additional_fields' => []
+                            ],
                             null
                         ]
-                    ]
+                    ],
+                    'additional_fields' => []
                 ]
             ],
             'entities_updated'    => [],

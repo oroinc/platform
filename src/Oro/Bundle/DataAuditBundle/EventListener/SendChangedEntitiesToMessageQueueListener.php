@@ -285,7 +285,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
                     sprintf('The entity "%s" has an empty id.', $deletion['entity_class']),
                     ['entity' => $entity, 'deletion' => $deletion]
                 );
-                if (isset($deletion['change_set'])) {
+                if (!empty($deletion['change_set'])) {
                     $deletions[$entity] = $deletion;
                 }
             } else {
