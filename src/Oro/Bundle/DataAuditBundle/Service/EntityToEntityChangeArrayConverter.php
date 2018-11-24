@@ -112,9 +112,6 @@ class EntityToEntityChangeArrayConverter
      */
     private function getEntityId(EntityManagerInterface $em, $entity)
     {
-//        return $em->getClassMetadata(ClassUtils::getClass($entity))
-//            ->getSingleIdReflectionProperty()
-//            ->getValue($entity);
         try {
             return $em->getUnitOfWork()->getSingleIdentifierValue($entity);
         } catch (ORMInvalidArgumentException $e) {
