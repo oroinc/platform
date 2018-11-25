@@ -39,7 +39,7 @@ The following is an example of using an expression in the layout update:
 ```yaml
 layout:
     actions:
-        - @add:
+        - '@add':
             id: debug_init_script:
             parentId: head
             blockType: script

@@ -36,9 +36,9 @@ To build a frame of your layout theme, create a layout update file and place it 
 ```yaml
 layout:
     actions:
-        - @setBlockTheme:
+        - '@setBlockTheme':
             themes: 'DemoBundle:layouts:first_theme/default.html.twig'
-        - @addTree:
+        - '@addTree':
             items:
                 head:
                     blockType: head
@@ -207,17 +207,17 @@ To do this, we create the layout update file and place it in the `Resources/view
 ```yaml
 layout:
     actions:
-        - @setOption:
+        - '@setOption':
             id: head
             optionName: title
             optionValue: Hello World!
-        - @add:
+        - '@add':
             id: test_text
             parentId: page_content
             blockType: text
             options:
                 text: Layouts. Hello World!
-        - @appendOption:
+        - '@appendOption':
             id: main_panel
             optionName: attr.class
             optionValue: test-css-class
