@@ -96,7 +96,7 @@ Let's consider an example when we need to move the email field before the first 
 ```yml
 layout:
     actions:
-        - @move:
+        - '@move':
             id:        embedded_form_email
             siblingId: embedded_form_firstName
             prepend:   true                     # place moved block before sibling

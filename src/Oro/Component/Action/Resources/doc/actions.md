@@ -213,7 +213,7 @@ Remove Entity
 
 **Configuration Example**
 ```
-- @remove_entity:
+- '@remove_entity':
     target: $.data #remove the entity being processed
 ```
 
