@@ -64,30 +64,13 @@ class EntityFieldWriterTest extends \PHPUnit\Framework\TestCase
             'enum',
             [
                 'enum_options' => [
-                    0 => [
-                        'id' => 'test_id',
-                        'label' => 'Test ID'
-                    ],
-                    1 => [
-                        'id' => '',
-                        'label' => 'Option Two'
-                    ],
-                    2 => [
-                        'id' => '',
-                        'label' => 'Option Three'
-                    ],
-                    3 => [
-                        'id' => '',
-                        'label' => 'option two'
-                    ],
-                    4 => [
-                        'id' => 'test_id',
-                        'label' => 'Test ID 2'
-                    ],
-                    5 => [
-                        'id' => 'test_id_2',
-                        'label' => 'Test ID 2'
-                    ],
+                    0 => ['id' => 'test_id', 'label' => 'Test ID'],
+                    1 => ['id' => '', 'label' => 'Option Two'],
+                    2 => ['id' => '', 'label' => 'Option Three'],
+                    3 => ['id' => '', 'label' => 'option two'],
+                    4 => ['id' => 'test_id', 'label' => 'Test ID 2'],
+                    5 => ['id' => 'test_id_2', 'label' => 'Test ID 2'],
+                    6 => ['id' => '', 'label' => 'Option Two']
                 ]
             ]
         );
@@ -132,22 +115,11 @@ class EntityFieldWriterTest extends \PHPUnit\Framework\TestCase
             ->with(
                 ExtendHelper::buildEnumValueClassName($enumCode),
                 [
-                    0 => [
-                        'id' => 'test_id',
-                        'label' => 'Test ID'
-                    ],
-                    1 => [
-                        'id' => '',
-                        'label' => 'Option Two'
-                    ],
-                    2 => [
-                        'id' => '',
-                        'label' => 'Option Three'
-                    ],
-                    5 => [
-                        'id' => 'test_id_2',
-                        'label' => 'Test ID 2'
-                    ],
+                    0 => ['id' => 'test_id','label' => 'Test ID'],
+                    1 => ['id' => '','label' => 'Option Two'],
+                    2 => ['id' => '','label' => 'Option Three'],
+                    3 => ['id' => '', 'label' => 'option two'],
+                    5 => ['id' => 'test_id_2','label' => 'Test ID 2']
                 ],
                 'fr'
             );

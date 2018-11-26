@@ -13,6 +13,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
+/**
+ * Restore and backup PostgreSQL database between features
+ */
 final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements IsolatorInterface
 {
     const TIMEOUT = 120;
@@ -233,7 +236,7 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
         $process = sprintf(
             'PGPASSWORD="%s" psql -h %s --port=%s -U %s -t -c "'.
             'SELECT pg_terminate_backend(pid) FROM pg_stat_activity '.
-            'WHERE datname in (\'%s\', \'%s\') AND pid <> pg_backend_pid()"',
+            'WHERE datname in (\'%s\', \'%s\') AND pid <> pg_backend_pid()" postgres',
             $this->dbPass,
             $this->dbHost,
             $this->dbPort,

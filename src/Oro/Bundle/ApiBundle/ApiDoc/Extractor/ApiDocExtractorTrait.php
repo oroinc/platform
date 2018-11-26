@@ -127,6 +127,10 @@ trait ApiDocExtractorTrait
                             $element['resource'] = $resource;
                             $resources[] = $resource;
                         }
+                        $action = $this->getRouteAction($route);
+                        if ($action) {
+                            $element['action'] = $action;
+                        }
                         $array[] = $element;
                     }
                 }
@@ -270,5 +274,15 @@ trait ApiDocExtractorTrait
         }
 
         return $order;
+    }
+
+    /**
+     * @param Route $route
+     *
+     * @return string|null
+     */
+    protected function getRouteAction(Route $route)
+    {
+        return $route->getDefault('_action');
     }
 }
