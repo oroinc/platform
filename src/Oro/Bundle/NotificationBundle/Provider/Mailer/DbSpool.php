@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\NotificationBundle\Provider\Mailer;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
 use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Stores notification emails in the database.
+ */
 class DbSpool extends \Swift_ConfigurableSpool
 {
     const STATUS_FAILED     = 0;
@@ -15,46 +19,30 @@ class DbSpool extends \Swift_ConfigurableSpool
     const STATUS_PROCESSING = 2;
     const STATUS_COMPLETE   = 3;
 
-    /**
-     * @var EntityManager
-     */
-    protected $em;
+    /** @var ManagerRegistry */
+    protected $doctrine;
 
-    /**
-     * @var EntityPool
-     */
+    /** @var EntityPool */
     protected $entityPool;
 
-    /**
-     * @var string
-     */
-    protected $entityClass;
-
-    /**
-     * @var EventDispatcherInterface
-     */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $logType;
 
     /**
-     * @param EntityManager $em
-     * @param EntityPool $entityPool
-     * @param string $entityClass
+     * @param ManagerRegistry          $doctrine
+     * @param EntityPool               $entityPool
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
-        EntityManager $em,
+        ManagerRegistry $doctrine,
         EntityPool $entityPool,
-        $entityClass,
         EventDispatcherInterface $eventDispatcher
     ) {
-        $this->em = $em;
+        $this->doctrine = $doctrine;
         $this->entityPool = $entityPool;
-        $this->entityClass = $entityClass;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -87,8 +75,7 @@ class DbSpool extends \Swift_ConfigurableSpool
      */
     public function queueMessage(\Swift_Mime_Message $message)
     {
-        /** @var SpoolItem $mailObject */
-        $mailObject = new $this->entityClass;
+        $mailObject = new SpoolItem();
         $mailObject->setMessage($message);
         $mailObject->setStatus(self::STATUS_READY);
         $mailObject->setLogType($this->logType);
@@ -107,10 +94,14 @@ class DbSpool extends \Swift_ConfigurableSpool
             $transport->start();
         }
 
-        $repo = $this->em->getRepository($this->entityClass);
+        /** @var EntityManager $em */
+        $em = $this->doctrine->getManagerForClass(SpoolItem::class);
+
         $limit = $this->getMessageLimit();
         $limit = $limit > 0 ? $limit : null;
-        $emails = $repo->findBy(array("status" => self::STATUS_READY), null, $limit);
+        /** @var SpoolItem[] $emails */
+        $emails = $em->getRepository(SpoolItem::class)
+            ->findBy(['status' => self::STATUS_READY], null, $limit);
         if (!count($emails)) {
             return 0;
         }
@@ -118,19 +109,18 @@ class DbSpool extends \Swift_ConfigurableSpool
         $failedRecipients = (array)$failedRecipients;
         $count = 0;
         $time = time();
-        /** @var SpoolItem $email */
         foreach ($emails as $email) {
             $email->setStatus(self::STATUS_PROCESSING);
-            $this->em->persist($email);
-            $this->em->flush($email);
+            $em->persist($email);
+            $em->flush($email);
             $sentCount = $transport->send($email->getMessage(), $failedRecipients);
             $count += $sentCount;
             $this->eventDispatcher->dispatch(
                 NotificationSentEvent::NAME,
                 new NotificationSentEvent($email, $sentCount)
             );
-            $this->em->remove($email);
-            $this->em->flush($email);
+            $em->remove($email);
+            $em->flush($email);
 
             if ($this->getTimeLimit() && (time() - $time) >= $this->getTimeLimit()) {
                 break;
