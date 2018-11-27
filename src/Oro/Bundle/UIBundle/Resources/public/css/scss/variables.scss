@@ -1,7 +1,5 @@
 /* @theme: admin.oro; */
 
-@import "bowerassets/font-awesome/scss/_variables";
-
 // Should be refactored when style builder will updated
 @import "bootstrap/functions";
 @import "bootstrap/variables";
@@ -13,9 +11,6 @@ $enable-safe-area:                      true;
 // Screen sizes
 $side-bar-closed-width:                 33px;
 $side-bar-opened-width:                 200px;
-
-$dot-menu-dropdown-min-height:          168px;
-$dot-menu-dropdown-max-height:          330px;
 
 // Loading
 

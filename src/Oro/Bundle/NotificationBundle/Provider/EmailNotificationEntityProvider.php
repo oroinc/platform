@@ -2,29 +2,30 @@
 
 namespace Oro\Bundle\NotificationBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Provides the list of entities for which it is allowed to configure email notifications.
+ */
 class EmailNotificationEntityProvider extends EntityProvider
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
     /**
-     * Constructor
-     *
      * @param ConfigProvider      $entityConfigProvider
      * @param ConfigProvider      $extendConfigProvider
      * @param EntityClassResolver $entityClassResolver
      * @param TranslatorInterface $translator
      * @param FeatureChecker      $featureChecker
-     * @param EntityManager       $em
+     * @param ManagerRegistry     $doctrine
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -32,7 +33,7 @@ class EmailNotificationEntityProvider extends EntityProvider
         EntityClassResolver $entityClassResolver,
         TranslatorInterface $translator,
         FeatureChecker $featureChecker,
-        EntityManager $em
+        ManagerRegistry $doctrine
     ) {
         parent::__construct(
             $entityConfigProvider,
@@ -41,7 +42,7 @@ class EmailNotificationEntityProvider extends EntityProvider
             $translator,
             $featureChecker
         );
-        $this->em = $em;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -49,7 +50,7 @@ class EmailNotificationEntityProvider extends EntityProvider
      */
     protected function addEntities(array &$result, $applyExclusions, $translate)
     {
-        $entities = $this->em->getRepository('OroEmailBundle:EmailTemplate')
+        $entities = $this->getEmailTemplateRepository()
             ->getDistinctByEntityNameQueryBuilder()
             ->getQuery()
             ->getScalarResult();
@@ -64,5 +65,15 @@ class EmailNotificationEntityProvider extends EntityProvider
                 $translate
             );
         }
+    }
+
+    /**
+     * @return EmailTemplateRepository
+     */
+    private function getEmailTemplateRepository()
+    {
+        return $this->doctrine
+            ->getManagerForClass(EmailTemplate::class)
+            ->getRepository(EmailTemplate::class);
     }
 }

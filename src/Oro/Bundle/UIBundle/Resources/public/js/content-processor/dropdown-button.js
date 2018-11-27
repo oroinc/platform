@@ -8,7 +8,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
     $.widget('oroui.dropdownButtonProcessor', {
         options: {
             separator: '.separator-btn',
-            includeButtons: '.btn, .divider, .dropdown-menu>li>*',
+            includeButtons: '.btn, .divider, .dropdown-divider, .dropdown-menu>li>*',
             excludeButtons: '.dropdown-toggle',
             mainButtons: '.main-group:not(.more-group)',
             useMainButtonsClone: false,
@@ -28,7 +28,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
 
         _create: function() {
             // replaces button's separators
-            this.element.find(this.options.separator).replaceWith('<li class="divider"></li>');
+            this.element.find(this.options.separator).replaceWith('<div class="dropdown-divider"></div>');
 
             this._renderButtons();
         },
@@ -162,10 +162,11 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
         },
 
         _prepareButtons: function($buttons) {
+            $buttons.filter(':not(.dropdown-divider)').addClass('dropdown-item');
             return $buttons.filter('.btn')
                 .removeClass(function(index, css) {
                     return (css.match(/\bbtn(-\S+)?/g) || []).join(' ');
-                }).addClass('dropdown-item').wrap('<li></li>').parent();
+                }).wrap('<li></li>').parent();
         }
     });
 

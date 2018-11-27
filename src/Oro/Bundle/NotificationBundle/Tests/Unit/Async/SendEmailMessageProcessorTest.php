@@ -32,7 +32,8 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
-            $this->createLoggerMock()
+            $this->createLoggerMock(),
+            $this->createTemplateEmailMessageSenderMock()
         );
     }
 
@@ -58,7 +59,8 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
-            $logger
+            $logger,
+            $this->createTemplateEmailMessageSenderMock()
         );
 
         $sender = From::emailAddress('from@email.com');
@@ -86,7 +88,8 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
-            $logger
+            $logger,
+            $this->createTemplateEmailMessageSenderMock()
         );
 
         $message = new NullMessage;
@@ -113,7 +116,8 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
-            $logger
+            $logger,
+            $this->createTemplateEmailMessageSenderMock()
         );
 
         $sender = From::emailAddress('from@email.com');
@@ -141,7 +145,8 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
-            $logger
+            $logger,
+            $this->createTemplateEmailMessageSenderMock()
         );
 
         $message = new NullMessage;
@@ -176,7 +181,8 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
-            $logger
+            $logger,
+            $this->createTemplateEmailMessageSenderMock()
         );
 
         $message = new NullMessage;
@@ -210,7 +216,8 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
-            $logger
+            $logger,
+            $this->createTemplateEmailMessageSenderMock()
         );
 
         $message = new NullMessage;
@@ -263,7 +270,8 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createEmailProcessorMock(),
             $managerRegistry,
             $emailRenderer,
-            $this->createLoggerMock()
+            $this->createLoggerMock(),
+            $this->createTemplateEmailMessageSenderMock()
         );
 
         $message = new NullMessage;
@@ -314,7 +322,8 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createEmailProcessorMock(),
             $managerRegistry,
             $emailRenderer,
-            $this->createLoggerMock()
+            $this->createLoggerMock(),
+            $this->createTemplateEmailMessageSenderMock()
         );
 
         $message = new NullMessage;
@@ -331,12 +340,14 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessWhenMessageIsTranslatableAndMessageSent()
     {
+        $templateEmailMessageSender = $this->createTemplateEmailMessageSenderMock();
         $processor = new SendEmailMessageProcessor(
             $this->createMailerMock(),
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
-            $this->createLoggerMock()
+            $this->createLoggerMock(),
+            $templateEmailMessageSender
         );
 
         $sender = From::emailAddress('from@email.com');
@@ -350,9 +361,6 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $message = new NullMessage;
         $message->setBody(json_encode($messageBody));
-
-        /** @var TemplateEmailMessageSender|\PHPUnit\Framework\MockObject\MockObject $templateEmailMessageSender */
-        $templateEmailMessageSender = $this->createMock(TemplateEmailMessageSender::class);
 
         $templateEmailMessageSender
             ->expects($this->any())
@@ -369,8 +377,6 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 return $message == array_replace_recursive($message, $messageBody);
             }))
             ->willReturn(1);
-
-        $processor->setTemplateEmailMessageSender($templateEmailMessageSender);
 
         self::assertEquals(MessageProcessorInterface::ACK, $processor->process($message, $this->createSessionMock()));
     }
@@ -389,16 +395,15 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message->setBody(json_encode($messageBody));
 
         $logger = $this->createLoggerMock();
+        $templateEmailMessageSender = $this->createTemplateEmailMessageSenderMock();
         $processor = new SendEmailMessageProcessor(
             $this->createMailerMock(),
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
-            $logger
+            $logger,
+            $templateEmailMessageSender
         );
-
-        /** @var TemplateEmailMessageSender|\PHPUnit\Framework\MockObject\MockObject $templateEmailMessageSender */
-        $templateEmailMessageSender = $this->createMock(TemplateEmailMessageSender::class);
 
         $templateEmailMessageSender
             ->expects($this->once())
@@ -419,8 +424,6 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
                 return 0;
             });
-
-        $processor->setTemplateEmailMessageSender($templateEmailMessageSender);
 
         $logger
             ->expects($this->once())
@@ -449,6 +452,13 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         return $this->createMock(LoggerInterface::class);
     }
 
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject | TemplateEmailMessageSender
+     */
+    private function createTemplateEmailMessageSenderMock()
+    {
+        return $this->createMock(TemplateEmailMessageSender::class);
+    }
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */

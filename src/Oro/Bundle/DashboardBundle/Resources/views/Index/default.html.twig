@@ -69,7 +69,7 @@
 
                 {% block navButtons %}
                     {% if dashboards|length > 1 %}
-                        <div class="dashboard-selector-container pull-right title-buttons-container">
+                        <div class="dashboard-selector-container pull-right">
                             <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
                             <select id="dashboard_selector" {{ UI.renderPageComponentAttributes({
                                 view: 'orodashboard/js/app/views/dashboard-change-view'

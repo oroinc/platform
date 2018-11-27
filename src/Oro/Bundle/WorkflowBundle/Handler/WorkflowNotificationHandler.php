@@ -15,7 +15,7 @@ class WorkflowNotificationHandler extends EmailNotificationHandler
     /**
      * {@inheritdoc}
      */
-    public function handle(NotificationEvent $event, $matchedNotifications)
+    public function handle(NotificationEvent $event, array $matchedNotifications)
     {
         if (!$event instanceof WorkflowNotificationEvent) {
             return;

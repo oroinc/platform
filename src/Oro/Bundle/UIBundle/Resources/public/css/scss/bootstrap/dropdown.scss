@@ -127,8 +127,23 @@
 }
 
 .dropdown-item {
+    line-height: $dropdown-item-line-height;
+
     [class^="fa-"],
     [class*=" fa-"] {
-        margin: $dropdown-item-icon-fa-offset;
+        min-width: $dropdown-item-icon-fa-size;
+        height: $dropdown-item-icon-fa-size;
+        margin-#{$end}: $dropdown-item-icon-fa-offset;
+
+        text-align: center;
+        line-height: 0;
+
+        vertical-align: middle;
+
+        &:before {
+            font-size: $dropdown-item-icon-fa-font-size;
+
+            vertical-align: text-bottom;
+        }
     }
 }

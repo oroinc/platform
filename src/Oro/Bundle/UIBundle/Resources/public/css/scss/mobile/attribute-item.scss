@@ -1,0 +1,32 @@
+/* @theme: admin.oro; */
+
+.attribute-item {
+    margin: $attribute-item-offset;
+
+    &__term {
+        width: $attribute-item-term-width;
+        max-width: $attribute-item-term-max-width;
+        text-align: $attribute-item-term-text-align;
+    }
+
+    &__description {
+        margin-#{$start}: $attribute-item-description-offset-start;
+        word-break: $attribute-item-description-word-break;
+    }
+
+    &--mobile-full {
+        flex-wrap: wrap;
+
+        .attribute-item {
+            &__term {
+                width: 100%;
+                margin-bottom: $attribute-item-full-description-offset-bottom;
+            }
+
+            &__description {
+                width: 100%;
+                margin-#{$start}: 0;
+            }
+        }
+    }
+}

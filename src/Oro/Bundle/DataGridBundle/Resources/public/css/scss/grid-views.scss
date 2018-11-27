@@ -50,18 +50,20 @@
         }
     }
 
-    .grid-views-choice-icon {
-        float: #{$start};
-
-        line-height: inherit;
-    }
-
     .grid-views-dropdown {
         max-width: $oro-datagrid-grid-views-dropdown-width;
     }
 
     .grid-views-item {
+        padding: $oro-datagrid-grid-views-item-offset;
+
         @include clearfix();
+    }
+
+    .grid-views-choice-icon {
+        float: #{$start};
+
+        line-height: $font-size-base * $line-height-base;
     }
 
     .grid-views-choice {
@@ -74,6 +76,16 @@
         overflow: hidden;
 
         white-space: normal;
+    }
+
+    @at-root .has-icons {
+        .grid-views-choice {
+            margin-#{$start}: $dropdown-item-icon-fa-size + $dropdown-item-icon-fa-offset;
+        }
+
+        .grid-views-choice-icon +. grid-views-choice {
+            margin-#{$start}: 0;
+        }
     }
 
     @supports (-webkit-line-clamp: 2) {

@@ -1,0 +1,39 @@
+/* @theme: admin.oro; */
+
+.no-data {
+    margin: $no-data-offset;
+    padding: 0 $content-padding;
+    text-align: center;
+    font-size: $no-data-font-size;
+    line-height: $no-data-line-height;
+
+    color: $no-data-color;
+
+    &__title {
+        margin: 0;
+
+        font-size: $no-data-title-font-size;
+        line-height: 1;
+        font-weight: $no-data-title-font-weight;
+
+        color: $no-data-title-color;
+
+        @include fa-icon($no-data-icon, before, true) {
+            display: inline-block;
+
+            margin-#{$end}: $no-data-icon-offset;
+        }
+
+        &:first-child {
+            margin-bottom: $no-data-title-offset;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    &__text {
+        margin: 0;
+    }
+}

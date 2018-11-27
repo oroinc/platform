@@ -7,20 +7,6 @@
         display: none;
     }
 
-    .grid-toolbar {
-        margin-bottom: $activity-toolbar-offset;
-    }
-
-    .filter-box {
-        padding: 0;
-        width: 33%;
-        flex-grow: 1;
-    }
-
-    .pagination {
-        margin: 0;
-    }
-
     .actions-panel {
         width: $activity-filter-box-width;
         flex-grow: 1;
@@ -32,16 +18,29 @@
     .activity-list {
         position: relative;
 
+        .grid-toolbar {
+            align-items: flex-start;
+        }
+
+        .filter-box {
+            width: $activity-filter-box-width;
+            margin-bottom: $activity-filter-box-offset;
+            flex-grow: 1;
+        }
+
         .filter-item {
-            margin-#{$end}: $activity-filter-item-offset;
+            margin-bottom: $activity-filter-item-offset;
+
+            // should keep nesting
+            > .btn {
+                height: $activity-filter-item-size;
+
+                line-height: $activity-filter-item-size;
+            }
 
             &:last-child {
                 margin-#{$end}: 0;
             }
-        }
-
-        .info {
-            margin: $activity-filter-info-offset;
         }
 
         .info.responsive-cell {
@@ -69,24 +68,27 @@
         font-size: $activity-date-font-size;
     }
 
-    .list-item:last-child {
-        border-bottom: 0;
-    }
-
     .icon {
         width: $activity-icon-size;
 
         font-size: $activity-icon-font-size;
+        line-height: 1;
         text-align: center;
 
         color: $activity-icon-color;
     }
 
     .activity-actions {
-        margin-#{$start}: $activity-actions-offset;
-
         .dropdown-toggle {
             font-size: $activity-icon-font-size;
+
+            text-align: $end;
+
+            width: $activity-dropdown-toggle-size;
+
+            @include fa-icon($activity-dropdown-toggle-icon, before, true) {
+                font-weight: normal;
+            }
         }
     }
 
@@ -117,8 +119,8 @@
         @include clearfix();
 
         .details,
-        .message,
         .message-subject,
+        .message-description,
         .actions {
             @include text-line-truncate(null);
         }
@@ -172,6 +174,10 @@
         }
 
         .message-item {
+            display: flex;
+            align-items: center;
+            padding-#{$end}: $activity-message-item-offset;
+
             color: $activity-icon-color;
 
             @include text-line-truncate();
@@ -183,23 +189,33 @@
     }
 
     .accordion-body {
-        padding: 0;
+        padding-top: $activity-accordion-body-offset;
 
         .user-fieldset {
             margin: $activity-user-fieldset-offset;
         }
+    }
 
-        .comment {
-            padding: $activity-comment-offset;
+    .activity-item-email-content {
+        padding: $activity-item-email-content-padding;
+
+        .info {
+            width: 100%;
         }
     }
 
-    .no-data {
-        @include no-data;
+    .activity-item-content {
+        padding: $activity-item-content-padding;
+        margin-bottom: $activity-item-content-margin;
     }
 
-    .responsive-block {
-        margin-bottom: $activity-responsive-block-offset;
+    .list-item:last-child {
+        border-bottom: 0;
+
+        .activity-item-email-content,
+        .activity-item-content {
+             margin-bottom: 0;
+        }
     }
 }
 
@@ -224,5 +240,24 @@
 
     .dropdown-toggle:after {
         display: none;
+    }
+}
+
+.responsive-section:not(.responsive-small) {
+    .email-content,
+    .activity-item-content {
+        display: flex;
+
+        > .responsive-cell {
+            &:first-child {
+                padding-#{$end}: $activity-item-content-offset;
+
+                border-#{$end}: 1px solid $activity-item-content-border-color;
+            }
+
+            &:last-child {
+                padding-#{$start}: $activity-item-content-offset;
+            }
+        }
     }
 }

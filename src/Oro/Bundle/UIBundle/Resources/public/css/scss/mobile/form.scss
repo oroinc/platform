@@ -147,3 +147,22 @@ h5.user-fieldset {
         margin-bottom: $well-tags-overlay-offset-bottom;
     }
 }
+
+.clearable-input {
+
+    &__container--clear .clearable-input__placeholder-icon {
+        font-size: $icon-font-size;
+        top: ($input-size - $icon-font-size) / -2;
+        width: $input-size;
+        height: $input-size;
+        line-height: $input-size;
+    }
+
+    &__clear {
+        top: ($input-size - $icon-font-size) / -2;
+    }
+
+    &__container > input {
+        padding-#{$end}: $input-size;
+    }
+}

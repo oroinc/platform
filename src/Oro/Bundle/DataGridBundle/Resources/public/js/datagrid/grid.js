@@ -58,13 +58,15 @@ define(function(require) {
         /** @property */
         noDataTemplate: require('tpl!orodatagrid/templates/datagrid/no-data.html'),
 
+        noSearchResultsTemplate: require('tpl!orodatagrid/templates/datagrid/no-search-results.html'),
+
         /** @property {Object} */
         noDataTranslations: {
             entityHint: 'oro.datagrid.entityHint',
             noColumns: 'oro.datagrid.no.columns',
             noEntities: 'oro.datagrid.no.entities',
             noResults: 'oro.datagrid.no.results',
-            noResultsTitle: 'oro.datagrid.no.resultsTitle'
+            noResultsTitle: 'oro.datagrid.no.results_title'
         },
 
         /** @property {Object} */
@@ -1111,23 +1113,26 @@ define(function(require) {
          * Define no data block.
          */
         _defineNoDataBlock: function() {
+            var messageHTML;
             var placeholders = {
                 entityHint: (this.entityHint || __(this.noDataTranslations.entityHint)).toLowerCase()
             };
 
-            var hints = [];
+            if (this.noColumnsFlag || _.isEmpty(this.collection.state.filters)) {
+                var translation = this.noColumnsFlag
+                    ? this.noDataTranslations.noColumns : this.noDataTranslations.noEntities;
 
-            if (this.noColumnsFlag) {
-                hints.push(__(this.noDataTranslations.noColumns));
-            } else if (_.isEmpty(this.collection.state.filters)) {
-                hints.push(__(this.noDataTranslations.noEntities));
+                messageHTML = this.noDataTemplate({
+                    text: __(translation, placeholders)
+                });
             } else {
-                hints.push(__(this.noDataTranslations.noResultsTitle));
-                hints.push(__(this.noDataTranslations.noResults, placeholders));
+                messageHTML = this.noSearchResultsTemplate({
+                    title: __(this.noDataTranslations.noResultsTitle),
+                    text: __(this.noDataTranslations.noResults, placeholders)
+                });
             }
-            this.$(this.selectors.noDataBlock).html($(this.noDataTemplate({
-                hints: hints
-            })));
+
+            this.$(this.selectors.noDataBlock).html(messageHTML);
         },
 
         /**

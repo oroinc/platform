@@ -4,6 +4,7 @@
 
 @import "app-page";
 @import "application-menu";
+@import "attribute-item";
 @import "drag-and-drop-support";
 @import "create-select-entity";
 @import "entity";
@@ -18,6 +19,7 @@
 @import "datepicker";
 @import "simplecolorpicker";
 @import "dialog";
+@import "label";
 
 @import "page-header";
 @import "page-toolbar";
@@ -31,12 +33,10 @@
 @import "footer";
 @import "fs-toolbar";
 @import "flash-messages";
-@import "alert";
 @import "inline-actions";
-@import "modal";
-@import "dropdown/dropdown-menu-collection";
 @import "error-page";
 @import "nav";
+@import "no-data";
 
 @import "tab/tabs";
 @import "tab/oro-tabs";
@@ -54,3 +54,4 @@
 @import "widget-picker";
 @import "tables";
 @import "other-scroll-container";
+@import "load-more";

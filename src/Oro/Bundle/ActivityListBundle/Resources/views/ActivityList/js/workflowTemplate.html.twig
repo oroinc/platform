@@ -1,7 +1,7 @@
 <% if (workflowsData && workflowsData.length > 0) { %>
     <% _.each(workflowsData, function(workflow) { %>
         <% if (workflow.transitionsData.length > 0) { %>
-            <li role="separator" class="divider">&nbsp;</li>
+            <li role="separator" class="dropdown-divider">&nbsp;</li>
             <% _.each(workflow.transitionsData, function(transition) { %>
                 <li>
                     <a href="<%- transition.transitionUrl %>" class="dropdown-item transition-item"

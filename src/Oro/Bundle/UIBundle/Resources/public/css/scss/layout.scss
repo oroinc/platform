@@ -19,6 +19,10 @@
     }
 
     .responsive-block {
+        &:empty {
+            display: none;
+        }
+
         @include responsive-inline-position();
     }
 
@@ -141,10 +145,6 @@
         .responsive-cell {
             &:only-child {
                 padding-#{$end}: 0;
-            }
-
-            .no-data {
-                @include no-data;
             }
         }
     }

@@ -72,6 +72,7 @@
             serverTimeOffset = Date.parse(serverTime) - clientTime,
             $motd = $('.motd').first(),
             $apiDocLink = $('#header a').first(),
+            apiActions = {{ actions|default([])|json_encode|raw }},
             apiType = window.location.pathname.substr('{{ rootPath }}'.length + 1) || '{{ defaultView }}',
             apiPrefix = '',
             operatorMap = {'eq': '=', 'neq': '!=', 'gt': '>', 'lt': '<', 'gte': '>=', 'lte': '<='},
@@ -276,13 +277,26 @@
              */
             {% if views is defined and views -%}
                 var $headers = $(this).closest('.content').find('fieldset.headers'),
-                    routePath = $(this).parents('li.operation').find('div.heading span.path').text();
+                    routePath = $(this).parents('li.operation').find('div.heading span.path').text(),
+                    apiAction = apiActions[$(this).closest('.operation').attr('id')] || null,
+                    headerActions = [],
+                    headers = {};
                 {% for name, view in views -%}
                 {% if view.headers is defined and view.headers -%}
                 if (apiType === '{{ name }}' && routePath.indexOf('/api/rest/') === -1) {
-                    {%- for headerName, headerValue in view.headers -%}
-                    addHeader($headers, '{{ headerName }}', '{{ headerValue }}');
-                    {%- endfor -%}
+                    {% for headerName, headerValues in view.headers -%}
+                    {% for headerValue in headerValues -%}
+                    headerActions = {{ headerValue.actions|json_encode|raw }};
+                    if (!apiAction || headerActions.length === 0 || headerActions.indexOf(apiAction) >= 0) {
+                        headers['{{ headerName }}'] = headers['{{ headerName }}']
+                            ? headers['{{ headerName }}'] + ';{{ headerValue.value }}'
+                            : '{{ headerValue.value }}';
+                    }
+                    {% endfor -%}
+                    {% endfor -%}
+                    for (var key in headers) {
+                        addHeader($headers, key, headers[key]);
+                    }
                 }
                 {% endif %}
                 {%- endfor %}

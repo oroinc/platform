@@ -26,49 +26,8 @@
         }
     }
 
-    &__filter {
-        position: relative;
-        display: inline-block;
-        text-align: #{$start};
-
-        &.empty {
-            @include fa-icon($widget-picker-filter-search-icon, after, true) {
-                font-size: $icon-font-size;
-                color: $btn-text-color;
-                display: block;
-                position: absolute;
-                top: 0;
-                #{$end}: 0;
-                width: $widget-picker-icon-size;
-                height: $widget-picker-icon-size;
-                line-height: $widget-picker-icon-size;
-                text-align: center;
-            }
-        }
-    }
-
-    &__filter-clear {
-        [class^="fa-"] {
-            @include fa-icon($widget-picker-filter-clear-icon);
-        }
-
-        position: absolute;
-        top: 0;
-        #{$end}: 0;
-
-        .widget-picker__filter.empty & {
-            display: none;
-        }
-    }
-
     input&__filter-search {
         width: $widget-picker-search-width;
-        padding-#{$end}: $widget-picker-icon-size;
-    }
-
-    &__no-results-found {
-        text-align: center;
-        padding-top: 24px;
     }
 
     &__results {

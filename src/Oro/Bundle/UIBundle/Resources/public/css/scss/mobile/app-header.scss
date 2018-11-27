@@ -37,22 +37,17 @@
 
         @include safe-area-offset(padding, 0);
 
-        .nav-content {
-            padding: 0 $mobile-app-header-dropdown-item-padding;
-        }
-
         .dropdown-menu {
             #{$start}: 0;
 
             color: $app-header-dropdown-menu-color;
 
             .nav-header {
-                padding-#{$start}: $mobile-app-header-dropdown-item-padding;
-                padding-#{$end}: $mobile-app-header-dropdown-item-padding;
-                margin-#{$end}: $app-header-dropdown-close-icon-margin + $app-header-dropdown-close-icon-font-size;
+                margin-#{$end}: $mobile-app-header-header-margin-end;
                 margin-bottom: $mobile-app-header-header-margin-bottom;
 
                 font-size: $mobile-app-header-header-font-size;
+                line-height: 1;
                 text-transform: none;
 
                 overflow: hidden;
@@ -116,17 +111,30 @@
         .logo {
             font-size: $mobile-app-header-organization-logo-font-size;
             color: $app-header-logo-text-color;
+            font-weight: bold;
             margin: 0;
-            float: #{$start};
+            float: $start;
             line-height: $app-header-height;
             height: $app-header-height;
             white-space: nowrap;
+            max-width: 100%;
 
             .organization-name {
                 color: inherit;
+                text-transform: uppercase;
                 display: inline-block;
-                vertical-align: middle;
+                max-width: $app-header-max-width;
                 @include text-line-truncate($app-header-max-width, true);
+            }
+
+            &.dropdown-toggle {
+                padding-#{$end}: 12px;
+
+                &:after {
+                    vertical-align: initial;
+                    height: 54%;
+                    position: relative;
+                }
             }
         }
 
@@ -157,29 +165,34 @@
             }
 
             .dropdown-menu {
+                padding: $mobile-app-header-dropdown-menu-padding;
+
                 .nav-header {
-                    padding-#{$start}: $mobile-app-header-dropdown-item-padding;
-                    padding-#{$end}: $mobile-app-header-dropdown-item-padding;
+                    font-size: $mobile-app-header-title-font-size;
+                    margin-bottom: $mobile-app-header-header-margin-bottom;
                 }
             }
         }
 
         .header-dropdown-shortcut {
-            &__search {
-                width: 100%;
-            }
-
             .dropdown-menu {
                 #{$start}: auto;
                 #{$end}: 0;
 
-                .nav-content {
-                    margin-bottom: $mobile-app-header-shortcuts-content-margin-bottom;
-                }
-
                 &:before {
                     #{$start}: auto;
                     #{$end}: $tablet-app-header-shortcuts-arrow-end;
+                }
+            }
+
+            .nav-content form {
+                padding: 0 0 18px;
+            }
+
+            .dropdown-item {
+                padding: $mobile-app-header-dropdown-item-padding;
+                > a {
+                    font-size: $mobile-app-header-dropdown-link-font-size;
                 }
             }
         }
@@ -217,7 +230,7 @@
                     }
                 }
 
-                .no-result-message {
+                .no-data {
                     top: $input-size - $input-border-width;
                 }
 
@@ -227,6 +240,10 @@
                     .select2-container {
                         width: 100%;
                         margin-bottom: $mobile-app-header-search-form-row-margin-bottom;
+                    }
+
+                    .search-field-container {
+                        margin-right: 12px;
                     }
                 }
             }
@@ -248,8 +265,26 @@
             }
 
             .dropdown-menu {
+                padding: $mobile-app-header-dropdown-menu-padding;
                 #{$start}: auto;
                 #{$end}: $tablet-app-header-user-menu-offset;
+
+                .nav-header {
+                    margin-#{$end}: $mobile-app-header-header-margin-end;
+                    margin-bottom: $mobile-app-header-title-margin-bottom;
+                }
+
+                .divider {
+                    border-bottom: $mobile-app-header-user-menu-divider-border-bottom;
+                }
+
+                li:not(.nav-header):not(.divider) {
+                    padding: $mobile-app-header-dropdown-item-padding;
+                    > a {
+                        font-size: $mobile-app-header-dropdown-link-font-size;
+                        padding: 0;
+                    }
+                }
 
                 &:before {
                     #{$start}: auto;

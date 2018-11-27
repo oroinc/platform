@@ -442,3 +442,36 @@ input[type='text'].hasDatepicker.ui-datepicker-dialog-is-below:focus,
 .timepicker-dialog-is-below.timepicker-error + span.validation-failed:after {
     left: 128px;
 }
+
+.clearable-input {
+
+    &__container {
+        position: relative;
+    }
+
+    &__placeholder-icon {
+        display: none;
+    }
+
+    &__container--clear .clearable-input__placeholder-icon {
+        color: $btn-text-color;
+        display: block;
+        position: absolute;
+        #{$end}: 0;
+        text-align: center;
+        pointer-events: none;
+    }
+
+    &__clear {
+        [class^="fa-"] {
+            @include fa-icon($fa-var-close);
+        }
+
+        position: absolute;
+        #{$end}: 0;
+    }
+
+    &__container--clear .clearable-input__clear {
+        display: none;
+    }
+}

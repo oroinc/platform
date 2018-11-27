@@ -28,9 +28,9 @@ The default ["base"](https://github.com/orocrm/platform/blob/84b1d81ac3a7198bdd0
 #MyBundle/Resources/views/layouts/first_theme/default.yml
 layout:
     actions:
-        - @setBlockTheme:
+        - '@setBlockTheme':
             themes: 'MyBundle:layouts/first_theme/php'
-        - @addTree:
+        - '@addTree':
             items:
                 head:
                     blockType: head
@@ -61,7 +61,7 @@ The example above creates a standard web page structure (head, metadata, and bod
 
 ```Yaml
     actions:
-        - @setBlockTheme:
+        - '@setBlockTheme':
             themes: 'MyBundle:layouts/first_theme/php'
 ```
 

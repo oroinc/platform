@@ -6,4 +6,4 @@ oro:
             entity_filter: "Entity filter"
             empty: No results
         quick_search:
-            noresults: no results found
+            noresults: No results found

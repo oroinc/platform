@@ -1,10 +1,5 @@
 /* @theme: admin.oro; */
 
-.label-info,
-.badge-info {
-    background: $secondary-200;
-}
-
 .widget-content > .label-info:first-child {
     margin-bottom: 10px;
 }
@@ -63,8 +58,8 @@ footer {
 
 /* general style classes */
 .extra-small {
-    font-size: 10px;
-    color: $primary-700;
+    font-size: 12px;
+    color: $primary-550;
 }
 
 .input-large {
@@ -146,44 +141,6 @@ footer {
     border-top: 1px solid $primary-860;
     width: 100%;
     box-sizing: border-box;
-}
-
-.status-disabled,
-.status-unknown {
-    color: #aaa;
-}
-
-.status-enabled {
-    color: #2f8206;
-}
-
-.status-tentatively {
-    color: #a7a50a;
-}
-
-.status-disabled,
-.status-tentatively,
-.status-enabled,
-.status-unknown {
-    margin-#{$start}: 5px;
-    text-shadow: none;
-    padding: side-values(3px 10px 3px 5px);
-
-    [class^="fa-"]:before {
-        font-size: 12px;
-    }
-}
-
-.status-enabled [class^="fa-"]:before {
-    color: #4a9938;
-}
-
-.status-disabled [class^="fa-"]:before {
-    color: #e37878;
-}
-
-.status-unknown [class^="fa-"]:before {
-    color: #aaa;
 }
 
 .holder-height {
@@ -519,13 +476,7 @@ h5.user-fieldset {
 .separator-btn {
     border-#{$start}: 1px solid $additional-extra-lighten;
     margin: 4px 8px 0;
-    height: 24px;
-}
-
-.title-buttons-container {
-    .pull-left > .separator-btn {
-        margin-#{$end}: 1px;
-    }
+    height: $btn-line-height;
 }
 
 .pagination-centered > label {
@@ -773,10 +724,6 @@ span.validation-failed {
     }
 }
 
-.control-group {
-    @include clearfix();
-}
-
 .control-group.create-select-entity {
     max-width: inherit;
 }
@@ -837,51 +784,7 @@ label .popover-body {
     text-transform: none;
 }
 
-.list-widget.box-type1 {
-    .title {
-        padding-bottom: 0;
-    }
-}
-
 .list-widget .widget-actions-section {
-    a.btn {
-        height: auto;
-        border: 0;
-        box-shadow: none;
-        padding: side-values(0 2px 0 8px);
-
-        .action-button-icon {
-            line-height: initial;
-
-            &:before {
-                font-size: 15px;
-            }
-
-            &:hover {
-                &:before {
-                    opacity: 1;
-                }
-            }
-        }
-    }
-
-    a.btn.disabled,
-    a.btn[disabled] {
-        cursor: not-allowed;
-
-        .action-button-icon {
-            &:before {
-                opacity: .3;
-            }
-
-            &:hover {
-                &:before {
-                    opacity: .3;
-                }
-            }
-        }
-    }
-
     .action-wrapper {
         vertical-align: middle;
 
@@ -889,17 +792,14 @@ label .popover-body {
             margin-#{$start}: 5px;
         }
 
-        .btn-mini {
-            margin-#{$start}: 0;
-            border-radius: 0;
-            font-weight: normal;
-            font-size: $font-size-base;
+        .collapse-all-button,
+        .expand-all-button {
             padding: side-values(0 8px 0 6px);
         }
     }
 
-    .action-wrapper + .action-wrapper .btn-mini {
-        border-left: 1px solid $primary-750;
+    .expand-all-button {
+        border-#{$end}: 1px solid $primary-750;
     }
 }
 
@@ -916,47 +816,7 @@ label .popover-body {
         .actions {
             position: relative;
             float: #{$end};
-            margin-#{$end}: -4px;
             z-index: 99;
-
-            .btn {
-                line-height: 1em;
-                height: auto;
-                border: 0;
-                background: none;
-                box-shadow: none;
-                padding: 0;
-
-                .action-button-icon {
-                    &:before {
-                        opacity: .6;
-                        font-size: 15px;
-                    }
-
-                    &:hover {
-                        &:before {
-                            opacity: 1;
-                        }
-                    }
-                }
-            }
-
-            .btn.disabled,
-            .btn[disabled] {
-                cursor: not-allowed;
-
-                .action-button-icon {
-                    &:before {
-                        opacity: .3;
-                    }
-
-                    &:hover {
-                        &:before {
-                            opacity: .3;
-                        }
-                    }
-                }
-            }
         }
     }
 }
@@ -1020,8 +880,25 @@ label .popover-body {
 
 .collapse-block {
     [data-collapse-container] {
+        position: relative;
+
+        max-height: round($font-size-base * $line-height-base * 3);
+
         overflow: hidden;
-        max-height: 69.4px; // 4 (lines) * 13px (font-size) * 1.2 (line-height) + 7px (padding)
+    }
+
+    &.overflows [data-collapse-container]:after {
+        position: absolute;
+        bottom: 0;
+
+        display: block;
+        height: round($font-size-base * $line-height-base);
+        width: 100%;
+
+        background-image: linear-gradient(to top, $primary-inverse, rgba($primary-inverse, 0.1));
+
+        content: '';
+        pointer-events: none;
     }
 
     &.expanded [data-collapse-container] {
