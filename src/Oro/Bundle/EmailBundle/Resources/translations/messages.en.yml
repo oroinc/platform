@@ -26,8 +26,8 @@ oro:
         form:
             choose_template:                     Choose a Template
             add_signature:                       Add Signature
-            attach_file:                         Attach file
-            from_record:                         From record
+            attach_file:                         Attach File
+            from_record:                         From Record
             upload:                              Upload
             attach:                              Attach
             no_attachments:                      No available attachments
