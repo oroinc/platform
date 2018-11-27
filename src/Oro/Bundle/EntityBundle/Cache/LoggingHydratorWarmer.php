@@ -5,12 +5,15 @@ namespace Oro\Bundle\EntityBundle\Cache;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 
 /**
- * Warmer for logging hydrator classes.
+ * Creates classes for logging hydrators.
  */
 class LoggingHydratorWarmer extends CacheWarmer
 {
+    /** @var array [hydrator name => hydrator class, ...] */
+    private $hydrators;
+
     /**
-     * @param array $hydrators [{hydrator_name} => {hydrator_class}, ...]
+     * @param array $hydrators [hydrator name => hydrator class, ...]
      */
     public function __construct(array $hydrators)
     {

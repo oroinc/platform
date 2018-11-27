@@ -880,8 +880,25 @@ label .popover-body {
 
 .collapse-block {
     [data-collapse-container] {
+        position: relative;
+
+        max-height: round($font-size-base * $line-height-base * 3);
+
         overflow: hidden;
-        max-height: 69.4px; // 4 (lines) * 13px (font-size) * 1.2 (line-height) + 7px (padding)
+    }
+
+    &.overflows [data-collapse-container]:after {
+        position: absolute;
+        bottom: 0;
+
+        display: block;
+        height: round($font-size-base * $line-height-base);
+        width: 100%;
+
+        background-image: linear-gradient(to top, $primary-inverse, rgba($primary-inverse, 0.1));
+
+        content: '';
+        pointer-events: none;
     }
 
     &.expanded [data-collapse-container] {

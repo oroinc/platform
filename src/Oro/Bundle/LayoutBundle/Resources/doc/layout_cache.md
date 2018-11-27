@@ -38,9 +38,9 @@ For example:
 ```
 actions:
     ...
-    - @add:
+    - '@add':
         id: blockId
-        parent: parentId
+        parentId: parentId
         blockType: typeName
         options:
             optionName: '=context["valueKey"]'
@@ -51,9 +51,9 @@ It will be evaluated before the [BlockTypeInterface::buildBlock](../../../../Com
 ```
 actions:
     ...
-    - @add:
+    - '@add':
         id: blockId
-        parent: parentId
+        parentId: parentId
         blockType: typeName
         options:
             optionName: '=data["valueKey"]'

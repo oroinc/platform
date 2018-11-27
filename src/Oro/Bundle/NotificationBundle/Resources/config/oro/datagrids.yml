@@ -88,7 +88,7 @@ datagrids:
             entityHint: transactional emails
             entity_pagination: true
         acl_resource: oro_notification_emailnotification_view
-        extended_entity_name: '%oro_notification.emailnotification.entity.class%'
+        extended_entity_name: 'Oro\Bundle\NotificationBundle\Entity\EmailNotification'
         source:
             type: orm
             query:
@@ -123,7 +123,7 @@ datagrids:
             eventName:
                 label: oro.notification.emailnotification.event.label
                 type: translatable
-                choices: "@oro_notification.event_listener.email_notification_service->getEventNameChoices"
+                choices: "@oro_notification.grid_helper->getEventNameChoices"
                 order: 20
 
             templateName:
@@ -141,7 +141,7 @@ datagrids:
                 label: oro.notification.datagrid.recipient.group
                 type: twig
                 template: OroNotificationBundle:EmailNotification:Datagrid/Property/recipientGroupsList.html.twig
-                choices: "@oro_notification.event_listener.email_notification_service->getRecipientGroupsChoices"
+                choices: "@oro_notification.grid_helper->getRecipientGroupsChoices"
                 frontend_type: html
                 order: 70
 
@@ -197,7 +197,7 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
-                            choices: "@oro_notification.event_listener.email_notification_service->getEventNameChoices"
+                            choices: "@oro_notification.grid_helper->getEventNameChoices"
 
                 templateName:
                     type: string
@@ -209,7 +209,7 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
-                            choices: "@oro_notification.event_listener.email_notification_service->getRecipientUsersChoices"
+                            choices: "@oro_notification.grid_helper->getRecipientUsersChoices"
 
                 recipientGroupsList:
                     type: choice
@@ -217,7 +217,7 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
-                            choices: "@oro_notification.event_listener.email_notification_service->getRecipientGroupsChoices"
+                            choices: "@oro_notification.grid_helper->getRecipientGroupsChoices"
 
                 emailRecipient:
                     type: string

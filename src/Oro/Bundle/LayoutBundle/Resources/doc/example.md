@@ -38,9 +38,9 @@ For this, we should create a default layout update file and place it in the `Res
 ```yaml
 layout:
     actions:
-        - @setBlockTheme:
+        - '@setBlockTheme':
             themes: 'AcmeLayoutBundle:layouts:first_theme/default.html.twig'
-        - @addTree:
+        - '@addTree':
             items:
                 head:
                     blockType: head
@@ -217,7 +217,7 @@ In our example, we need to add the `lang="en"` attribute to the `<html>` tag. Fo
 ```
 Now we can set the `lang` attribute in the layout update file using the `setOption` action:
  ```yaml
-     - @setOption:
+     - '@setOption':
          id: root
          optionName: attr.lang
          optionValue: en
@@ -264,19 +264,19 @@ To add some CSS and JS to our page, we use the `style` and `script` block types:
 ```yaml
 layout:
     actions:
-        - @add:
+        - '@add':
             id: style_calendar
             parentId: head_style
             blockType: style
             options:
                 src: 'js/calendar/calendar.css'
-        - @add:
+        - '@add':
             id: script_prototype
             parentId: head_script
             blockType: script
             options:
                 src: 'js/prototype/prototype.js'
-        - @add:
+        - '@add':
             id: script_cookie_path
             parentId: head_script
             blockType: script
@@ -291,7 +291,7 @@ For demonstration purposes, we will add some scripts for the IE using only  cond
 ```yaml
 layout:
     actions:
-        - @add:
+        - '@add':
             id: script_ie
             parentId: head_script
             blockType: block
@@ -322,9 +322,9 @@ In our default theme we have a two-column layout, however, for our example page 
 ```yaml
 layout:
     actions:
-        - @remove:
+        - '@remove':
             id: left_panel
-        - @replaceOption:
+        - '@replaceOption':
             id: main_container
             optionName: attr.class
             oldOptionValue: col2-left-layout
@@ -335,7 +335,7 @@ Here, we know the option value that we need to replace. But if you want to add a
 ```yaml
 layout:
     actions:
-        - @appendOption:
+        - '@appendOption':
             id: body
             optionName: attr.class
             optionValue: catalog-product-view
@@ -345,11 +345,11 @@ For our example, we also need to add a wrapper for the body content. For this,  
 ```yaml
 layout:
     actions:
-        - @add:
+        - '@add':
             id: body_wrapper
             blockType: container
             parentId: body
-        - @move:
+        - '@move':
             id: page_container
             parentId: body_wrapper
 ```
@@ -422,7 +422,7 @@ Now we can added it to the layout depending on the condition using the `visible`
 ```yaml
 layout:
     actions:
-        - @add:
+        - '@add':
             id: demo_notice
             parentId: body_wrapper
             blockType: block
@@ -531,11 +531,11 @@ Now we can use the product data in the layout update to add the page title, meta
 ```yaml
 layout:
     actions:
-        - @setOption:
+        - '@setOption':
             id: head
             optionName: title
             optionValue: '=data["product"].getName()~" - "~data["product"].getSubcategory()~" - "~data["product"].getCategory()'
-        - @add:
+        - '@add':
             id: link_canonical
             parentId: head
             blockType: external_resource
@@ -592,7 +592,7 @@ Now we can refer to the language data the same way as to the product data and ad
 ```yaml
 layout:
     actions:
-        - @add:
+        - '@add':
             id: lang_switch
             parentId: page_container
             blockType: block
@@ -696,7 +696,7 @@ And pass the `current_language` variable to the block using the layout update:
 ```yml
 layout:
     actions:
-        - @setOption:
+        - '@setOption':
             id: lang_switch
             optionName: vars.current_language
             optionValue: '=data["current_language"]'
@@ -713,7 +713,7 @@ As an example, we can add the meta description block right after the main meta b
 ```yaml
 layout:
     actions:
-        - @add:
+        - '@add':
             id: meta_description
             parentId: head
             blockType: meta
@@ -727,7 +727,7 @@ If you need to place a block before another one, use the `prepend: true` attribu
 The same positioning can be achieved using the `move` action. As an example, we can move our language switcher before the header block:
 
 ```yaml
-    - @move:
+    - '@move':
         id: lang_switch
         parentId: page_container
         siblingId: ~
@@ -898,7 +898,7 @@ Now we can customize the twig template for the link block by adding the followin
 
 Now we can add a logo image into our header block before the navigation block:
 ```yaml
-   - @add:
+   - '@add':
        id : logo
        parentId: header
        blockType: link
@@ -993,7 +993,7 @@ We can use it in the layout update file:
 ```yaml
 layout:
     actions:
-        - @add:
+        - '@add':
             id: some_wrapper
             blockType: container
             parentId: some_parent
@@ -1011,7 +1011,7 @@ In the layout update file we do the following:
 ```yaml
 layout:
     actions:
-        - @addTree:
+        - '@addTree':
             items:
                 nav_container:
                     blockType: container
@@ -1113,13 +1113,13 @@ We can now place the block with the `breadcrumbs` Id in the layout update and ad
 ```yaml
 layout:
     actions:
-        - @add:
+        - '@add':
             id : breadcrumbs
             parentId: main_container
             blockType: list
             siblingId: ~
             prepend: true
-        - @add:
+        - '@add':
             id : breadcrumbs_home
             parentId: breadcrumbs
             blockType: link
@@ -1128,7 +1128,7 @@ layout:
                 text: Home
                 attr:
                     title: Go to Home Page
-        - @add:
+        - '@add':
             id : breadcrumbs_product
             parentId: breadcrumbs
             blockType: text
@@ -1199,7 +1199,7 @@ Now we can add the search form into the layout.
 ```yaml
 layout:
     actions:
-        - @addTree:
+        - '@addTree':
             items:
                 searh_form_start':
                     blockType: form_start
@@ -1392,9 +1392,9 @@ Render this form by adding it to the layout update file:
 ```yaml
 layout:
     actions:
-        - @setBlockTheme:
+        - '@setBlockTheme':
             themes: 'AcmeLayoutBundle:layouts:first_theme/demo_layout_test/product.html.twig'
-        - @addTree:
+        - '@addTree':
             items:
                 product_view:
                     blockType: container
@@ -1616,9 +1616,9 @@ We can now add the product image box to our example page:
 ```yaml
 layout:
     actions:
-        - @setBlockTheme:
+        - '@setBlockTheme':
             themes: 'AcmeLayoutBundle:layouts:first_theme/demo_layout_test/product.html.twig'
-        - @addTree:
+        - '@addTree':
             items:
                 product_image_box:
                     blockType: container
@@ -1703,9 +1703,9 @@ So far, we have seen how the layout engine can be extended to suit every day nee
 ```yaml
 layout:
     actions:
-        - @setBlockTheme:
+        - '@setBlockTheme':
             themes: 'AcmeLayoutBundle:layouts:first_theme/demo_layout_test/product.html.twig'
-        - @add:
+        - '@add':
             id: product_shop
             parentId: product_essential
             blockType: container
@@ -1714,7 +1714,7 @@ layout:
                 attr:
                     class: product-shop
             siblingId: product_image_box # add right after this block
-        - @addTree:
+        - '@addTree':
             items:
                 product_options:
                     blockType: container
@@ -1842,12 +1842,12 @@ layout:
                             product_add_to_wishlist_link: ~
                         product_share_links: ~
         # Final position does not depend on move operations order
-        - @move:
+        - '@move':
             id: color_field
             parentId: product_options
             siblingId: ~
             prepend: true
-        - @add:
+        - '@add':
             id: qty_wrapper
             parentId: add_to_cart_wrapper
             blockType: container
@@ -1855,7 +1855,7 @@ layout:
                 type: div
                 attr:
                     class: qty-wrapper
-        - @add:
+        - '@add':
             id: add_to_cart_buttonaa
             parentId: add_to_cart_wrapper
             blockType: container
@@ -1863,24 +1863,24 @@ layout:
                 type: div
                 attr:
                     class: add-to-cart-buttons
-        - @move:
+        - '@move':
             id: add_to_cart_button
             parentId: add_to_cart_buttonaa
-        - @move:
+        - '@move':
             id: qty_field
             parentId: qty_wrapper
-        - @move:
+        - '@move':
             id: add_to_cart_wrapper
             parentId: product_options_bottom
             siblingId: ~
             prepend: true
         # Adding product collateral tabs
-        - @add:
+        - '@add':
             id: product_collateral_tabs
             parentId: product_view
             blockType: container
             siblingId: product_essential
-        - @add:
+        - '@add':
             id: product_collateral_tab_description
             parentId: product_collateral_tabs
             blockType: text
@@ -1889,7 +1889,7 @@ layout:
                 vars:
                     tabLabel: "Description"
         # Adding footer links
-        - @add:
+        - '@add':
             id: company_links
             parentId: footer
             blockType: list
@@ -1897,7 +1897,7 @@ layout:
                 label: "Company"
                 attr:
                     class: "links"
-        - @add:
+        - '@add':
             id: social_media_links
             parentId: footer
             blockType: list
@@ -1905,14 +1905,14 @@ layout:
                 label: "Connect With Us"
                 attr:
                     class: "links social-media"
-        - @add:
+        - '@add':
             id: footer_about_us_link
             parentId: company_links
             blockType: link
             options:
                 path: "/about-us/"
                 text: About Us
-        - @add:
+        - '@add':
             id: footer_facebook_link
             parentId: social_media_links
             blockType: link
