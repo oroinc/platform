@@ -33,6 +33,7 @@ $input-error-color: $danger-dark !default;
 $uploader-border-radius: $input-field-border-radius !default;
 $uploader-background-color: $input-background-color !default;
 $uploader-height: $field-size !default;
+$uploader-width: $field-width !default;
 $uploader-line-height: $field-size !default;
 $uploader-float: left !default;
 $uploader-white-space: nowrap !default;
@@ -94,7 +95,7 @@ $selector-select-color: $primary-200 !default;
 
 $selector-uniform-display: block !default;
 $selector-uniform-box-sizing: border-box !default;
-$selector-uniform-inner-offset: side-values(0 20px 0 6px) !default;
+$selector-uniform-inner-offset: side-values(0 30px 0 6px) !default;
 $selector-uniform-white-space: nowrap !default;
 $selector-uniform-overflow: hidden !default;
 $selector-uniform-text-overflow: ellipsis !default;
