@@ -1,64 +1,85 @@
 /* @theme: admin.oro; */
 
-.form-horizontal .query-designer-form {
-    @include clearfix();
+.form-horizontal {
+    .query-designer-form {
+        margin-bottom: $query-designer-controls-group-margin-start;
+    }
 
-    .control-group {
-        float: #{$start};
-        min-height: $query-designer-control-group-min-height;/* @TODO temporary solution, will be fixed in CRM-2025 */
+    .query-designer-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
 
-        label.control-label,
-        .control-label.wrap {
-            width: auto;
-            margin-#{$start}: $query-designer-controls-margin-start;
-            min-width: $query-designer-control-label-min-width;/* @TODO temporary solution, will be fixed in CRM-2025 */
-        }
-
-        .controls {
-            margin-#{$start}: $query-designer-controls-margin-start;
+        .control-group {
             float: #{$start};
-        }
-    }
+            flex-direction: column;
+            margin-#{$end}: $query-designer-controls-group-margin-start;
+            margin-bottom: $query-designer-controls-group-margin-start;
 
-    .select2-container {
-        width: $query-designer-select2-container-width !important;
-    }
-    input.label-text {
-        width: $query-designer-label-text-width;
-    }
-    .function-selector .controls select {
-        width: $query-designer-function-selector-width;
-    }
-    .sorting-selector .controls select {
-        width: $query-designer-sorting-selector-width;
-    }
-    .filter-box {
-        padding: $query-designer-filter-box-padding;
-        background: $query-designer-filter-box-background;
+            .control-label {
+                width: auto;
+                padding-top: 0;
+                padding-bottom: 6px;
 
-        > .btn-group {
-            margin: 0;
-        }
-
-        .filter-item {
-            padding: 0;
-
-            > .btn {
-                border-top-#{$end}-radius: $query-designer-filter-item-border-radius;
-                border-bottom-#{$end}-radius: $query-designer-filter-item-border-radius;
+                text-align: #{$start};
             }
 
-            .filter-select .select-filter-widget,
-            .filter-criteria-hint {
-                font-weight: normal;
+            .controls {
+                float: #{$start};
+                margin-#{$start}: 0;
             }
         }
-    }
 
-    .submit-cancel-buttons .btn-group {
-        margin-#{$start}: $query-designer-submit-cancel-buttons-margin-start;
+        .select2-container,
+        .label-text,
+        .function-selector .controls select {
+            width: $query-designer-label-width;
+        }
+
+        .sorting-selector .controls select {
+            width: $query-designer-sorting-selector-width;
+        }
+
+        .submit-cancel-buttons {
+            margin-#{$start}: auto;
+            margin-bottom: $query-designer-controls-group-margin-start;
+
+            @include clearfix();
+
+            .btn-group {
+                float: none;
+            }
+
+            .btn {
+                margin-#{$start}: $query-designer-submit-cancel-buttons-margin-start;
+            }
+        }
+
+        .filter-box {
+            padding: $query-designer-filter-box-padding;
+            background: $query-designer-filter-box-background;
+
+            > .btn-group {
+                margin: 0;
+            }
+
+            .filter-item {
+                padding: 0;
+
+                > .btn {
+                    border-top-#{$end}-radius: $query-designer-filter-item-border-radius;
+                    border-bottom-#{$end}-radius: $query-designer-filter-item-border-radius;
+                }
+
+                .filter-select .select-filter-widget,
+                .filter-criteria-hint {
+                    font-weight: normal;
+                }
+            }
+        }
     }
 }
+
 
 .query-designer-grid-container {
     .grid {
@@ -77,10 +98,6 @@
         .sorting-cell {
             width: $query-designer-grid-sorting-cell-width;
         }
-        .label-cell {
-            text-transform: uppercase;
-            font-weight: bold;
-        }
         .index-column,
         .index-cell {
             width: $query-designer-grid-index-cell-width;
@@ -88,17 +105,6 @@
         .action-cell {
             white-space: nowrap;
         }
-        .action-column,
-        .action-cell {
-            width: $query-designer-grid-action-cell-width;
-        }
-    }
-
-    i.fa-list {
-        cursor: move;
-        cursor: -moz-grab;
-        cursor: -webkit-grab;
-        font-size: $query-designer-list-icon-font-size;
     }
 }
 .query-designer-columns-grid-container {
@@ -106,10 +112,7 @@
         .action-column,
         .action-cell {
             width: $query-designer-columns-grid-action-cell-width;
+            padding-#{$end}: 0;
         }
-    }
-
-    tbody tr {
-        cursor: default;
     }
 }

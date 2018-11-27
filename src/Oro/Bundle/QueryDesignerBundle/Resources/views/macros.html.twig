@@ -109,17 +109,19 @@
             {% endif %}
             {% if ('action' in showItems) %}
             <td class="action-cell">
-                <a href="javascript: void(0);" class="action no-hash edit-button"
+                {% spaceless %}
+                <a href="javascript: void(0);" class="btn btn-icon btn-lighter action no-hash edit-button"
                         title="{{ 'oro.query_designer.datagrid.action.update_column'|trans }}"
                         data-collection-action="edit">
-                    <i class="fa-pencil-square-o hide-text"></i></a>
-                <a href="javascript: void(0);" class="action no-hash delete-button"
+                    <span class="fa-pencil-square-o" aria-hidden="true"></span></a>
+                <a href="javascript: void(0);" class="btn btn-icon btn-lighter action no-hash delete-button"
                         title="{{ 'oro.query_designer.datagrid.action.delete_column'|trans }}"
                         data-collection-action="delete"
                         data-message="{{ 'oro.query_designer.datagrid.action.delete_column_confirmation'|trans }}">
-                    <i class="fa-trash-o hide-text"></i></a>
-                <span title="{{ 'oro.query_designer.datagrid.action.move_column'|trans }}">
-                    <i class="fa-arrows-v handle"></i></span>
+                    <span class="fa-trash-o" aria-hidden="true"></span></a>
+                <span class="btn btn-icon btn-lighter" title="{{ 'oro.query_designer.datagrid.action.move_column'|trans }}">
+                    <span class="fa-arrows-v handle" aria-hidden="true"></span></span>
+                {% endspaceless %}
             </td>
             {% endif %}
         </tr>
@@ -131,17 +133,19 @@
         <tr data-cid="<%= cid %>">
             <td class="name-cell<% if (obj.deleted) { %> deleted-field<% } %>"><%= name %></td>
             <td class="action-cell">
-                <a href="javascript: void(0);" class="action no-hash edit-button"
+                {% spaceless %}
+                <a href="javascript: void(0);" class="btn btn-icon btn-lighter action no-hash edit-button"
                         title="{{ 'oro.query_designer.datagrid.action.update_column'|trans }}"
                         data-collection-action="edit">
-                    <i class="fa-pencil-square-o hide-text"></i></a>
-                <a href="javascript: void(0);" class="action no-hash delete-button"
+                    <span class="fa-pencil-square-o" aria-hidden="true"></span></a>
+                <a href="javascript: void(0);" class="btn btn-icon btn-lighter action no-hash delete-button"
                         title="{{ 'oro.query_designer.datagrid.action.delete_column'|trans }}"
                         data-collection-action="delete"
                         data-message="{{ 'oro.query_designer.datagrid.action.delete_column_confirmation'|trans }}">
-                    <i class="fa-trash-o hide-text"></i></a>
-                <span title="{{ 'oro.query_designer.datagrid.action.move_column'|trans }}">
-                    <i class="fa-arrows-v handle"></i></span>
+                    <span class="fa-trash-o" aria-hidden="true"></span></a>
+                <span class="btn btn-icon btn-lighter" title="{{ 'oro.query_designer.datagrid.action.move_column'|trans }}">
+                    <span class="fa-arrows-v handle" aria-hidden="true"></span></span>
+                {% endspaceless %}
             </td>
         </tr>
     </script>
@@ -150,66 +154,70 @@
 {% macro query_designer_column_form(form, attr, params, showItems = ['column', 'label', 'function', 'sorting', 'action']) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({
-        'class': (attr.class|default('') ~ ' query-designer-form clearfix')|trim
+        'class': (attr.class|default('') ~ ' query-designer-form')|trim
     }) %}
     <div {{ UI.attributes(attr) }}>
-        {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
-        {% if ('column' in showItems) %}
-        {{ form_row(form.name, {
-            'label': 'oro.query_designer.form.column',
-            'attr': {
-                'data-purpose': 'column-selector',
-                'data-validation': { NotBlank: null }|json_encode
-            }
-        }) }}
-        {% endif %}
-        {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
-        {% if ('label' in showItems) %}
-        {{ form_row(form.label, {
-            'label': 'oro.query_designer.form.label',
-            'attr': {
-                'class': 'label-text',
-                'data-purpose': 'label',
-                'data-validation': { NotBlank: null }|json_encode
-            }
-        }) }}
-        {% endif %}
-        {% if ('function' in showItems) %}
-        {{ form_row(form.func, {
-            'label': 'oro.query_designer.form.function',
-            'attr': {
-                'class': 'function-selector',
-                'data-purpose': 'function-selector'
-            }
-        }) }}
-        {% endif %}
-        {% if ('sorting' in showItems) %}
-        {{ form_row(form.sorting, {
-            'label': 'oro.query_designer.form.sorting',
-            'attr': {
-                'class': 'sorting-selector',
-                'data-purpose': 'sorting-selector'
-            }
-        }) }}
-        {% endif %}
-        {% if ('action' in showItems) %}
-        <div class="pull-right submit-cancel-buttons">
-            {{ UI.clientButton({
-                'aCss': 'no-hash cancel-button column-form-button',
-                'label' : 'oro.query_designer.form.action.cancel'|trans
+        <div class="query-designer-row">
+            {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
+            {% if ('column' in showItems) %}
+            {{ form_row(form.name, {
+                'label': 'oro.query_designer.form.column',
+                'attr': {
+                    'data-purpose': 'column-selector',
+                    'data-validation': { NotBlank: null }|json_encode
+                }
             }) }}
-            {{ UI.clientButton({
-                'visible': false,
-                'aCss': 'no-hash btn-success save-button column-form-button',
-                'label' : 'oro.query_designer.form.action.save'|trans
+            {% endif %}
+            {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
+            {% if ('label' in showItems) %}
+            {{ form_row(form.label, {
+                'label': 'oro.query_designer.form.label',
+                'attr': {
+                    'class': 'label-text',
+                    'data-purpose': 'label',
+                    'data-validation': { NotBlank: null }|json_encode
+                }
             }) }}
-            {{ UI.clientButton({
-                'visible': false,
-                'aCss': 'no-hash btn-primary add-button column-form-button',
-                'label' : 'oro.query_designer.form.action.add'|trans
+            {% endif %}
+            {% if ('function' in showItems) %}
+            {{ form_row(form.func, {
+                'label': 'oro.query_designer.form.function',
+                'attr': {
+                    'class': 'function-selector',
+                    'data-purpose': 'function-selector'
+                }
             }) }}
+            {% endif %}
+            {% if ('sorting' in showItems) %}
+            {{ form_row(form.sorting, {
+                'label': 'oro.query_designer.form.sorting',
+                'attr': {
+                    'class': 'sorting-selector',
+                    'data-purpose': 'sorting-selector'
+                }
+            }) }}
+            {% endif %}
+            {% if ('action' in showItems) %}
+            <div class="submit-cancel-buttons">
+                {% spaceless %}
+                {{ UI.clientButton({
+                    'aCss': 'no-hash cancel-button column-form-button',
+                    'label' : 'oro.query_designer.form.action.cancel'|trans
+                }) }}
+                {{ UI.clientButton({
+                    'visible': false,
+                    'aCss': 'no-hash btn-success save-button column-form-button',
+                    'label' : 'oro.query_designer.form.action.save'|trans
+                }) }}
+                {{ UI.clientButton({
+                    'visible': false,
+                    'aCss': 'no-hash btn-primary add-button column-form-button',
+                    'label' : 'oro.query_designer.form.action.add'|trans
+                }) }}
+                {% endspaceless %}
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
 {% endmacro %}
 
@@ -217,37 +225,41 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-grouping-form query-designer-form')|trim}) %}
     <div{{ UI.attributes(attr) }}>
-        {# @todo own formtype for this kind field based on hidden input #}
-        {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
-        {{ form_row(form.columnNames, {
-            'label': 'oro.query_designer.form.grouping_columns',
-            'attr': {
-                'data-purpose': 'column-selector',
-                'data-validation': { NotBlank: null }|json_encode
-            }
-        }) }}
-        <div class="pull-right submit-cancel-buttons">
-            {{ UI.clientButton({
-                'aCss': 'no-hash cancel-button',
-                'label' : 'oro.query_designer.form.action.cancel'|trans
+        <div class="query-designer-row">
+            {# @todo own formtype for this kind field based on hidden input #}
+            {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
+            {{ form_row(form.columnNames, {
+                'label': 'oro.query_designer.form.grouping_columns',
+                'attr': {
+                    'data-purpose': 'column-selector',
+                    'data-validation': { NotBlank: null }|json_encode
+                }
             }) }}
-            {{ UI.clientButton({
-                'visible': false,
-                'aCss': 'no-hash btn-success save-button',
-                'label' : 'oro.query_designer.form.action.save'|trans
-            }) }}
-            {{ UI.clientButton({
-                'visible': false,
-                'aCss': 'no-hash btn-primary add-button',
-                'label' : 'oro.query_designer.form.action.add'|trans
-            }) }}
+            <div class="submit-cancel-buttons">
+                {% spaceless %}
+                {{ UI.clientButton({
+                    'aCss': 'no-hash cancel-button',
+                    'label' : 'oro.query_designer.form.action.cancel'|trans
+                }) }}
+                {{ UI.clientButton({
+                    'visible': false,
+                    'aCss': 'no-hash btn-success save-button',
+                    'label' : 'oro.query_designer.form.action.save'|trans
+                }) }}
+                {{ UI.clientButton({
+                    'visible': false,
+                    'aCss': 'no-hash btn-primary add-button',
+                    'label' : 'oro.query_designer.form.action.add'|trans
+                }) }}
+                {% endspaceless %}
+            </div>
         </div>
     </div>
 {% endmacro %}
 
 {% macro query_designer_date_grouping_form(form, params) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-grouping-form query-designer-form clearfix')|trim}) %}
+    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-grouping-form clearfix')|trim}) %}
     <div{{ UI.attributes(attr) }} {{ UI.renderPageComponentAttributes({
         module: 'oroui/js/app/components/view-component',
         options: {

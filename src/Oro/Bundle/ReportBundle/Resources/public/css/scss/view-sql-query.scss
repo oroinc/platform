@@ -1,0 +1,15 @@
+/* @theme: admin.oro; */
+
+pre.sql-query-code {
+    display: block;
+    padding: 2px 4px;
+
+    background-color: $primary-900;
+    color: $danger;
+    border: 1px solid $primary-830;
+
+    word-break: normal;
+}
+div.sql-query-container {
+    padding: side-values(0 20px 20px 20px);
+}
