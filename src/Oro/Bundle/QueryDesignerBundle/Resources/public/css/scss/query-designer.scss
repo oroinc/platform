@@ -18,7 +18,7 @@
             .control-label {
                 width: auto;
                 padding-top: 0;
-                padding-bottom: 6px;
+                padding-bottom: $form-horizontal-control-label-offset;
 
                 text-align: #{$start};
             }
