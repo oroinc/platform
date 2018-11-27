@@ -159,7 +159,10 @@ define(function(require) {
                         var popper = data.instance.popper;
                         var offset = data.offsets.popper;
 
-                        if (inheritParentWidth === 'strictly' || (offset.width && offset.width < popper.parentElement.clientWidth)) {
+                        if (
+                            offset.width &&
+                            (inheritParentWidth === 'strictly' || offset.width < popper.parentElement.clientWidth)
+                        ) {
                             popper.style.width = popper.parentElement.clientWidth + 'px';
                             _.extend(data.offsets.popper, _.pick(
                                 popper.parentElement.getBoundingClientRect(),
