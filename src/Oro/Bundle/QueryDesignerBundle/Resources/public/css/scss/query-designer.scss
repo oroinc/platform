@@ -15,6 +15,8 @@
             margin-#{$end}: $query-designer-controls-group-margin-start;
             margin-bottom: $query-designer-controls-group-margin-start;
 
+            word-break: break-all;
+
             .control-label {
                 width: auto;
                 padding-top: 0;
@@ -29,10 +31,22 @@
             }
         }
 
+        .control-group-hidden,
+        .control-group-text,
+        .control-group-choice {
+            width: $query-designer-control-group-width;
+        }
+
+        .control-group-choice {
+            max-width: $query-designer-control-group-width;
+        }
+
         .select2-container,
-        .label-text,
-        .function-selector .controls select {
-            width: $query-designer-label-width;
+        input.label-text,
+        .function-selector .controls select,
+        .function-selector .controls .selector {
+            width: 100%;
+            max-width: 100%;
         }
 
         .sorting-selector .controls select {
