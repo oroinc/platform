@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
@@ -52,7 +53,12 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('process')
             ->with($this->equalTo($notificationsForManager));
 
-        $handler = new EmailNotificationHandler($manager, $em, $this->getPropertyAccessor(), $dispatcher);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManager')
+            ->willReturn($em);
+
+        $handler = new EmailNotificationHandler($manager, $doctrine, $this->getPropertyAccessor(), $dispatcher);
         $handler->handle($event, $notifications);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Event\Handler;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
@@ -18,8 +18,8 @@ class EmailNotificationHandler implements EventHandlerInterface
     /** @var EmailNotificationManager */
     protected $manager;
 
-    /** @var EntityManager */
-    protected $em;
+    /** @var ManagerRegistry */
+    protected $doctrine;
 
     /** @var PropertyAccessor */
     protected $propertyAccessor;
@@ -29,18 +29,18 @@ class EmailNotificationHandler implements EventHandlerInterface
 
     /**
      * @param EmailNotificationManager $manager
-     * @param EntityManager $em
-     * @param PropertyAccessor $propertyAccessor
+     * @param ManagerRegistry          $doctrine
+     * @param PropertyAccessor         $propertyAccessor
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         EmailNotificationManager $manager,
-        EntityManager $em,
+        ManagerRegistry $doctrine,
         PropertyAccessor $propertyAccessor,
         EventDispatcherInterface $eventDispatcher
     ) {
         $this->manager = $manager;
-        $this->em = $em;
+        $this->doctrine = $doctrine;
         $this->propertyAccessor = $propertyAccessor;
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -48,7 +48,7 @@ class EmailNotificationHandler implements EventHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(NotificationEvent $event, $matchedNotifications)
+    public function handle(NotificationEvent $event, array $matchedNotifications)
     {
         // convert notification rules to a list of EmailNotificationInterface
         $notifications = [];
@@ -73,7 +73,7 @@ class EmailNotificationHandler implements EventHandlerInterface
         return new TemplateEmailNotificationAdapter(
             $event->getEntity(),
             $notification,
-            $this->em,
+            $this->doctrine->getManager(),
             $this->propertyAccessor,
             $this->eventDispatcher
         );
