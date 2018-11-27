@@ -586,7 +586,7 @@ a.attachment .icon .fa-link {
 }
 
 .control-group .email-body-action {
-    margin-#{$end}: 15px;
+    margin-#{$end}: $content-padding-medium;
 }
 
 .dropdown.link-to-record {
