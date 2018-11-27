@@ -149,6 +149,8 @@ define(function(require) {
                 config.positionFixed = true;
             }
 
+            config.modifiers.preventOverflow.boundariesElement = 'window';
+
             if (this._config.inheritParentWidth) {
                 var inheritParentWidth = this._config.inheritParentWidth;
                 config.positionFixed = true;
