@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Mail\Header;
 
-use Zend\Mail\Header\Bcc as BaseHeader;
+use \Zend\Mail\Header\Bcc as BaseHeader;
 
 class Bcc extends BaseHeader
 {

@@ -12,7 +12,7 @@ class OptionalAddressList extends AddressList
     /**
      * {@inheritdoc}
      */
-    public function addFromString($address)
+    public function addFromString($address, $comment = null)
     {
         if (empty($address)) {
             return $this;

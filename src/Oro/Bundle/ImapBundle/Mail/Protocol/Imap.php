@@ -16,12 +16,12 @@ use Oro\Bundle\ImapBundle\Mail\Protocol\Exception\InvalidEmailFormatException;
 class Imap extends \Zend\Mail\Protocol\Imap
 {
     /**
-     * {@inheridoc}
+     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function fetch($items, $from, $to = null)
+    public function fetch($items, $from, $to = null, $uid = false)
     {
         if (is_array($from)) {
             $set = implode(',', $from);
@@ -95,7 +95,7 @@ class Imap extends \Zend\Mail\Protocol\Imap
     }
 
     /**
-     * {@inheridoc}
+     * {@inheritdoc}
      */
     public function connect($host, $port = null, $ssl = false)
     {
@@ -107,7 +107,7 @@ class Imap extends \Zend\Mail\Protocol\Imap
 
     // @codingStandardsIgnoreStart
     /**
-     * {@inheridoc}
+     * {@inheritdoc}
      */
     protected function _nextLine()
     {
