@@ -43,7 +43,8 @@ define(function(require) {
         dispose: function() {
             var parent = Dropdown._getParentFromElement(this._element);
             $(parent).off(EVENT_KEY);
-            $(document).off('mCSB.scroll' + EVENT_KEY, this._onCustomScroll);
+            $(document).off('mCSB.scroll' + EVENT_KEY, this._popperUpdate);
+            $(this._dialog).off('dialogresize dialogdrag dialogreposition', this._popperUpdate);
             original.dispose.call(this);
         },
 
@@ -77,11 +78,14 @@ define(function(require) {
         },
 
         _addEventListeners: function() {
-            this._onCustomScroll = this._onCustomScroll.bind(this);
+            this._popperUpdate = this._popperUpdate.bind(this);
 
             original._addEventListeners.call(this);
 
             var parent = Dropdown._getParentFromElement(this._element);
+            var dialogContent = $(this._element).closest(DIALOG_SCROLLABLE_CONTAINER);
+
+            this._dialog = dialogContent.length && dialogContent.parent() || null;
 
             $(this._element).add(parent).on(TO_HIDE_EVENT, function(event) {
                 event.stopImmediatePropagation();
@@ -91,10 +95,14 @@ define(function(require) {
             }.bind(this));
 
             $(parent).on(HIDE_EVENT, this._onHide.bind(this));
-            $(document).on('mCSB.scroll' + EVENT_KEY, this._onCustomScroll);
+            $(document).on('mCSB.scroll' + EVENT_KEY, this._popperUpdate);
+
+            if (this._dialog) {
+                $(this._dialog).on('dialogresize dialogdrag dialogreposition', this._popperUpdate);
+            }
         },
 
-        _onCustomScroll: function() {
+        _popperUpdate: function(e) {
             if (this._popper) {
                 // When scrolling leads to hidden dropdown appears again, single call of scroll handler
                 // shows dropdown menu in wrong position. But since single scroll event happens very
@@ -149,7 +157,7 @@ define(function(require) {
                         var popper = data.instance.popper;
                         var offset = data.offsets.popper;
 
-                        if (inheritParentWidth === 'strictly' || offset.width < popper.parentElement.clientWidth) {
+                        if (inheritParentWidth === 'strictly' || (offset.width && offset.width < popper.parentElement.clientWidth)) {
                             popper.style.width = popper.parentElement.clientWidth + 'px';
                             _.extend(data.offsets.popper, _.pick(
                                 popper.parentElement.getBoundingClientRect(),
