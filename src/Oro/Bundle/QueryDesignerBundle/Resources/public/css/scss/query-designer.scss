@@ -8,7 +8,6 @@
     .query-designer-row {
         display: flex;
         flex-wrap: wrap;
-        align-items: flex-end;
 
         .control-group {
             float: #{$start};
@@ -41,6 +40,8 @@
         }
 
         .submit-cancel-buttons {
+            display: flex;
+            align-items: flex-end;
             margin-#{$start}: auto;
             margin-bottom: $query-designer-controls-group-margin-start;
 
