@@ -47,8 +47,8 @@
 
         &:not(.attribute-row) {
             .control-label {
-                padding-top: 6px;
-                line-height: 20px;
+                padding-top: $form-horizontal-control-label-offset;
+                line-height: $form-horizontal-control-label-line-height;
             }
         }
 

@@ -15,8 +15,6 @@
             margin-#{$end}: $query-designer-controls-group-margin-start;
             margin-bottom: $query-designer-controls-group-margin-start;
 
-            word-break: break-all;
-
             .control-label {
                 width: auto;
                 padding-top: 0;
@@ -54,12 +52,17 @@
         }
 
         .submit-cancel-buttons {
-            display: flex;
-            align-items: flex-end;
             margin-#{$start}: auto;
             margin-bottom: $query-designer-controls-group-margin-start;
 
             @include clearfix();
+
+            &:before {
+                display: block;
+                height: $form-horizontal-control-label-line-height + $form-horizontal-control-label-offset;
+
+                content: '';
+            }
 
             .btn-group {
                 float: none;
