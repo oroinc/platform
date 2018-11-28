@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use PHPUnit\Framework\TestCase;
-
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use NumberFormatter as IntlNumberFormatter;
 use Symfony\Component\Intl\Util\IntlTestHelper;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -14,7 +15,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 class NumberFormatterTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $localeSettings;
 
@@ -27,9 +28,7 @@ class NumberFormatterTest extends TestCase
     {
         IntlTestHelper::requireIntl($this);
 
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
         $this->formatter = new NumberFormatter($this->localeSettings);
     }
 
@@ -192,54 +191,33 @@ class NumberFormatterTest extends TestCase
 
     /**
      * @dataProvider formatCurrencyDataProvider
+     *
+     * @param string $expected
+     * @param int|float $value
+     * @param string $currency
+     * @param string $locale
      */
-    public function testFormatCurrency($expected, $value, $currency, $attributes, $textAttributes, $symbols, $locale)
+    public function testFormatCurrency(string $expected, $value, string $currency, string $locale)
     {
-        $currencySymbolMap = array(
-            array('USD', '$'),
-            array('RUB', 'руб.'),
-        );
-        $this->localeSettings->expects($this->any())
+        $this->localeSettings
+            ->expects($this->any())
             ->method('getCurrencySymbolByCurrency')
-            ->will($this->returnValueMap($currencySymbolMap));
+            ->willReturnMap([['USD', '$'], ['EUR', '€']]);
 
         $this->assertEquals(
             $expected,
-            $this->formatter->formatCurrency($value, $currency, $attributes, $textAttributes, $symbols, $locale)
+            $this->formatter->formatCurrency($value, $currency, [], [], [], $locale)
         );
     }
 
-    public function formatCurrencyDataProvider()
+    /**
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function formatCurrencyDataProvider(): array
     {
-        return array(
-            array(
-                'expected' => '$1,234.57',
-                'value' => 1234.56789,
-                'currency' => 'USD',
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en_US'
-            ),
-            array(
-                'expected' => 'руб.1,234.57',
-                'value' => 1234.56789,
-                'currency' => 'RUB',
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en_US'
-            ),
-            array(
-                'expected' => '1 234,57 €',
-                'value' => 1234.56789,
-                'currency' => 'EUR',
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'ru_RU'
-            ),
-        );
+        return Yaml::parse(file_get_contents(__DIR__.'/Data/format_currency_data.yml'));
     }
 
     /**
