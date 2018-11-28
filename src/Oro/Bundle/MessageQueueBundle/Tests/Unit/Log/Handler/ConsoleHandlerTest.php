@@ -114,7 +114,7 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(OutputInterface::VERBOSITY_DEBUG);
         $this->output->expects(self::once())
             ->method('write')
-            ->with('2018-07-06 09:16:05 <fg=white>app.DEBUG</>: test message [] []' . "\n");
+            ->with('2018-07-06 09:16:05 <fg=white>app.DEBUG</>: test message' . "\n");
         self::assertFalse(
             $this->handler->handle([
                 'datetime' => new \DateTime('2018-07-06 09:16:05'),
