@@ -85,6 +85,11 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }
             - { name: oro.api.processor, action: delete_relationship, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }
 
+    oro_api.tests.add_filters_to_test_resource_without_identifier:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\AddFiltersToResourceWithoutIdentifier
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }
+
     oro_api.tests.load_test_resource_without_identifier_data:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\LoadTestResourceWithoutIdentifierData
         tags:

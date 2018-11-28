@@ -41,6 +41,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      */
     protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
+        $this->checkHateoasHeader($server);
         $this->checkWsseAuthHeader($server);
 
         if (!empty($parameters['filter'])) {

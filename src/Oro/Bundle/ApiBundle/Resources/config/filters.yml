@@ -13,6 +13,38 @@ services:
         arguments:
             - [] # The operators. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
 
+    oro_api.filter_names_registry:
+        class: Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry
+        public: false
+        arguments:
+            - [] # providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FilterNamesCompilerPass
+            - '@oro_api.request_expression_matcher'
+
+    oro_api.filter_names.rest_plain:
+        class: Oro\Bundle\ApiBundle\Filter\FilterNames
+        public: false
+        arguments:
+            - 'sort'
+            - 'page'
+            - 'limit'
+            - 'meta'
+        tags:
+            - { name: oro.api.filter_names, requestType: rest&!json_api, priority: -10 }
+
+    oro_api.filter_names.json_api:
+        class: Oro\Bundle\ApiBundle\Filter\FilterNames
+        public: false
+        arguments:
+            - 'sort'
+            - 'page[number]'
+            - 'page[size]'
+            - 'meta'
+            - 'filter'
+            - 'fields'
+            - 'include'
+        tags:
+            - { name: oro.api.filter_names, requestType: json_api }
+
     oro_api.filter_factory:
         class: Oro\Bundle\ApiBundle\Filter\ChainFilterFactory
         public: false

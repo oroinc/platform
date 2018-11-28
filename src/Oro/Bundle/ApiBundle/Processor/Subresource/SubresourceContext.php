@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\HateoasMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraCollection;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -336,12 +337,7 @@ class SubresourceContext extends Context
         }
 
         try {
-            $config = $this->configProvider->getConfig(
-                $parentEntityClass,
-                $this->getVersion(),
-                $this->getRequestType(),
-                $this->getParentConfigExtras()
-            );
+            $config = $this->loadEntityConfig($parentEntityClass, $this->getParentConfigExtras());
             $this->set(self::PARENT_CONFIG, $config->getDefinition());
         } catch (\Exception $e) {
             $this->set(self::PARENT_CONFIG, null);
@@ -410,7 +406,7 @@ class SubresourceContext extends Context
      *
      * @param EntityMetadata|null $metadata
      */
-    public function setParentMetadata(EntityMetadata $metadata = null)
+    public function setParentMetadata(?EntityMetadata $metadata)
     {
         if ($metadata) {
             $this->set(self::PARENT_METADATA, $metadata);
@@ -459,12 +455,16 @@ class SubresourceContext extends Context
         }
 
         try {
+            $extras = $this->getParentMetadataExtras();
+            if ($this->isHateoasEnabled()) {
+                $extras[] = new HateoasMetadataExtra($this->getFilterValues());
+            }
             $metadata = $this->metadataProvider->getMetadata(
                 $parentEntityClass,
                 $this->getVersion(),
                 $this->getRequestType(),
                 $this->getParentConfig(),
-                $this->getParentMetadataExtras()
+                $extras
             );
             $this->set(self::PARENT_METADATA, $metadata);
         } catch (\Exception $e) {

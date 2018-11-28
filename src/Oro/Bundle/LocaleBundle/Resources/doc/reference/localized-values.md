@@ -26,7 +26,7 @@ Use `locale` Layout data provider and `getLocalizedValue()`.
 # .../Resources/views/layouts/.../myconfig.yml
 layout:
     actions:
-        - @add:
+        - '@add':
             ...
             options:
                 ...

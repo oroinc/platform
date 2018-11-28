@@ -5,9 +5,13 @@ namespace Oro\Bundle\ActionBundle\Helper;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\OperationButton;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Manages options for "action buttons"
+ */
 class OptionsHelper
 {
     /** @var TranslatorInterface */
@@ -19,19 +23,27 @@ class OptionsHelper
     /** @var FormProvider */
     protected $formProvider;
 
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
+
     /**
-     * @param Router              $router
+     * OptionsHelper constructor.
+     *
+     * @param Router $router
      * @param TranslatorInterface $translator
-     * @param FormProvider        $formProvider
+     * @param FormProvider $formProvider
+     * @param HtmlTagHelper $htmlTagHelper
      */
     public function __construct(
         Router $router,
         TranslatorInterface $translator,
-        FormProvider $formProvider
+        FormProvider $formProvider,
+        HtmlTagHelper $htmlTagHelper
     ) {
         $this->router       = $router;
         $this->translator   = $translator;
         $this->formProvider = $formProvider;
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -103,6 +115,10 @@ class OptionsHelper
             $options['message']['content'] = $message;
         }
 
+        if (isset($frontendOptions['confirmation']['message_parameters'])) {
+            $frontendOptions['confirmation']['message_parameters'] =
+                $this->prepareParameters($frontendOptions['confirmation']['message_parameters']);
+        }
         $this->addOption($options, $frontendOptions, 'confirmation');
 
         return $options;
@@ -117,9 +133,11 @@ class OptionsHelper
     protected function getTitle(ButtonInterface $button, array $frontendOptions)
     {
         $title = isset($frontendOptions['title']) ? $frontendOptions['title'] : $button->getLabel();
-        $titleParams = isset($frontendOptions['title_parameters']) ? $frontendOptions['title_parameters'] : [];
-
-        return $this->translator->trans($title, $titleParams, $button->getTranslationDomain());
+        $parameters = [];
+        if (isset($frontendOptions['title_parameters'])) {
+            $parameters = $this->prepareParameters($frontendOptions['title_parameters']);
+        }
+        return $this->translator->trans($title, $parameters, $button->getTranslationDomain());
     }
 
     /**
@@ -130,19 +148,19 @@ class OptionsHelper
      */
     protected function getMessage(ButtonInterface $button, array $frontendOptions)
     {
-        if (empty($frontendOptions['message']['content'])) {
-            return;
+        $content = null;
+        if (isset($frontendOptions['message']['content'])) {
+            $message = $frontendOptions['message'];
+            $parameters = [];
+            if (isset($message['message_parameters'])) {
+                $parameters = $this->prepareParameters($message['message_parameters']);
+            }
+
+            $content = $this->translator->trans($message['content'], $parameters, $button->getTranslationDomain());
+            $content = $content !== $message['content'] ? $content : null;
         }
 
-        $messageOptions = $frontendOptions['message'];
-
-        $message = $this->translator->trans(
-            $messageOptions['content'],
-            isset($messageOptions['message_parameters']) ? $messageOptions['message_parameters'] : [],
-            $button->getTranslationDomain()
-        );
-
-        return $message !== $messageOptions['content'] ? $message : null;
+        return $content;
     }
 
     /**
@@ -184,5 +202,25 @@ class OptionsHelper
             ],
             $data
         );
+    }
+
+    /**
+     * Recursive escape parameters
+     *
+     * @param $parameters
+     *
+     * @return mixed
+     */
+    private function prepareParameters($parameters)
+    {
+        foreach ($parameters as $key => &$value) {
+            if (\is_array($value)) {
+                $value = $this->prepareParameters($value);
+            } elseif (\is_string($value)) {
+                $value = $this->htmlTagHelper->escape($value);
+            }
+        }
+
+        return $parameters;
     }
 }

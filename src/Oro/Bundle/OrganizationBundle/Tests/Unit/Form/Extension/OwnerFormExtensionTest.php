@@ -336,7 +336,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             EntityType::class,
             [
                 'class' => BusinessUnit::class,
-                'property' => 'name',
+                'choice_label' => 'name',
                 'mapped' => true,
                 'required' => true,
                 'constraints' => array(new NotBlank()),

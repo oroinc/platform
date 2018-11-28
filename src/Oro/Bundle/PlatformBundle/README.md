@@ -66,10 +66,10 @@ out of the box.
 For own bundles services must be marked as lazy in service declaration by adding additional key "lazy" set to true.
 For example:
 ```
-oro_notification.event_listener.email_notification_service:
-    class: %oro_notification.event_listener.email_notification_service.class%
+acme.some_service:
+    class: Acme\Bundle\AcmeBundle\SomeService
     arguments:
-        - @doctrine.orm.entity_manager
+        - '@acme.another_service'
     lazy: true
 ```
 

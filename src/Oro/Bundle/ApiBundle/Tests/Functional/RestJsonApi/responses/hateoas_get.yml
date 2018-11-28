@@ -1,0 +1,158 @@
+data:
+    type: testapientity1
+    id: '{entityId}'
+    links:
+        self: '{baseUrl}/testapientity1/{entityId}'
+    attributes:
+        name: 'Entity 1 (1)'
+    relationships:
+        biM2O:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/biM2O'
+                related: '{baseUrl}/testapientity1/{entityId}/biM2O'
+            data:
+                type: testapientity2
+                id: '<toString(@entity2_1->id)>'
+        biM2M:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/biM2M'
+                related: '{baseUrl}/testapientity1/{entityId}/biM2M'
+            data:
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_1->id)>'
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_2->id)>'
+        default_biM2M:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/default_biM2M'
+                related: '{baseUrl}/testapientity1/{entityId}/default_biM2M'
+            data:
+                type: testapientity2
+                id: '<toString(@entity2_1->id)>'
+        biM2MnD:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/biM2MnD'
+                related: '{baseUrl}/testapientity1/{entityId}/biM2MnD'
+            data:
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_1->id)>'
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_2->id)>'
+        biO2M:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/biO2M'
+                related: '{baseUrl}/testapientity1/{entityId}/biO2M'
+            data:
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_1->id)>'
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_2->id)>'
+        default_biO2M:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/default_biO2M'
+                related: '{baseUrl}/testapientity1/{entityId}/default_biO2M'
+            data:
+                type: testapientity2
+                id: '<toString(@entity2_1->id)>'
+        biO2MnD:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/biO2MnD'
+                related: '{baseUrl}/testapientity1/{entityId}/biO2MnD'
+            data:
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_1->id)>'
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_2->id)>'
+        uniM2O:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/uniM2O'
+                related: '{baseUrl}/testapientity1/{entityId}/uniM2O'
+            data:
+                type: testapientity2
+                id: '<toString(@entity2_1->id)>'
+        uniM2M:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/uniM2M'
+                related: '{baseUrl}/testapientity1/{entityId}/uniM2M'
+            data:
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_1->id)>'
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_2->id)>'
+        default_uniM2M:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/default_uniM2M'
+                related: '{baseUrl}/testapientity1/{entityId}/default_uniM2M'
+            data:
+                type: testapientity2
+                id: '<toString(@entity2_1->id)>'
+        uniM2MnD:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/uniM2MnD'
+                related: '{baseUrl}/testapientity1/{entityId}/uniM2MnD'
+            data:
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_1->id)>'
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_2->id)>'
+        uniO2M:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/uniO2M'
+                related: '{baseUrl}/testapientity1/{entityId}/uniO2M'
+            data:
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_1->id)>'
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_2->id)>'
+        default_uniO2M:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/default_uniO2M'
+                related: '{baseUrl}/testapientity1/{entityId}/default_uniO2M'
+            data:
+                type: testapientity2
+                id: '<toString(@entity2_1->id)>'
+        uniO2MnD:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/uniO2MnD'
+                related: '{baseUrl}/testapientity1/{entityId}/uniO2MnD'
+            data:
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_1->id)>'
+                -
+                    type: testapientity2
+                    id: '<toString(@entity2_2->id)>'
+        enumField:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/enumField'
+                related: '{baseUrl}/testapientity1/{entityId}/enumField'
+            data:
+                type: testapienum1
+                id: '<toString(@enum1_1->id)>'
+        multiEnumField:
+            links:
+                self: '{baseUrl}/testapientity1/{entityId}/relationships/multiEnumField'
+                related: '{baseUrl}/testapientity1/{entityId}/multiEnumField'
+            data:
+                -
+                    type: testapienum2
+                    id: '<toString(@enum2_1->id)>'
+                -
+                    type: testapienum2
+                    id: '<toString(@enum2_2->id)>'
+links:
+    self: '{baseUrl}/testapientity1'

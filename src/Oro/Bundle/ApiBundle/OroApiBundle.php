@@ -38,6 +38,7 @@ class OroApiBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new Compiler\ProcessorBagCompilerPass());
+        $container->addCompilerPass(new Compiler\FilterNamesCompilerPass());
         $container->addCompilerPass(new Compiler\FilterFactoryCompilerPass());
         $container->addCompilerPass(new Compiler\FormCompilerPass());
         $container->addCompilerPass(new Compiler\DataTransformerCompilerPass());
@@ -57,6 +58,7 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new Compiler\QueryModifierCompilerPass());
         $container->addCompilerPass(new Compiler\MandatoryFieldProviderCompilerPass());
         $container->addCompilerPass(new Compiler\DocumentationProviderCompilerPass());
+        $container->addCompilerPass(new Compiler\RestRoutesCompilerPass());
         $container->addCompilerPass(
             new LoadApplicableCheckersCompilerPass('oro_api.processor_bag', 'oro.api.processor.applicable_checker')
         );

@@ -18,7 +18,7 @@ class ProcessorsLoader
      *
      * @return array [action => [priority => [[processor service id, processor attributes], ...], ...], ...]
      */
-    public static function loadProcessors(ContainerBuilder $container, $processorTagName)
+    public static function loadProcessors(ContainerBuilder $container, string $processorTagName): array
     {
         $processors = [];
         $isDebug = $container->getParameter('kernel.debug');
@@ -32,14 +32,14 @@ class ProcessorsLoader
                 unset($attributes['action']);
 
                 $group = null;
-                if (!empty($attributes['group'])) {
-                    $group = $attributes['group'];
-                } else {
+                if (empty($attributes['group'])) {
                     unset($attributes['group']);
+                } else {
+                    $group = $attributes['group'];
                 }
 
                 if (!$action && $group) {
-                    throw new \InvalidArgumentException(sprintf(
+                    throw new \InvalidArgumentException(\sprintf(
                         'Tag attribute "group" can be used only if '
                         . 'the attribute "action" is specified. Service: "%s".',
                         $id
@@ -48,20 +48,14 @@ class ProcessorsLoader
 
                 $container->getDefinition($id)->setPublic(true);
 
-                $priority = 0;
-                if (isset($attributes['priority'])) {
-                    $priority = $attributes['priority'];
-                }
+                $priority = $attributes['priority'] ?? 0;
                 if (!$isDebug) {
                     unset($attributes['priority']);
                 }
 
-                $attributes = array_map(
-                    function ($val) {
-                        return ExpressionParser::parse($val);
-                    },
-                    $attributes
-                );
+                foreach ($attributes as $name => $value) {
+                    $attributes[$name] = ExpressionParser::parse($value);
+                }
 
                 $processors[$action][$priority][] = [$id, $attributes];
             }

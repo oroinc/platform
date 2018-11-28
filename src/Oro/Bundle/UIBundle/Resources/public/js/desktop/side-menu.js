@@ -300,9 +300,8 @@ define(function(require) {
 
                     $menuItem
                         .attr('data-index', uniqueIndex)
-                        .attr('data-original-text', $menuItem.text())
+                        .attr('data-original-text', _.escape($menuItem.text()))
                         .addClass(self.options.innerMenuItemClassName);
-
                     collection.push($menuItem[0]);
 
                     if ($nestedMenuItem) {

@@ -73,7 +73,9 @@ define(function(require) {
         },
 
         fileNameChange: function() {
-            this.$('span.filename-label').html(this.model.get('fileName'));
+            this.$('.attachment-item__filename')
+                .html(this.model.get('fileName'))
+                .attr('title', this.model.get('fileName'));
         },
 
         typeChange: function() {
@@ -81,7 +83,7 @@ define(function(require) {
         },
 
         iconChange: function() {
-            this.$('.filename .fa').addClass(this.model.get('icon'));
+            this.$('.attachment-item .fa').addClass(this.model.get('icon'));
         }
     });
 

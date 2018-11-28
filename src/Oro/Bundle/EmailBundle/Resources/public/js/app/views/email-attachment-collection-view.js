@@ -36,7 +36,6 @@ define(function(require) {
             });
 
             this.listSelector = options.listSelector;
-            $(this.listSelector).css('padding-top', 5); // todo move to class styles
             $(this.listSelector).html('');
 
             this.$el.hide();

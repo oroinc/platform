@@ -563,8 +563,13 @@ services:
     oro_api.rest.document_builder:
         class: Oro\Bundle\ApiBundle\Request\Rest\RestDocumentBuilder
         shared: false
+        arguments:
+            - '@oro_api.value_normalizer'
+            - '@oro_api.entity_id_transformer_registry'
+            - '@logger'
         tags:
             - { name: oro.api.document_builder, requestType: rest&!json_api, priority: -10 }
+            - { name: monolog.logger, channel: api }
 
     oro_api.rest.error_completer:
         class: Oro\Bundle\ApiBundle\Request\Rest\ErrorCompleter
@@ -579,16 +584,26 @@ services:
         arguments:
             - '@oro_api.value_normalizer'
             - '@oro_api.entity_id_transformer_registry'
+            - '@logger'
         tags:
             - { name: oro.api.document_builder, requestType: json_api }
+            - { name: monolog.logger, channel: api }
 
     oro_api.json_api.error_completer:
         class: Oro\Bundle\ApiBundle\Request\JsonApi\ErrorCompleter
         arguments:
             - '@oro_api.exception_text_extractor'
             - '@oro_api.value_normalizer'
+            - '@oro_api.filter_names_registry'
         tags:
             - { name: oro.api.error_completer, requestType: json_api }
+
+    oro_api.rest.routes_registry:
+        class: Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry
+        public: false
+        arguments:
+            - [] # providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\RestRoutesCompilerPass
+            - '@oro_api.request_expression_matcher'
 
     oro_api.rest.routes:
         class: Oro\Bundle\ApiBundle\Request\Rest\RestRoutes
@@ -598,6 +613,8 @@ services:
             - 'oro_rest_api_list'
             - 'oro_rest_api_subresource'
             - 'oro_rest_api_relationship'
+        tags:
+            - { name: oro.api.rest_routes, requestType: rest, priority: -10 }
 
     oro_api.rest.action_mapper:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestActionMapper

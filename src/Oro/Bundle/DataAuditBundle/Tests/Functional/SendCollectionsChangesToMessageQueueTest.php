@@ -42,18 +42,21 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $updateCollection['entity_class']);
         $this->assertEquals($owner->getId(), $updateCollection['entity_id']);
-        $this->assertEquals(['childrenManyToMany' => [null, [
-            'inserted' => [
-                [
-                    'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => $childId,
-                    'change_set' => [],
-                    'additional_fields' => []
-                ],
+        $this->assertEquals(
+            [
+                'childrenManyToMany' => [
+                    null,
+                    [
+                        'inserted' => [
+                            ['entity_class' => TestAuditDataChild::class, 'entity_id' => $childId]
+                        ],
+                        'deleted' => [],
+                        'changed' => []
+                    ]
+                ]
             ],
-            'deleted' => [],
-            'changed' => [],
-        ]]], $updateCollection['change_set']);
+            $updateCollection['change_set']
+        );
     }
 
     public function testShouldSendCollectionUpdateWhenStoredChildAddedToNewOwner()
@@ -76,18 +79,21 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $updateCollection['entity_class']);
         $this->assertEquals($owner->getId(), $updateCollection['entity_id']);
-        $this->assertEquals(['childrenManyToMany' => [null, [
-            'inserted' => [
-                [
-                    'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => $child->getId(),
-                    'change_set' => [],
-                    'additional_fields' => []
+        $this->assertEquals(
+            [
+                'childrenManyToMany' => [
+                    null,
+                    [
+                        'inserted' => [
+                            ['entity_class' => TestAuditDataChild::class, 'entity_id' => $child->getId()]
+                        ],
+                        'deleted' => [],
+                        'changed' => []
+                    ]
                 ]
             ],
-            'deleted' => [],
-            'changed' => [],
-        ]]], $updateCollection['change_set']);
+            $updateCollection['change_set']
+        );
     }
 
     public function testShouldSendCollectionUpdateWhenStoredChildAddedToStoredOwnerAdded()
@@ -109,18 +115,21 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $updateCollection['entity_class']);
         $this->assertEquals($owner->getId(), $updateCollection['entity_id']);
-        $this->assertEquals(['childrenManyToMany' => [null, [
-            'inserted' => [
-                [
-                    'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => $child->getId(),
-                    'change_set' => [],
-                    'additional_fields' => []
+        $this->assertEquals(
+            [
+                'childrenManyToMany' => [
+                    null,
+                    [
+                        'inserted' => [
+                            ['entity_class' => TestAuditDataChild::class, 'entity_id' => $child->getId()]
+                        ],
+                        'deleted' => [],
+                        'changed' => []
+                    ]
                 ]
             ],
-            'deleted' => [],
-            'changed' => [],
-        ]]], $updateCollection['change_set']);
+            $updateCollection['change_set']
+        );
     }
 
     public function testShouldSendCollectionUpdateWhenStoredChildAddedToStoredProxyOwnerAdded()
@@ -142,18 +151,21 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $updateCollection['entity_class']);
         $this->assertEquals($owner->getId(), $updateCollection['entity_id']);
-        $this->assertEquals(['childrenManyToMany' => [null, [
-            'inserted' => [
-                [
-                    'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => $child->getId(),
-                    'change_set' => [],
-                    'additional_fields' => []
+        $this->assertEquals(
+            [
+                'childrenManyToMany' => [
+                    null,
+                    [
+                        'inserted' => [
+                            ['entity_class' => TestAuditDataChild::class, 'entity_id' => $child->getId()]
+                        ],
+                        'deleted' => [],
+                        'changed' => []
+                    ]
                 ]
             ],
-            'deleted' => [],
-            'changed' => [],
-        ]]], $updateCollection['change_set']);
+            $updateCollection['change_set']
+        );
     }
 
     public function testShouldSendCollectionWhenOneChildRemoved()
@@ -178,18 +190,21 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $updateCollection = $message->getBody()['collections_updated'][0];
         $this->assertEquals(TestAuditDataOwner::class, $updateCollection['entity_class']);
         $this->assertEquals($owner->getId(), $updateCollection['entity_id']);
-        $this->assertEquals(['childrenManyToMany' => [null, [
-            'deleted' => [
-                [
-                    'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => $child->getId(),
-                    'change_set' => [],
-                    'additional_fields' => []
+        $this->assertEquals(
+            [
+                'childrenManyToMany' => [
+                    null,
+                    [
+                        'deleted' => [
+                            ['entity_class' => TestAuditDataChild::class, 'entity_id' => $child->getId()]
+                        ],
+                        'inserted' => [],
+                        'changed' => []
+                    ]
                 ]
             ],
-            'inserted' => [],
-            'changed' => [],
-        ]], ], $updateCollection['change_set']);
+            $updateCollection['change_set']
+        );
     }
 
     public function testShouldSendCollectionWhenOneChildRemovedFromCollectionAndRemovedItself()
@@ -216,18 +231,21 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $updateCollection = $message->getBody()['collections_updated'][0];
         $this->assertEquals(TestAuditDataOwner::class, $updateCollection['entity_class']);
         $this->assertEquals($owner->getId(), $updateCollection['entity_id']);
-        $this->assertEquals(['childrenManyToMany' => [null, [
-            'deleted' => [
-                [
-                    'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => $childId,
-                    'change_set' => [],
-                    'additional_fields' => []
+        $this->assertEquals(
+            [
+                'childrenManyToMany' => [
+                    null,
+                    [
+                        'deleted' => [
+                            ['entity_class' => TestAuditDataChild::class, 'entity_id' => $childId]
+                        ],
+                        'inserted' => [],
+                        'changed' => []
+                    ]
                 ]
             ],
-            'inserted' => [],
-            'changed' => [],
-        ]]], $updateCollection['change_set']);
+            $updateCollection['change_set']
+        );
     }
 
     public function testShouldSendCollectionWhenClearedAndOneAdded()
@@ -253,18 +271,21 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $updateCollection = $message->getBody()['collections_updated'][0];
         $this->assertEquals(TestAuditDataOwner::class, $updateCollection['entity_class']);
         $this->assertEquals($owner->getId(), $updateCollection['entity_id']);
-        $this->assertEquals(['childrenManyToMany' => [null, [
-            'inserted' => [
-                [
-                    'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => $child->getId(),
-                    'change_set' => [],
-                    'additional_fields' => []
+        $this->assertEquals(
+            [
+                'childrenManyToMany' => [
+                    null,
+                    [
+                        'inserted' => [
+                            ['entity_class' => TestAuditDataChild::class, 'entity_id' => $child->getId()]
+                        ],
+                        'deleted' => [],
+                        'changed' => []
+                    ]
                 ]
             ],
-            'deleted' => [],
-            'changed' => [],
-        ]], ], $updateCollection['change_set']);
+            $updateCollection['change_set']
+        );
     }
 
     public function testShouldSendEntityInsertedWhenNewChildAddedToNewOwner()
@@ -290,17 +311,15 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $insertedEntity = $message->getBody()['entities_inserted'][1];
         $this->assertEquals(TestAuditDataChild::class, $insertedEntity['entity_class']);
         $this->assertEquals($child->getId(), $insertedEntity['entity_id']);
-        $this->assertEquals([
-            'ownerManyToOne' => [
-                null,
-                [
-                    'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => $owner->getId(),
-                    'change_set' => [],
-                    'additional_fields' => []
-                ],
+        $this->assertEquals(
+            [
+                'ownerManyToOne' => [
+                    null,
+                    ['entity_class' => TestAuditDataOwner::class, 'entity_id' => $owner->getId()]
+                ]
             ],
-        ], $insertedEntity['change_set']);
+            $insertedEntity['change_set']
+        );
     }
 
     public function testShouldSendEntityUpdatedWhenStoredChildAddedToNewOwner()
@@ -325,17 +344,15 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $updatedEntity = $message->getBody()['entities_updated'][0];
         $this->assertEquals(TestAuditDataChild::class, $updatedEntity['entity_class']);
         $this->assertEquals($child->getId(), $updatedEntity['entity_id']);
-        $this->assertEquals([
-            'ownerManyToOne' => [
-                null,
-                [
-                    'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => $owner->getId(),
-                    'change_set' => [],
-                    'additional_fields' => []
-                ],
+        $this->assertEquals(
+            [
+                'ownerManyToOne' => [
+                    null,
+                    ['entity_class' => TestAuditDataOwner::class, 'entity_id' => $owner->getId()]
+                ]
             ],
-        ], $updatedEntity['change_set']);
+            $updatedEntity['change_set']
+        );
     }
 
     public function testShouldSendEntityUpdateWhenStoredChildAddedToStoredOwnerAdded()
@@ -356,17 +373,15 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $updatedEntity = $message->getBody()['entities_updated'][0];
         $this->assertEquals(TestAuditDataChild::class, $updatedEntity['entity_class']);
         $this->assertEquals($child->getId(), $updatedEntity['entity_id']);
-        $this->assertEquals([
-            'ownerManyToOne' => [
-                null,
-                [
-                    'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => $owner->getId(),
-                    'change_set' => [],
-                    'additional_fields' => []
-                ],
+        $this->assertEquals(
+            [
+                'ownerManyToOne' => [
+                    null,
+                    ['entity_class' => TestAuditDataOwner::class, 'entity_id' => $owner->getId()]
+                ]
             ],
-        ], $updatedEntity['change_set']);
+            $updatedEntity['change_set']
+        );
     }
 
     public function testShouldSendEntityUpdateWhenStoredChildAddedToStoredProxyOwnerAdded()
@@ -387,17 +402,15 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $updatedEntity = $message->getBody()['entities_updated'][0];
         $this->assertEquals(TestAuditDataChild::class, $updatedEntity['entity_class']);
         $this->assertEquals($child->getId(), $updatedEntity['entity_id']);
-        $this->assertEquals([
-            'ownerManyToOne' => [
-                null,
-                [
-                    'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => $owner->getId(),
-                    'change_set' => [],
-                    'additional_fields' => []
-                ],
+        $this->assertEquals(
+            [
+                'ownerManyToOne' => [
+                    null,
+                    ['entity_class' => TestAuditDataOwner::class, 'entity_id' => $owner->getId()]
+                ]
             ],
-        ], $updatedEntity['change_set']);
+            $updatedEntity['change_set']
+        );
     }
 
     public function testShouldSendEntityRemoveWhenOneChildRemoved()
@@ -422,17 +435,15 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $updatedEntity = $message->getBody()['entities_updated'][0];
         $this->assertEquals(TestAuditDataChild::class, $updatedEntity['entity_class']);
         $this->assertEquals($child->getId(), $updatedEntity['entity_id']);
-        $this->assertEquals([
-            'ownerManyToOne' => [
-                [
-                    'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => $owner->getId(),
-                    'change_set' => [],
-                    'additional_fields' => []
-                ],
-                null,
+        $this->assertEquals(
+            [
+                'ownerManyToOne' => [
+                    ['entity_class' => TestAuditDataOwner::class, 'entity_id' => $owner->getId()],
+                    null
+                ]
             ],
-        ], $updatedEntity['change_set']);
+            $updatedEntity['change_set']
+        );
     }
 
     public function testShouldSendEntityDeletedWhenOneChildRemovedFromCollectionAndRemovedItself()
@@ -459,7 +470,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $deletedEntity = $message->getBody()['entities_deleted'][0];
         $this->assertEquals(TestAuditDataChild::class, $deletedEntity['entity_class']);
         $this->assertEquals($childId, $deletedEntity['entity_id']);
-        $this->assertEquals([], $deletedEntity['change_set']);
+        $this->assertArrayNotHasKey('change_set', $deletedEntity);
     }
 
     public function testShouldSendEntityUpdatedWhenClearedAndOneAdded()
@@ -486,16 +497,14 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $insertedEntity = $message->getBody()['entities_updated'][0];
         $this->assertEquals(TestAuditDataChild::class, $insertedEntity['entity_class']);
         $this->assertEquals($child->getId(), $insertedEntity['entity_id']);
-        $this->assertEquals([
-            'ownerManyToOne' => [
-                null,
-                [
-                    'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => $owner->getId(),
-                    'change_set' => [],
-                    'additional_fields' => []
-                ],
+        $this->assertEquals(
+            [
+                'ownerManyToOne' => [
+                    null,
+                    ['entity_class' => TestAuditDataOwner::class, 'entity_id' => $owner->getId()]
+                ]
             ],
-        ], $insertedEntity['change_set']);
+            $insertedEntity['change_set']
+        );
     }
 }

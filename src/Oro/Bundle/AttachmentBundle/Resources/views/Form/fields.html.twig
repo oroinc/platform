@@ -1,6 +1,6 @@
 {% block oro_file_widget %}
     {% spaceless %}
-        <div class="control-group" style="margin-bottom: 0">
+        <div class="control-group control-group--column">
             {{ form_widget(form.file) }}
             {% if form_errors(form.file) %}
                 <div style="clear:both; float:left">
@@ -49,7 +49,7 @@
 
 {% block oro_image_widget %}
     {% spaceless %}
-        <div class="control-group" style="margin-bottom: 0">
+        <div class="control-group control-group--column">
             {%  if form.vars.name == 'attachment'  %}
                 <div class="attachment-file">
                     {% set jsonParams = '{"initializeOptions":{"fileDefaultHtml":"' ~ "Attach file:"|trans  ~ '" ,"fileButtonHtml":"' ~ "Upload"|trans  ~ '"}}' %}
@@ -78,26 +78,26 @@
 
                 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-                <div id="{{ divId }}" class="attachment_item" {{ UI.renderPageComponentAttributes({
+                <div id="{{ divId }}" class="attachment-item" {{ UI.renderPageComponentAttributes({
                     view: 'oroattachment/js/app/views/attachment-view',
                     options: {
                         inputSelector: '#' ~ inputId,
                     }
                 }) }}>
                     <i class="fa-paperclip"></i>
-                    <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename" title="{{ value.originalFilename }}">
+                    <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash attachment-item__filename" title="{{ value.originalFilename }}">
                         {{  value.originalFilename }}
                     </a>
-                    ({{ file_size(value.fileSize) }})
+                    <span class="attachment-item__file-size">({{ file_size(value.fileSize) }})</span>
                     {{ form_row(form.emptyFile) }}
                     <i data-role="remove"
-                       class="btn btn-link fa-close remove-attachment"
+                       class="btn btn-square-lighter fa-close remove-attachment"
                        data-related="{{ form.emptyFile.vars.name }}"
                     ></i>
                 </div>
                 {% else %}
                     <div class="well well-small oro_attachment_file">
-                        <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename" title="{{ value.originalFilename }}">
+                        <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash attachment-item__filename" title="{{ value.originalFilename }}">
                             <img src="{{ resized_image_url(value) }}" alt="{{ value.originalFilename }}" />
                             {{ value.originalFilename }}
                         </a>

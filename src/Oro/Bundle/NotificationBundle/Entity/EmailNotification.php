@@ -9,10 +9,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\NotificationBundle\Model\ExtendEmailNotification;
 
 /**
- * EmailNotification
+ * Represents notification rule.
  *
  * @ORM\Table("oro_notification_email_notif")
- * @ORM\Entity(repositoryClass="Oro\Bundle\NotificationBundle\Entity\Repository\EmailNotificationRepository")
+ * @ORM\Entity()
  * @Config(
  *      defaultValues={
  *          "security"={
