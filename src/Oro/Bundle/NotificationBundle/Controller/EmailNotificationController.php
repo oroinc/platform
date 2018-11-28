@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * The controller for EmailNotification entity.
  * @Route("/email")
  */
 class EmailNotificationController extends Controller
@@ -34,7 +35,7 @@ class EmailNotificationController extends Controller
     public function indexAction()
     {
         return [
-            'entity_class' => $this->container->getParameter('oro_notification.emailnotification.entity.class')
+            'entity_class' => EmailNotification::class
         ];
     }
 

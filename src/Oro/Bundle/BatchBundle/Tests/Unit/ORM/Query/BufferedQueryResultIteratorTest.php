@@ -126,7 +126,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $this->assertEquals(
             'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT '
             . $maxResults
-            . ') AS e',
+            . ') AS count_query',
             $actualSql
         );
     }
@@ -159,7 +159,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $this->assertEquals(
             'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT '
             . $maxResults
-            . ') AS e',
+            . ') AS count_query',
             $actualSql
         );
     }
@@ -263,7 +263,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $this->assertEquals(
             'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT '
             . $maxResults
-            . ') AS e',
+            . ') AS count_query',
             $actualSqls[0]
         );
         $this->assertEquals(
@@ -321,7 +321,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $this->assertEquals(
             'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT '
             . $maxResults
-            . ') AS e',
+            . ') AS count_query',
             $actualSqls[0]
         );
         $this->assertEquals(
@@ -386,7 +386,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $this->assertCount(3, $actualSqls);
         $this->assertEquals(
             'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT '
-            . $maxResults . ' OFFSET ' . $firstResult . ') AS e',
+            . $maxResults . ' OFFSET ' . $firstResult . ') AS count_query',
             $actualSqls[0]
         );
         $this->assertEquals(

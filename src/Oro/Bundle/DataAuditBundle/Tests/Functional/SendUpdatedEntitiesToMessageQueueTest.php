@@ -57,9 +57,10 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
-        $this->assertEquals([
-            'stringProperty' => [null, 'aString'],
-        ], $insertedEntity['change_set']);
+        $this->assertEquals(
+            ['stringProperty' => [null, 'aString']],
+            $insertedEntity['change_set']
+        );
     }
 
     public function testShouldSendRealClassWhenProxyEntityChanged()
@@ -86,9 +87,10 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
-        $this->assertEquals([
-            'stringProperty' => [null, 'aString'],
-        ], $insertedEntity['change_set']);
+        $this->assertEquals(
+            ['stringProperty' => [null, 'aString']],
+            $insertedEntity['change_set']
+        );
     }
 
     public function testShouldSendWhenIntPropertyChanged()
@@ -108,9 +110,10 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
-        $this->assertEquals([
-            'intProperty' => [null, 1234],
-        ], $insertedEntity['change_set']);
+        $this->assertEquals(
+            ['intProperty' => [null, 1234]],
+            $insertedEntity['change_set']
+        );
     }
 
     public function testShouldSendWhenSerializedPropertyChanged()
@@ -131,9 +134,10 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
-        $this->assertEquals([
-            'serializedProperty' => [null, ['foo' => 'fooVal']],
-        ], $insertedEntity['change_set']);
+        $this->assertEquals(
+            ['serializedProperty' => [null, ['foo' => 'fooVal']]],
+            $insertedEntity['change_set']
+        );
     }
 
     public function testShouldSendWhenJsonPropertyChanged()
@@ -150,9 +154,10 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
-        $this->assertEquals([
-            'jsonProperty' => [null, ['foo' => 'fooVal']],
-        ], $insertedEntity['change_set']);
+        $this->assertEquals(
+            ['jsonProperty' => [null, ['foo' => 'fooVal']]],
+            $insertedEntity['change_set']
+        );
     }
 
     public function testShouldSendWhenDateTimePropertyChanged()
@@ -173,9 +178,10 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
-        $this->assertEquals([
-            'dateProperty' => [null, '2010-11-12T00:01:02+0000'],
-        ], $insertedEntity['change_set']);
+        $this->assertEquals(
+            ['dateProperty' => [null, '2010-11-12T00:01:02+0000']],
+            $insertedEntity['change_set']
+        );
     }
 
     public function testShouldNotSendWhenDateTimePropertyChangedToExactlySameDateTime()
@@ -204,7 +210,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
-        $this->assertEquals([], $insertedEntity['change_set']);
+        $this->assertArrayNotHasKey('change_set', $insertedEntity);
     }
 
     public function testShouldSendWhenOneToOnePropertyChangedFromNullToChild()
@@ -231,14 +237,15 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
-        $this->assertEquals([
-            'child' => [null, [
-                'entity_class' => TestAuditDataChild::class,
-                'entity_id' => $child->getId(),
-                'change_set' => [],
-                'additional_fields' => []
-            ]],
-        ], $insertedEntity['change_set']);
+        $this->assertEquals(
+            [
+                'child' => [
+                    null,
+                    ['entity_class' => TestAuditDataChild::class, 'entity_id' => $child->getId()]
+                ]
+            ],
+            $insertedEntity['change_set']
+        );
     }
 
     public function testShouldSendWhenOneToOnePropertyChangedFromOneChildToAnother()
@@ -267,22 +274,15 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
-        $this->assertEquals([
-            'child' => [
-                [
-                    'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => $firstChild->getId(),
-                    'change_set' => [],
-                    'additional_fields' => []
-                ],
-                [
-                    'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => $secondChild->getId(),
-                    'change_set' => [],
-                    'additional_fields' => []
+        $this->assertEquals(
+            [
+                'child' => [
+                    ['entity_class' => TestAuditDataChild::class, 'entity_id' => $firstChild->getId()],
+                    ['entity_class' => TestAuditDataChild::class, 'entity_id' => $secondChild->getId()]
                 ]
             ],
-        ], $insertedEntity['change_set']);
+            $insertedEntity['change_set']
+        );
     }
 
     public function testShouldSendWhenOneToOnePropertyChangedWithProxyChild()
@@ -311,13 +311,14 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
 
         $insertedEntity = $message->getBody()['entities_updated'][0];
 
-        $this->assertEquals([
-            'child' => [null, [
-                'entity_class' => TestAuditDataChild::class,
-                'entity_id' => $child->getId(),
-                'change_set' => [],
-                'additional_fields' => []
-            ]],
-        ], $insertedEntity['change_set']);
+        $this->assertEquals(
+            [
+                'child' => [
+                    null,
+                    ['entity_class' => TestAuditDataChild::class, 'entity_id' => $child->getId()]
+                ]
+            ],
+            $insertedEntity['change_set']
+        );
     }
 }

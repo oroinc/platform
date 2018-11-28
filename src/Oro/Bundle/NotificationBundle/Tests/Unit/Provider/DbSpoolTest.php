@@ -2,62 +2,45 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Provider;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
+use Oro\Bundle\NotificationBundle\Entity\Repository\SpoolItemRepository;
 use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
-use Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface;
 use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
 use Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DbSpoolTest extends \PHPUnit\Framework\TestCase
 {
-    const SPOOL_ITEM_CLASS = 'Oro\Bundle\NotificationBundle\Entity\SpoolItem';
+    /** @var DbSpool */
+    private $spool;
 
-    /**
-     * @var DbSpool
-     */
-    protected $spool;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface */
+    private $em;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $em;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityPool */
+    private $entityPool;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityPool;
-
-    /**
-     * @var string
-     */
-    protected $className;
-
-    /**
-     * @var EventHandlerInterface
-     */
-    protected $handler;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $eventDispatcher;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
+    private $eventDispatcher;
 
     protected function setUp()
     {
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->entityPool = $this->createMock(EntityPool::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->entityPool = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Doctrine\EntityPool')
-            ->disableOriginalConstructor()->getMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->with(SpoolItem::class)
+            ->willReturn($this->em);
 
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->spool = new DbSpool($this->em, $this->entityPool, self::SPOOL_ITEM_CLASS, $this->eventDispatcher);
-
+        $this->spool = new DbSpool($doctrine, $this->entityPool, $this->eventDispatcher);
         $this->spool->start();
         $this->spool->stop();
-        $this->assertTrue($this->spool->isStarted());
+        self::assertTrue($this->spool->isStarted());
     }
 
     /**
@@ -65,116 +48,101 @@ class DbSpoolTest extends \PHPUnit\Framework\TestCase
      */
     public function testQueueMessage()
     {
-        $message = $this->createMock('\Swift_Mime_Message');
+        $message = $this->createMock(\Swift_Mime_Message::class);
         $this->spool->setLogType('log type');
-        $this->entityPool->expects($this->once())
+        $this->entityPool->expects(self::once())
             ->method('addPersistEntity')
-            ->with(
-                $this->callback(
-                    function ($spoolItem) use ($message) {
-                        /** @var SpoolItem $spoolItem */
-                        $this->assertInstanceOf(self::SPOOL_ITEM_CLASS, $spoolItem);
-                        $this->assertEquals($message, $spoolItem->getMessage());
-                        $this->assertEquals(DbSpool::STATUS_READY, $spoolItem->getStatus());
-                        $this->assertEquals('log type', $spoolItem->getLogType());
-                        return true;
-                    }
-                )
-            );
+            ->willReturnCallback(function (SpoolItem $spoolItem) use ($message) {
+                self::assertEquals($message, $spoolItem->getMessage());
+                self::assertEquals(DbSpool::STATUS_READY, $spoolItem->getStatus());
+                self::assertEquals('log type', $spoolItem->getLogType());
 
-        $this->assertTrue($this->spool->queueMessage($message));
+                return true;
+            });
+
+        self::assertTrue($this->spool->queueMessage($message));
     }
 
     public function testFlushMessage()
     {
-        $transport = $this->createMock('\Swift_Transport');
+        $transport = $this->createMock(\Swift_Transport::class);
 
-        $transport->expects($this->once())
+        $transport->expects(self::once())
             ->method('isStarted')
-            ->will($this->returnValue(false));
-        $transport->expects($this->once())
+            ->willReturn(false);
+        $transport->expects(self::once())
             ->method('start');
 
-        $message = $this->createMock('\Swift_Mime_Message');
+        $message = $this->createMock(\Swift_Mime_Message::class);
 
-        $spoolItem = $this->createMock(self::SPOOL_ITEM_CLASS);
-        $spoolItem->expects($this->once())
+        $spoolItem = $this->createMock(SpoolItem::class);
+        $spoolItem->expects(self::once())
             ->method('setStatus');
-        $spoolItem->expects($this->once())
+        $spoolItem->expects(self::once())
             ->method('getMessage')
-            ->will($this->returnValue($message));
+            ->willReturn($message);
 
-        $emails = array($spoolItem);
+        $emails = [$spoolItem];
 
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('persist')
-            ->with($this->isInstanceOf(self::SPOOL_ITEM_CLASS));
-
-        $this->em->expects($this->exactly(2))
+            ->with(self::identicalTo($spoolItem));
+        $this->em->expects(self::exactly(2))
             ->method('flush');
-
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('remove');
 
-        $repository = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Entity\Repository\SpoolItemRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repository->expects($this->once())
+        $repository = $this->createMock(SpoolItemRepository::class);
+        $repository->expects(self::once())
             ->method('findBy')
-            ->will($this->returnValue($emails));
+            ->willReturn($emails);
 
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('getRepository')
-            ->with(self::SPOOL_ITEM_CLASS)
-            ->will($this->returnValue($repository));
+            ->with(SpoolItem::class)
+            ->willReturn($repository);
 
-        $transport->expects($this->once())
+        $transport->expects(self::once())
             ->method('send')
-            ->with($message, array())
-            ->will($this->returnValue(1));
+            ->with($message, [])
+            ->willReturn(1);
 
-        $this->eventDispatcher->expects($this->once())->method('dispatch')->with(
-            NotificationSentEvent::NAME,
-            $this->callback(
-                function ($event) use ($spoolItem) {
-                    $this->assertTrue($event instanceof NotificationSentEvent);
-                    $this->assertEquals($spoolItem, $event->getSpoolItem());
-                    $this->assertEquals(1, $event->getSentCount());
-                    return true;
-                }
-            )
-        );
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->willReturnCallback(function ($eventName, NotificationSentEvent $event) use ($spoolItem) {
+                self::assertEquals(NotificationSentEvent::NAME, $eventName);
+                self::assertEquals($spoolItem, $event->getSpoolItem());
+                self::assertEquals(1, $event->getSentCount());
+
+                return true;
+            });
 
         $this->spool->setTimeLimit(-100);
         $count = $this->spool->flushQueue($transport);
-        $this->assertEquals(1, $count);
+        self::assertEquals(1, $count);
     }
 
     public function testFlushMessageZeroEmails()
     {
-        $transport = $this->createMock('\Swift_Transport');
+        $transport = $this->createMock(\Swift_Transport::class);
 
-        $transport->expects($this->once())
+        $transport->expects(self::once())
             ->method('isStarted')
-            ->will($this->returnValue(false));
-        $transport->expects($this->once())
+            ->willReturn(false);
+        $transport->expects(self::once())
             ->method('start');
 
-        $repository = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Entity\Repository\SpoolItemRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repository->expects($this->once())
+        $repository = $this->createMock(SpoolItemRepository::class);
+        $repository->expects(self::once())
             ->method('findBy')
-            ->will($this->returnValue(array()));
+            ->willReturn([]);
 
-        $this->em
-            ->expects($this->once())
+        $this->em->expects(self::once())
             ->method('getRepository')
-            ->with(self::SPOOL_ITEM_CLASS)
-            ->will($this->returnValue($repository));
+            ->with(SpoolItem::class)
+            ->willReturn($repository);
 
         $count = $this->spool->flushQueue($transport);
-        $this->assertEquals(0, $count);
+        self::assertEquals(0, $count);
     }
 }

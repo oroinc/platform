@@ -138,7 +138,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('api_doc_views')
-                ->info('All supported API views')
+                ->info('All supported API views.')
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                     ->children()
@@ -146,7 +146,7 @@ class Configuration implements ConfigurationInterface
                             ->info('The view label.')
                         ->end()
                         ->booleanNode('default')
-                            ->info('Is the given view is default.')
+                            ->info('Whether this view is default one.')
                             ->defaultFalse()
                         ->end()
                         ->arrayNode('request_type')
@@ -161,14 +161,44 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue('oro_api.api_doc.formatter.html_formatter')
                         ->end()
                         ->booleanNode('sandbox')
-                            ->info('Should the sandbox have a link to this view.')
+                            ->info('Whether the sandbox should have a link to this view.')
                             ->defaultTrue()
                         ->end()
                         ->arrayNode('headers')
-                            ->info('Headers should be sent with request in Sandbox.')
+                            ->info('Headers that should be sent with requests from the sandbox.')
+                            ->example([
+                                'Content-Type' => 'application/vnd.api+json',
+                                'X-Include'    => [
+                                    ['value' => 'totalCount', 'actions' => ['get_list', 'delete_list']],
+                                    ['value' => 'deletedCount', 'actions' => ['delete_list']]
+                                ]
+                            ])
                             ->useAttributeAsKey('name')
                             ->normalizeKeys(false)
-                            ->prototype('variable')->end()
+                            ->prototype('array')
+                                ->beforeNormalization()
+                                    ->always(function ($value) {
+                                        if (is_string($value)) {
+                                            $value = [['value' => $value, 'actions' => []]];
+                                        }
+
+                                        return $value;
+                                    })
+                                ->end()
+                                ->prototype('array')
+                                    ->children()
+                                        ->scalarNode('value')
+                                            ->info('The header value.')
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        ->arrayNode('actions')
+                                            ->info('API actions for which this value should be used.')
+                                            ->prototype('scalar')->end()
+                                            ->defaultValue([])
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()

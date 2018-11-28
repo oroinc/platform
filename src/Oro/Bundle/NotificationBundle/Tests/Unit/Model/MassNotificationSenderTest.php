@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Model;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Proxy\Proxy;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
-use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
@@ -25,47 +25,48 @@ class MassNotificationSenderTest extends \PHPUnit\Framework\TestCase
     const TEST_SENDER_NAME  = 'sender name';
     const TEMPLATE_NAME     = 'test template';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
-    protected $entityManager;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface */
+    private $entityManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|UserRepository */
-    protected $userRepository;
+    private $userRepository;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityPool */
-    protected $entityPool;
+    private $entityPool;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|NotificationSettings */
-    protected $notificationSettings;
+    private $notificationSettings;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EmailNotificationManager */
-    protected $manager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DQLNameFormatter */
-    protected $dqlNameFormatter;
+    private $manager;
 
     /** @var MassNotificationSender */
-    protected $sender;
+    private $sender;
 
-    /** @var  array */
-    protected $massNotificationParams;
+    /** @var array */
+    private $massNotificationParams;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->userRepository = $this->createMock(UserRepository::class);
         $this->entityPool = $this->createMock(EntityPool::class);
         $this->notificationSettings = $this->createMock(NotificationSettings::class);
-        $this->dqlNameFormatter = $this->createMock(DQLNameFormatter::class);
         $this->manager = $this->createMock(EmailNotificationManager::class);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManager')
+            ->willReturn($this->entityManager);
+
         $this->sender = new MassNotificationSender(
             $this->manager,
             $this->notificationSettings,
-            $this->entityManager,
-            $this->entityPool,
-            $this->dqlNameFormatter
+            $doctrine,
+            $this->entityPool
         );
     }
 
@@ -180,7 +181,7 @@ class MassNotificationSenderTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
-            ->with('OroUserBundle:User')
+            ->with(User::class)
             ->willReturn($this->userRepository);
     }
 }

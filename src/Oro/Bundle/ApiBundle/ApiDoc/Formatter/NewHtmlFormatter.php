@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc\Formatter;
 
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\DataTypes as ApiDocDataTypes;
 
 /**
@@ -31,6 +32,7 @@ class NewHtmlFormatter extends HtmlFormatter
         return $this->engine->render('NelmioApiDocBundle::resources.html.twig', array_merge(
             [
                 'resources' => $this->reformatDocData($collection),
+                'actions'   => $this->getActions($collection)
             ],
             $this->getGlobalVars()
         ));
@@ -112,5 +114,59 @@ class NewHtmlFormatter extends HtmlFormatter
         }
 
         return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function processCollection(array $collection)
+    {
+        $array = [];
+        foreach ($collection as $item) {
+            /** @var ApiDoc $annotationObject */
+            $annotationObject = $item['annotation'];
+            $data = $annotationObject->toArray();
+            if (!empty($item['action'])) {
+                $data['action'] = $item['action'];
+            }
+            $array[$annotationObject->getSection()][$item['resource']][] = $data;
+        }
+
+        $processedCollection = [];
+        foreach ($array as $section => $resources) {
+            if (!$section) {
+                $section = '_others';
+            }
+            foreach ($resources as $path => $annotations) {
+                foreach ($annotations as $annotation) {
+                    $processedCollection[$section][$path][] = $this->processAnnotation($annotation);
+                }
+            }
+        }
+
+        ksort($processedCollection);
+
+        return $processedCollection;
+    }
+
+    /**
+     * @param array $collection
+     *
+     * @return array [resource id => API action, ...]
+     */
+    protected function getActions(array $collection)
+    {
+        $actions = [];
+        foreach ($collection as $resourceBlockName => $resourceGroupBlock) {
+            foreach ($resourceGroupBlock as $resourceUrl => $resourceBlock) {
+                foreach ($resourceBlock as $resource) {
+                    if (!empty($resource['action'])) {
+                        $actions[$resource['id']] = $resource['action'];
+                    }
+                }
+            }
+        }
+
+        return $actions;
     }
 }

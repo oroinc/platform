@@ -3,8 +3,8 @@
 namespace Oro\Bundle\FormBundle\Form\Extension;
 
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToHtml5LocalDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -12,7 +12,8 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Reverts https://github.com/symfony/symfony/pull/24401 to avoid BC break.
+ * Reverts https://github.com/symfony/symfony/pull/24401 to avoid BC break,
+ * https://github.com/symfony/symfony/pull/28466 and https://github.com/symfony/symfony/pull/28372 as well.
  * Also the default format is changed in OroDateTimeType
  * @see \Oro\Bundle\FormBundle\Form\Type\OroDateTimeType::setDefaultOptions
  */
@@ -35,10 +36,8 @@ class DateTimeExtension extends AbstractTypeExtension
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $pattern = is_string($options['format']) ? $options['format'] : null;
-        if (self::HTML5_FORMAT_WITH_TIMEZONE === $pattern) {
-            $this->replaceLocalizedStringWithRfc3339ViewTransformer($builder, $options);
-        } elseif (self::HTML5_FORMAT_WITHOUT_TIMEZONE === $pattern) {
-            $this->replaceRfc3339WithLocalizedStringViewTransformer($builder, $pattern, $options);
+        if (self::HTML5_FORMAT_WITHOUT_TIMEZONE === $pattern) {
+            $this->replaceHtml5LocalDateTimeWithLocalizedStringViewTransformer($builder, $pattern, $options);
         }
     }
 
@@ -66,44 +65,13 @@ class DateTimeExtension extends AbstractTypeExtension
     }
 
     /**
-     * Replaces DateTimeToLocalizedStringTransformer with DateTimeToRfc3339Transformer view transformer.
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    private function replaceLocalizedStringWithRfc3339ViewTransformer(
-        FormBuilderInterface $builder,
-        array $options
-    ) {
-        $transformerKey = null;
-        $viewTransformers = $builder->getViewTransformers();
-        foreach ($viewTransformers as $key => $viewTransformer) {
-            if ($viewTransformer instanceof DateTimeToLocalizedStringTransformer) {
-                $transformerKey = $key;
-                break;
-            }
-        }
-        if (null !== $transformerKey) {
-            $builder->resetViewTransformers();
-            $viewTransformers[$transformerKey] = new DateTimeToRfc3339Transformer(
-                $options['model_timezone'],
-                $options['view_timezone']
-            );
-            \rsort($viewTransformers);
-            foreach ($viewTransformers as $key => $viewTransformer) {
-                $builder->addViewTransformer($viewTransformer);
-            }
-        }
-    }
-
-    /**
-     * Replaces DateTimeToRfc3339Transformer with DateTimeToLocalizedStringTransformer view transformer.
+     * Replaces DateTimeToHtml5LocalDateTimeTransformer with DateTimeToLocalizedStringTransformer view transformer.
      *
      * @param FormBuilderInterface $builder
      * @param string               $pattern
      * @param array                $options
      */
-    private function replaceRfc3339WithLocalizedStringViewTransformer(
+    private function replaceHtml5LocalDateTimeWithLocalizedStringViewTransformer(
         FormBuilderInterface $builder,
         $pattern,
         array $options
@@ -111,7 +79,7 @@ class DateTimeExtension extends AbstractTypeExtension
         $transformerKey = null;
         $viewTransformers = $builder->getViewTransformers();
         foreach ($viewTransformers as $key => $viewTransformer) {
-            if ($viewTransformer instanceof DateTimeToRfc3339Transformer) {
+            if ($viewTransformer instanceof DateTimeToHtml5LocalDateTimeTransformer) {
                 $transformerKey = $key;
                 break;
             }
