@@ -51,6 +51,8 @@
             width: $query-designer-sorting-selector-width;
         }
 
+        @include selector-width($query-designer-sorting-selector-width);
+
         .submit-cancel-buttons {
             margin-#{$start}: auto;
             margin-bottom: $query-designer-controls-group-margin-start;
