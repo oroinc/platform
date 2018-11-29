@@ -40,6 +40,8 @@
 * Removed `result_name` deprecated configuration attribute for a field. Use `property_path` attribute instead.
 * Removed `orderBy` deprecated configuration attribute. Use `order_by` attribute instead.
 * Removed deprecated signature `function (array &$item) : void` of post serialization handler that can be specified in `post_serialize` configuration attribute. Use `function (array $item, array $context) : array` instead.
+#### Testing Component
+* The class `Oro\Component\Testing\Validator\AbstractConstraintValidatorTest` was removed. Use `Symfony\Component\Validator\Test\ConstraintValidatorTestCase` instead.
 
 ### Changed
 #### AddressBundle
