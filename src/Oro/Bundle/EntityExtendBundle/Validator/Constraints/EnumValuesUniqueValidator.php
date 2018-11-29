@@ -21,22 +21,23 @@ class EnumValuesUniqueValidator extends ConstraintValidator
             return;
         }
 
-        $foundDuplicates = [];
-        foreach ($value as $currentKey => $currentArray) {
-            $currentLabel = $currentArray['label'];
-            foreach ($value as $searchKey => $searchArray) {
-                if ($currentKey !== $searchKey && $searchArray['label'] === $currentLabel) {
-                    if (!in_array($currentLabel, $foundDuplicates, true)) {
-                        $foundDuplicates[] = $currentLabel;
-                    }
-                }
+        $occurrences = [];
+        foreach ($value as $option) {
+            $label = $option['label'];
+            $occurrences[$label] = ($occurrences[$label] ?? 0) + 1;
+        }
+
+        $duplicates = [];
+        foreach ($occurrences as $label => $count) {
+            if ($count > 1) {
+                $duplicates[] = $label;
             }
         }
 
-        if (!empty($foundDuplicates)) {
+        if (!empty($duplicates)) {
             $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', "'" . implode("', '", $foundDuplicates) . "'")
-                ->setPlural(count($foundDuplicates))
+                ->setParameter('{{ value }}', "'" . implode("', '", $duplicates) . "'")
+                ->setPlural(count($duplicates))
                 ->addViolation();
         }
     }
