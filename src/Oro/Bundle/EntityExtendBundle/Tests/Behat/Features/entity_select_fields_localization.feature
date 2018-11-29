@@ -1,6 +1,6 @@
 @fixture-OroLocaleBundle:ZuluLocalization.yml
 
-Feature: Entity select field
+Feature: Entity select fields localization
   In order to check whether the translations in the fields are working
   As a Administrator
   I create an additional entity with fields and provide two localizations

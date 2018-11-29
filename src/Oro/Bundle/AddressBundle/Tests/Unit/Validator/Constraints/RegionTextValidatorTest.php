@@ -6,10 +6,10 @@ use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Validator\Constraints\RegionText;
 use Oro\Bundle\AddressBundle\Validator\Constraints\RegionTextValidator;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class RegionTextValidatorTest extends AbstractConstraintValidatorTest
+class RegionTextValidatorTest extends ConstraintValidatorTestCase
 {
     /**
      * {@inheritdoc}

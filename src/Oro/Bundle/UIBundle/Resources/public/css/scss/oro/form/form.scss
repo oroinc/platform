@@ -192,11 +192,13 @@ select[multiple] {
 .selector {
     line-height: $selector-line-height;
     height: $selector-height;
-    width: $selector-width;
     border: $selector-border;
     background-color: $selector-background-color;
     border-radius: $selector-border-radius;
     padding: $selector-inner-offset;
+
+    max-width: $selector-max-width;
+    width: $selector-width;
 
     option {
         padding-left: $selector-option-inner-offset-left;
@@ -211,6 +213,10 @@ select[multiple] {
         width: $selector-select-width;
         box-sizing: $selector-select-box-sizing;
         color: $selector-select-color;
+
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
     }
 
     span {
@@ -223,6 +229,7 @@ select[multiple] {
         overflow: $selector-uniform-overflow;
         text-overflow: $selector-uniform-text-overflow;
         position: $selector-uniform-position;
+        width: $selector-uniform-width;
 
         &:after {
             content: "\f0dd";
@@ -402,16 +409,6 @@ select[multiple] {
         &--column:not(:last-of-type) {
             margin: 0;
         }
-    }
-}
-
-/* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
-.controls {
-    select:not([multiple]) {
-        width: $select-width;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
     }
 }
 

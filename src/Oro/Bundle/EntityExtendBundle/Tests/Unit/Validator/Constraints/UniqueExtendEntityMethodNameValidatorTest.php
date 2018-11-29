@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
-use Doctrine\Common\EventManager;
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
@@ -15,10 +13,10 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethod
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class UniqueExtendEntityMethodNameValidatorTest extends AbstractConstraintValidatorTest
+class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestCase
 {
     const TEST_CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools\TestEntity';
     const TEST_FIELD_NAME = 'testField';

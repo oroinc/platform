@@ -164,9 +164,7 @@
         }
     }
 
-    .selector {
-        width: $filter-box-selector-width;
-    }
+    @include selector-width($filter-box-selector-width, $filter-box-field-max-width);
 
     .filter-update {
         margin-left: $filter-update-offset-left;

@@ -26,11 +26,11 @@
     input.label-text {
         width: $query-designer-label-text-width;
     }
-    .function-selector .controls select {
-        width: $query-designer-function-selector-width;
+    .function-selector .controls {
+        @include selector-width($query-designer-function-selector-width);
     }
-    .sorting-selector .controls select {
-        width: $query-designer-sorting-selector-width;
+    .sorting-selector .controls {
+        @include selector-width($query-designer-sorting-selector-width);
     }
     .filter-box {
         padding: $query-designer-filter-box-padding;

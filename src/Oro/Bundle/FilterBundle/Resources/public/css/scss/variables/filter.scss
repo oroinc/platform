@@ -14,6 +14,8 @@ $filter-box-criteria-top: auto !default;
 $filter-box-criteria-offset-left: -9999px !default;
 $filter-box-criteria-focus-outline: none !default;
 
+$filter-box-field-max-width: $field-width !default;
+
 $filter-box-criteria-btn-group-offset-left: 0 !default;
 
 $filter-box-criteria-value-offset-bottom: 0 !default;
@@ -286,7 +288,7 @@ $filter-box-oro-action-btn-group-float: right !default;
 $filter-box-oro-action-btn-outline: none !default;
 $filter-box-oro-action-btn-position: static !default;
 
-$filter-box-selector-width: auto !default;
+$filter-box-selector-width: 100% !default;
 
 $filter-select-oro-height: 20px !default;
 $filter-select-oro-line-height: 20px !default;
