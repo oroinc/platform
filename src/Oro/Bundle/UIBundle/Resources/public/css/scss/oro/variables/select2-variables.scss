@@ -99,7 +99,7 @@ $select2-search-choice-img-offset-vertical-align: top !default;
 $select2-search-choice-img-offset-width: 16px !default;
 $select2-search-choice-img-offset-height: 16px !default;
 
-$select2-search-field-inner-offset: 0 !default;
+$select2-search-field-inner-offset: side-values(0 0 0 3px) !default;
 $select2-search-field-float: left !default;
 $select2-search-field-height: auto !default;
 $select2-search-field-line-height: $select2-search-choice-line-height + (2 * $select2-search-choice-inner-offset-vertical) !default;

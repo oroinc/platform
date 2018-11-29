@@ -122,6 +122,16 @@
                 padding-top: 6px;
             }
         }
+
+        &.control-group-oro_type_filter {
+            .date-filter-container {
+                &:not(.date-filter-custom) {
+                    .control-group {
+                        margin-bottom: 0;
+                    }
+                }
+            }
+        }
     }
 }
 

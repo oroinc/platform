@@ -64,9 +64,9 @@
             @include fa-icon($datepicker-prev-button-icon);
         }
 
-        select {
-            width: $datepicker-header-nav-select-width;
+        @include selector-width($datepicker-header-nav-select-width);
 
+        select {
             opacity: 0;
         }
 
