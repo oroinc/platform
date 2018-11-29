@@ -22,15 +22,13 @@ class DateHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTimeZoneOffset()
     {
-        $this->markTestSkipped('Will be fixed in BAP-17868');
-
         $this->localeSettings->expects(self::once())
             ->method('getTimeZone')
-            ->willReturn('Europe/Kiev');
+            ->willReturn('Asia/Tokyo');
 
-        self::assertEquals('+03:00', $this->dateHelper->getTimeZoneOffset());
+        self::assertEquals('+09:00', $this->dateHelper->getTimeZoneOffset());
         // test that the offset is cached
-        self::assertEquals('+03:00', $this->dateHelper->getTimeZoneOffset());
+        self::assertEquals('+09:00', $this->dateHelper->getTimeZoneOffset());
     }
 
     public function testGetTimeZoneOffsetForUTC()
@@ -44,14 +42,12 @@ class DateHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetConvertTimezoneExpression()
     {
-        $this->markTestSkipped('Will be fixed in BAP-17868');
-
         $this->localeSettings->expects(self::once())
             ->method('getTimeZone')
-            ->willReturn('Europe/Kiev');
+            ->willReturn('Asia/Tokyo');
 
         self::assertEquals(
-            'CONVERT_TZ(e.createdAt, \'+00:00\', \'+03:00\')',
+            'CONVERT_TZ(e.createdAt, \'+00:00\', \'+09:00\')',
             $this->dateHelper->getConvertTimezoneExpression('e.createdAt')
         );
     }

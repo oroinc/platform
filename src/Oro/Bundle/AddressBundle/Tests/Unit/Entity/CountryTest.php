@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Entity;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;

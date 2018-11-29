@@ -870,6 +870,7 @@ services:
         arguments:
             - '@oro_api.constraint_text_extractor'
             - '@oro_api.error_completer_registry'
+            - '@oro_api.form_property_accessor'
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, requestType: json_api, priority: -99 }
             - { name: oro.api.processor, action: update, group: transform_data, requestType: json_api, priority: -99 }
@@ -879,6 +880,7 @@ services:
         arguments:
             - '@oro_api.constraint_text_extractor'
             - '@oro_api.error_completer_registry'
+            - '@oro_api.form_property_accessor'
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: transform_data, requestType: json_api, priority: -99 }
             - { name: oro.api.processor, action: add_subresource, group: transform_data, requestType: json_api, priority: -99 }
@@ -892,6 +894,7 @@ services:
         arguments:
             - '@oro_api.constraint_text_extractor'
             - '@oro_api.error_completer_registry'
+            - '@oro_api.form_property_accessor'
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, priority: -100 }
             - { name: oro.api.processor, action: update, group: transform_data, priority: -100 }
@@ -901,6 +904,7 @@ services:
         arguments:
             - '@oro_api.constraint_text_extractor'
             - '@oro_api.error_completer_registry'
+            - '@oro_api.form_property_accessor'
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: transform_data, priority: -100 }
             - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -100 }

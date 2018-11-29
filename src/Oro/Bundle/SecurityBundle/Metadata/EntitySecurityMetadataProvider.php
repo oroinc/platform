@@ -13,6 +13,9 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * ACL metadata provider for entities.
+ */
 class EntitySecurityMetadataProvider
 {
     const ACL_SECURITY_TYPE = 'ACL';
@@ -50,12 +53,12 @@ class EntitySecurityMetadataProvider
     protected $eventDispatcher;
 
     /**
-     * @param ConfigProvider      $securityConfigProvider
-     * @param ConfigProvider      $entityConfigProvider
-     * @param ConfigProvider      $extendConfigProvider
-     * @param ManagerRegistry     $doctrine
+     * @param ConfigProvider $securityConfigProvider
+     * @param ConfigProvider $entityConfigProvider
+     * @param ConfigProvider $extendConfigProvider
+     * @param ManagerRegistry $doctrine
      * @param TranslatorInterface $translator
-     * @param CacheProvider|null  $cache
+     * @param CacheProvider|null $cache
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
@@ -64,7 +67,7 @@ class EntitySecurityMetadataProvider
         ConfigProvider $extendConfigProvider,
         ManagerRegistry $doctrine,
         TranslatorInterface $translator,
-        CacheProvider  $cache = null,
+        CacheProvider $cache = null,
         EventDispatcherInterface $eventDispatcher
     ) {
         $this->securityConfigProvider = $securityConfigProvider;
@@ -79,7 +82,7 @@ class EntitySecurityMetadataProvider
     /**
      * Checks whether an entity is protected using the given security type.
      *
-     * @param string $className    The entity class name
+     * @param string $className The entity class name
      * @param string $securityType The security type. Defaults to ACL.
      *
      * @return bool
@@ -285,7 +288,7 @@ class EntitySecurityMetadataProvider
      * Gets a label of a field.
      *
      * @param ClassMetadata $metadata
-     * @param string        $fieldName
+     * @param string $fieldName
      *
      * @return string
      */

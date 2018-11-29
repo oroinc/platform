@@ -6,6 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Exception\NotFoundSupportedOwnershipDecisionMakerException;
 
+/**
+ * Makes decisions on ownership of domain objects based on decision makers registered in chain.
+ */
 class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionMakerInterface
 {
     /**
@@ -174,10 +177,6 @@ class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionM
      */
     protected function getSupportedOwnershipDecisionMaker()
     {
-        if ($this->ownershipDecisionMaker) {
-            return $this->ownershipDecisionMaker;
-        }
-
         foreach ($this->ownershipDecisionMakers as $ownershipDecisionMaker) {
             if ($ownershipDecisionMaker->supports()) {
                 $this->ownershipDecisionMaker = $ownershipDecisionMaker;

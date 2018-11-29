@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
+use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -16,6 +17,7 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
+ * This class contains logic of enum configuration, options and translations synchronization
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EnumSynchronizer
@@ -263,7 +265,7 @@ class EnumSynchronizer
             ->getQuery()
             ->setHint(
                 Query::HINT_CUSTOM_OUTPUT_WALKER,
-                'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+                TranslationWalker::class
             )
             ->getArrayResult();
     }
@@ -336,30 +338,40 @@ class EnumSynchronizer
     }
 
     /**
-     * @param AbstractEnumValue[] $values
+     * @param array|AbstractEnumValue[] $values
      * @param array $options
      * @param EntityManager $em
      * @param EnumValueRepository $enumRepo
      *
-     * @return AbstractEnumValue[]
+     * @return array|AbstractEnumValue[]
      */
     protected function processValues(array $values, array $options, EntityManager $em, EnumValueRepository $enumRepo)
     {
-        $ids = [];
+        $this->fillOptionIds($values, $options);
+
         /** @var AbstractEnumValue[] $changes */
         $changes = [];
         /** @var AbstractEnumValue[] $removes */
         $removes = [];
         foreach ($values as $value) {
-            $id = $value->getId();
-            $optionKey = $this->getEnumOptionKey($id, $options);
+            $optionKey = $this->getEnumOptionKey($value->getId(), $options);
+            // If generated id is equal to existing one and generated was prefixed
+            // Then remove existing value and create new one
+            if ($optionKey !== null && !empty($options[$optionKey]['generated'])) {
+                $originalId = $this->generateEnumValueId($options[$optionKey]['label'], []);
+                if ($originalId !== $options[$optionKey]['id']) {
+                    $optionKey = null;
+                }
+            }
+
+            // If existing value was found by option id or label if id was empty - update value
             if ($optionKey !== null) {
-                $ids[] = $id;
                 if ($this->setEnumValueProperties($value, $options[$optionKey])) {
                     $changes[] = $value;
                 }
                 unset($options[$optionKey]);
             } else {
+                // If there is no matching option for existing value - remove value
                 $em->remove($value);
                 $removes[] = $value;
             }
@@ -369,17 +381,77 @@ class EnumSynchronizer
         }
 
         foreach ($options as $option) {
-            $id = $this->generateEnumValueId($option['label'], $ids);
-            $ids[] = $id;
+            // Create new values for options that had no matching value
             $value = $enumRepo->createEnumValue(
                 $option['label'],
                 $option['priority'],
                 $option['is_default'],
-                $id
+                $option['id']
             );
             $em->persist($value);
             $changes[] = $value;
         }
+
         return $changes;
+    }
+
+    /**
+     * @param array|AbstractEnumValue[] $values
+     * @param array $option
+     * @return null|string
+     */
+    protected function getIdByExistingValues(array $values, array $option)
+    {
+        foreach ($values as $value) {
+            if ($value->getName() === $option['label']) {
+                return $value->getId();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array $values
+     * @param array $options
+     */
+    protected function fillOptionIds(array $values, array &$options)
+    {
+        $ids = array_map(function (AbstractEnumValue $value) {
+            return $value->getId();
+        }, $values);
+        // Fill existing ids by given option ids or by value ids if labels are equal
+        foreach ($options as &$option) {
+            if ($this->isEmptyOption($option, 'id')) {
+                $id = $this->getIdByExistingValues($values, $option);
+                if ($id) {
+                    $option['id'] = $id;
+                    $ids[] = $option['id'];
+                }
+            } else {
+                $ids[] = $option['id'];
+            }
+        }
+        unset($option);
+
+        // Generate ids for options without ids
+        foreach ($options as &$option) {
+            if ($this->isEmptyOption($option, 'id')) {
+                $id = $this->generateEnumValueId($option['label'], $ids);
+                $option['generated'] = true;
+                $option['id'] = $id;
+                $ids[] = $option['id'];
+            }
+        }
+    }
+
+    /**
+     * @param array $option
+     * @param string $key
+     * @return bool
+     */
+    protected function isEmptyOption(array $option, $key): bool
+    {
+        return !array_key_exists($key, $option) || $option[$key] === null || $option[$key] === '';
     }
 }

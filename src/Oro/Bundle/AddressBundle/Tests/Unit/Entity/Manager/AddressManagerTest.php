@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Entity\Manager;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity\Manager;
 
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Entity\Manager\AddressManager;

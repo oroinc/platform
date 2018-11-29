@@ -103,7 +103,11 @@ class MapPrimaryFieldTest extends TypeTestCase
                 }
             );
 
-        $this->formValidationHandler = new FormValidationHandler($this->validator, $this->customizationHandler);
+        $this->formValidationHandler = new FormValidationHandler(
+            $this->validator,
+            $this->customizationHandler,
+            PropertyAccess::createPropertyAccessor()
+        );
     }
 
     protected function getExtensions()
