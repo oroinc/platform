@@ -8,10 +8,10 @@ use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
 use Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion;
 use Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class ValidRegionValidatorTest extends AbstractConstraintValidatorTest
+class ValidRegionValidatorTest extends ConstraintValidatorTestCase
 {
     /**
      * {@inheritdoc}

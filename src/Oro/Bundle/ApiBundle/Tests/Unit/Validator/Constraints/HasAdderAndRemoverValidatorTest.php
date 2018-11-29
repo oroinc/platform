@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemover;
 use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemoverValidator;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class HasAdderAndRemoverValidatorTest extends AbstractConstraintValidatorTest
+class HasAdderAndRemoverValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {

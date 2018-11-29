@@ -10,9 +10,9 @@ use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\Contact as TestTargetEntity
 use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\ContactEmail as TestEntity;
 use Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableField;
 use Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableFieldValidator;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class UnchangeableFieldValidatorTest extends AbstractConstraintValidatorTest
+class UnchangeableFieldValidatorTest extends ConstraintValidatorTestCase
 {
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;

@@ -125,7 +125,8 @@
     }) %}
 
     <div data-page-component-module="oroemail/js/app/components/email-attachment-component"
-         data-page-component-options="{{ options|json_encode }}">
+         data-page-component-options="{{ options|json_encode }}"
+         class="attachment-container">
         {{ form_row(form) }}
     </div>
 {% endblock %}

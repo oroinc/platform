@@ -18,6 +18,8 @@
     .selector {
         float: #{$start};
     }
+
+    @include selector-width();
 }
 
 .ui-dialog .form-horizontal {

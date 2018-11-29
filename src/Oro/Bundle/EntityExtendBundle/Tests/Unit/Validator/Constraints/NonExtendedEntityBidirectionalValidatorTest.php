@@ -10,11 +10,11 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NonExtendedEntityBidirectional;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NonExtendedEntityBidirectionalValidator;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class NonExtendedEntityBidirectionalValidatorTest extends AbstractConstraintValidatorTest
+class NonExtendedEntityBidirectionalValidatorTest extends ConstraintValidatorTestCase
 {
     /**
      * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
