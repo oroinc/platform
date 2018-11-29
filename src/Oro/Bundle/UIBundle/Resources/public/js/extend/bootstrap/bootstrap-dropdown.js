@@ -102,7 +102,10 @@ define(function(require) {
             $(document).on('mCSB.scroll' + EVENT_KEY, this._popperUpdate);
 
             if (this._dialog) {
-                $(this._dialog).on(_events(['dialogresize','dialogdrag','dialogreposition']), this._popperUpdate);
+                $(this._dialog).on(
+                    _events(['dialogresize', 'dialogdrag', 'dialogreposition']),
+                    this._popperUpdate
+                );
             }
         },
 
