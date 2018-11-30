@@ -1,10 +1,13 @@
+@regression
+@ticket-BAP-17910
 @fixture-OroReportBundle:user_with_service_value_in_first_name.yml
-Feature: Reports should not process services in filers
-    In order to manage reports
-    As administrator
-    I should not be able to call service from Symfony service container using Custom Report
 
-    Scenario: Create report with the service call as filter value
+Feature: Reports should not process services in filers
+    In order to prevent a security vulnerability in reports
+    As an Administrator
+    I should not be able to call a service from Dependency Injection Container using report filters
+
+    Scenario: Should process a service call in a filter value as a regular string
         Given I login as administrator
         When I go to Reports & Segments / Manage Custom Reports
         And I click "Create Report"
