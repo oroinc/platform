@@ -21,6 +21,9 @@ use Oro\Component\MessageQueue\Client\MessagePriority;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 {
@@ -914,5 +917,104 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
             ]
         ];
         $this->assertEquals($expectedEntitiesUpdated, $additionalMessage['message']->getBody()['entities_updated']);
+    }
+
+    public function testShouldSendUpdatedEntityWithIdFromUnitOfWorkInsteadOfIdFromEntityObject()
+    {
+        $em = $this->getEntityManager();
+
+        $owner = new TestAuditDataOwner();
+        $owner->setStringProperty('aString');
+        $owner->setAdditionalFields(['field_array' => ['value' => 1]]);
+        $em->persist($owner);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $updatedOwnerId = $owner->getId();
+        $owner->setStringProperty('anotherString');
+
+        // remove ID from entity object to test that ID will be got from UnitOfWork
+        $owner->setId(null);
+
+        $em->flush();
+
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [],
+            'entities_updated'    => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $updatedOwnerId,
+                    'change_set'   => [
+                        'stringProperty' => ['aString', 'anotherString']
+                    ],
+                    'additional_fields' => ['field_array' => ['value' => 1]]
+                ]
+            ],
+            'collections_updated' => []
+        ]);
+    }
+
+    public function testShouldNotSendDeletedEntityWithEmptyId()
+    {
+        $em = $this->getEntityManager();
+
+        $owner = new TestAuditDataOwner();
+        $owner->setStringProperty('aString');
+        $em->persist($owner);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        // remove ID from entity object to test that this entity will be skipped
+        $owner->setId(null);
+
+        $em->remove($owner);
+        $em->flush();
+
+        self::assertMessagesEmpty(Topics::ENTITIES_CHANGED);
+    }
+
+    public function testShouldSendDeletedEntityWithEmptyIdIfItHadNotEmptyManyToOneChildren()
+    {
+        $em = $this->getEntityManager();
+
+        $owner = new TestAuditDataChild();
+        $owner->setStringProperty('aString');
+        $child = new TestAuditDataOwner();
+        $child->setStringProperty('aChild');
+        $owner->setOwnerManyToOne($child);
+        $em->persist($child);
+        $em->persist($owner);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $owner->setId(null);
+
+        $em->remove($owner);
+        $em->flush();
+
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => null,
+                    'change_set' => [
+                        'ownerManyToOne' => [
+                            [
+                                'entity_class' => get_class($child),
+                                'entity_id' => $child->getId(),
+                                'change_set' => [],
+                                'additional_fields' => []
+                            ],
+                            null
+                        ]
+                    ],
+                    'additional_fields' => []
+                ]
+            ],
+            'entities_updated'    => [],
+            'collections_updated' => []
+        ]);
     }
 }

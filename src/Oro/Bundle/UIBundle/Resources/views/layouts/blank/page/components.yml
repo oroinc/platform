@@ -9,5 +9,4 @@ layout:
             prepend: false
             blockType: text
             options:
-                text: 'oro_frontend.copyright'
-                escape: false
+                text: 'oro_frontend.copyright.label'

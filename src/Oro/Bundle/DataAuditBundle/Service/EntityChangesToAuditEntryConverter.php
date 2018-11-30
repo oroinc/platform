@@ -12,7 +12,13 @@ use Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper;
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
+use Psr\Log\LoggerInterface;
 
+/**
+ * This converter is intended to add the data audit records to the database
+ * based on a list of entity changes.
+ * @see \Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener
+ */
 class EntityChangesToAuditEntryConverter
 {
     /** @var ManagerRegistry */
@@ -32,6 +38,9 @@ class EntityChangesToAuditEntryConverter
 
     /** @var ChangeSetToAuditFieldsConverter */
     private $changeSetToAuditFieldsConverter;
+
+    /** @var LoggerInterface|null */
+    private $logger;
 
     /**
      * Local cache of entities metadata.
@@ -66,6 +75,14 @@ class EntityChangesToAuditEntryConverter
     }
 
     /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @param array           $entityChanges
@@ -92,9 +109,12 @@ class EntityChangesToAuditEntryConverter
         /** @var EntityManagerInterface $auditEntityManager */
         $auditEntityManager = $this->doctrine->getManagerForClass($auditEntryClass);
         foreach ($entityChanges as $entityChange) {
+            if (!$this->validateAuditRecord($entityChange, $auditDefaultAction)) {
+                continue;
+            }
+
             $entityClass = $entityChange['entity_class'];
             $entityId = $entityChange['entity_id'];
-
             if (!$this->configProvider->isAuditableEntity($entityClass)) {
                 continue;
             }
@@ -180,6 +200,10 @@ class EntityChangesToAuditEntryConverter
         $auditEntityManager = $this->doctrine->getManagerForClass($auditEntryClass);
 
         foreach ($entityChanges as $entityChange) {
+            if (!$this->validateAuditRecord($entityChange, $auditDefaultAction)) {
+                continue;
+            }
+
             $entityClass = $entityChange['entity_class'];
             $entityId = $entityChange['entity_id'];
             if (!$this->configProvider->isAuditableEntity($entityClass)) {
@@ -333,5 +357,43 @@ class EntityChangesToAuditEntryConverter
         }
 
         return $this->entityMetadataCache[$entityClass];
+    }
+
+    /**
+     * @param array       $record
+     * @param string|null $action
+     *
+     * @return bool
+     */
+    private function validateAuditRecord(array $record, $action)
+    {
+        $isValid = true;
+        if (!array_key_exists('entity_class', $record) || !$record['entity_class']) {
+            $this->logError('The "entity_class" must not be empty.', $record, $action);
+            $isValid = false;
+        } elseif (!array_key_exists('entity_id', $record) || null === $record['entity_id']) {
+            $this->logError('The "entity_id" must not be null.', $record, $action);
+            $isValid = false;
+        }
+
+        return $isValid;
+    }
+
+    /**
+     * @param string      $message
+     * @param array       $record
+     * @param string|null $action
+     */
+    private function logError($message, $record, $action)
+    {
+        if (null === $this->logger) {
+            return;
+        }
+
+        $context = ['audit_record' => $record];
+        if ($action) {
+            $context['audit_action'] = $action;
+        }
+        $this->logger->error($message, $context);
     }
 }
