@@ -31,7 +31,7 @@
             }
         }
 
-        &.select2-dropdown-open {
+        &.select2-container-with-searchbox.select2-dropdown-open {
             border-color: $select2-container-open-border-color;
         }
 

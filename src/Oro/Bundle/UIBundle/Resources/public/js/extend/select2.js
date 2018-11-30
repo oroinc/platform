@@ -235,8 +235,12 @@ define(function(require) {
 
             if (!options || !options.noFocus)
                 this.focusSearch();
-        }
+        },
         /* eslint-enable */
+        showSearch: function(original, showSearchInput) {
+            original.apply(this, _.rest(arguments));
+            $(this.container).toggleClass('select2-container-with-searchbox', showSearchInput);
+        }
     };
 
     // Override methods of AbstractSelect2 class
@@ -409,6 +413,7 @@ define(function(require) {
         prototype.moveHighlight = _.wrap(prototype.moveHighlight, overrideMethods.moveHighlight);
         prototype.initContainer = _.wrap(prototype.initContainer, overrideMethods.initContainer);
         prototype.tokenize = _.wrap(prototype.tokenize, overrideMethods.tokenize);
+        prototype.showSearch = _.wrap(prototype.showSearch, overrideMethods.showSearch);
     }(Select2['class'].single.prototype));
 
     // Override methods of MultiSelect2 class
