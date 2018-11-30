@@ -46,18 +46,17 @@ class SendMassEmailMessageProcessor implements MessageProcessorInterface, TopicS
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @var TemplateEmailMessageSender
-     */
+    /** @var TemplateEmailMessageSender */
     private $templateEmailMessageSender;
 
     /**
-     * @param DirectMailer             $mailer
-     * @param Processor                $processor
-     * @param ManagerRegistry          $managerRegistry
-     * @param EmailRenderer            $emailRenderer
-     * @param LoggerInterface          $logger
-     * @param EventDispatcherInterface $eventDispatcher
+     * @param DirectMailer               $mailer
+     * @param Processor                  $processor
+     * @param ManagerRegistry            $managerRegistry
+     * @param EmailRenderer              $emailRenderer
+     * @param LoggerInterface            $logger
+     * @param EventDispatcherInterface   $eventDispatcher
+     * @param TemplateEmailMessageSender $templateEmailMessageSender
      */
     public function __construct(
         DirectMailer $mailer,
@@ -65,14 +64,16 @@ class SendMassEmailMessageProcessor implements MessageProcessorInterface, TopicS
         ManagerRegistry $managerRegistry,
         EmailRenderer $emailRenderer,
         LoggerInterface $logger,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        TemplateEmailMessageSender $templateEmailMessageSender
     ) {
         $this->mailer = $mailer;
         $this->mailerProcessor = $processor;
         $this->managerRegistry = $managerRegistry;
         $this->emailRenderer = $emailRenderer;
-        $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->templateEmailMessageSender = $templateEmailMessageSender;
     }
 
     /**
@@ -102,7 +103,7 @@ class SendMassEmailMessageProcessor implements MessageProcessorInterface, TopicS
         }
 
         $failedRecipients = [];
-        if ($this->templateEmailMessageSender && $this->templateEmailMessageSender->isTranslatable($data)) {
+        if ($this->templateEmailMessageSender->isTranslatable($data)) {
             $result = $this->templateEmailMessageSender->sendTranslatedMessage($data, $failedRecipients);
         } else {
             if (isset($data['template'])) {
@@ -146,14 +147,6 @@ class SendMassEmailMessageProcessor implements MessageProcessorInterface, TopicS
         }
 
         return self::ACK;
-    }
-
-    /**
-     * @param TemplateEmailMessageSender $templateEmailMessageSender
-     */
-    public function setTemplateEmailMessageSender(TemplateEmailMessageSender $templateEmailMessageSender)
-    {
-        $this->templateEmailMessageSender = $templateEmailMessageSender;
     }
 
     /**

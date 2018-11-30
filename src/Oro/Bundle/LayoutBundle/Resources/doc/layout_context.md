@@ -45,9 +45,9 @@ Context can be accessed in a few ways. The most common of them are:
    ```yaml
     actions:
         ...
-        - @add:
+        - '@add':
             id: blockId
-            parent: parentId
+            parentId: parentId
             blockType: typeName
             options:
                 optionName: '=context["valueKey"]

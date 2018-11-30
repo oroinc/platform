@@ -60,7 +60,7 @@ class AuditChangedEntitiesRelationsProcessorTest extends WebTestCase
             'entities_updated' => [],
             'entities_deleted' => [],
             'collections_updated' => [
-                ['entity_class' => Organization::class, 'entity_id' => 1, 'change_set' => []]
+                ['entity_class' => Organization::class, 'entity_id' => 1]
             ],
         ]);
 

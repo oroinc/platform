@@ -20,4 +20,5 @@ oro:
     entity_extend:
         enum:
             options_error.message: Invalid enum options provided
+            options_duplicates.message: The option {{ value }} is duplicated.|The options {{ value }} are duplicated.
         change_type_not_allowed.message: Changing type of existing field {{ field }} is not allowed.

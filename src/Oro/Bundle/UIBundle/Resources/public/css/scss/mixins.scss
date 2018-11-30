@@ -314,3 +314,15 @@ $enable-safe-area: true;
     &::-moz-placeholder          {@content}
     &:-ms-input-placeholder      {@content}
 }
+
+// Prevented .selector uniform width
+@mixin selector-width($width: auto, $max-width: null) {
+    .selector {
+        width: $width;
+        max-width: $max-width;
+
+        > span {
+            width: 100%;
+        }
+    }
+}

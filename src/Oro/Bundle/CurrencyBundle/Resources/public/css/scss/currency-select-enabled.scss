@@ -9,9 +9,7 @@
             }
         }
 
-        select {
-            width: $currency-select-enabled-base-currency-select-width;
-        }
+        @include selector-width($currency-select-enabled-base-currency-select-width);
 
         .selector {
             margin-#{$start}: $currency-select-enabled-base-currency-selector-offset-left;

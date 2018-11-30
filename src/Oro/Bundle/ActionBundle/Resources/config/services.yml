@@ -62,6 +62,7 @@ services:
             - '@router'
             - '@translator'
             - '@oro_action.operation.execution.form_provider'
+            - '@oro_ui.html_tag_helper'
 
     oro_action.helper.applications_url:
         class: '%oro_action.helper.applications_url.class%'

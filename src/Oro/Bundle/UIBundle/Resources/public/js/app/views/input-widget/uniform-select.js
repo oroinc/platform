@@ -14,6 +14,14 @@ define(function(require) {
         containerClassSuffix: 'select',
 
         /**
+         * Default widget uniform options
+         * @property
+         */
+        initializeOptions: {
+            selectAutoWidth: false
+        },
+
+        /**
          * @inheritDoc
          */
         constructor: function UniformSelectInputWidget() {

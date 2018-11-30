@@ -2,29 +2,19 @@
 
 namespace Oro\Bundle\EntityBundle;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\CustomGridFieldValidatorCompilerPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DatabaseCheckerCompilerPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DataCollectorCompilerPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DictionaryValueListProviderPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityAliasProviderPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityClassNameProviderPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFallbackCompilerPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFieldHandlerPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityNameProviderPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityRepositoryCompilerPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\ExclusionProviderPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\GeneratedValueStrategyListenerPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\QueryHintResolverPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\SqlWalkerPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualFieldProvidersCompilerPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualRelationProvidersCompilerPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Component\DoctrineUtils\DependencyInjection\AddTransactionWatcherCompilerPass;
 use Oro\Component\PhpUtils\ClassLoader;
+use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * The EntityBundle bundle class.
+ */
 class OroEntityBundle extends Bundle
 {
     /**
@@ -55,27 +45,28 @@ class OroEntityBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
-        $container->addCompilerPass(new DatabaseCheckerCompilerPass());
-        $container->addCompilerPass(new EntityAliasProviderPass());
-        $container->addCompilerPass(new EntityNameProviderPass());
-        $container->addCompilerPass(new EntityClassNameProviderPass());
-        $container->addCompilerPass(new ExclusionProviderPass());
-        $container->addCompilerPass(new VirtualFieldProvidersCompilerPass());
-        $container->addCompilerPass(new VirtualRelationProvidersCompilerPass());
-        $container->addCompilerPass(new DictionaryValueListProviderPass());
-        $container->addCompilerPass(new QueryHintResolverPass());
-        $container->addCompilerPass(new EntityFieldHandlerPass());
-        $container->addCompilerPass(new CustomGridFieldValidatorCompilerPass());
-        $container->addCompilerPass(new DataCollectorCompilerPass());
-        $container->addCompilerPass(new EntityFallbackCompilerPass());
-        $container->addCompilerPass(new SqlWalkerPass());
-        $container->addCompilerPass(new EntityRepositoryCompilerPass());
+        $container->addCompilerPass(new Compiler\DatabaseCheckerCompilerPass());
+        $container->addCompilerPass(new Compiler\EntityAliasProviderPass());
+        $container->addCompilerPass(new Compiler\EntityNameProviderPass());
+        $container->addCompilerPass(new Compiler\EntityClassNameProviderPass());
+        $container->addCompilerPass(new Compiler\ExclusionProviderPass());
+        $container->addCompilerPass(new Compiler\VirtualFieldProvidersCompilerPass());
+        $container->addCompilerPass(new Compiler\VirtualRelationProvidersCompilerPass());
+        $container->addCompilerPass(new Compiler\DictionaryValueListProviderPass());
+        $container->addCompilerPass(new Compiler\QueryHintResolverPass());
+        $container->addCompilerPass(new Compiler\EntityFieldHandlerPass());
+        $container->addCompilerPass(new Compiler\CustomGridFieldValidatorCompilerPass());
+        $container->addCompilerPass(new Compiler\ManagerRegistryCompilerPass());
+        $container->addCompilerPass(new Compiler\DataCollectorCompilerPass());
+        $container->addCompilerPass(new Compiler\EntityFallbackCompilerPass());
+        $container->addCompilerPass(new Compiler\SqlWalkerPass());
+        $container->addCompilerPass(new Compiler\EntityRepositoryCompilerPass());
 
         if ($container instanceof ExtendedContainerBuilder) {
-            $container->addCompilerPass(new GeneratedValueStrategyListenerPass());
+            $container->addCompilerPass(new Compiler\GeneratedValueStrategyListenerPass());
             $container->moveCompilerPassBefore(
-                'Oro\Bundle\EntityBundle\DependencyInjection\Compiler\GeneratedValueStrategyListenerPass',
-                'Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass'
+                GeneratedValueStrategyListenerPass::class,
+                RegisterEventListenersAndSubscribersPass::class
             );
         }
 

@@ -115,9 +115,9 @@ There are few ways to access data. The most common ways are:
    ```yaml
     actions:
         ...
-        - @add:
+        - '@add':
             id: product_code
-            parent: product_details
+            parentId: product_details
             blockType: text
             options:
                 text: '=data["product"].getCode()'
