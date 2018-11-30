@@ -26,6 +26,10 @@
             .controls {
                 float: #{$start};
                 margin-#{$start}: 0;
+
+                .select2-container {
+                    order: -1;
+                }
             }
         }
 
@@ -37,6 +41,13 @@
 
         .control-group-choice {
             max-width: $query-designer-control-group-width;
+        }
+
+        .control-group-hidden {
+            .controls {
+                display: flex;
+                flex-direction: column;
+            }
         }
 
         .select2-container,
@@ -100,39 +111,40 @@
     }
 }
 
-
 .query-designer-grid-container {
     .grid {
         th {
             font-size: $query-designer-grid-th-font-size;
         }
+
         .label-column,
         .label-cell {
             width: $query-designer-grid-label-cell-width;
         }
+
         .function-column,
         .function-cell {
             width: $query-designer-grid-function-cell-width;
         }
+
         .sorting-column,
         .sorting-cell {
             width: $query-designer-grid-sorting-cell-width;
         }
+
         .index-column,
         .index-cell {
             width: $query-designer-grid-index-cell-width;
         }
-        .action-cell {
-            white-space: nowrap;
+
+        .action-column {
+            text-align: #{$end};
         }
-    }
-}
-.query-designer-columns-grid-container {
-    .grid {
-        .action-column,
+
         .action-cell {
-            width: $query-designer-columns-grid-action-cell-width;
             padding-#{$end}: 0;
+
+            white-space: nowrap;
         }
     }
 }
