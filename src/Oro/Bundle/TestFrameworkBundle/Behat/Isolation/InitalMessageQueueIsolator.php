@@ -7,35 +7,49 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class InitalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolatorAwareInterface
+/**
+ * Process all messages in queue before make db dump
+ */
+class InitalMessageQueueIsolator
 {
-    /**
-     * @var MessageQueueIsolatorInterface
-     */
-    protected $messageQueueIsolator;
-
-    /**
-     * @var KernelInterface
-     */
+    /** @var KernelInterface */
     private $kernel;
 
-    public function __construct(KernelInterface $kernel)
-    {
+    /** @var MessageQueueProcessorInterface */
+    private $dbalMessageQueueProcessor;
+
+    /** @var MessageQueueProcessorInterface */
+    private $amqpMessageQueueProcessor;
+
+    /**
+     * @param KernelInterface $kernel
+     * @param MessageQueueProcessorInterface $dbalMessageQueueProcessor
+     * @param MessageQueueProcessorInterface $amqpMessageQueueProcessor
+     */
+    public function __construct(
+        KernelInterface $kernel,
+        MessageQueueProcessorInterface $dbalMessageQueueProcessor,
+        MessageQueueProcessorInterface $amqpMessageQueueProcessor
+    ) {
         $this->kernel = $kernel;
+        $this->dbalMessageQueueProcessor = $dbalMessageQueueProcessor;
+        $this->amqpMessageQueueProcessor = $amqpMessageQueueProcessor;
     }
 
     /** {@inheritdoc} */
     public function start(BeforeStartTestsEvent $event)
     {
-        $this->kernel->boot();
-        $this->messageQueueIsolator->startMessageQueue();
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
-        $this->messageQueueIsolator->stopMessageQueue();
-        $this->kernel->shutdown();
         $event->writeln('<info>Process messages before make db dump</info>');
+
+        $this->kernel->boot();
+        $this->getMessageQueueProcessor()->startMessageQueue();
+        $this->getMessageQueueProcessor()->waitWhileProcessingMessages();
+        $this->getMessageQueueProcessor()->stopMessageQueue();
+        $this->kernel->shutdown();
     }
 
     /** {@inheritdoc} */
@@ -73,7 +87,7 @@ class InitalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsola
     /** {@inheritdoc} */
     public function getName()
     {
-        return 'Inital Message Queue Isolator';
+        return sprintf('Initial Message Queue Isolator');
     }
 
     /**
@@ -85,10 +99,15 @@ class InitalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsola
     }
 
     /**
-     * {@inheritdoc}
+     * @return MessageQueueProcessorInterface
      */
-    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
+    private function getMessageQueueProcessor()
     {
-        $this->messageQueueIsolator = $messageQueueIsolator;
+        $container = $this->kernel->getContainer();
+        if ($container->getParameter('message_queue_transport') === 'amqp') {
+            return $this->amqpMessageQueueProcessor;
+        }
+
+        return $this->dbalMessageQueueProcessor;
     }
 }
