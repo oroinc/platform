@@ -15,7 +15,6 @@ use Behat\Testwork\ServiceContainer\ServiceProcessor;
 use Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ArtifactsHandlerInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
@@ -43,7 +42,6 @@ class OroTestFrameworkExtension implements TestworkExtension
     const HEALTH_CHECKER_TAG = 'behat_health_checker';
     const HEALTH_CHECKER_AWARE_TAG = 'health_checker_aware';
     const CONFIG_PATH = '/Tests/Behat/behat.yml';
-    const MESSAGE_QUEUE_ISOLATOR_AWARE_TAG = 'message_queue_isolator_aware';
     const ELEMENTS_CONFIG_ROOT = 'elements';
     const PAGES_CONFIG_ROOT = 'pages';
     const SUITES_CONFIG_ROOT = 'suites';
@@ -72,7 +70,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->transferApplicationParameters($container);
         $this->processBundleBehatConfigurations($container);
         $this->processBundleAutoload($container);
-        $this->injectMessageQueueIsolator($container);
         $this->processReferenceRepositoryInitializers($container);
         $this->processIsolationSubscribers($container);
         $this->processSuiteAwareSubscriber($container);
@@ -247,40 +244,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container
             ->getDefinition('mink.listener.sessions')
             ->setClass('Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener');
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    private function injectMessageQueueIsolator(ContainerBuilder $container)
-    {
-        $applicationContainer = $container->get(Symfony2Extension::KERNEL_ID)->getContainer();
-        $applicableIsolatorId = null;
-
-        foreach ($container->findTaggedServiceIds(self::ISOLATOR_TAG) as $id => $attributes) {
-            /** @var IsolatorInterface $isolator */
-            $isolator = $container->get($id);
-
-            if ($isolator->isApplicable($applicationContainer) && $isolator instanceof MessageQueueIsolatorInterface) {
-                $applicableIsolatorId = $id;
-                break;
-            }
-        }
-
-        if (null === $applicableIsolatorId) {
-            throw new RuntimeException('Not found any MessageQueue Isolator to inject into FixtureLoader');
-        }
-
-        foreach ($container->findTaggedServiceIds(self::MESSAGE_QUEUE_ISOLATOR_AWARE_TAG) as $id => $attributes) {
-            if (!$container->hasDefinition($id)) {
-                continue;
-            }
-            $definition = $container->getDefinition($id);
-
-            if (is_a($definition->getClass(), MessageQueueIsolatorAwareInterface::class, true)) {
-                $definition->addMethodCall('setMessageQueueIsolator', [new Reference($applicableIsolatorId)]);
-            }
-        }
     }
 
     /**
