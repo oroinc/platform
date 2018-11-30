@@ -351,7 +351,6 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
      */
     protected function prepareMetadata()
     {
-
         $manager = $this->createMock(ObjectManager::class);
         $this->doctrine->expects($this->any())
             ->method('getManagerForClass')
