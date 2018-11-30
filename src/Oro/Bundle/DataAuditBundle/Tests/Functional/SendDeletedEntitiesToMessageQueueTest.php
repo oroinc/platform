@@ -56,7 +56,7 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $deletedEntity['entity_class']);
         $this->assertEquals($ownerId, $deletedEntity['entity_id']);
-        $this->assertEquals([], $deletedEntity['change_set']);
+        $this->assertArrayNotHasKey('change_set', $deletedEntity);
     }
 
     public function testShouldSendDeletedProxyEntity()
@@ -78,7 +78,7 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataOwner::class, $deletedEntity['entity_class']);
         $this->assertEquals($ownerId, $deletedEntity['entity_id']);
-        $this->assertEquals([], $deletedEntity['change_set']);
+        $this->assertArrayNotHasKey('change_set', $deletedEntity);
     }
 
     public function testShouldSendDeletedEntityFromManyToOneRelation()
@@ -107,16 +107,14 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
 
         $this->assertEquals(TestAuditDataChild::class, $deletedEntity['entity_class']);
         $this->assertEquals($childId, $deletedEntity['entity_id']);
-        $this->assertEquals([
-            'ownerManyToOne' => [
-                [
-                    'entity_id' => $ownerId,
-                    'entity_class' => TestAuditDataOwner::class,
-                    'change_set' => [],
-                    'additional_fields' => []
-                ],
-                null
-            ]
-        ], $deletedEntity['change_set']);
+        $this->assertEquals(
+            [
+                'ownerManyToOne' => [
+                    ['entity_class' => TestAuditDataOwner::class, 'entity_id' => $ownerId],
+                    null
+                ]
+            ],
+            $deletedEntity['change_set']
+        );
     }
 }

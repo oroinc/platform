@@ -20,6 +20,9 @@
 * Added the `addBeforeActionPromise` static method of `BaseController` in JS which enables to postpone route action if the required async process is in progress.
 
 ### Removed
+#### DataAuditBundle
+* The event `oro_audit.collect_audit_fields` was removed. Use decoration of `oro_dataaudit.converter.change_set_to_audit_fields` service instead.
+* The alias `oro_dataaudit.listener.entity_listener` for the service `oro_dataaudit.listener.send_changed_entities_to_message_queue` was removed.
 #### EntityConfigBundle
 * Removed `oro.entity_config.field.after_remove` event. Use `oro.entity_config.post_flush` event and `ConfigManager::getFieldConfigChangeSet('extend', $className, $fieldName)` method to check if a field was removed. If the change set has `is_deleted` attribute and its value is changed from `false` to `true` than a field was removed.
 #### NotificationBundle
@@ -37,6 +40,8 @@
 * Removed `result_name` deprecated configuration attribute for a field. Use `property_path` attribute instead.
 * Removed `orderBy` deprecated configuration attribute. Use `order_by` attribute instead.
 * Removed deprecated signature `function (array &$item) : void` of post serialization handler that can be specified in `post_serialize` configuration attribute. Use `function (array $item, array $context) : array` instead.
+#### Testing Component
+* The class `Oro\Component\Testing\Validator\AbstractConstraintValidatorTest` was removed. Use `Symfony\Component\Validator\Test\ConstraintValidatorTestCase` instead.
 
 ### Changed
 #### AddressBundle

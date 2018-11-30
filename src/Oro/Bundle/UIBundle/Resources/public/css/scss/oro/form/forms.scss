@@ -47,8 +47,8 @@
 
         &:not(.attribute-row) {
             .control-label {
-                padding-top: 6px;
-                line-height: 20px;
+                padding-top: $form-horizontal-control-label-offset;
+                line-height: $form-horizontal-control-label-line-height;
             }
         }
 
@@ -120,6 +120,16 @@
         &.control-group-choice {
             .choice-widget-expanded {
                 padding-top: 6px;
+            }
+        }
+
+        &.control-group-oro_type_filter {
+            .date-filter-container {
+                &:not(.date-filter-custom) {
+                    .control-group {
+                        margin-bottom: 0;
+                    }
+                }
             }
         }
     }

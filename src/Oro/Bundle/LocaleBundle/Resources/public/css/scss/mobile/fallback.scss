@@ -14,7 +14,7 @@
 
     div {
         &.input-widget-select {
-            width: $fallback-container-select-mobile-width !important;
+            width: $fallback-container-select-mobile-width;
 
             span {
                 min-width: $fallback-container-select-span-mobile-min-width;

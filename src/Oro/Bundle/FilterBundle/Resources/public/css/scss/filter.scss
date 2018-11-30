@@ -17,10 +17,9 @@
         margin-#{$start}: $filter-box-criteria-offset-left;
         top: $filter-box-criteria-top;
 
-        .btn-group {
+        .btn-block {
             .btn:not(.filter-update) {
                 border-radius: $filter-box-criteria-btn-group-border-radius;
-                background-color: $filter-box-criteria-btn-group-background-color;
                 border: $filter-box-criteria-btn-group-border;
                 font-weight: $filter-box-criteria-btn-group-font-weight;
                 text-transform: $filter-box-criteria-btn-group-text-transform;
@@ -28,6 +27,7 @@
                 + .dropdown-menu {
                     text-transform: $filter-box-criteria-btn-group-text-transform;
                 }
+
             }
 
 
@@ -38,6 +38,20 @@
             [class^="fa-"] {
                 padding-top: $filter-box-criteria-btn-group-icon-inner-offset-top;
                 vertical-align: $filter-box-criteria-btn-group-icon-vertical-align;
+            }
+
+            .dropdown-toggle  {
+                padding: $selector-uniform-inner-offset;
+                text-align: #{$start};
+                width: 100%;
+                font-size: $selector-uniform-font-size;
+
+                &:after {
+                    position: $selector-uniform-arrow-position;
+                    #{$end}: $number-range-filter-field-caret-end;
+                    top: $number-range-filter-field-caret-top;
+                    margin-top: $number-range-filter-field-caret-margin;
+                }
             }
         }
 
@@ -150,9 +164,7 @@
         }
     }
 
-    .selector {
-        width: $filter-box-selector-width;
-    }
+    @include selector-width($filter-box-selector-width, $filter-box-field-max-width);
 
     .filter-update {
         margin-left: $filter-update-offset-left;
@@ -348,10 +360,6 @@
             vertical-align: $filter-item-dropdown-toggle-vertical-align;
             line-height: $filter-item-dropdown-toggle-line-height;
             position: $filter-item-dropdown-toggle-position;
-        }
-
-        .dropdown-menu {
-            min-width: $filter-item-dropdown-menu-min-width !important;
         }
 
         & > .btn {
@@ -714,27 +722,6 @@
         .btn,
         input[type='text'] {
             width: $number-range-filter-field-width;
-        }
-    }
-
-    .btn-block {
-
-        .dropdown-toggle  {
-            padding: $selector-uniform-inner-offset;
-            text-align: #{$start};
-            width: 100%;
-            font-size: $selector-uniform-font-size;
-
-            &:after {
-                position: $selector-uniform-arrow-position;
-                #{$end}: $number-range-filter-field-caret-end;
-                top: $number-range-filter-field-caret-top;
-                margin-top: $number-range-filter-field-caret-margin;
-            }
-        }
-
-        .dropdown-menu {
-            min-width: 100%;
         }
     }
 

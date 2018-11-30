@@ -10,6 +10,9 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Handles changes on inverse side of associations.
+ */
 class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcessor implements TopicSubscriberInterface
 {
     /** @var ManagerRegistry */
@@ -73,6 +76,10 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
     private function processBidirectionalAssociations(array $sourceEntitiesData, array &$map)
     {
         foreach ($sourceEntitiesData as $sourceEntityData) {
+            if (empty($sourceEntityData['change_set'])) {
+                continue;
+            }
+
             $sourceEntityClass = $sourceEntityData['entity_class'];
             $sourceEntityId = $sourceEntityData['entity_id'];
             /** @var EntityManagerInterface $sourceEntityManager */
@@ -156,8 +163,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
             $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
             $change[1]['deleted'][] = [
                 'entity_class' => $sourceEntityClass,
-                'entity_id' => $sourceEntityId,
-                'change_set' => [],
+                'entity_id' => $sourceEntityId
             ];
 
             $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
@@ -169,8 +175,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
             $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
             $change[1]['inserted'][] = [
                 'entity_class' => $sourceEntityClass,
-                'entity_id' => $sourceEntityId,
-                'change_set' => [],
+                'entity_id' => $sourceEntityId
             ];
 
             $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
@@ -204,8 +209,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
                 $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
                 $change[1]['inserted'][] = [
                     'entity_class' => $sourceEntityClass,
-                    'entity_id' => $sourceEntityId,
-                    'change_set' => [],
+                    'entity_id' => $sourceEntityId
                 ];
 
                 $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
@@ -219,8 +223,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
                 $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
                 $change[1]['deleted'][] = [
                     'entity_class' => $sourceEntityClass,
-                    'entity_id' => $sourceEntityId,
-                    'change_set' => [],
+                    'entity_id' => $sourceEntityId
                 ];
 
                 $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
@@ -252,8 +255,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
             $change = $this->getChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
             $change[0] = [
                 'entity_class' => $sourceEntityClass,
-                'entity_id' => $sourceEntityId,
-                'change_set' => [],
+                'entity_id' => $sourceEntityId
             ];
 
             $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
@@ -265,8 +267,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
             $change = $this->getChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
             $change[1] = [
                 'entity_class' => $sourceEntityClass,
-                'entity_id' => $sourceEntityId,
-                'change_set' => [],
+                'entity_id' => $sourceEntityId
             ];
 
             $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
@@ -318,8 +319,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
                     $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
                     $change[1]['changed'][] = [
                         'entity_class' => $sourceEntityClass,
-                        'entity_id' => $sourceEntityId,
-                        'change_set' => [],
+                        'entity_id' => $sourceEntityId
                     ];
 
                     $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
@@ -334,8 +334,6 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
      * @param int $entityId
      * @param string $fieldName
      * @param array $change
-     *
-     * @return array
      */
     private function addChangeSetToMap(array &$map, $entityClass, $entityId, $fieldName, array $change)
     {
@@ -356,18 +354,15 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
             throw new \LogicException('Entity class either entity id cannot be empty');
         }
 
-        if (false == isset($map[$entityClass.$entityId])) {
-            $map[$entityClass.$entityId] = [
+        $key = $entityClass . $entityId;
+        if (!isset($map[$key])) {
+            $map[$key] = [
                 'entity_class' => $entityClass,
-                'entity_id' => $entityId,
-                'change_set' => [],
+                'entity_id' => $entityId
             ];
         }
 
-        return isset($map[$entityClass.$entityId]['change_set'][$fieldName]) ?
-            $map[$entityClass.$entityId]['change_set'][$fieldName] :
-            [null, null]
-        ;
+        return $map[$key]['change_set'][$fieldName] ?? [null, null];
     }
 
     /**

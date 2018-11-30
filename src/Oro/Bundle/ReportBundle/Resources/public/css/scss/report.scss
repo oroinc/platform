@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 .report-designer {
     position: relative;
 }
@@ -6,8 +8,8 @@
 }
 
 .desktop-version .chart-wrapper {
-    padding: 25px;
     width: 70%;
+    padding: 25px;
     margin: 0 auto;
 }
 
@@ -16,10 +18,5 @@
 }
 
 .oro_report-columns:not(:last-child) {
-    margin-bottom: 35px;
-}
-
-.query-designer-form > .pull-right {
-    margin-bottom: 10px;
-    margin-left: 20px;
+    margin-bottom: 22px;
 }

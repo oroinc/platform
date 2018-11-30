@@ -118,7 +118,6 @@ define(function(require) {
                 // self.cloneValueToChildren(self.getItemEl(this)); uncomment on merging master
             });
 
-            this.fixFallbackWidth();
             this.setStatusIcon();
         },
 
@@ -479,14 +478,6 @@ define(function(require) {
             });
 
             return isChildEdited;
-        },
-
-        /**
-         * Set fallback selector width depending of their content
-         */
-        fixFallbackWidth: function() {
-            var $fallback = this.$el.find(this.options.selectors.itemFallback).find('select');
-            $fallback.inputWidget('width', this.options.fallbackWidth);
         },
 
         /**
