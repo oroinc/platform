@@ -214,6 +214,7 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
             if (this.settings.currency_data.hasOwnProperty(currencyCode)) {
                 return this.settings.currency_data[currencyCode].symbol;
             }
+
             return currencyCode;
         },
 

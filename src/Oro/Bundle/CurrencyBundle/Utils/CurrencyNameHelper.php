@@ -9,6 +9,9 @@ use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Intl\Intl;
 
+/**
+ * Contains handy methods for working with currencies.
+ */
 class CurrencyNameHelper
 {
     /** @var ViewTypeProviderInterface  */
@@ -75,7 +78,7 @@ class CurrencyNameHelper
             case ViewTypeProviderInterface::VIEW_TYPE_SYMBOL:
                 $currencyName = $this->intlCurrencyBundle->getCurrencySymbol($currencyIsoCode, $locale);
                 if ($currencyName === $currencyIsoCode) {
-                    $currencyName = $this->localeSettings->getCurrencySymbolByCurrency($currencyIsoCode);
+                    $currencyName = $this->localeSettings->getCurrencySymbolByCurrency($currencyIsoCode, $locale);
                 }
                 break;
             case ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME:

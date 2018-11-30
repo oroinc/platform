@@ -90,8 +90,6 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
     public function testGetCurrencyChoices()
     {
         $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_SYMBOL;
-        $currencyProvider = new CurrencyListProviderStub();
-        $currencyProvider->setCurrencyList(['USD', 'EUR']);
 
         $currencyNameHelper = new CurrencyNameHelper(
             $this->getLocaleStub('en'),
@@ -131,8 +129,8 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
             ->expects($this->any())
             ->method('getCurrencySymbolByCurrency')
             ->will($this->returnValueMap([
-                ['USD', '$'],
-                ['UAH', '₴'],
+                ['USD', $localeCode, '$'],
+                ['UAH', $localeCode, '₴'],
             ]));
 
         return $localeSettings;

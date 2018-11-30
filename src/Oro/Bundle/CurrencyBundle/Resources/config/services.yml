@@ -79,11 +79,11 @@ services:
             - '@oro_config.manager'
             - '@oro_locale.calendar_factory'
             - '@oro_currency.provider.view_type'
+            - '@oro_currency.config.currency'
         calls:
             - [addNameFormats, ['%oro_locale.format.name%']]
             - [addAddressFormats, ['%oro_locale.format.address%']]
             - [addLocaleData, ['%oro_locale.locale_data%']]
-            - [addCurrencyData, ['%oro_locale.currency_data%']]
 
     oro_currency.converter.currency_to_string:
         class: Oro\Bundle\CurrencyBundle\Converter\CurrencyToString
@@ -100,13 +100,6 @@ services:
         arguments:
              - '@oro_locale.formatter.number'
              - '@oro_currency.rounding.price_rounding_service'
-
-    oro_currency.formatter.number:
-        class: Oro\Bundle\CurrencyBundle\Formatter\NumberFormatter
-        decorates: oro_locale.formatter.number
-        arguments:
-            - '@oro_locale.settings'
-            - '@oro_currency.provider.view_type'
 
     oro_currency.converter.rate:
         class: Oro\Bundle\CurrencyBundle\Converter\RateConverter

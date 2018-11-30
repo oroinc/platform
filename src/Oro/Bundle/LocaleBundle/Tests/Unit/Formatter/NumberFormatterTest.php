@@ -3,9 +3,13 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use NumberFormatter as IntlNumberFormatter;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -13,7 +17,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 class NumberFormatterTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $localeSettings;
 
@@ -26,9 +30,7 @@ class NumberFormatterTest extends TestCase
     {
         IntlTestHelper::requireIntl($this);
 
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
         $this->formatter = new NumberFormatter($this->localeSettings);
     }
 
@@ -177,7 +179,7 @@ class NumberFormatterTest extends TestCase
     {
         $locale = 'en_GB';
         $currency = 'GBP';
-        $currencySymbol = 'Pound';
+        $currencySymbol = '£';
 
         $this->localeSettings->expects($this->any())->method('getLocale')->will($this->returnValue($locale));
         $this->localeSettings->expects($this->any())->method('getCurrency')->will($this->returnValue($currency));
@@ -186,59 +188,36 @@ class NumberFormatterTest extends TestCase
             ->with($currency)
             ->will($this->returnValue($currencySymbol));
 
-        $this->assertEquals('Pound1,234.57', $this->formatter->formatCurrency(1234.56789));
+        $this->assertEquals('£1,234.57', $this->formatter->formatCurrency(1234.56789));
     }
 
     /**
      * @dataProvider formatCurrencyDataProvider
+     *
+     * @param string $expected
+     * @param int|float $value
+     * @param string $currency
+     * @param string $locale
      */
-    public function testFormatCurrency($expected, $value, $currency, $attributes, $textAttributes, $symbols, $locale)
+    public function testFormatCurrency(string $expected, $value, string $currency, string $locale)
     {
-        $currencySymbolMap = array(
-            array('USD', '$'),
-            array('RUB', 'руб.'),
-        );
-        $this->localeSettings->expects($this->any())
-            ->method('getCurrencySymbolByCurrency')
-            ->will($this->returnValueMap($currencySymbolMap));
-
+        $configManager = $this->createMock(ConfigManager::class);
+        $calendarFactory = $this->createMock(CalendarFactoryInterface::class);
+        $formatter = new NumberFormatter(new LocaleSettings($configManager, $calendarFactory));
         $this->assertEquals(
             $expected,
-            $this->formatter->formatCurrency($value, $currency, $attributes, $textAttributes, $symbols, $locale)
+            $formatter->formatCurrency($value, $currency, [], [], [], $locale)
         );
     }
 
-    public function formatCurrencyDataProvider()
+    /**
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function formatCurrencyDataProvider(): array
     {
-        return array(
-            array(
-                'expected' => '$1,234.57',
-                'value' => 1234.56789,
-                'currency' => 'USD',
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en_US'
-            ),
-            array(
-                'expected' => 'руб.1,234.57',
-                'value' => 1234.56789,
-                'currency' => 'RUB',
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en_US'
-            ),
-            array(
-                'expected' => '1 234,57 €',
-                'value' => 1234.56789,
-                'currency' => 'EUR',
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'ru_RU'
-            ),
-        );
+        return Yaml::parse(file_get_contents(__DIR__.'/Data/format_currency_data.yml'));
     }
 
     /**
