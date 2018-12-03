@@ -9,7 +9,7 @@ namespace Oro\Bundle\EntityConfigBundle\Event;
 class PreSetRequireUpdateEvent extends PreFlushConfigEvent
 {
     /** @var bool */
-    private $updateRequired = false;
+    private $updateRequired = true;
 
     /**
      * @param bool $updateRequired
