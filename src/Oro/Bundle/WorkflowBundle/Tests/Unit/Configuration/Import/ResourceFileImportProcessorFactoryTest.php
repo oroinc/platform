@@ -13,10 +13,13 @@ class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ResourceFileImportProcessorFactory */
     private $factory;
 
+    /** @var array */
+    private $kernelBundles = ['TestBundle1', 'TestBundle2'];
+
     protected function setUp()
     {
         $this->reader = $this->createMock(ConfigFileReaderInterface::class);
-        $this->factory = new ResourceFileImportProcessorFactory($this->reader);
+        $this->factory = new ResourceFileImportProcessorFactory($this->reader, $this->kernelBundles);
     }
 
     /**
@@ -68,8 +71,19 @@ class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
             true
         ];
 
+        /**
+         * ```
+         * imports:
+         *     - { resource: './stringFileName', ignore_errors: true }
+         * ```
+         */
+        yield 'usual object with ignore_errors' => [
+            'import' => ['resource' => './stringFileName', 'ignore_errors' => true],
+            true
+        ];
+
         yield 'too big - not applicable' => [
-            'import' => ['a', 'b'],
+            'import' => ['a', 'b', 'c'],
             false
         ];
 

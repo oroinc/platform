@@ -82,6 +82,7 @@ services:
         class: Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileImportProcessorFactory
         arguments:
             - '@oro_workflow.configuration.reader.yaml'
+            - '%kernel.bundles%'
 
     oro_workflow.configuration.import_processor_factory.workflow_file:
         class: Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowFileImportProcessorFactory
