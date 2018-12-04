@@ -15,6 +15,7 @@ define(function(require) {
     mediator.setHandler('layout:disablePageScroll', layout.disablePageScroll, layout);
     mediator.setHandler('layout:hasHorizontalScroll', layout.disablePageScroll, layout);
     mediator.setHandler('layout:scrollbarWidth', layout.scrollbarWidth, layout);
+    mediator.setHandler('layout:adjustLabelsWidth', layout.adjustLabelsWidth, layout);
     mediator.on('page:beforeChange', layout.pageRendering, layout);
     mediator.on('page:afterChange', layout.pageRendered, layout);
 });

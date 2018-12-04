@@ -131,6 +131,10 @@
             }
         }
     }
+
+    .validation-failed {
+        padding-top: 4px;
+    }
 }
 
 textarea,
@@ -389,6 +393,16 @@ select[multiple] {
 }
 
 .form-horizontal {
+    > .span6 {
+        max-width: $form-container-column-max-width;
+        margin-#{$end}: $form-container-column-offset-right;
+        float: $start;
+
+        &:not(:last-of-type) {
+            margin-bottom: $form-container-control-row-space;
+        }
+    }
+
     .control-group {
         margin: 0;
         max-width: 800px;
@@ -403,7 +417,7 @@ select[multiple] {
 .form-horizontal {
     .control-group {
         &:not(:last-of-type) {
-            margin: 0 0 $form-container-control-row-space;
+            margin-bottom: $form-container-control-row-space;
         }
 
         &--column:not(:last-of-type) {

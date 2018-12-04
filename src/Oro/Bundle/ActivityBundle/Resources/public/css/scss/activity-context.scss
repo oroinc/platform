@@ -31,19 +31,7 @@
 }
 
 .context-item {
-    background: $context-item-background;
-    color: $context-item-color;
-    padding: $context-item-inner-offset;
-    border-radius: $context-item-border-radius;
-    list-style: none;
     cursor: pointer;
-    white-space: nowrap;
-
-    &.active,
-    .dropdown-menu &:hover {
-        background: $primary-860;
-        color: #444;
-    }
 }
 
 .cell-context-item {
@@ -84,26 +72,23 @@
     }
 }
 
-.context-items-dropdown {
-    top: 38px;
-    left: 14px;
-    border-color: #d3d3d3;
-
-    .context-item {
-        padding: 2px 8px;
-        font-size: 13px;
-    }
-}
-
 .activity-context-current-block {
     cursor: pointer;
     background-color: #fff;
     border: none;
     outline: none;
-    margin: 10px 10px 15px 10px;
+    margin: side-values(10px 10px 15px 0);
+    padding: 0;
     box-shadow: none;
 
     .btn-group.open & {
         box-shadow: none;
+    }
+
+    .activity-context-current-item {
+        font-size: $base-font-size--l;
+        line-height: $base-font-size--l;
+        font-weight: 700;
+        color: $primary-200;
     }
 }

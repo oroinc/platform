@@ -14,7 +14,7 @@ class ContextSelector extends Element
      */
     public function select($needle)
     {
-        $this->find('css', 'span.fa-caret-down')->click();
+        $this->find('css', '.dropdown-toggle')->click();
         $contexts = $this->findAll('css', 'ul.context-items-dropdown li');
 
         /** @var NodeElement $context */

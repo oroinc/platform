@@ -237,6 +237,10 @@ define(function(require) {
 
             mediator.trigger('modal:open', this);
 
+            if (!_.isMobile()) {
+                mediator.execute('layout:adjustLabelsWidth', this.$el);
+            }
+
             // Focus OK button
             if (this.options.focusOk) {
                 this.$('.ok').focus();
