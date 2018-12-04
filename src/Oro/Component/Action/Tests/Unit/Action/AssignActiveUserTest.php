@@ -48,18 +48,36 @@ class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($expectedOptions, 'options', $this->action);
     }
 
+    /**
+     * @return array
+     */
     public function optionsDataProvider()
     {
-        return array(
-            'numeric attribute' => array(
-                'inputOptions'    => array(new PropertyPath(self::ATTRIBUTE_NAME)),
-                'expectedOptions' => array('attribute' => new PropertyPath(self::ATTRIBUTE_NAME)),
-            ),
-            'string attribute' => array(
-                'inputOptions'    => array('attribute' => new PropertyPath(self::ATTRIBUTE_NAME)),
-                'expectedOptions' => array('attribute' => new PropertyPath(self::ATTRIBUTE_NAME)),
-            )
-        );
+        return [
+            'numeric attribute' => [
+                'inputOptions'    => [new PropertyPath(self::ATTRIBUTE_NAME)],
+                'expectedOptions' => [
+                    'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
+                    'exceptionOnNotFound' => true
+                ],
+            ],
+            'string attribute' => [
+                'inputOptions'    => ['attribute' => new PropertyPath(self::ATTRIBUTE_NAME)],
+                'expectedOptions' => [
+                    'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
+                    'exceptionOnNotFound' => true],
+            ],
+            'exceptionOnNotFound false' => [
+                'inputOptions' => [
+                    'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
+                    'exceptionOnNotFound' => false,
+                ],
+                'expectedOptions' => [
+                    'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
+                    'exceptionOnNotFound' => false,
+                ],
+            ],
+        ];
     }
 
     /**
@@ -80,35 +98,36 @@ class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
      */
     public function initializeExceptionDataProvider()
     {
-        return array(
-            'no options' => array(
-                'options' => array(),
+        return [
+            'no options' => [
+                'options' => [],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
-                'exceptionMessage' => 'Only one attribute parameter must be defined',
-            ),
-            'too many options' => array(
-                'options' => array(
+                'exceptionMessage' => 'Only one or two attribute parameters must be defined',
+            ],
+            'too many options' => [
+                'options' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
+                    'exceptionOnNotFound' => false,
                     'additional' => 'value'
-                ),
+                ],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
-                'exceptionMessage' => 'Only one attribute parameter must be defined',
-            ),
-            'no attribute' => array(
-                'options' => array(
+                'exceptionMessage' => 'Only one or two attribute parameters must be defined',
+            ],
+            'no attribute' => [
+                'options' => [
                     'additional' => 'value'
-                ),
+                ],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Attribute must be defined',
-            ),
-            'not a property path' => array(
-                'options' => array(
+            ],
+            'not a property path' => [
+                'options' => [
                     'attribute' => self::ATTRIBUTE_NAME,
-                ),
+                ],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Attribute must be valid property definition',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
