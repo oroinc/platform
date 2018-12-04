@@ -20,7 +20,7 @@ $input-append-add-on-width: 40px;
 $input-append-add-on-font-size: $base-font-size;
 $input-append-add-on-line-height: 36px;
 
-$controls-fields-row-input-small-width: 140px;
+$controls-fields-row-input-small-width: calc(50% - 5px);
 
 $form-horizontal-max-width: 100%;
 $form-horizontal-control-group-max-width: none;

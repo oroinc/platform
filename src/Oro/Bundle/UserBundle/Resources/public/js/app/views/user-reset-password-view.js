@@ -45,7 +45,7 @@ define(function(require) {
                 title: __('oro.user.show_hide_password.label')
             }));
 
-            $passwordInput.parent().after(this.passwordSuggestionTemplate({
+            $passwordInput.after(this.passwordSuggestionTemplate({
                 label: __('oro.user.suggest_password.label')
             }));
 

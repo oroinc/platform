@@ -180,10 +180,6 @@
             display: none;
         }
 
-        .mce-tinymce {
-            width: calc(97% + 12px);
-        }
-
         .form-horizontal {
             width: 636px;
             margin: auto;
@@ -197,7 +193,8 @@
                     input,
                     textarea,
                     .select2-container,
-                    .validate-group {
+                    .validate-group,
+                    .mce-tinymce {
                         width: 100%;
                         max-width: 100%;
                     }
@@ -211,12 +208,8 @@
                         margin-bottom: 0;
 
                         &:not(:last-child) {
-                            margin-right: 5px;
+                            margin-#{$end}: 5px;
                         }
-                    }
-
-                    &:first-child {
-                        margin-#{$start}: 120px;
                     }
 
                     .dropup {
@@ -247,9 +240,11 @@
     }
 }
 
-.select2-container.select2-container-multi.taggable-email {
-    ul.select2-choices {
-        padding-right: 70px;
+.taggable-field {
+    .select2-container.select2-container-multi.taggable-email {
+        ul.select2-choices {
+            padding-#{$end}: 70px;
+        }
     }
 }
 
@@ -257,7 +252,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    right: 8px;
+    #{$end}: $content-padding-small;
     line-height: 18px;
     height: 18px;
     margin: auto;
