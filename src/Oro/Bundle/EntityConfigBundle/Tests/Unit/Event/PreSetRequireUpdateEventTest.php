@@ -13,7 +13,7 @@ class PreSetRequireUpdateEventTest extends \PHPUnit\Framework\TestCase
         $configManager = $this->createMock(ConfigManager::class);
 
         $event = new PreSetRequireUpdateEvent([], $configManager);
-        self::assertFalse($event->isUpdateRequired());
+        self::assertTrue($event->isUpdateRequired());
 
         $event->setUpdateRequired(true);
         self::assertTrue($event->isUpdateRequired());

@@ -24,7 +24,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
 
         // first call - add to originalValues
         // second call - call getEntityConfig in preFlush method
-        $this->configCache->expects($this->once())
+        $this->configCache->expects($this->exactly(2))
             ->method('getEntityConfig')
             ->willReturnOnConsecutiveCalls(clone $entityConfig, $entityConfig);
         $this->configManager->getEntityConfig(
