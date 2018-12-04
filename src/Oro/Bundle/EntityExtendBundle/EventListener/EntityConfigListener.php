@@ -20,7 +20,10 @@ class EntityConfigListener
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }

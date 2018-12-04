@@ -164,8 +164,8 @@ services:
 
     oro_entity_extend.listener.config_listener:
         class: Oro\Bundle\EntityExtendBundle\EventListener\EntityConfigListener
-        arguments:
-            - '@event_dispatcher'
+        calls:
+            - [setEventDispatcher, ['@event_dispatcher']]
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.entity.create, method: updateEntity }
             - { name: kernel.event_listener, event: oro.entity_config.entity.update, method: updateEntity }

@@ -31,7 +31,8 @@ class EntityConfigListenerCreateEntityTest extends EntityConfigListenerTestCase
 
         $event = new EntityConfigEvent($configModel->getClassName(), $this->configManager);
 
-        $listener = new EntityConfigListener($this->eventDispatcher);
+        $listener = new EntityConfigListener();
+        $listener->setEventDispatcher($this->eventDispatcher);
         $listener->updateEntity($event);
 
         $this->assertEquals(
@@ -77,7 +78,8 @@ class EntityConfigListenerCreateEntityTest extends EntityConfigListenerTestCase
 
         $event = new EntityConfigEvent($configModel->getClassName(), $this->configManager);
 
-        $listener = new EntityConfigListener($this->eventDispatcher);
+        $listener = new EntityConfigListener();
+        $listener->setEventDispatcher($this->eventDispatcher);
         $listener->updateEntity($event);
 
         $this->assertEquals(

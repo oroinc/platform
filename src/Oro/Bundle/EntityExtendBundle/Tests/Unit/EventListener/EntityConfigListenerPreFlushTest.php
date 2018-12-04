@@ -39,7 +39,8 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
 
         $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
 
-        $listener = new EntityConfigListener($this->eventDispatcher);
+        $listener = new EntityConfigListener();
+        $listener->setEventDispatcher($this->eventDispatcher);
         $listener->preFlush($event);
 
         $this->assertEquals(
@@ -84,7 +85,8 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
                 $event->setUpdateRequired(true);
             });
 
-        $listener = new EntityConfigListener($this->eventDispatcher);
+        $listener = new EntityConfigListener();
+        $listener->setEventDispatcher($this->eventDispatcher);
         $listener->preFlush($event);
 
         $this->configManager->calculateConfigChangeSet($entityConfig);
@@ -125,7 +127,8 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
                 $event->setUpdateRequired(false);
             });
 
-        $listener = new EntityConfigListener($this->eventDispatcher);
+        $listener = new EntityConfigListener();
+        $listener->setEventDispatcher($this->eventDispatcher);
         $listener->preFlush($event);
 
         $this->configManager->calculateConfigChangeSet($entityConfig);
@@ -163,7 +166,8 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
 
         $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
 
-        $listener = new EntityConfigListener($this->eventDispatcher);
+        $listener = new EntityConfigListener();
+        $listener->setEventDispatcher($this->eventDispatcher);
         $listener->preFlush($event);
 
         $this->assertEquals(
