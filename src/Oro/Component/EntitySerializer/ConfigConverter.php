@@ -37,6 +37,7 @@ class ConfigConverter
         $this->setMaxResults($result, $config);
         $this->setHasMore($result, $config);
         $this->setPostSerializeHandler($result, $config);
+        $this->setPostSerializeCollectionHandler($result, $config);
         $this->setExcludedFields($result, $config);
         $this->setRenamedFields($result, $config);
 
@@ -160,6 +161,19 @@ class ConfigConverter
             && null !== $config[ConfigUtil::POST_SERIALIZE]
         ) {
             $result->setPostSerializeHandler($config[ConfigUtil::POST_SERIALIZE]);
+        }
+    }
+
+    /**
+     * @param EntityConfig $result
+     * @param array        $config
+     */
+    protected function setPostSerializeCollectionHandler(EntityConfig $result, array $config)
+    {
+        if (\array_key_exists(ConfigUtil::POST_SERIALIZE_COLLECTION, $config)
+            && null !== $config[ConfigUtil::POST_SERIALIZE_COLLECTION]
+        ) {
+            $result->setPostSerializeCollectionHandler($config[ConfigUtil::POST_SERIALIZE_COLLECTION]);
         }
     }
 

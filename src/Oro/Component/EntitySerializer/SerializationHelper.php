@@ -46,7 +46,7 @@ class SerializationHelper
     }
 
     /**
-     * Passes a serialized data through the specified "post serialization" handler.
+     * Passes a serialized item through the specified "post serialization" handler.
      *
      * @param array    $item
      * @param callable $handler
@@ -57,6 +57,40 @@ class SerializationHelper
     public function postSerialize(array $item, $handler, array $context)
     {
         return $handler($item, $context);
+    }
+
+    /**
+     * Passes a collection of serialized items through the specified "post serialization" handler.
+     *
+     * @param array    $items
+     * @param callable $handler
+     * @param array    $context
+     *
+     * @return array
+     */
+    public function postSerializeCollection(array $items, $handler, array $context)
+    {
+        return $handler($items, $context);
+    }
+
+    /**
+     * Passes a collection of serialized items through the specified "post serialization" handler
+     * if the given config has this handler.
+     *
+     * @param array        $items
+     * @param EntityConfig $config
+     * @param array        $context
+     *
+     * @return array
+     */
+    public function processPostSerializeCollection(array $items, EntityConfig $config, array $context)
+    {
+        $collectionHandler = $config->getPostSerializeCollectionHandler();
+        if (null !== $collectionHandler) {
+            $items = $this->postSerializeCollection($items, $collectionHandler, $context);
+        }
+
+        return $items;
     }
 
     /**
