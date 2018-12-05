@@ -128,11 +128,6 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
         $this->prepareRepository($report);
         $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
 
-        $this->resolver->expects($this->once())
-            ->method('resolve')
-            ->with($gridName, $this->isInstanceOf(DatagridConfiguration::class))
-            ->willReturnArgument(1);
-
         $configuration = $this->target->getConfiguration($gridName);
         $this->assertEmpty($configuration->offsetGetByPath('[actions]'));
     }
@@ -168,11 +163,6 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
             ->method('getEntityMetadata')
             ->with($entity)
             ->will($this->returnValue($entityMetadata));
-
-        $this->resolver->expects($this->once())
-            ->method('resolve')
-            ->with($gridName, $this->isInstanceOf(DatagridConfiguration::class))
-            ->willReturnArgument(1);
 
         $configuration = $this->target->getConfiguration($gridName);
         $this->assertEmpty($configuration->offsetGetByPath('[actions]'));
@@ -215,11 +205,6 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
             ->method('getEntityMetadata')
             ->with($entity)
             ->will($this->returnValue($entityMetadata));
-
-        $this->resolver->expects($this->once())
-            ->method('resolve')
-            ->with($gridName, $this->isInstanceOf(DatagridConfiguration::class))
-            ->willReturnArgument(1);
 
         $configuration = $this->target->getConfiguration($gridName);
         $this->assertEmpty($configuration->offsetGetByPath('[actions]'));
@@ -268,11 +253,6 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
             ->method('getEntityMetadata')
             ->with($entity)
             ->will($this->returnValue($entityMetadata));
-
-        $this->resolver->expects($this->once())
-            ->method('resolve')
-            ->with($gridName, $this->isInstanceOf(DatagridConfiguration::class))
-            ->willReturnArgument(1);
 
         $configuration = $this->target->getConfiguration($gridName);
 
@@ -351,11 +331,6 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
             ->method('getEntityMetadata')
             ->with($entity)
             ->will($this->returnValue($entityMetadata));
-
-        $this->resolver->expects($this->once())
-            ->method('resolve')
-            ->with($gridName, $this->isInstanceOf(DatagridConfiguration::class))
-            ->willReturnArgument(1);
 
         $expectedConfiguration = $this->buildConfiguration($gridName, $report);
         $this->reportCacheManager->expects(self::once())
