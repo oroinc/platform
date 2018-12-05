@@ -231,7 +231,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
             'entity' => $entityConfig,
         ];
 
-        $this->eventDispatcher->expects(self::at(1))
+        $this->eventDispatcher->expects(self::at(0))
             ->method('dispatch')
             ->with(Events::PRE_FLUSH, new PreFlushConfigEvent($configs, $this->configManager))
             ->willReturnCallback(function (string $eventName, PreFlushConfigEvent $event) use ($testEntityConfig) {
