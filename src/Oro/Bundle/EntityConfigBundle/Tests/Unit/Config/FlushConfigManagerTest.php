@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -171,6 +172,76 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('entity_name', $model->getIndexedValues()[1]->getCode());
         $this->assertEquals('entity', $model->getIndexedValues()[2]->getScope());
         $this->assertEquals('label', $model->getIndexedValues()[2]->getCode());
+    }
+
+    public function testFlushWithPersistConfigsChanged()
+    {
+        $model = new EntityConfigModel(self::ENTITY_CLASS);
+
+        $entityConfigId = new EntityConfigId('entity', self::ENTITY_CLASS);
+        $entityConfig   = new Config($entityConfigId);
+
+        $testEntityConfigId = new EntityConfigId('test', self::ENTITY_CLASS);
+        $testEntityConfig   = new Config($testEntityConfigId);
+
+
+        $entityPropertyConfig = new PropertyConfigContainer(
+            [
+                'entity' => [
+                    'items' => [
+                        'icon'  => [],
+                        'label' => ['options' => ['indexed' => true]]
+                    ]
+                ]
+            ]
+        );
+        $testPropertyConfig = new PropertyConfigContainer(
+            [
+                'test' => [
+                    'items' => [
+                        'icon'  => [],
+                        'label' => ['options' => ['indexed' => true]]
+                    ]
+                ]
+            ]
+        );
+
+        // First occurrence is on the first pass of prepareFlush(),
+        // second occurrence - on the second pass of prepareFlush()
+        $this->entityConfigProvider->expects($this->exactly(2))
+            ->method('getPropertyConfig')
+            ->willReturnOnConsecutiveCalls($entityPropertyConfig, $entityPropertyConfig);
+
+        // Called on the second pass of prepareFlush(), after persistConfigs were updated during the first pass
+        $this->testConfigProvider->expects($this->once())
+            ->method('getPropertyConfig')
+            ->willReturnOnConsecutiveCalls($testPropertyConfig);
+
+        $this->modelManager->expects($this->once())
+            ->method('getEntityModel')
+            ->with($entityConfigId->getClassName())
+            ->willReturn($model);
+
+        $em = $this->createMock(EntityManager::class);
+        $this->modelManager->expects($this->atLeast(1))
+            ->method('getEntityManager')
+            ->willReturn($em);
+
+        $configs = [
+            'entity' => $entityConfig,
+        ];
+
+        $this->eventDispatcher->expects(self::at(1))
+            ->method('dispatch')
+            ->with(Events::PRE_FLUSH, new PreFlushConfigEvent($configs, $this->configManager))
+            ->willReturnCallback(function (string $eventName, PreFlushConfigEvent $event) use ($testEntityConfig) {
+                $configManager = $event->getConfigManager();
+                $configManager->persist($testEntityConfig);
+                $configManager->calculateConfigChangeSet($testEntityConfig);
+            });
+
+        $this->configManager->persist($entityConfig);
+        $this->configManager->flush();
     }
 
     /**
