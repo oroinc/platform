@@ -835,6 +835,32 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem->submit();
     }
 
+    /**
+     * Assert default filter type
+     *
+     * @When /^(?:|I )filter "(?P<filterName>[\w\s]+)" should have selected "(?P<type>[\w\s]+)" type$/
+     *
+     * @param string $filterName
+     * @param string $type
+     * @param string $filterGridName
+     */
+    public function assertSelectedFilterType($filterName, $type, $filterGridName = 'Grid')
+    {
+        /** @var GridFilterStringItem $filterItem */
+        $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('GridFilterStringItem', $filterName);
+
+        $filterItem->open();
+        $selected = $filterItem->getSelectedType();
+
+        self::assertRegExp(
+            sprintf('/%s/i', $type),
+            $selected,
+            sprintf('Chosen "%s" filter instead of "%s" type', $selected, $type)
+        );
+
+        $filterItem->close();
+    }
+
     //@codingStandardsIgnoreStart
     /**
      * Filter grid by choice filter
