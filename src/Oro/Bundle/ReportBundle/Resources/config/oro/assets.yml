@@ -1,4 +1,4 @@
 assets:
     css:
-        'ororeport':
+        inputs:
             - 'bundles/ororeport/css/scss/main.scss'

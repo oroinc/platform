@@ -32,7 +32,7 @@
 
     min-height: $loading-mask-icon-size + 6px;
 
-    body& {
+    body#{&} {
         height: 100vh;
     }
 

@@ -6,14 +6,23 @@
     "type": "git",
     "url": "https://github.com/orocrm/platform"
   },
+  "main": "webpack.config.js",
   "scripts": {
     "test-codestyle": "./node_modules/.bin/eslint ../../** -c .eslintrc.yml --ignore-path .eslintignore --quiet"
   },
   "devDependencies": {
+    "autoprefixer": "^9.1.5",
+    "css-loader": "^1.0.0",
+    "deepmerge": "^2.1.1",
     "eslint": "^4.19.1",
     "eslint-config-google": "^0.9.1",
     "eslint-plugin-oro": "git://github.com/laboro/eslint-plugin-oro.git#master",
+    "extract-loader": "^3.0.0",
+    "file-loader": "^2.0.0",
+    "file-system": "^2.2.2",
+    "font-awesome": "^4.7.0",
     "jasmine-core": "2.8.0",
+    "js-yaml": "^3.12.0",
     "karma": "2.0.0",
     "karma-chrome-launcher": "2.2.0",
     "karma-coverage": "1.1.1",
@@ -22,6 +31,19 @@
     "karma-junit-reporter": "1.2.0",
     "karma-requirejs": "1.1.0",
     "karma-requirejs-exposure": "git://github.com/laboro/karma-requirejs-exposure.git#master",
-    "requirejs": "2.3.5"
+    "mini-css-extract-plugin": "^0.4.2",
+    "node-sass": "4.8.3",
+    "optimize-css-assets-webpack-plugin": "^4.0.3",
+    "path": "^0.12.7",
+    "postcss-loader": "^3.0.0",
+    "requirejs": "2.3.5",
+    "resolve-url-loader": "^2.3.1",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.0",
+    "text-loader": "0.0.1",
+    "url-loader": "^1.1.1",
+    "webpack": "^4.17.2",
+    "webpack-cli": "^3.1.0",
+    "webpack-merge": "^4.1.2"
   }
 }

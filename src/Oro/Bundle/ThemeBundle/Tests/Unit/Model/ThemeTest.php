@@ -42,11 +42,4 @@ class ThemeTest extends \PHPUnit\Framework\TestCase
         $this->theme->setScreenshot('screenshot.png');
         $this->assertEquals('screenshot.png', $this->theme->getScreenshot());
     }
-
-    public function testStylesMethods()
-    {
-        $this->assertEquals(array(), $this->theme->getStyles());
-        $this->theme->setStyles(array('styles.png'));
-        $this->assertEquals(array('styles.png'), $this->theme->getStyles());
-    }
 }

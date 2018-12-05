@@ -29,4 +29,3 @@ custom:
           - 'variables.css': ~
           - my_forms.css
         output: 'output.css'
-        filters: ['filters']

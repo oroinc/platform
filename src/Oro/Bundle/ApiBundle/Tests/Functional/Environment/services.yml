@@ -156,3 +156,15 @@ services:
         tags:
             - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestOverrideClassTargetModel }
             - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget }
+
+    oro_api.tests.update_loaded_data:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedData
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Extend\Entity\TestApiE1 }
+            - { name: oro.api.processor, action: customize_loaded_data, class: Extend\Entity\TestApiE2 }
+
+    oro_api.tests.update_loaded_collection:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedCollection
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, collection: true, class: Extend\Entity\TestApiE1 }
+            - { name: oro.api.processor, action: customize_loaded_data, collection: true, class: Extend\Entity\TestApiE2 }

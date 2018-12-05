@@ -1,5 +1,0 @@
-assets:
-    css:
-        'css_group':
-            - 'first.css'
-            - 'second.css'

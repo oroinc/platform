@@ -1,8 +1,8 @@
 assets:
     css:
-        'timepicker':
+        inputs:
             - 'bundles/bowerassets/timepicker/jquery.timepicker.css'
-        'oroui':
+
             - 'bundles/components/jstree/dist/themes/default/style.min.css'
 
             # Bootstrap port
@@ -28,3 +28,4 @@ assets:
             # custom styles
             - 'bundles/oroui/css/scss/main.scss'
             - 'bundles/oroui/css/all.css'
+        output: css/oro.css

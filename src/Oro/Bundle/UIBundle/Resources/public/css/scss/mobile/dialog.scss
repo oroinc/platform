@@ -59,7 +59,7 @@
         z-index: $dialog-mobile-header-z-index;
         border-radius: $dialog-mobile-header-border-radius;
 
-        @include safe-area-offset(padding, $dialog-mobile-header-inner-offset, 60px, 12px, 12px);
+        @include safe-area-offset(padding, $dialog-mobile-header-inner-offset, 60px 12px 12px);
 
         margin: $dialog-mobile-header-outer-offset;
     }
@@ -72,7 +72,7 @@
         margin: $dialog-mobile-content-outer-offset;
         background: $primary-inverse;
 
-        @include safe-area-offset(padding, $dialog-mobile-content-inner-offset, 10px, 0, 10px);
+        @include safe-area-offset(padding, $dialog-mobile-content-inner-offset, 10px 0 10px);
     }
 
     .ui-resizable-handle {

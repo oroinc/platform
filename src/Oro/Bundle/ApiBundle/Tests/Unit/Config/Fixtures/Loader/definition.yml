@@ -121,6 +121,11 @@ empty_post_serialize:
         post_serialize: ~
     expected: []
 
+empty_post_serialize_collection:
+    config:
+        post_serialize_collection: ~
+    expected: []
+
 null_description:
     config:
         description: ~
@@ -159,6 +164,7 @@ all_attributes:
             - hint1
             - {name: hint2, value: hint_val2}
         post_serialize: [class, method]
+        post_serialize_collection: [class_collection, method_collection]
         description: description1
         documentation: documentation1
         collapse: true
@@ -175,6 +181,7 @@ all_attributes:
             - hint1
             - {name: hint2, value: hint_val2}
         post_serialize: [class, method]
+        post_serialize_collection: [class_collection, method_collection]
         description: description1
         documentation: documentation1
         collapse: true

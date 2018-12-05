@@ -1,4 +1,4 @@
 assets:
     css:
-        'orosecurity':
+        inputs:
             - 'bundles/orosecurity/css/scss/main.scss'

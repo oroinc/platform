@@ -1,0 +1,36 @@
+Extend\Entity\TestApiE2:
+    entity2_1:
+        name: 'Entity 2_1'
+    entity2_2:
+        name: 'Entity 2_2'
+    entity2_3:
+        name: 'Entity 2_3'
+    entity2_4:
+        name: 'Entity 2_4'
+Extend\Entity\TestApiE1:
+    entity1_1:
+        name: 'Entity 1_1'
+        enumField: '@enum1_1'
+        multiEnumField: ['@enum2_1', '@enum2_2']
+        biM2O: '@entity2_1'
+        biM2M: ['@entity2_1', '@entity2_2']
+        biO2M: ['@entity2_1', '@entity2_2']
+    entity1_2:
+        name: 'Entity 1_2'
+        enumField: '@enum1_1'
+        multiEnumField: ['@enum2_1', '@enum2_2']
+        biM2O: '@entity2_1'
+        biM2M: ['@entity2_1', '@entity2_2']
+    entity1_3:
+        name: 'Entity 1_3'
+        enumField: '@enum1_2'
+        multiEnumField: ['@enum2_3', '@enum2_4']
+        biM2O: '@entity2_3'
+        biM2M: ['@entity2_3', '@entity2_4']
+        biO2M: ['@entity2_3', '@entity2_4']
+    entity1_4:
+        name: 'Entity 1_4'
+        enumField: '@enum1_2'
+        multiEnumField: ['@enum2_3', '@enum2_4']
+        biM2O: '@entity2_3'
+        biM2M: ['@entity2_3', '@entity2_4']
