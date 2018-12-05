@@ -1,4 +1,4 @@
 assets:
     css:
-        'oroimportexport':
+        inputs:
             - 'bundles/oroimportexport/css/scss/main.scss'

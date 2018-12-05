@@ -37,7 +37,7 @@ class OroThemeExtensionTest extends \PHPUnit\Framework\TestCase
         if ($expectedActiveTheme) {
             $this->assertCount(1, $registryDefinitionMethodCalls);
             $this->assertEquals(
-                array('setActiveTheme', array($expectedActiveTheme)),
+                ['setActiveTheme', [$expectedActiveTheme]],
                 $registryDefinitionMethodCalls[0]
             );
         } else {
@@ -50,46 +50,42 @@ class OroThemeExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function loadDataProvider()
     {
-        return array(
-            'basic' => array(
-                'configs' => array(
-                    array()
-                ),
-                'expectedThemeSettings' => array(
-                    'foo' => array(
+        return [
+            'basic' => [
+                'configs' => [
+                    []
+                ],
+                'expectedThemeSettings' => [
+                    'foo' => [
                         'label' => 'Foo Theme',
-                        'styles' => array('styles.css')
-                    ),
-                    'bar' => array(
+                    ],
+                    'bar' => [
                         'label' => 'Bar Theme',
-                        'styles' => array('styles.css')
-                    )
-                ),
+                    ]
+                ],
                 'expectedActiveTheme' => null
-            ),
-            'override' => array(
-                'configs' => array(
-                    array(
+            ],
+            'override' => [
+                'configs' => [
+                    [
                         'active_theme' => 'foo',
-                        'themes' => array(
-                            'foo' => array(
+                        'themes' => [
+                            'foo' => [
                                 'label' => 'Foo Extended Theme'
-                            )
-                        )
-                    )
-                ),
-                'expectedThemeSettings' => array(
-                    'foo' => array(
+                            ]
+                        ]
+                    ]
+                ],
+                'expectedThemeSettings' => [
+                    'foo' => [
                         'label' => 'Foo Extended Theme',
-                        'styles' => array('styles.css')
-                    ),
-                    'bar' => array(
+                    ],
+                    'bar' => [
                         'label' => 'Bar Theme',
-                        'styles' => array('styles.css')
-                    )
-                ),
+                    ]
+                ],
                 'expectedActiveTheme' => 'foo'
-            )
-        );
+            ]
+        ];
     }
 }

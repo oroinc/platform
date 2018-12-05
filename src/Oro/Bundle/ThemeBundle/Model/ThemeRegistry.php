@@ -4,6 +4,9 @@ namespace Oro\Bundle\ThemeBundle\Model;
 
 use Oro\Bundle\ThemeBundle\Exception\ThemeNotFoundException;
 
+/**
+ * Registry to store all themes, their settings and an active theme
+ */
 class ThemeRegistry
 {
     /**
@@ -82,9 +85,6 @@ class ThemeRegistry
     protected function createTheme($name, array $settings)
     {
         $result = new Theme($name);
-        if (isset($settings['styles'])) {
-            $result->setStyles((array) $settings['styles']);
-        }
         if (isset($settings['label'])) {
             $result->setLabel($settings['label']);
         }

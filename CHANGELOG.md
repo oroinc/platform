@@ -1,3 +1,14 @@
+## 3.1.0
+
+### Added
+#### AssetBundle
+* bundle replace AsseticBundle to build assets
+
+### Removed
+#### AsseticBundle
+* Bundle was removed, use AssetBundle instead
+
+
 ## 3.1.0-rc (2018-11-30)
 [Show detailed list of changes](incompatibilities-3-1-rc.md)
 
@@ -60,6 +71,8 @@
 * Updated version of bootstrap from 2.3.0 to 4.1.1
 * All global JS Views and Components are defined in the HTML through data attributes.
 * Change target and name of a layout event. Now `layout` triggers `initLayout` event on DOM element instead `layoutInit` on `mediator`
+#### RequireJsBundle
+* `oro_require_js.js_engine` configuration option was removed. Use `oro_asset.nodejs_path` instead.
 #### SecurityBundle
 * `Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper::apply` method logic was changed to support Access rules.
 * `oro_security.encoder.mcrypt` service was changed to `oro_security.encoder.default`.

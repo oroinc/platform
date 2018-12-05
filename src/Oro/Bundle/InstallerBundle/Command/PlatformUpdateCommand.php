@@ -158,16 +158,14 @@ class PlatformUpdateCommand extends AbstractCommand
         $this->processTranslations($input, $commandExecutor);
 
         if (!$skipAssets) {
-            $assetsOptions = [
-                '--exclude' => ['OroInstallerBundle']
-            ];
+            $assetsOptions = [];
             if ($input->hasOption('symlink') && $input->getOption('symlink')) {
                 $assetsOptions['--symlink'] = true;
             }
 
             $commandExecutor
-                ->runCommand('oro:assets:install', $assetsOptions)
-                ->runCommand('assetic:dump')
+                ->runCommand('assets:install', $assetsOptions)
+                ->runCommand('oro:assets:build', ['--npm-install' => true])
                 ->runCommand('fos:js-routing:dump', ['--process-isolation' => true])
                 ->runCommand('oro:localization:dump', ['--process-isolation' => true])
                 ->runCommand('oro:translation:dump', ['--process-isolation' => true])
