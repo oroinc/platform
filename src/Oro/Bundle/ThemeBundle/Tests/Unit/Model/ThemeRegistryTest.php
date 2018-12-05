@@ -12,18 +12,16 @@ class ThemeRegistryTest extends \PHPUnit\Framework\TestCase
      */
     protected $themeRegistry;
 
-    protected $themeSettings = array(
-        'foo' => array(
+    protected $themeSettings = [
+        'foo' => [
             'label' => 'Foo Theme',
-            'styles' => array('style.css'),
             'icon' => 'favicon.ico',
             'logo' => 'logo.png',
             'screenshot' => 'screenshot.png'
-        ),
-        'bar' => array(
-            'styles' => array('style.css')
-        )
-    );
+        ],
+        'bar' => [
+        ]
+    ];
 
     protected function setUp()
     {
@@ -34,7 +32,6 @@ class ThemeRegistryTest extends \PHPUnit\Framework\TestCase
     {
         $fooTheme = $this->themeRegistry->getTheme('foo');
         $this->assertInstanceOf('Oro\Bundle\ThemeBundle\Model\Theme', $fooTheme);
-        $this->assertEquals(array('style.css'), $fooTheme->getStyles());
         $this->assertEquals('Foo Theme', $fooTheme->getLabel());
         $this->assertEquals('favicon.ico', $fooTheme->getIcon());
         $this->assertEquals('logo.png', $fooTheme->getLogo());
@@ -43,7 +40,6 @@ class ThemeRegistryTest extends \PHPUnit\Framework\TestCase
 
         $barTheme = $this->themeRegistry->getTheme('bar');
         $this->assertInstanceOf('Oro\Bundle\ThemeBundle\Model\Theme', $barTheme);
-        $this->assertEquals(array('style.css'), $barTheme->getStyles());
         $this->assertNull($barTheme->getLabel());
         $this->assertNull($barTheme->getIcon());
         $this->assertNull($barTheme->getLogo());

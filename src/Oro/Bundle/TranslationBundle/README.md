@@ -14,3 +14,4 @@ The bundle enables developers to define translation strings in the YAML configur
 - [Translation Context Resolver](./Resources/doc/reference/context_resolver.md)
 - [Migrations](./Resources/doc/reference/migrations.md)
 - [The Dependency Injection Tags](./Resources/doc/reference/dependency_injection_tags.md)
+- [Internationalization Use Cases](./Resources/doc/reference/internationalization_use_cases.md)

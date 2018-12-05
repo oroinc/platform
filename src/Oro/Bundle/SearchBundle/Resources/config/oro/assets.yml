@@ -1,4 +1,4 @@
 assets:
     css:
-      'orosearch':
+        inputs:
           - 'bundles/orosearch/css/scss/main.scss'

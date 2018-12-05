@@ -1,4 +1,4 @@
 assets:
     css:
-        'oroentity':
+        inputs:
             - 'bundles/oroentity/css/scss/main.scss'

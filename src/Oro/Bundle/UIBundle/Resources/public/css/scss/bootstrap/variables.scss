@@ -66,6 +66,8 @@ $input-border-color: $primary-750;
 
 $input-btn-padding-y: 0;
 $input-btn-padding-x: 16px;
+$input-btn-padding-y-sm: $content-padding-small;
+$input-btn-padding-y-lg: $content-padding;
 $input-box-shadow: none;
 $input-focus-box-shadow: none;
 $input-focus-border-color: $secondary;
@@ -87,6 +89,7 @@ $btn-group-divider-color: rgba($primary-inverse, .4);
 // Navbar
 $nav-tabs-link-hover-border-color: $primary-750;
 $nav-divider-margin-y: 4px;
+$nav-link-padding-y: 0;
 
 //Alert
 $alert-border-radius: 2px;
@@ -136,7 +139,9 @@ $dropdown-padding-y: 8px;
 $dropdown-item-padding-x: 16px;
 $dropdown-item-padding-y: 2px;
 $dropdown-item-line-height: 1.75;
-$dropdown-item-icon-fa-width: 22px;
+$dropdown-item-icon-fa-size: 18px;
+$dropdown-item-icon-fa-font-size: $base-font-size--m;
+$dropdown-item-icon-fa-offset: 4px;
 $dropdown-link-color: $primary-200;
 $dropdown-link-hover-color: $primary-300;
 $dropdown-link-hover-bg: $primary-900;
@@ -168,6 +173,8 @@ $modal-dialog-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
 $modal-footer-bg: $primary-900;
 $modal-footer-padding: 8px;
 
+$modal-md: 560px;
+
 // Progress bars
 $progress-height: 22px;
 $progress-font-size: 22px;
@@ -179,6 +186,9 @@ $progress-bar-bg: $primary-600;
 
 $tooltip-arrow-width: 10px;
 $tooltip-arrow-height: 5px;
+
+// Alert
+$alert-padding-x: $content-padding;
 
 // Popover
 $popover-font-size: 14px;

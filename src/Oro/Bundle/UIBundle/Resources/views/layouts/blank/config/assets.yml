@@ -32,7 +32,6 @@ styles:
         - 'bundles/oroui/blank/scss/reset.scss'
         - 'bundles/oroui/blank/vendors/font-awesome/font-awesome.scss'
         - 'bundles/oroui/blank/scss/styles.scss'
-    filters: ['cssrewrite', 'cssmin']
     output: 'css/layout/blank/styles.css'
 
 stylebook_styles:

@@ -2,24 +2,26 @@
 
 namespace Oro\Bundle\NotificationBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\MassNotification;
 use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
 
+/**
+ * Adds notifications items with MassNotificationSender::NOTIFICATION_LOG_TYPE log type to the database.
+ * @see \Oro\Bundle\NotificationBundle\Model\MassNotificationSender::NOTIFICATION_LOG_TYPE
+ */
 class MassNotificationListener
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
     /**
-     * @param EntityManager $em
+     * @param ManagerRegistry $doctrine
      */
-    public function __construct(EntityManager $em)
+    public function __construct(ManagerRegistry $doctrine)
     {
-        $this->em = $em;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -32,17 +34,18 @@ class MassNotificationListener
         if ($spoolItem->getLogType() === MassNotificationSender::NOTIFICATION_LOG_TYPE) {
             $logEntity = new MassNotification();
             $this->updateFromSwiftMessage($logEntity, $spoolItem->getMessage(), $sentCount);
-            $this->em->persist($logEntity);
-            $this->em->flush($logEntity);
+            $em = $this->doctrine->getManagerForClass(MassNotification::class);
+            $em->persist($logEntity);
+            $em->flush($logEntity);
         }
     }
 
     /**
-     * @param MassNotification $entity
+     * @param MassNotification    $entity
      * @param \Swift_Mime_Message $message
-     * @param int $sentCount
+     * @param int                 $sentCount
      */
-    protected function updateFromSwiftMessage(MassNotification $entity, $message, $sentCount)
+    private function updateFromSwiftMessage(MassNotification $entity, $message, $sentCount)
     {
         $dateScheduled = new \DateTime();
         $dateScheduled->setTimestamp($message->getDate());
@@ -58,9 +61,10 @@ class MassNotificationListener
 
     /**
      * @param array $email
+     *
      * @return string
      */
-    protected function formatEmail($email)
+    private function formatEmail($email)
     {
         return current($email) . ' <' . key($email) . '>';
     }

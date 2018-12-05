@@ -525,6 +525,9 @@ define(function(require) {
             this.internalSetDialogPosition(position, leftShift, topShift);
             this.leftAndWidthAdjustments(dialog, containerEl);
             this.topAndHeightAdjustments(dialog, containerEl);
+            if (!_.isMobile()) {
+                mediator.execute('layout:adjustLabelsWidth', this.widget);
+            }
             this.widget.trigger('dialogreposition');
 
             if (tools.isIOS() && initialDialogPosition === 'fixed') {

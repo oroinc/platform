@@ -105,6 +105,10 @@ define(function(require) {
                 checked: state.selected
             }));
             this.$checkbox = this.$el.find(this.checkboxSelector);
+
+            this.$checkbox.inputWidget('isInitialized')
+                ? this.$checkbox.inputWidget('refresh')
+                : this.$checkbox.inputWidget('create');
             return this;
         }
     });

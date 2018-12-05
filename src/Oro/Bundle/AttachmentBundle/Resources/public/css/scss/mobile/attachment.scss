@@ -1,0 +1,17 @@
+/* @theme: admin.oro; */
+
+.attachment-item {
+    margin: 4px 0;
+    width: 100%;
+    max-width: 100%;
+
+    &__note {
+        margin: 0;
+    }
+}
+
+.attachment-file {
+    .uploader {
+        max-width: 100%;
+    }
+}

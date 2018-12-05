@@ -35,7 +35,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 'themes' => [
                     'foo-bar' => [
                         'label' => 'Foo Theme',
-                        'styles' => 'style.css',
                         'logo' => 'logo.png',
                         'icon' => 'favicon.ico',
                         'screenshot' => 'screenshot.png'
@@ -65,7 +64,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'themes' => [
                             'foo' => [
                                 'label' => 'Foo Theme',
-                                'styles' => 'style.css',
                                 'logo' => 'logo.png',
                                 'icon' => 'favicon.ico',
                                 'screenshot' => 'screenshot.png'
@@ -78,7 +76,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'themes' => [
                         'foo' => [
                             'label' => 'Foo Theme',
-                            'styles' => ['style.css'],
                             'logo' => 'logo.png',
                             'icon' => 'favicon.ico',
                             'screenshot' => 'screenshot.png'
@@ -93,7 +90,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'themes' => [
                             'foo' => [
                                 'label' => 'Foo Theme',
-                                'styles' => 'style.css',
                                 'logo' => 'logo.png',
                                 'icon' => 'favicon.ico',
                                 'screenshot' => 'screenshot.png'
@@ -105,7 +101,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'themes' => [
                             'bar' => [
                                 'label' => 'Bar Theme',
-                                'styles' => 'style.css',
                                 'logo' => 'logo.png',
                                 'icon' => 'favicon.ico',
                                 'screenshot' => 'screenshot.png'
@@ -116,14 +111,12 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'themes' => [
                             'bar' => [
                                 'label' => 'Bar Extended Theme',
-                                'styles' => 'style-extended.css',
                                 'logo' => 'logo-extended.png',
                                 'icon' => 'favicon-extended.ico',
                                 'screenshot' => 'screenshot-extended.png'
                             ],
                             'foo-bar_bar' => [
                                 'label' => 'Bar Extended Theme',
-                                'styles' => 'style-extended.css',
                                 'logo' => 'logo-extended.png',
                                 'icon' => 'favicon-extended.ico',
                                 'screenshot' => 'screenshot-extended.png'
@@ -136,21 +129,18 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'themes' => [
                         'foo' => [
                             'label' => 'Foo Theme',
-                            'styles' => ['style.css'],
                             'logo' => 'logo.png',
                             'icon' => 'favicon.ico',
                             'screenshot' => 'screenshot.png'
                         ],
                         'bar' => [
                             'label' => 'Bar Extended Theme',
-                            'styles' => ['style.css', 'style-extended.css'],
                             'logo' => 'logo-extended.png',
                             'icon' => 'favicon-extended.ico',
                             'screenshot' => 'screenshot-extended.png'
                         ],
                         'foo-bar_bar' => [
                             'label' => 'Bar Extended Theme',
-                            'styles' => ['style-extended.css'],
                             'logo' => 'logo-extended.png',
                             'icon' => 'favicon-extended.ico',
                             'screenshot' => 'screenshot-extended.png'

@@ -75,6 +75,19 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+
+        className: 'date-filter-container',
+
+        /**
+         * CSS class for custom date range
+         *
+         * @property
+         */
+        customClass: 'date-filter-custom',
+
+        /**
          * CSS class for visual date input elements
          *
          * @property
@@ -283,6 +296,7 @@ define(function(require) {
             if (!isNaN(type)) {
                 // it's type
                 this.$(startSeparatorEndSelector).css('display', '');
+                this.$el.addClass(this.customClass);
                 var typeDefinedValues = [
                     this.typeDefinedValues.today,
                     this.typeDefinedValues.this_week,
@@ -293,6 +307,7 @@ define(function(require) {
                 ];
                 if (typeDefinedValues.indexOf(type) > -1) {
                     this.$(startSeparatorEndSelector).hide();
+                    this.$el.removeClass(this.customClass);
                     this.subview('start').setValue('');
                     this.subview('end').setValue('');
                 } else if (this.typeValues.moreThan === type) {

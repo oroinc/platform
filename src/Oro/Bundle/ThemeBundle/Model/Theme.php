@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ThemeBundle\Model;
 
+/**
+ * Stores theme information
+ */
 class Theme
 {
     /**
@@ -13,11 +16,6 @@ class Theme
      * @var string
      */
     protected $label;
-
-    /**
-     * @var array
-     */
-    protected $styles = array();
 
     /**
      * @var string
@@ -64,22 +62,6 @@ class Theme
     public function setLabel($label)
     {
         $this->label = $label;
-    }
-
-    /**
-     * @return array
-     */
-    public function getStyles()
-    {
-        return $this->styles;
-    }
-
-    /**
-     * @param array $styles
-     */
-    public function setStyles(array $styles)
-    {
-        $this->styles = $styles;
     }
 
     /**

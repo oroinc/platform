@@ -103,7 +103,7 @@ bin/console assetic:dump
 
 ## Debugging theme styles
 
-Each theme is appended to the list of OroAsseticBundle's CSS assets in group "theme". So, if you want to debug theme's
+Each theme is appended to the list of CSS assets in group "theme". So, if you want to debug theme's
 styles, you should use next configuration in _config.yml_:
 
 ```

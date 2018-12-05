@@ -2,38 +2,67 @@
 
 namespace Oro\Bundle\RequireJSBundle\Command;
 
-use Oro\Bundle\RequireJSBundle\DependencyInjection\Compiler\ConfigProviderCompilerPass;
+use Oro\Bundle\AssetBundle\NodeProcessFactory;
 use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
 
-class OroBuildCommand extends ContainerAwareCommand
+/**
+ * Build RequireJs assets
+ */
+class OroBuildCommand extends Command
 {
-    const BUILD_CONFIG_FILE_NAME    = 'build.js';
-    const OPTIMIZER_FILE_PATH       = 'bundles/npmassets/requirejs/bin/r.js';
+    protected const BUILD_CONFIG_FILE_NAME    = 'build.js';
+    protected const OPTIMIZER_FILE_PATH       = 'bundles/npmassets/requirejs/bin/r.js';
+
+    /**
+     * @var NodeProcessFactory
+     */
+    private $nodeProcessFactory;
+
+    /**
+     * @var ConfigProviderManager
+     */
+    private $configProviderManager;
 
     /**
      * @var Filesystem
      */
-    protected $filesystem;
+    private $filesystem;
 
     /**
-     * @var array
+     * @var null|float|int
      */
-    protected $config;
+    private $timeout;
 
     /**
-     * {@inheritdoc}
+     * @var string
      */
-    public function __construct($name = null)
-    {
-        parent::__construct($name);
+    private $webRoot;
 
-        $this->filesystem = new Filesystem();
+    /**
+     * @param NodeProcessFactory    $nodeProcessFactory
+     * @param ConfigProviderManager $configProviderManager
+     * @param Filesystem            $filesystem
+     * @param string                $webRoot
+     * @param int|float|null        $timeout
+     */
+    public function __construct(
+        NodeProcessFactory $nodeProcessFactory,
+        ConfigProviderManager $configProviderManager,
+        Filesystem $filesystem,
+        string $webRoot,
+        $timeout
+    ) {
+        $this->nodeProcessFactory = $nodeProcessFactory;
+        $this->configProviderManager = $configProviderManager;
+        $this->filesystem = $filesystem;
+        $this->webRoot = $webRoot;
+        $this->timeout = $timeout;
+        parent::__construct();
     }
 
     /**
@@ -51,31 +80,22 @@ class OroBuildCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->config = $this->getContainer()->getParameter('oro_require_js');
-
-        if (!$this->config['js_engine']) {
-            $output->writeln(sprintf('JS engine not found'));
-            return;
-        }
-        
-        /** @var ConfigProviderManager $manager */
-        $manager = $this->getContainer()->get(ConfigProviderCompilerPass::PROVIDER_SERVICE);
-        foreach ($manager->getProviders() as $provider) {
+        foreach ($this->configProviderManager->getProviders() as $provider) {
             foreach ($provider->collectConfigs() as $config) {
-                $output->writeln(sprintf('Generating require.js config'));
+                $output->writeln('Generating require.js config');
 
-                $configPath = $this->getWebRoot() . self::BUILD_CONFIG_FILE_NAME;
+                $configPath = $this->webRoot . self::BUILD_CONFIG_FILE_NAME;
 
                 // for some reason built application gets broken with configuration in "oneline-json"
                 $mainConfig = str_replace(',', ",\n", $config->getMainConfig());
-                $this->writeFile($mainConfig, $this->getWebRoot() . $config->getConfigFilePath());
+                $this->writeFile($mainConfig, $this->webRoot . $config->getConfigFilePath());
 
                 $buildConfig = '(' . json_encode($config->getBuildConfig()) . ')';
                 $this->writeFile($buildConfig, $configPath);
 
-                $output->writeln(sprintf('Running code optimizer'));
+                $output->writeln('Running code optimizer');
 
-                $this->process($this->config['js_engine'], $configPath);
+                $this->process($configPath);
 
                 $output->writeln('Cleaning up');
 
@@ -85,7 +105,7 @@ class OroBuildCommand extends ContainerAwareCommand
                     sprintf(
                         '<comment>%s</comment> <info>[file+]</info> %s',
                         date('H:i:s'),
-                        realpath($this->getWebRoot() . $config->getOutputFilePath())
+                        realpath($this->webRoot . $config->getOutputFilePath())
                     )
                 );
             }
@@ -93,42 +113,20 @@ class OroBuildCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param string $JSEngine
      * @param string $configPath
      */
-    protected function process($JSEngine, $configPath)
+    protected function process(string $configPath): void
     {
         $path = dirname($configPath) . DIRECTORY_SEPARATOR . basename($configPath);
-        $commandline = $JSEngine . ' ' . self::OPTIMIZER_FILE_PATH . ' -o ' . $path . ' 1>&2';
+        $command = self::OPTIMIZER_FILE_PATH . ' -o ' . $path . ' 1>&2';
 
-        $process = new Process($commandline, $this->getWebRoot());
-        
-        if (isset($this->config['building_timeout'])) {
-            $process->setTimeout($this->config['building_timeout']);
-        }
+        $process = $this->nodeProcessFactory->createProcess($command, $this->webRoot, $this->timeout);
 
-        // some workaround when this command is launched from web
-        if (isset($_SERVER['PATH'])) {
-            $env = $_SERVER;
-            if (isset($env['Path'])) {
-                unset($env['Path']);
-            }
-            $process->setEnv($env);
-        }
-        
         $process->run();
 
         if (!$process->isSuccessful()) {
             throw new \RuntimeException($process->getErrorOutput());
         }
-    }
-
-    /**
-     * @return string
-     */
-    protected function getWebRoot()
-    {
-        return $this->getContainer()->getParameter('oro_require_js.web_root') . DIRECTORY_SEPARATOR;
     }
 
     /**

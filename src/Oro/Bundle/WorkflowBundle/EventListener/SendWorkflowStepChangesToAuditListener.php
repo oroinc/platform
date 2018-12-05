@@ -7,18 +7,17 @@ use Oro\Bundle\DataAuditBundle\Model\AdditionalEntityChangesToAuditStorage;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 
+/**
+ * Adds changes of a workflow step to the an auditable entity for which the step is changed.
+ */
 class SendWorkflowStepChangesToAuditListener implements OptionalListenerInterface
 {
-    const FIELD_ALIAS = 'workflow:currentStep';
+    public const FIELD_ALIAS = 'workflow:currentStep';
 
-    /**
-     * @var AdditionalEntityChangesToAuditStorage
-     */
+    /** @var AdditionalEntityChangesToAuditStorage */
     private $storage;
 
-    /**
-     * @var boolean
-     */
+    /** @var bool */
     private $enabled = true;
 
     /**
@@ -39,7 +38,7 @@ class SendWorkflowStepChangesToAuditListener implements OptionalListenerInterfac
 
     /**
      * @param WorkflowTransitionRecord $transitionRecord
-     * @param LifecycleEventArgs $eventArgs
+     * @param LifecycleEventArgs       $eventArgs
      */
     public function postPersist(WorkflowTransitionRecord $transitionRecord, LifecycleEventArgs $eventArgs)
     {
@@ -58,8 +57,8 @@ class SendWorkflowStepChangesToAuditListener implements OptionalListenerInterfac
             [
                 self::FIELD_ALIAS => [
                     $transitionRecord->getStepFrom(),
-                    $transitionRecord->getStepTo(),
-                ],
+                    $transitionRecord->getStepTo()
+                ]
             ]
         );
     }

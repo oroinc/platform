@@ -25,8 +25,6 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\EntityStatus;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
@@ -50,8 +48,7 @@ class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
     OroPageObjectAware,
     KernelAwareContext,
-    SessionAliasProviderAwareInterface,
-    MessageQueueIsolatorAwareInterface
+    SessionAliasProviderAwareInterface
 {
     const SKIP_WAIT_PATTERN = '/'.
         '^(?:|I )should see ".+" flash message$|'.
@@ -60,11 +57,6 @@ class OroMainContext extends MinkContext implements
     '/';
 
     use AssertTrait, KernelDictionary, PageObjectDictionary, SessionAliasProviderAwareTrait;
-
-    /**
-     * @var MessageQueueIsolatorInterface
-     */
-    protected $messageQueueIsolator;
 
     /** @var Stopwatch */
     private $stopwatch;
@@ -97,14 +89,6 @@ class OroMainContext extends MinkContext implements
     public function cancelSkipWait()
     {
         $this->skipWait = false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
-    {
-        $this->messageQueueIsolator = $messageQueueIsolator;
     }
 
     /** @return Stopwatch */
@@ -176,7 +160,6 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
         $driver->waitPageToLoad();
     }
 

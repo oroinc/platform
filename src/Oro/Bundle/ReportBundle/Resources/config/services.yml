@@ -23,7 +23,6 @@ services:
             - '@oro_report.grid.datagrid_configuration_builder'
             - '@doctrine'
             - '@oro_report.cache'
-            - '@oro_datagrid.provider.resolver'
             - '%oro_report.cache.report_grid_config_key%'
         tags:
             - { name: oro_datagrid.configuration.provider }
