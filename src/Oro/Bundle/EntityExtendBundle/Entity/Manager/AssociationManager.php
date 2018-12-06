@@ -18,7 +18,7 @@ use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
- * Provides a set of methods to manage extended associations (see see "Resources/doc/associations.md").
+ * Provides a set of methods to manage extended associations (see "Resources/doc/associations.md").
  */
 class AssociationManager
 {
