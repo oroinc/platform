@@ -1,126 +1,89 @@
 /* @theme: admin.oro; */
 
-.workflow-steps-container {
-    margin-top: 6px;
-    width: auto;
+.workflow-widget-content {
+    position: relative;
+    padding-#{$end}: 0;
+}
 
-    .box-type1 {
-        margin: 0;
+.workflow-collapse {
+    position: absolute;
+    #{$start}: -$icon-font-size;
 
-        > .row-fluid {
-            position: relative;
-        }
+    float: none;
+}
+
+.collapse,
+.collapsing {
+    .workflow-entity {
+        margin-#{$start}: 0;
     }
+}
 
-    .widget-content {
-        overflow-x: auto;
+@media only screen and (max-width: $small-devices-media-breakpoint) {
+    .workflow-entity {
+        display: block;
+        padding-bottom: 12px;
+        margin-bottom: 4px;
 
-        &:before,
-        &:after {
+        tbody,
+        tr {
             display: block;
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            z-index: 1;
-            box-shadow: 0 0 14px 12px #fff;
+            width: 100%;
         }
 
-        &:after {
-            left: auto;
-            right: 0;
+        &:last-child {
+            .transition-btn-group {
+                border-bottom: 0;
+                padding-bottom: 4px;
+            }
         }
     }
 
-    .workflow-step-list {
-        white-space: nowrap;
-        display: inline-block;
-    }
-}
-
-.widget-content-bordered {
-    margin-left: -12px;
-    border: 0;
-}
-
-.workflow-entity {
-    display: block;
-    margin-bottom: 3px;
-
-    tbody,
-    tr {
+    .workflow-label {
         display: block;
         width: 100%;
     }
 
-    &:last-child {
-        margin-bottom: 7px;
-
-        .btn-group {
-            border-bottom: 0;
-            padding-bottom: 4px;
-        }
-    }
-}
-
-.workflow-label {
-    display: block;
-    width: 100%;
-    padding-top: 4px;
-}
-
-.workflow-label-text {
-    width: 100%;
-}
-
-.workflow-content-container {
-    display: block;
-    width: 100%;
-    padding-right: 10px;
-}
-
-.workflow-content {
-    display: block;
-}
-
-.workflow-scroller {
-    padding-right: 5px;
-    overflow-x: auto;
-}
-
-.workflow-buttons-scroller {
-    overflow-x: auto;
-}
-
-.workflow-steps {
-    display: block;
-    width: 100%;
-    padding: 5px 0 10px 20px;
-}
-
-.workflow-controls {
-    display: block;
-    width: 100%;
-    padding: 0 0 0 20px;
-    text-align: left;
-
-    .btn-group {
+    .workflow-label-text {
         width: 100%;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #f2f2f2;
     }
-}
 
-.workflow-ordered-steps {
-    width: 120px;
-}
+    .workflow-content-container {
+        display: block;
+        width: 100%;
+    }
 
-.workflow-collapse:not(.expanded) {
-    .workflow-entity {
-        .btn-group {
-            border-bottom: 0;
+    .workflow-content {
+        display: block;
+    }
+
+    .workflow-scroller {
+        padding-#{$end}: 5px;
+        overflow-x: auto;
+    }
+
+    .workflow-buttons-scroller {
+        overflow-x: auto;
+    }
+
+    .workflow-steps {
+        display: block;
+        width: 100%;
+        padding: side-values(5px 0 10px 8px);
+    }
+
+    .workflow-controls {
+        display: block;
+        width: 100%;
+        padding: 0;
+        text-align: $start;
+
+        .transitions-btn-group {
+            width: 100%;
         }
+    }
+
+    .workflow-ordered-steps {
+        width: 120px;
     }
 }

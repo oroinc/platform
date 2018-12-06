@@ -1,6 +1,6 @@
 {% if workflow.transitionsData|length or workflow.resetAllowed|default(false) %}
     {% set blockId = 'entity-transitions-container-' ~ random() %}
-    <div class="btn-group" id="{{ blockId }}">
+    <div class="transitions-btn-group" id="{{ blockId }}">
         {% for data in workflow.transitionsData %}
             {# Show button for start or transit workflow #}
             {% set transitionLabel = data.transition.label|trans({},'workflows') %}
