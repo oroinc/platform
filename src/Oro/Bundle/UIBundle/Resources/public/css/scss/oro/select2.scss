@@ -207,6 +207,11 @@
                 float: $select2-search-choice-float;
                 list-style: $select2-search-choice-list-style;
                 white-space: nowrap;
+                max-width: calc(100% - (#{$select2-search-choice-offset * 2}));
+
+                > div {
+                    @include text-line-truncate(auto, 100%);
+                }
 
                 &.select2-locked {
                     padding: $select2-search-choice-select2-locked-inner-offset;
@@ -225,7 +230,7 @@
                 margin: $select2-search-field-offset;
                 padding: $select2-search-field-inner-offset;
                 white-space: $select2-search-field-white-space;
-                float: left;
+                float: #{$start};
 
                 input {
                     float: $select2-search-field-float;

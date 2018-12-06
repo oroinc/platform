@@ -333,15 +333,6 @@
 }
 
 .widget-configuration {
-    .form-horizontal {
-        .control-group {
-            > .control-label {
-                width: $dashboard-widget-configuration-control-label-width;
-                min-width: $dashboard-widget-configuration-control-label-width;
-            }
-        }
-    }
-
     .items-selector-widget {
         margin-#{$end}: $content-padding;
     }

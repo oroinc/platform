@@ -30,7 +30,7 @@ $dialog-mobile-content-min-height: 0 !default;
 $dialog-mobile-content-max-height: none !default;
 $dialog-mobile-content-height: auto !default;
 $dialog-mobile-content-outer-offset: 0 !default;
-$dialog-mobile-content-inner-offset: 54px 16px !default;
+$dialog-mobile-content-inner-offset: 64px 16px 0 !default;
 
 $dialog-mobile-titlebar-icons-display: none !default;
 $dialog-mobile-dialog-on-background-display: none !default;
@@ -44,6 +44,8 @@ $dialog-mobile-actions-btn-inner-offset: 0 16px !default;
 $dialog-mobile-actions-btn-border-radius: 20px !default;
 $dialog-mobile-actions-btn-border: none !default;
 $dialog-mobile-actions-btn-outer-offset: 8px !default;
+
+$dialog-mobile-inner-grid-min-width: 0 !default;
 
 $dialog-resizable-handle-mobile-display: none !default;
 

@@ -1,4 +1,4 @@
 assets:
     css:
-        orouser:
+        inputs:
             - 'bundles/orouser/css/scss/main.scss'

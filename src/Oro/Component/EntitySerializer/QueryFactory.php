@@ -65,8 +65,7 @@ class QueryFactory
      */
     public function getRelatedItemsQueryBuilder($entityClass, $entityIds)
     {
-        return $this->doctrineHelper->getEntityRepository($entityClass)
-            ->createQueryBuilder('r')
+        return $this->doctrineHelper->createQueryBuilder($entityClass, 'r')
             ->where(sprintf('r.%s IN (:ids)', $this->doctrineHelper->getEntityIdFieldName($entityClass)))
             ->setParameter('ids', $entityIds);
     }
@@ -81,8 +80,7 @@ class QueryFactory
     {
         $entityIdField = $this->doctrineHelper->getEntityIdFieldName($associationMapping['sourceEntity']);
 
-        $qb = $this->doctrineHelper->getEntityRepository($associationMapping['targetEntity'])
-            ->createQueryBuilder('r')
+        $qb = $this->doctrineHelper->createQueryBuilder($associationMapping['targetEntity'], 'r')
             ->select(sprintf('e.%s as entityId', $entityIdField));
         if (count($entityIds) === 1) {
             $qb

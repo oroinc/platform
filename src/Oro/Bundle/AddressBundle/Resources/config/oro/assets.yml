@@ -1,4 +1,4 @@
 assets:
     css:
-      'oroaddress':
+        inputs:
           - 'bundles/oroaddress/css/scss/main.scss'

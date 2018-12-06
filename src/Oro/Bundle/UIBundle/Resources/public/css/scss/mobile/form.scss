@@ -71,6 +71,12 @@
 .form-horizontal {
     & > .span6 {
         max-width: $form-horizontal-max-width;
+        float: none;
+        margin-right: 0;
+
+        &:not(:last-of-type) {
+            margin: side-values(0 0 $form-container-control-row-space 0);
+        }
     }
 
     .control-group {

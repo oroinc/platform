@@ -41,7 +41,6 @@ class OroDistributionExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturnMap(
                 [
                     ['kernel.bundles', $kernelBundles],
-                    ['assetic.bundles', []],
                 ]
             );
 
@@ -86,7 +85,6 @@ class OroDistributionExtensionTest extends \PHPUnit\Framework\TestCase
                 'public/css',
                 'composer.json',
             ],
-            'assetic.bundles' => [],
             'twig.form.resources' => [],
             'oro_distribution.composer_cache_home' => '%kernel.project_dir%/var/cache/composer'
         ];

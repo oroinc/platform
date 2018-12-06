@@ -34,6 +34,12 @@
         .pull-right {
             max-width: 100%;
         }
+
+        .control-group {
+            .controls:first-child {
+                margin-#{$start}: 0;
+            }
+        }
     }
 }
 
@@ -163,8 +169,11 @@
     }
 }
 
-.ui-dialog .comment-form textarea,
-.ui-dialog .comment-form .mce-tinymce {
-    width: 100%;
-    box-sizing: border-box;
+.ui-dialog {
+    .comment-form {
+        textarea,
+        .mce-tinymce {
+            max-width: 100%;
+        }
+    }
 }

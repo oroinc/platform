@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContex
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\AssociationHandler;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\EntityHandler;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
 class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
@@ -109,8 +110,47 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 ->getPostSerializeHandler()
         );
 
+        self::assertNull($configObject->getPostSerializeCollectionHandler());
+
         $assert = $this->getRootHandlerAssertion($configObject);
         $assert();
+    }
+
+    public function testProcessForGetListTargetAction()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => null
+            ]
+        ];
+
+        /** @var EntityDefinitionConfig $configObject */
+        $configObject = $this->createConfigObject($config);
+        $this->context->setTargetAction(ApiActions::GET_LIST);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        self::assertInstanceOf(
+            EntityHandler::class,
+            $configObject->getPostSerializeHandler()
+        );
+        self::assertNull(
+            $configObject
+                ->getField('field1')
+                ->getTargetEntity()
+        );
+
+        self::assertInstanceOf(
+            EntityHandler::class,
+            $configObject->getPostSerializeCollectionHandler()
+        );
+
+        $rootAssert = $this->getRootHandlerAssertion($configObject);
+        $rootCollectionAssert = $this->getRootHandlerAssertion($configObject, 'collection');
+        foreach ([$rootAssert, $rootCollectionAssert] as $assert) {
+            $assert();
+        }
     }
 
     /**
@@ -164,6 +204,12 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
             $configObject
                 ->getField('field2')
                 ->getTargetEntity()
+                ->getPostSerializeCollectionHandler()
+        );
+        self::assertNull(
+            $configObject
+                ->getField('field2')
+                ->getTargetEntity()
                 ->getField('field21')
                 ->getTargetEntity()
         );
@@ -175,6 +221,14 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 ->getField('field22')
                 ->getTargetEntity()
                 ->getPostSerializeHandler()
+        );
+        self::assertNull(
+            $configObject
+                ->getField('field2')
+                ->getTargetEntity()
+                ->getField('field22')
+                ->getTargetEntity()
+                ->getPostSerializeCollectionHandler()
         );
         self::assertNull(
             $configObject
@@ -200,6 +254,130 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
             'field2.field22'
         );
         foreach ([$rootAssert, $field2Assert, $field22Assert] as $assert) {
+            $assert();
+        }
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testProcessForEntityWithCollectionValuedAssociations()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => null,
+                'field2' => [
+                    'exclusion_policy' => 'all',
+                    'target_class'     => 'Test\Field2Target',
+                    'target_type'      => 'to-many',
+                    'fields'           => [
+                        'field21' => null,
+                        'field22' => [
+                            'exclusion_policy' => 'all',
+                            'target_class'     => 'Test\Field22Target',
+                            'target_type'      => 'to-many',
+                            'fields'           => [
+                                'field221' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        /** @var EntityDefinitionConfig $configObject */
+        $configObject = $this->createConfigObject($config);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        self::assertInstanceOf(
+            EntityHandler::class,
+            $configObject->getPostSerializeHandler()
+        );
+        self::assertNull(
+            $configObject
+                ->getField('field1')
+                ->getTargetEntity()
+        );
+        self::assertInstanceOf(
+            AssociationHandler::class,
+            $configObject
+                ->getField('field2')
+                ->getTargetEntity()
+                ->getPostSerializeHandler()
+        );
+        self::assertInstanceOf(
+            AssociationHandler::class,
+            $configObject
+                ->getField('field2')
+                ->getTargetEntity()
+                ->getPostSerializeCollectionHandler()
+        );
+        self::assertNull(
+            $configObject
+                ->getField('field2')
+                ->getTargetEntity()
+                ->getField('field21')
+                ->getTargetEntity()
+        );
+        self::assertInstanceOf(
+            AssociationHandler::class,
+            $configObject
+                ->getField('field2')
+                ->getTargetEntity()
+                ->getField('field22')
+                ->getTargetEntity()
+                ->getPostSerializeHandler()
+        );
+        self::assertInstanceOf(
+            AssociationHandler::class,
+            $configObject
+                ->getField('field2')
+                ->getTargetEntity()
+                ->getField('field22')
+                ->getTargetEntity()
+                ->getPostSerializeCollectionHandler()
+        );
+        self::assertNull(
+            $configObject
+                ->getField('field2')
+                ->getTargetEntity()
+                ->getField('field22')
+                ->getTargetEntity()
+                ->getField('field221')
+                ->getTargetEntity()
+        );
+
+        $rootAssert = $this->getRootHandlerAssertion($configObject);
+        $field2Assert = $this->getChildHandlerAssertion(
+            $configObject,
+            $configObject->getField('field2')->getTargetEntity(),
+            'Test\Field2Target',
+            'field2'
+        );
+        $field2CollectionAssert = $this->getChildHandlerAssertion(
+            $configObject,
+            $configObject->getField('field2')->getTargetEntity(),
+            'Test\Field2Target',
+            'field2',
+            'collection'
+        );
+        $field22Assert = $this->getChildHandlerAssertion(
+            $configObject,
+            $configObject->getField('field2')->getTargetEntity()->getField('field22')->getTargetEntity(),
+            'Test\Field22Target',
+            'field2.field22'
+        );
+        $field22CollectionAssert = $this->getChildHandlerAssertion(
+            $configObject,
+            $configObject->getField('field2')->getTargetEntity()->getField('field22')->getTargetEntity(),
+            'Test\Field22Target',
+            'field2.field22',
+            'collection'
+        );
+        $asserts = [$rootAssert, $field2Assert, $field2CollectionAssert, $field22Assert, $field22CollectionAssert];
+        foreach ($asserts as $assert) {
             $assert();
         }
     }
@@ -372,10 +550,11 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 
     /**
      * @param EntityDefinitionConfig $configObject
+     * @param string                 $handlerType
      *
      * @return callable
      */
-    private function getRootHandlerAssertion(EntityDefinitionConfig $configObject)
+    private function getRootHandlerAssertion(EntityDefinitionConfig $configObject, $handlerType = '')
     {
         $sourceDataItem = ['source data'];
         $processedDataItem = ['processed data'];
@@ -397,11 +576,12 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 }
             );
 
-        return function () use ($configObject, $processedDataItem, $sourceDataItem) {
-            $rootHandler = $configObject->getPostSerializeHandler();
+        return function () use ($configObject, $processedDataItem, $sourceDataItem, $handlerType) {
+            $getter = 'getPostSerialize' . ucfirst($handlerType) . 'Handler';
+            $rootHandler = $configObject->{$getter}();
             self::assertEquals(
                 $processedDataItem,
-                call_user_func($rootHandler, $sourceDataItem)
+                $rootHandler($sourceDataItem)
             );
         };
     }
@@ -411,6 +591,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
      * @param EntityDefinitionConfig $childConfigObject
      * @param string                 $childEntityClass
      * @param string                 $fieldPath
+     * @param string                 $handlerType
      *
      * @return callable
      */
@@ -418,7 +599,8 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
         EntityDefinitionConfig $configObject,
         EntityDefinitionConfig $childConfigObject,
         $childEntityClass,
-        $fieldPath
+        $fieldPath,
+        $handlerType = ''
     ) {
         $sourceDataItem = ['source data'];
         $processedDataItem = ['processed data'];
@@ -446,11 +628,12 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 }
             );
 
-        return function () use ($childConfigObject, $processedDataItem, $sourceDataItem) {
-            $childHandler = $childConfigObject->getPostSerializeHandler();
+        return function () use ($childConfigObject, $processedDataItem, $sourceDataItem, $handlerType) {
+            $getter = 'getPostSerialize' . ucfirst($handlerType) . 'Handler';
+            $childHandler = $childConfigObject->{$getter}();
             self::assertEquals(
                 $processedDataItem,
-                call_user_func($childHandler, $sourceDataItem)
+                $childHandler($sourceDataItem)
             );
         };
     }

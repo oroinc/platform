@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@import "oroui/css/scss/mixins/direction";
+
 .entity-pagination {
     display: flex;
     align-items: baseline;

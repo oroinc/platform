@@ -1,14 +1,3 @@
-assetic:
-    assets:
-        tinymce_bdesk_photo:
-            inputs:
-                - bundles/oroform/lib/bdeskphoto/plugin.min.js
-            output: bundles/components/tinymce/plugins/bdesk_photo/plugin.js
-        tinymce_bdesk_photo_min:
-            inputs:
-                - bundles/oroform/lib/bdeskphoto/plugin.min.js
-            output: bundles/components/tinymce/plugins/bdesk_photo/plugin.min.js
-
 oro_form:
     wysiwyg:
         html_allowed_elements:
