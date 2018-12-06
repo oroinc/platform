@@ -928,3 +928,11 @@ label .popover-body {
 .url-actions a.btn {
     text-transform: none !important;
 }
+
+.oro-collapse-icon {
+    @include fa-icon($fa-var-minus-square-o);
+
+    @at-root .collapsed > .oro-collapse-icon {
+        @include fa-icon($fa-var-plus-square-o);
+    }
+}

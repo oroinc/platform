@@ -9,6 +9,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * This class prepares icon names and css-classes that rendered by Symfony's ChoiceType
+ */
 class OroIconType extends AbstractType
 {
     const NAME = 'oro_icon_select';
@@ -56,7 +59,11 @@ class OroIconType extends AbstractType
         $config = Yaml::parse(file_get_contents($configFile));
         $choices = [];
         foreach ($config['oro_icon_select'] as $label => $value) {
-            $choices['oro.form.icon_select.' . $label] = $value;
+            // Symfony flips this array when renders select option elements.
+            // So we have to be sure that values are unique
+            if (false === array_search($value, $choices)) {
+                $choices["oro.form.icon_select." . $label] = $value;
+            }
         }
 
         $resolver->setDefaults(
