@@ -56,7 +56,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     ): array {
         $result = [];
         foreach ($collection as $object) {
-            $result[] = null === $object || \is_scalar($object)
+            $result[] = null === $object || \is_scalar($object) || \is_array($object)
                 ? $object
                 : $this->convertObjectToArray($object, $requestType, $metadata);
         }
