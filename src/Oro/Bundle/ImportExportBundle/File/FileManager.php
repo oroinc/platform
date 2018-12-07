@@ -232,4 +232,20 @@ class FileManager
     {
         return $this->filesystem->has($fileName);
     }
+
+    /**
+     * @param string|File $file
+     */
+    public function getMimeType($file)
+    {
+        if ($file instanceof File) {
+            $file = $file->getKey();
+        }
+
+        if ($file && $this->filesystem->has($file)) {
+            return $this->filesystem->mimeType($file);
+        }
+
+        return null;
+    }
 }
