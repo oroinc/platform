@@ -16,10 +16,12 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
     private $data = [
         Country::class => [
             'germany' => ['iso2Code' => 'DE'],
+            'austria' => ['iso2Code' => 'AT'],
             'united_states' => ['iso2Code' => 'US'],
         ],
         Region::class => [
             'berlin' => ['combinedCode' => 'DE-BE'],
+            'vienna' => ['combinedCode' => 'AT-9'],
             'florida' => ['combinedCode' => 'US-FL'],
         ],
         AddressType::class => [
@@ -28,8 +30,10 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
         ],
         TranslationKey::class => [
             'translation_key_oro_country_DE' => ['key' => 'country.DE', 'domain' => 'entities'],
-            'translation_key_oro_region_DE-BE' => ['key' => 'region.DE-BE', 'domain' => 'entities'],
+            'translation_key_oro_country_AT' => ['key' => 'country.AT', 'domain' => 'entities'],
             'translation_key_oro_country_US' => ['key' => 'country.US', 'domain' => 'entities'],
+            'translation_key_oro_region_DE-BE' => ['key' => 'region.DE-BE', 'domain' => 'entities'],
+            'translation_key_oro_region_AT-9' => ['key' => 'region.AT-9', 'domain' => 'entities'],
             'translation_key_oro_region_US-FL' => ['key' => 'region.US-FL', 'domain' => 'entities'],
         ],
     ];
