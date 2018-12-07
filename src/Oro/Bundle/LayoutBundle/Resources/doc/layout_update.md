@@ -45,11 +45,11 @@ Actions definition is processed as a multidimensional array where the key is the
 ```yaml
 layout:
     actions:
-        - @add: # Sequential list
+        - '@add': # Sequential list
             - block_id
             - parent_block_id
             - block_type
-        - @remove: # Named arguments
+        - '@remove': # Named arguments
             id: content
 ```
 
@@ -67,7 +67,7 @@ Optional parameters can be skipped when named arguments are used. In the followi
 ```yaml
 layout:
     actions:
-        - @move:
+        - '@move':
             id:        block_id
             siblingId: sibling_block_id
 ```
@@ -86,7 +86,7 @@ In the **Tree** node, arrange the items into the desired hierarchy. Use the exis
 ```yaml
 layout:
     actions:
-        - @addTree:
+        - '@addTree':
             items:
                 head:
                     blockType:   head

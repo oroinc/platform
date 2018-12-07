@@ -4,3 +4,4 @@
 **/public/*/vendors/**
 **/Karma/lib/**
 **/*.min.js
+**/webpack-config-builder/**

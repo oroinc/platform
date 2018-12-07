@@ -201,4 +201,19 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($entityConfig->getPostSerializeHandler());
         $this->assertEquals([], $entityConfig->toArray());
     }
+
+    public function testPostSerializeCollectionHandler()
+    {
+        $entityConfig = new EntityConfig();
+        $this->assertNull($entityConfig->getPostSerializeCollectionHandler());
+
+        $handler = 'test';
+        $entityConfig->setPostSerializeCollectionHandler($handler);
+        $this->assertSame($handler, $entityConfig->getPostSerializeCollectionHandler());
+        $this->assertEquals(['post_serialize_collection' => 'test'], $entityConfig->toArray());
+
+        $entityConfig->setPostSerializeCollectionHandler();
+        $this->assertNull($entityConfig->getPostSerializeCollectionHandler());
+        $this->assertEquals([], $entityConfig->toArray());
+    }
 }

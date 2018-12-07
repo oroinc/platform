@@ -599,12 +599,13 @@ services:
         arguments:
             - "@translator"
 
-    oro_workflow.event_listener.collect_audit_fields:
-        class: Oro\Bundle\WorkflowBundle\EventListener\CollectAuditFieldsListener
+    oro_workflow.workflow_step_to_audit_field_converter:
+        class: Oro\Bundle\WorkflowBundle\DataAudit\WorkflowStepToAuditFieldConverter
+        decorates: oro_dataaudit.converter.change_set_to_audit_fields
+        public: false
         arguments:
+            - '@oro_workflow.workflow_step_to_audit_field_converter.inner'
             - '@oro_entity.doctrine_helper'
-        tags:
-            - { name: kernel.event_listener, event: oro_audit.collect_audit_fields, method: onCollectAuditFields }
 
     oro_workflow.event_listener.send_workflow_step_changes_to_audit:
         class: Oro\Bundle\WorkflowBundle\EventListener\SendWorkflowStepChangesToAuditListener

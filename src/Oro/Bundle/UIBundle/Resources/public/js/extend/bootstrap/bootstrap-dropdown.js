@@ -43,7 +43,12 @@ define(function(require) {
         dispose: function() {
             var parent = Dropdown._getParentFromElement(this._element);
             $(parent).off(EVENT_KEY);
-            $(document).off('mCSB.scroll' + EVENT_KEY, this._onCustomScroll);
+            $(document).off('mCSB.scroll' + EVENT_KEY, this._popperUpdate);
+
+            if (this._dialog) {
+                $(this._dialog).off(EVENT_KEY);
+                delete this._dialog;
+            }
             original.dispose.call(this);
         },
 
@@ -77,11 +82,14 @@ define(function(require) {
         },
 
         _addEventListeners: function() {
-            this._onCustomScroll = this._onCustomScroll.bind(this);
+            this._popperUpdate = this._popperUpdate.bind(this);
 
             original._addEventListeners.call(this);
 
             var parent = Dropdown._getParentFromElement(this._element);
+            var dialogContent = $(this._element).closest(DIALOG_SCROLLABLE_CONTAINER);
+
+            this._dialog = dialogContent.length && dialogContent.parent() || null;
 
             $(this._element).add(parent).on(TO_HIDE_EVENT, function(event) {
                 event.stopImmediatePropagation();
@@ -91,10 +99,17 @@ define(function(require) {
             }.bind(this));
 
             $(parent).on(HIDE_EVENT, this._onHide.bind(this));
-            $(document).on('mCSB.scroll' + EVENT_KEY, this._onCustomScroll);
+            $(document).on('mCSB.scroll' + EVENT_KEY, this._popperUpdate);
+
+            if (this._dialog) {
+                $(this._dialog).on(
+                    _events(['dialogresize', 'dialogdrag', 'dialogreposition']),
+                    this._popperUpdate
+                );
+            }
         },
 
-        _onCustomScroll: function() {
+        _popperUpdate: function(e) {
             if (this._popper) {
                 // When scrolling leads to hidden dropdown appears again, single call of scroll handler
                 // shows dropdown menu in wrong position. But since single scroll event happens very
@@ -146,15 +161,23 @@ define(function(require) {
                 config.positionFixed = true;
                 config.modifiers.computeStyle = {
                     fn: function(data, options) {
-                        Popper.Defaults.modifiers.computeStyle.fn(data, options);
-
                         var popper = data.instance.popper;
                         var offset = data.offsets.popper;
 
-                        if (inheritParentWidth === 'strictly' || offset.width < popper.parentElement.clientWidth) {
-                            data.styles.width = popper.parentElement.clientWidth;
-                            data.styles.left = data.styles.left - (popper.parentElement.clientWidth - offset.width);
+                        if (
+                            offset.width &&
+                            (inheritParentWidth === 'strictly' || offset.width < popper.parentElement.clientWidth)
+                        ) {
+                            popper.style.width = popper.parentElement.clientWidth + 'px';
+                            _.extend(offset, _.pick(
+                                popper.parentElement.getBoundingClientRect(),
+                                'left',
+                                'right',
+                                'width')
+                            );
                         }
+
+                        Popper.Defaults.modifiers.computeStyle.fn(data, options);
 
                         return data;
                     }
@@ -197,9 +220,11 @@ define(function(require) {
             if (_.result(config.modifiers, 'preventOverflow')) {
                 var boundariesElement = config.modifiers.preventOverflow.boundariesElement;
 
-                if (['scrollParent', 'window', 'viewport'].indexOf(boundariesElement) === -1) {
+                if (boundariesElement && ['scrollParent', 'window', 'viewport'].indexOf(boundariesElement) === -1) {
                     config.modifiers.preventOverflow.boundariesElement = $(this._element).closest(boundariesElement)[0];
                 }
+
+                config.modifiers.preventOverflow.escapeWithReference = true;
             }
 
             return config;

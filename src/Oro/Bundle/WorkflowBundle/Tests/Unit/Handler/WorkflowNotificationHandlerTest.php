@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\TemplateEmailNotificationAdapter;
@@ -50,9 +51,14 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->manager = $this->createMock(EmailNotificationManager::class);
 
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManager')
+            ->willReturn($this->em);
+
         $this->handler = new WorkflowNotificationHandler(
             $this->manager,
-            $this->em,
+            $doctrine,
             new PropertyAccessor(),
             $this->eventDispatcher
         );

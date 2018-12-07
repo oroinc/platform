@@ -959,6 +959,21 @@ class EntityOverrideTest extends RestJsonApiTestCase
         self::assertNull($this->getEntityManager()->find(TestOverrideClassOwner::class, $entityIdToDelete));
     }
 
+    public function testDeleteListWithTotalAndDeletedCountsOfOverriddenEntities()
+    {
+        $entityIdToDelete = $this->getReference('owner_1')->id;
+        $response = $this->cdelete(
+            ['entity' => 'testapioverrideclassowners'],
+            ['filter' => ['id' => (string)$entityIdToDelete]],
+            ['HTTP_X-Include' => 'totalCount;deletedCount']
+        );
+
+        self::assertEquals(1, $response->headers->get('X-Include-Total-Count'), 'totalCount');
+        self::assertEquals(1, $response->headers->get('X-Include-Deleted-Count'), 'deletedCount');
+
+        self::assertNull($this->getEntityManager()->find(TestOverrideClassOwner::class, $entityIdToDelete));
+    }
+
     public function testUpdateOverriddenEntityAttribute()
     {
         $response = $this->patch(

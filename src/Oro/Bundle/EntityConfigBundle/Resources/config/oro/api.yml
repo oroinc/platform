@@ -1,7 +1,6 @@
 api:
     entities:
         Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily:
-        Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily:
             documentation_resource: '@OroEntityConfigBundle/Resources/doc/api/attribute_family.md'
             actions:
                 create: false

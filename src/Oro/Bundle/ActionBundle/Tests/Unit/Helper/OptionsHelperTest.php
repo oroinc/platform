@@ -4,9 +4,8 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
-use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -24,26 +23,38 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
     /** @var OptionsHelper */
     protected $helper;
 
+    /** @var HtmlTagHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $htmlTagHelper;
+
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->router = $this->createMock(Router::class);
-        $this->router->expects($this->any())->method('generate')->willReturn('generated-url');
+        $this->router = self::createMock(Router::class);
+        $this->router->expects(self::any())->method('generate')->willReturn('generated-url');
 
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->translator->expects($this->any())
+        $this->translator = self::createMock(TranslatorInterface::class);
+        $this->translator->expects(self::any())
             ->method('trans')
-            ->willReturnCallback(function ($id) {
-                return $id === 'untranslated' ? 'untranslated' : '[trans]'.$id.'[/trans]';
+            ->willReturnCallback(function ($id, $parameters) {
+                $parameters = implode('_', $parameters);
+                return sprintf('[trans]%s[%s][/trans]', $id, $parameters);
             });
 
-        $this->formProvider = $this->createMock(FormProvider::class);
+        $this->formProvider = self::createMock(FormProvider::class);
+        $this->htmlTagHelper = self::createMock(HtmlTagHelper::class);
+        $this->htmlTagHelper->expects(self::any())
+            ->method('escape')
+            ->willReturnCallback(function ($value) {
+                return $value . '_escaped';
+            });
+
         $this->helper = new OptionsHelper(
             $this->router,
             $this->translator,
-            $this->formProvider
+            $this->formProvider,
+            $this->htmlTagHelper
         );
     }
 
@@ -88,6 +99,7 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
                     'showDialog' => true,
                     'frontendOptions' => [
                         'title' => 'custom title',
+                        'title_parameters' => ['param1' => 'value1'],
                         'message' => [
                             'message' => 'message1',
                             'message_parameters' => ['param1' => 'value1'],
@@ -104,7 +116,7 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
                         'hasDialog' => true,
                         'showDialog' => true,
                         'dialogOptions' => [
-                            'title' => '[trans]custom title[/trans]',
+                            'title' => '[trans]custom title[value1_escaped][/trans]',
                             'dialogOptions' => [],
                         ],
                         'dialogUrl' => 'generated-url',
@@ -137,7 +149,7 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
                         'jsDialogWidget' => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
                         'message' => [
                             'title' => 'title1',
-                            'content' => '[trans]message1[/trans]',
+                            'content' => '[trans]message1[value1_escaped][/trans]',
                             'message_parameters' => ['param1' => 'value1']
                         ],
                     ],
@@ -161,6 +173,39 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
                         'executionUrl' => 'generated-url',
                         'url' => 'generated-url',
                         'jsDialogWidget' => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
+                    ],
+                    'data' => [],
+                ],
+            ],
+            'options with frontend confirmation message' => [
+                'button' => $this->getButton('test label', [
+                    'hasForm' => false,
+                    'frontendOptions' => [
+                        'confirmation' => [
+                            'title' => 'title1',
+                            'okText' => 'okText1',
+                            'message' => 'message1',
+                            'message_parameters' => [
+                                'username' => 'username'
+                            ],
+                        ],
+                    ],
+                ]),
+                'expectedData' => [
+                    'options' => [
+                        'hasDialog' => false,
+                        'showDialog' => false,
+                        'executionUrl' => 'generated-url',
+                        'url' => 'generated-url',
+                        'jsDialogWidget' => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
+                        'confirmation' => [
+                            'title' => 'title1',
+                            'okText' => 'okText1',
+                            'message' => 'message1',
+                            'message_parameters' => [
+                                'username' => 'username_escaped'
+                            ],
+                        ],
                     ],
                     'data' => [],
                 ],

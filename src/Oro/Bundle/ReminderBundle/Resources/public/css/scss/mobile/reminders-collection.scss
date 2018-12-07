@@ -2,8 +2,32 @@
 
 .reminders-collection,
 .ui-dialog .form-horizontal .control-group .controls .reminders-collection {
+    .float-holder {
+        float: none;
+
+        > div {
+            display: flex;
+            justify-content: stretch;
+        }
+    }
+
+    .inline-field {
+        float: none;
+    }
+
+    select.unit {
+        width: 100%;
+    }
+
+    select.method {
+        width: 100%;
+    }
+
     input.number {
-        height: 30px;
-        width: 40px !important;
+        width: 60px;
+    }
+
+    .oro-multiselect-holder {
+        padding-#{$end}: 40px;
     }
 }

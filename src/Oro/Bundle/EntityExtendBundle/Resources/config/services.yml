@@ -230,6 +230,11 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_enum_name }
 
+    oro_entity_extend.validator.unique_enum_values:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\EnumValuesUniqueValidator
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_enum_values }
+
     oro_entity_extend.validator.non_extended_entity_bidirectional:
         class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\NonExtendedEntityBidirectionalValidator
         arguments:

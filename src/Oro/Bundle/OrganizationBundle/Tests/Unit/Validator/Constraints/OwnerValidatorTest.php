@@ -21,14 +21,14 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class OwnerValidatorTest extends AbstractConstraintValidatorTest
+class OwnerValidatorTest extends ConstraintValidatorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     private $doctrine;

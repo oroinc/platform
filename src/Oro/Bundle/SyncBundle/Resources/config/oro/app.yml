@@ -8,8 +8,6 @@ gos_web_socket:
             resources: ~
         origin_check: true
 
-    # We don`t need assets of GosWebSocketBundle
-    assetic: false
     # We don`t need server connection parameters provided by GosWebSocketBundle in TWIG.
     shared_config: false
 

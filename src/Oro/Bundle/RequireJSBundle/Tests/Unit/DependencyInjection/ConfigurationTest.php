@@ -24,28 +24,24 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         return array(
             array(
                 array(
-                    'js_engine' => 'node',
                     'config' => array('waitSeconds' => -3),
                 ),
                 '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException'
             ),
             array(
                 array(
-                    'js_engine' => 'node',
                     'config' => array('scriptType' => ''),
                 ),
                 '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException'
             ),
             array(
                 array(
-                    'js_engine' => 'node',
                     'building_timeout' => -3,
                 ),
                 '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException'
             ),
             array(
                 array(
-                    'js_engine' => 'node',
                     'build' => array('optimize' => 'test'),
                 ),
                 '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException'
@@ -67,65 +63,60 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function dataProviderConfigTree()
     {
-        return array(
-            array(
-                array(
-                    'js_engine' => 'node'
-                ),
-                array(
-                    'js_engine' => 'node',
-                    'config' => array(
+        return [
+            [
+                [],
+                [
+                    'config' => [
                         'waitSeconds' => 0,
-                    ),
-                    'web_root' => '%kernel.project_dir%/public',
+                    ],
+                    'web_root' => '%kernel.project_dir%/public/',
                     'build_path' => 'js/app.min.js',
                     'building_timeout' => 60,
                     'build_logger' => false,
-                    'build' => array(
+                    'build' => [
                         'optimize' => 'uglify2',
-                        'paths' => array(),
-                    )
-                )
-            ),
-            array(
-                array(
-                    'config' => array(
+                        'paths' => [],
+                    ]
+                ]
+            ],
+            [
+                [
+                    'config' => [
                         'waitSeconds' => 0,
                         'enforceDefine' => true,
                         'scriptType' => 'text/javascript'
-                    ),
-                    'js_engine' => 'node',
+                    ],
                     'build_path' => 'js/test/app.min.js',
                     'building_timeout' => 3600,
                     'build_logger' => false,
-                    'build' => array(
+                    'build' => [
                         'optimize' => 'none',
                         'generateSourceMaps' => false,
                         'preserveLicenseComments' => true,
                         'useSourceUrl' => false,
-                        'paths' => array(),
-                    )
-                ),
-                array(
-                    'config' => array(
+                        'paths' => [],
+                    ]
+                ],
+                [
+                    'config' => [
                         'waitSeconds' => 0,
                         'enforceDefine' => true,
                         'scriptType' => 'text/javascript',
-                    ),
-                    'js_engine' => 'node',
-                    'web_root' => '%kernel.project_dir%/public',
+                    ],
+                    'web_root' => '%kernel.project_dir%/public/',
                     'build_path' => 'js/test/app.min.js',
                     'building_timeout' => 3600,
                     'build_logger' => false,
-                    'build' => array(
+                    'build' => [
                         'optimize' => 'none',
                         'generateSourceMaps' => false,
                         'preserveLicenseComments' => 1,
                         'useSourceUrl' => false,
-                        'paths' => array(),
-                    ),
-                )
-            ),
-        );
+                        'paths' => [],
+                    ],
+                ]
+            ],
+        ];
     }
 }

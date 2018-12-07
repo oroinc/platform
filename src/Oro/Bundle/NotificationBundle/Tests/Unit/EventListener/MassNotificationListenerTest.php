@@ -2,88 +2,82 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\EventListener;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\NotificationBundle\Entity\MassNotification;
+use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
+use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
 use Oro\Bundle\NotificationBundle\EventListener\MassNotificationListener;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
 
 class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
+    private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $event;
-
-    /**
-     * @var MassNotificationListener
-     */
-    protected $listener;
+    /** @var MassNotificationListener */
+    private $listener;
 
     protected function setUp()
     {
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
-        $this->event = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Event\NotificationSentEvent')
-            ->disableOriginalConstructor()->getMock();
+        $this->em = $this->createMock(EntityManager::class);
 
-        $this->listener = new MassNotificationListener($this->em);
-    }
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->with(MassNotification::class)
+            ->willReturn($this->em);
 
-    protected function tearDown()
-    {
-        unset($this->em);
-        unset($this->listener);
-        unset($this->event);
+        $this->listener = new MassNotificationListener($doctrine);
     }
 
     public function testLogMassNotification()
     {
-        $spoolItem = $this->createMock('Oro\Bundle\NotificationBundle\Entity\SpoolItem');
         $date = new \DateTime('now');
         $message = $this->createMock('Swift_Mime_Message');
-        $message->expects($this->once())->method('getTo')->will($this->returnValue(['to@test.com' => 'test']));
-        $message->expects($this->once())->method('getFrom')->will($this->returnValue(['from@test.com' => 'test']));
-        $message->expects($this->once())->method('getDate')->will($this->returnValue($date->getTimestamp()));
-        $message->expects($this->once())->method('getSubject')->will($this->returnValue('test subject'));
-        $message->expects($this->once())->method('getBody')->will($this->returnValue('test body'));
-        
-        $spoolItem->expects($this->once())->method('getMessage')->will($this->returnValue($message));
-        $spoolItem->expects($this->once())->method('getLogType')->will(
-            $this->returnValue(MassNotificationSender::NOTIFICATION_LOG_TYPE)
-        );
+        $message->expects(self::once())->method('getTo')->willReturn(['to@test.com' => 'test']);
+        $message->expects(self::once())->method('getFrom')->willReturn(['from@test.com' => 'test']);
+        $message->expects(self::once())->method('getDate')->willReturn($date->getTimestamp());
+        $message->expects(self::once())->method('getSubject')->willReturn('test subject');
+        $message->expects(self::once())->method('getBody')->willReturn('test body');
 
-        $this->event->expects($this->once())->method('getSpoolItem')->will($this->returnValue($spoolItem));
-        $this->event->expects($this->once())->method('getSentCount')->will($this->returnValue(1));
-        $this->em->expects($this->once())->method('persist')->with($this->callback(
-            function ($logEntity) use ($message, $date) {
-                /** @var $logEntity MassNotification */
-                $this->assertTrue($logEntity instanceof MassNotification);
-                $this->assertEquals($logEntity->getEmail(), 'test <to@test.com>');
-                $this->assertEquals($logEntity->getSender(), 'test <from@test.com>');
-                $this->assertEquals($logEntity->getSubject(), 'test subject');
-                $this->assertEquals($logEntity->getBody(), 'test body');
-                $this->assertGreaterThanOrEqual($logEntity->getScheduledAt(), $date);
-                $this->assertEquals($logEntity->getStatus(), MassNotification::STATUS_SUCCESS);
+        $spoolItem = new SpoolItem();
+        $spoolItem->setMessage($message);
+        $spoolItem->setLogType(MassNotificationSender::NOTIFICATION_LOG_TYPE);
+
+        $event = new NotificationSentEvent($spoolItem, 1);
+
+        $this->em->expects(self::once())
+            ->method('persist')
+            ->willReturnCallback(function (MassNotification $logEntity) use ($date) {
+                self::assertEquals($logEntity->getEmail(), 'test <to@test.com>');
+                self::assertEquals($logEntity->getSender(), 'test <from@test.com>');
+                self::assertEquals($logEntity->getSubject(), 'test subject');
+                self::assertEquals($logEntity->getBody(), 'test body');
+                self::assertGreaterThanOrEqual($logEntity->getScheduledAt(), $date);
+                self::assertEquals($logEntity->getStatus(), MassNotification::STATUS_SUCCESS);
 
                 return true;
-            }
-        ));
-        $this->em->expects($this->once())->method('flush');
+            });
+        $this->em->expects(self::once())
+            ->method('flush')
+            ->with(self::isInstanceOf(MassNotification::class));
 
-        $this->listener->logMassNotification($this->event);
+        $this->listener->logMassNotification($event);
     }
 
     public function testNoLoggingDone()
     {
-        $spoolItem = $this->createMock('Oro\Bundle\NotificationBundle\Entity\SpoolItem');
-        $spoolItem->expects($this->once())->method('getLogType')->will(
-            $this->returnValue('non existing type')
-        );
-        $this->event->expects($this->once())->method('getSpoolItem')->will($this->returnValue($spoolItem));
-        $this->event->expects($this->once())->method('getSentCount')->will($this->returnValue(1));
+        $spoolItem = new SpoolItem();
+        $spoolItem->setLogType('non existing type');
 
-        $this->em->expects($this->never())->method('persist');
+        $event = new NotificationSentEvent($spoolItem, 1);
 
-        $this->listener->logMassNotification($this->event);
+        $this->em->expects(self::never())
+            ->method('persist');
+        $this->em->expects(self::never())
+            ->method('persist');
+
+        $this->listener->logMassNotification($event);
     }
 }

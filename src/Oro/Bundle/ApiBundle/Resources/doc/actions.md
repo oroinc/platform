@@ -685,7 +685,30 @@ The main processor class: [CustomizeLoadedDataProcessor](../../Processor/Customi
 
 As example of a processor used to modify the loaded data: [ComputePrimaryField](../../Processor/CustomizeLoadedData/ComputePrimaryField.php) or [Add a Computed Field](./how_to.md#add-a-computed-field). Run `php bin/console oro:api:debug customize_loaded_data` to display other processors registered in this action.
 
-Please none that all processors for this action has `identifier_only` tag attribute set to `false`. It means that such
+The `collection` tag attribute can be used for processors of this action to process all primary entities in
+[get_list](#get_list-action) or [get_subresource](#get_subresource-action) actions or all entities in `to-many`
+associations for [get](#get-action), [get_list](#get_list-action) or [get_subresource](#get_subresource-action) actions.
+An example of a case when using of this attribute can be helpful is if you want to execute one SQL query for all
+entities in a collection to get an additional data instead of executing a separate SQL query for each entity in a collection.
+The default value the `collection` tag attribute is `false`. An example of a processor that should be executed
+to a whole collection:
+
+```yaml
+services:
+    acme.api.process_my_collection:
+        class: Acme\Bundle\AppBundle\Api\Processor\ProcessMyCollection
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Acme\Bundle\AppBundle\Entity\MyEntity, collection: true }
+```
+
+**Important:**
+
+The collection elements are an associative array and processors responsible to customize the collection must keep
+keys in this array without changes.
+
+**Please note:**
+
+All processors for this action has `identifier_only` tag attribute set to `false`. It means that such
 processors are not executed during loading of relationships. If your processor should be executed
 during loading of relationships set `identifier_only` tag attribute to `true`. If your processor should be executed
 during loading of relationships, primary and included entities, set `identifier_only` tag attribute to `null`. E.g.:

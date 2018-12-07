@@ -3,6 +3,7 @@ oro:
         help:
             title: How To Use Pinbar
             message: Use pin icon on the right top corner of page to create fast access link in the pinbar.
+            pinbar.location: Location of the Pinbar icon
         menu:
             pinbar.label: Pinbar
             recent_pages.label: Recent pages

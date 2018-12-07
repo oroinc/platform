@@ -3,7 +3,7 @@
 [class^="fa-"],
 [class*=" fa-"] {
     display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
+    font: normal normal normal $base-font-size/1 FontAwesome;
     font-size: inherit;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
@@ -19,7 +19,7 @@
             padding: 0;
             text-indent: 0;
             font-size: $icon-font-size;
-            line-height: 1.3em;
+            line-height: 1;
             font-family: FontAwesome;
         }
     }

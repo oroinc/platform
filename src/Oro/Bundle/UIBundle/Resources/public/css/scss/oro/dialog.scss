@@ -53,6 +53,7 @@
         flex-grow: 1;
         flex-shrink: 1;
         text-align: $start;
+        margin-#{$end}: $content-padding-medium;
 
         .lang-en & {
             text-transform: capitalize;
@@ -82,6 +83,7 @@
 
     .ui-widget-content {
         border: $dialog-widget-content-border;
+        color: $dialog-widget-content-color;
     }
 
     &-titlebar-min {
@@ -241,6 +243,17 @@
 
         .action-wrapper {
             margin-#{$start}: $dialog-buttonpane-action-wrapper-offset-left;
+        }
+    }
+
+    .grid-toolbar {
+        min-width: $dialog-grid-toolbar-min-width;
+    }
+
+    // Reset offset for layout content into dialog
+    .ui-dialog-content {
+        form > .layout-content {
+            padding: 0;
         }
     }
 }

@@ -1,4 +1,5 @@
 /* @theme: admin.oro; */
+@import "oroui/css/scss/oro/variables";
 
 .widget-content > .label-info:first-child {
     margin-bottom: 10px;
@@ -320,8 +321,12 @@ label.required em,
     top: 0;
 }
 
-body .mce-tinymce {
-    width: 292px;
+.mce-tinymce {
+    width: $field-width;
+
+    .ui-dialog & {
+        max-width: $field-width;
+    }
 }
 
 textarea {
@@ -880,8 +885,25 @@ label .popover-body {
 
 .collapse-block {
     [data-collapse-container] {
+        position: relative;
+
+        max-height: round($font-size-base * $line-height-base * 3);
+
         overflow: hidden;
-        max-height: 69.4px; // 4 (lines) * 13px (font-size) * 1.2 (line-height) + 7px (padding)
+    }
+
+    &.overflows [data-collapse-container]:after {
+        position: absolute;
+        bottom: 0;
+
+        display: block;
+        height: round($font-size-base * $line-height-base);
+        width: 100%;
+
+        background-image: linear-gradient(to top, $primary-inverse, rgba($primary-inverse, 0.1));
+
+        content: '';
+        pointer-events: none;
     }
 
     &.expanded [data-collapse-container] {
@@ -905,4 +927,12 @@ label .popover-body {
 
 .url-actions a.btn {
     text-transform: none !important;
+}
+
+.oro-collapse-icon {
+    @include fa-icon($fa-var-minus-square-o);
+
+    @at-root .collapsed > .oro-collapse-icon {
+        @include fa-icon($fa-var-plus-square-o);
+    }
 }

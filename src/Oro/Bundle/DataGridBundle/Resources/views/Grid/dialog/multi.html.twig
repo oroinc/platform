@@ -44,17 +44,16 @@
         {% set togglerId = 'dropdown-'|uniqid %}
 
         <script type="text/template" id="multi-grid-item">
-            <li id="<%= entity.get('entityAlias') %>" class="context-item" data-cid="<%= entity.cid %>">
+            <li id="<%= entity.get('entityAlias') %>" class="context-item dropdown-item" data-cid="<%= entity.cid %>">
                 <%= entity.get('label') %>
             </li>
         </script>
 
         <div data-page-component-module="{{ multiGridComponent|default('orodatagrid/js/app/components/multi-grid-component') }}"
-             data-page-component-options="{{ options|json_encode }}" class="btn-group">
+             data-page-component-options="{{ options|json_encode }}" class="context-selector-dropdown dropdown dropdown--with-arrow">
             <button class="activity-context-current-block dropdown-toggle" type="button" id="{{ togglerId }}"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="activity-context-current-item"></span>
-                {{ UI.insertIcon('fa-caret-down') }}
             </button>
             <ul class="context-items-dropdown dropdown-menu" aria-labelledby="{{ togglerId }}"></ul>
         </div>

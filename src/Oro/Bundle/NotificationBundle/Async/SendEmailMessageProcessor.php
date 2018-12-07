@@ -37,30 +37,31 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @var TemplateEmailMessageSender
-     */
+    /** @var TemplateEmailMessageSender */
     private $templateEmailMessageSender;
 
     /**
-     * @param DirectMailer    $mailer
-     * @param Processor       $processor
-     * @param ManagerRegistry $managerRegistry
-     * @param EmailRenderer   $emailRenderer
-     * @param LoggerInterface $logger
+     * @param DirectMailer               $mailer
+     * @param Processor                  $processor
+     * @param ManagerRegistry            $managerRegistry
+     * @param EmailRenderer              $emailRenderer
+     * @param LoggerInterface            $logger
+     * @param TemplateEmailMessageSender $templateEmailMessageSender
      */
     public function __construct(
         DirectMailer $mailer,
         Processor $processor,
         ManagerRegistry $managerRegistry,
         EmailRenderer $emailRenderer,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        TemplateEmailMessageSender $templateEmailMessageSender
     ) {
         $this->mailer = $mailer;
         $this->mailerProcessor = $processor;
         $this->managerRegistry = $managerRegistry;
         $this->emailRenderer = $emailRenderer;
         $this->logger = $logger;
+        $this->templateEmailMessageSender = $templateEmailMessageSender;
     }
 
     /**
@@ -89,7 +90,7 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
         }
 
         $failedRecipients = [];
-        if ($this->templateEmailMessageSender && $this->templateEmailMessageSender->isTranslatable($data)) {
+        if ($this->templateEmailMessageSender->isTranslatable($data)) {
             $result = $this->templateEmailMessageSender->sendTranslatedMessage($data, $failedRecipients);
         } else {
             if (isset($data['template'])) {
@@ -124,14 +125,6 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
         }
 
         return self::ACK;
-    }
-
-    /**
-     * @param TemplateEmailMessageSender $templateEmailMessageSender
-     */
-    public function setTemplateEmailMessageSender(TemplateEmailMessageSender $templateEmailMessageSender)
-    {
-        $this->templateEmailMessageSender = $templateEmailMessageSender;
     }
 
     /**

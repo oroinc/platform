@@ -1,6 +1,6 @@
 /* @theme: admin.oro; */
 
-@mixin badge-custom-variant($background, $color: color-yiq($background), $icon-color) {
+@mixin badge-custom-variant($background, $icon-color, $color: color-yiq($background)) {
     color: $color;
     background-color: $background;
 

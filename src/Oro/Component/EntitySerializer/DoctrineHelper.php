@@ -4,19 +4,21 @@ namespace Oro\Component\EntitySerializer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
+/**
+ * Provides a set of helper methods to work with manageable ORM entities.
+ */
 class DoctrineHelper
 {
-    const KEY_METADATA = 'metadata';
-    const KEY_ID_FIELD = 'id';
+    private const KEY_METADATA = 'metadata';
+    private const KEY_ID_FIELD = 'id';
 
     /** @var ManagerRegistry */
-    protected $doctrine;
+    private $doctrine;
 
     /** @var array */
-    protected $cache = [];
+    private $cache = [];
 
     /**
      * @param ManagerRegistry $doctrine
@@ -27,7 +29,7 @@ class DoctrineHelper
     }
 
     /**
-     * Checks whether the given class is manageable entity.
+     * Checks whether the given class represents a manageable entity.
      *
      * @param string $entityClass
      *
@@ -39,6 +41,8 @@ class DoctrineHelper
     }
 
     /**
+     * Gets the entity manager associated with the given entity class.
+     *
      * @param string $entityClass
      *
      * @return EntityManager
@@ -56,16 +60,23 @@ class DoctrineHelper
     }
 
     /**
-     * @param string $entityClass
+     * Creates a new query builder object for the given entity class.
      *
-     * @return EntityRepository
+     * @param string $entityClass
+     * @param string $alias
+     *
+     * @return QueryBuilder
      */
-    public function getEntityRepository($entityClass)
+    public function createQueryBuilder($entityClass, $alias)
     {
-        return $this->getEntityManager($entityClass)->getRepository($entityClass);
+        return $this->getEntityManager($entityClass)
+            ->getRepository($entityClass)
+            ->createQueryBuilder($alias);
     }
 
     /**
+     * Gets the ORM metadata for the given entity class.
+     *
      * @param string $entityClass
      *
      * @return EntityMetadata
@@ -85,7 +96,7 @@ class DoctrineHelper
     }
 
     /**
-     * Gets the full class name for the given entity
+     * Gets the full class name for the given entity.
      *
      * @param string $entityName The name of the entity. Can be bundle:entity or full class name
      *
@@ -94,23 +105,25 @@ class DoctrineHelper
      */
     public function resolveEntityClass($entityName)
     {
-        $split = explode(':', $entityName);
-        if (count($split) <= 1) {
-            // The given entity name is not in bundle:entity format. Suppose that it is the full class name
+        $parts = explode(':', $entityName);
+        $numberOfParts = count($parts);
+        if ($numberOfParts <= 1) {
+            // the given entity name is not in bundle:entity format; it is supposed that it is the full class name
             return $entityName;
-        } elseif (count($split) > 2) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Incorrect entity name: %s. Expected the full class name or bundle:entity.',
-                    $entityName
-                )
-            );
+        }
+        if ($numberOfParts > 2) {
+            throw new \InvalidArgumentException(sprintf(
+                'Incorrect entity name: %s. Expected the full class name or bundle:entity.',
+                $entityName
+            ));
         }
 
-        return $this->doctrine->getAliasNamespace($split[0]) . '\\' . $split[1];
+        return $this->doctrine->getAliasNamespace($parts[0]) . '\\' . $parts[1];
     }
 
     /**
+     * Gets the root alias of the given query.
+     *
      * @param QueryBuilder $qb
      *
      * @return string
@@ -121,21 +134,18 @@ class DoctrineHelper
     {
         $aliases = $qb->getRootAliases();
         if (count($aliases) !== 1) {
-            if (count($aliases) === 0) {
-                throw new \RuntimeException(
-                    'Cannot get root alias. A query builder has no root entity.'
-                );
-            } else {
-                throw new \RuntimeException(
-                    'Cannot get root alias. A query builder has more than one root entity.'
-                );
-            }
+            throw new \RuntimeException(
+                'Cannot get root alias. A query builder has '
+                . (count($aliases) === 0 ? 'no root entity.' : 'more than one root entity.')
+            );
         }
 
         return $aliases[0];
     }
 
     /**
+     * Gets the root entity class of the given query.
+     *
      * @param QueryBuilder $qb
      *
      * @return string
@@ -146,22 +156,17 @@ class DoctrineHelper
     {
         $entities = $qb->getRootEntities();
         if (count($entities) !== 1) {
-            if (count($entities) === 0) {
-                throw new \RuntimeException(
-                    'Cannot get root entity class. A query builder has no root entity.'
-                );
-            } else {
-                throw new \RuntimeException(
-                    'Cannot get root entity class. A query builder has more than one root entity.'
-                );
-            }
+            throw new \RuntimeException(
+                'Cannot get root entity class. A query builder has '
+                . (count($entities) === 0 ? 'no root entity.' : 'more than one root entity.')
+            );
         }
 
         return $this->resolveEntityClass($entities[0]);
     }
 
     /**
-     * Gets the name of entity identifier field if an entity has a single-field identifier
+     * Gets the name of entity identifier field if an entity has a single-field identifier.
      *
      * @param string $entityClass
      *
@@ -177,5 +182,45 @@ class DoctrineHelper
         $this->cache[$entityClass][self::KEY_ID_FIELD] = $idFieldName;
 
         return $idFieldName;
+    }
+
+    /**
+     * Gets the data-type of entity identifier field if an entity has a single-field identifier.
+     *
+     * @param string $entityClass
+     *
+     * @return string|null
+     */
+    public function getEntityIdType($entityClass)
+    {
+        return $this->getEntityMetadata($entityClass)
+            ->getFieldType($this->getEntityIdFieldName($entityClass));
+    }
+
+    /**
+     * Gets the target class name of an association by the given property path.
+     *
+     * @param EntityMetadata $entityMetadata
+     * @param string[]       $propertyPath
+     *
+     * @return string|null
+     */
+    public function getAssociationTargetClass(EntityMetadata $entityMetadata, array $propertyPath): ?string
+    {
+        $targetClass = null;
+        $currentMetadata = $entityMetadata;
+        foreach ($propertyPath as $property) {
+            if (null === $currentMetadata) {
+                $currentMetadata = $this->getEntityMetadata($targetClass);
+            }
+            if (!$currentMetadata->isAssociation($property)) {
+                $targetClass = null;
+                break;
+            }
+            $targetClass = $currentMetadata->getAssociationTargetClass($property);
+            $currentMetadata = null;
+        }
+
+        return $targetClass;
     }
 }

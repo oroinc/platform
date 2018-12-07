@@ -37,8 +37,7 @@ class AuditInsertedEntitiesTest extends WebTestCase
             'entities_inserted' => [
                 [
                     'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => 123,
-                    'change_set' => [],
+                    'entity_id' => 123
                 ]
             ],
         ]);

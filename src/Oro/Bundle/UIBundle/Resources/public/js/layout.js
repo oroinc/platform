@@ -336,6 +336,36 @@ define(function(require) {
 
         onContentRemove: function(e) {
             layout.unstyleForm($(e.target));
+        },
+
+        /**
+         * Adjust width for form labels into dialog form
+         * @private
+         */
+        adjustLabelsWidth: function($context) {
+            var controlGroups = $context.find('.control-group').filter(function(i, group) {
+                return !$(group).find('> .control-label').length && !$(group).closest('.tab-content').length;
+            });
+            var labels = $context.find('.control-label').filter(function(i, label) {
+                return !$(label).closest('.widget-title-container').length;
+            });
+
+            labels.css('width', '');
+
+            var width = labels.map(function(i, label) {
+                return label.clientWidth;
+            }).get();
+
+            var newWidth = Math.max.apply(null, width) + 1;
+            labels.css('width', newWidth);
+
+            controlGroups.each(function(i, group) {
+                var prop = 'margin-' + (_.isRTL() ? 'right' : 'left');
+                var controls = $(group).find('> .controls');
+                controls
+                    .css(prop, '')
+                    .css(prop, parseInt(controls.css(prop)) + newWidth);
+            });
         }
     };
 
