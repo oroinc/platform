@@ -111,7 +111,7 @@ oro_behat_extension:
     ContextSelector:
       selector:
         type: xpath
-        locator: '//div[contains(@class, "ui-dialog")]/div[contains(@class, "widget-content")]/div[contains(@class, "context-selector-dropdown")]'
+        locator: '//div[contains(@class, "ui-dialog")]/div[contains(@class, "widget-content")]/div[contains(@class, "dropdown")]'
       class: Oro\Bundle\UIBundle\Tests\Behat\Element\ContextSelector
 
     Application Settings Form:

@@ -1,6 +1,9 @@
 /* @theme: admin.oro; */
+
 @import "oroui/css/scss/variables";
 @import "oroui/css/scss/mixins";
 @import "orotag/css/scss/variables";
 
 @import "./variables/activity-context-variables";
+@import "./variables/activity-context-current-block-variables";
+@import "./variables/context-item-variables";

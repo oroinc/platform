@@ -1,0 +1,18 @@
+/* @theme: admin.oro; */
+
+$context-item-background: $tag-item-background !default;
+$context-item-color: $tag-item-color !default;
+$context-item-offset: 8px !default;
+$context-item-inner-offset: 6px 12px !default;
+$context-item-display: inline-block !default;
+$context-item-font-size: $base-font-size--s !default;
+$context-item-border-radius: 16px !default;
+
+$context-item-active-background-color: $secondary-dark !default;
+$context-item-active-color: $primary-inverse !default;
+
+$context-label-width: 180px !default;
+
+$context-icon-offset: 8px !default;
+
+$cell-context-item-offset: side-values(0 0 4px 0) !default;
