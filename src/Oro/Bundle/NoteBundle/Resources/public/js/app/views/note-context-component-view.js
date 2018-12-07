@@ -19,7 +19,7 @@ define([
          */
         initialize: function() {
             this.on('render', function() {
-                var $icons = this.$el.find('i.fa-close');
+                var $icons = this.$el.find('[data-role="delete-item"]');
 
                 if (this.collection.length === 1) {
                     $icons.css('visibility', 'hidden');

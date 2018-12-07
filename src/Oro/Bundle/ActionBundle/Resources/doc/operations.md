@@ -149,7 +149,7 @@ php bin/console oro:action:configuration:validate
 **Oro Action Bundle** defines several system wide default operations for a common purpose. Those are basic CRUD-called operations for entities:
  
  - `UPDATE` - operation for an entity editing that uses a route from the `routeUpdate` option of the entity configuration.
- - `DELETE` - operation for an entity deletion that uses a route from the `routeDelete` option of the entity configuration.
+ - `DELETE` - operation for an entity deletion that uses a route from the `routeName` option of the entity configuration.
 
   If the default operations are used in the nondefault applications, as in `commerce`, for example, the routes are retrieved from the `routeCommerceUpdate` and `routeCommerceDelete` options.
 

@@ -7,7 +7,7 @@ oro_behat_extension:
     Context Entity Dropdown:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
       selector:
-        locator: '//button[@class="activity-context-current-block dropdown-toggle"]'
+        locator: '//div[@class="activity-context-current-block dropdown-toggle"]'
         type: xpath
 
     View selector:
