@@ -1,7 +1,7 @@
 <div class="inline-editor__fields">
     <select multiple>
         <% _.each(options, function (option) { %>
-        <option value="<%= option.id %>" title="<%- option.text %>"
+        <option value="<%- option.id %>" title="<%- option.text %>"
         <% if (_.indexOf(value, option.id) !== -1) { %> selected="selected"<% } %>>
         <%- option.text %>
         </option>
@@ -10,7 +10,7 @@
 </div>
 <div class="inline-editor__actions inline-editor__actions--over-multiselect">
     <button class="inline-editor__action-item" type="submit" data-role="apply"
-            title="<%= _.__('oro.form.inlineEditing.action.save') %>"><i class="fa-check-square-o"></i></button>
+            title="<%- _.__('oro.form.inlineEditing.action.save') %>"><i class="fa-check-square-o"></i></button>
     <button class="inline-editor__action-item" data-action="cancel"
-            title="<%= _.__('oro.form.inlineEditing.action.cancel') %>"><i class="fa-ban"></i></button>
+            title="<%- _.__('oro.form.inlineEditing.action.cancel') %>"><i class="fa-ban"></i></button>
 </div>
