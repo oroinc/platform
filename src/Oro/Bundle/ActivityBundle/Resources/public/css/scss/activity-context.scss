@@ -10,35 +10,6 @@
     margin-bottom: $activity-context-activity-list-offset;
 }
 
-.activity-context-activity-items .context-item {
-    background: $activity-context-item-background;
-    color: $activity-context-item-color;
-    display: $activity-context-item-display;
-    margin: $activity-context-item-offset;
-    font-size: $activity-context-item-font-size;
-    line-height: 1;
-}
-
-.cell-context-item,
-.context-item {
-    .context-label {
-        max-width: 180px;
-        display: inline-block;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        vertical-align: bottom;
-    }
-}
-
-.context-item {
-    cursor: pointer;
-}
-
-.cell-context-item {
-    display: inline-block;
-    white-space: nowrap;
-}
-
 .activity-context-activity-label {
     float: $start;
     margin: $activity-context-activity-label-offset;
@@ -47,7 +18,7 @@
 }
 
 .activity-context-activity-items {
-    margin: $activity-context-activity-items-offset;
+    margin-#{$start}: $activity-context-activity-items-offset;
 }
 
 .activity-context-activity-block {
@@ -69,26 +40,5 @@
         .context-item .fa-close {
             cursor: pointer;
         }
-    }
-}
-
-.activity-context-current-block {
-    cursor: pointer;
-    background-color: #fff;
-    border: none;
-    outline: none;
-    margin: side-values(10px 10px 15px 0);
-    padding: 0;
-    box-shadow: none;
-
-    .btn-group.open & {
-        box-shadow: none;
-    }
-
-    .activity-context-current-item {
-        font-size: $base-font-size--l;
-        line-height: $base-font-size--l;
-        font-weight: 700;
-        color: $primary-200;
     }
 }

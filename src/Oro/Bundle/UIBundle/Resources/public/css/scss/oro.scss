@@ -475,7 +475,7 @@ h5.user-fieldset {
 }
 
 .page-size .dropdown-menu {
-    min-width: 100%;
+    min-width: inherit;
 }
 
 .separator-btn {
@@ -927,4 +927,12 @@ label .popover-body {
 
 .url-actions a.btn {
     text-transform: none !important;
+}
+
+.oro-collapse-icon {
+    @include fa-icon($fa-var-minus-square-o);
+
+    @at-root .collapsed > .oro-collapse-icon {
+        @include fa-icon($fa-var-plus-square-o);
+    }
 }

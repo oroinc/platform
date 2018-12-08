@@ -59,9 +59,9 @@ define(function(require) {
                 }
 
                 dropdown.append($view);
-                dropdown.find('.context-item:last').click(function() {
+                dropdown.find('.dropdown-item:last').click(function() {
                     self.currentTargetClass(model.attributes.className);
-                    dropdown.find('> .context-item').each(function() {
+                    dropdown.find('> .dropdown-item').each(function() {
                         $(this).removeClass('active');
                     });
                     var item = $(this);
