@@ -12,6 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResol
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
+use Oro\Bundle\TestFrameworkBundle\Test\Event\DisableListenersForDataFixturesEvent;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Testing\DbIsolationExtension;
@@ -20,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -526,13 +528,34 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * @return string[]
+     */
+    protected function getListenersThatShouldBeDisabledDuringDataFixturesLoading()
+    {
+        $event = new DisableListenersForDataFixturesEvent();
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = self::getContainer()->get('event_dispatcher');
+        $eventDispatcher->dispatch(DisableListenersForDataFixturesEvent::NAME, $event);
+
+        return array_merge(
+            [
+                'oro_dataaudit.listener.send_changed_entities_to_message_queue',
+                'oro_sync.event_listener.doctrine_tag',
+                'oro_search.index_listener'
+            ],
+            $event->getListeners()
+        );
+    }
+
+    /**
      * @param DataFixturesExecutor $executor
      * @param DataFixturesLoader   $loader
      */
     private function doLoadFixtures(DataFixturesExecutor $executor, DataFixturesLoader $loader)
     {
+        $container = self::getContainer();
         /** @var TestBufferedMessageProducer|null $messageProducer */
-        $messageProducer = self::getContainer()->get(
+        $messageProducer = $container->get(
             'oro_message_queue.client.buffered_message_producer',
             ContainerInterface::NULL_ON_INVALID_REFERENCE
         );
@@ -540,6 +563,11 @@ abstract class WebTestCase extends BaseWebTestCase
             $messageProducer = null;
         }
 
+        // disable some listeners to speed up loading of fixtures
+        $listenersToDisable = $this->getListenersThatShouldBeDisabledDuringDataFixturesLoading();
+        foreach ($listenersToDisable as $listenerServiceId) {
+            $container->get($listenerServiceId)->setEnabled(false);
+        }
         // prevent sending of messages during loading of fixtures,
         // because fixtures are used to prepare data for tests
         // and it makes no sense to send messages before a test starts
@@ -551,6 +579,9 @@ abstract class WebTestCase extends BaseWebTestCase
         try {
             $executor->execute($loader->getFixtures(), true);
         } finally {
+            foreach ($listenersToDisable as $listenerServiceId) {
+                $container->get($listenerServiceId)->setEnabled(true);
+            }
             if ($restoreSendingOfMessages) {
                 $messageProducer->restoreSendingOfMessages();
             }
