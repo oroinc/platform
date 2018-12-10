@@ -9,8 +9,8 @@ trait UpdatedByAwareTrait
     /**
      * @var User
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="updated_by_user_id", referencedColumnName="id", onDelete="SET NULL")
+     * @Doctrine\ORM\Mapping\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @Doctrine\ORM\Mapping\JoinColumn(name="updated_by_user_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $updatedBy;
 
