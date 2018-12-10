@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\EntityProperty;
 
+/**
+ * Add update date support to entities
+ */
 trait UpdatedAtAwareTrait
 {
     /**

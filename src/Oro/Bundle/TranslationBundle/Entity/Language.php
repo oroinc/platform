@@ -31,6 +31,8 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  *          }
  *      }
  * )
+ *
+ * Store Language in a database
  */
 class Language implements DatesAwareInterface, OrganizationAwareInterface
 {

@@ -4,6 +4,9 @@ namespace Oro\Bundle\EntityBundle\EntityProperty;
 
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Add update by support to entities
+ */
 trait UpdatedByAwareTrait
 {
     /**

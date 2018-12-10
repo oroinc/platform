@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\EntityProperty;
 
+/**
+ * Add create date support to entities
+ */
 trait CreatedAtAwareTrait
 {
     /**
