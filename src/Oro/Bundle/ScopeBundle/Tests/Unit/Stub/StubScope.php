@@ -56,6 +56,8 @@ class StubScope extends Scope
             $name = lcfirst(substr($name, 3));
 
             $this->attributes[$name] = $args[0];
+
+            return $this;
         }
         throw new \InvalidArgumentException();
     }
