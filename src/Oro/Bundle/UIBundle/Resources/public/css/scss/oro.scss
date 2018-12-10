@@ -583,13 +583,13 @@ label.radio.error {
     }
 
     .row-oro.oro-multiselect-holder {
-        margin: 0 0 8px;
+        margin: 0 0 $content-padding-small;
     }
 
     .enum-value-collection & {
         .row-oro {
             &.oro-multiselect-holder {
-                margin: 0 0 10px;
+                margin: 0 0 $content-padding-small;
             }
         }
 
@@ -609,7 +609,7 @@ label.radio.error {
 .oro-address-collection.oro-item-collection {
     & > div {
         position: relative;
-        padding: 16px 0;
+        padding: $content-padding-medium 0;
         margin: 0 0 20px;
         border: 1px solid $primary-860;
         background: $primary-900;
