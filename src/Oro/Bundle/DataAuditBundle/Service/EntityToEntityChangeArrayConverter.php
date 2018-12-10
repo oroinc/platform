@@ -3,6 +3,7 @@ namespace Oro\Bundle\DataAuditBundle\Service;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMInvalidArgumentException;
 
 use Oro\Bundle\DataAuditBundle\Entity\AuditAdditionalFieldsInterface;
 
@@ -100,12 +101,17 @@ class EntityToEntityChangeArrayConverter
      * @param EntityManagerInterface $em
      * @param object $entity
      *
-     * @return int|string
+     * @return int|string|null
      */
     private function getEntityId(EntityManagerInterface $em, $entity)
     {
-        return $em->getClassMetadata(ClassUtils::getClass($entity))
-            ->getSingleIdReflectionProperty()
-            ->getValue($entity);
+        try {
+            return $em->getUnitOfWork()->getSingleIdentifierValue($entity);
+        } catch (ORMInvalidArgumentException $e) {
+            throw new \LogicException(sprintf(
+                'The entity "%s" has a composite identifier. The data audit does not support such identifiers.',
+                ClassUtils::getClass($entity)
+            ));
+        }
     }
 }

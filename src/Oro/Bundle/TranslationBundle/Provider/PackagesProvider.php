@@ -75,13 +75,7 @@ class PackagesProvider implements PackageProviderInterface
      */
     public function getInstalledPackages()
     {
-        $packages = $this->getPackageManager()->getInstalled();
-        $packages = array_map(
-            function (PackageInterface $package) {
-                return $package->getName();
-            },
-            $packages
-        );
+        $packages = [];
 
         // collect bundle namespaces
         foreach ($this->bundles as $bundle) {

@@ -180,13 +180,35 @@ services:
     oro_translation.packages_provider.translation:
         class: 'Oro\Bundle\TranslationBundle\Provider\TranslationPackageProvider'
 
+    # this instance of the composer does not require the full initialization
+    # and can work without Phar and Zip PHP extensions
+    oro_translation.composer:
+        class: Composer\Composer
+        public: false
+        factory: ['@oro_translation.composer.factory', createComposer]
+        arguments:
+            - '@oro_translation.composer.io'
+            - '%kernel.root_dir%/../composer.json'
+            - false
+            - ~
+            - false
+        lazy: true
+
+    oro_translation.composer.factory:
+        class: Composer\Factory
+        public: false
+
+    oro_translation.composer.io:
+        class: Composer\IO\BufferIO
+        public: false
+
     oro_translation.extension.transtation_packages_provider.abstract:
         class: 'Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtension'
         abstract: true
         public: false
         arguments:
             - '@oro_platform.composer.local_repo_factory'
-            - '@oro_distribution.composer'
+            - '@oro_translation.composer'
 
     oro_translation.extension.transtation_packages_provider:
         parent: oro_translation.extension.transtation_packages_provider.abstract

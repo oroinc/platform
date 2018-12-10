@@ -260,10 +260,11 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
                 continue;
             }
 
-            $changeSet = [];
-            $entityMeta = $em->getClassMetadata($entityClass);
+            $deletion = $this->convertEntityToArray($em, $entity, []);
 
             // in order to audit many to one inverse side we have to store some info to change set.
+            $changeSet = [];
+            $entityMeta = $em->getClassMetadata($entityClass);
             foreach ($entityMeta->associationMappings as $filedName => $mapping) {
                 if (ClassMetadataInfo::MANY_TO_ONE === $mapping['type']) {
                     $relatedEntity = $entityMeta->getFieldValue($entity, $filedName);
@@ -275,8 +276,21 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
                     }
                 }
             }
+            if (!empty($changeSet)) {
+                $deletion['change_set'] = $changeSet;
+            }
 
-            $deletions[$entity] = $this->convertEntityToArray($em, $entity, $changeSet);
+            if (null === $deletion['entity_id']) {
+                $this->logger->error(
+                    sprintf('The entity "%s" has an empty id.', $deletion['entity_class']),
+                    ['entity' => $entity, 'deletion' => $deletion]
+                );
+                if (!empty($deletion['change_set'])) {
+                    $deletions[$entity] = $deletion;
+                }
+            } else {
+                $deletions[$entity] = $deletion;
+            }
         }
 
         $this->saveChanges($this->allDeletions, $em, $deletions);
@@ -432,22 +446,21 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     }
 
     /**
-     * @param object $entity
-     * @param array $changeSet
-     * @return null|array
+     * @param EntityManager $entityManager
+     * @param object        $entity
+     * @param array         $changeSet
+     *
+     * @return array|null
      */
     private function processUpdate(EntityManager $entityManager, $entity, array $changeSet)
     {
         $update = $this->convertEntityToArray($entityManager, $entity, $changeSet);
-        if ($update['entity_id']) {
+        if (null !== $update['entity_id']) {
             return $update;
         }
 
         $this->logger->error(
-            sprintf(
-                'The entity %s has an empty id. Possibly $entity->setId(null) was executed',
-                $update['entity_class']
-            ),
+            sprintf('The entity "%s" has an empty id.', $update['entity_class']),
             ['entity' => $entity, 'update' => $update]
         );
 
