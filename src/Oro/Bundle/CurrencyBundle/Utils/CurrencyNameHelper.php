@@ -76,10 +76,7 @@ class CurrencyNameHelper
 
         switch ($nameViewStyle) {
             case ViewTypeProviderInterface::VIEW_TYPE_SYMBOL:
-                $currencyName = $this->intlCurrencyBundle->getCurrencySymbol($currencyIsoCode, $locale);
-                if ($currencyName === $currencyIsoCode) {
-                    $currencyName = $this->localeSettings->getCurrencySymbolByCurrency($currencyIsoCode, $locale);
-                }
+                $currencyName = $this->localeSettings->getCurrencySymbolByCurrency($currencyIsoCode, $locale);
                 break;
             case ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME:
                 $currencyName = $this->intlCurrencyBundle->getCurrencyName($currencyIsoCode, $locale);
