@@ -10,6 +10,8 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
 
 /**
+ * Store Language in a database
+ *
  * @ORM\Table(name="oro_language")
  * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -31,8 +33,6 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  *          }
  *      }
  * )
- *
- * Store Language in a database
  */
 class Language implements DatesAwareInterface, OrganizationAwareInterface
 {
