@@ -57,12 +57,6 @@ services:
         tags:
             - { name: 'context.initializer' }
 
-    oro_behat_extension.message_queue_isolator_initializer:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\MessageQueueIsolatorInitializer
-        tags:
-            - { name: 'context.initializer' }
-            - { name: 'message_queue_isolator_aware' }
-
     oro_test.context.fixture_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader
         arguments:
@@ -143,3 +137,20 @@ services:
             - '@symfony2_extension.kernel'
         tags:
             - { name: 'context.class_resolver' }
+
+    oro_test.processor.message_queue:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessor
+        arguments:
+            - '@symfony2_extension.kernel'
+
+    oro_test.processor.message_queue.dbal:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\DbalMessageQueueProcessor
+        arguments:
+            - '@symfony2_extension.kernel'
+            - '@oro_test.processor.message_queue'
+
+    oro_test.processor.message_queue.amqp:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\AmqpMessageQueueProcessor
+        arguments:
+            - '@symfony2_extension.kernel'
+            - '@oro_test.processor.message_queue'

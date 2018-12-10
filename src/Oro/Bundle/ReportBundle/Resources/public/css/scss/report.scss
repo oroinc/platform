@@ -1,0 +1,22 @@
+/* @theme: admin.oro; */
+
+.report-designer {
+    position: relative;
+}
+.form-horizontal .report-descr textarea {
+    height: 54px;
+}
+
+.desktop-version .chart-wrapper {
+    width: 70%;
+    padding: 25px;
+    margin: 0 auto;
+}
+
+.mobile-version .chart-wrapper {
+    margin-top: 20px;
+}
+
+.oro_report-columns:not(:last-child) {
+    margin-bottom: 22px;
+}

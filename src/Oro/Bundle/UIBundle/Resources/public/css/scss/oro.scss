@@ -1,4 +1,5 @@
 /* @theme: admin.oro; */
+@import "oroui/css/scss/oro/variables";
 
 .widget-content > .label-info:first-child {
     margin-bottom: 10px;
@@ -320,8 +321,12 @@ label.required em,
     top: 0;
 }
 
-body .mce-tinymce {
-    width: 292px;
+.mce-tinymce {
+    width: $field-width;
+
+    .ui-dialog & {
+        max-width: $field-width;
+    }
 }
 
 textarea {
@@ -470,7 +475,7 @@ h5.user-fieldset {
 }
 
 .page-size .dropdown-menu {
-    min-width: 100%;
+    min-width: inherit;
 }
 
 .separator-btn {
@@ -922,4 +927,12 @@ label .popover-body {
 
 .url-actions a.btn {
     text-transform: none !important;
+}
+
+.oro-collapse-icon {
+    @include fa-icon($fa-var-minus-square-o);
+
+    @at-root .collapsed > .oro-collapse-icon {
+        @include fa-icon($fa-var-plus-square-o);
+    }
 }

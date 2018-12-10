@@ -1,4 +1,4 @@
 assets:
     css:
-        'oroactivity':
+        inputs:
             - 'bundles/oroactivity/css/scss/main.scss'

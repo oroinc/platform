@@ -24,7 +24,7 @@ define(function(require) {
             options.snapshot = options.snapshot || {};
 
             options.content = new options.contentView({
-                className: 'sidebar-widget-setup',
+                className: 'sidebar-widget-setup form-horizontal',
                 model: this.model
             });
 

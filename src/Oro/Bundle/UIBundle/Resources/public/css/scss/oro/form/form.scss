@@ -55,14 +55,17 @@
     Uploader uniform
 **/
 .uploader {
+    float: $uploader-float;
+
+    color: $uploader-color;
     border-radius: $uploader-border-radius;
     background-color: $uploader-background-color;
     border: $input-border-width solid $input-border-color;
     height: $uploader-height;
-    line-height: $uploader-line-height;
-    float: $uploader-float;
+    width: $uploader-width;
+
     white-space: $uploader-white-space;
-    color: $uploader-color;
+    line-height: $uploader-line-height;
     font-family: $uploader-font-family;
 
     input {
@@ -84,7 +87,7 @@
     }
 
     .action {
-        border-left: $input-border-width solid $input-border-color;
+        border-#{$start}: $input-border-width solid $input-border-color;
     }
 
     &.focus,
@@ -110,6 +113,27 @@
         background-color: $input-disabled-background-color;
         color: $input-disabled-color;
         resize: $input-disabled-resize;
+    }
+
+    &.error {
+        border-color: $danger-dark;
+
+        .action {
+            border-color: $danger-dark;
+        }
+
+        &.focus,
+        &.hover {
+            border-color: $danger-dark;
+
+            .action {
+                border-color: $danger-dark;
+            }
+        }
+    }
+
+    .validation-failed {
+        padding-top: 4px;
     }
 }
 
@@ -172,11 +196,13 @@ select[multiple] {
 .selector {
     line-height: $selector-line-height;
     height: $selector-height;
-    width: $selector-width;
     border: $selector-border;
     background-color: $selector-background-color;
     border-radius: $selector-border-radius;
     padding: $selector-inner-offset;
+
+    max-width: $selector-max-width;
+    width: $selector-width;
 
     option {
         padding-left: $selector-option-inner-offset-left;
@@ -191,6 +217,10 @@ select[multiple] {
         width: $selector-select-width;
         box-sizing: $selector-select-box-sizing;
         color: $selector-select-color;
+
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
     }
 
     span {
@@ -203,6 +233,7 @@ select[multiple] {
         overflow: $selector-uniform-overflow;
         text-overflow: $selector-uniform-text-overflow;
         position: $selector-uniform-position;
+        width: $selector-uniform-width;
 
         &:after {
             content: "\f0dd";
@@ -300,7 +331,6 @@ select[multiple] {
 
     .error & {
         border-color: $input-error-border-color;
-        color: $input-error-border-color;
     }
 
     .input-append & {
@@ -361,27 +391,37 @@ select[multiple] {
     }
 }
 
-.form-horizontal .control-group {
-    margin: 0;
-    max-width: 800px;
+.form-horizontal {
+    > .span6 {
+        max-width: $form-container-column-max-width;
+        margin-#{$end}: $form-container-column-offset-right;
+        float: $start;
+
+        &:not(:last-of-type) {
+            margin-bottom: $form-container-control-row-space;
+        }
+    }
+
+    .control-group {
+        margin: 0;
+        max-width: 800px;
+
+        &--column {
+            flex-direction: column;
+        }
+    }
 }
 
 .form-container,
 .form-horizontal {
     .control-group {
         &:not(:last-of-type) {
-            margin: 0 0 $form-container-control-row-space;
+            margin-bottom: $form-container-control-row-space;
         }
-    }
-}
 
-/* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
-.controls {
-    select:not([multiple]) {
-        width: $select-width;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
+        &--column:not(:last-of-type) {
+            margin: 0;
+        }
     }
 }
 

@@ -1,4 +1,4 @@
 assets:
     css:
-        'oroconfig':
+        inputs:
           - 'bundles/oroconfig/css/scss/main.scss'

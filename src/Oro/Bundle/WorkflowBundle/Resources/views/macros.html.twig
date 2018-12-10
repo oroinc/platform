@@ -83,7 +83,7 @@
     {% set class %}
         {{ aClass }}
         icons-holder-text
-        {% if not onlyLink|default(false) %}btn workflow-transition-buttons{% endif %}
+        {% if not onlyLink|default(false) %}btn btn-sm workflow-transition-buttons{% endif %}
         {% if transition.displayType == 'dialog' %}no-hash{% endif %}
         {% if not transitionData.enabled %}disabled{% endif %}
         {{ transition.frontendOptions.class|default('') }}

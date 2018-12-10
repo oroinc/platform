@@ -26,7 +26,6 @@ class OroDistributionExtension extends Extension
         $loader->load('services.yml');
         $loader->load('commands.yml');
 
-        $this->mergeAsseticBundles($container);
         $this->mergeTwigResources($container);
         $this->replaceTranslator($container);
 
@@ -36,28 +35,6 @@ class OroDistributionExtension extends Extension
             }
             $container->setParameter('oro_distribution.composer_cache_home', $config['composer_cache_home']);
         }
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    protected function mergeAsseticBundles(ContainerBuilder $container)
-    {
-        $data = array();
-
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $file = dirname($reflection->getFileName()) . '/Resources/config/oro/assetic.yml';
-            if (is_file($file)) {
-                $data = array_merge($data, Yaml::parse(file_get_contents(realpath($file)))['bundles']);
-            }
-        }
-
-        $container->setParameter(
-            'assetic.bundles',
-            array_unique(array_merge((array)$container->getParameter('assetic.bundles'), $data))
-        );
     }
 
     /**

@@ -1,0 +1,57 @@
+/* @theme: admin.oro; */
+
+.cell-context-item,
+.context-item {
+    display: $context-item-display;
+    padding: $context-item-inner-offset;
+
+    font-size: $context-item-font-size;
+    line-height: 1;
+
+    background: $context-item-background;
+    color: $context-item-color;
+    border-radius: $context-item-border-radius;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    list-style: none;
+
+    .context-label {
+        max-width: $context-label-width;
+        display: inline-block;
+
+        text-overflow: ellipsis;
+
+        overflow: hidden;
+        vertical-align: bottom;
+    }
+
+    .context-icon {
+        margin-#{$end}: $context-icon-offset;
+    }
+
+    &.active {
+        background-color: $context-item-active-background-color;
+        color: $context-item-active-color;
+    }
+}
+
+.cell-context-item {
+    margin: $cell-context-item-offset;
+}
+
+.activity-context-activity-items {
+    margin-bottom: -$context-item-offset;
+
+    .context-item {
+        margin: side-values(0 $context-item-offset $context-item-offset 0);
+    }
+}
+
+.context-items-dropdown {
+    .dropdown-item {
+        cursor: pointer;
+    }
+}

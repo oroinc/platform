@@ -60,6 +60,7 @@ class OroThemeExtension extends Extension
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
+            unset($resource->data['styles']);
             $result[basename(dirname($resource->path))] = $resource->data;
         }
 

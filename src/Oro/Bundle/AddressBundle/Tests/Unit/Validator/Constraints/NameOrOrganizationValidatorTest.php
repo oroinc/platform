@@ -5,10 +5,10 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganization;
 use Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganizationValidator;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class NameOrOrganizationValidatorTest extends AbstractConstraintValidatorTest
+class NameOrOrganizationValidatorTest extends ConstraintValidatorTestCase
 {
     /**
      * {@inheritdoc}

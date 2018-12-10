@@ -229,6 +229,7 @@ class ObjectNormalizer
      * @param EntityDefinitionConfig|null $config
      *
      * @return mixed
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function normalizeValue($value, $level, array $context, EntityDefinitionConfig $config = null)
     {
@@ -236,6 +237,9 @@ class ObjectNormalizer
             $nextLevel = $level + 1;
             foreach ($value as $key => $val) {
                 $value[$key] = $this->normalizeValue($val, $nextLevel, $context, $config);
+            }
+            if (null !== $config) {
+                $value = $this->serializationHelper->processPostSerializeCollection($value, $config, $context);
             }
         } elseif (is_object($value)) {
             $objectNormalizer = $this->normalizerRegistry->getObjectNormalizer($value);
@@ -246,6 +250,9 @@ class ObjectNormalizer
                 $nextLevel = $level + 1;
                 foreach ($value as $val) {
                     $result[] = $this->normalizeValue($val, $nextLevel, $context, $config);
+                }
+                if (null !== $config) {
+                    $result = $this->serializationHelper->processPostSerializeCollection($result, $config, $context);
                 }
                 $value = $result;
             } elseif (null !== $config) {

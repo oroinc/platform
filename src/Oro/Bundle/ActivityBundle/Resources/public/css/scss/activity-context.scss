@@ -10,47 +10,6 @@
     margin-bottom: $activity-context-activity-list-offset;
 }
 
-.activity-context-activity-items .context-item {
-    background: $activity-context-item-background;
-    color: $activity-context-item-color;
-    display: $activity-context-item-display;
-    margin: $activity-context-item-offset;
-    font-size: $activity-context-item-font-size;
-    line-height: 1;
-}
-
-.cell-context-item,
-.context-item {
-    .context-label {
-        max-width: 180px;
-        display: inline-block;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        vertical-align: bottom;
-    }
-}
-
-.context-item {
-    background: $context-item-background;
-    color: $context-item-color;
-    padding: $context-item-inner-offset;
-    border-radius: $context-item-border-radius;
-    list-style: none;
-    cursor: pointer;
-    white-space: nowrap;
-
-    &.active,
-    .dropdown-menu &:hover {
-        background: $primary-860;
-        color: #444;
-    }
-}
-
-.cell-context-item {
-    display: inline-block;
-    white-space: nowrap;
-}
-
 .activity-context-activity-label {
     float: $start;
     margin: $activity-context-activity-label-offset;
@@ -59,7 +18,7 @@
 }
 
 .activity-context-activity-items {
-    margin: $activity-context-activity-items-offset;
+    margin-#{$start}: $activity-context-activity-items-offset;
 }
 
 .activity-context-activity-block {
@@ -81,29 +40,5 @@
         .context-item .fa-close {
             cursor: pointer;
         }
-    }
-}
-
-.context-items-dropdown {
-    top: 38px;
-    left: 14px;
-    border-color: #d3d3d3;
-
-    .context-item {
-        padding: 2px 8px;
-        font-size: 13px;
-    }
-}
-
-.activity-context-current-block {
-    cursor: pointer;
-    background-color: #fff;
-    border: none;
-    outline: none;
-    margin: 10px 10px 15px 10px;
-    box-shadow: none;
-
-    .btn-group.open & {
-        box-shadow: none;
     }
 }

@@ -9,16 +9,18 @@
             }
         }
 
-        select {
-            width: $currency-select-enabled-base-currency-select-width;
-        }
+        @include selector-width($currency-select-enabled-base-currency-select-width);
 
         .selector {
             margin-#{$start}: $currency-select-enabled-base-currency-selector-offset-left;
             font-size: $currency-select-enabled-base-currency-selector-font-size;
             flex-shrink: 0;
 
-            @include border-#{$start}-radius(0);
+            @if $start == 'left' {
+                @include border-left-radius(0);
+            } @else {
+                @include border-right-radius(0);
+            }
 
             &.active {
                 outline: $currency-select-enabled-base-currency-selector-active-outline;

@@ -1,4 +1,4 @@
 assets:
     css:
-        'oroform':
+        inputs:
             - 'bundles/oroform/css/scss/main.scss'

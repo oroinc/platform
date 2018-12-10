@@ -208,7 +208,7 @@ services:
     acme_category.form.extension.product_form:
         class: Acme\Bundle\CategoryBundle\Form\Extension\ProductFormExtension
     tags:
-        { name: oro_featuretogle.feature, feature: acme_feature }
+        - { name: oro_featuretogle.feature, feature: acme_feature }
 ```
 
 ## Feature state checking

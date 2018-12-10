@@ -509,6 +509,8 @@ entity_config:
                         value_type:         enum
                         allowed_type:       [enum, multiEnum]
                         auditable:          false
+                    constraints:
+                        - Oro\Bundle\EntityExtendBundle\Validator\Constraints\EnumValuesUnique: ~
                     form:
                         type:               Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueCollectionType
                         options:

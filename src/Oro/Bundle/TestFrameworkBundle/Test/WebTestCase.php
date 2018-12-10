@@ -482,7 +482,7 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         if ($cleanUp) {
-            $content = preg_replace(['/\s{2,}\n\s{2,}/', '/(\n|\s{2,})+/'], ['', ' '], $content);
+            $content = preg_replace(['/\s{2}\n\s{2}/', '/\n?(\s+)/'], ['', ' '], $content);
         }
 
         return trim($content);

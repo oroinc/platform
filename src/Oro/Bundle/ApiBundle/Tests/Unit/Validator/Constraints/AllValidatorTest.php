@@ -11,11 +11,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 use Doctrine\Common\Collections\AbstractLazyCollection;
 use Oro\Bundle\ApiBundle\Validator\Constraints\All;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AllValidator;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class AllValidatorTest extends AbstractConstraintValidatorTest
+class AllValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {

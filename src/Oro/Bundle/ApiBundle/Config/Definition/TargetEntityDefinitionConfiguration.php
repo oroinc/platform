@@ -100,9 +100,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
         if (empty($config[ConfigUtil::HINTS])) {
             unset($config[ConfigUtil::HINTS]);
         }
-        if (empty($config[ConfigUtil::POST_SERIALIZE])) {
-            unset($config[ConfigUtil::POST_SERIALIZE]);
-        }
         if (empty($config[ConfigUtil::FORM_TYPE])) {
             unset($config[ConfigUtil::FORM_TYPE]);
         }
@@ -148,7 +145,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
                     ->end()
                 ->end()
             ->end()
-            ->variableNode(ConfigUtil::POST_SERIALIZE)->end()
             ->scalarNode(ConfigUtil::FORM_TYPE)->end()
             ->arrayNode(ConfigUtil::FORM_OPTIONS)
                 ->useAttributeAsKey('name')

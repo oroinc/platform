@@ -1,27 +1,12 @@
 {% block oro_currency_price_widget %}
-    {% if hide_currency %}
-        <div class="currency-price-value">
+    <div class="currency-select-enabled">
+        <div class="multicurrency-fields-wrapper value-field input-append">
             {{ form_widget(form.value) }}
             {{ form_widget(form.currency) }}
             {{ form_errors(form.value) }}
             {{ form_errors(form.currency) }}
         </div>
-    {% else %}
-        <table>
-            <tr>
-                <td>
-                    <div class="currency-price-value">
-                        {{ form_widget(form.value) }}
-                        {{ form_errors(form.value) }}
-                    </div>
-                </td>
-                <td>
-                    {{ form_widget(form.currency) }}
-                    {{ form_errors(form.currency) }}
-                </td>
-            </tr>
-        </table>
-    {% endif %}
+    </div>
 {% endblock %}
 
 {% block oro_multicurrency_row %}

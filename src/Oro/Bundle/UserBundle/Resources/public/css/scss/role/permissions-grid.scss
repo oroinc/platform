@@ -178,8 +178,8 @@
 }
 
 .role-permissions-action-launcher {
-    .launchers-list .launcher-item a&:hover,
-    .launchers-list .launcher-item a&:focus {
+    .launchers-list .launcher-item a#{&}:hover,
+    .launchers-list .launcher-item a#{&}:focus {
         background: transparent !important;
     }
 }

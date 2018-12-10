@@ -14,7 +14,10 @@ placeholders:
             items:
                 add_update_delete:
                     order: 100
-        head_style: ~
+        head_style:
+            items:
+                assets_css:
+                    order: 100
         head_script: ~
         requirejs_config_extend:
             items:
@@ -59,3 +62,5 @@ placeholders:
             template: OroUIBundle::debug_toolbar_view.html.twig
         oro_ui_url_copy_action_button:
             template: OroUIBundle::copy_button.html.twig
+        assets_css:
+            template: OroUIBundle:Assets:oro_css.html.twig

@@ -20,7 +20,6 @@ class OroRequireJSExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected $config = array(
         'oro_translation' => array(
-            'js_engine' => 'node',
             'web_root' => '/path/to/web_root',
             'build_path' => 'js/app.min.js',
         )

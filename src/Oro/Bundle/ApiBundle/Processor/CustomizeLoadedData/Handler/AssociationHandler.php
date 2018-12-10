@@ -27,6 +27,7 @@ class AssociationHandler extends EntityHandler
      * @param string                   $propertyPath
      * @param string                   $entityClass
      * @param EntityDefinitionConfig   $config
+     * @param bool                     $collection
      * @param callable|null            $previousHandler
      */
     public function __construct(
@@ -37,6 +38,7 @@ class AssociationHandler extends EntityHandler
         string $propertyPath,
         string $entityClass,
         EntityDefinitionConfig $config,
+        bool $collection,
         ?callable $previousHandler = null
     ) {
         $this->rootEntityClass = $rootEntityClass;
@@ -47,6 +49,7 @@ class AssociationHandler extends EntityHandler
             $requestType,
             $entityClass,
             $config,
+            $collection,
             $previousHandler
         );
     }

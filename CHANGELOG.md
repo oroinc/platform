@@ -1,6 +1,18 @@
 ## 3.1.0
 
 ### Added
+#### AssetBundle
+* bundle replace AsseticBundle to build assets
+
+### Removed
+#### AsseticBundle
+* Bundle was removed, use AssetBundle instead
+
+
+## 3.1.0-rc (2018-11-30)
+[Show detailed list of changes](incompatibilities-3-1-rc.md)
+
+### Added
 #### ApiBundle
 * Enable filters for to-many associations. The following operators are implemented: `=` (`eq`), `!=` (`neq`), `*` (`exists`), `!*` (`neq_or_null`), `~` (`contains`) and `!~` (`not_contains`).
 * Added [documentation about filters](./src/Oro/Bundle/ApiBundle/Resources/doc/filters.md).
@@ -20,6 +32,9 @@
 * Added the `addBeforeActionPromise` static method of `BaseController` in JS which enables to postpone route action if the required async process is in progress.
 
 ### Removed
+#### DataAuditBundle
+* The event `oro_audit.collect_audit_fields` was removed. Use decoration of `oro_dataaudit.converter.change_set_to_audit_fields` service instead.
+* The alias `oro_dataaudit.listener.entity_listener` for the service `oro_dataaudit.listener.send_changed_entities_to_message_queue` was removed.
 #### EntityConfigBundle
 * Removed `oro.entity_config.field.after_remove` event. Use `oro.entity_config.post_flush` event and `ConfigManager::getFieldConfigChangeSet('extend', $className, $fieldName)` method to check if a field was removed. If the change set has `is_deleted` attribute and its value is changed from `false` to `true` than a field was removed.
 #### NotificationBundle
@@ -37,6 +52,8 @@
 * Removed `result_name` deprecated configuration attribute for a field. Use `property_path` attribute instead.
 * Removed `orderBy` deprecated configuration attribute. Use `order_by` attribute instead.
 * Removed deprecated signature `function (array &$item) : void` of post serialization handler that can be specified in `post_serialize` configuration attribute. Use `function (array $item, array $context) : array` instead.
+#### Testing Component
+* The class `Oro\Component\Testing\Validator\AbstractConstraintValidatorTest` was removed. Use `Symfony\Component\Validator\Test\ConstraintValidatorTestCase` instead.
 
 ### Changed
 #### AddressBundle
@@ -54,6 +71,8 @@
 * Updated version of bootstrap from 2.3.0 to 4.1.1
 * All global JS Views and Components are defined in the HTML through data attributes.
 * Change target and name of a layout event. Now `layout` triggers `initLayout` event on DOM element instead `layoutInit` on `mediator`
+#### RequireJsBundle
+* `oro_require_js.js_engine` configuration option was removed. Use `oro_asset.nodejs_path` instead.
 #### SecurityBundle
 * `Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper::apply` method logic was changed to support Access rules.
 * `oro_security.encoder.mcrypt` service was changed to `oro_security.encoder.default`.

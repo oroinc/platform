@@ -1,0 +1,30 @@
+services:
+    _defaults:
+        public: false
+
+    oro_asset_bundle.bundles_path.cache:
+        class: Oro\Bundle\AssetBundle\Cache\BundlesPathCache
+        arguments:
+            - '@kernel'
+
+    oro_asset_bundle.bundles_path.cache_warmer:
+        class: Oro\Bundle\AssetBundle\Cache\BundlesPathCacheWarmer
+        arguments:
+            - '@oro_asset_bundle.bundles_path.cache'
+        tags:
+            - { name: kernel.cache_warmer, priority: 0 }
+
+    Oro\Bundle\AssetBundle\Command\OroAssetBuildCommand:
+        arguments:
+            - '@oro_asset.node_process_factory'
+            - '@oro_asset_bundle.bundles_path.cache'
+            - '%oro_asset.npm_path%'
+            - '%oro_asset.build_timeout%'
+            - '%oro_asset.npm_install_timeout%'
+        tags:
+            - { name: console.command, command: 'oro:assets:build' }
+
+    oro_asset.node_process_factory:
+        class: Oro\Bundle\AssetBundle\NodeProcessFactory
+        arguments:
+            - '%oro_asset.nodejs_path%'
