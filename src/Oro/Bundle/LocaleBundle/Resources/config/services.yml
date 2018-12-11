@@ -366,3 +366,10 @@ services:
             - '@oro_locale.settings'
         tags:
             - { name: oro_locale.preferred_language_provider, priority: 255 }
+
+    oro_locale_config.event_listener.localization_change:
+        class: 'Oro\Bundle\LocaleBundle\EventListener\LocalizationChangeListener'
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
