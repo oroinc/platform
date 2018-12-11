@@ -283,11 +283,11 @@ Flush Entity
 
 OR
 
-- @find_entity: $.someEntity
+- @flush_entity: $.someEntity
 
 OR
 
-- @find_entity: ~ #flush context entity
+- @flush_entity: ~ #flush context entity
 ```
 
 Format String
