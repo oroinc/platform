@@ -81,11 +81,11 @@ class SearchEntityConfigListener
 
         $extendConfig = $event->getConfig('extend');
 
-        $searchConfig = $this->searchMappingProvider->getEntityConfig($event->getClassName());
+        $searchMapping = $this->searchMappingProvider->getEntityConfig($event->getClassName());
 
         return
             null !== $extendConfig
             && $extendConfig->is('state', ExtendScope::STATE_ACTIVE)
-            && !empty($searchConfig);
+            && !empty($searchMapping);
     }
 }
