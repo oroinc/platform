@@ -306,21 +306,6 @@ footer {
     line-height: 0;
 }
 
-label.required,
-.form-horizontal label.required {
-    position: relative;
-}
-
-label.required em,
-.form-horizontal label.required em {
-    color: $danger-dark;
-    font-size: 21px;
-    font-style: normal;
-    margin-#{$start}: 3px;
-    position: absolute;
-    top: 0;
-}
-
 .mce-tinymce {
     width: $field-width;
 
