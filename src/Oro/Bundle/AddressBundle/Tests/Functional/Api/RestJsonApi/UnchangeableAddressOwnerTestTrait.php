@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AddressBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 
 /**
  * Tests to check that address owner is unchangeable.
@@ -12,7 +13,7 @@ use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
  * * OWNER_ENTITY_TYPE
  * * OWNER_RELATIONSHIP
  * * CREATE_MIN_REQUEST_DATA
- * * OWNER_CREATE_MIN_REQUEST_DATA
+ * * OWNER_CREATE_MIN_REQUEST_DATA (optional, can be omitted if the owner API resource is read-only)
  * * UNCHANGEABLE_ADDRESS_REF
  * * ANOTHER_OWNER_REF
  * * ANOTHER_OWNER_ADDRESS_2_REF
@@ -23,6 +24,10 @@ trait UnchangeableAddressOwnerTestTrait
 {
     public function testCreateViaOwnerCreateResourceAndAddressDoesNotHaveOwnerRelationship()
     {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::CREATE)) {
+            self::markTestSkipped('The "create" action is disabled for owner entity');
+        }
+
         $addressData = $this->getRequestData(self::CREATE_MIN_REQUEST_DATA);
         $addressData['data']['id'] = 'new_address';
         unset($addressData['data']['relationships'][self::OWNER_RELATIONSHIP]);
@@ -52,9 +57,16 @@ trait UnchangeableAddressOwnerTestTrait
 
     public function testCreateViaOwnerCreateResourceAndAddressHasOwnerRelationship()
     {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::CREATE)) {
+            self::markTestSkipped('The "create" action is disabled for owner entity');
+        }
+
         $addressData = $this->getRequestData(self::CREATE_MIN_REQUEST_DATA);
         $addressData['data']['id'] = 'new_address';
-        $addressData['data']['relationships'][self::OWNER_RELATIONSHIP]['data']['id'] = 'new_owner';
+        $addressData['data']['relationships'][self::OWNER_RELATIONSHIP]['data'] = [
+            'type' => self::OWNER_ENTITY_TYPE,
+            'id'   => 'new_owner'
+        ];
         $data = $this->getRequestData(self::OWNER_CREATE_MIN_REQUEST_DATA);
         $data['data']['id'] = 'new_owner';
         $data['included'] = [
@@ -79,6 +91,10 @@ trait UnchangeableAddressOwnerTestTrait
 
     public function testCreateViaOwnerUpdateResourceAndAddressDoesNotHaveOwnerRelationship()
     {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+            self::markTestSkipped('The "update" action is disabled for owner entity');
+        }
+
         $ownerId = $this->getReference(self::ANOTHER_OWNER_REF)->getId();
 
         $addressData = $this->getRequestData(self::CREATE_MIN_REQUEST_DATA);
@@ -118,11 +134,18 @@ trait UnchangeableAddressOwnerTestTrait
 
     public function testCreateViaOwnerUpdateResourceAndAddressHasOwnerRelationship()
     {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+            self::markTestSkipped('The "update" action is disabled for owner entity');
+        }
+
         $ownerId = $this->getReference(self::ANOTHER_OWNER_REF)->getId();
 
         $addressData = $this->getRequestData(self::CREATE_MIN_REQUEST_DATA);
         $addressData['data']['id'] = 'new_address';
-        $addressData['data']['relationships'][self::OWNER_RELATIONSHIP]['data']['id'] = (string)$ownerId;
+        $addressData['data']['relationships'][self::OWNER_RELATIONSHIP]['data'] = [
+            'type' => self::OWNER_ENTITY_TYPE,
+            'id'   => (string)$ownerId
+        ];
         $data = [
             'data'     => [
                 'type' => self::OWNER_ENTITY_TYPE,
@@ -161,6 +184,10 @@ trait UnchangeableAddressOwnerTestTrait
 
     public function testTryToChangeOwnerViaOwnerCreateResource()
     {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::CREATE)) {
+            self::markTestSkipped('The "create" action is disabled for owner entity');
+        }
+
         $address1Id = $this->getReference(self::UNCHANGEABLE_ADDRESS_REF)->getId();
         $address2Id = $this->getReference(self::ANOTHER_OWNER_ADDRESS_2_REF)->getId();
 
@@ -202,6 +229,10 @@ trait UnchangeableAddressOwnerTestTrait
 
     public function testTryToChangeOwnerViaOwnerUpdateResource()
     {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+            self::markTestSkipped('The "update" action is disabled for owner entity');
+        }
+
         /** @var AbstractAddress $address */
         $address = $this->getReference(self::UNCHANGEABLE_ADDRESS_REF);
         $ownerId = $this->getOwner($address)->getId();
@@ -245,6 +276,10 @@ trait UnchangeableAddressOwnerTestTrait
 
     public function testRemoveAddressFromOwnerViaOwnerUpdateResource()
     {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+            self::markTestSkipped('The "update" action is disabled for owner entity');
+        }
+
         /** @var AbstractAddress $address */
         $address = $this->getReference(self::UNCHANGEABLE_ADDRESS_REF);
         $addressId = $address->getId();
@@ -286,6 +321,10 @@ trait UnchangeableAddressOwnerTestTrait
 
     public function testTryToChangeOwnerViaOwnerUpdateResourceAndAddressHasOwnerRelationship()
     {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+            self::markTestSkipped('The "update" action is disabled for owner entity');
+        }
+
         /** @var AbstractAddress $address */
         $address = $this->getReference(self::ANOTHER_OWNER_ADDRESS_2_REF);
         $addressId = $address->getId();
