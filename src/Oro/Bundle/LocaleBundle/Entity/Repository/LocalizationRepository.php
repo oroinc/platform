@@ -8,6 +8,8 @@ use Oro\Bundle\EntityBundle\ORM\Repository\BatchIteratorTrait;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 /**
+ * Doctrine repository for Localization entity
+ *
  * @method Localization|null findOneByName($name)
  */
 class LocalizationRepository extends EntityRepository implements BatchIteratorInterface
@@ -52,5 +54,26 @@ class LocalizationRepository extends EntityRepository implements BatchIteratorIn
             ->select('COUNT(l.id) as localizationsCount')
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * @param string $languageCode
+     * @param string $formattingCode
+     * @return Localization|null
+     */
+    public function findOneByLanguageCodeAndFormattingCode(string $languageCode, string $formattingCode): ?Localization
+    {
+        $qb = $this->createQueryBuilder('localization');
+
+        return $qb->innerJoin('localization.language', 'language')
+            ->where(
+                $qb->expr()->eq('localization.formattingCode', ':formattingCode'),
+                $qb->expr()->eq('language.code', ':languageCode')
+            )
+            ->setParameter('formattingCode', $formattingCode)
+            ->setParameter('languageCode', $languageCode)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

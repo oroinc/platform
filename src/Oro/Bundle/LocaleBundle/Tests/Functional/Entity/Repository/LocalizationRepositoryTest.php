@@ -104,6 +104,16 @@ class LocalizationRepositoryTest extends WebTestCase
         $this->assertEquals($expectedLocalizations, $localizations);
     }
 
+    public function testFindOneByLanguageCodeAndFormattingCode()
+    {
+        $this->assertTrue(null === $this->repository->findOneByLanguageCodeAndFormattingCode('mx', 'mx'));
+
+        $localization = $this->repository->findOneByLanguageCodeAndFormattingCode('en_CA', 'en_CA');
+
+        $this->assertFalse(null === $localization);
+        $this->assertEquals('English (Canada)', $localization->getDefaultTitle());
+    }
+
     /**
      * @return object|Localization
      */

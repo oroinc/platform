@@ -16,6 +16,8 @@ class OroLocaleExtension extends Extension
     const PARAMETER_ADDRESS_FORMATS = 'oro_locale.format.address';
     const PARAMETER_LOCALE_DATA = 'oro_locale.locale_data';
     const PARAMETER_CURRENCY_DATA = 'oro_locale.currency_data';
+    const PARAMETER_FORMATTING_CODE = 'oro_locale.formatting_code';
+    const PARAMETER_LANGUAGE = 'oro_locale.language';
 
     /**
      * {@inheritDoc}
@@ -44,6 +46,9 @@ class OroLocaleExtension extends Extension
             self::PARAMETER_CURRENCY_DATA,
             $this->escapePercentSymbols($config['currency_data'])
         );
+
+        $container->setParameter(self::PARAMETER_FORMATTING_CODE, $config['formatting_code']);
+        $container->setParameter(self::PARAMETER_LANGUAGE, $config['language']);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
@@ -155,11 +160,11 @@ class OroLocaleExtension extends Extension
         if (!empty($configs)) {
             $configData = array_shift($configs);
         } else {
-            $configData = array();
+            $configData = [];
         }
 
         // merge formats
-        foreach (array('name_format', 'address_format', 'locale_data', 'currency_data') as $configKey) {
+        foreach (['name_format', 'address_format', 'locale_data', 'currency_data'] as $configKey) {
             if (!empty($configData[$configKey])) {
                 $configData[$configKey] = array_merge($externalData[$configKey], $configData[$configKey]);
             } else {

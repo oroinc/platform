@@ -34,6 +34,8 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder
             ->root(self::ROOT_NAME)
             ->children()
+                ->scalarNode('formatting_code')->defaultValue(self::DEFAULT_LOCALE)->end()
+                ->scalarNode('language')->defaultValue(self::DEFAULT_LANGUAGE)->end()
                 ->arrayNode('name_format')
                     ->prototype('scalar')
                     ->end()
@@ -109,7 +111,7 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
-                'locale' => ['value' => '%locale%'],
+                'locale' => ['value' => self::DEFAULT_LOCALE],
                 self::LANGUAGE => ['value' => null],
                 'languages' => ['value' => [self::DEFAULT_LANGUAGE], 'type' => 'array'],
                 'country' => ['value' => null],
