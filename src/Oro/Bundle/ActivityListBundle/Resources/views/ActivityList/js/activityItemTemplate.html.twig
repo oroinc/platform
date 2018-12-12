@@ -6,7 +6,7 @@
 
 {% block activityActions %}
     <% var togglerId = _.uniqueId('dropdown-') %>
-    <div class="vertical-actions activity-actions dropdown--with-arrow">
+    <div class="vertical-actions activity-actions">
         <button id="<%- togglerId %>" data-placement="left-start" data-toggle="dropdown" class="btn btn-icon btn-lighter dropdown-toggle dropdown-toggle--no-caret activity-item"
            aria-haspopup="true" aria-expanded="false" aria-label="{{ 'oro.activitylist.actions.label'|trans }}">
         </button>

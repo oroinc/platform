@@ -44,10 +44,6 @@
         margin: $oro-datagrid-grid-views-icon-offset;
 
         @include fa-icon($oro-datagrid-grid-views-icon-close);
-
-        @at-root .show > .grid-views-toogler .grid-view-icon {
-            @include fa-icon($oro-datagrid-grid-views-icon-show);
-        }
     }
 
     .grid-views-dropdown {

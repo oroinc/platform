@@ -13,6 +13,7 @@ $input-outer-offset-bottom: 8px !default;
 $input-control-group-outer-offset-bottom: 0 !default;
 $input-box-sizing: border-box !default;
 $input-outline: none !default;
+$input-append-width: $field-width - 30px !default;
 
 $input-focus-box-shadow: none !default;
 $input-focus-border-color: $secondary !default;

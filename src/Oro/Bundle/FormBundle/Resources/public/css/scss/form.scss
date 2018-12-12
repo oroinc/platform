@@ -154,11 +154,22 @@
         td {
             padding-top: $controls-list-group-inner-offset-top;
             padding-bottom: $controls-list-group-inner-offset-bottom;
-            vertical-align: $controls-list-group-vertical-align;
 
             &:first-child,
             &.fallback-item-value {
-                padding-left: $controls-list-group-fallback-item-value-inner-offset-left;
+                padding-#{$start}: $controls-list-group-fallback-item-value-inner-offset-left;
+            }
+
+            &.float-holder-label {
+                padding: $controls-list-group-float-holder-label-inner-offset;
+
+                &:first-child {
+                    padding-#{$start}: 0;
+                }
+
+                &:last-child {
+                    padding-#{$end}: 0;
+                }
             }
 
             label {
