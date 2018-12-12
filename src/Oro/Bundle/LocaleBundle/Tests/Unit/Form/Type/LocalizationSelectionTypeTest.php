@@ -7,12 +7,14 @@ use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectionType;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizationSelectionTypeTest extends FormIntegrationTestCase
@@ -20,77 +22,84 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
     use EntityTrait;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
-
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localeSettings;
+    private $configManager;
 
     /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localizationManager;
+    private $localizationManager;
 
     /** @var LocalizationChoicesProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localizationChoicesProvider;
+    private $localizationChoicesProvider;
 
     /** @var LocalizationSelectionType */
-    protected $formType;
+    private $formType;
 
     /**
      * {@inheritDoc}
      */
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->setMethods(['get'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->configManager->expects($this->any())
+            ->method('get')
+            ->with('oro_locale.enabled_localizations', false, false, 0)
+            ->willReturn([1001, 3003]);
 
-        $this->localeSettings = $this->getMockBuilder(LocaleSettings::class)
-            ->setMethods(['getCurrency', 'getLocale'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->localizationManager = $this->createMock(LocalizationManager::class);
+        $this->localizationManager->expects($this->any())
+            ->method('getLocalizations')
+            ->willReturnCallback(
+                function (array $ids) {
+                    $result = [];
 
-        $this->localeSettings->expects($this->any())
-            ->method('getLocale')
-            ->willReturn('en');
+                    foreach ($ids as $id) {
+                        $result[$id] = $this->getEntity(Localization::class, ['id' => $id]);
+                    }
 
-        $this->localizationManager = $this->getMockBuilder(LocalizationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+                    return $result;
+                }
+            );
 
-        $this->localizationChoicesProvider = $this->getMockBuilder(LocalizationChoicesProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->localizationChoicesProvider = $this->createMock(LocalizationChoicesProvider::class);
+        $this->localizationChoicesProvider->expects($this->any())
+            ->method('getLocalizationChoices')
+            ->willReturn([
+                'Localization 1' => 1001,
+                'Localization 2' => 2002,
+                'Localization 3' => 3003,
+            ]);
 
         $this->formType = new LocalizationSelectionType(
             $this->configManager,
-            $this->localeSettings,
             $this->localizationManager,
             $this->localizationChoicesProvider
         );
+
         parent::setUp();
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
-        $this->assertEquals(LocalizationSelectionType::NAME, $this->formType->getName());
+        $this->assertEquals('oro_locale_localization_selection', $this->formType->getName());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(OroChoiceType::class, $this->formType->getParent());
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
-        /* @var $resolver OptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
+        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
-                'choices' => function () {
-                },
-                'compact' => false,
-                'full_localization_list' => false,
+                'choices' => [
+                    'Localization 1' => 1001,
+                    'Localization 2' => 2002,
+                    'Localization 3' => 3003,
+                ],
+                'show_all' => false,
                 'placeholder' => '',
                 'translatable_options' => false,
                 'configs' => [
@@ -107,29 +116,9 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
      * @param string $submittedValue
      * @param bool $isValid
      */
-    public function testSubmitValidForm($submittedValue, $isValid)
+    public function testSubmitValidForm($submittedValue, $isValid): void
     {
-        $this->localizationManager->method('getLocalization')
-            ->will($this->returnValueMap([
-                [1, true, $this->getEntity(Localization::class, ['id' => 1, 'name' => 'Localization 1'])],
-                [2, true, $this->getEntity(Localization::class, ['id' => 2, 'name' => 'Localization 2'])],
-                [3, true, $this->getEntity(Localization::class, ['id' => 3, 'name' => 'Localization 3'])],
-            ]));
-
-        $this->localizationManager->method('getLocalizations')->willReturn([
-            1 => $this->getEntity(Localization::class, ['id' => 1, 'name' => 'Localization 1']),
-            2 => $this->getEntity(Localization::class, ['id' => 2, 'name' => 'Localization 2']),
-            3 => $this->getEntity(Localization::class, ['id' => 3, 'name' => 'Localization 3']),
-        ]);
-
-        $this->localizationChoicesProvider->method('getLocalizationChoices')->willReturn([
-            'Localization 1' => 1,
-            'Localization 2' => 2,
-            'Localization 3' => 3,
-        ]);
-
         $form = $this->factory->create(LocalizationSelectionType::class);
-
         $form->submit($submittedValue);
 
         $this->assertSame($isValid, $form->isValid());
@@ -138,17 +127,71 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
     /**
      * @return array
      */
-    public function submitFormDataProvider()
+    public function submitFormDataProvider(): array
     {
         return [
             'valid' => [
-                'submittedValue' => '1',
+                'submittedValue' => '2002',
                 'isValid' => true
             ],
             'invalid' => [
                 'submittedValue' => '10',
                 'isValid' => false
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider finishViewProvider
+     *
+     * @param bool $showAll
+     * @param array $expected
+     */
+    public function testFinishView(bool $showAll, array $expected): void
+    {
+        $view = new FormView();
+        $view->vars['choices'] = [
+            new ChoiceView(1001, 1001, 'Localization 1'),
+            new ChoiceView(2002, 2002, 'Localization 2'),
+            new ChoiceView(3003, 3003, 'Localization 3'),
+            new ChoiceView(4004, 4004, 'Localization 4'),
+        ];
+
+        /** @var FormInterface $form */
+        $form = $this->createMock(FormInterface::class);
+
+        $this->formType->finishView($view, $form, ['show_all' => $showAll]);
+
+        $this->assertCount(count($expected), $view->vars['choices']);
+
+        foreach ($expected as $key => $data) {
+            $this->assertEquals($data['label'], $view->vars['choices'][$key]->label);
+            $this->assertEquals($data['value'], $view->vars['choices'][$key]->value);
+            $this->assertEquals($data['data'], $view->vars['choices'][$key]->data);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function finishViewProvider()
+    {
+        return [
+            'show all' => [
+                'showAll' => true,
+                'expected' => [
+                    0 => ['label' => 'Localization 1', 'value' => 1001, 'data' => 1001],
+                    1 => ['label' => 'Localization 2', 'value' => 2002, 'data' => 2002],
+                    2 => ['label' => 'Localization 3', 'value' => 3003, 'data' => 3003],
+                ],
+            ],
+            'not show all' => [
+                'showAll' => false,
+                'expected' => [
+                    0 => ['label' => 'Localization 1', 'value' => 1001, 'data' => 1001],
+                    2 => ['label' => 'Localization 3', 'value' => 3003, 'data' => 3003],
+                ],
+            ]
         ];
     }
 

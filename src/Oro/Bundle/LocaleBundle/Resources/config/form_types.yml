@@ -126,7 +126,6 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectionType'
         arguments:
             - '@oro_config.manager'
-            - '@oro_locale.settings'
             - '@oro_locale.manager.localization'
             - '@oro_locale.provider.localization_choices'
         tags:
@@ -141,3 +140,8 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Form\Extension\LocalizationScopeExtension'
         tags:
             - { name: form.type_extension, extended_type: Oro\Bundle\ScopeBundle\Form\Type\ScopeType }
+
+    oro_locale.configurator.localization_configurator:
+        class: Oro\Bundle\LocaleBundle\Form\Configurator\LocalizationConfigurator
+        arguments:
+            - '@oro_config.form.handler.config'
