@@ -9,6 +9,12 @@
 
         width: 16px;
 
+        &.btn {
+            padding: $jstree-actions-handle-offset;
+
+            width: 16px;
+        }
+
         &:hover {
             color: $jstree-actions-handle-hover-color;
         }
