@@ -1,7 +1,5 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/variables";
-
 $oro-quarter-width: auto !default;
 $oro-quarter-min-width: 68px !default;
 $oro-quarter-float: left !default;
@@ -54,6 +52,5 @@ $fallback-item-value--first-display: inline-flex !default;
 $fallback-item-value--first-width: auto !default;
 $fallback-item-value--first-validation-width: 100% !default;
 $fallback-item-value--first-validation-order: 1 !default;
-$fallback-item-value--first-input-width: 254px !default;
 
 $fallback-item-value--first-input-group-offset-end: 4px !default;

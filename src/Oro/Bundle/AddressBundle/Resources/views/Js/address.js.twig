@@ -10,7 +10,7 @@
                     <button class="btn btn-icon btn-light item-remove-button address-book-item__action" title="<%= _.__('Remove') %>"><span class="fa-trash-o hide-text"><%= _.__('Remove') %></span></button>
                 <% } %>
             <% } else { %>
-                <div class="dropdown dropdown--with-arrow">
+                <div class="dropdown">
                     <% var togglerId = _.uniqueId('dropdown-') %>
                     <button id="<%- togglerId %>"
                         class="dropdown-toggle dropdown-toggle--no-caret btn btn-icon btn-light address-book-item__action"

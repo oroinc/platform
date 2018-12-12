@@ -144,8 +144,4 @@
             margin-#{$end}: $fallback-item-value--first-input-group-offset-end;
         }
     }
-
-    input[type="text"] {
-        width: $fallback-item-value--first-input-width;
-    }
 }

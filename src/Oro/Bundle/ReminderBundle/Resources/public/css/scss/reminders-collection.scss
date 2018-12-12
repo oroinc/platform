@@ -1,14 +1,21 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/mixins/direction";
-
 .reminders-collection,
 .ui-dialog .form-horizontal .control-group .controls .reminders-collection {
     .inline-field {
         float: #{$start};
 
         &:not(:last-child) {
-            margin-#{$end}: 5px;
+            margin-#{$end}: $content-padding-small / 2;
+        }
+    }
+
+    .inline-field {
+        float: #{$start};
+        margin-#{$end}: $content-padding-small / 2;
+
+        &:last-of-type {
+            margin-#{$end}: 0;
         }
     }
 
@@ -18,7 +25,7 @@
     }
 
     .inline-field .selector {
-        margin-left: 0;
+        margin-#{$start}: 0;
     }
 
     input.number {
