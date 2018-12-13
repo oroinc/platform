@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type provides functionality to select an existing tree
+ */
 class TreeSelectType extends AbstractType
 {
     const NAME = 'oro_ui_tree_select';

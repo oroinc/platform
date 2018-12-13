@@ -7,6 +7,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type provides functionality to select an existing entity from the tree
+ */
 class EntityTreeSelectType extends AbstractType
 {
     const NAME = 'oro_entity_tree_select';
