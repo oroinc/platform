@@ -319,6 +319,9 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($fieldConfigModel)
             ->willReturn($redirectResponse);
 
-        $this->assertEquals($redirectResponse, $this->handler->redirect($fieldConfigModel));
+        $response = $this->handler->redirect($fieldConfigModel);
+
+        $this->assertEquals($redirectResponse->getStatusCode(), $response->getStatusCode());
+        $this->assertEquals($redirectResponse->getTargetUrl(), $response->getTargetUrl());
     }
 }
