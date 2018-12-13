@@ -15,7 +15,7 @@ class PreSetRequireUpdateEventTest extends \PHPUnit\Framework\TestCase
         $event = new PreSetRequireUpdateEvent([], $configManager);
         self::assertTrue($event->isUpdateRequired());
 
-        $event->setUpdateRequired(true);
-        self::assertTrue($event->isUpdateRequired());
+        $event->setUpdateRequired(false);
+        self::assertFalse($event->isUpdateRequired());
     }
 }
