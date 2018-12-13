@@ -25,10 +25,6 @@
         display: inline-block;
         width: $role-capability-item-width;
         padding: $role-capability-item-offset;
-
-        label {
-            margin-bottom: 0; // reset global styles
-        }
     }
 
     &__item-label {

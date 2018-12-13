@@ -39,7 +39,7 @@ class FormSubmitLayoutRedirectProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(new RedirectResponse('///workflow result url'), $context->getResult());
+        $this->assertEquals('///workflow result url', $context->getResult()->getTargetUrl());
         $this->assertTrue($context->isProcessed());
     }
 
@@ -61,7 +61,7 @@ class FormSubmitLayoutRedirectProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(new RedirectResponse('///referer url'), $context->getResult());
+        $this->assertEquals('///referer url', $context->getResult()->getTargetUrl());
         $this->assertTrue($context->isProcessed());
     }
 
@@ -83,7 +83,7 @@ class FormSubmitLayoutRedirectProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(new RedirectResponse('///original url'), $context->getResult());
+        $this->assertEquals('///original url', $context->getResult()->getTargetUrl());
         $this->assertTrue($context->isProcessed());
     }
 
@@ -104,7 +104,7 @@ class FormSubmitLayoutRedirectProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(new RedirectResponse('/'), $context->getResult());
+        $this->assertEquals('/', $context->getResult()->getTargetUrl());
         $this->assertTrue($context->isProcessed());
     }
 

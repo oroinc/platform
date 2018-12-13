@@ -80,14 +80,22 @@
         -webkit-touch-callout: $select2-choice-touch-callout;
         user-select: $select2-choice-user-select;
 
+        &:hover {
+            color: $select2-choice-hover-color;
+        }
+
+        &:focus {
+            outline: $select2-choice-focus-outline;
+        }
+
         &.select2-default .select2-chosen {
-            color: $primary-200;
+            color: $select2-choice-placeholder-color;
             cursor: $select2-choice-cursor;
         }
 
         img {
             max-width: $select2-choice-image-max-width;
-            margin-top: $select2-choice-image-offset-left;
+            margin-top: $select2-choice-image-offset-top;
             margin-right: $select2-choice-image-offset-right;
             display: $select2-choice-image-display;
             float: $select2-choice-image-float;
@@ -99,10 +107,6 @@
             overflow: $select2-choice-span-overflow;
             white-space: $select2-choice-span-white-space;
             text-overflow: $select2-choice-span-text-overflow;
-        }
-
-        &:focus {
-            outline: $select2-choice-focus-outline;
         }
 
         .separated-img {
@@ -143,6 +147,12 @@
         outline: $select2-search-choice-close-outline;
         z-index: $select2-search-choice-close-z-index;
         color: $select2-search-choice-close-icon-color;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+
+        &:hover {
+            opacity: .85;
+        }
 
         @include fa-icon($icon: $select2-search-choice-close-icon) {
             top: $select2-search-choice-close-icon-top;
@@ -159,6 +169,7 @@
         font-size: $select2-search-choice-arrow-font-size;
         font-family: $select2-search-choice-arrow-font-family;
         font-style: $select2-search-choice-arrow-font-style;
+        color: $select2-search-choice-arrow-color;
         text-decoration: $select2-search-choice-arrow-text-decoration;
         -webkit-font-smoothing: $select2-search-choice-arrow-font-smoothing;
 
@@ -181,7 +192,7 @@
 
         .select2-choices {
             list-style: $select2-search-multi-choices-list-style;
-            margin: side-values($select2-search-multi-choices-offset 0 0 $select2-search-multi-choices-offset);
+            margin: side-values($select2-search-multi-choices-offset);
             padding: side-values($select2-search-multi-choices-inner-offset);
             height: $select2-search-multi-choices-height;
             overflow: $select2-search-multi-choices-overflow;
@@ -232,7 +243,8 @@
                 white-space: $select2-search-field-white-space;
                 float: #{$start};
 
-                input {
+                input,
+                .select2-input {
                     float: $select2-search-field-float;
                     height: $select2-search-field-height;
                     line-height: $select2-search-field-line-height;
@@ -240,19 +252,37 @@
                     margin-bottom: $select2-search-field-offset-bottom;
                     border: $select2-search-field-border;
                     padding: $select2-search-field-inner-offset;
+
+                    &.select2-default {
+                        color: $select2-search-field-default-color;
+                        padding: $select2-search-field-default-inner-offset;
+                    }
+                }
+
+                &:first-child {
+                    input,
+                    .select2-input {
+                        padding: $select2-search-field-default-inner-offset;
+                    }
                 }
             }
         }
 
         .select2-search-choice-close {
             display: $select2-search-multi-choice-close-display;
+            align-items: $select2-search-multi-choice-close-align-items;
             width: $select2-search-multi-choice-close-width;
             height: $select2-search-multi-choice-close-height;
             #{$end}: $select2-search-multi-choice-close-right;
             top: $select2-search-multi-choice-close-top;
 
+            &:hover {
+                color: inherit;
+            }
+
             &:before {
                 font-size: $select2-search-multi-choice-close-icon-font-size;
+                height: $select2-search-multi-choice-close-icon-height;
             }
         }
     }

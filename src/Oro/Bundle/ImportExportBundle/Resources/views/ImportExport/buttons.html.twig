@@ -53,7 +53,7 @@
     {% if exportAllowed %}
         <div class="btn-group">
             <a href="#" role="button" class="btn export-btn icons-holder-text no-hash">
-                <i class="fa-upload hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
+                <span class="fa-upload hide-text">{{ 'oro.importexport.export.label'|trans }}</span>{{ 'oro.importexport.export.label'|trans }}
             </a>
         </div>
     {% endif %}
@@ -62,14 +62,14 @@
         <div class="btn-group">
             {% set buttonsHtml %}
                 <a href="#" role="button" class="btn import-btn icons-holder-text no-hash">
-                    <i class="fa-download hide-text">{{ importLabel }}</i>{{ importLabel }}
+                    <span class="fa-download hide-text">{{ importLabel }}</span>{{ importLabel }}
                 </a>
                 <a href="#" role="button" class="btn import-validation-btn icons-holder-text no-hash">
-                    <i class="icon-download-alt hide-text">{{ importValidationLabel }}</i>{{ importValidationLabel }}
+                    <span class="icon-download-alt hide-text">{{ importValidationLabel }}</span>{{ importValidationLabel }}
                 </a>
                 {% if hasExportTemplateProcessor %}
                     <a href="#" role="button" class="btn template-btn icons-holder-text no-hash">
-                        <i class="fa-file-o hide-text"></i>{{ 'oro.importexport.import.tempate'|trans }}
+                        <span class="fa-file-o hide-text"></span>{{ 'oro.importexport.import.tempate'|trans }}
                     </a>
                 {% endif %}
             {% endset %}

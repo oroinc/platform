@@ -63,13 +63,14 @@
                         </div>
                     </div>
                     <div class="oro-remember-me">
-                        <label>
-                            <span class="checkbox-view">
-                                <input type="checkbox" id="remember_me" name="_remember_me" class="checkbox-view__input input-widget" value="on">
-                                <span class="checkbox-view__icon"></span>
-                            </span>
-                            {{ 'Remember me on this computer'|trans }}
-                        </label>
+                        <span class="checkbox-view">
+                            <input type="checkbox"
+                                   id="remember_me"
+                                   name="_remember_me"
+                                   class="checkbox-view__input input-widget"
+                                   value="on">
+                            <span class="checkbox-view__icon"></span>
+                        </span><label for="remember_me">{{ 'Remember me on this computer'|trans }}</label>
                     </div>
                     <div class="form-signin__footer">
                         <a href="{{ path('oro_user_reset_request') }}">{{ 'Forgot your password?'|trans }}</a>

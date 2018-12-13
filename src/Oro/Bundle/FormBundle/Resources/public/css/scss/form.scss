@@ -191,7 +191,7 @@
         .collapse-action {
             color: $control-group-collapsible-collapse-action-color;
             font-size: $control-group-collapsible-collapse-action-font-size;
-            font-family: $control-group-collapsible-collapse-action-font-family, Arial, sans-serif;
+            font-family: $control-group-collapsible-collapse-action-font-family;
             font-weight: $control-group-collapsible-collapse-action-font-weight;
 
             &:before {
@@ -281,6 +281,6 @@
 
 .responsive-form-inner {
     .float-holder {
-        margin-right: 4px;
+        margin-#{$end}: ($content-padding-small / 2);
     }
 }
