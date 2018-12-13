@@ -37,6 +37,9 @@ $btn-font-weight: bold;
 $btn-font-size: 12px;
 $btn-text-transform: uppercase;
 
+$btn-link-font-weight: bold;
+$btn-link-text-transform: uppercase;
+
 $btn-padding-y-sm: 0;
 $btn-padding-x-sm: 12px;
 $btn-in-group-padding-x-sm: 8px;
@@ -84,9 +87,6 @@ $btn-mobile-line-height: 40px;
 $btn-square-mobile-line-height: 36px;
 $btn-mobile-padding-y: $input-btn-mobile-padding-y;
 $btn-mobile-padding-x: $input-btn-mobile-padding-x;
-
-$btn-group-divider-width: 1px;
-$btn-group-divider-color: rgba($primary-inverse, .4);
 
 // Navbar
 $nav-tabs-link-hover-border-color: $primary-750;
@@ -324,4 +324,5 @@ $large-screen:                          1920px;
 
 @import "variables/alert";
 @import "variables/buttons";
+@import "variables/button-group";
 @import "variables/badge";

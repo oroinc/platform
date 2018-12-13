@@ -362,6 +362,12 @@ select[multiple] {
             align-items: center;
         }
     }
+
+    .btn {
+        &:focus {
+            border-color: $secondary-100;
+        }
+    }
 }
 
 .btn-group {
