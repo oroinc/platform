@@ -19,6 +19,7 @@
 
         &--inline {
             margin: $jstree-actions-menu-inline-margin;
+            align-items: $jstree-actions-menu-inline-li-align-items;
             list-style: $jstree-actions-menu-inline-list-style;
 
             li {

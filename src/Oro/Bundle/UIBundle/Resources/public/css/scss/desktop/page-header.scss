@@ -27,14 +27,6 @@
                 }
             }
 
-            .btn-group {
-                margin-#{$start}: $content-padding-small;
-
-                .btn-group {
-                    margin-#{$start}: 0;
-                }
-            }
-
             > .pinned-dropdown > .btn-group {
                 text-align: #{$start};
             }

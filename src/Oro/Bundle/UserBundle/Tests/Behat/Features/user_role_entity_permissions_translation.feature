@@ -1,5 +1,7 @@
 @ticket-BAP-17661
 @fixture-OroLocaleBundle:LocalizationFixture.yml
+@regression
+
 Feature: User role entity permissions translation
   In order to see role permissions on view page
   As an Administrator
