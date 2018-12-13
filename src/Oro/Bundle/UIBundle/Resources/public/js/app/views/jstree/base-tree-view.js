@@ -27,8 +27,7 @@ define(function(require) {
 
         optionNames: BaseView.prototype.optionNames.concat([
             'onSelectRoute', 'onSelectRouteParameters', 'onRootSelectRoute',
-            'autoSelectFoundNode',
-            'viewGroup', 'autohideNeighbors'
+            'autoSelectFoundNode', 'viewGroup', 'autohideNeighbors'
         ]),
 
         /**

@@ -4,14 +4,10 @@
     display: $jstree-actions-display;
 
     &__handle {
-        padding: $jstree-actions-handle-offset;
         color: $jstree-actions-handle-color;
-
-        width: 16px;
 
         &.btn {
             padding: $jstree-actions-handle-offset;
-
             width: 16px;
         }
 

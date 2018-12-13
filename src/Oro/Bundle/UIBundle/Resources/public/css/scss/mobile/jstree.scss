@@ -20,7 +20,7 @@
 
     .jstree-open > .jstree-ocl:before,
     .jstree-closed > .jstree-ocl:before {
-        font-size: 18px;
+        font-size: $base-font-size--l;
     }
 
     .jstree-open > .jstree-ocl:before {
@@ -32,8 +32,8 @@
     }
 
     .jstree-anchor {
-        font-size: 16px;
-        padding: side-values(7px 8px 7px 8px);
+        font-size: $jstree-mobile-anchor-font-size;
+        padding: side-values($jstree-mobile-anchor-inner-offset);
         line-height: $jstree-mobile-anchor-line-height;
         height: $jstree-mobile-wholerow-height;
 

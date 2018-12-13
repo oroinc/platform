@@ -2,6 +2,6 @@
 
 $jstree-mobile-wholerow-height: 43px !default;
 
-$jstree-mobile-anchor-line-height: 29px !default;
-$jstree-mobile-anchor-font-size: $base-font-size--l !default;
-$jstree-mobile-anchor-inner-offset: side-values(7px 8px 7px 8px) !default;
+$jstree-mobile-anchor-line-height: 1.9 !default;
+$jstree-mobile-anchor-font-size: $base-font-size--m !default;
+$jstree-mobile-anchor-inner-offset: 7px $content-padding-medium 7px $content-padding-medium !default;
