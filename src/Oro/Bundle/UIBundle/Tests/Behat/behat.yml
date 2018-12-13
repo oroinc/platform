@@ -88,6 +88,10 @@ oro_behat_extension:
       selector: 'div.ui-dialog-buttonpane button[type=reset]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    UiDialog Disabled okButton:
+      selector: 'div.ui-dialog-buttonpane button.disabled[type=submit]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
     UiWindow:
       selector: 'div.modal'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
