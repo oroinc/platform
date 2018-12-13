@@ -158,7 +158,8 @@
 
     + span,
     + div,
-    + label {
+    + label,
+    &-label {
         margin-#{$start}: $checkbox-sibling-outer-offset-start;
         vertical-align: middle;
         display: inline-block;

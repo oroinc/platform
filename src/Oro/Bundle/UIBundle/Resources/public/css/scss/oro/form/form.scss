@@ -414,7 +414,14 @@ select[multiple] {
 
 .form-container,
 .form-horizontal {
-    .control-group {
+    .control-group-subline {
+        &:not(:last-of-type) {
+            margin: 0 0 $content-padding-small;
+        }
+    }
+
+    .control-group,
+    .control-group-container {
         &:not(:last-of-type) {
             margin-bottom: $form-container-control-row-space;
         }
