@@ -165,6 +165,8 @@ select[multiple] {
     height: $select-multiple-height !important;
     padding: $select-multiple-inner-offset;
 
+    vertical-align: top;
+
     option {
         padding: $select-multiple-option-inner-offset;
         border-radius: $select-multiple-option-border-radius;
@@ -438,6 +440,11 @@ select[multiple] {
         &--column:not(:last-of-type) {
             margin: 0;
         }
+    }
+
+    + .form-horizontal,
+    + .form-container {
+        margin-top: $form-container-control-row-space;
     }
 }
 

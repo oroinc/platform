@@ -68,6 +68,15 @@
                 margin-top: 10px;
             }
 
+            &.messages {
+                margin: 0;
+
+                .alert {
+                    margin: side-values($content-padding-small 0 0);
+                    max-width: $field-width;
+                }
+            }
+
             .control-label {
                 &.html-property {
                     overflow: auto;
@@ -91,6 +100,11 @@
 
             &-description {
                 margin-top: $content-padding-small;
+            }
+
+            &.html-content {
+                padding-top: $form-horizontal-control-label-offset;
+                max-width: $field-width;
             }
         }
 
@@ -148,6 +162,14 @@
                 cursor: default;
                 color: $primary-550;
             }
+        }
+    }
+
+    .control-group-button {
+        .btn {
+            display: block;
+            width: 100%;
+            max-width: $field-width;
         }
     }
 }

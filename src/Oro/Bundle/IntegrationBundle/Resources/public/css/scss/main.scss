@@ -1,15 +1,16 @@
 /* @theme: admin.oro; */
 
+@import "oroui/css/scss/variables";
+
 .integration-icon,
 .select2-choice .select2-chosen .aware-icon-block,
 .select2-results .select2-result-label .aware-icon-block {
     height: 16px;
     width: 16px;
     background-size: contain !important;
-    margin-right: 4px;
-    margin-top: -2px;
+    margin-#{$end}: 4px;
     vertical-align: middle;
-    float: left;
+    float: $start;
 }
 
 .integration-icon {

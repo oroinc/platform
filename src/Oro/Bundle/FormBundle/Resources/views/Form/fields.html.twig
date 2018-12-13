@@ -738,3 +738,9 @@
     {{ form_widget(form) }}
     {{ form_errors(form) }}
 {% endblock %}
+
+{% block button_row %}
+    <div class="control-group-container control-group-button">
+        {{ form_widget(form) }}
+    </div>
+{% endblock %}
