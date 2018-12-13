@@ -59,6 +59,14 @@ table.grid {
             background-image: none;
             padding: 12px;
         }
+
+        ul {
+            margin: 0 0 $content-padding-small $content-padding;
+        }
+
+        p:last-child {
+            margin-bottom: 0;
+        }
     }
 }
 

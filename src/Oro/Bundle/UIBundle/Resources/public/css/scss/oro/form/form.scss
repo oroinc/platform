@@ -357,6 +357,9 @@ select[multiple] {
     &.collection-element-primary {
         .add-on {
             background: $primary-900;
+
+            display: inline-flex;
+            align-items: center;
         }
     }
 }

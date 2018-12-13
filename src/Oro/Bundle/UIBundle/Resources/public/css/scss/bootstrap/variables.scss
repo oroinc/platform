@@ -29,7 +29,7 @@ $btn-border-radius: 16px;
 $btn-border-width: 0;
 $btn-square-border-radius: 2px;
 $btn-square-border-width: 2px;
-$font-family-sans-serif: Helvetica, Arial, sans-serif;
+$font-family-sans-serif: Arial, Helvetica, sans-serif;
 $font-size-base: 14px;
 $line-height-base: 1.57;
 $link-hover-decoration: none;
@@ -62,6 +62,7 @@ $label-margin-bottom: 0;
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
 $border-width: 2px;
 
+$input-color: $primary-200;
 $input-border-width: 2px;
 $input-border-color: $primary-750;
 
@@ -92,7 +93,7 @@ $nav-tabs-link-hover-border-color: $primary-750;
 $nav-divider-margin-y: 4px;
 $nav-link-padding-y: 0;
 
-//Alert
+// Alert
 $alert-border-radius: 2px;
 $alert-border-width: 1px;
 $alert-padding-y: $content-padding-small / 2;
