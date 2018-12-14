@@ -50,6 +50,12 @@ body {
     }
 }
 
+.product-container {
+    .jstree-wrapper {
+        margin-top: 10px;
+    }
+}
+
 .page-title + [data-bound-component*="datagrid"] {
     @include safe-area-property-left(padding-left, $content-padding, false);
     @include safe-area-property-right(padding-right, $content-padding, false);
