@@ -11,6 +11,8 @@ use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * The default implementation of extractor that retrieves information from an exception object.
@@ -20,20 +22,26 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
     /** @var bool */
     private $debug;
 
+    /** @var TranslatorInterface */
+    private $translator;
+
     /** @var string[] */
     private $safeExceptions;
 
     /**
-     * @param bool     $debug
-     * @param string[] $safeExceptions
+     * @param bool                $debug
+     * @param TranslatorInterface $translator
+     * @param string[]            $safeExceptions
      */
-    public function __construct($debug, $safeExceptions)
+    public function __construct($debug, TranslatorInterface $translator, array $safeExceptions)
     {
         $this->debug = $debug;
+        $this->translator = $translator;
         $this->safeExceptions = $safeExceptions;
         $this->safeExceptions[] = ApiException::class;
         $this->safeExceptions[] = HttpExceptionInterface::class;
         $this->safeExceptions[] = AccessDeniedException::class;
+        $this->safeExceptions[] = AuthenticationException::class;
         $this->safeExceptions[] = ForbiddenException::class;
     }
 
@@ -48,6 +56,7 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         }
         if ($underlyingException instanceof AccessDeniedException
             || $underlyingException instanceof ForbiddenException
+            || $underlyingException instanceof AuthenticationException
         ) {
             return Response::HTTP_FORBIDDEN;
         }
@@ -79,10 +88,13 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
      */
     public function getExceptionType(\Exception $exception)
     {
-        return ValueNormalizerUtil::humanizeClassName(
-            \get_class(ExceptionUtil::getProcessorUnderlyingException($exception)),
-            'Exception'
-        );
+        $exception = ExceptionUtil::getProcessorUnderlyingException($exception);
+        $exceptionClass = \get_class($exception);
+        if ($exception instanceof AuthenticationException) {
+            $exceptionClass = AuthenticationException::class;
+        }
+
+        return ValueNormalizerUtil::humanizeClassName($exceptionClass, 'Exception');
     }
 
     /**
@@ -146,6 +158,9 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
     {
         if ($exception instanceof ForbiddenException) {
             return $exception->getReason();
+        }
+        if ($exception instanceof AuthenticationException) {
+            return $this->translator->trans($exception->getMessageKey(), $exception->getMessageData());
         }
 
         return $exception->getMessage();
