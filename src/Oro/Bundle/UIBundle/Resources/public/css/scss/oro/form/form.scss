@@ -277,16 +277,6 @@ select[multiple] {
             color: $input-disabled-color;
         }
     }
-
-    &.error {
-        span {
-            color: $input-error-color;
-
-            &:after {
-                color: $input-error-border-color;
-            }
-        }
-    }
 }
 
 .add-on {
