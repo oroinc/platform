@@ -83,6 +83,9 @@ oro:
         toolbar_sorting:
             label: "Sorted By"
         settings:
+            tab:
+                grid: "Grid"
+                filters: "Filters"
             header.title: "Settings"
             title: "Grid Settings"
             tooltip: "Use drag and drop to sort items"
