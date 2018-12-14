@@ -35,7 +35,7 @@
     {% if (tooltip == tooltip_raw) %}
         {% set tooltip = tooltip_raw|trans(tooltip_parameters, "tooltips") %}
     {% endif %}
-    {% if tooltip is not empty %}
+    {%- if tooltip is not empty -%}
         {% set details_anchor = details_anchor|default(null) %}
         {% set details_link = details_link|default(null) %}
         {% set details_enabled = details_enabled|default(false) %}
@@ -63,7 +63,7 @@
            {% if tooltip_placement %}data-placement="{{ tooltip_placement }}"{% endif %}
            data-content="{{ tooltip }}"
            data-toggle="popover"></i>
-    {% endif %}
+    {%- endif -%}
 {% endmacro %}
 
 {#
