@@ -38,7 +38,7 @@
                 {% block search %}
                     {% if not data.disableSearch and data.treeOptions.data|default([]) %}
                     <div class="jstree-search-component" data-name="jstree-search-component">
-                        <input type="search" placeholder="Quick Search" class="jstree-search-component__input" data-name="search"/>
+                        <input type="search" placeholder="{{ 'oro.ui.jstree.quick_search'|trans }}" class="jstree-search-component__input" data-name="search"/>
                         <span data-name="clear-search" class="jstree-search-component__clear-icon">
                             <i class="fa fa-close"></i>
                         </span>

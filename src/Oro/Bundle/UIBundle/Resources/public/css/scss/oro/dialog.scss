@@ -246,10 +246,6 @@
         }
     }
 
-    .grid-toolbar {
-        min-width: $dialog-grid-toolbar-min-width;
-    }
-
     // Reset offset for layout content into dialog
     .ui-dialog-content {
         form > .layout-content {

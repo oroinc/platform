@@ -433,14 +433,8 @@ textarea {
     @include clearfix();
 
     &.row-fluid-divider {
-        background: url(../../img/vertical-separator.png) repeat-y 50% 0;
-    }
-}
-
-/* fix incorrect aligment of fluid divider line in Firefox */
-@-moz-document url-prefix() {
-    .row-fluid.row-fluid-divider {
-        background-position: calc(50% - 1px) 0;
+        background: linear-gradient($additional-ultra-light, $additional-ultra-light) repeat-y 50% 0;
+        background-size: 1px 100%;
     }
 }
 
@@ -629,7 +623,8 @@ label.radio.error {
         padding: 20px 15px;
 
         &.box-split-content {
-            background: url(../../img/vertical-separator.png) repeat-y center 0;
+            background: linear-gradient($additional-ultra-light, $additional-ultra-light) repeat-y 50% 0;
+            background-size: 1px 100%;
 
             .responsive-small &,
             .responsive-big & {

@@ -22,6 +22,7 @@ oro:
             job_scheduled.message: "The job has been added to the queue"
             job_progress: Check progress
         recent_emails_widget:
+            title: Recent emails
             no_subject: "no subject"
         form:
             choose_template:                     Choose a Template
@@ -294,6 +295,7 @@ oro:
         show_details.tooltip:     Show details
         show_details.label:       Email details
         contexts:
+            label:                Contexts
             tooltip:              Context is any record or records that have meaningful relation to an email conversation. When you add context of a record to the email conversation, it will be displayed in the Activity list of that record.
         not_found:                Email with id "%id%" can not be found
         forbidden:                Action forbidden

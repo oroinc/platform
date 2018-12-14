@@ -545,6 +545,20 @@ define(function(require) {
             }
 
             return true;
+        },
+
+        /**
+         * Checking initialize select2 widget
+         * hide criteria witout applying and validation value if select2 have not been initialize yet
+         * @returns {*|void}
+         * @private
+         */
+        _applyValueAndHideCriteria: function() {
+            if (!this.isInitSelect2) {
+                return this._hideCriteria();
+            }
+
+            DictionaryFilter.__super__._applyValueAndHideCriteria.call(this);
         }
     });
 

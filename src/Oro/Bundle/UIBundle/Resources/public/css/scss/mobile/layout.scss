@@ -50,6 +50,12 @@ body {
     }
 }
 
+.product-container {
+    .jstree-wrapper {
+        margin-top: 10px;
+    }
+}
+
 .page-title + [data-bound-component*="datagrid"] {
     @include safe-area-property-left(padding-left, $content-padding, false);
     @include safe-area-property-right(padding-right, $content-padding, false);
@@ -303,7 +309,8 @@ form > .layout-content {
 
                 .row-fluid {
                     &.row-fluid-divider {
-                        background: url(../../img/vertical-separator.png) repeat-y 50% 0;
+                        background: linear-gradient($additional-ultra-light, $additional-ultra-light) repeat-y 50% 0;
+                        background-size: 1px 100%;
                     }
                 }
             }
