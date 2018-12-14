@@ -2,15 +2,18 @@
 
 namespace Oro\Bundle\MigrationBundle\Command;
 
-use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader;
 use Oro\Bundle\MigrationBundle\Migration\MigrationExecutor;
 use Oro\Component\Log\OutputLogger;
+use Oro\Component\PhpUtils\Tools\CommandExecutor\CommandExecutor;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * This command load migrations
+ */
 class LoadMigrationsCommand extends ContainerAwareCommand
 {
     /**
