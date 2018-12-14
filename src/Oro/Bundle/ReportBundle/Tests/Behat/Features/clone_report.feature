@@ -8,7 +8,6 @@ Feature: Clone report
   Scenario: Create report
     Given I login as administrator
     And I go to Reports & Segments/ Manage Custom Reports
-    And there are one records in grid
     When I click "Create Report"
     And I fill "Report Form" with:
       | Name        | Report on clone |
@@ -23,7 +22,6 @@ Feature: Clone report
       | Field Condition | Username | contains | test |
     And I save and close form
     Then I should see "Report saved" flash message
-    And there are two records in grid
 
   Scenario: Check clone button exist on grid
     When I go to Reports & Segments/ Manage Custom Reports
@@ -57,7 +55,7 @@ Feature: Clone report
 
   Scenario: Clone report from grid
     Given I go to Reports & Segments/ Manage Custom Reports
-    Then there are 4 records in grid
+    Then there are 3 records in grid
     When I click clone "Report on clone" in grid
     Then Name field should has "Copy of Report on clone" value
     When I fill in "Name" with "Copy of Report on clone from grid"
@@ -67,7 +65,7 @@ Feature: Clone report
 
   Scenario: Check index page after clone
     Given I go to Reports & Segments/ Manage Custom Reports
-    Then there are 5 records in grid
+    Then there are 4 records in grid
     And I should see "Copy of Report on clone" in grid
     And I should see "Copy of Report on clone from edit page" in grid
     And I should see "Copy of Report on clone from grid" in grid
