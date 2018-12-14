@@ -110,6 +110,7 @@ define([
             var type = $(e.currentTarget).attr('data-value');
             this._onClickChoiceValueSetType(type);
 
+            this._alignCriteria();
             e.preventDefault();
         },
 
