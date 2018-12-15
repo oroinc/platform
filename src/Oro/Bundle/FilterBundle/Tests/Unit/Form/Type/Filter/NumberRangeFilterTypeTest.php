@@ -8,6 +8,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -24,10 +25,11 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     protected function setUp()
     {
         $translator = $this->createMockTranslator();
+        $localeSettings = $this->createMockLocaleSettings();
         $this->type = new NumberRangeFilterType($translator);
         $this->formExtensions[] = new CustomFormExtension([
             new FilterType($translator),
-            new NumberFilterType($translator),
+            new NumberFilterType($translator, $localeSettings),
         ]);
         $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
@@ -174,5 +176,16 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
                 ],
             ],
         ];
+    }
+
+    private function createMockLocaleSettings()
+    {
+        $localeSettings = $this->createMock(LocaleSettings::class);
+        $localeSettings
+            ->expects($this->any())
+            ->method('getLocale')
+            ->willReturn('en');
+
+        return $localeSettings;
     }
 }

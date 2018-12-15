@@ -3,8 +3,8 @@
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\ImportExport\Serializer\Normalizer;
 
 use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
-use Oro\Bundle\CurrencyBundle\Formatter\NumberFormatter;
 use Oro\Bundle\CurrencyBundle\ImportExport\Serializer\Normalizer\MultiCurrencyNormalizer;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 class MultiCurrencyNormalizerTest extends \PHPUnit\Framework\TestCase
 {

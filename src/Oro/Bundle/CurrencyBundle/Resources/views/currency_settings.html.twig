@@ -1,8 +1,0 @@
-<script type="text/javascript">
-require(['oroconfig/js/configuration', 'orolocale/js/locale-settings'],
-    function(configuration, localeSettings) {
-        configuration.set('currency-view-type', '{{ oro_currency_view_type() }}');
-        configuration.set('is-currency-symbol-prepend', {{ oro_currency_symbol_prepend() ? 'true' : 'false' }});
-        localeSettings.extendSettings({'currency_data': {{ oro_currency_symbol_collection() }} });
-    });
-</script>
