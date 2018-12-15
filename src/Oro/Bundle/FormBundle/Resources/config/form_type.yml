@@ -384,3 +384,10 @@ services:
             - '@oro_form.related_entity_collection.form.type.api'
         tags:
             - { name: form.type, alias: oro_related_entity_standalone_collection_api }
+
+    oro_form.type.hidden_number:
+        class: 'Oro\Bundle\FormBundle\Form\Type\OroHiddenNumberType'
+        arguments:
+            - '@oro_locale.formatter.number'
+        tags:
+            - { name: form.type, alias: oro_hidden_number }

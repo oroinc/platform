@@ -23,6 +23,8 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
             language: 'en',
             country: 'US',
             currency: 'USD',
+            currencyViewType: 'symbol',
+            currencySymbolPrepend: true,
             datetime_separator: false,
             timezone: 'UTC',
             timezone_offset: '+00:00',
@@ -213,6 +215,14 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
                 return this.settings.currency_data[currencyCode].symbol;
             }
             return currencyCode;
+        },
+
+        getCurrencyViewType: function() {
+            return this.settings.currencyViewType;
+        },
+
+        isCurrencySymbolPrepend: function() {
+            return this.settings.currencySymbolPrepend;
         },
 
         /**
