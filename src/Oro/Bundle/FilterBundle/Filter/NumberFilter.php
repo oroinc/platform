@@ -3,8 +3,12 @@
 namespace Oro\Bundle\FilterBundle\Filter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Exception\LogicException;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 
+/**
+ * Basic number filter which supports multiple operators, for "orm" datasource.
+ */
 class NumberFilter extends AbstractFilter
 {
     /**

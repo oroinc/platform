@@ -1,0 +1,797 @@
+af_USD:
+    expected: US$1 234,57
+    value: 1234.56789
+    currency: USD
+    locale: af
+
+ak_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: ak
+
+am_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: am
+
+ar_USD:
+    expected: US$ ١٬٢٣٤٫٥٧
+    value: 1234.56789
+    currency: USD
+    locale: ar
+
+as_USD:
+    expected: US$ ১,২৩৪.৫৭
+    value: 1234.56789
+    currency: USD
+    locale: as
+
+az_USD:
+    expected: US$ 1.234,57
+    value: 1234.56789
+    currency: USD
+    locale: az
+
+be_USD:
+    expected: $1 234,57
+    value: 1234.56789
+    currency: USD
+    locale: be
+
+bg_USD:
+    expected: 1 234,57 щ.д.
+    value: 1234.56789
+    currency: USD
+    locale: bg
+
+bm_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: bm
+
+bn_USD:
+    expected: ১,২৩৪.৫৭US$
+    value: 1234.56789
+    currency: USD
+    locale: bn
+
+bo_USD:
+    expected: US$ 1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: bo
+
+br_USD:
+    expected: US$ 1 234,57
+    value: 1234.56789
+    currency: USD
+    locale: br
+
+bs_USD:
+    expected: US$ 1.234,57
+    value: 1234.56789
+    currency: USD
+    locale: bs
+
+ca_USD:
+    expected: 1.234,57 $
+    value: 1234.56789
+    currency: USD
+    locale: ca
+
+ce_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: ce
+
+cs_USD:
+    expected: 1 234,57 US$
+    value: 1234.56789
+    currency: USD
+    locale: cs
+
+cy_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: cy
+
+da_USD:
+    expected: 1.234,57 $
+    value: 1234.56789
+    currency: USD
+    locale: da
+
+de_USD:
+    expected: 1.234,57 $
+    value: 1234.56789
+    currency: USD
+    locale: de
+
+de_DE_USD:
+    expected: 1.234,57 $
+    value: 1234.56789
+    currency: USD
+    locale: de_DE
+
+de_DE_EUR:
+    expected: 1.234,57 €
+    value: 1234.56789
+    currency: EUR
+    locale: de_DE
+
+dz_USD:
+    expected: US$༡,༢༣༤.༥༧
+    value: 1234.56789
+    currency: USD
+    locale: dz
+
+ee_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: ee
+
+el_USD:
+    expected: 1.234,57 $
+    value: 1234.56789
+    currency: USD
+    locale: el
+
+en_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: en
+
+en_US_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: en_US
+
+en_US_EUR:
+    expected: €1,234.57
+    value: 1234.56789
+    currency: EUR
+    locale: en_US
+
+en_CA_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: en_CA
+
+eo_USD:
+    expected: US$ 1 234,57
+    value: 1234.56789
+    currency: USD
+    locale: eo
+
+es_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: es_US
+
+et_USD:
+    expected: 1 234,57 $
+    value: 1234.56789
+    currency: USD
+    locale: et
+
+eu_USD:
+    expected: 1.234,57 US$
+    value: 1234.56789
+    currency: USD
+    locale: eu
+
+fa_USD:
+    expected: ‎$۱٬۲۳۴٫۵۷
+    value: 1234.56789
+    currency: USD
+    locale: fa
+
+ff_USD:
+    expected: 1 234,57 US$
+    value: 1234.56789
+    currency: USD
+    locale: ff
+
+fi_USD:
+    expected: 1 234,57 $
+    value: 1234.56789
+    currency: USD
+    locale: fi
+
+fo_USD:
+    expected: US$1.234,57
+    value: 1234.56789
+    currency: USD
+    locale: fo
+
+fr_USD:
+    expected: 1 234,57 $US
+    value: 1234.56789
+    currency: USD
+    locale: fr
+
+fy_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: fy
+
+ga_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: ga
+
+gd_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: gd
+
+gl_USD:
+    expected: $1.234,57
+    value: 1234.56789
+    currency: USD
+    locale: gl
+
+gu_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: gu
+
+gv_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: gv
+
+ha_USD:
+    expected: US$ 1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: ha
+
+he_USD:
+    expected: 1,234.57 US$
+    value: 1234.56789
+    currency: USD
+    locale: he
+
+hi_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: hi
+
+hr_USD:
+    expected: 1.234,57 USD
+    value: 1234.56789
+    currency: USD
+    locale: hr
+
+hu_USD:
+    expected: 1 234,57 $
+    value: 1234.56789
+    currency: USD
+    locale: hu
+
+hy_USD:
+    expected: 1234,57 $
+    value: 1234.56789
+    currency: USD
+    locale: hy
+
+id_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: US$1.234,57
+
+ig_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: ig
+
+ii_USD:
+    expected: US$ 1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: ii
+
+in_USD:
+    expected: US$1.234,57
+    value: 1234.56789
+    currency: USD
+    locale: in
+
+is_USD:
+    expected: 1.234,57 USD
+    value: 1234.56789
+    currency: USD
+    locale: is
+
+it_USD:
+    expected: 1.234,57 US$
+    value: 1234.56789
+    currency: USD
+    locale: it
+
+iw_USD:
+    expected: 1,234.57 US$
+    value: 1234.56789
+    currency: USD
+    locale: iw
+
+ja_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: ja
+
+ka_USD:
+    expected: 1 234,57 US$
+    value: 1234.56789
+    currency: USD
+    locale: ka
+
+ki_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: ki
+
+kk_USD:
+    expected: 1 234,57 US$
+    value: 1234.56789
+    currency: USD
+    locale: kk
+
+kl_USD:
+    expected: US$1.234,57
+    value: 1234.56789
+    currency: USD
+    locale: kl
+
+km_USD:
+    expected: US$1.234,57
+    value: 1234.56789
+    currency: USD
+    locale: km
+
+kn_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: kn
+
+ko_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: ko
+
+ks_USD:
+    expected: US$ ۱٬۲۳۴٫۵۷
+    value: 1234.56789
+    currency: USD
+    locale: ks
+
+kw_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: kw
+
+ky_USD:
+    expected: 1 234,57 USD
+    value: 1234.56789
+    currency: USD
+    locale: ky
+
+lb_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: lb
+
+lg_USD:
+    expected: 1,234.57US$
+    value: 1234.56789
+    currency: USD
+    locale: lg
+
+ln_USD:
+    expected: 1.234,57 US$
+    value: 1234.56789
+    currency: USD
+    locale: ln
+
+lo_USD:
+    expected: US$1.234,57
+    value: 1234.56789
+    currency: USD
+    locale: lo
+
+lt_USD:
+    expected: 1 234,57 USD
+    value: 1234.56789
+    currency: USD
+    locale: lt
+
+lu_USD:
+    expected: 1.234,57US$
+    value: 1234.56789
+    currency: USD
+    locale: lu
+
+lv_USD:
+    expected: $1 234,57
+    value: 1234.56789
+    currency: USD
+    locale: lv
+
+mg_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: mg
+
+mk_USD:
+    expected: US$ 1.234,57
+    value: 1234.56789
+    currency: USD
+    locale: mk
+
+ml_USD:
+    expected: 1,234.57$
+    value: 1234.56789
+    currency: USD
+    locale: ml
+
+mn_USD:
+    expected: $ 1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: mn
+
+mo_USD:
+    expected: 1.234,57 USD
+    value: 1234.56789
+    currency: USD
+    locale: mo
+
+mr_USD:
+    expected: $१,२३४.५७
+    value: 1234.56789
+    currency: USD
+    locale: mr
+
+ms_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: ms
+
+mt_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: mt
+
+my_USD:
+    expected: US$ ၁,၂၃၄.၅၇
+    value: 1234.56789
+    currency: USD
+    locale: my
+
+nb_USD:
+    expected: USD 1 234,57
+    value: 1234.56789
+    currency: USD
+    locale: nb
+
+nd_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: nd
+
+ne_USD:
+    expected: US$१,२३४.५७
+    value: 1234.56789
+    currency: USD
+    locale: ne
+
+nl_USD:
+    expected: US$ 1.234,57
+    value: 1234.56789
+    currency: USD
+    locale: nl
+
+nn_USD:
+    expected: 1 234,57 US$
+    value: 1234.56789
+    currency: USD
+    locale: nn
+
+no_USD:
+    expected: USD 1 234,57
+    value: 1234.56789
+    currency: USD
+    locale: no
+
+om_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: om
+
+or_USD:
+    expected: US$ 1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: or
+
+os_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: os
+
+pa_USD:
+    expected: US$ 1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: pa
+
+pl_USD:
+    expected: 1 234,57 USD
+    value: 1234.56789
+    currency: USD
+    locale: pl
+
+ps_USD:
+    expected: ۱٬۲۳۴٫۵۷ US$
+    value: 1234.56789
+    currency: USD
+    locale: ps
+
+pt_USD:
+    expected: US$1.234,57
+    value: 1234.56789
+    currency: USD
+    locale: pt
+
+qu_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: qu
+
+rm_USD:
+    expected: 1’234.57 US$
+    value: 1234.56789
+    currency: USD
+    locale: rm
+
+rn_USD:
+    expected: 1.234,57US$
+    value: 1234.56789
+    currency: USD
+    locale: rn
+
+ro_USD:
+    expected: 1.234,57 USD
+    value: 1234.56789
+    currency: USD
+    locale: ro
+
+ru_USD:
+    expected: 1 234,57 $
+    value: 1234.56789
+    currency: USD
+    locale: ru
+
+rw_USD:
+    expected: US$ 1.234,57
+    value: 1234.56789
+    currency: USD
+    locale: rw
+
+se_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: se
+
+sg_USD:
+    expected: US$1.234,57
+    value: 1234.56789
+    currency: USD
+    locale: sg
+
+sh_USD:
+    expected: 1.234,57 US$
+    value: 1234.56789
+    currency: USD
+    locale: sh
+
+si_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: si
+
+sk_USD:
+    expected: 1 234,57 USD
+    value: 1234.56789
+    currency: USD
+    locale: sk
+
+sl_USD:
+    expected: $1.234,57
+    value: 1234.56789
+    currency: USD
+    locale: sl
+
+sn_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: sn
+
+so_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: so
+
+sq_USD:
+    expected: 1 234,57 US$
+    value: 1234.56789
+    currency: USD
+    locale: sq
+
+sr_USD:
+    expected: 1.234,57 US$
+    value: 1234.56789
+    currency: USD
+    locale: sr
+
+sv_USD:
+    expected: 1 234:57 US$
+    value: 1234.56789
+    currency: USD
+    locale: sv
+
+sw_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: sw
+
+ta_USD:
+    expected: $ 1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: ta
+
+te_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: te
+
+tq_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: tg
+
+th_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: th
+
+ti_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: ti
+
+tl_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: tl
+
+to_USD:
+    expected: US$ 1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: to
+
+tr_USD:
+    expected: 1.234,57 $
+    value: 1234.56789
+    currency: USD
+    locale: tr
+
+tt_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: tt
+
+ug_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: ug
+
+uk_USD:
+    expected: 1 234,57 USD
+    value: 1234.56789
+    currency: USD
+    locale: uk
+
+ur_USD:
+    expected: $1,234.57‎
+    value: 1234.56789
+    currency: USD
+    locale: ur
+
+uz_USD:
+    expected: US$ 1 234,57
+    value: 1234.56789
+    currency: USD
+    locale: uz
+
+vi_USD:
+    expected: 1.234,57 US$
+    value: 1234.56789
+    currency: USD
+    locale: vi
+
+wo_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: wo
+
+yi_USD:
+    expected: $1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: yi
+
+yo_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: yo
+
+zh_USD:
+    expected: US$ 1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: zh
+
+zu_USD:
+    expected: US$1,234.57
+    value: 1234.56789
+    currency: USD
+    locale: zu

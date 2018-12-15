@@ -9,6 +9,7 @@ use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterManager;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterPriceItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridInterface;
@@ -881,6 +882,52 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     //@codingStandardsIgnoreStart
     /**
+     * Filter grid by string filter
+     * Example: I filter "Price (USD)" as equals "12" use "item" unit
+     * Example: I filter "Price (USD)" as between "5,89" and "6,11" use "item" unit
+     *
+     * @When /^(?:|I )filter "(?P<filterName>.+)" as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" use "(?P<unitType>[\w\s\=\<\>]+)" unit$/
+     * @When /^(?:|I )filter "(?P<filterName>.+)" as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" use "(?P<unitType>[\w\s\=\<\>]+)" unit in "(?P<filterGridName>[\w\s]+)" grid$/
+     * @When /^(?:|I )filter "(?P<filterName>.+)" as (?P<type>(?:|between|not between)) "(?P<value>[\w\s\,\.\_\%]+)" and "(?P<secondValue>[\w\s\,\.\_\%]+)" use "(?P<unitType>[\w\s\=\<\>]+)" unit$/
+     * @When /^(?:|I )filter "(?P<filterName>.+)" as (?P<type>(?:|between|not between)) "(?P<value>[\w\s\,\.\_\%]+)" and "(?P<secondValue>[\w\s\,\.\_\%]+)" use "(?P<unitType>[\w\s\=\<\>]+)" unit in "(?P<filterGridName>[\w\s]+)" grid$/
+     *
+     * @param string $filterName
+     * @param string $type
+     * @param string $value
+     * @param string $secondValue
+     * @param string $unitType
+     * @param string $filterGridName
+     * @param string $strictly
+     */
+    //@codingStandardsIgnoreEnd
+    public function applyPriceFilter(
+        $filterName,
+        $type,
+        $value = null,
+        $secondValue = null,
+        $unitType = null,
+        $filterGridName = 'Grid',
+        string $strictly = ''
+    ) {
+        /** @var GridFilterPriceItem $filterItem */
+        $filterItem = $this
+            ->getGridFilters($filterGridName)
+            ->getFilterItem('GridFilterPriceItem', $filterName, $strictly === 'strictly');
+
+        $filterItem->open();
+        $filterItem->selectType($type);
+        $filterItem->selectUnitType($unitType);
+        $filterItem->setFilterValue($value);
+
+        if ($type === 'between' && $secondValue !== null) {
+            $filterItem->setSecondFilterValue($secondValue);
+        }
+
+        $filterItem->submit();
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
      * Filter grid by choice filter
      * Example: When I choose filter for Status as Is Any Of "Option 1"
      * Example: And I choose filter for Step as Is not Any Of "Option 2"
@@ -1046,24 +1093,59 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * Example: Then I should see grid with filter hints:
+     * Example: Then I should see filter hints in frontend grid:
      *            | Any Text: contains "Lamp" |
      *
-     * @When /^(?:|I )should see grid with filter hints:$/
+     * @When /^(?:|I )should see filter hints in frontend grid:$/
+     * @When /^(?:|I )should see filter hints in "(?P<gridName>[\w\s]+)" frontend grid:$/
      *
      * @param TableNode $table
+     * @param string    $gridName
      */
-    public function shouldSeeGridWithFilterHints(TableNode $table)
+    public function shouldSeeFrontendGridWithFilterHints(TableNode $table, string $gridName = 'Grid')
     {
         $hints = array_filter(
             array_map(
                 function ($item) {
-                    $label = trim($this->createElement('GridFilterHintLabel', $item)->getText());
-                    $text = trim($this->createElement('GridFilterHint', $item)->getText());
+                    $label = trim($this->createElement('FrontendGridFilterHintLabel', $item)->getText());
+                    $text = trim($this->createElement('FrontendGridFilterHint', $item)->getText());
 
                     return $label && $text ? sprintf('%s %s', $label, $text) : '';
                 },
-                $this->findAllElements('GridFilterHintItem')
+                $this->getGridFilters($gridName)->findAll('css', 'span.filter-criteria-hint-item')
+            )
+        );
+
+        foreach ($table->getRows() as $row) {
+            list($hint) = $row;
+
+            $this->assertTrue(
+                in_array($hint, $hints, true),
+                sprintf('Hint "%s" not found on page', $hint)
+            );
+        }
+    }
+
+    /**
+     * Example: Then should see filter hints in grid:
+     *            | Any Text: contains "Lamp" |
+     *
+     * @When /^(?:|I )should see filter hints in grid:$/
+     * @When /^(?:|I )should see filter hints in "(?P<gridName>[\w\s]+)" grid:$/
+     *
+     * @param TableNode $table
+     * @param string    $gridName
+     */
+    public function shouldSeeGridWithFilterHints(TableNode $table, string $gridName = 'Grid')
+    {
+        $hints = array_filter(
+            array_map(
+                function ($item) {
+                    $text = trim($this->createElement('GridFilterHintLabel', $item)->getText());
+
+                    return $text ? trim(sprintf('%s', str_replace('Reset', '', $text))) : '';
+                },
+                $this->getGridFilters($gridName)->findAll('xpath', '//div[@class="filter-item oro-drop"]')
             )
         );
 

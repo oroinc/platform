@@ -58,7 +58,9 @@ services:
 
     oro_filter.form.type.filter.number:
         class: '%oro_filter.form.type.filter.number.class%'
-        arguments: ["@translator"]
+        arguments:
+            - '@translator'
+            - '@oro_locale.settings'
         tags:
             - { name: form.type, alias: oro_type_number_filter }
 
