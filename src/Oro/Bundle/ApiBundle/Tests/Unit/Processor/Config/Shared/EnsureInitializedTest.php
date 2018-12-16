@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
-use Oro\Bundle\ApiBundle\Config\ExcludeCustomFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\EnsureInitialized;
 use Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub\TestConfigExtension;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
@@ -68,66 +67,6 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
         );
         self::assertFalse(
             $this->context->has('test')
-        );
-    }
-
-    public function testProcessWithExcludeCustomFieldsConfigExtra()
-    {
-        $this->context->setResult($this->createConfigObject([]));
-        $this->context->setExtras([
-            new ExcludeCustomFieldsConfigExtra()
-        ]);
-        $this->processor->process($this->context);
-
-        $this->assertConfig(
-            [
-                'exclusion_policy' => 'custom_fields'
-            ],
-            $this->context->getResult()
-        );
-    }
-
-    public function testProcessWithExcludeCustomFieldsConfigExtraButExcludeWasNotRequested()
-    {
-        $this->context->setResult($this->createConfigObject([]));
-        $this->context->setExtras([
-            new ExcludeCustomFieldsConfigExtra(false)
-        ]);
-        $this->processor->process($this->context);
-
-        $this->assertConfig(
-            [],
-            $this->context->getResult()
-        );
-    }
-
-    public function testProcessWithExcludeCustomFieldsConfigExtraButExclusionPolicyIsAlreadySetToAll()
-    {
-        $this->context->setResult($this->createConfigObject(['exclusion_policy' => 'all']));
-        $this->context->setExtras([
-            new ExcludeCustomFieldsConfigExtra()
-        ]);
-        $this->processor->process($this->context);
-
-        $this->assertConfig(
-            [
-                'exclusion_policy' => 'all'
-            ],
-            $this->context->getResult()
-        );
-    }
-
-    public function testProcessWithExcludeCustomFieldsConfigExtraButExclusionPolicyIsAlreadySetToNone()
-    {
-        $this->context->setResult($this->createConfigObject(['exclusion_policy' => 'none']));
-        $this->context->setExtras([
-            new ExcludeCustomFieldsConfigExtra()
-        ]);
-        $this->processor->process($this->context);
-
-        $this->assertConfig(
-            [],
-            $this->context->getResult()
         );
     }
 }
