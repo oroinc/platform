@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Config\ExcludeCustomFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -37,6 +38,7 @@ class EnsureInitialized implements ProcessorInterface
                 $this->configLoaderFactory->getLoader(ConfigUtil::DEFINITION)->load([])
             );
         }
+
         $extras = $context->getExtras();
         foreach ($extras as $extra) {
             $sectionName = $extra->getName();
@@ -45,6 +47,17 @@ class EnsureInitialized implements ProcessorInterface
                     $sectionName,
                     $this->configLoaderFactory->getLoader($extra->getConfigType())->load([])
                 );
+            }
+        }
+
+        if ($context->hasExtra(ExcludeCustomFieldsConfigExtra::NAME)) {
+            /** @var ExcludeCustomFieldsConfigExtra $excludeCustomFieldsExtra */
+            $excludeCustomFieldsExtra = $context->getExtra(ExcludeCustomFieldsConfigExtra::NAME);
+            if ($excludeCustomFieldsExtra->isExclude()) {
+                $definition = $context->getResult();
+                if (!$definition->hasExclusionPolicy()) {
+                    $definition->setExclusionPolicy(ConfigUtil::EXCLUSION_POLICY_CUSTOM_FIELDS);
+                }
             }
         }
     }
