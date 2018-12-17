@@ -421,6 +421,7 @@ services:
             - '@oro_action.resolver.destination_page_resolver'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
+            - ['setOriginalUrlFixer', ['@oro_workflow.fixer.original_url_fixer']]
         tags:
            - { name: oro.action.extension.button_provider, priority: 100 }
 
@@ -432,6 +433,7 @@ services:
             - '@oro_action.resolver.destination_page_resolver'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
+            - ['setOriginalUrlFixer', ['@oro_workflow.fixer.original_url_fixer']]
         tags:
            - { name: oro.action.extension.button_provider, priority: 110 }
 
@@ -443,6 +445,7 @@ services:
             - '@oro_action.resolver.destination_page_resolver'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
+            - ['setOriginalUrlFixer', ['@oro_workflow.fixer.original_url_fixer']]
         tags:
            - { name: oro.action.extension.button_provider, priority: 120 }
 
@@ -626,3 +629,9 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }
+
+    oro_workflow.fixer.original_url_fixer:
+        class: Oro\Bundle\WorkflowBundle\Fixer\OriginalUrlFixer
+        public: false
+        arguments:
+            - '@router'
