@@ -55,9 +55,13 @@
         {% if errors|length > 0 %}
             {% if form.parent %}
                 {% set combinedError = '' %}
+                {% set newErrors = [] %}
                 {% for error in errors %}
-                    {% set combinedError = (combinedError != '') ? combinedError ~ '; ' ~ error.message : error.message %}
+                    {% if error.message not in newErrors %}
+                        {% set newErrors = newErrors|merge([error.message]) %}
+                    {% endif %}
                 {% endfor %}
+                {% set combinedError = newErrors|join('; ') %}
                 <span class="validation-failed"><span><span>{{ combinedError }}</span></span></span>
             {% else %}
                 {{ parent() }}

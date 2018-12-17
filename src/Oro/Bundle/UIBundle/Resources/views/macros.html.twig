@@ -121,8 +121,11 @@
         title - row title
         data - row data
 #}
-{% macro renderControlGroup(title, data) %}
-    <div class="control-group attribute-row">
+{% macro renderControlGroup(title, data, options) %}
+    {% set options = {
+        rootClass: 'attribute-row'
+    }|merge(options|default({})) %}
+    <div class="control-group{% if options.rootClass %} {{ options.rootClass }}{% endif %}">
         <label class="control-label">{{ title }}</label>
         <div class="controls">
             {{ data|raw }}

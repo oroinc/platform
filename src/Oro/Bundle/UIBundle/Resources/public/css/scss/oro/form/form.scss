@@ -49,6 +49,10 @@
     @include placeholder {
         color: $primary-700;
     }
+
+    td & {
+        margin-bottom: 0;
+    }
 }
 
 /**
