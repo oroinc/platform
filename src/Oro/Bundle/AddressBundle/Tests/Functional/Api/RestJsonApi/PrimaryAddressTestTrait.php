@@ -4,6 +4,7 @@ namespace Oro\Bundle\AddressBundle\Tests\Functional\Api\RestJsonApi;
 
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\FormBundle\Entity\PrimaryItem;
 
 /**
@@ -70,7 +71,10 @@ trait PrimaryAddressTestTrait
         self::assertTrue($existingAddress->isPrimary());
 
         $data = $this->getRequestData(self::CREATE_MIN_REQUEST_DATA);
-        $data['data']['relationships'][self::OWNER_RELATIONSHIP]['data']['id'] = (string)$ownerId;
+        $data['data']['relationships'][self::OWNER_RELATIONSHIP]['data'] = [
+            'type' => self::OWNER_ENTITY_TYPE,
+            'id'   => (string)$ownerId
+        ];
         $data['data']['attributes']['primary'] = true;
         $response = $this->post(
             ['entity' => self::ENTITY_TYPE],
@@ -85,6 +89,10 @@ trait PrimaryAddressTestTrait
 
     public function testCreateOneMorePrimaryAddressViaOwnerEntityUpdateResource()
     {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+            self::markTestSkipped('The "update" action is disabled for owner entity');
+        }
+
         /** @var AbstractAddress|PrimaryItem $existingAddress */
         $existingAddress = $this->getReference(self::PRIMARY_ADDRESS_REF);
         $existingAddressId = $existingAddress->getId();
@@ -99,7 +107,10 @@ trait PrimaryAddressTestTrait
 
         $addressData = $this->getRequestData(self::CREATE_MIN_REQUEST_DATA);
         $addressData['data']['id'] = 'new_address';
-        $addressData['data']['relationships'][self::OWNER_RELATIONSHIP]['data']['id'] = (string)$ownerId;
+        $data['data']['relationships'][self::OWNER_RELATIONSHIP]['data'] = [
+            'type' => self::OWNER_ENTITY_TYPE,
+            'id'   => (string)$ownerId
+        ];
         $addressData['data']['attributes']['primary'] = true;
         $data = [
             'data'     => [
@@ -142,7 +153,10 @@ trait PrimaryAddressTestTrait
         self::assertCount(0, $owner->getAddresses());
 
         $data = $this->getRequestData(self::CREATE_MIN_REQUEST_DATA);
-        $data['data']['relationships'][self::OWNER_RELATIONSHIP]['data']['id'] = (string)$ownerId;
+        $data['data']['relationships'][self::OWNER_RELATIONSHIP]['data'] = [
+            'type' => self::OWNER_ENTITY_TYPE,
+            'id'   => (string)$ownerId
+        ];
         $data['data']['attributes']['primary'] = false;
         $response = $this->post(
             ['entity' => self::ENTITY_TYPE],
@@ -157,6 +171,10 @@ trait PrimaryAddressTestTrait
 
     public function testCreateNotPrimaryAddressWithOwnerEntityRelationshipViaOwnerEntityUpdateResource()
     {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+            self::markTestSkipped('The "update" action is disabled for owner entity');
+        }
+
         /** @var object $owner */
         $owner = $this->getOwner($this->getReference(self::PRIMARY_ADDRESS_REF));
         $ownerId = $owner->getId();
@@ -169,7 +187,10 @@ trait PrimaryAddressTestTrait
 
         $addressData = $this->getRequestData(self::CREATE_MIN_REQUEST_DATA);
         $addressData['data']['id'] = 'new_address';
-        $addressData['data']['relationships'][self::OWNER_RELATIONSHIP]['data']['id'] = (string)$ownerId;
+        $data['data']['relationships'][self::OWNER_RELATIONSHIP]['data'] = [
+            'type' => self::OWNER_ENTITY_TYPE,
+            'id'   => (string)$ownerId
+        ];
         $addressData['data']['attributes']['primary'] = false;
         $data = [
             'data'     => [
@@ -200,6 +221,10 @@ trait PrimaryAddressTestTrait
 
     public function testCreateNotPrimaryAddressWithoutOwnerEntityRelationshipViaOwnerEntityUpdateResource()
     {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+            self::markTestSkipped('The "update" action is disabled for owner entity');
+        }
+
         /** @var object $owner */
         $owner = $this->getOwner($this->getReference(self::PRIMARY_ADDRESS_REF));
         $ownerId = $owner->getId();
@@ -243,6 +268,10 @@ trait PrimaryAddressTestTrait
 
     public function testCreateSeveralPrimaryAddressesWithOwnerEntityRelationshipViaOwnerEntityUpdateResource()
     {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+            self::markTestSkipped('The "update" action is disabled for owner entity');
+        }
+
         /** @var object $owner */
         $owner = $this->getOwner($this->getReference(self::PRIMARY_ADDRESS_REF));
         $ownerId = $owner->getId();
@@ -255,11 +284,17 @@ trait PrimaryAddressTestTrait
 
         $addressData1 = $this->getRequestData(self::CREATE_MIN_REQUEST_DATA);
         $addressData1['data']['id'] = 'new_address1';
-        $addressData1['data']['relationships'][self::OWNER_RELATIONSHIP]['data']['id'] = (string)$ownerId;
+        $addressData1['data']['relationships'][self::OWNER_RELATIONSHIP]['data'] = [
+            'type' => self::OWNER_ENTITY_TYPE,
+            'id'   => (string)$ownerId
+        ];
         $addressData1['data']['attributes']['primary'] = false;
         $addressData2 = $this->getRequestData(self::CREATE_MIN_REQUEST_DATA);
         $addressData2['data']['id'] = 'new_address2';
-        $addressData2['data']['relationships'][self::OWNER_RELATIONSHIP]['data']['id'] = (string)$ownerId;
+        $addressData2['data']['relationships'][self::OWNER_RELATIONSHIP]['data'] = [
+            'type' => self::OWNER_ENTITY_TYPE,
+            'id'   => (string)$ownerId
+        ];
         $addressData2['data']['attributes']['primary'] = false;
         $data = [
             'data'     => [
@@ -292,6 +327,10 @@ trait PrimaryAddressTestTrait
 
     public function testCreateSeveralPrimaryAddressesWithoutOwnerEntityRelationshipViaOwnerEntityUpdateResource()
     {
+        if (!$this->isActionEnabled($this->getEntityClass(self::OWNER_ENTITY_TYPE), ApiActions::UPDATE)) {
+            self::markTestSkipped('The "update" action is disabled for owner entity');
+        }
+
         /** @var object $owner */
         $owner = $this->getOwner($this->getReference(self::PRIMARY_ADDRESS_REF));
         $ownerId = $owner->getId();

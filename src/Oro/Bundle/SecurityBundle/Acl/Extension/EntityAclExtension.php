@@ -19,6 +19,7 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
+ * The ACL extensions that check permissions for ORM entities.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityAclExtension extends AbstractAccessLevelAclExtension
@@ -410,7 +411,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
      */
     public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
     {
-        if (!$this->isSupportedObject($object)) {
+        if (!$this->isSupportedObject($object) || null === $this->getObjectId($object)) {
             return true;
         }
 

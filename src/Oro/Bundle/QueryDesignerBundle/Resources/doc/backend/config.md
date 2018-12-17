@@ -35,7 +35,7 @@ The `applicable` attribute describes rules then a filter will be used. In this c
 
 For instance if you need to use a special filter for `name` field of `User` entity, you can use the following applicable condition: `{entity: OroUserBundle:User, field: name}`
 The `type` attribute sets the identifier of a filter UI control. All existing controls you can find in [FilterBundle](../../../../FilterBundle/Resources/config/filters.yml). The value of `type` attribute in `query_designer.yml` should be equal of the value of `type` attribute of `oro_filter.extension.orm_filter.filter` tag.
-The `query_type` attribute sets the types of queries this filter will be available. The `all` word is reserved and it means the the filter will be available in all queries.
+The `query_type` attribute sets the types of queries this filter will be available. The `all` word is reserved and it means the filter will be available in all queries.
 
 How modify existing filter from your bundle
 -------------------------------------------

@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
@@ -61,7 +62,11 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
      */
     private function createPersistentCollection($owner)
     {
-        $coll = new PersistentCollection($this->em, 'TestClass', new ArrayCollection());
+        $coll = new PersistentCollection(
+            $this->em,
+            $this->createMock(ClassMetadata::class),
+            new ArrayCollection()
+        );
         $coll->setOwner($owner, ['inversedBy' => null, 'mappedBy' => 'test']);
 
         return $coll;
@@ -78,6 +83,30 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
         $prop = $refl->getProperty($property);
         $prop->setAccessible(true);
         $prop->setValue($object, $value);
+    }
+
+    public function testOnFlushForDisabledListener()
+    {
+        $this->uow->expects(self::never())
+            ->method('getScheduledEntityInsertions');
+        $this->uow->expects(self::never())
+            ->method('getScheduledEntityDeletions');
+        $this->uow->expects(self::never())
+            ->method('getScheduledEntityUpdates');
+        $this->uow->expects(self::never())
+            ->method('getScheduledCollectionDeletions');
+        $this->uow->expects(self::never())
+            ->method('getScheduledCollectionUpdates');
+
+        $this->tagGenerator->expects(self::never())
+            ->method('generate');
+
+        $event = new OnFlushEventArgs($this->em);
+        $this->eventListener->setEnabled(false);
+        $this->eventListener->onFlush($event);
+
+        self::assertAttributeEquals([], 'collectedTags', $this->eventListener);
+        self::assertAttributeEquals([], 'processedEntities', $this->eventListener);
     }
 
     public function testOnFlushForScheduledEntityInsertions()

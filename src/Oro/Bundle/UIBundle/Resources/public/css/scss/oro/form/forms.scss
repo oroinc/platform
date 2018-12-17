@@ -130,6 +130,12 @@
             .choice-widget-expanded {
                 padding-top: 6px;
             }
+
+            .select2 {
+                + input {
+                    margin-top: $input-outer-offset-bottom;
+                }
+            }
         }
 
         &.control-group-oro_type_filter {
@@ -160,7 +166,6 @@
         .control-group {
             &.attribute-row label.control-label {
                 cursor: default;
-                color: $primary-550;
             }
         }
     }

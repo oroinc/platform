@@ -128,6 +128,14 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&definition', requestType: rest&!json_api, priority: -28 }
 
+    oro_api.get_config.exclude_custom_fields:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExcludeCustomFields
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&definition', priority: -29 }
+
     oro_api.get_config.complete_definition:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition
         arguments:

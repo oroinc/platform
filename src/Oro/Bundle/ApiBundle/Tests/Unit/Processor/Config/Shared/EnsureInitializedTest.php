@@ -24,12 +24,10 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
 
     public function testProcessForNotInitializedConfigs()
     {
-        $this->context->setExtras(
-            [
-                new TestConfigSection('test_section'),
-                new TestConfigExtra('test')
-            ]
-        );
+        $this->context->setExtras([
+            new TestConfigSection('test_section'),
+            new TestConfigExtra('test')
+        ]);
         $this->processor->process($this->context);
 
         $this->assertConfig(
@@ -49,12 +47,10 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
     {
         $this->context->setResult($this->createConfigObject(['exclusion_policy' => 'all']));
         $this->context->set('test_section', $this->createConfigObject(['attr' => 'val']));
-        $this->context->setExtras(
-            [
-                new TestConfigSection('test_section'),
-                new TestConfigExtra('test')
-            ]
-        );
+        $this->context->setExtras([
+            new TestConfigSection('test_section'),
+            new TestConfigExtra('test')
+        ]);
         $this->processor->process($this->context);
 
         $this->assertConfig(

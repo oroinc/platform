@@ -624,7 +624,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
-     * Asserts the response content contains the the given data.
+     * Asserts the response content contains the given data.
      *
      * @param array|string $expectedContent The file name or full file path to YAML template file or array
      * @param Response     $response
@@ -666,7 +666,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
-     * Asserts the response content contains the the given validation error.
+     * Asserts the response content contains the given validation error.
      *
      * @param array    $expectedError
      * @param Response $response
@@ -681,7 +681,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
-     * Asserts the response content contains the the given validation errors.
+     * Asserts the response content contains the given validation errors.
      *
      * @param array    $expectedErrors
      * @param Response $response
