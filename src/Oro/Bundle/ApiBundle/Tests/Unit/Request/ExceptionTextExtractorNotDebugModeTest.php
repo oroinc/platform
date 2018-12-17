@@ -11,6 +11,10 @@ use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Exception\DisabledException;
+use Symfony\Component\Security\Core\Exception\LockedException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,8 +23,21 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::any())
+            ->method('trans')
+            ->willReturnCallback(function ($label, $parameters) {
+                $result = 'translated: ' . $label;
+                if (!empty($parameters)) {
+                    $result .= sprintf(' (%s)', implode(',', array_keys($parameters)));
+                }
+
+                return $result;
+            });
+
         $this->exceptionTextExtractor = new ExceptionTextExtractor(
             false,
+            $translator,
             [\UnexpectedValueException::class]
         );
     }
@@ -63,6 +80,9 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
             [new RuntimeException(), 500],
             [new ActionNotAllowedException(), 405],
             [new ForbiddenException('Reason.'), 403],
+            [new LockedException('Reason.'), 403],
+            [new DisabledException('Reason.'), 403],
+            [new UsernameNotFoundException('Reason.'), 403],
             [new ResourceNotAccessibleException(), 404],
             [new NotSupportedConfigOperationException('Test\Class', 'test_operation'), 400]
         ];
@@ -96,6 +116,9 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
             [new RuntimeException('Some error.'), 'runtime exception'],
             [new ActionNotAllowedException(), 'action not allowed exception'],
             [new ForbiddenException('Reason.'), 'forbidden exception'],
+            [new LockedException('Reason.'), 'authentication exception'],
+            [new DisabledException('Reason.'), 'authentication exception'],
+            [new UsernameNotFoundException('Reason.'), 'authentication exception'],
             [new ResourceNotAccessibleException(), 'resource not accessible exception'],
             [
                 new NotSupportedConfigOperationException('Test\Class', 'test_operation'),
@@ -182,6 +205,18 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
             [
                 new ForbiddenException('Reason.'),
                 'Reason.'
+            ],
+            [
+                new LockedException('Reason.'),
+                'translated: Account is locked.'
+            ],
+            [
+                new DisabledException('Reason.'),
+                'translated: Account is disabled.'
+            ],
+            [
+                new UsernameNotFoundException('Reason.'),
+                'translated: Username could not be found. ({{ username }}).'
             ],
             [
                 new ResourceNotAccessibleException(),

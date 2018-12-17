@@ -357,13 +357,7 @@ class DebugCommand extends AbstractDebugCommand
             }
 
             $attributesColumn = $this->formatProcessorAttributes($processors->getProcessorAttributes());
-
-            $table->addRow(
-                [
-                    $processorColumn,
-                    $attributesColumn
-                ]
-            );
+            $table->addRow([$processorColumn, $attributesColumn]);
             $i++;
         }
 
@@ -434,21 +428,34 @@ class DebugCommand extends AbstractDebugCommand
             return sprintf('<comment>%s</comment>%s', key($value), $items);
         }
 
-        return implode(
-            sprintf(' <comment>%s</comment> ', key($value)),
-            array_map(
-                function ($val) {
-                    if (is_array($val)) {
-                        $item = reset($val);
+        $delimiter = sprintf(' <comment>%s</comment> ', key($value));
+        $items = array_map(
+            function ($val) {
+                if (is_array($val)) {
+                    $item = reset($val);
 
-                        return sprintf('<comment>%s</comment>%s', key($val), $item);
-                    }
+                    return sprintf('<comment>%s</comment>%s', key($val), $item);
+                }
 
-                    return $val;
-                },
-                $items
-            )
+                return $val;
+            },
+            $items
         );
+
+        if ($items <= 3) {
+            return implode($delimiter, $items);
+        }
+
+        $result = '';
+        $chunks = array_chunk($items, 3);
+        foreach ($chunks as $chunk) {
+            if ($result) {
+                $result .= "\n" . $delimiter;
+            }
+            $result .= implode($delimiter, $chunk);
+        }
+
+        return $result;
     }
 
     /**

@@ -163,6 +163,7 @@ class Loader
                 $fixture = $this->fixtures[$fixtureId];
                 if (0 === count($this->getUnsequencedFixtures($sequences, $fixture->getDependencies()))) {
                     $sequences[$fixtureId] = $sequence++;
+                    break;
                 }
             }
 

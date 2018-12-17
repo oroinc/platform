@@ -123,7 +123,11 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
     {
         $node
             ->enumNode(ConfigUtil::EXCLUSION_POLICY)
-                ->values([ConfigUtil::EXCLUSION_POLICY_ALL, ConfigUtil::EXCLUSION_POLICY_NONE])
+                ->values([
+                    ConfigUtil::EXCLUSION_POLICY_ALL,
+                    ConfigUtil::EXCLUSION_POLICY_CUSTOM_FIELDS,
+                    ConfigUtil::EXCLUSION_POLICY_NONE
+                ])
             ->end()
             ->integerNode(ConfigUtil::MAX_RESULTS)->min(-1)->end()
             ->arrayNode(ConfigUtil::ORDER_BY)

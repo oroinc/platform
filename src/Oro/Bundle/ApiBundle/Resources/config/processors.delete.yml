@@ -40,7 +40,7 @@ services:
     oro_api.delete.entity_object_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck
         arguments:
-            - '@security.authorization_checker'
+            - '@oro_api.security.authorization_checker'
             - DELETE
         tags:
             - { name: oro.api.processor, action: delete, group: data_security_check, priority: 10 }

@@ -397,10 +397,18 @@ services:
             - '@service_container'
             - '@oro_api.request_expression_matcher'
 
+    oro_api.security.authorization_checker:
+        class: Oro\Bundle\ApiBundle\Util\AuthorizationChecker
+        public: false
+        arguments:
+            - '@security.authorization_checker'
+            - '@oro_security.acl.group_provider.chain'
+            - '@oro_api.doctrine_helper'
+
     oro_api.entity_serializer.acl_filter:
         class: Oro\Bundle\SecurityBundle\Filter\SerializerFieldFilter
         arguments:
-            - '@security.authorization_checker'
+            - '@oro_api.security.authorization_checker'
             - '@oro_entity_config.provider.security'
             - '@oro_api.entity_serializer.doctrine_helper'
         calls:
@@ -531,6 +539,7 @@ services:
         public: false
         arguments:
             - '%kernel.debug%'
+            - '@translator'
             -
                 - '\InvalidArgumentException'
                 - '\UnexpectedValueException'
