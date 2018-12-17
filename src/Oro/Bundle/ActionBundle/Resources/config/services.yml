@@ -73,7 +73,6 @@ services:
     oro_action.resolver.destination_page_resolver:
         class: 'Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver'
         arguments:
-            - '@request_stack'
             - '@oro_entity_config.helper.entity_config'
             - '@router'
 
@@ -255,3 +254,10 @@ services:
         arguments:
             - '@form.factory'
             - Oro\Bundle\ActionBundle\Form\Type\OperationExecutionType
+
+    oro_action.provider.original_url_provider:
+        class: 'Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider'
+        arguments:
+            - '@request_stack'
+            - '@router'
+            - '@oro_datagrid.converter.url_converter'

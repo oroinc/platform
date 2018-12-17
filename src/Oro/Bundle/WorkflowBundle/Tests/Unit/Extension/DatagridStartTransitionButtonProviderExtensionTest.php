@@ -6,8 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
-use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -30,8 +30,8 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var DestinationPageResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $destinationPageResolver;
+    /** @var OriginalUrlProvider|\PHPUnit\Framework\MockObject\MockObject */
+    protected $originalUrlProvider;
 
     /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $applicationProvider;
@@ -47,14 +47,14 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->routeProvider = $this->createMock(RouteProviderInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->destinationPageResolver = $this->createMock(DestinationPageResolver::class);
+        $this->originalUrlProvider = $this->createMock(OriginalUrlProvider::class);
         $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
 
         $this->extension = new DatagridStartTransitionButtonProviderExtension(
-            $this->doctrineHelper,
             $this->workflowRegistry,
             $this->routeProvider,
-            $this->destinationPageResolver
+            $this->originalUrlProvider,
+            $this->doctrineHelper
         );
         $this->extension->setApplicationProvider($this->applicationProvider);
     }
@@ -69,7 +69,7 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
             $this->routeProvider,
             $this->extension,
             $this->doctrineHelper,
-            $this->destinationPageResolver
+            $this->originalUrlProvider
         );
     }
 
@@ -105,7 +105,7 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
         $this->applicationProvider->expects($this->any())->method('getCurrentApplication')->willReturn($application);
 
         if ($expected) {
-            $this->destinationPageResolver->expects($this->once())->method('getOriginalUrl')->willReturn('example.com');
+            $this->originalUrlProvider->expects($this->once())->method('getOriginalUrl')->willReturn('example.com');
 
             $buttonContext = (new ButtonContext())
                 ->setEntity($searchContext->getEntityClass())
@@ -113,7 +113,7 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
                 ->setDatagridName($searchContext->getDatagrid());
             $buttons = [new StartTransitionButton($transition, $workflow, $buttonContext)];
         } else {
-            $this->destinationPageResolver->expects($this->never())->method('getOriginalUrl');
+            $this->originalUrlProvider->expects($this->never())->method('getOriginalUrl');
 
             $buttons = [];
         }
