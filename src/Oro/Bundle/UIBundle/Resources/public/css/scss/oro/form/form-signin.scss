@@ -47,7 +47,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding-left: 93px;
+        padding-left: 91px;
 
         &--forgot {
             padding-left: 0;
@@ -124,7 +124,7 @@
     .input-prepend {
         width: 100%;
         display: flex;
-        align-items: center;
+        align-items: baseline;
     }
 
     .oro-hint {
@@ -157,21 +157,6 @@
         z-index: 5;
     }
 
-    .add-on {
-        & + input[type="text"],
-        & + input[type="password"],
-        & + select {
-            width: calc(100% - 93px);
-        }
-
-        & + select {
-            display: inline-block;
-            height: 34px;
-            width: 225px;
-            padding: 0;
-        }
-    }
-
     .forgot-pass {
         float: left;
         font-weight: bold;
@@ -187,8 +172,8 @@
     }
 
     .oro-remember-me {
-        margin-bottom: 15px;
-        padding-left: 93px;
+        margin-bottom: 14px;
+        padding-left: 91px;
     }
 
     .extra-btn-large {

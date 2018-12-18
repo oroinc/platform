@@ -129,6 +129,7 @@ oro:
         filter:
             by: Filter By
         jstree:
+            quick_search: 'Quick Search'
             move:
                 success.label: '%nodes% was successfully moved'
                 source.label: 'Selected items'

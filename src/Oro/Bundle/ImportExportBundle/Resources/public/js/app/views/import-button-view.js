@@ -4,6 +4,7 @@ define(function(require) {
     var ImportButtonsView;
     var BaseView = require('oroui/js/app/views/base/view');
     var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
     var $ = require('jquery');
     var routing = require('routing');
     var DialogWidget = require('oro/dialog-widget');
@@ -16,7 +17,7 @@ define(function(require) {
             alias: null,
             importRoute: 'oro_importexport_import_validate_export_template_form',
             dialogOptions: {
-                title: 'Import',
+                title: __('oro.importexport.import.widget.title'),
                 stateEnabled: false,
                 incrementalPosition: false,
                 dialogOptions: {

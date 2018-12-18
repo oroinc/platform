@@ -218,6 +218,20 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->selector->select($val, false));
     }
 
+    public function testSelectByInvalidDomainObjectAndThrowExceptionIsNotRequestedWhenPhpErrorOccurred()
+    {
+        $val = new \stdClass();
+
+        $this->objectIdAccessor->expects(self::once())
+            ->method('getId')
+            ->with(self::identicalTo($val))
+            ->willReturnCallback(function () {
+                throw new \Error();
+            });
+
+        self::assertNull($this->selector->select($val, false));
+    }
+
     public function testAll()
     {
         $result = $this->selector->all();

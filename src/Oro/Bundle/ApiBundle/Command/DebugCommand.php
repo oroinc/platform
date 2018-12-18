@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * The CLI command to show different kind of debug information about Data API.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DebugCommand extends AbstractDebugCommand
 {
@@ -98,6 +99,7 @@ class DebugCommand extends AbstractDebugCommand
             return;
         }
 
+        /** @var string[] $attributes */
         $attributes = $input->getOption('attribute');
         $group = $input->getArgument('group');
         if ($group) {
@@ -115,30 +117,34 @@ class DebugCommand extends AbstractDebugCommand
         $actionProcessorBag = $this->getContainer()->get('oro_api.action_processor_bag');
         /** @var ProcessorBagInterface $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
+        $publicActions = $actionProcessorBag->getActions();
 
-        $output->writeln('<info>All Actions:</info>');
-        $table = new Table($output);
-        $table->setHeaders(['Action', 'Groups', 'Details']);
-
-        $i = 0;
+        $processorsForPublicActions = [];
+        $processorsForOtherActions = [];
         $totalNumberOfProcessors = 0;
         $allProcessorsIds = [];
         foreach ($processorBag->getActions() as $action) {
-            if ($i > 0) {
-                $table->addRow(new TableSeparator());
-            }
             $processorIds = $this->getProcessorIds($processorBag, $action);
             $allProcessorsIds = array_merge($allProcessorsIds, $processorIds);
             $numberOfProcessors = count($processorIds);
             $totalNumberOfProcessors += $numberOfProcessors;
-            $table->addRow([
-                $action,
-                implode(PHP_EOL, $processorBag->getActionGroups($action)),
-                sprintf('Number of processors: %s', $numberOfProcessors)
-            ]);
-            $i++;
+            $processorInfo = [$numberOfProcessors, $processorBag->getActionGroups($action)];
+            if (in_array($action, $publicActions, true)) {
+                $processorsForPublicActions[$action] = $processorInfo;
+            } else {
+                $processorsForOtherActions[$action] = $processorInfo;
+            }
         }
         $allProcessorsIds = array_unique($allProcessorsIds);
+        $processors = [];
+        foreach ($processorsForOtherActions as $action => $processorInfo) {
+            $processors[$action] = $processorInfo;
+        }
+        foreach ($publicActions as $action) {
+            if (isset($processorsForPublicActions[$action])) {
+                $processors[$action] = $processorsForPublicActions[$action];
+            }
+        }
 
         $container = $this->getContainer();
         $allProcessorsIdsRegisteredInContainer = [];
@@ -148,39 +154,58 @@ class DebugCommand extends AbstractDebugCommand
             }
         }
 
-        $table->render();
+        $output->writeln('<info>All Actions:</info>');
+        $this->dumpAllActions($output, $processors);
 
-        $output->writeln(
-            sprintf('<info>Total number of processors in the ProcessorBag:</info> %s', $totalNumberOfProcessors)
-        );
-        $output->writeln(
-            sprintf(
-                '<info>Total number of processor instances'
-                . ' (the same processor can be re-used in several actions or groups):</info> %s',
-                count($allProcessorsIds)
-            )
-        );
-        $output->writeln(
-            sprintf(
-                '<info>Total number of processors in DIC'
-                . ' (only processors that depend on other services are added to DIC):</info> %s',
-                count($allProcessorsIdsRegisteredInContainer)
-            )
-        );
+        $output->writeln(sprintf(
+            '<info>Total number of processors in the ProcessorBag:</info> %s',
+            $totalNumberOfProcessors
+        ));
+        $output->writeln(sprintf(
+            '<info>Total number of processor instances'
+            . ' (the same processor can be re-used in several actions or groups):</info> %s',
+            count($allProcessorsIds)
+        ));
+        $output->writeln(sprintf(
+            '<info>Total number of processors in DIC'
+            . ' (only processors that depend on other services are added to DIC):</info> %s',
+            count($allProcessorsIdsRegisteredInContainer)
+        ));
 
         $output->writeln('<info>Public Actions:</info>');
-        foreach ($actionProcessorBag->getActions() as $action) {
+        foreach ($publicActions as $action) {
             $output->writeln('  ' . $action);
         }
 
         $output->writeln('');
-        $output->writeln(
-            sprintf(
-                'To show a list of processors for a specific action, run <info>%1$s ACTION</info>,'
-                . ' e.g. <info>%1$s get_list</info>',
-                $this->getName()
-            )
-        );
+        $output->writeln(sprintf(
+            'To show a list of processors for a specific action, run <info>%1$s ACTION</info>,'
+            . ' e.g. <info>%1$s get_list</info>',
+            $this->getName()
+        ));
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param array           $processors [action => [number of processors, groups], ...]
+     */
+    protected function dumpAllActions(OutputInterface $output, array $processors)
+    {
+        $table = new Table($output);
+        $table->setHeaders(['Action', 'Groups', 'Details']);
+        $i = 0;
+        foreach ($processors as $action => list($numberOfProcessors, $groups)) {
+            if ($i > 0) {
+                $table->addRow(new TableSeparator());
+            }
+            $table->addRow([
+                $action,
+                implode(PHP_EOL, $groups),
+                sprintf('Number of processors: %s', $numberOfProcessors)
+            ]);
+            $i++;
+        }
+        $table->render();
     }
 
     /**
@@ -320,7 +345,7 @@ class DebugCommand extends AbstractDebugCommand
                 $processor = $processor->getProcessor();
             }
 
-            $processorColumn      = sprintf(
+            $processorColumn = sprintf(
                 '<comment>%s</comment>%s%s',
                 $processors->getProcessorId(),
                 PHP_EOL,
@@ -332,13 +357,7 @@ class DebugCommand extends AbstractDebugCommand
             }
 
             $attributesColumn = $this->formatProcessorAttributes($processors->getProcessorAttributes());
-
-            $table->addRow(
-                [
-                    $processorColumn,
-                    $attributesColumn
-                ]
-            );
+            $table->addRow([$processorColumn, $attributesColumn]);
             $i++;
         }
 
@@ -409,21 +428,34 @@ class DebugCommand extends AbstractDebugCommand
             return sprintf('<comment>%s</comment>%s', key($value), $items);
         }
 
-        return implode(
-            sprintf(' <comment>%s</comment> ', key($value)),
-            array_map(
-                function ($val) {
-                    if (is_array($val)) {
-                        $item = reset($val);
+        $delimiter = sprintf(' <comment>%s</comment> ', key($value));
+        $items = array_map(
+            function ($val) {
+                if (is_array($val)) {
+                    $item = reset($val);
 
-                        return sprintf('<comment>%s</comment>%s', key($val), $item);
-                    }
+                    return sprintf('<comment>%s</comment>%s', key($val), $item);
+                }
 
-                    return $val;
-                },
-                $items
-            )
+                return $val;
+            },
+            $items
         );
+
+        if ($items <= 3) {
+            return implode($delimiter, $items);
+        }
+
+        $result = '';
+        $chunks = array_chunk($items, 3);
+        foreach ($chunks as $chunk) {
+            if ($result) {
+                $result .= "\n" . $delimiter;
+            }
+            $result .= implode($delimiter, $chunk);
+        }
+
+        return $result;
     }
 
     /**

@@ -33,7 +33,7 @@
     class="<%= actionClassNames.join(' ') %>"
     title="<%- title %>"
     <% attributesTemplate(attributes) %>
-    <% if (links) { %> data-toggle="dropdown" role="button" id="<%- togglerId %>"
+    <% if (links) { %> data-toggle="dropdown" data-inherit-parent-width="loosely" role="button" id="<%- togglerId %>"
         aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>"<% } %>>
 
     <% if (launcherMode == 'icon-text') { %>

@@ -30,10 +30,17 @@ $oro-datagrid-body-cell-inner-top: 11px !default;
 $oro-datagrid-body-cell-inner-bottom: 11px !default;
 $oro-datagrid-body-cell-inner-horizontal: 8px !default;
 $oro-datagrid-body-cell-inner-offset: side-values(
-        $oro-datagrid-body-cell-inner-top
-        $oro-datagrid-body-cell-inner-horizontal
-        $oro-datagrid-body-cell-inner-bottom
+    $oro-datagrid-body-cell-inner-top
+    $oro-datagrid-body-cell-inner-horizontal
+    $oro-datagrid-body-cell-inner-bottom
 ) !default;
+
+$oro-datagrid-body-cell-wide-inner-offset: side-values(
+    ($oro-datagrid-body-cell-inner-top - 2px)
+    $oro-datagrid-body-cell-inner-horizontal
+    ($oro-datagrid-body-cell-inner-bottom - 6px)
+) !default;
+
 $oro-datagrid-body-cell-border: 1px solid $oro-datagrid-cell-border-color !default;
 $oro-datagrid-body-cell-line-height: 1.6 !default;
 

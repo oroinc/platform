@@ -8,6 +8,7 @@ use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Button\OperationButton;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -17,6 +18,9 @@ use Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Populates datagrid config with actions and context configs that attached to it
+ */
 class DatagridActionButtonProvider implements DatagridActionProviderInterface
 {
     /** @var ButtonProvider */
@@ -226,7 +230,10 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         $context = $this->contextHelper->getContext();
 
         if (!empty($context['route'])) {
-            $config->offsetSetByPath('[options][urlParams][originalRoute]', $context['route']);
+            $config->offsetSetByPath(
+                '[options][urlParams]['. DefaultOperationRequestHelper::ORIGINAL_ROUTE_URL_PARAMETER_KEY .']',
+                $context['route']
+            );
         }
     }
 

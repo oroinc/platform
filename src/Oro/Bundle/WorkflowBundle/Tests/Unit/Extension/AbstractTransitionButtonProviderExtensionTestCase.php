@@ -5,8 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Extension;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
-use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 use Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
@@ -24,8 +24,8 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
     /** @var AbstractButtonProviderExtension */
     protected $extension;
 
-    /** @var DestinationPageResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $destinationPageResolver;
+    /** @var OriginalUrlProvider|\PHPUnit\Framework\MockObject\MockObject */
+    protected $originalUrlProvider;
 
     /** @var  CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $applicationProvider;
@@ -40,7 +40,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->routeProvider = $this->createMock(RouteProviderInterface::class);
-        $this->destinationPageResolver = $this->createMock(DestinationPageResolver::class);
+        $this->originalUrlProvider = $this->createMock(OriginalUrlProvider::class);
         $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
         $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
 

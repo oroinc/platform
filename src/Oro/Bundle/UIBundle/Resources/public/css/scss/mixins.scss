@@ -124,9 +124,11 @@ $enable-safe-area: true;
 }
 
 @mixin floating-validation-message() {
+    $arrow-height: 6px;
+
     display: block;
     position: relative;
-    z-index: 1;
+    z-index: 2;
     width: auto;
     height: 0;
     margin: 0;
@@ -140,34 +142,33 @@ $enable-safe-area: true;
         display: block;
         position: absolute;
         top: 100%;
-        margin-top: -38px;
+        margin-top: -($field-size + $arrow-height);
         #{$start}: 10px;
         border-style: solid;
-        border-color: $danger-ultra-dark transparent;
-        border-width: 8px 4px 0;
+        border-color: $danger-lighten transparent;
+        border-width: $arrow-height ($arrow-height - 1) 0;
     }
 
     > span {
         position: fixed;
         width: $width-input;
-        margin-top: -37px;
+        margin-top: -($field-size + $arrow-height);
 
         > span {
             position: absolute;
             bottom: 0;
-            padding: side-values(5px 5px 5px 20px);
-            border-radius: 4px;
-            background-color: $danger-ultra-dark;
-            color: $primary-inverse;
+            padding: side-values(5px 8px 6px 30px);
+            border-radius: $input-field-border-radius;
+            font-size: $base-font-size - 1;
+            background-color: $danger-lighten;
+            color: $danger-ultra-dark;
 
-            &:before {
-                content: "\f00d";
-                display: inline-block;
-                width: 14px;
-                margin-#{$start}: -14px;
-                margin-#{$end}: 2px;
-                color: $primary-inverse;
-                font: normal 1.15em/1em FontAwesome, sans-serif;
+            @include fa-icon($fa-var-times, before, true) {
+                position: absolute;
+                #{$start}: 9px;
+                top: 3px;
+                font-size: $icon-font-size;
+                color: $danger-darken;
             }
         }
     }

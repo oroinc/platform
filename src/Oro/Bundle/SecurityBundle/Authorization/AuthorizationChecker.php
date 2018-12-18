@@ -8,8 +8,12 @@ use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * The main authorization point of the Security component.
+ */
 class AuthorizationChecker implements AuthorizationCheckerInterface
 {
     /** @var ServiceLink */
@@ -56,10 +60,10 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
      */
     public function isGranted($attributes, $object = null)
     {
-        if (is_string($attributes) && !empty($attributes) && $annotation = $this->getAnnotation($attributes)) {
+        if (\is_string($attributes) && !empty($attributes) && $annotation = $this->getAnnotation($attributes)) {
             if (null === $object) {
                 $this->logger->debug(
-                    sprintf('Check class based an access using "%s" ACL annotation.', $annotation->getId())
+                    \sprintf('Check class based an access using "%s" ACL annotation.', $annotation->getId())
                 );
                 $isGranted = $this->isAccessGranted(
                     $annotation->getPermission(),
@@ -67,24 +71,24 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
                 );
             } else {
                 $this->logger->debug(
-                    sprintf('Check object based an access using "%s" ACL annotation.', $annotation->getId())
+                    \sprintf('Check object based an access using "%s" ACL annotation.', $annotation->getId())
                 );
                 $isGranted = $this->isAccessGranted(
                     $annotation->getPermission(),
                     $object
                 );
             }
-        } elseif (is_string($object)) {
+        } elseif (\is_string($object)) {
             $isGranted = $this->isAccessGranted(
                 $attributes,
-                $this->getObjectIdentity($object)
+                $this->tryGetObjectIdentity($object) ?? $object
             );
         } else {
-            if (null === $object && is_string($attributes)) {
-                $delimiter = strpos($attributes, ';');
+            if (null === $object && \is_string($attributes)) {
+                $delimiter = \strpos($attributes, ';');
                 if ($delimiter) {
-                    $object = substr($attributes, $delimiter + 1);
-                    $attributes = substr($attributes, 0, $delimiter);
+                    $object = \substr($attributes, $delimiter + 1);
+                    $attributes = \substr($attributes, 0, $delimiter);
                 }
             }
 
@@ -132,5 +136,22 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
         $objectIdentityFactory = $this->objectIdentityFactoryLink->getService();
 
         return $objectIdentityFactory->get($val);
+    }
+
+    /**
+     * @param mixed $val
+     *
+     * @return ObjectIdentity|null
+     */
+    private function tryGetObjectIdentity($val)
+    {
+        /** @var ObjectIdentityFactory $objectIdentityFactory */
+        $objectIdentityFactory = $this->objectIdentityFactoryLink->getService();
+
+        try {
+            return $objectIdentityFactory->get($val);
+        } catch (InvalidDomainObjectException $e) {
+            $this->logger->debug('The ObjectIdentity cannot be created.', ['exception' => $e, 'object' => $val]);
+        }
     }
 }

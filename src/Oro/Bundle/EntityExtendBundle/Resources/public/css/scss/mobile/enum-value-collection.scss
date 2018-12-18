@@ -1,0 +1,31 @@
+/* @theme: admin.oro; */
+
+.enum-value-collection {
+    width: 100%;
+
+    .float-holder {
+        float: none;
+    }
+
+    .oro-item-collection > div {
+        margin-#{$end}: $tooltip-icon-container-mobile-size;
+    }
+
+    .removeRow,
+    .tooltip-icon-container {
+        #{$end}: -$tooltip-icon-container-mobile-size;
+    }
+
+    .tooltip-icon-container {
+        width: $tooltip-icon-container-mobile-size;
+        height: $tooltip-icon-container-mobile-size;
+    }
+
+    .tooltip-icon {
+        font-size: $base-font-size--l;
+    }
+
+    &__clear-default {
+        #{$end}: $tooltip-icon-container-mobile-size;
+    }
+}

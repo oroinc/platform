@@ -1,91 +1,88 @@
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
 {% if workflows|length > 0 %}
-<div class="widget-content widget-content-bordered">
-    <div {% if workflows|length > 1 %}
-        class="workflow-collapse"
-        data-page-component-collapse="{{ { storageKey: 'entityWorkflow' ~ entityId }|json_encode() }}"
-    {% endif %}>
-        {% if workflows|length > 1 %}
-        <span class="workflow-collapse-button" data-collapse-trigger></span>
+    {% set collapseContainerId = 'entityWorkflow' ~ entityId %}
+<div class="widget-content workflow-widget-content">
+    {% for workflow in workflows %}
+        {% if loop.index == 2 %}
+        <div class="collapse show" id="{{ collapseContainerId }}">
         {% endif %}
-        {% for workflow in workflows %}
-            {% if loop.index == 2 %}
-            <div class="workflow-collapse-container" data-collapse-container>
-            {% endif %}
-                <table class="workflow-entity">
-                    <tr>
-                        <td class="workflow-label">
-                            <div class="workflow-label-text" title="{{ workflow.label|trans({},'workflows') }}">
-                                {{ workflow.label|trans({},'workflows') }}
-                            </div>
-                        </td>
-                        <td class="workflow-content-container">
-                            <table class="workflow-content">
-                                <tr>
-                                    <td class="workflow-steps">
-                                        {% set isOrdered = workflow.stepsData.isOrdered %}
-                                        {% set steps = workflow.stepsData.steps %}
-
-                                        {% if not workflow.isStarted and workflow.transitionsData|length > 1 %}
-                                            {% set steps = [{active: false, label: '...', possibleStepsCount: 0, final: false}] %}
-                                        {% endif %}
-
-                                        <div class="workflow-scroller">
-                                            <ul class="workflow-steps-list {% if not workflow.isStarted %}workflow-not-started{% endif %}">
-                                                {% set activeRendered = not workflow.isStarted %}
-                                                {% set manyVariantsFound = false %}
-                                                {% set manyVariantsRendered = false %}
-
-                                                {% for step in steps if not manyVariantsRendered %}
-                                                    {% set final = step.final %}
-                                                    {% if isOrdered %}
-                                                        {% set active = step.active %}
-
-                                                        {% if activeRendered and manyVariantsFound %}
-                                                            {% set manyVariantsRendered = true %}
-                                                            {% set step = step|merge({label: '...'}) %}
-                                                        {% endif %}
-
-                                                        {% if active and not activeRendered %}
-                                                            {% set activeRendered = true %}
-                                                        {% endif %}
-
-                                                        {% if step.possibleStepsCount > 1 and activeRendered %}
-                                                            {% set manyVariantsFound = true %}
-                                                        {% endif %}
-
-                                                        <li class="workflow-steps-item workflow-ordered-steps {% if active %}active{% endif %} {% if final %}workflow-step-final{% endif %}">
-                                                            <div class="workflow-steps-item-arrow-container" title="{{ step.label|trans({},'workflows') }}">
-                                                                <span class="workflow-step-arrow-left"></span>
-                                                                <span class="workflow-step-arrow-right"></span>
-                                                                <span class="workflow-step-name">{{ step.label|trans({},'workflows') }}</span>
-                                                            </div>
-                                                        </li>
-                                                    {% else %}
-                                                        <li class="workflow-steps-item workflow-unordered-steps">
-                                                            <span class="workflow-unordered-step-name  {% if final %}workflow-step-final{% endif %}">{{ step.label|trans({},'workflows') }}</span>
-                                                        </li>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
-                                    </td>
-                                    {% if workflow.transitionsData|length != 0 %}
-                                        <td class="workflow-controls">
-                                            <div class="workflow-buttons-scroller">
-                                                {% include 'OroWorkflowBundle::Widget/widget/button.html.twig' with {'workflow': workflow, 'entity_id': entityId, 'originalUrl': originalUrl} %}
-                                            </div>
-                                        </td>
-                                    {% endif %}
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            {% if loop.index > 1 and loop.last %}
+        {% if workflows|length > 1 and loop.first %}
+            <div class="workflow-collapse">
+                <button class="btn-light" data-toggle="collapse"
+                        data-target="#{{ collapseContainerId }}" data-collapse-state-id="{{ collapseContainerId }}"
+                        data-collapsed-title="Expand" data-expanded-title="Collapse" aria-label="Expand / Collapse"
+                        aria-expanded="true" title="Expand">
+                    <span class="fa-icon oro-collapse-icon" aria-hidden="true"></span>
+                </button>
             </div>
-            {% endif %}
-        {% endfor %}
-    </div>
+        {% endif %}
+            <div class="workflow-entity {% if workflows|length == 1 %} only-workflow{% endif %}">
+                <div class="workflow-label">
+                    <div class="workflow-label-text" title="{{ workflow.label|trans({},'workflows') }}">
+                        {{ workflow.label|trans({},'workflows') }}:
+                    </div>
+                </div>
+                <div class="workflow-content-container">
+                    <table class="workflow-content">
+                        <tr>
+                            <td class="workflow-steps">
+                                {% set isOrdered = workflow.stepsData.isOrdered %}
+                                {% set steps = workflow.stepsData.steps %}
+
+                                {% if not workflow.isStarted and workflow.transitionsData|length > 1 %}
+                                    {% set steps = [{active: false, label: '...', possibleStepsCount: 0, final: false}] %}
+                                {% endif %}
+
+                                <div class="workflow-scroller">
+                                    <ul class="workflow-steps-list {% if not workflow.isStarted %}workflow-not-started{% endif %}">
+                                        {% set activeRendered = not workflow.isStarted %}
+                                        {% set manyVariantsFound = false %}
+                                        {% set manyVariantsRendered = false %}
+
+                                        {% for step in steps if not manyVariantsRendered %}
+                                            {% set final = step.final %}
+                                            {% if isOrdered %}
+                                                {% set active = step.active %}
+
+                                                {% if activeRendered and manyVariantsFound %}
+                                                    {% set manyVariantsRendered = true %}
+                                                    {% set step = step|merge({label: '...'}) %}
+                                                {% endif %}
+
+                                                {% if active and not activeRendered %}
+                                                    {% set activeRendered = true %}
+                                                {% endif %}
+
+                                                {% if step.possibleStepsCount > 1 and activeRendered %}
+                                                    {% set manyVariantsFound = true %}
+                                                {% endif %}
+
+                                                <li class="workflow-steps-item workflow-ordered-steps{% if active %} active{% endif %}{% if final %} workflow-step-final{% endif %}" title="{{ step.label|trans({},'workflows') }}">
+                                                    <span class="workflow-step-name">{{ step.label|trans({},'workflows') }}</span>
+                                                </li>
+                                            {% else %}
+                                                <li class="workflow-steps-item workflow-unordered-steps">
+                                                    <span class="workflow-unordered-step-name{% if final %} workflow-step-final-name{% endif %}">{{ step.label|trans({},'workflows') }}</span>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </td>
+                            {% if workflow.transitionsData|length != 0 %}
+                                <td class="workflow-controls">
+                                    <div class="workflow-buttons-scroller">
+                                        {% include 'OroWorkflowBundle::Widget/widget/button.html.twig' with {'workflow': workflow, 'entity_id': entityId, 'originalUrl': originalUrl} %}
+                                    </div>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        {% if loop.index > 1 and loop.last %}
+        </div>
+        {% endif %}
+    {% endfor %}
 </div>
 {% endif %}

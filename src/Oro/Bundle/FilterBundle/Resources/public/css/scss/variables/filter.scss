@@ -137,8 +137,6 @@ $filter-multiselect-offset-left: 0 !default;
 
 $filter-multiselect-filter-widget-display: inline-block !default;
 
-$filter-separator-offset: 0 3px !default;
-
 $filter-select-oro-wrapper-width: 113px !default;
 $filter-select-oro-wrapper-offset-bottom: 8px !default;
 $filter-select-oro-wrapper-width: 100% !default;
@@ -223,6 +221,7 @@ $filter-item-btn-line-height: 24px !default;
 $filter-item-btn-text-transform: none !default;
 $filter-item-btn-border: none !default;
 $filter-item-btn-background-color: $primary-900 !default;
+$filter-item-btn-display: inline-block !default;
 $filter-item-btn-hover-background-color: $primary-830 !default;
 
 $filter-item-dropdown-toggle-vertical-align: top !default;

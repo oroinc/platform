@@ -80,9 +80,13 @@ class TagManager
      */
     public function getTagsByEntityIds($entityClassName, array $ids)
     {
+        $user = $this->getUser();
+        if (!$user) {
+            return [];
+        }
         $repository = $this->getTagsRepository();
 
-        return $repository->getTagsByEntityIds($entityClassName, $ids, $this->getUser());
+        return $repository->getTagsByEntityIds($entityClassName, $ids, $user);
     }
 
     /**

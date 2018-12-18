@@ -14,7 +14,7 @@
     {% if form.vars.group_fallback_fields %}
         <div class="fallback-item-fallback-line">
             <div nowrap="true" class="fallback-item-use-fallback">
-                {{ form_widget(form.use_fallback) }} {{ form.use_fallback.vars.label|trans }}
+                {{ form_widget(form.use_fallback) }}{{ form.use_fallback.vars.label|trans }}
             </div>
             <div class="fallback-item-fallback">
                 {{ form_widget(form.fallback, {'attr': {'class': 'fallback'}}) }}
@@ -28,7 +28,7 @@
         {% if not form.vars.group_fallback_fields %}
             <div class="fallback-item-fallback-line">
                 <div nowrap="true" class="fallback-item-use-fallback">
-                    {{ form_widget(form.use_fallback) }} {{ form.use_fallback.vars.label|trans }}
+                    {{ form_widget(form.use_fallback) }}{{ form.use_fallback.vars.label|trans }}
                 </div>
                 <div class="fallback-item-fallback {% if form.vars.exclude_parent_localization %}hide{% endif %}">
                     {{ form_widget(form.fallback, {'attr': {'class': 'fallback'}}) }}

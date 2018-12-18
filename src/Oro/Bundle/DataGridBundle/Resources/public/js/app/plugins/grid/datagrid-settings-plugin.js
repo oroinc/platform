@@ -31,7 +31,7 @@ define(function(require) {
                     viewConstructors: toolbarOptions.viewConstructors || [
                         {
                             id: 'grid',
-                            label: 'Grid',
+                            label: __('oro.datagrid.settings.tab.grid'),
                             view: DatagridManageColumnView,
                             options: {
                                 collection: this.main.columns
@@ -39,7 +39,7 @@ define(function(require) {
                         },
                         {
                             id: 'filters',
-                            label: 'Filters',
+                            label: __('oro.datagrid.settings.tab.filters'),
                             view: DatagridManageFilterView,
                             options: {
                                 collection: this.main.metadata.filters,

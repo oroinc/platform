@@ -27,6 +27,10 @@
     }
 }
 
+.fallback-item-fallback-line {
+    max-width: $fallback-item-mobile-label-max-width;
+}
+
 .fallback-item {
     max-width: $fallback-item-mobile-max-width;
 }
@@ -37,6 +41,10 @@
 
 .fallback-item-value--first {
     width: $fallback-item-value-mobile--first-width;
+
+    .input-append {
+        width: 100%;
+    }
 
     input[type="text"] {
         width: $fallback-item-value-mobile--first-input-width;

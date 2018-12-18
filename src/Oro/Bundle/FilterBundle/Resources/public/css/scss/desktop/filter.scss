@@ -9,4 +9,29 @@
             position: $filter-box-filter-container-select-filter-widget-position;
         }
     }
+
+    .choice-filter {
+        .btn-group.btn-block {
+            &.product-price-unit-filter {
+                width: 100%;
+            }
+        }
+    }
+
+    .filter-criteria {
+        .product-price-unit-filter-separator,
+        .filter-separator {
+            height: 0;
+            overflow: hidden;
+            position: static;
+            width: 0;
+            margin: 0;
+        }
+    }
+}
+
+.filter-date-range {
+    .datepicker-input {
+        max-width: 200px;
+    }
 }

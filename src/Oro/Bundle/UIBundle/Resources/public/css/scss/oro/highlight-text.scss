@@ -2,7 +2,7 @@
 
 .highlight {
     &-text {
-        span#{&} {
+        @at-root span#{&} {
             text-decoration: underline;
             background-color: $highlight-text-color;
             font-family: inherit;
@@ -20,7 +20,7 @@
             text-transform: none;
         }
 
-        label#{&} {
+        @at-root label#{&} {
             span {
                 font-weight: normal;
             }
@@ -40,9 +40,15 @@
         }
     }
 
-    &-element.selector,
-    input#{&}-element,
-    textarea#{&}-element {
+    &-element.selector {
+        background: $highlight-text-color;
+    }
+
+    @at-root input#{&}-element {
+        background: $highlight-text-color;
+    }
+
+    @at-root textarea#{&}-element {
         background: $highlight-text-color;
     }
 

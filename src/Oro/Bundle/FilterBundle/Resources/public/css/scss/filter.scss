@@ -22,13 +22,13 @@
                 border-radius: $filter-box-criteria-btn-group-border-radius;
                 border: $filter-box-criteria-btn-group-border;
                 font-weight: $filter-box-criteria-btn-group-font-weight;
+                background-color: $primary-inverse;
                 text-transform: $filter-box-criteria-btn-group-text-transform;
 
                 + .dropdown-menu {
                     text-transform: $filter-box-criteria-btn-group-text-transform;
                 }
             }
-
 
             + .value-field-frame {
                 margin-left: $filter-box-criteria-btn-group-value-field-frame-offset-left;
@@ -39,7 +39,7 @@
                 vertical-align: $filter-box-criteria-btn-group-icon-vertical-align;
             }
 
-            .dropdown-toggle  {
+            .dropdown-toggle {
                 padding: $selector-uniform-inner-offset;
                 text-align: #{$start};
                 width: 100%;
@@ -66,11 +66,6 @@
         .product-price-filter {
             display: $choice-filter-display;
             align-items: $choice-filter-align-items;
-        }
-
-        .product-price-unit-filter-separator,
-        .filter-separator {
-            margin: $filter-separator-offset;
         }
 
         .input-append,
@@ -190,10 +185,6 @@
 
         .loader-frame {
             padding-left: $filter-box-item-loader-frame-inner-offset-left;
-        }
-
-        .filter-update-empty {
-            margin-left: $filter-update-empty-offset-left;
         }
 
         .reset-filter {
@@ -368,6 +359,7 @@
             text-transform: $filter-item-btn-text-transform;
             border: $filter-item-btn-border;
             background-color: $filter-item-btn-background-color;
+            display: $filter-item-btn-display;
 
             &:hover {
                 background-color: $filter-item-btn-hover-background-color;

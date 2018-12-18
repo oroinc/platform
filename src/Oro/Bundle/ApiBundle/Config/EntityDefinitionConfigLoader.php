@@ -10,9 +10,10 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class EntityDefinitionConfigLoader extends AbstractConfigLoader implements ConfigLoaderFactoryAwareInterface
 {
     private const METHOD_MAP = [
-        ConfigUtil::DOCUMENTATION_RESOURCE => 'setDocumentationResources',
-        ConfigUtil::POST_SERIALIZE         => 'setPostSerializeHandler',
-        ConfigUtil::FORM_EVENT_SUBSCRIBER  => 'setFormEventSubscribers'
+        ConfigUtil::DOCUMENTATION_RESOURCE    => 'setDocumentationResources',
+        ConfigUtil::POST_SERIALIZE            => 'setPostSerializeHandler',
+        ConfigUtil::POST_SERIALIZE_COLLECTION => 'setPostSerializeCollectionHandler',
+        ConfigUtil::FORM_EVENT_SUBSCRIBER     => 'setFormEventSubscribers'
     ];
 
     /** @var ConfigLoaderFactory */

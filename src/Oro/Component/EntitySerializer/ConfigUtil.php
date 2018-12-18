@@ -70,8 +70,11 @@ class ConfigUtil
      */
     public const HAS_MORE = 'has_more';
 
-    /** a handler that can be used to modify serialized data */
+    /** a handler that can be used to modify serialized data for a single item */
     public const POST_SERIALIZE = 'post_serialize';
+
+    /** a handler that can be used to modify serialized data for a list of items */
+    public const POST_SERIALIZE_COLLECTION = 'post_serialize_collection';
 
     /** a flag indicates whether the field should be excluded */
     public const EXCLUDE = 'exclude';

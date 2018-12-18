@@ -138,6 +138,24 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * @param string $entityClass
+     * @param string $action
+     *
+     * @return bool
+     */
+    protected function isActionEnabled($entityClass, $action)
+    {
+        $resourcesProvider = self::getContainer()->get('oro_api.resources_provider');
+        $excludeActions = $resourcesProvider->getResourceExcludeActions(
+            $entityClass,
+            Version::LATEST,
+            $this->getRequestType()
+        );
+
+        return !in_array($action, $excludeActions, true);
+    }
+
+    /**
      * @return array [entity class => [entity class, [excluded action, ...]], ...]
      */
     public function getEntities()
@@ -424,7 +442,7 @@ abstract class ApiTestCase extends WebTestCase
      * @param int|int[]   $statusCode
      * @param string|null $message
      */
-    public static function assertResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
     {
         try {
             if (is_array($statusCode)) {
@@ -462,7 +480,7 @@ abstract class ApiTestCase extends WebTestCase
      * @param string   $headerName
      * @param mixed    $expectedValue
      */
-    public static function assertResponseHeader(Response $response, string $headerName, string $expectedValue)
+    protected static function assertResponseHeader(Response $response, string $headerName, string $expectedValue)
     {
         self::assertEquals(
             $expectedValue,
@@ -477,7 +495,7 @@ abstract class ApiTestCase extends WebTestCase
      * @param Response $response
      * @param string   $headerName
      */
-    public static function assertResponseHeaderNotExists(Response $response, string $headerName)
+    protected static function assertResponseHeaderNotExists(Response $response, string $headerName)
     {
         self::assertFalse(
             $response->headers->has($headerName),
@@ -492,7 +510,7 @@ abstract class ApiTestCase extends WebTestCase
      * @param string   $expectedAllowedMethods
      * @param string   $message
      */
-    public static function assertAllowResponseHeader(
+    protected static function assertAllowResponseHeader(
         Response $response,
         string $expectedAllowedMethods,
         string $message = ''
@@ -508,7 +526,7 @@ abstract class ApiTestCase extends WebTestCase
      * @param string   $expectedAllowedMethods
      * @param string   $message
      */
-    public static function assertMethodNotAllowedResponse(
+    protected static function assertMethodNotAllowedResponse(
         Response $response,
         string $expectedAllowedMethods,
         string $message = ''

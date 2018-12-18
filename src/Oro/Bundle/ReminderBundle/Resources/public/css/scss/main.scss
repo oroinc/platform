@@ -1,6 +1,9 @@
 /* @theme: admin.oro; */
 
-@import "./reminders-collection";
-@import "./alert";
+@import "oroui/css/scss/variables";
+@import "oroui/css/scss/mixins";
 
-@import "./mobile/main";
+@import "reminders-collection";
+@import "alert";
+
+@import "mobile/main";

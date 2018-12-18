@@ -40,13 +40,8 @@ class ConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->configHelperHandler = $this->getMockBuilder(ConfigHelperHandler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->requestStack = $this->getMockBuilder(RequestStack::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configHelperHandler = $this->createMock(ConfigHelperHandler::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
 
         $this->fieldConfigModel = $this->getEntity(FieldConfigModel::class, ['id' => 777]);
 
@@ -89,12 +84,12 @@ class ConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->expectsFormCreationSubmissionAndValidation(true);
         $successMessage = 'Success message';
 
-        $response = new RedirectResponse('someurl');
+        $redirectResponse = new RedirectResponse('someurl');
         $this->configHelperHandler
             ->expects($this->once())
             ->method('showSuccessMessageAndRedirect')
             ->with($this->fieldConfigModel, $successMessage)
-            ->willReturn($response);
+            ->willReturn($redirectResponse);
 
         $this->configHelperHandler
             ->expects($this->once())
@@ -102,10 +97,10 @@ class ConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->configHelperHandler);
 
         $formAction = 'formAction';
-        $this->assertEquals(
-            $response,
-            $this->handler->handleUpdate($this->fieldConfigModel, $formAction, $successMessage)
-        );
+        $response = $this->handler->handleUpdate($this->fieldConfigModel, $formAction, $successMessage);
+
+        $this->assertEquals($redirectResponse->getTargetUrl(), $response->getTargetUrl());
+        $this->assertEquals($redirectResponse->getStatusCode(), $response->getStatusCode());
     }
 
     public function testHandleUpdateWhenFormIsNotValid()

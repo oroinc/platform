@@ -110,7 +110,7 @@ define([
                 var $view = $(view);
                 self.$containerContextTargets.append($view);
 
-                $view.find('i.fa-close').click(function() {
+                $view.find('[data-role="delete-item"]').click(function() {
                     $view.fadeOut();
                     model.destroy({
                         success: function(model, response) {

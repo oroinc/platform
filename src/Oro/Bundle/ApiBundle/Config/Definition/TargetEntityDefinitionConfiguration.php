@@ -100,9 +100,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
         if (empty($config[ConfigUtil::HINTS])) {
             unset($config[ConfigUtil::HINTS]);
         }
-        if (empty($config[ConfigUtil::POST_SERIALIZE])) {
-            unset($config[ConfigUtil::POST_SERIALIZE]);
-        }
         if (empty($config[ConfigUtil::FORM_TYPE])) {
             unset($config[ConfigUtil::FORM_TYPE]);
         }
@@ -126,7 +123,11 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
     {
         $node
             ->enumNode(ConfigUtil::EXCLUSION_POLICY)
-                ->values([ConfigUtil::EXCLUSION_POLICY_ALL, ConfigUtil::EXCLUSION_POLICY_NONE])
+                ->values([
+                    ConfigUtil::EXCLUSION_POLICY_ALL,
+                    ConfigUtil::EXCLUSION_POLICY_CUSTOM_FIELDS,
+                    ConfigUtil::EXCLUSION_POLICY_NONE
+                ])
             ->end()
             ->integerNode(ConfigUtil::MAX_RESULTS)->min(-1)->end()
             ->arrayNode(ConfigUtil::ORDER_BY)
@@ -148,7 +149,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
                     ->end()
                 ->end()
             ->end()
-            ->variableNode(ConfigUtil::POST_SERIALIZE)->end()
             ->scalarNode(ConfigUtil::FORM_TYPE)->end()
             ->arrayNode(ConfigUtil::FORM_OPTIONS)
                 ->useAttributeAsKey('name')

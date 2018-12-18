@@ -1,15 +1,8 @@
 /* @theme: admin.oro; */
 
-$activity-context-activity-list-offset: 8px !default;
-
-$activity-context-item-background: $tag-item-background !default;
-$activity-context-item-color: $tag-item-color !default;
-$activity-context-item-offset: side-values(0 8px 8px 0) !default;
-$activity-context-item-display: inline-block !default;
-$activity-context-item-font-size: $base-font-size--s !default;
-
+$activity-context-activity-list-offset: 16px !default;
 
 $activity-context-activity-label-offset: side-values(1px 0 0 0) !default;
 $activity-context-activity-label-color: $primary-500 !default;
 
-$activity-context-activity-items-offset: side-values(0 0 0 64px) !default;
+$activity-context-activity-items-offset: 64px !default;

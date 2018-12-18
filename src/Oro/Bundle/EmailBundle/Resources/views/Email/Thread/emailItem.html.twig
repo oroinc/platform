@@ -102,7 +102,7 @@
                     <div class="email-participants">
                         <div class="email-author">{{ EA.email_participant_name_or_me(email.fromEmailAddress, email.fromName, true) }}</div>
                         <span class="email-recipients">{{ 'To'|trans }}: {{ EA.email_participants_name(email.recipients, true) }}</span>
-                        <div class="email-detailed-info-table dropdown dropdown--with-arrow">
+                        <div class="email-detailed-info-table dropdown">
                             {% set togglerId = 'dropdown-'|uniqid %}
                             <span id="{{ togglerId }}" role="button" class="btn btn-light dropdown-toggle dropdown-toggle--no-caret" data-toggle="dropdown"
                                   aria-haspopup="true" aria-expanded="false"

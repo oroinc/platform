@@ -29,6 +29,17 @@ define(function(require) {
         }
     };
 
+    Popover.prototype.getTipElement = function() {
+        this.tip = this.tip || $(this.config.template)[0];
+
+        var addClass = $(this.element).data('class');
+        if (addClass) {
+            $(this.tip).addClass(addClass);
+        }
+
+        return this.tip;
+    };
+
     Popover.prototype.updateContent = function(content) {
         this.element.setAttribute('data-content', content);
         this.config.content = content;

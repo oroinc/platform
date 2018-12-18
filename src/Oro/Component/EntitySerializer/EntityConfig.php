@@ -404,7 +404,7 @@ class EntityConfig
     }
 
     /**
-     * Gets a handler that should be used to modify serialized data.
+     * Gets a handler that should be used to modify serialized data for a single item.
      *
      * @return callable|null
      */
@@ -414,9 +414,9 @@ class EntityConfig
     }
 
     /**
-     * Sets a handler that should be used to modify serialized data.
+     * Sets a handler that should be used to modify serialized data for a single item.
      *
-     * @param callable|null $handler function (array $item) : array
+     * @param callable|null $handler function (array $item, array $context) : array
      */
     public function setPostSerializeHandler($handler = null)
     {
@@ -424,6 +424,35 @@ class EntityConfig
             $this->items[ConfigUtil::POST_SERIALIZE] = $handler;
         } else {
             unset($this->items[ConfigUtil::POST_SERIALIZE]);
+        }
+    }
+
+    /**
+     * Gets a handler that should be used to modify serialized data for a list of items.
+     *
+     * @return callable|null
+     */
+    public function getPostSerializeCollectionHandler()
+    {
+        return $this->get(ConfigUtil::POST_SERIALIZE_COLLECTION);
+    }
+
+    /**
+     * Sets a handler that should be used to modify serialized data for a list of items.
+     * This handler is executed after each element in the collection
+     * is processed by own post serialization handler.
+     * @see setPostSerializeHandler
+     * IMPORTANT: the items are an associative array and the collection handler must keep
+     * keys in this array without changes.
+     *
+     * @param callable|null $handler function (array $items, array $context) : array
+     */
+    public function setPostSerializeCollectionHandler($handler = null)
+    {
+        if (null !== $handler) {
+            $this->items[ConfigUtil::POST_SERIALIZE_COLLECTION] = $handler;
+        } else {
+            unset($this->items[ConfigUtil::POST_SERIALIZE_COLLECTION]);
         }
     }
 }

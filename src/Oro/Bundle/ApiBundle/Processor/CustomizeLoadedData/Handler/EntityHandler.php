@@ -27,6 +27,9 @@ class EntityHandler
     /** @var EntityDefinitionConfig */
     private $config;
 
+    /** @var bool */
+    private $collection;
+
     /** @var callable|null */
     private $previousHandler;
 
@@ -36,6 +39,7 @@ class EntityHandler
      * @param RequestType              $requestType
      * @param string                   $entityClass
      * @param EntityDefinitionConfig   $config
+     * @param bool                     $collection
      * @param callable|null            $previousHandler
      */
     public function __construct(
@@ -44,6 +48,7 @@ class EntityHandler
         RequestType $requestType,
         string $entityClass,
         EntityDefinitionConfig $config,
+        bool $collection,
         ?callable $previousHandler = null
     ) {
         $this->customizationProcessor = $customizationProcessor;
@@ -51,6 +56,7 @@ class EntityHandler
         $this->requestType = $requestType;
         $this->entityClass = $entityClass;
         $this->config = $config;
+        $this->collection = $collection;
         $this->previousHandler = $this->getPreviousHandler($previousHandler);
     }
 
@@ -72,6 +78,12 @@ class EntityHandler
         $customizationContext->setIdentifierOnly(
             $this->isIdentifierOnly($customizationContext->getConfig())
         );
+
+        /** @see \Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ProcessorBagCompilerPass */
+        $group = $this->collection ? 'collection' : 'item';
+        $customizationContext->setFirstGroup($group);
+        $customizationContext->setLastGroup($group);
+
         $this->customizationProcessor->process($customizationContext);
 
         return $customizationContext->getResult();

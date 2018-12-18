@@ -45,7 +45,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             collapse: null,
             maximize: null,
             minimize: null,
-            restore: null
+            restore: null,
+            closeText: __('Close')
         }),
 
         _allowInteraction: function(e) {
@@ -395,7 +396,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             this.uiDialogTitlebarClose
             // override some unwanted jquery-ui styles
             .css({ 'position': 'static', 'top': 'auto', 'right': 'auto', 'margin': 0 })
-            .attr('title', __('close'))
+            .attr('title', this.options.closeText)
             // change icon
             .find('.ui-icon').removeClass('ui-icon-closethick').addClass(this.options.icons.close).end()
             // move to button-pane

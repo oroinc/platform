@@ -111,16 +111,9 @@ class LocaleSettings
     protected $localeData = array();
 
     /**
-     * Array format:
-     * array(
-     *     '<currencyIso3SymbolsCode>' => array(
-     *          'symbol' => '<currencySymbol>',
-     *     ),
-     * )
-     *
-     * @var array
+     * @var ConfigManager
      */
-    protected $currencyData = array();
+    protected $configManager;
 
     /**
      * @var CalendarFactoryInterface
@@ -195,26 +188,6 @@ class LocaleSettings
     public function getLocaleData()
     {
         return $this->localeData;
-    }
-
-    /**
-     * Adds locale data.
-     *
-     * @param array $data
-     */
-    public function addCurrencyData(array $data)
-    {
-        $this->currencyData = array_merge($this->currencyData, $data);
-    }
-
-    /**
-     * Get locale data.
-     *
-     * @return array
-     */
-    public function getCurrencyData()
-    {
-        return $this->currencyData;
     }
 
     /**
@@ -309,20 +282,24 @@ class LocaleSettings
     }
 
     /**
-     * @param string $currencyCode
-     * @return null
+     * @param string|null $currencyCode
+     * @param string|null $locale
+     *
+     * @return bool|string The symbol value or false on error
      */
-    public function getCurrencySymbolByCurrency($currencyCode = null)
+    public function getCurrencySymbolByCurrency(string $currencyCode = null, string $locale = null)
     {
         if (!$currencyCode) {
             $currencyCode = $this->getCurrency();
         }
 
-        if (!empty($this->currencyData[$currencyCode]['symbol'])) {
-            return $this->currencyData[$currencyCode]['symbol'];
+        if (!$locale) {
+            $locale = $this->getLocale();
         }
 
-        return $currencyCode;
+        $formatter = new \NumberFormatter($locale . '@currency=' . $currencyCode, \NumberFormatter::CURRENCY);
+
+        return $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL) ?: $currencyCode;
     }
 
     /**

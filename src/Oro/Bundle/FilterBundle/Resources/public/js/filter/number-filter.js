@@ -20,11 +20,6 @@ define(function(require) {
         wrapHintValue: false,
 
         /**
-         * @property {Number}
-         */
-        precision: null,
-
-        /**
          * @inheritDoc
          */
         constructor: function NumberFilter() {
@@ -238,9 +233,9 @@ define(function(require) {
         },
 
         _initInputWidget: function() {
-            if (this.precision) {
+            if (this.formatterOptions.decimals) {
                 _.each(this.$el.find('input[type="number"]:not([data-precision])'), function(field) {
-                    $(field).attr('data-precision', this.precision);
+                    $(field).attr('data-precision', this.formatterOptions.decimals);
                 }, this);
             }
 

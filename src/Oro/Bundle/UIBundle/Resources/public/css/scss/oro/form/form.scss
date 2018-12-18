@@ -49,6 +49,10 @@
     @include placeholder {
         color: $primary-700;
     }
+
+    td & {
+        margin-bottom: 0;
+    }
 }
 
 /**
@@ -165,6 +169,8 @@ select[multiple] {
     height: $select-multiple-height !important;
     padding: $select-multiple-inner-offset;
 
+    vertical-align: top;
+
     option {
         padding: $select-multiple-option-inner-offset;
         border-radius: $select-multiple-option-border-radius;
@@ -275,16 +281,6 @@ select[multiple] {
             color: $input-disabled-color;
         }
     }
-
-    &.error {
-        span {
-            color: $input-error-color;
-
-            &:after {
-                color: $input-error-border-color;
-            }
-        }
-    }
 }
 
 .add-on {
@@ -331,7 +327,6 @@ select[multiple] {
 
     .error & {
         border-color: $input-error-border-color;
-        color: $input-error-border-color;
     }
 
     .input-append & {
@@ -358,6 +353,15 @@ select[multiple] {
     &.collection-element-primary {
         .add-on {
             background: $primary-900;
+
+            display: inline-flex;
+            align-items: center;
+        }
+    }
+
+    .btn {
+        &:focus {
+            border-color: $secondary-100;
         }
     }
 }
@@ -415,7 +419,14 @@ select[multiple] {
 
 .form-container,
 .form-horizontal {
-    .control-group {
+    .control-group-subline {
+        &:not(:last-of-type) {
+            margin: 0 0 $content-padding-small;
+        }
+    }
+
+    .control-group,
+    .control-group-container {
         &:not(:last-of-type) {
             margin-bottom: $form-container-control-row-space;
         }
@@ -423,6 +434,11 @@ select[multiple] {
         &--column:not(:last-of-type) {
             margin: 0;
         }
+    }
+
+    + .form-horizontal,
+    + .form-container {
+        margin-top: $form-container-control-row-space;
     }
 }
 

@@ -1,0 +1,4 @@
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner:
+    owner1:
+        name: 'Owner 1'
+        extend_description: 'Description for Owner 1'

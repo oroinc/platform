@@ -1,0 +1,32 @@
+/* @theme: admin.oro; */
+
+$btn-group-divider-width: 1px;
+$btn-group-divider-color: $primary-inverse;
+
+$btn-group-divider-keys: () !default;
+$btn-group-divider-keys: map-merge(
+    (
+        'light': transparent,
+        'lighter': transparent,
+        'primary': rgba($primary-inverse, .4),
+        'info': rgba($primary-inverse, .4),
+        'success': #a5c387,
+        'warning': rgba($primary-inverse, .4),
+        'danger': rgba($primary-inverse, .4),
+        'dark': rgba($primary-inverse, .4),
+        'inverse': rgba($primary-inverse, .4)
+    ),
+    $btn-group-divider-keys
+);
+
+$btn-group-square-divider-width: $btn-square-border-width;
+
+$btn-group-square-divider-keys: () !default;
+$btn-group-square-divider-keys: map-merge(
+    (
+        'default': $primary-750,
+        'light': transparent,
+        'lighter': transparent
+    ),
+    $btn-group-square-divider-keys
+);

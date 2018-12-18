@@ -1,11 +1,11 @@
 /* @theme: admin.demo; */
 
 .loader-mask {
-  background-color: rgba($loading-mask-background-color, .5);
+    background-color: rgba($loading-mask-background-color, .5);
 
-  .loader-frame {
-    border-color: $loading-mask-icon-color;
-    border-bottom-color: transparent;
-    border-left-color: transparent;
-  }
+    .loader-frame {
+        border-color: $loading-mask-icon-color;
+        border-bottom-color: transparent;
+        border-left-color: transparent;
+    }
 }

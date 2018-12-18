@@ -1,0 +1,17 @@
+/* @theme: admin.oro; */
+
+$workflow-widget-row-height: $btn-line-height-sm !default;
+$workflow-widget-label-max-width: 260px !default;
+$workflow-translatable-field-large-icon-font-size: 20px !default;
+$workflow-widget-arrow-skew: 10px !default;
+$workflow-step-color: $success-darken !default;
+$workflow-step-background-color: $success-ultra-light !default;
+$workflow-ordered-step-color: $warning-darken !default;
+$workflow-ordered-step-background-color: $extra-300 !default;
+$workflow-final-step-color: $info-ultra-dark !default;
+$workflow-final-step-background-color: $info-lighten !default;
+$workflow-not-started-steps-color: $primary-550 !default;
+$workflow-not-started-steps-background-color: $primary-900 !default;
+$workflow-li-processed-color: $primary-400 !default;
+$workflow-li-current-color: $success-light !default;
+$workflow-translatable-field-color: $primary !default;

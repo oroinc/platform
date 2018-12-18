@@ -81,4 +81,10 @@
             }
         }
     }
+
+    .attribute-item & {
+        .inline-actions-btn {
+            line-height: 1;
+        }
+    }
 }

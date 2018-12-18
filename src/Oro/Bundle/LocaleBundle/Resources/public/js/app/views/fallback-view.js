@@ -285,30 +285,30 @@ define(function(require) {
         /**
          * Enable/disable value
          *
-         * @param {jQuery} $value
+         * @param {jQuery} $element
          * @param {Boolean} enable
          */
-        enableDisableValue: function($value, enable) {
-            var $valueContainer = $value.closest(this.options.selectors.itemValue);
+        enableDisableValue: function($element, enable) {
+            var $$elementContainer = $element.closest(this.options.selectors.itemValue);
 
             var editor;
-            if ($valueContainer.find('.mce-tinymce').length > 0) {
-                editor = tinyMCE.get($valueContainer.find('textarea').attr('id'));
+            if ($$elementContainer.find('.mce-tinymce').length > 0) {
+                editor = tinyMCE.get($$elementContainer.find('textarea').attr('id'));
             }
 
             if (enable) {
-                $value.removeAttr('disabled');
+                $element.removeAttr('disabled');
 
                 if (editor) {
-                    editor.getBody().setAttribute('contenteditable', true);
+                    editor.setMode('design');
                     $(editor.editorContainer).removeClass('disabled');
                     $(editor.editorContainer).children('.disabled-overlay').remove();
                 }
             } else {
-                $value.attr('disabled', 'disabled');
+                $element.attr('disabled', 'disabled');
 
                 if (editor) {
-                    editor.getBody().setAttribute('contenteditable', false);
+                    editor.setMode('readonly');
                     $(editor.editorContainer).addClass('disabled');
                     $(editor.editorContainer).append('<div class="disabled-overlay"></div>');
                 }
