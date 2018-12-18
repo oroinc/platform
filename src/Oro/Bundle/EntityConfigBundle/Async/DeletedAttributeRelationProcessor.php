@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Async;
 
-use Oro\Bundle\EntityBundle\ORM\DatabaseExceptionHelper;
+use Doctrine\DBAL\Exception\RetryableException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Provider\DeletedAttributeProviderInterface;
@@ -28,11 +28,6 @@ class DeletedAttributeRelationProcessor implements MessageProcessorInterface
     protected $logger;
 
     /**
-     * @var DatabaseExceptionHelper
-     */
-    protected $databaseExceptionHelper;
-
-    /**
      * @var DeletedAttributeProviderInterface
      */
     protected $deletedAttributeProvider;
@@ -40,18 +35,15 @@ class DeletedAttributeRelationProcessor implements MessageProcessorInterface
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param LoggerInterface $logger
-     * @param DatabaseExceptionHelper $databaseExceptionHelper
      * @param DeletedAttributeProviderInterface $deletedAttributeProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         LoggerInterface $logger,
-        DatabaseExceptionHelper $databaseExceptionHelper,
         DeletedAttributeProviderInterface $deletedAttributeProvider
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->logger = $logger;
-        $this->databaseExceptionHelper = $databaseExceptionHelper;
         $this->deletedAttributeProvider = $deletedAttributeProvider;
     }
 
@@ -87,12 +79,11 @@ class DeletedAttributeRelationProcessor implements MessageProcessorInterface
                 ['exception' => $e]
             );
 
-            $driverException = $this->databaseExceptionHelper->getDriverException($e);
-            if ($driverException && $this->databaseExceptionHelper->isDeadlock($driverException)) {
+            if ($e instanceof RetryableException) {
                 return self::REQUEUE;
-            } else {
-                return self::REJECT;
             }
+
+            return self::REJECT;
         }
 
         return self::ACK;
