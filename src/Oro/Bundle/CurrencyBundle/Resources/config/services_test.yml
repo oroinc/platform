@@ -1,0 +1,11 @@
+services:
+    oro_currency.tests.price_rounding_service:
+        alias: oro_currency.rounding.price_rounding_service
+
+    oro_currency.tests.alice_round_price_processor:
+        class: Oro\Bundle\CurrencyBundle\Test\Functional\AliceRoundProcessor
+        public: false
+        arguments:
+            - 'roundPrice'
+            - '@oro_currency.tests.price_rounding_service'
+        tags: ['oro_test.alice_processor']
