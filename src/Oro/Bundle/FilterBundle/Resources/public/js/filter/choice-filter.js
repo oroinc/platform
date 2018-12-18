@@ -122,9 +122,10 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        _renderCriteria: function() {
+        getTemplateData: function() {
             var value = _.extend({}, this.emptyValue, this.value);
             var selectedChoiceLabel = '';
+
             if (!_.isEmpty(this.choices)) {
                 var foundChoice = _.find(this.choices, function(choice) {
                     return String(choice.value) === String(value.type);
@@ -132,14 +133,22 @@ define(function(require) {
                 foundChoice = foundChoice || _.first(this.choices);
                 selectedChoiceLabel = _.result(foundChoice, 'label') || '';
             }
-            var $filter = $(this.template({
+
+            return {
                 name: this.name,
                 choices: this.choices,
                 selectedChoice: value.type,
                 selectedChoiceLabel: selectedChoiceLabel,
                 value: value.value,
                 renderMode: this.renderMode
-            }));
+            };
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _renderCriteria: function() {
+            var $filter = $(this.template(this.getTemplateData()));
             this._appendFilter($filter);
             this._updateDOMValue();
             this._updateValueField();

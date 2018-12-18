@@ -35,7 +35,7 @@
     {% if (tooltip == tooltip_raw) %}
         {% set tooltip = tooltip_raw|trans(tooltip_parameters, "tooltips") %}
     {% endif %}
-    {% if tooltip is not empty %}
+    {%- if tooltip is not empty -%}
         {% set details_anchor = details_anchor|default(null) %}
         {% set details_link = details_link|default(null) %}
         {% set details_enabled = details_enabled|default(false) %}
@@ -63,7 +63,7 @@
            {% if tooltip_placement %}data-placement="{{ tooltip_placement }}"{% endif %}
            data-content="{{ tooltip }}"
            data-toggle="popover"></i>
-    {% endif %}
+    {%- endif -%}
 {% endmacro %}
 
 {#
@@ -121,8 +121,11 @@
         title - row title
         data - row data
 #}
-{% macro renderControlGroup(title, data) %}
-    <div class="control-group attribute-row">
+{% macro renderControlGroup(title, data, options) %}
+    {% set options = {
+        rootClass: 'attribute-row'
+    }|merge(options|default({})) %}
+    <div class="control-group{% if options.rootClass %} {{ options.rootClass }}{% endif %}">
         <label class="control-label">{{ title }}</label>
         <div class="controls">
             {{ data|raw }}

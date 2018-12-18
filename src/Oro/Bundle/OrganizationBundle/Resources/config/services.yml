@@ -221,8 +221,9 @@ services:
            - '@oro_security.owner.ownership_metadata_provider'
            - '@security.authorization_checker'
            - '@oro_security.token_accessor'
-           - '@oro_security.ownership_tree_provider'
+           - '@oro_security.ownership_tree_provider.chain'
            - '@?security.acl.voter.basic_permissions'
+           - '@oro_security.acl.group_provider.chain'
            - '@oro_organization.business_unit_manager'
         tags:
             - { name: validator.constraint_validator, alias: owner_validator }

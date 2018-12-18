@@ -18,23 +18,29 @@ default_exclusion_policy:
     expected:
         exclusion_policy: none
 
-exclusion_policy:
+all_exclusion_policy:
     config:
         exclusion_policy: all
     expected:
         exclusion_policy: all
 
+custom_fields_exclusion_policy:
+    config:
+        exclusion_policy: custom_fields
+    expected:
+        exclusion_policy: custom_fields
+
 null_exclusion_policy:
     config:
         exclusion_policy: null
     expected: []
-    error: 'The value null is not allowed for path "entity.exclusion_policy". Permissible values: "all", "none"'
+    error: 'The value null is not allowed for path "entity.exclusion_policy". Permissible values: "all", "custom_fields", "none"'
 
 invalid_exclusion_policy:
     config:
         exclusion_policy: invalid
     expected: []
-    error: 'The value "invalid" is not allowed for path "entity.exclusion_policy". Permissible values: "all", "none"'
+    error: 'The value "invalid" is not allowed for path "entity.exclusion_policy". Permissible values: "all", "custom_fields", "none"'
 
 documentation_resource:
     config:

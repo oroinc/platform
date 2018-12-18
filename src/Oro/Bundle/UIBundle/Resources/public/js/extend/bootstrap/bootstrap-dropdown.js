@@ -3,6 +3,8 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
+    var config = require('module').config();
+
     var Popper = require('popper');
     require('bootstrap-dropdown');
 
@@ -15,14 +17,16 @@ define(function(require) {
     var DATA_API_KEY = '.data-api';
     var HIDE_EVENT = 'hide' + EVENT_KEY;
     var TO_HIDE_EVENT = 'tohide' + EVENT_KEY;
-    var ATTACHMENT_CLASSES = 'dropdown-menu--top dropdown-menu--bottom dropdown-menu--left dropdown-menu--right';
-    var DROPDOWN_WITH_ARROW_SELECTOR = '.dropdown--with-arrow';
     var GRID_SCROLLABLE_CONTAINER = '.grid-scrollable-container';
     var DIALOG_SCROLLABLE_CONTAINER = '.ui-dialog-content';
     var SCROLLABLE_CONTAINER = [
         DIALOG_SCROLLABLE_CONTAINER,
         GRID_SCROLLABLE_CONTAINER
     ].join(',');
+
+    config = _.extend({
+        displayArrow: true
+    }, config);
 
     _.extend(Dropdown.prototype, {
         toggle: function() {
@@ -34,6 +38,10 @@ define(function(require) {
             if (Dropdown._isShowing) {
                 // sets focus on first input
                 $(this._menu).find('input[type=text]:first').focus();
+            }
+
+            if (this._displayArrow()) {
+                $(this._menu).attr('x-displayed-arrow', Dropdown._isShowing ? '' : null);
             }
 
             delete Dropdown._togglingElement;
@@ -159,7 +167,7 @@ define(function(require) {
             if (this._config.inheritParentWidth) {
                 var inheritParentWidth = this._config.inheritParentWidth;
                 config.positionFixed = true;
-                config.modifiers.computeStyle = {
+                config.modifiers.offset = {
                     fn: function(data, options) {
                         var popper = data.instance.popper;
                         var offset = data.offsets.popper;
@@ -177,7 +185,7 @@ define(function(require) {
                             );
                         }
 
-                        Popper.Defaults.modifiers.computeStyle.fn(data, options);
+                        Popper.Defaults.modifiers.offset.fn(data, options);
 
                         return data;
                     }
@@ -196,9 +204,8 @@ define(function(require) {
                 this._popper = null;
             }
 
-            var menu = this._getMenuElement();
-
-            if ($(menu).closest(DROPDOWN_WITH_ARROW_SELECTOR).length) {
+            if (this._displayArrow()) {
+                var menu = this._getMenuElement();
                 var arrow = $(menu).children('.arrow')[0];
 
                 if (!arrow) {
@@ -209,11 +216,6 @@ define(function(require) {
 
                 config.modifiers.arrow = _.extend(config.modifiers.arrow || {}, {
                     element: arrow
-                });
-
-                _.extend(config, {
-                    onCreate: this._handlePopperPlacementChange.bind(this),
-                    onUpdate: this._handlePopperPlacementChange.bind(this)
                 });
             }
 
@@ -230,13 +232,6 @@ define(function(require) {
             return config;
         },
 
-        _handlePopperPlacementChange: function(data) {
-            var menu = this._getMenuElement();
-            var side = data.placement.split('-')[0];
-
-            $(menu).removeClass(ATTACHMENT_CLASSES).addClass('dropdown-menu--' + side);
-        },
-
         /**
          * Defined property `_inNavbar` is used only for
          *
@@ -247,6 +242,10 @@ define(function(require) {
             return original._detectNavbar.call(this) ||
                 this._config.popper === false || // popper plugin is turned off intentionally
                 $(this._element).closest('.app-header').length > 0; // app-header is considered as navbar as well
+        },
+
+        _displayArrow: function() {
+            return _.isBoolean(this._config.displayArrow) ? this._config.displayArrow : config.displayArrow;
         }
     });
 

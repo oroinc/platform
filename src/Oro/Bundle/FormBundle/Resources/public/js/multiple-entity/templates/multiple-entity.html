@@ -1,10 +1,10 @@
-<div class="clearfix">
-    <div class="clearfix">
-        <div class="pull-right">
-            <a href="javascript:void(0)" class="remove-btn" title="<%= _.__('Remove') %>"><i class="fa-close"></i></a>
-        </div>
+<div class="list-group-item__inner">
+    <a href="javascript:void(0)" class="btn btn-icon btn-square-lighter remove-btn" title="<%- _.__('Remove') %>">
+        <span class="fa-close"></span>
+    </a>
+    <div class="list-group-item__header">
         <% if (hasDefault) { %>
-        <div class="pull-left">
+        <div class="list-group-item__default">
             <input type="radio" class="default-selector"
                    name="<%= name %>_default"
                    title="<%= _.__('Default') %>"
@@ -15,15 +15,15 @@
             />
         </div>
         <% } %>
-        <div class="pull-left">
-            <h4><a href="<%= link %>" class="entity-info"><%= _.escape(label) %></a></h4>
-        </div>
+        <h4 class="list-group-item__title">
+            <a href="<%- link %>" class="list-group-item__link entity-info" title="<%- _.escape(label) %>"><%- _.escape(label) %></a>
+        </h4>
     </div>
-    <div class="extra-info">
+    <div class="list-group-item__extra-info">
         <% _.each(extraData, function(item) { %>
         <% if (!_.isUndefined(item.label)) { %>
             <% if (!item.hasOwnProperty('value') || !item.value) { item.value = _.__('N/A'); } %>
-            <div><%= _.escape(item.label) %>: <%= _.escape(item.value) %></div>
+            <div><%- _.escape(item.label) %>: <%- _.escape(item.value) %></div>
         <% } %>
         <% }); %>
     </div>

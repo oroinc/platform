@@ -391,12 +391,12 @@
         <td class="step-transitions"></td>
         <td><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}"><%- order %></span></td>
         <td class="step-actions">
-            <div class="pull-right">
-                <a href="#" class="add-step-transition" title="{{ 'Add transition to this step'|trans}}" class="action"><i class="fa-plus-circle hide-text"/></a>
+            <div class="btn-group pull-right">
+                <a href="#" class="btn btn-icon btn-lighter add-step-transition" title="{{ 'Add transition to this step'|trans}}" class="action"><i class="fa-plus-circle hide-text"/></a>
                 <% if (!_is_start) { %>
-                    <a href="#" class="edit-step action" title="{{ 'Update this step'|trans}}"><i class="fa-pencil-square-o hide-text"/></a>
-                    <a href="#" class="clone-step action" title="{{ 'Clone this step'|trans}}"><i class="fa-files-o hide-text"/></a>
-                    <a href="#" class="delete-step action" title="{{ 'Delete this step'|trans}}"><i class="fa-trash-o hide-text"/></a>
+                    <a href="#" class="btn btn-icon btn-lighter edit-step action" title="{{ 'Update this step'|trans}}"><i class="fa-pencil-square-o hide-text"/></a>
+                    <a href="#" class="btn btn-icon btn-lighter clone-step action" title="{{ 'Clone this step'|trans}}"><i class="fa-files-o hide-text"/></a>
+                    <a href="#" class="btn btn-icon btn-lighter delete-step action" title="{{ 'Delete this step'|trans}}"><i class="fa-trash-o hide-text"/></a>
                 <% } %>
             </div>
         </td>

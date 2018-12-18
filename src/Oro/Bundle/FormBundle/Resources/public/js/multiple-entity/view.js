@@ -1,8 +1,10 @@
-define(['underscore', 'backbone', 'oro/dialog-widget'
-], function(_, Backbone, DialogWidget) {
+define(function(require) {
     'use strict';
 
     var EntityView;
+    var _ = require('underscore');
+    var Backbone = require('backbone');
+    var DialogWidget = require('oro/dialog-widget');
 
     /**
      * @export  oroform/js/multiple-entity/view
@@ -11,7 +13,7 @@ define(['underscore', 'backbone', 'oro/dialog-widget'
      */
     EntityView = Backbone.View.extend({
         attributes: {
-            'class': 'list-group-item clearfix span3 box-type1'
+            'class': 'list-group-item'
         },
 
         events: {

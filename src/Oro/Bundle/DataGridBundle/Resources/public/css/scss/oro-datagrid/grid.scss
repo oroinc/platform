@@ -109,6 +109,10 @@
     vertical-align: top;
 }
 
+.grid-body-cell-contexts {
+    padding: $oro-datagrid-body-cell-wide-inner-offset;
+}
+
 .grid-footer-cell {
     padding: $oro-datagrid-footer-cell-inner-offset;
 

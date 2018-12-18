@@ -20,7 +20,7 @@
     {{ form_row(form.transportType) }}
 
     {% if (form.transport is defined) %}
-        {{ form_widget(form.transport) }}
+        {{ form_widget(form.transport, {'attr': {'class': 'control-group-container'}}) }}
     {% endif %}
 
     {% if (form.synchronizationSettings is defined) %}
@@ -32,7 +32,7 @@
     {% endif %}
 
     {% if (form.connectors is defined) %}
-        <div {% if form.connectors.vars.choices is empty %}{{ 'class="hide"' }}{% endif %}>
+        <div class="control-group-container {% if form.connectors.vars.choices is empty %}{{ 'hide' }}{% endif %}">
             {{ form_row(form.connectors) }}
         </div>
     {% endif %}

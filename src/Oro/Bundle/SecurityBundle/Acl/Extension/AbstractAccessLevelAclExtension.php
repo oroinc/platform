@@ -17,6 +17,9 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * The base class for ACL extensions that check permissions based on access levels.
+ */
 abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
 {
     /** All access levels from the most to the least permissive level */
@@ -199,6 +202,21 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
         }
 
         return $className;
+    }
+
+    /**
+     * Gets id for the given domain object
+     *
+     * @param  object $domainObject
+     *
+     * @return int|string
+     * @throws InvalidDomainObjectException
+     */
+    protected function getObjectId($domainObject)
+    {
+        return $domainObject instanceof DomainObjectReference
+            ? $domainObject->getIdentifier()
+            : $this->objectIdAccessor->getId($domainObject);
     }
 
     /**

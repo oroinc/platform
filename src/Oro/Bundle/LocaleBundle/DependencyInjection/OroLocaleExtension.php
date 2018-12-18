@@ -15,7 +15,6 @@ class OroLocaleExtension extends Extension
     const PARAMETER_NAME_FORMATS = 'oro_locale.format.name';
     const PARAMETER_ADDRESS_FORMATS = 'oro_locale.format.address';
     const PARAMETER_LOCALE_DATA = 'oro_locale.locale_data';
-    const PARAMETER_CURRENCY_DATA = 'oro_locale.currency_data';
 
     /**
      * {@inheritDoc}
@@ -39,10 +38,6 @@ class OroLocaleExtension extends Extension
         $container->setParameter(
             self::PARAMETER_LOCALE_DATA,
             $this->escapePercentSymbols($config['locale_data'])
-        );
-        $container->setParameter(
-            self::PARAMETER_CURRENCY_DATA,
-            $this->escapePercentSymbols($config['currency_data'])
         );
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
@@ -123,7 +118,6 @@ class OroLocaleExtension extends Extension
             'name_format'    => [],
             'address_format' => [],
             'locale_data'    => [],
-            'currency_data'  => [],
         ];
 
         $configLoader = new CumulativeConfigLoader(
@@ -132,7 +126,6 @@ class OroLocaleExtension extends Extension
                 new YamlCumulativeFileLoader('Resources/config/oro/name_format.yml'),
                 new YamlCumulativeFileLoader('Resources/config/oro/address_format.yml'),
                 new YamlCumulativeFileLoader('Resources/config/oro/locale_data.yml'),
-                new YamlCumulativeFileLoader('Resources/config/oro/currency_data.yml')
             ]
         );
         $resources    = $configLoader->load($container);
@@ -159,7 +152,7 @@ class OroLocaleExtension extends Extension
         }
 
         // merge formats
-        foreach (array('name_format', 'address_format', 'locale_data', 'currency_data') as $configKey) {
+        foreach (array('name_format', 'address_format', 'locale_data') as $configKey) {
             if (!empty($configData[$configKey])) {
                 $configData[$configKey] = array_merge($externalData[$configKey], $configData[$configKey]);
             } else {

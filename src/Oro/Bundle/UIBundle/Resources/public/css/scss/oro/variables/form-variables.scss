@@ -5,14 +5,15 @@ $field-width: 294px !default;
 
 $input-field-border-radius: 2px !default;
 $input-background-color: $primary-inverse !default;
-$input-inner-offset: 4px 6px !default;
+$input-inner-offset: ($content-padding-small / 2) $content-padding-small !default;
 $input-box-shadow: none !default;
 $input-font-family: $font-family-sans-serif !default;
 $input-color: $primary-200 !default;
-$input-outer-offset-bottom: 8px !default;
+$input-outer-offset-bottom: $content-padding-small !default;
 $input-control-group-outer-offset-bottom: 0 !default;
 $input-box-sizing: border-box !default;
 $input-outline: none !default;
+$input-append-width: $field-width - 30px !default;
 
 $input-focus-box-shadow: none !default;
 $input-focus-border-color: $secondary !default;
@@ -104,7 +105,7 @@ $selector-uniform-position: relative !default;
 $selector-uniform-font-size: 100% !default;
 $selector-uniform-width: 100% !default;
 
-$selector-uniform-arrow-outer-offset: side-values(3px 3px 0 0) !default;
+$selector-uniform-arrow-outer-offset: side-values(3px 6px 0 0) !default;
 $selector-uniform-arrow-display: inline-block !default;
 $selector-uniform-arrow-font-family: FontAwesome !default;
 $selector-uniform-arrow-position: absolute !default;

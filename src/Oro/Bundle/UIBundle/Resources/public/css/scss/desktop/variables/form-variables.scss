@@ -1,8 +1,8 @@
 /* @theme: admin.oro; */
 
 $form-item-collection-field-width: 261px !default;
-$form-item-collection-field-append-width: 228px !default;
-$form-item-collection-field-append-sortable-width: 220px !default;
+$form-item-collection-field-append-width: $input-append-width !default;
+$form-item-collection-field-append-sortable-width: 234px !default;
 
 $form-item-collection-element-offset-bottom: 5px !default;
 $form-item-collection-element-width: 259px !default;

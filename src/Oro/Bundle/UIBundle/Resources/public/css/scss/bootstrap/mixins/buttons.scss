@@ -12,6 +12,7 @@
     $active-color: color-yiq($active-background),
     $active-box-shadow: null,
     $focus-border: null,
+    $focus-box-shadow: null,
     $disabled-color: $color,
     $disabled-background-color: $background,
     $disabled-border-color: $border,
@@ -40,6 +41,8 @@
         // Avoid using mixin so we can pass custom focus shadow properly
         @if $enable-shadows {
             box-shadow: $btn-box-shadow;
+        } @else {
+            box-shadow: $focus-box-shadow;
         }
     }
 

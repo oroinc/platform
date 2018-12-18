@@ -2,6 +2,10 @@
 
 .reminders-collection,
 .ui-dialog .form-horizontal .control-group .controls .reminders-collection {
+    .number {
+        width: $reminders-collection-mobile-number-width;
+    }
+
     .float-holder {
         float: none;
 

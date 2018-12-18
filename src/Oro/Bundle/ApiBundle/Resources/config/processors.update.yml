@@ -46,9 +46,7 @@ services:
     oro_api.update.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - '@oro_api.doctrine_helper'
-            - '@security.authorization_checker'
-            - '@oro_security.acl.group_provider.chain'
+            - '@oro_api.security.authorization_checker'
             - EDIT
         tags:
             - { name: oro.api.processor, action: update, group: security_check, priority: 10 }
@@ -64,7 +62,7 @@ services:
     oro_api.update.entity_object_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck
         arguments:
-            - '@security.authorization_checker'
+            - '@oro_api.security.authorization_checker'
             - EDIT
         tags:
             - { name: oro.api.processor, action: update, group: data_security_check, priority: 10 }

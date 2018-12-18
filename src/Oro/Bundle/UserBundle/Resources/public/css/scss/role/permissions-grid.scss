@@ -177,10 +177,12 @@
     }
 }
 
-.role-permissions-action-launcher {
-    .launchers-list .launcher-item a#{&}:hover,
-    .launchers-list .launcher-item a#{&}:focus {
-        background: transparent !important;
+.launchers-list .launcher-item {
+    a.role-permissions-action-launcher {
+        &:hover,
+        &:focus {
+            background: transparent !important;
+        }
     }
 }
 

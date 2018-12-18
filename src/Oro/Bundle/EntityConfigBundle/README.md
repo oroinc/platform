@@ -86,7 +86,7 @@ entity_config:
                         type:          text         # sets the attribute type
                         options:
                             block:     entity       # specifies in which block on the form this attribute should be displayed
-                            label:     'Demo Attr'  # sets the the label name
+                            label:     'Demo Attr'  # sets the label name
 ```
 Now you may go to System > Entities. The 'Demo Attr' column should be displayed in the grid. Click Edit on any entity to go to edit entity form. 'Demo Attr' field should be displayed there.
 

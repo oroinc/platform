@@ -346,3 +346,9 @@ services:
         class: Oro\Bundle\DataGridBundle\Tools\DateHelper
         arguments:
             - '@oro_locale.settings'
+
+    oro_datagrid.converter.url_converter:
+        class: Oro\Bundle\DataGridBundle\Converter\UrlConverter
+        public: false
+        arguments:
+            - '@router'

@@ -997,8 +997,15 @@ class OroMainContext extends MinkContext implements
                 parent::pressButton($button);
                 break;
             } catch (ElementNotFoundException $e) {
-                if ($this->getSession()->getPage()->hasLink($button)) {
-                    $this->clickLink($button);
+                $clickLink = $this->spin(function () use ($button) {
+                    if ($this->getSession()->getPage()->hasLink($button)) {
+                        $this->clickLink($button);
+                        return true;
+                    }
+                    return false;
+                }, 1);
+
+                if ($clickLink) {
                     break;
                 }
 

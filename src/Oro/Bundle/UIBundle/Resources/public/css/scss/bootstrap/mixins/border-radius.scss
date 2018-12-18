@@ -1,0 +1,15 @@
+/* @theme: admin.oro; */
+
+@mixin border-start-radius($radius) {
+    @if $enable-rounded {
+        border-top-#{$start}-radius: $radius;
+        border-bottom-#{$start}-radius: $radius;
+    }
+}
+
+@mixin border-end-radius($radius) {
+    @if $enable-rounded {
+        border-top-#{$end}-radius: $radius;
+        border-bottom-#{$end}-radius: $radius;
+    }
+}

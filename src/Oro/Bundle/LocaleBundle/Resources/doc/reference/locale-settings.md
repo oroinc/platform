@@ -243,20 +243,6 @@ $localeSettings = $this->get('oro_locale.settings');
 $symbol = $localeSettings->getCurrencySymbolByCurrency('USD');
 ```
 
-Data about currency code and currency symbols are loaded from bundle's file ./Resources/config/oro/currency_data.yml. Other bundles could provide their files
-to extend this data.
-
-Example of currency_data.yml file:
-
-```yml
-UAH:
-    symbol: ₴
-UGX:
-    symbol: UGX
-USD:
-    symbol: $
-```
-
 
 Names formats
 -------------

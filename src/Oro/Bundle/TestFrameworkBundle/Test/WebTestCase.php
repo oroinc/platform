@@ -12,6 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResol
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
+use Oro\Bundle\TestFrameworkBundle\Test\Event\DisableListenersForDataFixturesEvent;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Testing\DbIsolationExtension;
@@ -20,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -526,13 +528,34 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * @return string[]
+     */
+    protected function getListenersThatShouldBeDisabledDuringDataFixturesLoading()
+    {
+        $event = new DisableListenersForDataFixturesEvent();
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = self::getContainer()->get('event_dispatcher');
+        $eventDispatcher->dispatch(DisableListenersForDataFixturesEvent::NAME, $event);
+
+        return array_merge(
+            [
+                'oro_dataaudit.listener.send_changed_entities_to_message_queue',
+                'oro_sync.event_listener.doctrine_tag',
+                'oro_search.index_listener'
+            ],
+            $event->getListeners()
+        );
+    }
+
+    /**
      * @param DataFixturesExecutor $executor
      * @param DataFixturesLoader   $loader
      */
     private function doLoadFixtures(DataFixturesExecutor $executor, DataFixturesLoader $loader)
     {
+        $container = self::getContainer();
         /** @var TestBufferedMessageProducer|null $messageProducer */
-        $messageProducer = self::getContainer()->get(
+        $messageProducer = $container->get(
             'oro_message_queue.client.buffered_message_producer',
             ContainerInterface::NULL_ON_INVALID_REFERENCE
         );
@@ -540,6 +563,11 @@ abstract class WebTestCase extends BaseWebTestCase
             $messageProducer = null;
         }
 
+        // disable some listeners to speed up loading of fixtures
+        $listenersToDisable = $this->getListenersThatShouldBeDisabledDuringDataFixturesLoading();
+        foreach ($listenersToDisable as $listenerServiceId) {
+            $container->get($listenerServiceId)->setEnabled(false);
+        }
         // prevent sending of messages during loading of fixtures,
         // because fixtures are used to prepare data for tests
         // and it makes no sense to send messages before a test starts
@@ -551,6 +579,9 @@ abstract class WebTestCase extends BaseWebTestCase
         try {
             $executor->execute($loader->getFixtures(), true);
         } finally {
+            foreach ($listenersToDisable as $listenerServiceId) {
+                $container->get($listenerServiceId)->setEnabled(true);
+            }
             if ($restoreSendingOfMessages) {
                 $messageProducer->restoreSendingOfMessages();
             }
@@ -898,7 +929,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param int $statusCode
      * @param string|null $message
      */
-    public static function assertEmptyResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertEmptyResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
     {
         self::assertResponseStatusCodeEquals($response, $statusCode, $message);
         self::assertEmpty(
@@ -914,7 +945,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param int $statusCode
      * @param string|null $message
      */
-    public static function assertJsonResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertJsonResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
     {
         self::assertResponseStatusCodeEquals($response, $statusCode, $message);
         self::assertResponseContentTypeEquals($response, 'application/json', $message);
@@ -927,7 +958,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param int $statusCode
      * @param string|null $message
      */
-    public static function assertHtmlResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertHtmlResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
     {
         self::assertResponseStatusCodeEquals($response, $statusCode, $message);
         self::assertResponseContentTypeEquals($response, 'text/html; charset=UTF-8', $message);
@@ -940,7 +971,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param int $statusCode
      * @param string|null $message
      */
-    public static function assertResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
     {
         try {
             \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
@@ -981,7 +1012,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param string $contentType
      * @param string|null $message
      */
-    public static function assertResponseContentTypeEquals(Response $response, $contentType, $message = null)
+    protected static function assertResponseContentTypeEquals(Response $response, $contentType, $message = null)
     {
         $message = $message ? $message . PHP_EOL : '';
         $message .= sprintf('Failed asserting response has header "Content-Type: %s":', $contentType);
@@ -997,7 +1028,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param array $actual
      * @param string $message
      */
-    public static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
+    protected static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
     {
         $actualIntersect = self::getRecursiveArrayIntersect($actual, $expected);
         \PHPUnit\Framework\TestCase::assertEquals(
@@ -1016,7 +1047,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param array $target
      * @return array
      */
-    public static function getRecursiveArrayIntersect(array $target, array $source)
+    protected static function getRecursiveArrayIntersect(array $target, array $source)
     {
         $result = [];
 

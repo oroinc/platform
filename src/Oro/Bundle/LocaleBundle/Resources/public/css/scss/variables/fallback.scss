@@ -1,7 +1,5 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/variables";
-
 $oro-quarter-width: auto !default;
 $oro-quarter-min-width: 68px !default;
 $oro-quarter-float: left !default;
@@ -15,7 +13,7 @@ $fallback-container-status-text-align: center !default;
 $fallback-container-status-line-height: 32px !default;
 $fallback-container-status-height: 32px !default;
 $fallback-container-input-offset-top: 0 !default;
-$fallback-container-select-width: auto !default;
+$fallback-container-select-width: 100% !default;
 $fallback-container-select-max-width: 234px !default;
 $fallback-container-select-float: left !default;
 $fallback-container-select-span-inner-offset-right: 18px !default;
@@ -39,7 +37,11 @@ $fallback-item-label-offset: 10px 0 !default;
 
 $fallback-item-fallback-line-offset: 10px 0 !default;
 
-$fallback-item-use-fallback-width: 60px !default;
+$fallback-item-fallback-min-width: 50% !default;
+$fallback-item-fallback-max-width: 80% !default;
+
+$fallback-item-use-fallback-width: 20% !default;
+$fallback-item-use-fallback-max-width: 50% !default;
 
 $fallback-item-mce-tinymce-width: 100% !important !default;
 
@@ -50,6 +52,5 @@ $fallback-item-value--first-display: inline-flex !default;
 $fallback-item-value--first-width: auto !default;
 $fallback-item-value--first-validation-width: 100% !default;
 $fallback-item-value--first-validation-order: 1 !default;
-$fallback-item-value--first-input-width: 254px !default;
 
 $fallback-item-value--first-input-group-offset-end: 4px !default;
