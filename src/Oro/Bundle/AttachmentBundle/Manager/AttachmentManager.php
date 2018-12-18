@@ -197,7 +197,7 @@ class AttachmentManager
             || count($result = explode('|', $decodedString)) < 5
         ) {
             throw new InvalidAttachmentEncodedParametersException(
-                'Input string is not correct attachment encoded parameters'
+                'Attachment parameters cannot be decoded'
             );
         }
 

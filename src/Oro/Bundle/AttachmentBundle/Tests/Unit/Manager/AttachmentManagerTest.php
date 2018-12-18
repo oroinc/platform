@@ -97,7 +97,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
     public function testDecodeAttachmentUrlException()
     {
         $this->expectException(InvalidAttachmentEncodedParametersException::class);
-        $this->expectExceptionMessage('Input string is not correct attachment encoded parameters');
+        $this->expectExceptionMessage('Attachment parameters cannot be decoded');
 
         $this->attachmentManager->decodeAttachmentUrl('some_string');
     }
