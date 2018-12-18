@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
-use Symfony\Component\Routing\RequestContextAwareInterface;
+use Oro\Bundle\AttachmentBundle\Exception\InvalidAttachmentEncodedParametersException;
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
@@ -93,6 +93,14 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
                 'T3JvXFRlc3RcVGVzdENsYXNzfHRlc3RGaWVsZHwxfGRvd25sb2FkfHRlc3RGaWxlLndpdGhGb3J3YXJkU2xhc2g/LnR4dA=='
             )
         );
+    }
+
+    public function testDecodeAttachmentUrlException()
+    {
+        $this->expectException(InvalidAttachmentEncodedParametersException::class);
+        $this->expectExceptionMessage('Input string is not correct attachment encoded parameters');
+
+        $this->attachmentManager->decodeAttachmentUrl('some_string');
     }
 
     public function testWrongAttachmentUrl()
