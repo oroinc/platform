@@ -35,7 +35,6 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_importexport.writer.entity_detach_fixer'
             - '@oro_importexport.context_registry'
-            - '@oro_entity.database_exception_helper'
         tags:
             - { name: oro_importexport.writer, alias: entity }
 
