@@ -4,14 +4,17 @@ namespace Oro\Bundle\AttachmentBundle\Controller;
 
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Exception\InvalidAttachmentEncodedParametersException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * Controller class with actions that work with files
+ */
 class FileController extends Controller
 {
     /**
@@ -22,11 +25,16 @@ class FileController extends Controller
      */
     public function getAttachmentAction($codedString, $extension)
     {
-        list($parentClass, $fieldName, $parentId, $type, $filename) = $this->get('oro_attachment.manager')
-            ->decodeAttachmentUrl($codedString);
+        list($parentClass, $fieldName, $parentId, $type, $filename) = $this->decodeAttachmentUrl($codedString);
+
         $parentEntity = $this->getDoctrine()->getRepository($parentClass)->find($parentId);
+
+        if (!$parentEntity) {
+            throw $this->createNotFoundException();
+        }
+
         if (!$this->isGranted('VIEW', $parentEntity)) {
-            throw new AccessDeniedException();
+            throw $this->createAccessDeniedException();
         }
 
         $accessor   = PropertyAccess::createPropertyAccessor();
@@ -41,7 +49,7 @@ class FileController extends Controller
         }
 
         if ($attachment instanceof Collection || $attachment->getOriginalFilename() !== $filename) {
-            throw new NotFoundHttpException();
+            throw $this->createNotFoundException();
         }
 
         $response = new Response();
@@ -118,9 +126,25 @@ class FileController extends Controller
     {
         $file = $this->get('doctrine')->getRepository('OroAttachmentBundle:File')->find($id);
         if (!$file || ($file->getFilename() !== $fileName && $file->getOriginalFilename() !== $fileName)) {
-            throw new NotFoundHttpException('File not found');
+            throw $this->createNotFoundException('File not found');
         }
 
         return $file;
+    }
+
+    /**
+     * @param $codedString
+     *
+     * @return array
+     */
+    private function decodeAttachmentUrl($codedString)
+    {
+        try {
+            $decodedParams = $this->get('oro_attachment.manager')->decodeAttachmentUrl($codedString);
+        } catch (InvalidAttachmentEncodedParametersException $exception) {
+            throw $this->createNotFoundException('File not found');
+        }
+
+        return $decodedParams;
     }
 }

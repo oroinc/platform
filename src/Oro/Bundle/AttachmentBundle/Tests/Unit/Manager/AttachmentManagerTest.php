@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
+use Oro\Bundle\AttachmentBundle\Exception\InvalidAttachmentEncodedParametersException;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
@@ -91,6 +92,14 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
                 'T3JvXFRlc3RcVGVzdENsYXNzfHRlc3RGaWVsZHwxfGRvd25sb2FkfHRlc3RGaWxlLndpdGhGb3J3YXJkU2xhc2g/LnR4dA=='
             )
         );
+    }
+
+    public function testDecodeAttachmentUrlException()
+    {
+        $this->expectException(InvalidAttachmentEncodedParametersException::class);
+        $this->expectExceptionMessage('Attachment parameters cannot be decoded');
+
+        $this->attachmentManager->decodeAttachmentUrl('some_string');
     }
 
     public function testWrongAttachmentUrl()
