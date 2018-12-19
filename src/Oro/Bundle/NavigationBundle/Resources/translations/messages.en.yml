@@ -6,6 +6,7 @@ oro:
             pinbar.location: Location of the Pinbar icon
         menu:
             pinbar.label: Pinbar
+            how_to_use_pinbar: Learn how to use this space
             recent_pages.label: Recent pages
             history.label: History
             favorite.label: Favorites
