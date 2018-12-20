@@ -21,18 +21,67 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         $this->accessor   = new RouteCollectionAccessor($this->collection);
     }
 
-    public function testGetByPath()
+    public function testGetByPathForSpecificMethods()
     {
+        $route1  = new Route('/route1');
         $route2Get  = new Route('/route2', [], [], [], '', [], 'GET');
         $route2Post = new Route('/route2', [], [], [], '', [], 'POST');
+        $route3 = new Route('/route3', [], [], [], '', [], ['GET', 'POST']);
 
-        $this->collection->add('route1', new Route('/route1'));
+        $this->collection->add('route1', $route1);
         $this->collection->add('route2_get', $route2Get);
         $this->collection->add('route2_post', $route2Post);
+        $this->collection->add('route3', $route3);
 
         $this->assertNull($this->accessor->getByPath('/route1', ['GET']));
+        $this->assertSame($route1, $this->accessor->getByPath('/route1', ['GET'], false));
+        $this->assertNull($this->accessor->getByPath('/route1', ['POST']));
+        $this->assertSame($route1, $this->accessor->getByPath('/route1', ['POST'], false));
+
         $this->assertSame($route2Get, $this->accessor->getByPath('/route2', ['GET']));
+        $this->assertSame($route2Get, $this->accessor->getByPath('/route2', ['GET'], false));
         $this->assertSame($route2Post, $this->accessor->getByPath('/route2', ['POST']));
+        $this->assertSame($route2Post, $this->accessor->getByPath('/route2', ['POST'], false));
+        $this->assertNull($this->accessor->getByPath('/route2', ['GET', 'POST']));
+        $this->assertNull($this->accessor->getByPath('/route2', ['GET', 'POST'], false));
+        $this->assertNull($this->accessor->getByPath('/route2', ['PATCH']));
+        $this->assertNull($this->accessor->getByPath('/route2', ['PATCH'], false));
+
+        $this->assertSame($route3, $this->accessor->getByPath('/route3', ['GET', 'POST']));
+        $this->assertSame($route3, $this->accessor->getByPath('/route3', ['GET', 'POST'], false));
+        $this->assertNull($this->accessor->getByPath('/route3', ['GET']));
+        $this->assertSame($route3, $this->accessor->getByPath('/route3', ['GET'], false));
+        $this->assertNull($this->accessor->getByPath('/route3', ['POST']));
+        $this->assertSame($route3, $this->accessor->getByPath('/route3', ['POST'], false));
+        $this->assertNull($this->accessor->getByPath('/route3', ['GET', 'POST', 'PATCH']));
+        $this->assertNull($this->accessor->getByPath('/route3', ['GET', 'POST', 'PATCH'], false));
+        $this->assertNull($this->accessor->getByPath('/route3', ['PATCH']));
+        $this->assertNull($this->accessor->getByPath('/route3', ['PATCH'], false));
+
+        $this->assertNull($this->accessor->getByPath('/unknown_route', ['GET']));
+        $this->assertNull($this->accessor->getByPath('/unknown_route', ['GET'], false));
+    }
+
+    public function testGetByPathForAnyMethods()
+    {
+        $route1  = new Route('/route1');
+        $route2Get  = new Route('/route2', [], [], [], '', [], 'GET');
+        $route2Post = new Route('/route2', [], [], [], '', [], 'POST');
+        $route3 = new Route('/route3', [], [], [], '', [], ['GET', 'POST']);
+
+        $this->collection->add('route1', $route1);
+        $this->collection->add('route2_get', $route2Get);
+        $this->collection->add('route2_post', $route2Post);
+        $this->collection->add('route3', $route3);
+
+        $this->assertSame($route1, $this->accessor->getByPath('/route1', []));
+        $this->assertSame($route1, $this->accessor->getByPath('/route1', [], false));
+        $this->assertNull($this->accessor->getByPath('/route2', []));
+        $this->assertSame($route2Get, $this->accessor->getByPath('/route2', [], false));
+        $this->assertNull($this->accessor->getByPath('/route3', []));
+        $this->assertSame($route3, $this->accessor->getByPath('/route3', [], false));
+        $this->assertNull($this->accessor->getByPath('/unknown_route', []));
+        $this->assertNull($this->accessor->getByPath('/unknown_route', [], false));
     }
 
     public function testGetName()
