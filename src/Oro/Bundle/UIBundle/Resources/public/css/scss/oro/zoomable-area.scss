@@ -1,0 +1,34 @@
+/* @theme: admin.oro; */
+
+.zoomable-area {
+    cursor: move;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+    position: relative; /* required for valid controls positioning */
+
+    .zoom-controls {
+        position: absolute;
+        z-index: 600;
+        right: 10px;
+        top: 10px;
+
+        .zoom-level {
+            width: 42px;
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        [class^="fa-"] {
+            font-size: $zoomable-area-zoom-controls-icon-font-size;
+        }
+    }
+}
+
+.fa-search-plus:before {
+    content: $fa-var-search-plus;
+}
+
+.fa-search-minus:before {
+    content: $fa-var-search-minus;
+}

@@ -1,0 +1,24 @@
+/* @theme: admin.oro; */
+
+.attribute-item {
+    display: $attribute-item-display;
+    margin: $attribute-item-offset;
+
+    &__term {
+        width: $attribute-item-term-width;
+        max-width: $attribute-item-term-max-width;
+        color: $attribute-item-term-color;
+        text-align: $attribute-item-term-text-align;
+        flex-shrink: 0;
+    }
+
+    &__description {
+        margin-#{$start}: $attribute-item-description-offset-start;
+        text-align: $attribute-item-description-text-align;
+        flex-grow: 1;
+
+        .list-inline {
+            margin-bottom: 0;
+        }
+    }
+}

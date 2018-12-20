@@ -17,7 +17,6 @@ parameters:
     oro_user.group.manager.api.class:             Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_user.autocomplete.user.search_handler:    Oro\Bundle\UserBundle\Autocomplete\UserSearchHandler
     oro_user.autocomplete.user.search_without_current_handler.class: Oro\Bundle\UserBundle\Autocomplete\UserWithoutCurrentHandler
-    oro_user.autocomplete.user.search_acl_handler.class: Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
     oro_user.autocomplete.user.organization_search_handler.class: Oro\Bundle\UserBundle\Autocomplete\OrganizationUsersHandler
     oro_user.autocomplete.role.search_handler.class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
     oro_user.autocomplete.role.authenticated_search_handler.class: Oro\Bundle\UserBundle\Autocomplete\AuthenticatedRolesHandler
@@ -59,6 +58,7 @@ services:
             - '@doctrine'
             - '@security.encoder_factory'
             - '@oro_entity_extend.enum_value_provider'
+            - '@oro_config.manager'
 
     oro_user.manager.api:
         class: '%oro_user.manager.api.class%'
@@ -95,11 +95,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: security.interactive_login, method: onLogin }
 
-    oro_user.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_user' ] ]
-
     oro_user.user_menu:
         class:                        '%oro_user.user_menu.builder.class%'
         tags:
@@ -119,6 +114,13 @@ services:
             - '@service_container'
         tags:
             - { name: twig.extension }
+
+    oro_user.topic.outdated_user_page:
+        class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic
+        arguments:
+            - 'oro_user.outdated_user_page'
+        tags:
+            - { name: gos_web_socket.topic }
 
     oro_user.status_manager:
         class:                        '%oro_user.status.manager.class%'
@@ -166,7 +168,7 @@ services:
     # Autocomplete acl user search handler
     oro_user.autocomplete.user.search_acl_handler.abstract:
         abstract: true
-        class: '%oro_user.autocomplete.user.search_acl_handler.class%'
+        class: Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_attachment.manager'
@@ -174,6 +176,7 @@ services:
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
             - '@oro_security.ownership_tree_provider'
+            - '@oro_entity.routing_helper'
             - "@?security.acl.voter.basic_permissions"
         calls:
             - [ setEntityNameResolver,  ['@oro_entity.entity_name_resolver']]
@@ -346,11 +349,13 @@ services:
     oro_user.mailer.processor:
         class: '%oro_user.mailer.processor.class%'
         arguments:
-            - '@doctrine'
-            - '@oro_config.global'
-            - '@oro_email.email_renderer'
-            - '@oro_email.email_holder_helper'
-            - '@oro_email.direct_mailer'
+            - '@oro_user.mailer.user_template_email_sender'
+
+    oro_user.mailer.user_template_email_sender:
+        class: 'Oro\Bundle\UserBundle\Mailer\UserTemplateEmailSender'
+        arguments:
+            - '@oro_notification.model.notification_settings'
+            - '@oro_email.manager.template_email'
 
     oro_user.placeholder.filter:
         class: '%oro_user.placeholder.filter.class%'
@@ -443,6 +448,22 @@ services:
             - '@oro_user.provider.password_complexity_config_provider'
         tags:
             - { name: validator.constraint_validator, alias: oro_user.validator.password_complexity }
+
+    oro_user.validator.email_case_insensitive_option:
+        class: Oro\Bundle\UserBundle\Validator\EmailCaseInsensitiveOptionValidator
+        arguments:
+            - '@oro_user.manager'
+            - '@translator'
+            - '@oro_datagrid.helper.route'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_user.validator.email_case_insensitive_option }
+
+    oro_user.validator.unique_user_email_validator:
+        class: Oro\Bundle\UserBundle\Validator\UniqueUserEmailValidator
+        arguments:
+            - '@oro_user.manager'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_user.validator.unique_user_email }
 
     oro_user.provider.password_complexity_config_provider:
         class: Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider
@@ -543,3 +564,20 @@ services:
             - '@security.token_storage'
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+    oro_user.event_listener.authentication_failure:
+        class: Oro\Bundle\UserBundle\EventListener\AuthenticationFailureListener
+        arguments:
+            - 'main'
+            - 'oro_user.login.errors.bad_credentials'
+        tags:
+            - { name: kernel.event_listener, event: security.authentication.failure, method: onAuthenticationFailure, priority: -255 }
+
+    oro_user.provider.user_preferred_language_provider:
+        class: Oro\Bundle\UserBundle\Provider\UserPreferredLanguageProvider
+        public: false
+        arguments:
+            - '@oro_config.user'
+            - '@oro_locale.settings'
+        tags:
+            - { name: oro_locale.preferred_language_provider }

@@ -1,0 +1,172 @@
+/* @theme: admin.oro; */
+
+.input,
+.selector,
+.uneditable-input {
+    width: $input-width;
+    font-size: $input-font-size;
+    padding: $input-inner-offset;
+    -webkit-appearance: $input-appearance;
+    -moz-appearance: $input-appearance;
+    appearance: $input-appearance;
+
+    &:not(textarea) {
+        height: $input-size;
+    }
+}
+
+.selector {
+    min-width: $selector-min-width;
+    padding: $selector-inner-offset;
+
+    span {
+        padding: $selector-span-inner-offset;
+        line-height: $selector-span-line-height;
+        min-width: $selector-span-min-width;
+        height: $selector-span-height;
+
+        &:after {
+            top: $selector-span-icon-top;
+            font-size: $selector-span-icon-font-size;
+        }
+    }
+}
+
+/**
+    Uploader uniform
+**/
+.uploader {
+    width: 100%;
+    height: 40px;
+    justify-content: space-between;
+    font-size: $base-font-size--m;
+
+    .filename {
+        width: 100%;
+    }
+
+    .filename,
+    .action {
+        height: 36px;
+        line-height: 36px;
+    }
+}
+
+.input-append,
+.input-prepend {
+    .add-on,
+    .btn {
+        height: $input-append-add-on-height;
+        width: $input-append-add-on-width;
+        font-size: $input-append-add-on-font-size;
+        line-height: $input-append-add-on-line-height;
+    }
+}
+
+.controls {
+    .fields-row {
+        .input-small {
+            width: $controls-fields-row-input-small-width;
+        }
+    }
+}
+
+.form-horizontal {
+    & > .span6 {
+        max-width: $form-horizontal-max-width;
+        float: none;
+        margin-right: 0;
+
+        &:not(:last-of-type) {
+            margin: side-values(0 0 $form-container-control-row-space 0);
+        }
+    }
+
+    .control-group {
+        max-width: $form-horizontal-control-group-max-width;
+        display: $form-horizontal-control-group-display;
+
+        .control-label {
+            width: $form-horizontal-control-label-width;
+            padding-top: $form-horizontal-control-label-inner-offset-top;
+            padding-bottom: $form-horizontal-control-label-inner-offset-bottom;
+            line-height: $form-horizontal-control-label-inner-line-height;
+            text-align: #{$start};
+        }
+
+        .controls {
+            margin-left: $form-horizontal-controls-offset-left;
+
+            .control-group-checkbox {
+                margin-top: $form-horizontal-controls-control-group-checkbox-offset-top;
+
+                > .control-label {
+                    padding-bottom: $form-horizontal-controls-control-group-checkbox-label-inner-offset-bottom;
+                }
+            }
+        }
+    }
+
+    .control-group-checkbox {
+        position: $control-group-checkbox-position;
+        display: $control-group-checkbox-display;
+        padding-right: $control-group-checkbox-inner-offset-right;
+
+        .control-label {
+            width: $control-group-checkbox-label-width;
+            margin-right: $control-group-checkbox-label-offset-right;
+        }
+
+        label.control-label {
+            line-height: $control-group-checkbox-label-line-height;
+        }
+
+        .controls {
+            padding-top: $control-group-checkbox-controls-padding-top;
+            position: $control-group-checkbox-controls-position;
+            top: $control-group-checkbox-controls-top;
+            right: $control-group-checkbox-controls-right;
+        }
+    }
+
+    .select2-container {
+        width: $control-select2-container-width;
+        max-width: $control-select2-container-max-width;
+    }
+}
+
+h5.user-fieldset {
+    line-height: $user-fieldset-line-height;
+    margin: $user-fieldset-offset;
+}
+
+.widget-title {
+    line-height: $user-fieldset-line-height;
+}
+
+.well {
+    margin-bottom: $well-offset-bottom;
+
+    .tags-overlay & {
+        margin-bottom: $well-tags-overlay-offset-bottom;
+    }
+}
+
+.clearable-input {
+
+    &__container--clear .clearable-input__placeholder-icon {
+        font-size: $icon-font-size;
+        top: ($input-size - $icon-font-size) / -2;
+        width: $input-size;
+        height: $input-size;
+        line-height: $input-size;
+    }
+
+    &__clear {
+        top: ($input-size - $icon-font-size) / -2;
+    }
+
+    &__container > input {
+        padding-#{$end}: $input-size;
+    }
+}

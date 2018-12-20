@@ -5,10 +5,10 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Generator\Prefixed;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Generator\Prefixed\PrefixedIntegrationIdentifierGenerator;
 
-class PrefixedIntegrationIdentifierGeneratorTest extends \PHPUnit_Framework_TestCase
+class PrefixedIntegrationIdentifierGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @return Channel|\PHPUnit_Framework_MockObject_MockObject
+     * @return Channel|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createChannelMock()
     {

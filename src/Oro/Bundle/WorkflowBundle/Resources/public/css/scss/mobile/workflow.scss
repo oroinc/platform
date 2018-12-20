@@ -1,0 +1,89 @@
+/* @theme: admin.oro; */
+
+.workflow-widget-content {
+    position: relative;
+    padding-#{$end}: 0;
+}
+
+.workflow-collapse {
+    position: absolute;
+    #{$start}: -$icon-font-size;
+
+    float: none;
+}
+
+.collapse,
+.collapsing {
+    .workflow-entity {
+        margin-#{$start}: 0;
+    }
+}
+
+@media only screen and (max-width: $small-devices-media-breakpoint) {
+    .workflow-entity {
+        display: block;
+        padding-bottom: 12px;
+        margin-bottom: 4px;
+
+        tbody,
+        tr {
+            display: block;
+            width: 100%;
+        }
+
+        &:last-child {
+            .transition-btn-group {
+                border-bottom: 0;
+                padding-bottom: 4px;
+            }
+        }
+    }
+
+    .workflow-label {
+        display: block;
+        width: 100%;
+    }
+
+    .workflow-label-text {
+        width: 100%;
+    }
+
+    .workflow-content-container {
+        display: block;
+        width: 100%;
+    }
+
+    .workflow-content {
+        display: block;
+    }
+
+    .workflow-scroller {
+        padding-#{$end}: 5px;
+        overflow-x: auto;
+    }
+
+    .workflow-buttons-scroller {
+        overflow-x: auto;
+    }
+
+    .workflow-steps {
+        display: block;
+        width: 100%;
+        padding: side-values(5px 0 10px 8px);
+    }
+
+    .workflow-controls {
+        display: block;
+        width: 100%;
+        padding: 0;
+        text-align: $start;
+
+        .transitions-btn-group {
+            width: 100%;
+        }
+    }
+
+    .workflow-ordered-steps {
+        width: 120px;
+    }
+}

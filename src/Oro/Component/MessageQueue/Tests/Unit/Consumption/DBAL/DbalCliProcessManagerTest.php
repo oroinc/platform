@@ -3,7 +3,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\DBAL;
 
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
 
-class DbalCliProcessManagerTest extends \PHPUnit_Framework_TestCase
+class DbalCliProcessManagerTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldReturnListOfProcessesPids()
     {

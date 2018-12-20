@@ -28,8 +28,7 @@ class ApiResolvedFormType implements ResolvedFormTypeInterface
 
     public function getBlockPrefix()
     {
-        //@TODO  Uncomment in scope of BAP-16504
-        //return $this->innerType->getBlockPrefix();
+        return $this->innerType->getBlockPrefix();
     }
 
     /**

@@ -216,10 +216,16 @@ define([
          */
         onPageInvalid: function(model, error, options) {
             var pathDesc;
+            var redirectOptions;
             if (error.redirect) {
                 pathDesc = {url: error.location};
-                _.extend(options.actionArgs.options, _.pick(error, ['redirect', 'fullRedirect']));
-                this._processRedirect(pathDesc, options.actionArgs.options);
+                redirectOptions = _.extend(
+                    {replace: true},
+                    options.actionArgs.options,
+                    _.pick(error, ['redirect', 'fullRedirect'])
+                );
+
+                this._processRedirect(pathDesc, redirectOptions);
             }
         },
 
@@ -370,9 +376,12 @@ define([
             }
 
             if (additionalData) {
-                additionalData = '<div class="alert alert-info fade in top-messages">' +
-                    '<a class="close" data-dismiss="alert" href="#">&times;</a>' +
-                    '<div class="message">' + additionalData + '</div></div>';
+                additionalData = '<div class="alert alert-info fade in top-messages alert-dismissible " role="alert">' +
+                    '<button type="button" class="close" data-dismiss="alert" aria-label="' + __('Close') + '">' +
+                    '<span aria-hidden="true">&times;</span>' +
+                    '</button>' +
+                    '<div class="message">' + additionalData + '</div>' +
+                    '</div>';
             }
 
             if (dataObj.content !== undefined) {

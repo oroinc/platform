@@ -6,9 +6,9 @@ use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository;
 use Oro\Bundle\AddressBundle\Provider\CountryProvider;
 
-class CountryProviderTest extends \PHPUnit_Framework_TestCase
+class CountryProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CountryRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CountryRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
     /** @var CountryProvider */
@@ -34,8 +34,8 @@ class CountryProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'iso2Code1' => 'name1',
-                'iso2Code2' => 'name2',
+                'name1' => 'iso2Code1',
+                'name2' => 'iso2Code2',
             ],
             $this->provider->getCountriesNames()
         );

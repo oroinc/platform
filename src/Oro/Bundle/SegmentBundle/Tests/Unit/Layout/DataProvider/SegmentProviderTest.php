@@ -14,7 +14,7 @@ class SegmentProviderTest extends WebTestCase
     /** @var SegmentProvider */
     private $provider;
 
-    /** @var SegmentManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var SegmentManager|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
 
     /**

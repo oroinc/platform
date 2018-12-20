@@ -1,0 +1,70 @@
+/* @theme: admin.oro; */
+
+.widget-picker__icon.mail-icon {
+    @include fa-icon($email-inactive-mail-icon);
+
+    font-style: normal;
+    line-height: 1;
+}
+
+.sidebar-widget-icon.mail-icon {
+    @include fa-icon($email-inactive-mail-icon);
+
+    font-style: normal;
+    vertical-align: baseline;
+
+    .item-counter {
+        display: none;
+        color: $email-item-counter-text-color;
+        background-color: $email-item-counter-bg;
+    }
+
+    &.has-icon-counter {
+        @include fa-icon($email-active-mail-icon);
+
+        .item-counter {
+            display: inline-block;
+        }
+    }
+}
+
+.sidebar-widget-recent-emails {
+    .sidebar-widget__content {
+        .header {
+            padding: 2px 17px;
+        }
+
+        .items {
+            overflow: hidden;
+            overflow-y: auto;
+        }
+
+        .more-unread {
+            display: block;
+            text-align: center;
+            font-size: $base-font-size--s;
+            line-height: $base-font-size--s;
+            padding-top: 6px;
+            padding-bottom: 6px;
+            color: $primary-550;
+        }
+    }
+
+    .sidebar.minimized &.sidebar-widget.poppedup {
+        .sidebar-widget__popup {
+            background: $email-dropdown-bg;
+            width: 360px;
+            padding-bottom: 0;
+
+            .content {
+                overflow: hidden;
+            }
+        }
+
+        .short-emails-list .items li .footer .reply-all-action,
+        .short-emails-list .items li .footer .reply-action,
+        .short-emails-list .items li .footer .forward-action {
+            display: inline;
+        }
+    }
+}

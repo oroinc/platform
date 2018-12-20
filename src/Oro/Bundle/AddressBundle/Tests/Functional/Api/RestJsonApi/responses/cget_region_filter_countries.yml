@@ -1,0 +1,133 @@
+data:
+    -
+        type: regions
+        id: IL-D
+        attributes:
+            code: D
+            name: HaDarom
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: IL
+    -
+        type: regions
+        id: IL-HA
+        attributes:
+            code: HA
+            name: Hefa
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: IL
+    -
+        type: regions
+        id: IL-JM
+        attributes:
+            code: JM
+            name: 'Yerushalayim Al Quds'
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: IL
+    -
+        type: regions
+        id: IL-M
+        attributes:
+            code: M
+            name: HaMerkaz
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: IL
+    -
+        type: regions
+        id: IL-TA
+        attributes:
+            code: TA
+            name: Tel-Aviv
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: IL
+    -
+        type: regions
+        id: IL-Z
+        attributes:
+            code: Z
+            name: HaZafon
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: IL
+    -
+        type: regions
+        id: MG-A
+        attributes:
+            code: A
+            name: Toamasina
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: MG
+    -
+        type: regions
+        id: MG-D
+        attributes:
+            code: D
+            name: Antsiranana
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: MG
+    -
+        type: regions
+        id: MG-F
+        attributes:
+            code: F
+            name: Fianarantsoa
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: MG
+    -
+        type: regions
+        id: MG-M
+        attributes:
+            code: M
+            name: Mahajanga
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: MG
+    -
+        type: regions
+        id: MG-T
+        attributes:
+            code: T
+            name: Antananarivo
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: MG
+    -
+        type: regions
+        id: MG-U
+        attributes:
+            code: U
+            name: Toliara
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: MG

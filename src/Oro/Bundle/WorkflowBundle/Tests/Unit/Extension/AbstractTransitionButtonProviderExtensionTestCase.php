@@ -5,32 +5,32 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Extension;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
-use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 use Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 
-abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowRegistry;
 
-    /** @var RouteProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $routeProvider;
 
     /** @var AbstractButtonProviderExtension */
     protected $extension;
 
-    /** @var DestinationPageResolver|\PHPUnit_Framework_MockObject_MockObject */
-    protected $destinationPageResolver;
+    /** @var OriginalUrlProvider|\PHPUnit\Framework\MockObject\MockObject */
+    protected $originalUrlProvider;
 
-    /** @var  CurrentApplicationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $applicationProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TransitionOptionsResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionOptionsResolver */
     protected $optionsResolver;
 
     /**
@@ -40,7 +40,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->routeProvider = $this->createMock(RouteProviderInterface::class);
-        $this->destinationPageResolver = $this->createMock(DestinationPageResolver::class);
+        $this->originalUrlProvider = $this->createMock(OriginalUrlProvider::class);
         $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
         $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
 
@@ -85,7 +85,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
      * @param array $transitions
      * @param string $method
      *
-     * @return TransitionManager|\PHPUnit_Framework_MockObject_MockObject
+     * @return TransitionManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getTransitionManager(array $transitions, $method)
     {

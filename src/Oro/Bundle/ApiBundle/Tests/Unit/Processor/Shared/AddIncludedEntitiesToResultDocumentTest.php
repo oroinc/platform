@@ -12,9 +12,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
 {
     /** @var AddIncludedEntitiesToResultDocument */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->processor = new AddIncludedEntitiesToResultDocument();

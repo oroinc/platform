@@ -36,16 +36,17 @@ class SerializationHelper
         array $context,
         FieldConfig $fieldConfig = null
     ) {
-        $config = [];
-        if (null !== $fieldConfig) {
-            $config = $fieldConfig->toArray(true);
-        }
-
-        return $this->dataTransformer->transform($entityClass, $fieldName, $fieldValue, $config, $context);
+        return $this->dataTransformer->transform(
+            $entityClass,
+            $fieldName,
+            $fieldValue,
+            null !== $fieldConfig ? $fieldConfig->toArray(true) : [],
+            $context
+        );
     }
 
     /**
-     * Passes a serialized data through the specified "post serialization" handler.
+     * Passes a serialized item through the specified "post serialization" handler.
      *
      * @param array    $item
      * @param callable $handler
@@ -55,25 +56,41 @@ class SerializationHelper
      */
     public function postSerialize(array $item, $handler, array $context)
     {
-        // @deprecated since 1.9. New signature of 'post_serialize' callback is
-        // function (array $item, array $context) : array
-        // Old signature was function (array &$item) : void
-        // The following implementation supports both new and old signature of the callback
-        // Remove this implementation when a support of old signature will not be required
-        if ($handler instanceof \Closure) {
-            $handleResult = $handler($item, $context);
-            if (null !== $handleResult) {
-                $item = $handleResult;
-            }
-        } else {
-            $item = call_user_func($handler, $item, $context);
+        return $handler($item, $context);
+    }
+
+    /**
+     * Passes a collection of serialized items through the specified "post serialization" handler.
+     *
+     * @param array    $items
+     * @param callable $handler
+     * @param array    $context
+     *
+     * @return array
+     */
+    public function postSerializeCollection(array $items, $handler, array $context)
+    {
+        return $handler($items, $context);
+    }
+
+    /**
+     * Passes a collection of serialized items through the specified "post serialization" handler
+     * if the given config has this handler.
+     *
+     * @param array        $items
+     * @param EntityConfig $config
+     * @param array        $context
+     *
+     * @return array
+     */
+    public function processPostSerializeCollection(array $items, EntityConfig $config, array $context)
+    {
+        $collectionHandler = $config->getPostSerializeCollectionHandler();
+        if (null !== $collectionHandler) {
+            $items = $this->postSerializeCollection($items, $collectionHandler, $context);
         }
 
-        /* New implementation, uncomment it when a support of old signature will not be required
-        $item = call_user_func($handler, $item, $context);
-        */
-
-        return $item;
+        return $items;
     }
 
     /**

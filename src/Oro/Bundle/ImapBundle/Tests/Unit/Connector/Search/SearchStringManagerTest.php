@@ -6,7 +6,7 @@ use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryMatch;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManager;
 
-class SearchStringManagerTest extends \PHPUnit_Framework_TestCase
+class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchStringManager */
     private $searchStringManager;

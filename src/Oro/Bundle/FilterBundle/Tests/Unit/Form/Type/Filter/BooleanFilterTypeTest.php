@@ -19,19 +19,19 @@ class BooleanFilterTypeTest extends AbstractTypeTestCase
     /**
      * @var array
      */
-    protected $booleanChoices = array(
-        BooleanFilterType::TYPE_YES => 'oro.filter.form.label_type_yes',
-        BooleanFilterType::TYPE_NO  => 'oro.filter.form.label_type_no',
-    );
+    protected $booleanChoices = [
+        'oro.filter.form.label_type_yes' => BooleanFilterType::TYPE_YES,
+        'oro.filter.form.label_type_no' => BooleanFilterType::TYPE_NO,
+    ];
 
     protected function setUp()
     {
         $translator = $this->createMockTranslator();
 
-        $types = array(
+        $types = [
             new FilterType($translator),
             new ChoiceFilterType($translator)
-        );
+        ];
 
         $this->type = new BooleanFilterType($translator);
         $this->formExtensions[] = new CustomFormExtension($types);
@@ -48,23 +48,20 @@ class BooleanFilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(BooleanFilterType::NAME, $this->type->getName());
-    }
-
     /**
      * {@inheritDoc}
      */
     public function configureOptionsDataProvider()
     {
-        return array(
-            array(
-                'defaultOptions' => array(
-                    'field_options' => array('choices' => $this->booleanChoices)
-                )
-            )
-        );
+        return [
+            [
+                'defaultOptions' => [
+                    'field_options' => [
+                        'choices' => $this->booleanChoices,
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -88,7 +85,7 @@ class BooleanFilterTypeTest extends AbstractTypeTestCase
                 ),
                 'customOptions' => array(
                     'field_options' => array(
-                        'choices' => $this->booleanChoices
+                        'choices' => $this->booleanChoices,
                     ),
                 )
             ),

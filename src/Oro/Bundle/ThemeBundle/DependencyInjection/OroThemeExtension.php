@@ -32,6 +32,7 @@ class OroThemeExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('commands.yml');
 
         if (isset($config['active_theme'])) {
             $registryDefinition = $container->getDefinition(self::THEME_REGISTRY_SERVICE_ID);
@@ -59,6 +60,7 @@ class OroThemeExtension extends Extension
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
+            unset($resource->data['styles']);
             $result[basename(dirname($resource->path))] = $resource->data;
         }
 

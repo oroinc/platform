@@ -5,7 +5,7 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Form\DataTransformer;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Form\DataTransformer\PriceTransformer;
 
-class PriceTransformerTest extends \PHPUnit_Framework_TestCase
+class PriceTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PriceTransformer

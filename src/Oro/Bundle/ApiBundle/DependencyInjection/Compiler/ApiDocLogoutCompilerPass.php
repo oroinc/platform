@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 use Oro\Bundle\ApiBundle\ApiDoc\LogoutSuccessHandler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -60,16 +59,11 @@ class ApiDocLogoutCompilerPass implements CompilerPassInterface
         $successHandlerId = (string)$container->getDefinition($listenerId)->getArgument(2);
         $successHandlerDecoratorId = 'oro_api.api_doc.' . $successHandlerId;
         $container
-            ->setDefinition(
-                $successHandlerDecoratorId,
-                new Definition(
-                    LogoutSuccessHandler::class,
-                    [
-                        new Reference($successHandlerDecoratorId . '.inner'),
-                        new Reference('oro_api.rest.doc_url_generator')
-                    ]
-                )
-            )
+            ->register($successHandlerDecoratorId, LogoutSuccessHandler::class)
+            ->setArguments([
+                new Reference($successHandlerDecoratorId . '.inner'),
+                new Reference('oro_api.rest.doc_url_generator')
+            ])
             ->setDecoratedService($successHandlerId)
             ->setPublic(false);
     }

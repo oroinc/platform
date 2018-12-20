@@ -4,17 +4,22 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\ExcludeNotAccessibleRelations;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
     private $resourcesProvider;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
+    private $entityOverrideProvider;
 
     /** @var ExcludeNotAccessibleRelations */
     private $processor;
@@ -25,10 +30,18 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->resourcesProvider = $this->createMock(ResourcesProvider::class);
+        $this->entityOverrideProvider = $this->createMock(EntityOverrideProviderInterface::class);
+
+        $entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);
+        $entityOverrideProviderRegistry->expects(self::any())
+            ->method('getEntityOverrideProvider')
+            ->with($this->context->getRequestType())
+            ->willReturn($this->entityOverrideProvider);
 
         $this->processor = new ExcludeNotAccessibleRelations(
             $this->doctrineHelper,
-            $this->resourcesProvider
+            $this->resourcesProvider,
+            $entityOverrideProviderRegistry
         );
     }
 
@@ -598,6 +611,264 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                     'association1' => [
                         'data_type' => 'array',
                         'exclude'   => true
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForAssociationToOverriddenEntity()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => null
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMapping')
+            ->with('association1')
+            ->willReturn(['targetEntity' => 'Test\Association1Target']);
+
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                    ['Test\Association1Target', true, $association1Metadata]
+                ]
+            );
+
+        $this->entityOverrideProvider->expects(self::once())
+            ->method('getSubstituteEntityClass')
+            ->with('Test\Association1Target')
+            ->willReturn('Test\Association1SubstituteTarget');
+        $this->resourcesProvider->expects(self::once())
+            ->method('isResourceAccessible')
+            ->with('Test\Association1SubstituteTarget', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(true);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'association1' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForArrayAssociationToOverriddenEntity()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'data_type' => 'array'
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMapping')
+            ->with('association1')
+            ->willReturn(['targetEntity' => 'Test\Association1Target']);
+
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                    ['Test\Association1Target', true, $association1Metadata]
+                ]
+            );
+
+        $this->entityOverrideProvider->expects(self::once())
+            ->method('getSubstituteEntityClass')
+            ->with('Test\Association1Target')
+            ->willReturn('Test\Association1SubstituteTarget');
+        $this->resourcesProvider->expects(self::once())
+            ->method('isResourceKnown')
+            ->with('Test\Association1SubstituteTarget', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(true);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'association1' => [
+                        'data_type' => 'array'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForAssociationToOverriddenEntityInTableInheritanceSubClass()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => null
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMapping')
+            ->with('association1')
+            ->willReturn(['targetEntity' => 'Test\Association1Target']);
+
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
+        $association1Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
+        $association1Metadata->subClasses = ['Test\Association1Target1'];
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                    ['Test\Association1Target', true, $association1Metadata]
+                ]
+            );
+
+        $this->entityOverrideProvider->expects(self::exactly(2))
+            ->method('getSubstituteEntityClass')
+            ->willReturnMap([
+                ['Test\Association1Target', null],
+                ['Test\Association1Target1', 'Test\Association1SubstituteTarget1']
+            ]);
+        $this->resourcesProvider->expects(self::exactly(2))
+            ->method('isResourceAccessible')
+            ->willReturnMap([
+                ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), false],
+                [
+                    'Test\Association1SubstituteTarget1',
+                    $this->context->getVersion(),
+                    $this->context->getRequestType(),
+                    true
+                ]
+            ]);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'association1' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForArrayAssociationToOverriddenEntityInTableInheritanceSubClass()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'data_type' => 'array'
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMapping')
+            ->with('association1')
+            ->willReturn(['targetEntity' => 'Test\Association1Target']);
+
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
+        $association1Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
+        $association1Metadata->subClasses = ['Test\Association1Target1'];
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                    ['Test\Association1Target', true, $association1Metadata]
+                ]
+            );
+
+        $this->entityOverrideProvider->expects(self::exactly(2))
+            ->method('getSubstituteEntityClass')
+            ->willReturnMap([
+                ['Test\Association1Target', null],
+                ['Test\Association1Target1', 'Test\Association1SubstituteTarget1']
+            ]);
+        $this->resourcesProvider->expects(self::exactly(2))
+            ->method('isResourceKnown')
+            ->willReturnMap([
+                ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), false],
+                [
+                    'Test\Association1SubstituteTarget1',
+                    $this->context->getVersion(),
+                    $this->context->getRequestType(),
+                    true
+                ]
+            ]);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'association1' => [
+                        'data_type' => 'array'
                     ]
                 ]
             ],

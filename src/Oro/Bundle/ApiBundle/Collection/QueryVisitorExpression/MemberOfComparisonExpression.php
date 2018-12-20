@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression;
 
-use Doctrine\Common\Collections\Expr\Comparison;
+use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
+use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Represents MEMBER OF comparison expression.
+ * This expression supports a scalar value, an array of scalar values and a range value.
  */
 class MemberOfComparisonExpression implements ComparisonExpressionInterface
 {
@@ -16,18 +18,51 @@ class MemberOfComparisonExpression implements ComparisonExpressionInterface
      */
     public function walkComparisonExpression(
         QueryExpressionVisitor $visitor,
-        Comparison $comparison,
-        $fieldName,
-        $parameterName
+        string $field,
+        string $expression,
+        string $parameterName,
+        $value
     ) {
-        QueryBuilderUtil::checkIdentifier($parameterName);
-        QueryBuilderUtil::checkField($fieldName);
+        if ($value instanceof Range) {
+            return $this->walkRangeExpression($visitor, $field, $parameterName, $value);
+        }
 
-        // set parameter
-        $visitor->addParameter($parameterName, $visitor->walkValue($comparison->getValue()));
+        $visitor->addParameter($parameterName, $value);
 
-        // generate expression
         return $visitor->getExpressionBuilder()
-            ->isMemberOf($visitor->buildPlaceholder($parameterName), $fieldName);
+            ->isMemberOf($visitor->buildPlaceholder($parameterName), $field);
+    }
+
+    /**
+     * @param QueryExpressionVisitor $visitor
+     * @param string                 $field
+     * @param string                 $parameterName
+     * @param Range                  $value
+     *
+     * @return Expr\Func
+     */
+    private function walkRangeExpression(
+        QueryExpressionVisitor $visitor,
+        string $field,
+        string $parameterName,
+        Range $value
+    ): Expr\Func {
+        $fromParameterName = $parameterName . '_from';
+        $toParameterName = $parameterName . '_to';
+
+        $visitor->addParameter($fromParameterName, $value->getFromValue());
+        $visitor->addParameter($toParameterName, $value->getToValue());
+
+        $subquery = $visitor->createSubquery($field);
+        $subquery->andWhere(
+            $subquery->expr()->between(
+                QueryBuilderUtil::getSingleRootAlias($subquery),
+                $visitor->buildPlaceholder($fromParameterName),
+                $visitor->buildPlaceholder($toParameterName)
+            )
+        );
+
+        return $visitor->getExpressionBuilder()
+            ->exists($subquery->getDQL());
     }
 }

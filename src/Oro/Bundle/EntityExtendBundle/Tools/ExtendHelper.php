@@ -9,6 +9,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
+ * Provides utility static methods to work with extended entities.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ExtendHelper
@@ -446,11 +447,12 @@ class ExtendHelper
             if ($extendConfig->is('is_deleted')) {
                 return false;
             }
-            if ($extendConfig->is('state', ExtendScope::STATE_NEW)) {
+            $state = $extendConfig->get('state');
+            if (ExtendScope::STATE_NEW === $state) {
                 return false;
             }
             // check if a new entity has been requested to be deleted before schema is updated
-            if ($extendConfig->is('state', ExtendScope::STATE_DELETE)
+            if (ExtendScope::STATE_DELETE === $state
                 && !class_exists($extendConfig->getId()->getClassName())
             ) {
                 return false;
@@ -491,11 +493,12 @@ class ExtendHelper
             if ($extendFieldConfig->is('is_deleted')) {
                 return false;
             }
-            if ($extendFieldConfig->is('state', ExtendScope::STATE_NEW)) {
+            $state = $extendFieldConfig->get('state');
+            if (ExtendScope::STATE_NEW === $state) {
                 return false;
             }
             // check if a new field has been requested to be deleted before schema is updated
-            if ($extendFieldConfig->is('state', ExtendScope::STATE_DELETE)) {
+            if (ExtendScope::STATE_DELETE === $state) {
                 /** @var FieldConfigId $fieldId */
                 $fieldId = $extendFieldConfig->getId();
                 if (!property_exists($fieldId->getClassName(), $fieldId->getFieldName())) {

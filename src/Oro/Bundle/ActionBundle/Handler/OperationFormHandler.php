@@ -96,7 +96,7 @@ class OperationFormHandler
 
             $form->handleRequest($request);
 
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $operation->execute($actionData, $data['errors']);
 
                 $data['response'] = $this->getResponseData($actionData, $flashBag, $operation);

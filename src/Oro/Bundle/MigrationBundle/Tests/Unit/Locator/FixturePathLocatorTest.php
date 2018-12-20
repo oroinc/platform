@@ -4,7 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Locator;
 
 use Oro\Bundle\MigrationBundle\Locator\FixturePathLocator;
 
-class FixturePathLocatorTest extends \PHPUnit_Framework_TestCase
+class FixturePathLocatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param string $type

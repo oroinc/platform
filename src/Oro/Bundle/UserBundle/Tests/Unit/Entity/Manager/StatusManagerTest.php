@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity\Manager;
 use Oro\Bundle\UserBundle\Entity\Manager\StatusManager;
 use Oro\Bundle\UserBundle\Entity\Status;
 
-class StatusManagerTest extends \PHPUnit_Framework_TestCase
+class StatusManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Oro\Bundle\UserBundle\Entity\Manager\StatusManager

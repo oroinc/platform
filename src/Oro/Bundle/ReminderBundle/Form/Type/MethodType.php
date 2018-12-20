@@ -28,11 +28,11 @@ class MethodType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'choices'  => $this->sendProcessorRegistry->getProcessorLabels(),
                 'expanded' => false,
                 'multiple' => false
-            )
+            ]
         );
     }
 

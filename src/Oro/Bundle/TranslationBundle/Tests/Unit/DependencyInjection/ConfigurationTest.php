@@ -6,7 +6,7 @@ use Oro\Bundle\TranslationBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Configuration */
     protected $configuration;
@@ -49,7 +49,11 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'default_api_adapter' => Configuration::DEFAULT_ADAPTER,
-            'debug_translator' => false
+            'debug_translator' => false,
+            'locales' => [],
+            'default_required' => true,
+            'manager_registry' => 'doctrine',
+            'templating' => 'OroTranslationBundle::default.html.twig'
         ];
 
         $this->assertEquals(

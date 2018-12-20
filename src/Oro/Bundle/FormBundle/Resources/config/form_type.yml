@@ -64,7 +64,6 @@ services:
         class: '%oro_form.type.duration.class%'
         tags:
             - { name: form.type, alias: oro_duration }
-            - { name: oro.api.form.type, alias: oro_duration }
 
     oro_form.type.money:
         class: '%oro_form.type.money.class%'
@@ -163,6 +162,7 @@ services:
         arguments:
             - '@oro_config.user'
             - '@oro_form.provider.html_tag_provider'
+            - '@assets.context'
             - '%kernel.cache_dir%'
         calls:
             - [setAssetHelper, ['@assets.packages']]
@@ -213,6 +213,11 @@ services:
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
+    oro_help.form.date_time_extension:
+         class: Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension
+         tags:
+             - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType }
+
     oro_form.extension.client_validation:
         class: '%oro_form.extension.client_validation.class%'
         tags:
@@ -253,7 +258,7 @@ services:
     oro_form.extension.js_validation.repeated:
         class: '%oro_form.extension.js_validation.repeated.class%'
         tags:
-            - { name: form.type_extension, alias: repeated }
+            - { name: form.type_extension, alias: repeated, extended_type: Symfony\Component\Form\Extension\Core\Type\RepeatedType }
 
     oro_form.extension.additional_attr:
         class: '%oro_form.extension.additional_attr.class%'
@@ -287,14 +292,14 @@ services:
     oro_form.type.encoded_password:
         class: '%oro_form.type.encoded_password.class%'
         arguments:
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
         tags:
             - { name: form.type, alias: oro_encoded_password }
 
     oro_form.type.encoded_placeholder_password:
         class: 'Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType'
         arguments:
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
         tags:
             - { name: form.type, alias: oro_encoded_placeholder_password }
 
@@ -385,3 +390,10 @@ services:
         class: Oro\Bundle\FormBundle\Form\Type\RelatedEntityStandaloneCollectionApiType
         tags:
             - { name: form.type, alias: oro_related_entity_standalone_collection_api }
+
+    oro_form.type.hidden_number:
+        class: 'Oro\Bundle\FormBundle\Form\Type\OroHiddenNumberType'
+        arguments:
+            - '@oro_locale.formatter.number'
+        tags:
+            - { name: form.type, alias: oro_hidden_number }

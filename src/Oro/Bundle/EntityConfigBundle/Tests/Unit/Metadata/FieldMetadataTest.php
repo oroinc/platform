@@ -7,7 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 
-class FieldMetadataTest extends \PHPUnit_Framework_TestCase
+class FieldMetadataTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EntityMetadata

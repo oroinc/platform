@@ -11,11 +11,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 use Doctrine\Common\Collections\AbstractLazyCollection;
 use Oro\Bundle\ApiBundle\Validator\Constraints\All;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AllValidator;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class AllValidatorTest extends AbstractConstraintValidatorTest
+class AllValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {
@@ -75,7 +75,7 @@ class AllValidatorTest extends AbstractConstraintValidatorTest
     {
         return [
             [[5, 6, 7]],
-            [new \ArrayObject([5, 6, 7])],
+            [new \ArrayObject([5, 6, 7])]
         ];
     }
 
@@ -87,6 +87,6 @@ class AllValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($collection, new All(new NotBlank()));
 
         $this->assertNoViolation();
-        $this->assertFalse($collection->isInitialized());
+        self::assertFalse($collection->isInitialized());
     }
 }

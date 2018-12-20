@@ -84,6 +84,7 @@ services:
             - '@form.factory'
             - '@security.authorization_checker'
             - '@oro_config.configuration_search_provider.chain'
+            - '@form.registry'
         calls:
             - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
         tags:
@@ -145,11 +146,6 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@validator'
-
-    oro_config.cache.doctrine_metadata:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'doctrine_metadata_config' ] ]
 
     oro_config.condition.is_system_config_equal:
         class: Oro\Bundle\ConfigBundle\Condition\IsSystemConfigEqual

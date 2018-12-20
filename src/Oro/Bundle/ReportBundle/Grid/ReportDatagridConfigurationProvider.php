@@ -5,12 +5,14 @@ namespace Oro\Bundle\ReportBundle\Grid;
 use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
-use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+/**
+ * The provider for configuration of datagrids used to show reports.
+ */
 class ReportDatagridConfigurationProvider implements ConfigurationProviderInterface, BuilderAwareInterface
 {
     /**
@@ -34,28 +36,20 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
     private $reportCacheManager;
 
     /**
-     * @var SystemAwareResolver
-     */
-    protected $resolver;
-
-    /**
      * @param ReportDatagridConfigurationBuilder $builder
      * @param ManagerRegistry                    $doctrine
      * @param Cache                              $reportCacheManager
-     * @param SystemAwareResolver                $resolver
      * @param string                             $prefixCacheKey
      */
     public function __construct(
         ReportDatagridConfigurationBuilder $builder,
         ManagerRegistry $doctrine,
         Cache $reportCacheManager,
-        SystemAwareResolver $resolver,
         $prefixCacheKey
     ) {
         $this->builder  = $builder;
         $this->doctrine = $doctrine;
         $this->reportCacheManager = $reportCacheManager;
-        $this->resolver = $resolver;
         $this->prefixCacheKey = $prefixCacheKey;
     }
 
@@ -74,14 +68,13 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
     {
         $cacheKey = $this->getCacheKey($gridName);
 
-        if ($this->reportCacheManager->contains($cacheKey)) {
-            $config = $this->reportCacheManager->fetch($cacheKey);
-        } else {
+        $config = $this->reportCacheManager->fetch($cacheKey);
+        if (false === $config) {
             $config = $this->prepareConfiguration($gridName);
             $this->reportCacheManager->save($cacheKey, $config);
         }
 
-        return $this->resolver->resolve($gridName, $config);
+        return $config;
     }
 
     /**

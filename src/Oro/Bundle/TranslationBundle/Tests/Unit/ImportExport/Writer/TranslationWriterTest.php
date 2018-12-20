@@ -10,15 +10,15 @@ use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationWriter;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
-class TranslationWriterTest extends \PHPUnit_Framework_TestCase
+class TranslationWriterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
-    /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $translationManager;
 
     /** @var TranslationWriter */

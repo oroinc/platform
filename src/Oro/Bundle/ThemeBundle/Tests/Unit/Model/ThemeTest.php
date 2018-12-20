@@ -5,7 +5,7 @@ namespace Oro\Bundle\ThemeBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ThemeBundle\Model\Theme;
 
-class ThemeTest extends \PHPUnit_Framework_TestCase
+class ThemeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Theme
@@ -41,12 +41,5 @@ class ThemeTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->theme->getScreenshot());
         $this->theme->setScreenshot('screenshot.png');
         $this->assertEquals('screenshot.png', $this->theme->getScreenshot());
-    }
-
-    public function testStylesMethods()
-    {
-        $this->assertEquals(array(), $this->theme->getStyles());
-        $this->theme->setStyles(array('styles.png'));
-        $this->assertEquals(array('styles.png'), $this->theme->getStyles());
     }
 }

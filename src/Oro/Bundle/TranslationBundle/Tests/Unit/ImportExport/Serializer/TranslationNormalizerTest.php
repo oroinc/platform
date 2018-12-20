@@ -8,9 +8,9 @@ use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
-class TranslationNormalizerTest extends \PHPUnit_Framework_TestCase
+class TranslationNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $translationManager;
 
     /** @var TranslationNormalizer */

@@ -7,7 +7,7 @@ use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
-class MessageManagerTest extends \PHPUnit_Framework_TestCase
+class MessageManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Session
@@ -15,17 +15,17 @@ class MessageManagerTest extends \PHPUnit_Framework_TestCase
     protected $session;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $navigation;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $storage;
 

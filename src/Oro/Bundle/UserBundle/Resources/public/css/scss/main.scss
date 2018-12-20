@@ -1,0 +1,74 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/variables";
+@import "oroui/css/scss/oro/variables/form-variables";
+@import "oroui/css/scss/mixins";
+@import "variables";
+
+@import "role/permissions-grid";
+@import "role/capabilities";
+
+.api-block #btn-apigen {
+    display: inline;
+    line-height: 1.2em;
+    vertical-align: baseline;
+    padding: 4px 12px;
+}
+
+form.change-password-form {
+    .controls {
+        position: relative;
+        padding-#{$end}: $content-padding;
+    }
+
+    span.fa-eye-slash,
+    span.fa-eye {
+        position: absolute;
+        top: 7px;
+        #{$start}: $field-width + 12px;
+    }
+
+    .validation-failed {
+        max-width: $field-width;
+    }
+}
+
+.mobile-version {
+    form.change-password-form {
+        .controls {
+            [class^="fa-"] {
+                top: 10px;
+            }
+        }
+
+        .validation-failed {
+            max-width: 100%;
+        }
+
+        span.fa-eye-slash,
+        span.fa-eye {
+            #{$start}: calc(100% - 12px);
+        }
+    }
+}
+
+.form-horizontal {
+    .control-group {
+        &.control-group-oro_user_emailsettings,
+        &.control-group-oro_imap_configuration {
+            > .controls {
+                margin-#{$start}: 0;
+            }
+        }
+    }
+}
+
+.form-horizontal .control-group-oro_organizations_select .select2-choices {
+    overflow: visible;
+}
+
+h1 .popover .oro-popover-content {
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: normal;
+}

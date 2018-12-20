@@ -6,15 +6,15 @@ use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfi
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
-class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
+class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $calendarFactory;
 
@@ -101,27 +101,6 @@ class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             array('US' => $usDataModified, 'RU' => $ruData),
             $this->localeSettings->getLocaleData()
-        );
-    }
-
-    public function testAddCurrencyData()
-    {
-        $usData = array(LocaleSettings::CURRENCY_SYMBOL_KEY => '$');
-        $usDataModified = array(LocaleSettings::CURRENCY_SYMBOL_KEY => 'AU$');
-        $ruData = array(LocaleSettings::CURRENCY_SYMBOL_KEY => 'руб.');
-
-        $this->assertEmpty($this->localeSettings->getCurrencyData());
-
-        $this->localeSettings->addCurrencyData(array('USD' => $usData));
-        $this->assertEquals(
-            array('USD' => $usData),
-            $this->localeSettings->getCurrencyData()
-        );
-
-        $this->localeSettings->addCurrencyData(array('USD' => $usDataModified, 'RUR' => $ruData));
-        $this->assertEquals(
-            array('USD' => $usDataModified, 'RUR' => $ruData),
-            $this->localeSettings->getCurrencyData()
         );
     }
 
@@ -391,6 +370,7 @@ class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($configurationValue));
 
         $this->assertEquals($expectedValue, $this->localeSettings->getLanguage());
+        $this->assertEquals($expectedValue, $this->localeSettings->getLanguage());
     }
 
     /**
@@ -410,16 +390,24 @@ class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetActualLanguage()
+    {
+        $en = 'en';
+        $fr = 'fr';
+        $this->configManager->expects($this->exactly(2))
+            ->method('get')
+            ->with('oro_locale.language')
+            ->willReturnOnConsecutiveCalls($en, $fr);
+
+        $this->assertEquals($en, $this->localeSettings->getActualLanguage());
+        $this->assertEquals($fr, $this->localeSettings->getActualLanguage());
+    }
+
     public function testGetCurrencySymbolByCurrency()
     {
         $existingCurrencyCode = 'USD';
         $existingCurrencySymbol = '$';
         $notExistingCurrencyCode = 'UAK';
-
-        $currencyData = array(
-            $existingCurrencyCode => array('symbol' => $existingCurrencySymbol)
-        );
-        $this->localeSettings->addCurrencyData($currencyData);
 
         $this->assertEquals(
             $existingCurrencySymbol,

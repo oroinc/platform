@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Action;
 
-class ActionTest extends \PHPUnit_Framework_TestCase
+class ActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Action */
     protected $action;

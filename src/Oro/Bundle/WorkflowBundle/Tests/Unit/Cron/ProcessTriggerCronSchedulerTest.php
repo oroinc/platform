@@ -8,9 +8,9 @@ use Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
-class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
+class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DeferredScheduler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DeferredScheduler|\PHPUnit\Framework\MockObject\MockObject */
     protected $deferredScheduler;
 
     /** @var ProcessTriggerCronScheduler */
@@ -33,7 +33,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $processDefinitionMock->expects($this->once())->method('getName')->willReturn('process-definition-name');
 
-        /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $trigger * */
+        /** @var ProcessTrigger|\PHPUnit\Framework\MockObject\MockObject $trigger * */
         $trigger = $this->createMock(ProcessTrigger::class);
         $trigger->expects($this->any())->method('getCron')->willReturn($cronExpression);
 
@@ -52,7 +52,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveSchedule()
     {
-        /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $mockTrigger */
+        /** @var ProcessTrigger|\PHPUnit\Framework\MockObject\MockObject $mockTrigger */
         $mockTrigger = $this->createMock(ProcessTrigger::class);
 
         $mockProcessDefinition = $this->createMock(ProcessDefinition::class);
@@ -71,7 +71,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveException()
     {
-        /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $mockTrigger */
+        /** @var ProcessTrigger|\PHPUnit\Framework\MockObject\MockObject $mockTrigger */
         $mockTrigger = $this->createMock(ProcessTrigger::class);
         $mockTrigger->expects($this->exactly(1))->method('getCron')->willReturn(null);
 
@@ -85,7 +85,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 
     public function testAddException()
     {
-        /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $trigger * */
+        /** @var ProcessTrigger|\PHPUnit\Framework\MockObject\MockObject $trigger * */
         $trigger = $this->createMock(ProcessTrigger::class);
         $trigger->expects($this->once())->method('getCron')->willReturn(null);
 

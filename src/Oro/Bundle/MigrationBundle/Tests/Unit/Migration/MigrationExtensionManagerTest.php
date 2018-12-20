@@ -14,7 +14,7 @@ use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\MigrationWithTestEx
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\MigrationWithTestExtensionDepended;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
-class MigrationExtensionManagerTest extends \PHPUnit_Framework_TestCase
+class MigrationExtensionManagerTest extends \PHPUnit\Framework\TestCase
 {
     public function testValidExtension()
     {

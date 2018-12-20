@@ -6,7 +6,7 @@ use Oro\Bundle\AttachmentBundle\Form\Type\AttachmentType;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
-class AttachmentTypeTest extends \PHPUnit_Framework_TestCase
+class AttachmentTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AttachmentType */
     protected $attachmentType;
@@ -14,11 +14,6 @@ class AttachmentTypeTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->attachmentType = new AttachmentType();
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_attachment', $this->attachmentType->getName());
     }
 
     public function testConfigureOptions()

@@ -13,7 +13,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
-class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
@@ -241,7 +241,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionMock()
     {
@@ -249,7 +249,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|EntityManager
      */
     private function createEntityManagerMock()
     {
@@ -257,7 +257,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EmailUserRepository
+     * @return \PHPUnit\Framework\MockObject\MockObject|EmailUserRepository
      */
     private function createEmailUserRepositoryMock()
     {
@@ -265,7 +265,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EmailFlagManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|EmailFlagManager
      */
     private function createEmailFlagManagerMock()
     {
@@ -273,7 +273,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Registry
+     * @return \PHPUnit\Framework\MockObject\MockObject|Registry
      */
     private function createDoctrineMock()
     {
@@ -281,7 +281,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     private function createLoggerMock()
     {

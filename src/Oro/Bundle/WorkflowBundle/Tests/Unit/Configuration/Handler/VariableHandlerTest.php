@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Handler;
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\VariableHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
-class VariableHandlerTest extends \PHPUnit_Framework_TestCase
+class VariableHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var VariableHandler

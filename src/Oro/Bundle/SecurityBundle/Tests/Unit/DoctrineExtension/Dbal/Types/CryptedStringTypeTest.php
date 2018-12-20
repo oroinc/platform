@@ -6,7 +6,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedStringType;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
-class CryptedStringTypeTest extends \PHPUnit_Framework_TestCase
+class CryptedStringTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CryptedStringType */
     protected $fieldType;
@@ -33,11 +33,6 @@ class CryptedStringTypeTest extends \PHPUnit_Framework_TestCase
             CryptedStringType::addType('crypted_string', CryptedStringType::class);
         }
         $this->fieldType = CryptedStringType::getType('crypted_string');
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('crypted_string', $this->fieldType->getName());
     }
 
     public function testConvertToDatabaseValue()

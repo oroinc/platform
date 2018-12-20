@@ -9,21 +9,21 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
-class AclExtensionSelectorTest extends \PHPUnit_Framework_TestCase
+class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclExtensionSelector */
     protected $selector;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityExtension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $fieldExtension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $actionExtension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $objectIdAccessor;
 
     protected function setUp()
@@ -218,6 +218,20 @@ class AclExtensionSelectorTest extends \PHPUnit_Framework_TestCase
         self::assertNull($this->selector->select($val, false));
     }
 
+    public function testSelectByInvalidDomainObjectAndThrowExceptionIsNotRequestedWhenPhpErrorOccurred()
+    {
+        $val = new \stdClass();
+
+        $this->objectIdAccessor->expects(self::once())
+            ->method('getId')
+            ->with(self::identicalTo($val))
+            ->willReturnCallback(function () {
+                throw new \Error();
+            });
+
+        self::assertNull($this->selector->select($val, false));
+    }
+
     public function testAll()
     {
         $result = $this->selector->all();
@@ -228,7 +242,7 @@ class AclExtensionSelectorTest extends \PHPUnit_Framework_TestCase
      * @param string $supportedType
      * @param bool   $setSupportsExpectation
      *
-     * @return \Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return \Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMockExtension($supportedType, $setSupportsExpectation = true)
     {

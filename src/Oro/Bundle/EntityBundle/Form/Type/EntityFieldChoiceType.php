@@ -174,9 +174,9 @@ class EntityFieldChoiceType extends AbstractType
         $choiceRelations = [];
         foreach ($this->getEntityFields($entityName, $withRelations, $withVirtualFields) as $fieldName => $field) {
             if (!isset($field['relation_type'])) {
-                $choiceFields[$fieldName] = $field['label'];
+                $choiceFields[$field['label']] = $fieldName;
             } else {
-                $choiceRelations[$fieldName] = $field['label'];
+                $choiceRelations[$field['label']] = $fieldName;
             }
         }
 

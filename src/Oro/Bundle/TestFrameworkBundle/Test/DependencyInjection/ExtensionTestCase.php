@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  * }
  * </code>
  */
-abstract class ExtensionTestCase extends \PHPUnit_Framework_TestCase
+abstract class ExtensionTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array
@@ -101,7 +101,7 @@ abstract class ExtensionTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder
+     * @return \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder
      */
     protected function buildContainerMock()
     {
@@ -109,7 +109,7 @@ abstract class ExtensionTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|\Symfony\Component\DependencyInjection\ContainerBuilder
+     * @return \PHPUnit\Framework\MockObject\MockObject|\Symfony\Component\DependencyInjection\ContainerBuilder
      */
     protected function getContainerMock()
     {

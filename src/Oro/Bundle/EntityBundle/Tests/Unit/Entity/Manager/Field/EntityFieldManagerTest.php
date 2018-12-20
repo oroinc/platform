@@ -5,27 +5,27 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Entity\Manager\Field;
 use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager;
 use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
 
-class EntityFieldManagerTest extends \PHPUnit_Framework_TestCase
+class EntityFieldManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
     /** @var EntityFieldManager */
     protected $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $handler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $formBuilder;
 
-    /**  @var \PHPUnit_Framework_MockObject_MockObject */
+    /**  @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityRoutingHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $ownershipMetadataProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $validator;
 
     protected function setUp()
@@ -161,7 +161,7 @@ class EntityFieldManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $options
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMetadata($options)
     {
@@ -210,7 +210,7 @@ class EntityFieldManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getEntity()
     {

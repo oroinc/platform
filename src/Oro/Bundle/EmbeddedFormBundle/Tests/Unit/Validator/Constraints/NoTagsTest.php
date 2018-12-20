@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EmbeddedFormBundle\Validator\Constraints\NoTags;
 
-class NoTagsTest extends \PHPUnit_Framework_TestCase
+class NoTagsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var NoTags

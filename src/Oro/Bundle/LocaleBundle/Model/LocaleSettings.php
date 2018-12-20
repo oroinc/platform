@@ -8,6 +8,8 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfigura
 use Symfony\Component\Intl\Intl;
 
 /**
+ * Provides locale related information such as locale's language and currency and also holds some helper methods.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class LocaleSettings
@@ -109,16 +111,9 @@ class LocaleSettings
     protected $localeData = array();
 
     /**
-     * Array format:
-     * array(
-     *     '<currencyIso3SymbolsCode>' => array(
-     *          'symbol' => '<currencySymbol>',
-     *     ),
-     * )
-     *
-     * @var array
+     * @var ConfigManager
      */
-    protected $currencyData = array();
+    protected $configManager;
 
     /**
      * @var CalendarFactoryInterface
@@ -196,26 +191,6 @@ class LocaleSettings
     }
 
     /**
-     * Adds locale data.
-     *
-     * @param array $data
-     */
-    public function addCurrencyData(array $data)
-    {
-        $this->currencyData = array_merge($this->currencyData, $data);
-    }
-
-    /**
-     * Get locale data.
-     *
-     * @return array
-     */
-    public function getCurrencyData()
-    {
-        return $this->currencyData;
-    }
-
-    /**
      * @return boolean
      */
     public function isFormatAddressByAddressCountry()
@@ -261,12 +236,15 @@ class LocaleSettings
     public function getLanguage()
     {
         if (null === $this->language) {
-            $this->language = $this->configManager->get('oro_locale.language');
-            if (!$this->language) {
-                $this->language = LocaleConfiguration::DEFAULT_LANGUAGE;
-            }
+            $this->language = $this->getLanguageConfigurationValue();
         }
+
         return $this->language;
+    }
+
+    public function getActualLanguage()
+    {
+        return $this->getLanguageConfigurationValue();
     }
 
     /**
@@ -304,20 +282,24 @@ class LocaleSettings
     }
 
     /**
-     * @param string $currencyCode
-     * @return null
+     * @param string|null $currencyCode
+     * @param string|null $locale
+     *
+     * @return bool|string The symbol value or false on error
      */
-    public function getCurrencySymbolByCurrency($currencyCode = null)
+    public function getCurrencySymbolByCurrency(string $currencyCode = null, string $locale = null)
     {
         if (!$currencyCode) {
             $currencyCode = $this->getCurrency();
         }
 
-        if (!empty($this->currencyData[$currencyCode]['symbol'])) {
-            return $this->currencyData[$currencyCode]['symbol'];
+        if (!$locale) {
+            $locale = $this->getLocale();
         }
 
-        return $currencyCode;
+        $formatter = new \NumberFormatter($locale . '@currency=' . $currencyCode, \NumberFormatter::CURRENCY);
+
+        return $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL) ?: $currencyCode;
     }
 
     /**
@@ -507,5 +489,15 @@ class LocaleSettings
     public function getFirstQuarterDay()
     {
         return $this->get('oro_locale.quarter_start')['day'];
+    }
+
+    /**
+     * @return string
+     */
+    private function getLanguageConfigurationValue(): string
+    {
+        $language = $this->configManager->get('oro_locale.language');
+
+        return $language ?? LocaleConfiguration::DEFAULT_LANGUAGE;
     }
 }

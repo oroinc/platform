@@ -3,18 +3,20 @@
 namespace Oro\Bundle\ApiBundle\Request\JsonApi;
 
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\LinkCollectionMetadataInterface;
+use Oro\Bundle\ApiBundle\Metadata\LinkMetadataInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\AbstractDocumentBuilder;
 use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\DocumentBuilder\EntityIdAccessor;
-use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
  * The document builder for REST API response conforms JSON.API specification.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class JsonApiDocumentBuilder extends AbstractDocumentBuilder
 {
@@ -26,6 +28,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     public const RELATIONSHIPS = 'relationships';
     public const ID            = 'id';
     public const TYPE          = 'type';
+    public const HREF          = 'href';
 
     private const ERROR_STATUS    = 'status';
     private const ERROR_CODE      = 'code';
@@ -35,38 +38,10 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     private const ERROR_POINTER   = 'pointer';
     private const ERROR_PARAMETER = 'parameter';
 
-    /** @var ValueNormalizer */
-    protected $valueNormalizer;
-
-    /** @var EntityIdTransformerInterface */
-    protected $entityIdTransformer;
-
-    /** @var EntityIdAccessor */
-    protected $entityIdAccessor;
-
-    /**
-     * @param ValueNormalizer              $valueNormalizer
-     * @param EntityIdTransformerInterface $entityIdTransformer
-     */
-    public function __construct(
-        ValueNormalizer $valueNormalizer,
-        EntityIdTransformerInterface $entityIdTransformer
-    ) {
-        parent::__construct();
-
-        $this->valueNormalizer = $valueNormalizer;
-        $this->entityIdTransformer = $entityIdTransformer;
-
-        $this->entityIdAccessor = new EntityIdAccessor(
-            $this->objectAccessor,
-            $this->entityIdTransformer
-        );
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function getDocument()
+    public function getDocument(): array
     {
         $result = $this->result;
         // check whether the result document data contains only a meta information
@@ -76,6 +51,11 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                 $result[self::META] = $data[self::META];
                 unset($result[self::DATA]);
             }
+            foreach ($this->links as $name => $link) {
+                if (\is_array($link)) {
+                    $result[self::LINKS][$name] = $this->getLinkObject($link[0], $link[1]);
+                }
+            }
         }
 
         return $result;
@@ -84,26 +64,73 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function convertObjectToArray($object, RequestType $requestType, EntityMetadata $metadata = null)
-    {
-        if (null === $metadata) {
-            throw new \InvalidArgumentException('The metadata should be provided.');
+    protected function convertCollectionToArray(
+        $collection,
+        RequestType $requestType,
+        EntityMetadata $metadata = null
+    ): array {
+        if (null !== $metadata) {
+            return parent::convertCollectionToArray($collection, $requestType, $metadata);
         }
 
+        $items = [];
+        foreach ($collection as $object) {
+            $item = $this->convertObjectToArray($object, $requestType);
+            $items[] = $item[self::META];
+        }
+
+        return [self::META => [self::DATA => $items]];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function convertObjectToArray(
+        $object,
+        RequestType $requestType,
+        EntityMetadata $metadata = null
+    ): array {
         $data = $this->objectAccessor->toArray($object);
-        if ($metadata->hasIdentifierFields()) {
-            $result = $this->getResourceIdObject(
-                $this->getEntityTypeForObject($object, $requestType, $metadata),
-                $this->entityIdAccessor->getEntityId($object, $metadata)
-            );
-            $this->addMeta($result, $data, $metadata);
-            $this->addAttributes($result, $data, $metadata);
-            $this->addRelationships($result, $data, $requestType, $metadata);
+        if (null === $metadata) {
+            $result = [self::META => $data];
         } else {
-            $result = [];
-            $this->addMeta($result, $data, $metadata);
-            $this->addAttributesAsMeta($result, $data, $metadata);
-            $this->addRelationshipsAsMeta($result, $data, $requestType, $metadata);
+            $hasIdentifierFields = $metadata->hasIdentifierFields();
+            $objectClass = $this->objectAccessor->getClassName($object);
+            if (!$objectClass) {
+                $objectClass = $metadata->getClassName();
+            }
+            $objectAlias = $this->getEntityAlias($objectClass, $requestType);
+            $objectId = null;
+            if ($hasIdentifierFields) {
+                $objectId = $this->getEntityId($object, $requestType, $metadata);
+            }
+
+            $entityData = $data;
+            $entityData[DataAccessorInterface::ENTITY_CLASS] = $objectClass;
+            if ($objectAlias) {
+                $entityData[DataAccessorInterface::ENTITY_TYPE] = $objectAlias;
+            }
+            if ($hasIdentifierFields) {
+                $entityData[DataAccessorInterface::ENTITY_ID] = $objectId;
+            }
+            $this->resultDataAccessor->setEntity($entityData);
+
+            if ($hasIdentifierFields) {
+                $result = $this->getResourceIdObject(
+                    $this->getEntityTypeForObject($object, $requestType, $metadata),
+                    $objectId
+                );
+                $this->addMeta($result, $data, $metadata);
+                $this->addLinks($result, $metadata->getLinks());
+                $this->addAttributes($result, $data, $metadata);
+                $this->addRelationships($result, $data, $requestType, $metadata);
+            } else {
+                $result = [];
+                $this->addMeta($result, $data, $metadata);
+                $this->addLinks($result, $metadata->getLinks());
+                $this->addAttributesAsMeta($result, $data, $metadata);
+                $this->addRelationshipsAsMeta($result, $data, $requestType, $metadata);
+            }
         }
 
         return $result;
@@ -112,7 +139,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function convertErrorToArray(Error $error)
+    protected function convertErrorToArray(Error $error): array
     {
         $result = [];
 
@@ -143,8 +170,11 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function convertToEntityType($entityClass, RequestType $requestType, $throwException = true)
-    {
+    protected function convertToEntityType(
+        string $entityClass,
+        RequestType $requestType,
+        bool $throwException = true
+    ): ?string {
         return ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,
             $entityClass,
@@ -158,14 +188,49 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
      * @param array          $data
      * @param EntityMetadata $metadata
      */
-    protected function addMeta(array &$result, array $data, EntityMetadata $metadata)
+    protected function addMeta(array &$result, array $data, EntityMetadata $metadata): void
     {
         $properties = $metadata->getMetaProperties();
         foreach ($properties as $name => $property) {
-            $resultName = $property->getResultName();
-            if (array_key_exists($name, $data)) {
-                $result[self::META][$resultName] = $data[$name];
+            if (!$property->isOutput()) {
+                continue;
             }
+            $resultName = $property->getResultName();
+            if (\array_key_exists($name, $data)) {
+                $result[self::META][$resultName] = $data[$name];
+            } else {
+                $value = null;
+                if ($this->resultDataAccessor->tryGetValue($property->getPropertyPath(), $value)) {
+                    $result[self::META][$resultName] = $value;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param array                   $result
+     * @param LinkMetadataInterface[] $links
+     */
+    protected function addLinks(array &$result, array $links): void
+    {
+        foreach ($links as $name => $link) {
+            $this->addLinkToResult($result, $name, $link);
+        }
+    }
+
+    /**
+     * @param array                 $result
+     * @param string                $name
+     * @param LinkMetadataInterface $link
+     */
+    protected function addLinkToResult(array &$result, string $name, LinkMetadataInterface $link): void
+    {
+        $href = $this->getLinkHref($link);
+        if ($href) {
+            $result[self::LINKS][$name] = $this->getLinkObject($href, $this->getLinkMeta($link));
+        }
+        if ($link instanceof LinkCollectionMetadataInterface) {
+            $this->addLinks($result, $link->getLinks($this->resultDataAccessor));
         }
     }
 
@@ -174,12 +239,15 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
      * @param array          $data
      * @param EntityMetadata $metadata
      */
-    protected function addAttributes(array &$result, array $data, EntityMetadata $metadata)
+    protected function addAttributes(array &$result, array $data, EntityMetadata $metadata): void
     {
         $idFieldNames = $metadata->getIdentifierFieldNames();
         $fields = $metadata->getFields();
         foreach ($fields as $name => $field) {
-            if (!in_array($name, $idFieldNames, true)) {
+            if (!$field->isOutput()) {
+                continue;
+            }
+            if (!\in_array($name, $idFieldNames, true)) {
                 $result[self::ATTRIBUTES][$name] = $data[$name] ?? null;
             }
         }
@@ -196,16 +264,92 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         array $data,
         RequestType $requestType,
         EntityMetadata $metadata
-    ) {
+    ): void {
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
-            $value = $this->getRelationshipValue($data, $requestType, $name, $association);
-            if (DataType::isAssociationAsField($association->getDataType())) {
-                $result[self::ATTRIBUTES][$name] = $value;
-            } else {
-                $result[self::RELATIONSHIPS][$name][self::DATA] = $value;
+            if (!$association->isOutput()) {
+                continue;
             }
+
+            if (DataType::isAssociationAsField($association->getDataType())) {
+                $result[self::ATTRIBUTES][$name] = $this->getRelationshipValue(
+                    $data,
+                    $requestType,
+                    $name,
+                    $association
+                );
+                continue;
+            }
+
+            $this->resultDataAccessor->setAssociation(
+                $name,
+                $this->getRelationshipData($requestType, $association)
+            );
+
+            $relationshipValue = [];
+            $this->addAssociationMeta($relationshipValue, $this->getRelationshipMeta($association));
+            $this->addLinks($relationshipValue, $association->getRelationshipLinks());
+
+            $value = $this->getRelationshipValue($data, $requestType, $name, $association);
+            if ($association->isCollection()) {
+                $items = $this->getCollectionAssociationData($data, $name);
+                if (!empty($items)) {
+                    $i = 0;
+                    foreach ($items as $item) {
+                        $this->resultDataAccessor->setAssociation(
+                            $name,
+                            $this->getAssociationData($requestType, $item, $value[$i][self::ID]),
+                            $i
+                        );
+                        $this->addAssociationMeta($value[$i], $this->getAssociationMeta($association));
+                        $this->addLinks($value[$i], $association->getLinks());
+                        $i++;
+                    }
+                }
+            } elseif (null !== $value) {
+                $this->resultDataAccessor->setAssociation(
+                    $name,
+                    $this->getAssociationData($requestType, $data[$name] ?? null, $value[self::ID])
+                );
+                $this->addAssociationMeta($value, $this->getAssociationMeta($association));
+                $this->addLinks($value, $association->getLinks());
+            }
+            $relationshipValue[self::DATA] = $value;
+            $result[self::RELATIONSHIPS][$name] = $relationshipValue;
         }
+    }
+
+    /**
+     * @param array      $result
+     * @param array|null $meta
+     */
+    protected function addAssociationMeta(array &$result, ?array $meta): void
+    {
+        if (!empty($meta)) {
+            $result[self::META] = $meta;
+        }
+    }
+
+    /**
+     * @param RequestType $requestType
+     * @param mixed       $item
+     * @param string      $itemId
+     */
+    protected function getAssociationData(RequestType $requestType, $item, string $itemId): array
+    {
+        if (!\is_array($item)) {
+            $item = [self::ID => $item];
+        } elseif (!empty($item[DataAccessorInterface::ENTITY_CLASS])
+            && !\array_key_exists(DataAccessorInterface::ENTITY_TYPE, $item)
+        ) {
+            $item[DataAccessorInterface::ENTITY_TYPE] = $this->getEntityAlias(
+                $item[DataAccessorInterface::ENTITY_CLASS],
+                $requestType
+            );
+        }
+        $item[DataAccessorInterface::ENTITY_ID] = $itemId;
+
+        return $item;
     }
 
     /**
@@ -213,10 +357,13 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
      * @param array          $data
      * @param EntityMetadata $metadata
      */
-    protected function addAttributesAsMeta(array &$result, array $data, EntityMetadata $metadata)
+    protected function addAttributesAsMeta(array &$result, array $data, EntityMetadata $metadata): void
     {
         $fields = $metadata->getFields();
         foreach ($fields as $name => $field) {
+            if (!$field->isOutput()) {
+                continue;
+            }
             $result[self::META][$name] = $data[$name] ?? null;
         }
     }
@@ -232,9 +379,12 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         array $data,
         RequestType $requestType,
         EntityMetadata $metadata
-    ) {
+    ): void {
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
+            if (!$association->isOutput()) {
+                continue;
+            }
             $result[self::META][$name] = $this->getRelationshipValue($data, $requestType, $name, $association);
         }
     }
@@ -247,29 +397,33 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         RequestType $requestType,
         AssociationMetadata $associationMetadata
     ) {
-        $targetMetadata = $associationMetadata->getTargetMetadata();
+        $this->resultDataAccessor->addEntity();
+        try {
+            $targetMetadata = $associationMetadata->getTargetMetadata();
+            $preparedValue = $this->prepareRelatedValue(
+                $object,
+                $requestType,
+                $associationMetadata->getTargetClassName(),
+                $targetMetadata
+            );
+            if ($preparedValue['idOnly']) {
+                $resourceId = $this->getResourceIdObject(
+                    $preparedValue['entityType'],
+                    $this->getEntityIdTransformer($requestType)->transform($preparedValue['value'], $targetMetadata)
+                );
+            } else {
+                $targetObject = $preparedValue['value'];
+                $resourceId = $this->getResourceIdObject(
+                    $preparedValue['entityType'],
+                    $this->getEntityId($targetObject, $requestType, $targetMetadata)
+                );
+                $this->addRelatedObject($this->convertObjectToArray($targetObject, $requestType, $targetMetadata));
+            }
 
-        $preparedValue = $this->prepareRelatedValue(
-            $object,
-            $requestType,
-            $associationMetadata->getTargetClassName(),
-            $targetMetadata
-        );
-        if ($preparedValue['idOnly']) {
-            $resourceId = $this->getResourceIdObject(
-                $preparedValue['entityType'],
-                $this->entityIdTransformer->transform($preparedValue['value'], $targetMetadata)
-            );
-        } else {
-            $targetObject = $preparedValue['value'];
-            $resourceId = $this->getResourceIdObject(
-                $preparedValue['entityType'],
-                $this->entityIdAccessor->getEntityId($targetObject, $targetMetadata)
-            );
-            $this->addRelatedObject($this->convertObjectToArray($targetObject, $requestType, $targetMetadata));
+            return $resourceId;
+        } finally {
+            $this->resultDataAccessor->removeLastEntity();
         }
-
-        return $resourceId;
     }
 
     /**
@@ -285,10 +439,10 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         RequestType $requestType,
         $targetClassName,
         EntityMetadata $targetMetadata = null
-    ) {
+    ): array {
         $idOnly = false;
         $targetEntityType = null;
-        if (is_array($object) || is_object($object)) {
+        if (\is_array($object) || \is_object($object)) {
             if (null !== $targetMetadata) {
                 if ($targetMetadata->isInheritedType()) {
                     $targetEntityType = $this->getEntityType(
@@ -301,8 +455,8 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                 if ($this->hasIdentifierFieldsOnly($targetMetadata)) {
                     $idOnly = true;
                     $idFieldNames = $targetMetadata->getIdentifierFieldNames();
-                    if (count($idFieldNames) === 1) {
-                        $object = $this->objectAccessor->getValue($object, reset($idFieldNames));
+                    if (\count($idFieldNames) === 1) {
+                        $object = $this->objectAccessor->getValue($object, \reset($idFieldNames));
                     } else {
                         $data = [];
                         foreach ($idFieldNames as $fieldName) {
@@ -329,7 +483,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /**
      * @param array $object
      */
-    protected function addRelatedObject(array $object)
+    protected function addRelatedObject(array $object): void
     {
         // check whether this object was already added
         if (!empty($this->result[self::INCLUDED])) {
@@ -351,11 +505,26 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
      *
      * @return array
      */
-    protected function getResourceIdObject($entityType, $entityId)
+    protected function getResourceIdObject(string $entityType, string $entityId): array
     {
         return [
             self::TYPE => $entityType,
             self::ID   => $entityId
         ];
+    }
+
+    /**
+     * @param string     $href
+     * @param array|null $properties
+     *
+     * @return array|string
+     */
+    protected function getLinkObject(string $href, ?array $properties)
+    {
+        if (empty($properties)) {
+            return $href;
+        }
+
+        return [self::HREF => $href, self::META => $properties];
     }
 }

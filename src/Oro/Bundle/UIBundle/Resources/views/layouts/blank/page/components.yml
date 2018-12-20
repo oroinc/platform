@@ -1,7 +1,7 @@
 layout:
     actions:
         - '@setBlockTheme':
-            themes: 'components.html.twig'
+            themes: 'OroUIBundle:layouts:blank/page/components.html.twig'
 
         - '@add':
             id: copyright
@@ -9,5 +9,4 @@ layout:
             prepend: false
             blockType: text
             options:
-                text: 'oro_frontend.copyright'
-                escape: false
+                text: 'oro_frontend.copyright.label'

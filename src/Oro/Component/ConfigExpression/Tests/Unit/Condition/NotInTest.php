@@ -6,7 +6,7 @@ use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class NotInTest extends \PHPUnit_Framework_Testcase
+class NotInTest extends \PHPUnit\Framework\Testcase
 {
     protected $condition;
 

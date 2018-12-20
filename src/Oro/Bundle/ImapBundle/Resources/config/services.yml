@@ -1,8 +1,8 @@
 parameters:
     oro_imap.user_form_name:                         oro_user_emailsettings
-    oro_imap.user_form_type:                         oro_user_emailsettings
+    oro_imap.user_form_type:                         Oro\Bundle\UserBundle\Form\Type\EmailSettingsType
     oro_imap.email_mailbox_form_name:                oro_email_mailbox
-    oro_imap.email_mailbox_form_type:                oro_email_mailbox
+    oro_imap.email_mailbox_form_type:                Oro\Bundle\EmailBundle\Form\Type\MailboxType
     oro_imap.connector.factory.class:                Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory
     oro_imap.connector.class:                        Oro\Bundle\ImapBundle\Connector\ImapConnector
     oro_imap.services.factory.class:                 Oro\Bundle\ImapBundle\Connector\ImapServicesFactory
@@ -49,7 +49,7 @@ services:
         class: '%oro_imap.email_body_loader.class%'
         arguments:
             - '@oro_imap.connector.factory'
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_imap.imap_email_google_oauth2_manager'
             - '@oro_config.global'
         tags:
@@ -60,7 +60,7 @@ services:
         class: '%oro_imap.email_flag_manager_loader.class%'
         arguments:
             - '@oro_imap.connector.factory'
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_imap.imap_email_google_oauth2_manager'
         tags:
             - { name: oro_email.email_flag_manager_loader }
@@ -73,7 +73,7 @@ services:
             - '@oro_email.known_email_address_checker_factory'
             - '@oro_imap.email_sync_processor_factory'
             - '@oro_imap.connector.factory'
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_imap.imap_email_google_oauth2_manager'
         calls:
             - ['setMessageProducer', ['@oro_message_queue.client.message_producer']]
@@ -105,7 +105,7 @@ services:
     oro_imap.form.type.configuration:
         class: '%oro_imap.form.type.configuration.class%'
         arguments:
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_security.token_accessor'
             - '@translator'
         tags:
@@ -135,7 +135,7 @@ services:
     oro_imap.listener.user_email_origin:
         class: Oro\Bundle\ImapBundle\EventListener\UserEmailOriginListener
         arguments:
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_imap.connector.factory'
             - '@doctrine'
             - '@oro_imap.imap_email_google_oauth2_manager'
@@ -174,7 +174,7 @@ services:
         class: '%oro_imap.manager.connection_controller_manager.class%'
         arguments:
             - '@form.factory'
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@doctrine'
             - '@oro_imap.connector.factory'
             - '@oro_imap.imap_email_google_oauth2_manager'
@@ -186,7 +186,7 @@ services:
     oro_imap.listener.send_email_transport_listener:
         class: '%oro_imap.listener.send_email_transport_listener.class%'
         arguments:
-            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.encoder.default'
             - '@oro_imap.imap_email_google_oauth2_manager'
         tags:
             - { name: kernel.event_listener, event: oro_email.send_email_transport, method: setSmtpTransport }
@@ -218,15 +218,8 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_imap.command.email_sync:
-        class: 'Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand'
-        tags:
-            - { name: console.command }
-
     oro_imap.validator.email_folders:
         class: 'Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator'
-        arguments:
-            - '@translator'
         tags:
             - { name: validator.constraint_validator, alias: oro_imap.validator.email_folders }
 
@@ -251,17 +244,16 @@ services:
     oro_imap.origin_credentials.notification_sender.socket:
         class: Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\SocketNotificationSender
         arguments:
-            - '@oro_wamp.publisher'
+            - '@oro_sync.websocket_client'
+            - '@oro_sync.client.connection_checker'
         tags:
             - {name: oro_imap.origin_credentials.notification_sender}
 
     oro_imap.origin_credentials.notification_sender.email:
         class: Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\EmailNotificationSender
         arguments:
-            - '@oro_config.global'
-            - '@oro_email.email_renderer'
-            - '@doctrine'
-            - '@oro_email.direct_mailer'
+            - '@oro_notification.model.notification_settings'
+            - '@oro_email.manager.template_email'
         tags:
             - {name: oro_imap.origin_credentials.notification_sender}
 
@@ -279,3 +271,11 @@ services:
              - '@oro_imap.origin_credentials.issue_manager'
         tags:
             - { name: kernel.event_listener, event: security.interactive_login, method: onLogin }
+
+    oro_imap.topic.sync_fail:
+        class: Oro\Bundle\ImapBundle\Topic\SyncFailTopic
+        arguments:
+            - 'oro_imap.sync_fail'
+            - '@gos_web_socket.websocket.client_manipulator'
+        tags:
+            - { name: gos_web_socket.topic }

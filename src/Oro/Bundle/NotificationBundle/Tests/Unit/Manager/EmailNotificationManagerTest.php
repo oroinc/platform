@@ -2,180 +2,301 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Manager;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\EmailBundle\Exception\EmailTemplateNotFoundException;
+use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\From;
+use Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider;
+use Oro\Bundle\LocaleBundle\Provider\PreferredLanguageProviderInterface;
+use Oro\Bundle\NotificationBundle\Exception\NotificationSendException;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender;
-use Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface;
+use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
+use Oro\Bundle\NotificationBundle\Model\TemplateMassNotification;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
-class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
+class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testShouldCreateWithAllRequiredArguments()
+    private const TEMPLATE_NAME = 'template_name';
+    private const TEMPLATE_ENTITY_NAME = 'Some/Entity';
+    private const LANGUAGE_ENGLISH = 'en';
+    private const LANGUAGE_FRENCH = 'fr_FR';
+    private const SUBJECT_ENGLISH = 'English subject';
+    private const SUBJECT_FRENCH = 'French subject';
+    private const SUBJECT_CUSTOM = 'Custom subject';
+    private const CONTENT_ENGLISH = 'English content';
+    private const CONTENT_FRENCH = 'French content';
+
+    /**
+     * @var EmailTemplateContentProvider|MockObject
+     */
+    private $emailTemplateContentProvider;
+
+    /**
+     * @var LoggerInterface|MockObject
+     */
+    private $logger;
+
+    /**
+     * @var PreferredLanguageProviderInterface|MockObject
+     */
+    private $languageProvider;
+
+    /**
+     * @var EmailNotificationSender|MockObject
+     */
+    private $emailNotificationSender;
+
+    /**
+     * @var EmailNotificationManager
+     */
+    private $manager;
+
+    protected function setUp()
     {
-        new EmailNotificationManager(
-            $this->createEmailRendererMock(),
-            $this->createEmailNotificationSenderMock(),
-            $this->createLoggerMock()
+        $this->emailNotificationSender = $this->createMock(EmailNotificationSender::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->languageProvider = $this->createMock(PreferredLanguageProviderInterface::class);
+        $this->emailTemplateContentProvider = $this->createMock(EmailTemplateContentProvider::class);
+
+        $this->manager = new EmailNotificationManager(
+            $this->emailNotificationSender,
+            $this->logger,
+            $this->emailTemplateContentProvider,
+            $this->languageProvider
         );
     }
 
-
-    public function testShouldSendMessageIfTemplateRendered()
+    public function testProcessSingle(): void
     {
-        $testSubject = 'test subject';
-        $testBody = 'test body';
+        $entity = new User();
+        $englishRecipient = (new User())->setEmail('english@mail.com');
+        $frenchRecipient1 = (new User())->setEmail('french1@mail.com');
+        $frenchRecipient2 = (new User())->setEmail('french2@mail.com');
 
-        $template = $this->createTemplateMock();
-        $template->expects($this->once())
-            ->method('getType')
-            ->will($this->returnValue('html'))
-        ;
+        $notification = new TemplateEmailNotification(
+            new EmailTemplateCriteria(self::TEMPLATE_NAME),
+            [$englishRecipient, $frenchRecipient1, $frenchRecipient2],
+            $entity
+        );
 
-        $object = $this->createUserMock();
+        $englishEmailTemplateModel = (new EmailTemplateModel())
+            ->setSubject(self::SUBJECT_ENGLISH)
+            ->setContent(self::CONTENT_ENGLISH)
+            ->setType(EmailTemplateModel::CONTENT_TYPE_HTML);
 
-        $emailRenderer = $this->createEmailRendererMock();
-        $emailRenderer->expects($this->once())
-            ->method('compileMessage')
-            ->with($template, ['entity' => $object])
-            ->will($this->returnValue([$testSubject, $testBody]))
-        ;
+        $frenchEmailTemplateModel = (new EmailTemplateModel())
+            ->setSubject(self::SUBJECT_FRENCH)
+            ->setContent(self::CONTENT_FRENCH)
+            ->setType(EmailTemplateModel::CONTENT_TYPE_HTML);
 
-        $notification = $this->createEmailNotificationMock();
-        $notification->expects($this->once())
-            ->method('getTemplate')
-            ->will($this->returnValue($template))
-        ;
+        $this->emailTemplateContentProvider
+            ->expects($this->exactly(2))
+            ->method('getTemplateContent')
+            ->withConsecutive(
+                [$notification->getTemplateCriteria(), self::LANGUAGE_ENGLISH, ['entity' => $entity]],
+                [$notification->getTemplateCriteria(), self::LANGUAGE_FRENCH, ['entity' => $entity]]
+            )
+            ->willReturnOnConsecutiveCalls($englishEmailTemplateModel, $frenchEmailTemplateModel);
 
-        $sender = $this->createEmailNotificationSenderMock();
-        $sender
+        $this->languageProvider
+            ->expects($this->any())
+            ->method('getPreferredLanguage')
+            ->willReturnMap([
+                [$frenchRecipient1, self::LANGUAGE_FRENCH],
+                [$frenchRecipient2, self::LANGUAGE_FRENCH],
+                [$englishRecipient, self::LANGUAGE_ENGLISH]
+            ]);
+
+        $expectedEnglishNotification = new TemplateEmailNotification(
+            new EmailTemplateCriteria(self::TEMPLATE_NAME),
+            [$englishRecipient],
+            $entity
+        );
+
+        $expectedFrenchNotification = new TemplateEmailNotification(
+            new EmailTemplateCriteria(self::TEMPLATE_NAME),
+            [$frenchRecipient1, $frenchRecipient2],
+            $entity
+        );
+
+        $this->emailNotificationSender
+            ->expects($this->exactly(2))
+            ->method('send')
+            ->withConsecutive(
+                [$expectedEnglishNotification, $englishEmailTemplateModel],
+                [$expectedFrenchNotification, $frenchEmailTemplateModel]
+            );
+
+        $this->manager->processSingle($notification, []);
+    }
+
+    public function testProcessSingleMassNotification(): void
+    {
+        $englishRecipient = (new User())->setEmail('english@mail.com');
+
+        $sender = From::emailAddress('some@mail.com');
+        $notification = new TemplateMassNotification(
+            $sender,
+            [$englishRecipient],
+            new EmailTemplateCriteria(self::TEMPLATE_NAME),
+            self::SUBJECT_CUSTOM
+        );
+
+        $englishEmailTemplateModel = (new EmailTemplateModel())
+            ->setSubject(self::SUBJECT_ENGLISH)
+            ->setContent(self::CONTENT_ENGLISH)
+            ->setType(EmailTemplateModel::CONTENT_TYPE_HTML);
+
+        $this->emailTemplateContentProvider
             ->expects($this->once())
-            ->method('send')
-            ->with($notification, $testSubject, $testBody, 'text/html');
+            ->method('getTemplateContent')
+            ->withConsecutive(
+                [$notification->getTemplateCriteria(), self::LANGUAGE_ENGLISH, ['entity' => null]]
+            )
+            ->willReturn($englishEmailTemplateModel);
 
-        $manager = new EmailNotificationManager(
-            $emailRenderer,
-            $sender,
-            $this->createLoggerMock()
+        $this->languageProvider
+            ->expects($this->any())
+            ->method('getPreferredLanguage')
+            ->willReturnMap([
+                [$englishRecipient, self::LANGUAGE_ENGLISH]
+            ]);
+
+        $customSubjectEmailTemplateModel = (new EmailTemplateModel())
+            ->setSubject(self::SUBJECT_CUSTOM)
+            ->setContent(self::CONTENT_ENGLISH)
+            ->setType(EmailTemplateModel::CONTENT_TYPE_HTML);
+
+        $expectedNotification = new TemplateEmailNotification(
+            $notification->getTemplateCriteria(),
+            [$englishRecipient],
+            null,
+            $sender
         );
 
-        $manager->process($object, [$notification]);
+        $this->emailNotificationSender
+            ->expects($this->once())
+            ->method('sendMass')
+            ->with($expectedNotification, $customSubjectEmailTemplateModel);
+
+        $this->manager->processSingle($notification, []);
     }
 
-    public function testShouldNotSendMessageIfTwigExceptionAppear()
+    public function testProcessSingleWhenExceptionIsThrown(): void
     {
-        $configManager = $this->createConfigManagerMock();
-        $configManager
-            ->expects($this->never())
-            ->method('get')
-        ;
+        $englishRecipient = (new User())->setEmail('english@mail.com');
 
-        $template = $this->createTemplateMock();
-        $template->expects($this->never())
-            ->method('getType')
-        ;
+        $notification = new TemplateEmailNotification(
+            new EmailTemplateCriteria(self::TEMPLATE_NAME),
+            [$englishRecipient]
+        );
 
-        $object = $this->createUserMock();
+        $exception = new EmailTemplateNotFoundException($notification->getTemplateCriteria());
+        $this->emailTemplateContentProvider
+            ->expects($this->once())
+            ->method('getTemplateContent')
+            ->with($notification->getTemplateCriteria(), self::LANGUAGE_ENGLISH, ['entity' => null, 'some' => true])
+            ->willThrowException($exception);
 
-        $emailRenderer = $this->createEmailRendererMock();
-        $emailRenderer->expects($this->once())
-            ->method('compileMessage')
-            ->will($this->throwException(new \Twig_Error('An error occured')))
-        ;
+        $this->languageProvider
+            ->expects($this->any())
+            ->method('getPreferredLanguage')
+            ->willReturnMap([
+                [$englishRecipient, self::LANGUAGE_ENGLISH]
+            ]);
 
-        $notification = $this->createEmailNotificationMock();
-        $notification->expects($this->once())
-            ->method('getTemplate')
-            ->will($this->returnValue($template))
-        ;
-
-        $sender = $this->createEmailNotificationSenderMock();
-        $sender
-            ->expects($this->never())
-            ->method('send')
-        ;
-
-        $logger = $this->createLoggerMock();
-        $logger->expects($this->once())
+        $this->logger
+            ->expects($this->once())
             ->method('error')
-        ;
+            ->with('An error occurred while processing notification', ['exception' => $exception]);
 
-        $manager = new EmailNotificationManager(
-            $emailRenderer,
-            $sender,
-            $logger
+        $this->expectException(NotificationSendException::class);
+        $this->manager->processSingle($notification, ['some' => true]);
+    }
+
+    public function testProcess(): void
+    {
+        $recipient = (new User())->setEmail('english@mail.com');
+
+        $notification1 = new TemplateEmailNotification(new EmailTemplateCriteria(self::TEMPLATE_NAME), [$recipient]);
+        $notification2 = new TemplateEmailNotification(
+            new EmailTemplateCriteria(self::TEMPLATE_NAME, self::TEMPLATE_ENTITY_NAME),
+            [$recipient]
         );
 
-        $manager->process($object, [$notification]);
+        $emailTemplateModel1 = (new EmailTemplateModel())
+            ->setSubject(self::SUBJECT_ENGLISH)
+            ->setContent(self::CONTENT_ENGLISH)
+            ->setType(EmailTemplateModel::CONTENT_TYPE_HTML);
+
+        $emailTemplateModel2 = (new EmailTemplateModel())
+            ->setSubject(self::SUBJECT_CUSTOM)
+            ->setContent(self::CONTENT_ENGLISH)
+            ->setType(EmailTemplateModel::CONTENT_TYPE_HTML);
+
+        $this->emailTemplateContentProvider
+            ->expects($this->exactly(2))
+            ->method('getTemplateContent')
+            ->withConsecutive(
+                [$notification1->getTemplateCriteria(), self::LANGUAGE_ENGLISH, ['entity' => null, 'some' => true]],
+                [$notification2->getTemplateCriteria(), self::LANGUAGE_ENGLISH, ['entity' => null, 'some' => true]]
+            )
+            ->willReturnOnConsecutiveCalls($emailTemplateModel1, $emailTemplateModel2);
+
+        $this->languageProvider
+            ->expects($this->any())
+            ->method('getPreferredLanguage')
+            ->willReturnMap([
+                [$recipient, self::LANGUAGE_ENGLISH]
+            ]);
+
+        $expectedNotification1 = new TemplateEmailNotification($notification1->getTemplateCriteria(), [$recipient]);
+        $expectedNotification2 = new TemplateEmailNotification($notification2->getTemplateCriteria(), [$recipient]);
+
+        $this->emailNotificationSender
+            ->expects($this->exactly(2))
+            ->method('send')
+            ->withConsecutive(
+                [$expectedNotification1, $emailTemplateModel1],
+                [$expectedNotification2, $emailTemplateModel2]
+            );
+
+        $this->manager->process([$notification1, $notification2], null, ['some' => true]);
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | EmailRenderer
-     */
-    private function createEmailRendererMock()
+    public function testProcessWhenExceptionIsThrown(): void
     {
-        return $this
-            ->getMockBuilder(EmailRenderer::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-    }
+        $recipient = (new User())->setEmail('english@mail.com');
+        $notification = new TemplateEmailNotification(new EmailTemplateCriteria(self::TEMPLATE_NAME), [$recipient]);
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | ConfigManager
-     */
-    private function createConfigManagerMock()
-    {
-        return $this
-            ->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-    }
+        $exception = new EmailTemplateNotFoundException($notification->getTemplateCriteria());
+        $this->emailTemplateContentProvider
+            ->expects($this->once())
+            ->method('getTemplateContent')
+            ->withConsecutive(
+                [$notification->getTemplateCriteria(), self::LANGUAGE_ENGLISH, ['entity' => null]]
+            )
+            ->willThrowException($exception);
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | EmailNotificationSender
-     */
-    private function createEmailNotificationSenderMock()
-    {
-        return $this
-            ->getMockBuilder(EmailNotificationSender::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-    }
+        $this->languageProvider
+            ->expects($this->any())
+            ->method('getPreferredLanguage')
+            ->willReturnMap([
+                [$recipient, self::LANGUAGE_ENGLISH]
+            ]);
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
-    }
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger
+            ->expects($this->exactly(2))
+            ->method('error')
+            ->withConsecutive(
+                ['An error occurred while processing notification', ['exception' => $exception]],
+                $this->matchesRegularExpression('/An error occurred while sending .* notification/')
+            );
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | EmailTemplate
-     */
-    private function createTemplateMock()
-    {
-        return $this->createMock(EmailTemplate::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | EmailNotificationInterface
-     */
-    private function createEmailNotificationMock()
-    {
-        return $this->createMock(EmailNotificationInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | User
-     */
-    private function createUserMock()
-    {
-        return $this->createMock(User::class);
+        $this->manager->process([$notification], $logger, []);
     }
 }

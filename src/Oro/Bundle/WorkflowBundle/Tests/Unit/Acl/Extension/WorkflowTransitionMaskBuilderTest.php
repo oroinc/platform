@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowTransitionMaskBuilder;
 
-class WorkflowTransitionMaskBuilderTest extends \PHPUnit_Framework_TestCase
+class WorkflowTransitionMaskBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testPerformTransitionGroup()
     {

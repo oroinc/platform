@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 
-class AuditFieldTypeRegistryTest extends \PHPUnit_Framework_TestCase
+class AuditFieldTypeRegistryTest extends \PHPUnit\Framework\TestCase
 {
     public function testAuditFieldTypeRegistry()
     {

@@ -9,7 +9,7 @@ use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class ConfigTypeTest extends \PHPUnit_Framework_TestCase
+class ConfigTypeTest extends \PHPUnit\Framework\TestCase
 {
     use ReflectionHelperTrait;
     use MockHelperTrait;
@@ -53,7 +53,7 @@ class ConfigTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'repositories',
                 CollectionType::class,
-                ['type' => RepositoryType::class, 'allow_add' => true, 'allow_delete' => true]
+                ['entry_type' => RepositoryType::class, 'allow_add' => true, 'allow_delete' => true]
             );
 
         $type->buildForm($builder, []);

@@ -58,6 +58,7 @@ class OroMessageQueueExtension extends Extension
         $loader->load('services.yml');
         $loader->load('log.yml');
         $loader->load('job.yml');
+        $loader->load('commands.yml');
 
         // php pcntl extension available only for UNIX like systems
         if (extension_loaded('pcntl')) {
@@ -113,6 +114,7 @@ class OroMessageQueueExtension extends Extension
         $this->setJobConfigurationProvider($config, $container);
 
         if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
             $this->configureTestEnvironment($container);
         }
     }

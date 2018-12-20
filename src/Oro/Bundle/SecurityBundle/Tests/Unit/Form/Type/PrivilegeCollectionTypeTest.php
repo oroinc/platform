@@ -6,7 +6,7 @@ use Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormView;
 
-class PrivilegeCollectionTypeTest extends \PHPUnit_Framework_TestCase
+class PrivilegeCollectionTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PrivilegeCollectionType */
     protected $formType;
@@ -14,11 +14,6 @@ class PrivilegeCollectionTypeTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->formType = new PrivilegeCollectionType();
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(PrivilegeCollectionType::NAME, $this->formType->getName());
     }
 
     public function testGetParent()

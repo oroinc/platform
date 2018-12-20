@@ -11,7 +11,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  *
  * @package Oro\Bundle\EmailBundle\Tests\Unit\Entity
  */
-class EmailThreadTest extends \PHPUnit_Framework_TestCase
+class EmailThreadTest extends \PHPUnit\Framework\TestCase
 {
     public function testEmailsGetterAndSetter()
     {

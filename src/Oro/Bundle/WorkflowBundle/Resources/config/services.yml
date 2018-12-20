@@ -232,9 +232,7 @@ services:
             - '@oro_entity.doctrine_helper'
 
     oro_workflow.changes.event.dispatcher:
-        class: 'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher'
-        arguments:
-            - '@service_container'
+        class: 'Symfony\Component\EventDispatcher\EventDispatcher'
 
     oro_workflow.handler.workflow_definition:
         class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler'
@@ -415,10 +413,10 @@ services:
     oro_workflow.extension.datagrid_start_transition_button_provider:
         class: 'Oro\Bundle\WorkflowBundle\Extension\DatagridStartTransitionButtonProviderExtension'
         arguments:
-            - '@oro_entity.doctrine_helper'
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.start_transition_route'
-            - '@oro_action.resolver.destination_page_resolver'
+            - '@oro_action.provider.original_url_provider'
+            - '@oro_entity.doctrine_helper'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
@@ -429,7 +427,7 @@ services:
         arguments:
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.start_transition_route'
-            - '@oro_action.resolver.destination_page_resolver'
+            - '@oro_action.provider.original_url_provider'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
@@ -440,7 +438,7 @@ services:
         arguments:
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.transition_route'
-            - '@oro_action.resolver.destination_page_resolver'
+            - '@oro_action.provider.original_url_provider'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
@@ -466,6 +464,14 @@ services:
             - '@oro_workflow.helper.translation'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow, datasource: orm }
+
+    oro_workflow.filter.workflow_step:
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowStepFilter'
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: workflow_step, datasource: orm }
 
     oro_workflow.filter.workflow_translation:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowTranslationFilter'
@@ -537,20 +543,20 @@ services:
             - '@oro_workflow.transition_data.provider'
 
     oro_workflow.variable_guesser:
-            class: 'Oro\Bundle\WorkflowBundle\Model\VariableGuesser'
-            parent: oro_action.abstract_guesser
-            arguments:
-                - '@translator'
-            calls:
-                # mapping from variable type to form parameters
-                # an additional array with form options can be added
-                - [addFormTypeMapping, ['string', 'Symfony\Component\Form\Extension\Core\Type\TextType']]
-                - [addFormTypeMapping, ['int', 'Symfony\Component\Form\Extension\Core\Type\IntegerType']]
-                - [addFormTypeMapping, ['integer', 'Symfony\Component\Form\Extension\Core\Type\IntegerType']]
-                - [addFormTypeMapping, ['bool', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
-                - [addFormTypeMapping, ['boolean', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
-                - [addFormTypeMapping, ['float', 'Symfony\Component\Form\Extension\Core\Type\NumberType']]
-                - [addFormTypeMapping, ['array', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', {allow_add: true, allow_delete: true, prototype: true}]]
+        class: 'Oro\Bundle\WorkflowBundle\Model\VariableGuesser'
+        parent: oro_action.abstract_guesser
+        arguments:
+            - '@translator'
+        calls:
+            # mapping from variable type to form parameters
+            # an additional array with form options can be added
+            - [addFormTypeMapping, ['string', 'Symfony\Component\Form\Extension\Core\Type\TextType']]
+            - [addFormTypeMapping, ['int', 'Symfony\Component\Form\Extension\Core\Type\IntegerType']]
+            - [addFormTypeMapping, ['integer', 'Symfony\Component\Form\Extension\Core\Type\IntegerType']]
+            - [addFormTypeMapping, ['bool', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
+            - [addFormTypeMapping, ['boolean', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
+            - [addFormTypeMapping, ['float', 'Symfony\Component\Form\Extension\Core\Type\NumberType']]
+            - [addFormTypeMapping, ['array', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', {allow_add: true, allow_delete: true, prototype: true}]]
 
     oro_workflow.transition_form.data_provider.transition_page_form:
         class: 'Oro\Bundle\WorkflowBundle\Provider\TransitionPageFormTemplateDataProvider'
@@ -593,12 +599,13 @@ services:
         arguments:
             - "@translator"
 
-    oro_workflow.event_listener.collect_audit_fields:
-        class: Oro\Bundle\WorkflowBundle\EventListener\CollectAuditFieldsListener
+    oro_workflow.workflow_step_to_audit_field_converter:
+        class: Oro\Bundle\WorkflowBundle\DataAudit\WorkflowStepToAuditFieldConverter
+        decorates: oro_dataaudit.converter.change_set_to_audit_fields
+        public: false
         arguments:
+            - '@oro_workflow.workflow_step_to_audit_field_converter.inner'
             - '@oro_entity.doctrine_helper'
-        tags:
-            - { name: kernel.event_listener, event: oro_audit.collect_audit_fields, method: onCollectAuditFields }
 
     oro_workflow.event_listener.send_workflow_step_changes_to_audit:
         class: Oro\Bundle\WorkflowBundle\EventListener\SendWorkflowStepChangesToAuditListener

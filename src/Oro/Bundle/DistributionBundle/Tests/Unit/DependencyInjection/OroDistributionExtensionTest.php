@@ -13,9 +13,9 @@ use Oro\Bundle\DistributionBundle\Security\AccessDeniedListener;
 use Oro\Bundle\DistributionBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroDistributionExtensionTest extends \PHPUnit_Framework_TestCase
+class OroDistributionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $containerBuilder;
 
     /** @var OroDistributionExtension */
@@ -41,7 +41,6 @@ class OroDistributionExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturnMap(
                 [
                     ['kernel.bundles', $kernelBundles],
-                    ['assetic.bundles', []],
                 ]
             );
 
@@ -75,20 +74,19 @@ class OroDistributionExtensionTest extends \PHPUnit_Framework_TestCase
             'oro_distribution.composer.installer.class' => 'Composer\Installer',
             'oro_distribution.composer.installation_manager.class' => 'Composer\Installer\InstallationManager',
             'oro_distribution.composer.json_file.class' => 'Composer\Json\JsonFile',
-            'oro_distribution.composer_json' => '%kernel.root_dir%/../composer.json',
+            'oro_distribution.composer_json' => '%kernel.project_dir%/composer.json',
             'oro_distribution.security.access_denied_listener.class' => AccessDeniedListener::class,
             'oro_distribution.form.type.composer_config.class' => ConfigType::class,
             'oro_distribution.form.type.composer_repository.class' => RepositoryType::class,
             'oro_distribution.package_manager.system_paths' => [
                 'vendor',
-                'web/bundles',
-                'web/js',
-                'web/css',
+                'public/bundles',
+                'public/js',
+                'public/css',
                 'composer.json',
             ],
-            'assetic.bundles' => [],
             'twig.form.resources' => [],
-            'oro_distribution.composer_cache_home' => '%kernel.root_dir%/cache/composer'
+            'oro_distribution.composer_cache_home' => '%kernel.project_dir%/var/cache/composer'
         ];
 
         yield 'with OroTranslationBundle' => [

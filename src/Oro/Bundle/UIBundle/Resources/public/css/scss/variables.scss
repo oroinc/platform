@@ -1,0 +1,21 @@
+/* @theme: admin.oro; */
+
+// Should be refactored when style builder will updated
+@import "bootstrap/functions";
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
+
+// Oro variables
+$enable-safe-area:                      true;
+
+// Screen sizes
+$side-bar-closed-width:                 33px;
+$side-bar-opened-width:                 200px;
+
+// Loading
+
+$loader-size:                           32px !default;
+$loader-width:                          6px !default;
+$loader-color:                          $primary-700 !default;
+
+$icon-font-size:                        $base-font-size--m !default;

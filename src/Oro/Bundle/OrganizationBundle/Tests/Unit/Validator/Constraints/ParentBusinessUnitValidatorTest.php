@@ -1,17 +1,17 @@
 <?php
 
-namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Validator\Constrains;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\ParentBusinessUnit;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\ParentBusinessUnitValidator;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class ParentBusinessUnitValidatorTest extends AbstractConstraintValidatorTest
+class ParentBusinessUnitValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $ownerTree;
 
     protected function setUp()

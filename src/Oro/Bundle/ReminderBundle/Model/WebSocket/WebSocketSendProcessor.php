@@ -4,8 +4,12 @@ namespace Oro\Bundle\ReminderBundle\Model\WebSocket;
 
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 
+/**
+ * Sends messages about reminders to websocket server.
+ */
 class WebSocketSendProcessor implements SendProcessorInterface
 {
     const NAME = 'web_socket';
@@ -16,9 +20,14 @@ class WebSocketSendProcessor implements SendProcessorInterface
     protected $remindersByRecipient = array();
 
     /**
-     * @var TopicPublisher
+     * @var WebsocketClientInterface
      */
-    protected $topicPublisher;
+    protected $websocketClient;
+
+    /**
+     * @var ConnectionChecker
+     */
+    protected $connectionChecker;
 
     /**
      * @var MessageParamsProvider
@@ -26,12 +35,17 @@ class WebSocketSendProcessor implements SendProcessorInterface
     protected $messageParamsProvider;
 
     /**
-     * @param TopicPublisher        $topicPublisher
+     * @param WebsocketClientInterface $websocketClient
+     * @param ConnectionChecker $connectionChecker
      * @param MessageParamsProvider $messageParamsProvider
      */
-    public function __construct(TopicPublisher $topicPublisher, MessageParamsProvider $messageParamsProvider)
-    {
-        $this->topicPublisher        = $topicPublisher;
+    public function __construct(
+        WebsocketClientInterface $websocketClient,
+        ConnectionChecker $connectionChecker,
+        MessageParamsProvider $messageParamsProvider
+    ) {
+        $this->websocketClient = $websocketClient;
+        $this->connectionChecker = $connectionChecker;
         $this->messageParamsProvider = $messageParamsProvider;
     }
 
@@ -98,10 +112,11 @@ class WebSocketSendProcessor implements SendProcessorInterface
      */
     protected function sendMessage(array $messageData, $recipientId)
     {
-        return $this->topicPublisher->send(
-            sprintf('oro/reminder/remind_user_%s', $recipientId),
-            json_encode($messageData)
-        );
+        if (!$this->connectionChecker->checkConnection()) {
+            return false;
+        }
+
+        return $this->websocketClient->publish(sprintf('oro/reminder_remind/%s', $recipientId), $messageData);
     }
 
     /**

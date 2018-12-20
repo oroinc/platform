@@ -6,6 +6,9 @@ use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Makes possible to manipulate EmailTemplate entities via API.
+ */
 class EmailTemplateApiType extends EmailTemplateType
 {
     /**
@@ -27,6 +30,7 @@ class EmailTemplateApiType extends EmailTemplateType
                 'data_class'      => 'Oro\Bundle\EmailBundle\Entity\EmailTemplate',
                 'csrf_token_id'   => 'emailtemplate',
                 'csrf_protection' => false,
+                'additional_language_codes' => [],
             )
         );
     }

@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager;
 
-use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorage;
 use Oro\Bundle\EmbeddedFormBundle\Manager\SessionIdProviderInterface;
 
-class CsrfTokenStorageTest extends \PHPUnit_Framework_TestCase
+class CsrfTokenStorageTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_SESSION_ID          = 'test_sid';
     const TEST_CSRF_TOKEN_ID       = 'test_token_id';
     const TEST_CSRF_TOKEN_LIFETIME = 123;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenCache;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $sessionIdProvider;
 
     /** @var CsrfTokenStorage */
@@ -23,7 +23,7 @@ class CsrfTokenStorageTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tokenCache = $this->createMock(Cache::class);
+        $this->tokenCache = $this->createMock(CacheProvider::class);
         $this->sessionIdProvider = $this->createMock(SessionIdProviderInterface::class);
 
         $this->sessionIdProvider->expects(self::any())
@@ -106,5 +106,13 @@ class CsrfTokenStorageTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_CSRF_TOKEN_ID . self::TEST_SESSION_ID);
 
         $this->csrfTokenStorage->removeToken(self::TEST_CSRF_TOKEN_ID);
+    }
+
+    public function testClear()
+    {
+        $this->tokenCache->expects(self::once())
+            ->method('deleteAll');
+
+        $this->csrfTokenStorage->clear();
     }
 }

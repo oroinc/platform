@@ -7,15 +7,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\MultipleAssociationEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
+class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 {
     const ASSOCIATION_SCOPE = 'test_scope';
     const ATTR_NAME         = 'items';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $associationBuilder;
 
     public function setUp()
@@ -150,7 +150,7 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framew
     /**
      * @param string[] $methods
      *
-     * @return MultipleAssociationEntityConfigDumperExtension|\PHPUnit_Framework_MockObject_MockObject
+     * @return MultipleAssociationEntityConfigDumperExtension|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getExtensionMock(array $methods = [])
     {

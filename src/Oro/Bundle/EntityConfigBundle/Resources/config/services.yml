@@ -76,9 +76,9 @@ services:
 
     oro_entity_config.tools.command_executor:
         class: '%oro_entity_config.tools.command_executor.class%'
+        decorates: oro_platform.command_executor
         arguments:
-            - '%kernel.root_dir%/console'
-            - '%kernel.environment%'
+            - '@oro_entity_config.tools.command_executor.inner'
             - '@oro_cache.oro_data_cache_manager'
 
     oro_entity_config.config_loader:
@@ -96,13 +96,13 @@ services:
 
     oro_entity_config.config_cache_impl:
         public: false
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [setNamespace, [ 'oro_entity_config' ] ]
 
     oro_entity_config.model_cache_impl:
         public: false
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [setNamespace, [ 'oro_entity_config_model' ] ]
 
@@ -245,7 +245,7 @@ services:
             - '@oro_entity_extend.extend.field_name_validation_helper'
             - '@oro_entity_config.config.config_helper'
             - '@session'
-            - '@event_dispatcher'
+            - '@doctrine'
 
     oro_entity_config.config.config_helper:
         class: 'Oro\Bundle\EntityConfigBundle\Config\ConfigHelper'
@@ -281,7 +281,6 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeFamilyExtension
         arguments:
             - '@oro_entity_config.provider.attribute'
-            - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
@@ -372,6 +371,14 @@ services:
         tags:
             - { name: layout.data_provider, alias: attribute_config }
 
+    oro_entity_config.layout.data_provider.attribute_groups_tabs_options_provider:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\DataProvider\AttributeGroupsTabsOptionsProvider'
+        arguments:
+            - '@oro_entity_config.attribute_render_registry'
+            - '@oro_locale.helper.localization'
+        tags:
+            - { name: layout.data_provider, alias: attribute_groups_tabs_options_provider }
+
     oro_entity_config.layout.data_provider.attachment_config_provider:
         class: 'Oro\Bundle\EntityConfigBundle\Layout\DataProvider\ConfigProvider'
         arguments:
@@ -395,7 +402,6 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@logger'
-            - '@oro_entity.database_exception_helper'
             - '@oro_entity_config.provider.deleted_attribute'
         tags:
             - { name: oro_message_queue.client.message_processor, topicName: 'oro_entity_config.attribute_was_removed_from_family' }
@@ -411,12 +417,12 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
 
-    oro_entity_config.event_listener.attribute_after_remove_field:
-        class: Oro\Bundle\EntityConfigBundle\EventListener\AfterRemoveFieldListener
+    oro_entity_config.event_listener.remove_attribute_group_relation:
+        class: Oro\Bundle\EntityConfigBundle\EventListener\RemoveAttributeGroupRelationListener
         arguments:
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
         tags:
-            - { name: kernel.event_listener, event: oro.entity_config.field.after_remove, method: onAfterRemove }
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: onPostFlushConfig }
 
     oro_entity_config.event_listener.cache_state:
         class:  Oro\Bundle\EntityConfigBundle\EventListener\CacheStateChangeListener
@@ -458,7 +464,8 @@ services:
         class: 'Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender'
         lazy: true
         arguments:
-            - '@oro_wamp.publisher'
+            - '@oro_sync.websocket_client'
+            - '@oro_sync.client.connection_checker'
             - '@oro_security.token_accessor'
 
     oro_entity_config.provider.entity_field_state_checker:
@@ -467,3 +474,18 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
             - '@form.factory'
+
+    oro_entity_config.topic.attribute_import:
+        class: Oro\Bundle\SyncBundle\Topic\SecuredTopic
+        arguments:
+            - 'oro_entity_config.attribute_import'
+            - '@gos_web_socket.websocket.client_manipulator'
+        tags:
+            - { name: gos_web_socket.topic }
+
+    oro_entity_config.event_listener.invalidate_translation_cache:
+        class: Oro\Bundle\EntityConfigBundle\EventListener\InvalidateTranslationCacheListener
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro_translation.invalidate_translation_cache, method: onInvalidateTranslationCache }

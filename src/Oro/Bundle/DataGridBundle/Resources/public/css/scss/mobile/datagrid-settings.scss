@@ -1,0 +1,86 @@
+/* @theme: admin.oro; */
+
+.datagrid-settings {
+    a.action.btn.dropdown-toggle {
+        display: inline-block !important;
+        line-height: 30px;
+        margin-right: 0;
+    }
+
+    label {
+        line-height: 1;
+    }
+
+    .dropdown-menu {
+        right: 0;
+        top: 100%;
+        margin-top: 7px;
+        min-width: 300px;
+        padding: 18px 12px 12px;
+
+        .close {
+            right: 12px;
+        }
+    }
+
+    &-dialog {
+        .close {
+            display: none;
+        }
+
+        .ui-dialog-content {
+            padding-bottom: 17px;
+        }
+    }
+
+    &__wrapper {
+        width: 100%;
+        .datagrid-settings-right-flap {
+            display: none;
+        }
+
+        .table-header-wrapper th:nth-child(2) {
+            text-align: center;
+        }
+
+        td.title-cell {
+            white-space: normal;
+
+            label {
+                padding: 5px 0;
+            }
+        }
+
+        td.sort-cell {
+            width: 40px;
+            padding-left: 0;
+            padding-right: 0;
+
+            .btn {
+                height: 28px;
+                width: 28px;
+
+                [class^="fa-"],
+                [class*=" fa-"] {
+                    vertical-align: top;
+
+                    &:before {
+                        line-height: 22px;
+                        font-size: 15px;
+                    }
+                }
+            }
+        }
+
+        td.visibility-cell {
+            width: 40px;
+        }
+
+        .table-wrapper {
+            .thead-sizing {
+                display: table-header-group;
+                visibility: hidden;
+            }
+        }
+    }
+}

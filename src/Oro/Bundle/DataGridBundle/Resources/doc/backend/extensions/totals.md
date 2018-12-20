@@ -1,4 +1,4 @@
-Pager extension:
+Totals extension:
 =======
 
 Overview

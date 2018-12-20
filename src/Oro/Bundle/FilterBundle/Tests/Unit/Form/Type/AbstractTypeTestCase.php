@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormExtensionInterface;
+use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -19,17 +21,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
     /**
      * @var string
      */
-    protected $defaultLocale = null;
-
-    /**
-     * @var string
-     */
     protected $defaultTimezone = null;
-
-    /**
-     * @var string
-     */
-    private $oldLocale;
 
     /**
      * @var string
@@ -44,10 +36,6 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
     protected function setUp()
     {
         parent::setUp();
-        if ($this->defaultLocale) {
-            $this->oldLocale = \Locale::getDefault();
-            \Locale::setDefault($this->defaultLocale);
-        }
         if ($this->defaultTimezone) {
             $this->oldTimezone = date_default_timezone_get();
             date_default_timezone_set($this->defaultTimezone);
@@ -57,16 +45,13 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
     protected function tearDown()
     {
         parent::tearDown();
-        if ($this->defaultLocale) {
-            \Locale::setDefault($this->oldLocale);
-        }
         if ($this->defaultTimezone) {
             date_default_timezone_set($this->oldTimezone);
         }
     }
 
     /**
-     * @return TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createMockTranslator()
     {
@@ -80,7 +65,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
     }
 
     /**
-     * @return OptionsResolver|\PHPUnit_Framework_MockObject_MockObject
+     * @return OptionsResolver|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createMockOptionsResolver()
     {
@@ -161,7 +146,10 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        return $this->formExtensions;
+        return array_merge(
+            $this->formExtensions,
+            [new PreloadedExtension([], ['datetime' => [new DateTimeExtension()]])]
+        );
     }
 
     /**

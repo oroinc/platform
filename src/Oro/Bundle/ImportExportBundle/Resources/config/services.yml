@@ -4,6 +4,7 @@ parameters:
     oro_importexport.action.execute_job.class:                Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction
     oro_importexport.import.size_of_batch: 100
     oro_importexport.export.size_of_batch: 5000
+    oro_importexport.importexport_dir: import_export
 
 services:
     oro_importexport.template_fixture.entity_registry:

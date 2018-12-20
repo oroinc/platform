@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Event;
 use Oro\Bundle\SearchBundle\Event\BeforeSearchEvent;
 use Oro\Bundle\SearchBundle\Query\Query;
 
-class BeforeSearchEventTest extends \PHPUnit_Framework_TestCase
+class BeforeSearchEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

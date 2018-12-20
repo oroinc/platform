@@ -4,7 +4,7 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Model\Data;
 
 use Oro\Bundle\ChartBundle\Model\Data\ArrayData;
 
-class ArrayDataTest extends \PHPUnit_Framework_TestCase
+class ArrayDataTest extends \PHPUnit\Framework\TestCase
 {
     public function testToArray()
     {

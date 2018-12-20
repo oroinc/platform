@@ -4,6 +4,10 @@ namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 
+/**
+ * Converts a date range configuration of a dashboard widget
+ * to a representation that can be used to filter data by previous date interval.
+ */
 class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
 {
     /**
@@ -34,6 +38,10 @@ class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
                 && $currentDateRange['start']
                 && $currentDateRange['end']
             ) {
+                /** @var \DateTime $start */
+                $start = clone $currentDateRange['start'];
+                /** @var \DateTime $end */
+                $end = clone $currentDateRange['end'];
                 if (in_array(
                     $currentDateRange['type'],
                     [
@@ -43,11 +51,6 @@ class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
                     ],
                     true
                 )) {
-                    /** @var \DateTime $start */
-                    $start = clone $currentDateRange['start'];
-                    /** @var \DateTime $end */
-                    $end = clone $currentDateRange['end'];
-
                     if ($currentDateRange['type'] == AbstractDateFilterType::TYPE_THIS_MONTH) {
                         $start->modify('first day of previous month');
                         $end->modify('last day of previous month');
@@ -59,10 +62,10 @@ class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
                         $end->modify('last day of - 3 month');
                     }
                 } else {
-                    list($start, $end) = $this->dateHelper->getPreviousDateTimeInterval(
-                        $currentDateRange['start'],
-                        $currentDateRange['end']
-                    );
+                    // shift to previous range
+                    $interval = $start->diff($end);
+                    $start= $start->sub($interval);
+                    $end = $end->sub($interval);
                 }
 
                 $result['start'] = $start;

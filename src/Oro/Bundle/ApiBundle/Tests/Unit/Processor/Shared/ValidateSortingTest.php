@@ -7,18 +7,20 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
-use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\FilterNames;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\ValidateSorting;
 use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
-use Symfony\Component\HttpFoundation\Request;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 
 class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 {
@@ -31,7 +33,16 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->context->setAction('get_list');
 
-        $this->processor = new ValidateSorting($this->doctrineHelper, $this->configProvider);
+        $filterNames = $this->createMock(FilterNames::class);
+        $filterNames->expects(self::any())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
+        $this->processor = new ValidateSorting(
+            $this->doctrineHelper,
+            $this->configProvider,
+            new FilterNamesRegistry([[$filterNames, null]], new RequestExpressionMatcher())
+        );
     }
 
     public function testProcessWhenQueryIsAlreadyBuilt()
@@ -49,14 +60,9 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $sortersConfig = $this->getSortersConfig(['id']);
         $sortersConfig->getField('id')->setExcluded(true);
 
-        $sorterFilter = new SortFilter('integer');
-        $filters      = new FilterCollection();
-        $filters->add('sort', $sorterFilter);
-
         $this->prepareFilters();
 
         $this->context->setConfigOfSorters($sortersConfig);
-        $this->context->set('filters', $filters);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -73,15 +79,13 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $sortersConfig = $this->getSortersConfig(['id']);
         $sortersConfig->getField('id')->setExcluded(true);
 
-        $sorterFilter = new SortFilter('integer');
-        $filters      = new FilterCollection();
-        $filters->add('sort', $sorterFilter);
-
         $this->prepareFilters();
-        $this->context->getFilterValues()->get('sort')->setSourceKey('sortFilterSourceKey');
+        $sortFilterValue = $this->context->getFilterValues()->get('sort');
+        $sortFilterValue->setSource(
+            FilterValue::createFromSource('sortFilterSourceKey', $sortFilterValue->getPath(), '')
+        );
 
         $this->context->setConfigOfSorters($sortersConfig);
-        $this->context->set('filters', $filters);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -284,6 +288,41 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
+    public function testProcessWhenSortByAllowedAssociationFieldRequestedForModelInheritedFromManageableEntity()
+    {
+        $this->notManageableClassNames = [UserProfile::class];
+
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['category']);
+        $categoryConfig = $this->getConfig(['name'], ['name']);
+
+        $this->prepareFilters('category.name');
+
+        $this->context->setClassName(UserProfile::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $primaryEntityConfig->setParentResourceClass(User::class);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                Category::class,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [
+                    new EntityDefinitionConfigExtra($this->context->getAction()),
+                    new SortersConfigExtra()
+                ]
+            )
+            ->willReturn($categoryConfig);
+
+        $this->processor->process($this->context);
+
+        self::assertEmpty($this->context->getErrors());
+        self::assertEquals(
+            ['category.name' => 'ASC'],
+            $this->context->getFilterValues()->get('sort')->getValue()
+        );
+    }
+
     public function testProcessWhenSortByNotAllowedAssociationFieldRequested()
     {
         $primaryEntityConfig = $this->getEntityDefinitionConfig(['category']);
@@ -394,15 +433,8 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
      */
     private function prepareFilters($sortBy = '-id')
     {
-        $sorterFilter = new SortFilter(DataType::ORDER_BY);
-        $filters      = new FilterCollection();
-        $filters->add('sort', $sorterFilter);
-
-        $request = $this->createMock(Request::class);
-        $request->expects(self::once())
-            ->method('getQueryString')
-            ->willReturn('sort=' . $sortBy);
-        $filterValues = new RestFilterValueAccessor($request);
+        $filterValues = new TestFilterValueAccessor();
+        $filterValues->set('sort', new FilterValue('sort', $sortBy));
 
         // emulate sort normalizer
         $orderBy = [];
@@ -417,8 +449,8 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         }
         $filterValues->get('sort')->setValue($orderBy);
 
-        $this->context->set('filters', $filters);
         $this->context->setFilterValues($filterValues);
+        $this->context->getFilters()->add('sort', new SortFilter(DataType::ORDER_BY));
     }
 
     /**

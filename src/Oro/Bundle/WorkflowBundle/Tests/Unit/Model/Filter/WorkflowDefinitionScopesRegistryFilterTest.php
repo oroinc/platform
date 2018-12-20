@@ -11,12 +11,12 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionScopesRegistryFilter;
 
-class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ScopeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $scopeManager;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
     /** @var WorkflowDefinitionScopesRegistryFilter */
@@ -61,7 +61,7 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit_Framework_Test
     }
 
     /**
-     * @return WorkflowDefinitionRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @return WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private function repositoryMocked()
     {

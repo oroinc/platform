@@ -15,7 +15,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * The helper class to complete the configuraton of different kind of ORM associations.
+ * The helper class to complete the configuration of different kind of ORM associations.
  */
 class CompleteAssociationHelper
 {
@@ -72,6 +72,7 @@ class CompleteAssociationHelper
                 $targetEntity = $field->createAndSetTargetEntity();
             }
 
+            $targetEntity->setParentResourceClass($targetDefinition->getParentResourceClass());
             $targetEntity->setIdentifierFieldNames($targetDefinition->getIdentifierFieldNames());
 
             if (!$isExcludeAll) {

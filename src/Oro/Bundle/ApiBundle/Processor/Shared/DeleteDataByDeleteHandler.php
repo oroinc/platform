@@ -11,7 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * A base class for processors that deletes entities by DeleteHandler.
+ * The base class for processors that deletes entities by DeleteHandler.
  */
 abstract class DeleteDataByDeleteHandler implements ProcessorInterface
 {
@@ -43,12 +43,17 @@ abstract class DeleteDataByDeleteHandler implements ProcessorInterface
             return;
         }
 
-        $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+        $config = $context->getConfig();
+        $entityClass = $this->doctrineHelper->getManageableEntityClass($context->getClassName(), $config);
+        if (!$entityClass) {
+            // only manageable entities or resources based on manageable entities are supported
             return;
         }
 
-        $deleteHandlerServiceId = $context->getConfig()->getDeleteHandler();
+        $deleteHandlerServiceId = null;
+        if (null !== $config) {
+            $deleteHandlerServiceId = $config->getDeleteHandler();
+        }
         if (!$deleteHandlerServiceId) {
             $deleteHandlerServiceId = $this->getDefaultDeleteHandler();
         }
@@ -73,7 +78,7 @@ abstract class DeleteDataByDeleteHandler implements ProcessorInterface
     }
 
     /**
-     * Deletes entity(es) stored in the given result property of the Context using the delete handler
+     * Deletes entity(es) stored in the given result property of the context using the delete handler
      *
      * @param mixed                  $data
      * @param DeleteHandler          $handler

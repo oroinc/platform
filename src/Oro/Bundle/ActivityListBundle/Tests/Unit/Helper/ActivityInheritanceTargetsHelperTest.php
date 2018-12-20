@@ -8,15 +8,15 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
-class ActivityInheritanceTargetsHelperTest extends \PHPUnit_Framework_TestCase
+class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActivityInheritanceTargetsHelper */
     protected $activityInheritanceTargetsHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Registry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Registry */
     protected $registry;
 
     public function setUp()

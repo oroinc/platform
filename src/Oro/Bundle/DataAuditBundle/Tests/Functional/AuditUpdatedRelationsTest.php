@@ -27,8 +27,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
             'collections_updated' => [
                 [
                     'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => 123,
-                    'change_set' => [],
+                    'entity_id' => 123
                 ]
             ],
         ]);

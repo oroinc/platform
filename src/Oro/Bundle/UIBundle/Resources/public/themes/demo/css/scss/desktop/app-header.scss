@@ -1,0 +1,36 @@
+/* @theme: admin.demo; */
+
+.app-header {
+    color: $app-header-text-color;
+    background-color: $app-header-bg-color;
+
+    .logo {
+        color: $app-header-logo-text-color;
+    }
+
+    &__search-and-shortcuts {
+        .dropdown-toggle {
+            &:hover,
+            &:active {
+                color: $app-header-text-hover-color;
+            }
+        }
+    }
+
+    .user-menu {
+        > li {
+            > .dropdown-toggle,
+            > .help {
+                &:hover {
+                    color: $app-header-text-hover-color;
+                }
+            }
+        }
+    }
+
+    .user-menu-dropdown {
+        &:before {
+            border-#{$start}-color: $app-header-divider-color;
+        }
+    }
+}

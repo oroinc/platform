@@ -52,7 +52,7 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
                 )
             );
 
-        /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $registry */
+        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry */
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->method('getManagerForClass')->willReturn($em);
 
@@ -151,10 +151,5 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
                 'expected' => ['1' => 'test', 'not_int' => 'test'],
             ],
         ];
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(ScopedDataType::NAME, $this->formType->getName());
     }
 }

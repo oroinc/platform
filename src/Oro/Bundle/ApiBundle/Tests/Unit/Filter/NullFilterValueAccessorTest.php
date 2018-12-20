@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
+use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
 
-class NullFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
+class NullFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var NullFilterValueAccessor */
-    protected $nullFilterValueAccessor;
+    private $nullFilterValueAccessor;
 
     /**
      * {@inheritdoc}
@@ -19,14 +20,25 @@ class NullFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testActions()
     {
-        $this->assertInstanceOf(
-            'Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface',
-            $this->nullFilterValueAccessor
-        );
+        self::assertInstanceOf(FilterValueAccessorInterface::class, $this->nullFilterValueAccessor);
 
-        $this->assertNull($this->nullFilterValueAccessor->get('key'));
-        $this->assertFalse($this->nullFilterValueAccessor->has('key'));
-        $this->assertEmpty($this->nullFilterValueAccessor->getAll());
-        $this->assertEmpty($this->nullFilterValueAccessor->getGroup('group'));
+        self::assertNull($this->nullFilterValueAccessor->get('key'));
+        self::assertFalse($this->nullFilterValueAccessor->has('key'));
+        self::assertFalse($this->nullFilterValueAccessor->has('key'));
+        self::assertEmpty($this->nullFilterValueAccessor->getAll());
+        self::assertEmpty($this->nullFilterValueAccessor->getGroup('group'));
+    }
+
+    public function testDefaultGroupName()
+    {
+        self::assertNull($this->nullFilterValueAccessor->getDefaultGroupName());
+
+        $this->nullFilterValueAccessor->setDefaultGroupName('filter');
+        self::assertNull($this->nullFilterValueAccessor->getDefaultGroupName());
+    }
+
+    public function testGetQueryString()
+    {
+        self::assertSame('', $this->nullFilterValueAccessor->getQueryString());
     }
 }

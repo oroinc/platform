@@ -10,7 +10,9 @@ use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
+use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectAutocomplete;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
@@ -21,6 +23,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Form\Type\UserAclSelectType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -35,7 +38,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class OwnerFormExtension
+ * Dependently on entity metadata adds user or business unit owned field to a form and a set of events to handle them
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OwnerFormExtension extends AbstractTypeExtension
@@ -346,7 +350,7 @@ class OwnerFormExtension extends AbstractTypeExtension
 
             $builder->add(
                 $this->fieldName,
-                'oro_user_acl_select',
+                UserAclSelectType::class,
                 $options
             );
         }
@@ -401,7 +405,7 @@ class OwnerFormExtension extends AbstractTypeExtension
             if ($this->authorizationChecker->isGranted('VIEW', 'entity:' . BusinessUnit::class)) {
                 $builder->add(
                     $this->fieldName,
-                    'oro_type_business_unit_select_autocomplete',
+                    BusinessUnitSelectAutocomplete::class,
                     [
                         'required' => false,
                         'label' => $this->fieldLabel,
@@ -438,9 +442,15 @@ class OwnerFormExtension extends AbstractTypeExtension
                     EntityType::class,
                     array_merge(
                         [
-                            'class'                => 'OroOrganizationBundle:BusinessUnit',
-                            'property'             => 'name',
-                            'choices'              => $businessUnits,
+                            'class'                => BusinessUnit::class,
+                            'choice_label'         => 'name',
+                            'query_builder'        => function (BusinessUnitRepository $repository) use ($user) {
+                                $qb = $repository->createQueryBuilder('bu');
+                                $qb->andWhere($qb->expr()->isMemberOf(':user', 'bu.users'));
+                                $qb->setParameter('user', $user);
+
+                                return $qb;
+                            },
                             'mapped'               => true,
                             'label'                => $this->fieldLabel,
                             'translatable_options' => false

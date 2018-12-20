@@ -1,0 +1,21 @@
+/* @theme: default; */
+
+$datepicker-box-position: relative !default;
+
+$datepicker-box-icon-position: absolute !default;
+$datepicker-box-icon-left: 12px !default;
+$datepicker-box-icon-top: 9px !default;
+$datepicker-box-icon-z-index: z('base') !default;
+
+$datepicker-box-icon-font-size: $base-font-size--m !default;
+$datepicker-box-icon-line-height: 1 !default;
+$datepicker-box-icon-color: get-color('additional', 'middle') !default;
+
+$datepicker-box-icon-pointer-events: none !default;
+$datepicker-input-display: block !default;
+$datepicker-input-max-width: 140px !default;
+$datepicker-input-padding-left: 39px !default;
+
+$datepicker-input-form-mode-icon-top: 35px !default;
+$datepicker-box-form-mode-datepicker-input-max-width: none !default;
+$datepicker-box-form-mode-datepicker-input-width: 100% !default;

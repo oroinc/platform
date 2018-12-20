@@ -82,7 +82,6 @@ services:
 
     oro_datagrid.extension.mass_action.type.massedit:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\MassEdit\MassEditAction
-        parrent: oro_datagrid.extension.mass_action.type.window
         shared: false
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: massedit }

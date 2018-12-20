@@ -1,139 +1,83 @@
 parameters:
-    # the time in milliseconds determines how often a ping service being called
-    # set 0 or false to disable pinging
-    oro_wamp.ping.interval: 60000 # 1 minute
-    # the time in milliseconds determines how often a ping service being called
-    # set 0 or false to disable pinging
-    oro_wamp.client_ping.interval: 45000 # 45 seconds
-
-    oro_wamp.listener.maintenance.class:  Oro\Bundle\SyncBundle\EventListener\MaintenanceListener
+    # the time in seconds determines how often a database ping service being called
+    oro_sync.db_ping.interval: 20
+    # the time in seconds determines how often a websocket ping service being called
+    oro_sync.websocket_ping.interval: 50
 
 services:
-    oro_wamp.publisher:
-        class: Oro\Bundle\SyncBundle\Wamp\TopicPublisher
+    oro_sync.periodic.db_ping:
+        class: Oro\Bundle\SyncBundle\Periodic\DbPingPeriodic
         arguments:
-            - "%websocket_backend_host%"
-            - "%websocket_backend_port%"
-            - "%websocket_backend_path%"
+            - '@doctrine'
+            - '%oro_sync.db_ping.interval%'
         calls:
-            - ['setLogger', ['@logger']]
-            - ['setTicketProvider', ['@oro_sync.authentication.ticket_provider']]
+            - [ setLogger, [ '@logger' ] ]
         tags:
-            - { name: monolog.logger, channel: oro_wamp }
+            - { name: gos_web_socket.periodic }
+            - { name: monolog.logger, channel: oro_websocket }
 
-    # this service is used as a workaround for "2006 MySQL server has gone away" error
-    # do not rename it because "oro_wamp.ping.{session_handler_type}" naming convention
-    # is used by ClankSessionHandlerConfigurationPass to add it to a list of periodic services
-    # in case if PdoSessionHandler is configured as a session storage handler
-    oro_wamp.ping.pdo:
-        class: Oro\Bundle\SyncBundle\Wamp\DbPing
+    oro_sync.topic.websocket_ping:
+        class: Oro\Bundle\SyncBundle\Topic\WebsocketPingTopic
         arguments:
-            - "@?doctrine.dbal.session_connection.wrapped"
+            - 'oro_sync.ping'
+            - '%oro_sync.websocket_ping.interval%'
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: gos_web_socket.topic }
+            - { name: monolog.logger, channel: oro_websocket }
 
-    # this service is used to broadcast messages to clients to prevent connection loose
-    # by default, the connection could be closed if no data were transmitted between client and server
-    # for more details see http://nginx.org/en/docs/http/websocket.html
-    oro_wamp.client.ping:
-        class: Oro\Bundle\SyncBundle\Wamp\ClientPing
-        arguments:
-            - '@oro_sync.authentication.topic_handler'
-            - '@logger'
-
-    oro_wamp.twig.sync_extension:
+    oro_sync.twig.sync_extension:
         class: Oro\Bundle\SyncBundle\Twig\OroSyncExtension
         public: false
         arguments:
-            - "@service_container"
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
-    kernel.listener.maintenance.event:
-        class: '%oro_wamp.listener.maintenance.class%'
+    oro_sync.client.connection_checker:
+        class: Oro\Bundle\SyncBundle\Client\ConnectionChecker
         arguments:
-            - "@oro_wamp.publisher"
-            - "@oro_security.token_accessor"
-            - "@logger"
+            - '@oro_sync.websocket_client.basic'
+
+    oro_sync.event_listener.maintenance:
+        class: Oro\Bundle\SyncBundle\EventListener\MaintenanceListener
+        arguments:
+            - '@oro_sync.websocket_client'
+            - '@oro_sync.client.connection_checker'
+            - '@oro_security.token_accessor'
         tags:
             - { name: kernel.event_listener, event: maintenance.on, method: onModeOn }
             - { name: kernel.event_listener, event: maintenance.off, method: onModeOff }
 
-    oro_sync.content.listener.datagrid_tag:
-        class: Oro\Bundle\SyncBundle\Content\DataGridTagListener
+    oro_sync.topic.maintenance:
+        class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic
         arguments:
-            - '@oro_sync.content.tag_generator_chain'
+            - 'oro_sync.maintenance'
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: buildAfter }
+            - { name: gos_web_socket.topic }
 
-    oro_sync.event_listener.doctrine_tag:
-        class: Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener
-        arguments:
-            - '@oro_sync.content.topic_sender'
-            - '%installed%'
-        tags:
-            - { name: doctrine.event_listener, event: onFlush, connection: default }
-            - { name: doctrine.event_listener, event: postFlush, connection: default }
+    oro_sync.authentication.origin.origin_provider_chain:
+        class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginProviderChain
+        public: false
 
-    oro_sync.content.tag_generator_chain:
-        class: Oro\Bundle\SyncBundle\Content\TagGeneratorChain
-        arguments:
-            - []
-
-    oro_sync.content.tag_generator.doctrine:
-        class: Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator
-        arguments:
-            - '@doctrine'
-        tags:
-            - { name: oro_sync.tag_generator }
-
-    oro_sync.content.tag_generator.simple:
-        class: Oro\Bundle\SyncBundle\Content\SimpleTagGenerator
-        tags:
-            - { name: oro_sync.tag_generator }
-
-    oro_sync.content.tag_generator_chain.link:
-        tags:
-            - { name: oro_service_link, service: oro_sync.content.tag_generator_chain }
-
-    oro_sync.content.topic_sender:
-        class: Oro\Bundle\SyncBundle\Content\TopicSender
-        arguments:
-            - '@oro_wamp.publisher'
-            - '@oro_sync.content.tag_generator_chain.link'
-            - '@security.token_storage'
-            - '@logger'
-
-    oro_sync.authentication.ticket_provider:
-        class: Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider
-        arguments:
-            - '@security.token_storage'
-            - '@oro_sync.authentication.ticket_storage_cache'
-            - '@oro_user.security.provider'
-            - '@logger'
-            - '%secret%'
-
-    oro_sync.authentication.topic_handler:
-        class: Oro\Bundle\SyncBundle\Authentication\AuthenticationTopicHandler
-        decorates: jdare_clank.clank_handler_topic
-        arguments:
-            - '@oro_sync.authentication.topic_handler.inner'
-            - '@logger'
-
-    oro_sync.authentication.listener:
-        class: Oro\Bundle\SyncBundle\EventListener\AuthenticateEventListener
-        arguments:
-            - '@oro_sync.authentication.ticket_provider'
-            - '@logger'
-        tags:
-            - { name: kernel.event_listener, event: clank.client.connected, method: onClientConnect }
-
-    oro_sync.authentication.ticket_storage_cache:
-        class: Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestStorage\CacheTicketDigestStorage
+    oro_sync.authentication.origin.application_origin_provider:
+        class: Oro\Bundle\SyncBundle\Authentication\Origin\ApplicationOriginProvider
         public: false
         arguments:
-            - '@oro_sync.authentication.ticket_storage_cache.impl'
+            - '@oro_config.global'
+            - '@oro_sync.authentication.origin.extractor'
+        tags:
+            - { name: oro_sync.origin_provider }
 
-    oro_sync.authentication.ticket_storage_cache.impl:
+    oro_sync.authentication.origin.origin_registry_decorator:
+        decorates: gos_web_socket.origins.registry
+        class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginRegistryDecorator
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_sync_auth_tickets' ]]
+        arguments:
+            - '@oro_sync.authentication.origin.origin_registry_decorator.inner'
+            - '@oro_sync.authentication.origin.origin_provider_chain'
+
+    oro_sync.authentication.origin.extractor:
+        class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginExtractor
+        public: false

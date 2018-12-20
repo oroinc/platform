@@ -1,0 +1,364 @@
+/* @theme: admin.oro; */
+
+.workflow-definition-buttons {
+    @include clearfix();
+
+    margin-top: -13px;
+    margin-bottom: 8px;
+
+    button {
+        margin-bottom: 7px;
+    }
+}
+
+a.disabled.workflow-transition-buttons {
+    pointer-events: auto;
+}
+
+.workflow-steps-placeholder {
+    display: block;
+    overflow: hidden;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.workflow-history-container {
+    margin-#{$end}: 10px;
+}
+
+table.grid {
+    .grid-workflow-step-column {
+        .grid-workflow-step-column-row {
+            float: $start;
+            min-height: 1px;
+            position: relative;
+            margin-#{$end}: 4px;
+        }
+    }
+}
+
+.ui-dialog {
+    .alert {
+        &.workflow-deactivation-message {
+            background-image: none;
+            padding: 12px;
+        }
+
+        ul {
+            margin: 0 0 $content-padding-small $content-padding;
+        }
+
+        p:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.workflow-collapse {
+    width: $icon-font-size;
+    padding-top: $content-padding-medium / 2;
+    line-height: $workflow-widget-row-height;
+
+    float: $start;
+
+    button {
+        padding: 0 1px;
+    }
+}
+
+.workflow-entity {
+    display: flex;
+    padding: $content-padding-medium / 2 0;
+
+    .workflow-label {
+        padding: 0 6px;
+        flex-grow: 0;
+        line-height: $workflow-widget-row-height
+    }
+
+    &.only-workflow .workflow-label {
+        padding-#{$start}: 0;
+    }
+
+    .collapse &,
+    .collapsing & {
+        margin-#{$start}: $icon-font-size;
+        border-top: 1px solid $primary-860;
+    }
+
+    .transitions-btn-group {
+        display: inline-flex;
+        vertical-align: middle;
+        > .btn {
+            margin-#{$start}: 8px;
+        }
+    }
+
+}
+
+.workflow-label-text {
+    white-space: nowrap;
+    font-size: $base-font-size--sm;
+    max-width: $workflow-widget-label-max-width;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.workflow-widget-content {
+    padding-#{$end}: $content-padding;
+}
+
+.workflow-content {
+    width: 100%;
+}
+
+.workflow-steps {
+    padding: side-values(0 10px 0 0);
+    vertical-align: middle;
+
+    &:last-child {
+        padding: side-values(0 0 0 10px);
+    }
+}
+
+.workflow-steps-list {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: $base-font-size--s;
+}
+
+.workflow-steps-item {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.workflow-ordered-steps {
+    position: relative;
+    z-index: 4;
+    box-sizing: border-box;
+    padding: 0 $workflow-widget-arrow-skew;
+
+    .workflow-step-name {
+        color: $workflow-step-color;
+        background: $workflow-step-background-color;
+    }
+
+    &:before {
+        position: absolute;
+        #{$start}: 0;
+        z-index: 1;
+        content: '';
+        display: block;
+        height: 0;
+        width: 0;
+        border-#{$start}: $workflow-widget-arrow-skew solid transparent;
+        border-top: $workflow-widget-row-height / 2 solid $workflow-step-background-color;
+        border-bottom: $workflow-widget-row-height / 2 solid $workflow-step-background-color;
+        line-height: 0;
+    }
+
+    &:after {
+        position: absolute;
+        top: 0;
+        #{$end}: 0;
+        z-index: 1;
+        content: '';
+        display: block;
+        height: 0;
+        width: 0;
+        border-#{$start}: $workflow-widget-arrow-skew solid $workflow-step-background-color;
+        border-top: $workflow-widget-row-height / 2 solid transparent;
+        border-bottom: $workflow-widget-row-height / 2 solid transparent;
+        line-height: 0;
+    }
+
+    &.active {
+        z-index: 3;
+
+        &.workflow-step-final {
+            .workflow-step-name {
+                color: $workflow-final-step-color;
+                background: $workflow-final-step-background-color;
+            }
+
+            &:before {
+                border-top-color: $workflow-final-step-background-color;
+                border-bottom-color: $workflow-final-step-background-color;
+            }
+
+            &:after {
+                border-#{$start}-color: $workflow-final-step-background-color;
+            }
+
+            &:last-child {
+                .workflow-step-name {
+                    color: $workflow-final-step-color;
+                    background: $workflow-final-step-background-color;
+                }
+
+                &:before {
+                    border-top-color: $workflow-final-step-background-color;
+                    border-bottom-color: $workflow-final-step-background-color;
+                }
+
+                &:after {
+                    border-#{$start}-color: $workflow-final-step-background-color;
+                }
+            }
+        }
+
+        &:last-child {
+            .workflow-step-name {
+                color: $workflow-step-color;
+                background: $workflow-step-background-color;
+            }
+
+            &:before {
+                border-top-color: $workflow-step-background-color;
+                border-bottom-color: $workflow-step-background-color;
+            }
+
+            &:after {
+                border-#{$start}-color: $workflow-step-background-color;
+            }
+        }
+
+        .workflow-step-name {
+            color: $workflow-ordered-step-color;
+            background: $workflow-ordered-step-background-color;
+        }
+
+        &:before {
+            border-top-color: $workflow-ordered-step-background-color;
+            border-bottom-color: $workflow-ordered-step-background-color;
+        }
+
+        &:after {
+            border-#{$start}-color: $workflow-ordered-step-background-color;
+        }
+
+        ~ .workflow-ordered-steps {
+            z-index: 2;
+
+            .workflow-step-name {
+                color: $workflow-not-started-steps-color;
+                background: $primary-860;
+            }
+
+            &:before {
+                border-top-color: $primary-860;
+                border-bottom-color: $primary-860;
+            }
+
+            &:after {
+                border-#{$start}-color: $primary-860;
+            }
+
+            + .workflow-ordered-steps {
+                z-index: 1;
+            }
+        }
+    }
+
+    .workflow-not-started & {
+        .workflow-step-name {
+            color: $workflow-not-started-steps-color;
+            background: $workflow-not-started-steps-background-color;
+        }
+
+        &:before {
+            border-top-color: $workflow-not-started-steps-background-color;
+            border-bottom-color: $workflow-not-started-steps-background-color;
+        }
+
+        &:after {
+            border-#{$start}-color: $workflow-not-started-steps-background-color;
+        }
+    }
+}
+
+.workflow-step-name {
+    display: block;
+    padding: side-values(0 10px 0 20px);
+    max-width: 100%;
+    line-height: $workflow-widget-row-height;
+    text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: $base-font-size--sm;
+}
+
+.workflow-unordered-step-name {
+    display: inline-block;
+    padding: 0 10px;
+    border-radius: 10px;
+    line-height: $btn-line-height-sm;
+    color: $workflow-step-color;
+    background: $workflow-step-background-color;
+    text-align: center;
+    white-space: nowrap;
+
+    &.workflow-step-final-name {
+        color: $workflow-final-step-color;
+        background: $workflow-final-step-background-color;
+    }
+}
+
+.workflow-controls {
+    width: 2%;
+    padding: side-values(0 0 0 10px);
+    text-align: $end;
+    .workflow-transition-buttons {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 280px;
+    }
+}
+
+.workflow-translatable-field {
+    padding-#{$start}: 5px;
+    padding-#{$end}: 5px;
+
+    a {
+        color: $workflow-translatable-field-color;
+
+        &:hover {
+            color: $workflow-translatable-field-color;
+        }
+
+        span.large-icon {
+            display: inline;
+            font-size: $workflow-translatable-field-large-icon-font-size;
+            margin-top: 5px;
+            vertical-align: top;
+        }
+    }
+}
+
+.workflow-definition-steps-list-container {
+    table {
+        td,
+        tr {
+            word-break: break-all;
+        }
+    }
+}
+
+.transition-example-container .transition-btn-example .btn {
+    max-width: 294px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.transition-attributes-form-container {
+    @include clearfix();
+
+    .select2-container {
+        max-width: 100%;
+    }
+}

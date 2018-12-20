@@ -1,0 +1,51 @@
+/* @theme: admin.oro; */
+
+$email-header-offset: side-values(8px 0 0 0) !default;
+
+$email-dropdown-bg: $primary-inverse !default;
+
+$email-default-text-color: $primary-200 !default;
+
+$email-highlight-bg: $extra-300 !default;
+$email-highlight-icon-color: $extra !default;
+
+$email-item-counter-bg: $extra !default;
+$email-item-counter-text-color: $primary-inverse !default;
+
+$email-active-mail-icon: $fa-var-envelope !default;
+$email-inactive-mail-icon: $fa-var-envelope-o !default;
+
+$email-recent-emails-popup-width: 252px !default;
+
+$email-sent-date-offset: 12px !default;
+
+$email-info-short-first-offset: 8px !default;
+$email-info-opened-first-offset: 22px !default;
+
+$email-info-in-offset: 22px !default;
+$email-info-in-border-color: $primary-860 !default;
+
+$email-actions-color: $primary-550 !default;
+$email-actions-offset: 12px !default;
+
+$email-comment-count-icon: $fa-var-comment !default;
+$email-comment-count-offset: $content-padding-small !default;
+
+$email-attachmen-offset: $content-padding-small !default;
+$email-attachment-icon: $fa-var-paperclip !default;
+
+$email-recipients-color: $primary-550 !default;
+
+$email-view-toggle-offset: 6px 0 !default;
+
+$email-short-padding: 8px 16px !default;
+$email-short-background-color: $primary-900 !default;
+$email-short-border: 1px solid $primary-830 !default;
+$email-short-color: $primary-550 !default;
+
+$email-short-sent-date-margin: 8px !default;
+
+$email-short-author-color: $primary-300 !default;
+$email-short-author-font-weight: bold !default;
+
+$email-short-comment-date-font-size: $base-font-size--s !default;

@@ -1,0 +1,11 @@
+<% if (iconClass) { %>
+    <i class="sidebar-widget-icon <%= iconClass %><% if (typeof itemsCounter !== 'undefined' && itemsCounter > 0) { %> has-icon-counter<% } %>"
+       title="<%= title %>">
+        <% if (typeof itemsCounter !== 'undefined' && itemsCounter > 0) { %>
+            <span class="item-counter"><%= (itemsCounter > 99 ? '99+' : itemsCounter) %></span>
+        <% } %>
+        <span class="loading-icon"></span>
+    </i>
+<% } else { %>
+    <img class="sidebar-widget-icon" src="<%= icon %>" alt="<%= title %>" title="<%= title %>"/>
+<% } %>

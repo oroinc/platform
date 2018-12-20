@@ -1,0 +1,6 @@
+services:
+    Oro\Bundle\ReminderBundle\Command\SendRemindersCommand:
+        public: false
+        class: Oro\Bundle\ReminderBundle\Command\SendRemindersCommand
+        tags:
+            - { name: console.command }

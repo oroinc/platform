@@ -7,7 +7,7 @@ use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\ContextEmailRecipientsProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class ContextEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
+class ContextEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
 {
     private $relatedEmailsProvider;
 

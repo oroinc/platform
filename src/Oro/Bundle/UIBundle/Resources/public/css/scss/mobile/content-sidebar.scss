@@ -1,0 +1,31 @@
+/* @theme: admin.oro; */
+
+.content-with-sidebar {
+    &--container {
+        @include safe-area-offset(padding, 0);
+
+        .scrollspy.container-fluid {
+            margin-top: 0;
+        }
+    }
+
+    &--sidebar {
+        max-width: $content-sidebar-mobile-max-width;
+        min-height: $content-sidebar-mobile-min-height;
+        margin: $content-sidebar-mobile-margin;
+
+        overflow: visible;
+
+        &.content-sidebar-maximized {
+            width: 100%;
+        }
+    }
+
+    &--controls {
+        float: none;
+    }
+
+    &--control {
+        width: auto;
+    }
+}

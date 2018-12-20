@@ -1,0 +1,50 @@
+/* @theme: admin.oro; */
+
+$app-header-height:                             48px !default;
+$app-header-max-width:                          100% !default;
+$app-header-bg-color:                           $primary !default;
+$app-header-logo-text-color:                    $primary-inverse !default;
+$app-header-text-color:                         $primary-800 !default;
+$app-header-icon-font-size:                     24px !default;
+$app-header-input-width:                        275px !default;
+
+$app-header-dropdown-menu-color:                $primary-200 !default;
+$app-header-dropdown-close-icon:                $fa-var-times !default;
+$app-header-dropdown-close-icon-color:          $primary-700 !default;
+$app-header-dropdown-close-icon-font-size:      18px !default;
+$app-header-dropdown-close-icon-margin:         11px 12px !default;
+
+$mobile-app-header-z-index:                     992 !default; // to prevent visibility mCSB scroll through header popup
+$mobile-app-header-title-font-size:             20px !default;
+$mobile-app-header-title-margin-bottom:         12px !default;
+$mobile-app-header-dropdown-menu-max-width:     320px !default;
+$mobile-app-header-dropdown-menu-padding:       $content-padding !default;
+$mobile-app-header-dropdown-item-margin:        5px 0 !default;
+$mobile-app-header-dropdown-item-font-size:     16px !default;
+$mobile-app-header-dropdown-item-padding:       7px 0 !default;
+$mobile-app-header-dropdown-link-font-size:     16px !default;
+$mobile-app-header-dropdown-divider-margin:     16px !default;
+$mobile-app-header-dropdown-link-v-padding:     7px !default;
+$mobile-app-header-search-form-row-margin-bottom: 15px !default;
+$mobile-app-header-search-dropdown-menu-max-height: 185px !default;
+$mobile-app-header-user-menu-toggler-padding-end: 13px !default;
+$mobile-app-header-organization-logo-wrapper-margin-start: $app-header-height !default;
+$mobile-app-header-organization-logo-wrapper-margin-end: 138px !default;
+$mobile-app-header-organization-logo-font-size: 17px !default;
+$mobile-app-header-main-menu-toggler-h-padding: 13px !default;
+$mobile-app-header-button-padding:              0 10px !default;
+$mobile-app-header-header-margin-end:           30px !default;
+$mobile-app-header-header-margin-bottom:        2px !default;
+$mobile-app-header-header-font-size:            20px !default;
+$mobile-app-header-suggestion-item-description-font-size: 16px !default;
+$mobile-app-header-suggestion-item-font-size:   12px !default;
+$mobile-app-header-user-menu-divider-border-bottom: 1px solid $primary-860 !default;
+
+$tablet-app-header-shortcuts-arrow-end:         53px !default;
+$tablet-app-header-search-arrow-end:            16px !default;
+$tablet-app-header-user-menu-arrow-end:         14px !default;
+$tablet-app-header-user-menu-offset:            8px !default;
+
+$phone-app-header-shortcuts-arrow-end:          104px !default;
+$phone-app-header-search-arrow-end:             64px !default;
+$phone-app-header-user-menu-arrow-end:          19px !default;

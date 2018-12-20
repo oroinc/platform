@@ -28,44 +28,44 @@ use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
+class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     /** @var EmailActivityListProvider */
     protected $emailActivityListProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineRegistryLink;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityNameResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $router;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $mailboxProcessStorageLink;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $activityAssociationHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $commentAssociationHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $featureChecker;
 
     protected function setUp()
@@ -220,7 +220,7 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetData(EntityMetadata $metadata = null, $expected)
     {
-        /** @var ActivityList|\PHPUnit_Framework_MockObject_MockObject $activityList */
+        /** @var ActivityList|\PHPUnit\Framework\MockObject\MockObject $activityList */
         $activityList = $this->createMock(ActivityList::class);
         $activityList->expects($this->once())
             ->method('getRelatedActivityId')

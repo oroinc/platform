@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsCollectionType;
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType;
 use Oro\Bundle\ChartBundle\Form\Type\ChartType;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
@@ -18,12 +17,12 @@ class ChartTypeTest extends FormIntegrationTestCase
     protected $type;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $formBuilder;
 
@@ -112,15 +111,13 @@ class ChartTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $childType      = new ChartSettingsType($this->configProvider);
-        $collectionType = new ChartSettingsCollectionType();
+        $childType = new ChartSettingsType($this->configProvider);
 
         return [
             new PreloadedExtension(
                 [
-                    ChartType::class => $this->type,
-                    $childType->getName()      => $childType,
-                    $collectionType->getName() => $collectionType,
+                    $this->type,
+                    ChartSettingsType::class => $childType
                 ],
                 []
             )

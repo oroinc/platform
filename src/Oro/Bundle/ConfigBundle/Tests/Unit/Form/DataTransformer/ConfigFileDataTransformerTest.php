@@ -11,7 +11,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpFoundation\File\File as HttpFile;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ConfigFileDataTransformerTest extends \PHPUnit_Framework_TestCase
+class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
 {
     const FILE_ID = 1;
     const FILENAME = 'filename.jpg';

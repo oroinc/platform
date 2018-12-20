@@ -34,6 +34,7 @@ define(function(require) {
             expanded: false,
             hideDefaultLabel: true,
             fallbackWidth: 180,
+            statusActiveClass: 'active',
             selectors: {
                 status: '.fallback-status',
                 item: '.fallback-item',
@@ -46,15 +47,15 @@ define(function(require) {
             },
             icons: {
                 'new': {
-                    html: '<i class="fa-folder-o"></i>',
+                    html: '<span class="fa-language"></span>',
                     event: 'expandChildItems'
                 },
                 'edited': {
-                    html: '<i class="fa-folder"></i>',
+                    html: '<span class="fa-language"></span>',
                     event: 'expandChildItems'
                 },
                 'save': {
-                    html: '<i class="fa-folder-open"></i>',
+                    html: '<span class="fa-language"></span>',
                     event: 'collapseChildItems'
                 }
             }
@@ -117,7 +118,6 @@ define(function(require) {
                 // self.cloneValueToChildren(self.getItemEl(this)); uncomment on merging master
             });
 
-            this.fixFallbackWidth();
             this.setStatusIcon();
         },
 
@@ -285,30 +285,30 @@ define(function(require) {
         /**
          * Enable/disable value
          *
-         * @param {jQuery} $value
+         * @param {jQuery} $element
          * @param {Boolean} enable
          */
-        enableDisableValue: function($value, enable) {
-            var $valueContainer = $value.closest(this.options.selectors.itemValue);
+        enableDisableValue: function($element, enable) {
+            var $$elementContainer = $element.closest(this.options.selectors.itemValue);
 
             var editor;
-            if ($valueContainer.find('.mce-tinymce').length > 0) {
-                editor = tinyMCE.get($valueContainer.find('textarea').attr('id'));
+            if ($$elementContainer.find('.mce-tinymce').length > 0) {
+                editor = tinyMCE.get($$elementContainer.find('textarea').attr('id'));
             }
 
             if (enable) {
-                $value.removeAttr('disabled');
+                $element.removeAttr('disabled');
 
                 if (editor) {
-                    editor.getBody().setAttribute('contenteditable', true);
+                    editor.setMode('design');
                     $(editor.editorContainer).removeClass('disabled');
                     $(editor.editorContainer).children('.disabled-overlay').remove();
                 }
             } else {
-                $value.attr('disabled', 'disabled');
+                $element.attr('disabled', 'disabled');
 
                 if (editor) {
-                    editor.getBody().setAttribute('contenteditable', false);
+                    editor.setMode('readonly');
                     $(editor.editorContainer).addClass('disabled');
                     $(editor.editorContainer).append('<div class="disabled-overlay"></div>');
                 }
@@ -322,7 +322,7 @@ define(function(require) {
          * @param {Boolean} enable
          */
         enableDisableFallback: function($fallback, enable) {
-            var $fallbackContainer = $fallback.inputWidget('container');
+            var $fallbackContainer = $fallback.inputWidget('getContainer');
 
             if (enable) {
                 $fallback.removeAttr('disabled');
@@ -481,14 +481,6 @@ define(function(require) {
         },
 
         /**
-         * Set fallback selector width depending of their content
-         */
-        fixFallbackWidth: function() {
-            var $fallback = this.$el.find(this.options.selectors.itemFallback).find('select');
-            $fallback.inputWidget('width', this.options.fallbackWidth);
-        },
-
-        /**
          * Change status icon depending on expanded flag and child custom values
          */
         setStatusIcon: function() {
@@ -506,7 +498,8 @@ define(function(require) {
 
             this.$el.find(this.options.selectors.status)
                 .html(icon.html)
-                .find('i').click(_.bind(this[icon.event], this));
+                .one('click' + this.eventNamespace(), _.bind(this[icon.event], this))
+                .toggleClass(this.options.statusActiveClass, this.options.expanded);
 
             var $defaultLabel = this.$el.find(this.options.selectors.defaultItem)
                 .find(this.options.selectors.itemLabel);

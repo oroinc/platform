@@ -8,9 +8,9 @@ use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactoryInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
-class ThemeManagerTest extends \PHPUnit_Framework_TestCase
+class ThemeManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ThemeFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ThemeFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $factory;
 
     protected function setUp()

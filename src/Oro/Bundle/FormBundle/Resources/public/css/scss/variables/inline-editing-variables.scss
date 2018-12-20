@@ -1,0 +1,40 @@
+/* @theme: admin.oro; */
+
+$inline-editor-actions-offset: 0 4px !default;
+
+$inline-editor-action-item-offset: 6px 4px !default;
+$inline-editor-action-item-color: $primary-200 !default;
+$inline-editor-action-item-color-hover: $additional-dark !default;
+$inline-editor-action-item-color-disabled: $primary-700 !default; //    closest to #68686a 0.5 opacity
+
+$inline-editor-action-item-input-offset: 6px !default;
+$inline-editor-action-item-fields-last-offset: 54px !default;
+
+$inline-editor-wrapper-width: 150px !default;
+
+$inline-editor-number-editor-width: 189px !default;
+
+$inline-editor-datetime-editor-width: 225px !default;
+
+$inline-editor-has-datepicker-width: 105px !default;
+$inline-editor-has-datepicker-offset: 9px !default;
+
+$inline-editor-has-timepicker-input-width: 144px !default;
+
+$inline-editor-select-editor-width: 180px !default;
+
+$inline-editor-select2-choice-width: calc(100% - 52px) !default;
+
+$inline-editor-select2-divider-color: $primary-750 !default;
+
+$inline-editor-multi-select2-choices-width: 130px !default;
+
+$inline-editor-select2-drop-box-shadow: 1px 3px 9px 3px rgba(0, 0, 0, .08) !default;
+$inline-editor-select2-drop-above-box-shadow: 1px -3px 9px 3px rgba(0, 0, 0, .08) !default;
+
+$inline-editor-select2-border-color: $primary-inverse !default;
+$inline-editor-select2-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
+$inline-editor-select2-drop-placeholder-height: 4px !default;
+$inline-editor-select2-drop-placeholder-color: $primary-inverse !default;
+
+$inline-editor-select2-drop-height: 45px !default;

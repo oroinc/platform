@@ -13,7 +13,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-class DelayRedeliveredMessageExtensionTest extends \PHPUnit_Framework_TestCase
+class DelayRedeliveredMessageExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
@@ -195,7 +195,7 @@ class DelayRedeliveredMessageExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DriverInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|DriverInterface
      */
     private function createDriverMock()
     {
@@ -203,7 +203,7 @@ class DelayRedeliveredMessageExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionMock()
     {
@@ -211,7 +211,7 @@ class DelayRedeliveredMessageExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     private function createLoggerMock()
     {

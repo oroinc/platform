@@ -93,17 +93,36 @@ define(function(require) {
             if (formattedData === null || /^\s+$/.test(formattedData) || formattedData === '') {
                 return void 0;
             }
+            var rawData = '';
+            var i;
 
             if (this.percent && formattedData.indexOf('%') > -1) {
                 formattedData = formattedData.replace(/%/g, '');
             }
 
-            formattedData = formatter.unformat(formattedData);
-
-            if (!this.percent) {
-                formattedData = String(formattedData.toFixed(this.decimals)) * 1;
+            var thousands = formattedData.trim().split(this.orderSeparator);
+            for (i = 0; i < thousands.length; i++) {
+                rawData += thousands[i];
             }
-            return formattedData;
+
+            var decimalParts = rawData.split(this.decimalSeparator);
+            rawData = '';
+            for (i = 0; i < decimalParts.length; i++) {
+                rawData = rawData + decimalParts[i] + '.';
+            }
+
+            if (rawData[rawData.length - 1] === '.') {
+                rawData = rawData.slice(0, rawData.length - 1);
+            }
+
+            var result = rawData * 1;
+            if (!this.percent) {
+                result = result.toFixed(this.decimals) * 1;
+            }
+
+            if (_.isNumber(result) && !_.isNaN(result)) {
+                return result;
+            }
         }
     });
 

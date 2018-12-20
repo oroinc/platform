@@ -6,7 +6,8 @@ navigation:
                 current_class: 'active'
                 ancestor_class: 'active'
                 allow_safe_labels: true
-                root_class: 'nav nav-multilevel main-menu'
+                root_class: 'nav-multilevel main-menu'
+                compressed: true
             dots_menu:
                 template: 'OroNavigationBundle:Menu:dots_menu.html.twig'
             shortcuts:
@@ -15,6 +16,8 @@ navigation:
                 template: 'OroNavigationBundle:Menu:navbar.html.twig'
             dropdown:
                 template: 'OroNavigationBundle:Menu:dropdown.html.twig'
+            user_menu:
+                template: 'OroNavigationBundle:Menu:user_menu.html.twig'
             horizontal_tabs:
                 template: 'OroNavigationBundle:Menu:horizontal_tabs.html.twig'
             pinbar:
@@ -41,6 +44,8 @@ navigation:
                 extras:
                     icon: 'fa-clock-o'
                     active_if_first_is_empty: true
+                    component_options:
+                        view: 'oronavigation/js/app/views/history-view'
                 uri: '#'
             favorite:
                 label: 'oro.navigation.menu.favorite.label'
@@ -51,6 +56,8 @@ navigation:
                 label: 'oro.navigation.menu.mostviewed.label'
                 extras:
                     icon: 'fa-flag'
+                    component_options:
+                        view: 'oronavigation/js/app/views/most-viewed-view'
                 uri: '#'
             menu_list_default:
                 label:    'oro.navigation.menu.menu_list_default.label'

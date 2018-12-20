@@ -12,6 +12,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_0\OroUserBundle;
@@ -59,7 +60,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v2_1';
+        return 'v2_3';
     }
 
     /**
@@ -193,6 +194,7 @@ class OroUserBundleInstaller implements
         $table->addColumn('status_id', 'integer', ['notnull' => false]);
         $table->addColumn('username', 'string', ['length' => 255, 'precision' => 0]);
         $table->addColumn('email', 'string', ['length' => 255, 'precision' => 0]);
+        $table->addColumn('email_lowercase', 'string', ['length' => 255]);
         $table->addColumn(
             'phone',
             'string',
@@ -221,6 +223,7 @@ class OroUserBundleInstaller implements
         $table->addColumn('updatedAt', 'datetime', ['precision' => 0]);
         $table->addUniqueIndex(['username'], 'UNIQ_F82840BCF85E0677');
         $table->addUniqueIndex(['email'], 'UNIQ_F82840BCE7927C74');
+        $table->addIndex(['email_lowercase'], 'idx_oro_user_email_lowercase', []);
         $table->addIndex(['phone'], 'oro_idx_user_phone');
         $table->addIndex(['business_unit_owner_id'], 'IDX_F82840BC59294170', []);
         $table->addUniqueIndex(['status_id'], 'UNIQ_F82840BC6BF700BD');
@@ -321,7 +324,7 @@ class OroUserBundleInstaller implements
                     'datagrid'  => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
                     'merge'     => ['display' => true],
                     'dataaudit' => ['auditable' => true],
-                    'form'      => ['type' => 'oro_resizeable_rich_text'],
+                    'form'      => ['type' => OroResizeableRichTextType::class],
                     'view'      => ['type' => 'html'],
                 ]
             ]

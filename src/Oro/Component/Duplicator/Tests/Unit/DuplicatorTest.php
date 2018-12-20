@@ -22,7 +22,7 @@ use Oro\Component\Duplicator\Tests\Unit\Stub\Entity3;
 use Oro\Component\Duplicator\Tests\Unit\Stub\EntityItem1;
 use Oro\Component\Duplicator\Tests\Unit\Stub\EntityItem2;
 
-class DuplicatorTest extends \PHPUnit_Framework_TestCase
+class DuplicatorTest extends \PHPUnit\Framework\TestCase
 {
     public function testDuplicate()
     {

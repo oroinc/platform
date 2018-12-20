@@ -2,139 +2,228 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
+use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
+use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface;
+use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Provider\NotificationManager;
+use Psr\Container\ContainerInterface;
 
-class NotificationManagerTest extends \PHPUnit_Framework_TestCase
+class NotificationManagerTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_EVENT_NAME = 'namespace.event_name';
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
+    private $handlerLocator;
 
-    /**
-     * @var NotificationManager
-     */
-    protected $manager;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Cache */
+    private $cache;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $em;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface */
+    private $em;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $entity;
-
-    /**
-     * @var string
-     */
-    protected $className;
-
-    /**
-     * @var EventHandlerInterface
-     */
-    protected $handler;
-
-    /**
-     * @var ArrayCollection
-     */
-    protected $rules;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
+    private $doctrine;
 
     protected function setUp()
     {
-        $this->em = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->className = 'Oro\Bundle\NotificationBundle\Entity\EmailNotification';
-        $this->handler = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entity = $this->createMock(\stdClass::class);
-        $this->rules = new ArrayCollection(array());
-
-        $repository = $this->getMockBuilder(
-            'Oro\Bundle\NotificationBundle\Entity\Repository\EmailNotificationRepository'
-        )->disableOriginalConstructor()->getMock();
-
-        $repository->expects($this->once())->method('getRules')
-            ->will($this->returnValue($this->rules));
-
-        $this->em->expects($this->once())->method('getRepository')
-            ->with($this->equalTo($this->className))
-            ->will($this->returnValue($repository));
-
-        $this->manager = new NotificationManager($this->em, $this->className);
-        $this->manager->addHandler($this->handler);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->em);
-        unset($this->className);
-        unset($this->handler);
-        unset($this->entity);
-        unset($this->rules);
-        unset($this->manager);
+        $this->handlerLocator = $this->createMock(ContainerInterface::class);
+        $this->cache = $this->createMock(Cache::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->with(EmailNotification::class)
+            ->willReturn($this->em);
     }
 
     /**
-     * @dataProvider dataProvider
+     * @param string[] $handlerIds
+     *
+     * @return NotificationManager
      */
-    public function testProcess($eventPropagationStopped)
+    private function getNotificationManager(array $handlerIds)
     {
-        $notificationEventMock = $this->createMock(
-            'Oro\Bundle\NotificationBundle\Event\NotificationEvent',
-            array(),
-            array($this->entity)
-        );
-        $notificationEventMock->expects($this->once())->method('getEntity')
-            ->will($this->returnValue($this->entity));
-        $notificationEventMock->expects($this->once())->method('isPropagationStopped')
-            ->will($this->returnValue($eventPropagationStopped));
-
-        $event = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Entity\Event')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->at(0))->method('getName')
-            ->will($this->returnValue(self::TEST_EVENT_NAME));
-        $event->expects($this->at(1))->method('getName')
-            ->will($this->returnValue(self::TEST_EVENT_NAME . ' not the same'));
-
-        $this->handler->expects($this->once())->method('handle');
-
-        $rule = $this->createMock($this->className);
-        $rule->expects($this->exactly(2))->method('getEntityName')
-            ->will($this->returnValue(get_class($this->entity)));
-        $rule->expects($this->exactly(2))->method('getEvent')
-            ->will($this->returnValue($event));
-
-        $this->rules->add($rule);
-        $this->rules->add($rule);
-
-        $this->manager->process($notificationEventMock, self::TEST_EVENT_NAME);
-    }
-
-    /**
-     * @return array
-     */
-    public function dataProvider()
-    {
-        return array(
-            array(false),
-            array(true),
+        return new NotificationManager(
+            $handlerIds,
+            $this->handlerLocator,
+            $this->cache,
+            $this->doctrine
         );
     }
 
-    /**
-     * Test setters, getters
-     */
-    public function testAddAndGetHandlers()
+    private function expectLoadRules(array $rules)
     {
-        $this->assertCount(1, $this->manager->getHandlers());
+        $qb = $this->createMock(QueryBuilder::class);
+        $query = $this->createMock(AbstractQuery::class);
+        $this->em->expects(self::any())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('from')
+            ->with(EmailNotification::class, 'e')
+            ->willReturnSelf();
+        $qb->expects(self::once())
+            ->method('select')
+            ->with(['e', 'event'])
+            ->willReturnSelf();
+        $qb->expects(self::once())
+            ->method('leftJoin')
+            ->with('e.event', 'event')
+            ->willReturnSelf();
+        $qb->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($query);
+        $query->expects(self::once())
+            ->method('getResult')
+            ->willReturn($rules);
+    }
 
-        $handler = $this->createMock('Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface');
-        $this->manager->addHandler($handler);
+    /**
+     * @param string $eventName
+     * @param object $entity
+     */
+    private function expectFetchRulesCache($eventName, $entity)
+    {
+        $this->cache->expects(self::once())
+            ->method('fetch')
+            ->with('rules')
+            ->willReturn([get_class($entity) => [$eventName]]);
+        $this->cache->expects(self::never())
+            ->method('save');
+    }
 
-        $this->assertCount(2, $this->manager->getHandlers());
-        $this->assertContains($handler, $this->manager->getHandlers());
+    /**
+     * @param string $eventName
+     * @param object $entity
+     *
+     * @return EmailNotification
+     */
+    private function createRule($eventName, $entity)
+    {
+        $rule = new EmailNotification();
+        $rule->setEntityName(get_class($entity));
+        $rule->setEvent(new Event($eventName));
+
+        return $rule;
+    }
+
+    public function testProcess()
+    {
+        $eventName = 'test_event';
+        $entity = $this->createMock(\stdClass::class);
+
+        $matchedRule = $this->createRule($eventName, $entity);
+        $this->expectFetchRulesCache($eventName, $entity);
+        $this->expectLoadRules([
+            $matchedRule,
+            $this->createRule('another_event', $entity),
+            $this->createRule($eventName, new \stdClass())
+        ]);
+
+        $handler1 = $this->createMock(EventHandlerInterface::class);
+        $handler2 = $this->createMock(EventHandlerInterface::class);
+        $this->handlerLocator->expects(self::exactly(2))
+            ->method('get')
+            ->willReturnMap([
+                ['handler1', $handler1],
+                ['handler2', $handler2]
+            ]);
+
+        $notificationEvent = new NotificationEvent($entity);
+        $handler1->expects(self::once())
+            ->method('handle')
+            ->with(self::identicalTo($notificationEvent), [$matchedRule]);
+        $handler2->expects(self::once())
+            ->method('handle')
+            ->with(self::identicalTo($notificationEvent), [$matchedRule]);
+
+        $manager = $this->getNotificationManager(['handler1', 'handler2']);
+        $manager->process($notificationEvent, $eventName);
+        self::assertFalse($notificationEvent->isPropagationStopped());
+    }
+
+    public function testProcessWhenSomeHandlerStopsPropagation()
+    {
+        $eventName = 'test_event';
+        $entity = $this->createMock(\stdClass::class);
+
+        $this->expectFetchRulesCache($eventName, $entity);
+        $this->expectLoadRules([$this->createRule($eventName, $entity)]);
+
+        $handler1 = $this->createMock(EventHandlerInterface::class);
+        $this->handlerLocator->expects(self::once())
+            ->method('get')
+            ->with('handler1')
+            ->willReturn($handler1);
+        $handler1->expects(self::once())
+            ->method('handle')
+            ->willReturnCallback(function (NotificationEvent $event) {
+                $event->stopPropagation();
+            });
+
+        $notificationEvent = new NotificationEvent($entity);
+        $manager = $this->getNotificationManager(['handler1', 'handler2']);
+        $manager->process($notificationEvent, $eventName);
+        self::assertTrue($notificationEvent->isPropagationStopped());
+    }
+
+    public function testProcessNoRulesCache()
+    {
+        $eventName = 'test_event';
+        $entity = $this->createMock(\stdClass::class);
+
+        $this->cache->expects(self::once())
+            ->method('fetch')
+            ->with('rules')
+            ->willReturn(false);
+        $this->cache->expects(self::once())
+            ->method('save')
+            ->with(
+                'rules',
+                [
+                    get_class($entity)   => ['some_event', 'another_event'],
+                    'Test\AnotherEntity' => [$eventName]
+                ]
+            );
+
+        $qb = $this->createMock(QueryBuilder::class);
+        $query = $this->createMock(AbstractQuery::class);
+        $this->em->expects(self::once())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('from')
+            ->with(EmailNotification::class, 'e')
+            ->willReturnSelf();
+        $qb->expects(self::once())
+            ->method('distinct')
+            ->with(true)
+            ->willReturnSelf();
+        $qb->expects(self::once())
+            ->method('select')
+            ->with('e.entityName, event.name as eventName')
+            ->willReturnSelf();
+        $qb->expects(self::once())
+            ->method('innerJoin')
+            ->with('e.event', 'event')
+            ->willReturnSelf();
+        $qb->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($query);
+        $query->expects(self::once())
+            ->method('getArrayResult')
+            ->willReturn([
+                ['entityName' => get_class($entity), 'eventName' => 'some_event'],
+                ['entityName' => get_class($entity), 'eventName' => 'another_event'],
+                ['entityName' => 'Test\AnotherEntity', 'eventName' => $eventName]
+            ]);
+
+        $notificationEvent = new NotificationEvent($entity);
+        $manager = $this->getNotificationManager(['handler1']);
+        $manager->process($notificationEvent, $eventName);
     }
 }

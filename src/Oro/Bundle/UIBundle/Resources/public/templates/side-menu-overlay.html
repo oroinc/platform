@@ -1,0 +1,44 @@
+<div class="side-menu-overlay__header">
+    <p class="side-menu-overlay__title" data-role="overlay-title"></p>
+    <div class="side-menu-overlay__search">
+        <input class="side-menu-overlay__field"
+               type="text"
+               placeholder="<%= _.__('oro.datagrid.settings.filter.search_placeholder') %>"
+               data-role="search"
+               aria-label="<%= _.__('oro.datagrid.settings.filter.search_placeholder') %>"
+        >
+        <span class="side-menu-overlay__search-icon"
+            data-role="search-icon"
+            aria-label="<%= _.__('oro.ui.search') %>">
+            <span class="fa-search" aria-hidden="true"></span>
+        </span>
+        <button class="side-menu-overlay__search-icon side-menu-overlay__search-icon--interactive hide"
+                data-role="clear-search"
+                aria-label="<%= _.__('oro.ui.reset') %>">
+            <span class="fa-times" aria-hidden="true"></span>
+        </button>
+    </div>
+
+    <p class="no-data hide" data-role="no-result"><%- _.__('oro.ui.jstree.search.search_no_found') %></p>
+</div>
+
+<div class="side-menu-overlay__content" data-role="overlay-content"></div>
+
+<div class="side-menu-overlay__ui-helper" data-role="overlay-design-helper">
+    <div class="side-menu-overlay__fill">
+        <% // For correct align in IE must be present empty inline tag %>
+        <span></span>
+    </div>
+    <div class="side-menu-overlay__fill-blur">
+        <div class="side-menu-overlay__fill-blur-inner" data-role="overlay-close">
+            <% // For correct align in IE must be present empty inline tag %>
+            <span></span>
+        </div>
+        <% // For correct align in IE must be present empty inline tag %>
+        <span></span>
+        <button class="side-menu-overlay__button" data-role="overlay-close"
+                aria-label="<%= _.__('oro.ui.close_menu') %>">
+            <span class="fa-times" aria-hidden="true"></span>
+        </button>
+    </div>
+</div>

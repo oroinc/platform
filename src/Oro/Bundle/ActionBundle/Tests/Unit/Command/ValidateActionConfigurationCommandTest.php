@@ -9,7 +9,7 @@ use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ValidateActionConfigurationCommandTest extends \PHPUnit_Framework_TestCase
+class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ValidateActionConfigurationCommand
@@ -17,17 +17,17 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit_Framework_TestCase
     protected $command;
 
     /**
-     * @var ConfigurationProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $provider;
 
     /**
-     * @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $container;
 
     /**
-     * @var InputInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var InputInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $input;
 

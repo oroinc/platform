@@ -18,22 +18,22 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ReflectionProperty;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
+class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_IDENTIFIER = 42;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
      */
     protected $registry;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $classMetadata;
 

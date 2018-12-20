@@ -3,16 +3,20 @@
 {% set widgetType = 'quick-launchpad' %}
 
 {% block content %}
-    <ul class="quick-launchpad-toolbar">
-        {% for item in items %}
-            <li{% if (item.class is defined) %} class="{{ item.class }}"{% endif %}>
-                <span class="title-box">{{ item.label|trans }}</span>
-                <span class="list-content">
-                    <i class="fa-{{ item.icon }}"></i>
-                </span>
-                <a href="{{ path(item.route, item.route_parameters) }}"></a>
-            </li>
-        {% endfor %}
-    </ul>
+    {% spaceless %}
+        <ul class="quick-launchpad-toolbar quick-launchpad-toolbar--with-{{ items|length }}-items">
+            {% for item in items %}
+                <li class="quick-launchpad-toolbar__item{% if (item.class is defined) %} {{ item.class }}{% endif %}">
+                    <a href="{{ path(item.route, item.route_parameters) }}" class="quick-launchpad-toolbar__link"
+                       title="{{ item.label|trans }}">
+                        <span class="fa-{{ item.icon }} quick-launchpad-toolbar__icon" aria-hidden="true"></span>
+                        <div class="quick-launchpad-toolbar__label-wrapper">
+                            <span class="quick-launchpad-toolbar__label">{{ item.label|trans }}</span>
+                        </div>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endspaceless %}
     {{ parent() }}
 {% endblock %}

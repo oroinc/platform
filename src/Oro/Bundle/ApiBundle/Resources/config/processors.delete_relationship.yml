@@ -45,12 +45,16 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship\BuildFormBuilder
         arguments:
             - '@oro_api.form_helper'
-            - '@form.property_accessor'
+            - '@oro_api.form_property_accessor'
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: 100 }
 
     #
     # save_data
+    #
+
+    #
+    # finalize
     #
 
     #

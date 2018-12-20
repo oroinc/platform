@@ -1,7 +1,9 @@
 # How To
 
- - [Turn on API for an Entity](#overview)
+ - [Turn on API for an Entity](#turn-on-api-for-an-entity)
  - [Turn on API for an Entity Disabled in "Resources/config/oro/entity.yml"](#turn-on-api-for-an-entity-disabled-in-resourcesconfigoroentityyml)
+ - [Enable Advanced Operators for String Filter](#enable-advanced-operators-for-string-filter)
+ - [Enable Case-insensitive String Filter](#enable-case-insensitive-string-filter)
  - [Change an ACL Resource for an Action](#change-an-acl-resource-for-an-action)
  - [Disable Access Checks for an Action](#disable-access-checks-for-an-action)
  - [Disable an Entity Action](#disable-an-entity-action)
@@ -17,6 +19,9 @@
  - [Using a Non-primary Key to Identify an Entity](#using-a-non-primary-key-to-identify-an-entity)
  - [Enable API for an Entity Without Identifier](#enable-api-for-an-entity-without-identifier)
  - [Enable Custom API](#enable-custom-api)
+ - [Add a Predefined Identifier for API Resource](#add-a-predefined-identifier-for-api-resource)
+ - [Add a Computed Field](#add-a-computed-field)
+ - [Disable HATEOAS](#disable-hateoas)
 
 
 ## Turn on API for an Entity
@@ -54,6 +59,65 @@ api:
             fields:
                 field1:
                     exclude: false # override exclude rule from entity.yml
+```
+
+## Enable Advanced Operators for String Filter
+
+By performance reasons the following operators are disabled out of the box:
+
+- `~` (`contains`) - uses `LIKE %text%` to check that a field value contains the text
+- `!~` (`not_contains`) - uses `NOT LIKE %text%` to check that a field value does not contain the text
+- `^` (`starts_with`) - uses `LIKE text%` to check that a field value starts with the text
+- `!^` (`not_starts_with`) - uses `NOT LIKE text%` to check that a field value does not start with the text
+- `$` (`ends_with`) - uses `LIKE %text` to check that a field value ends with the text
+- `!$` (`not_ends_with`) - uses `NOT LIKE %text` to check that a field value does not end with the text
+
+To enable these operators use `operators` option for filters in `Resources/config/oro/api.yml`, e.g.:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
+            filters:
+                fields:
+                    field1:
+                        operators: ['=', '!=', '*', '!*', '~', '!~', '^', '!^', '$', '!$']
+```
+
+## Enable Case-insensitive String Filter
+
+Depending on the [collation](https://en.wikipedia.org/wiki/Collation) settings of your database the case-insensitive
+filtering may be already enforced to be used on the database level. For example, if you are using MySQL database with
+`utf8_unicode_ci` collation you do not need to do anything to enable the case-insensitive filtering. But if the
+collation of your database or a particular field is not case-insensitive and you need to enable the case-insensitive
+filtering for this field, you can use `case_insensitive` option for a filter in `Resources/config/oro/api.yml`, e.g.:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
+            filters:
+                fields:
+                    field1:
+                        options:
+                            case_insensitive: true
+```
+
+**Please note** that the `LOWER` function will be used in this case and it can impact performance
+if there is no [proper index](https://use-the-index-luke.com/sql/where-clause/functions/case-insensitive-search).
+
+Also sometimes data in the database are already converted to lowercase or uppercase, in this case you can use
+`value_transformer` option to convert the filter value to before it will be passed to the database query, e.g.:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
+            filters:
+                fields:
+                    field1:
+                        options:
+                            value_transformer: strtoupper # convert the filter value to uppercase
 ```
 
 ## Change an ACL Resource for an Action
@@ -385,6 +449,7 @@ If this controller cannot handle the implementation of your REST API resources, 
  - saving data to the database
  - implementing relationships with other API resources
  - documenting such API resources
+ - implementing OPTIONS HTTP method for such API resources
 
 If you know about these disadvantages and still want to proceed, to register a custom controller, perform the following steps:
 
@@ -460,7 +525,7 @@ An example of the `Resources/config/oro/routing.yml` configuration file:
 
 ```yaml
 acme_api_get_my_resource:
-    path: /api/myresources/{id}
+    path: '%oro_api.rest.prefix%myresources/{id}'
     methods: [GET]
     defaults:
         _controller: AcmeAppBundle:Api\MyResource:get
@@ -471,11 +536,11 @@ acme_api_get_my_resource:
 For information about the `ApiDoc` annotation, see [Symfony documentation](https://symfony.com/doc/2.x/bundles/NelmioApiDocBundle/the-apidoc-annotation.html). 
 To learn about all possible properties of the `fields` option, see [AbstractFormatter class in NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle/blob/2.x/Formatter/AbstractFormatter.php). Please note that the `fields` option can be used inside the `input` and `output` options.
 
-Use the [oro:api:doc:cache:clear](./commands.md#oroapidoccacheclear) command to apply changes in the `ApiDoc` annotation to [API Sandbox](https://www.oroinc.com/doc/orocrm/current/book/data-api#api-sandbox).
+Use the [oro:api:doc:cache:clear](./commands.md#oroapidoccacheclear) command to apply changes in the `ApiDoc` annotation to [API Sandbox](https://oroinc.com/orocrm/doc/current/dev-guide/web-api#api-sandbox).
 
 ## Add a Custom Route
 
-As desctibed in [Add a Custom Controller](#add-a-custom-controller), [RestApiController](../../Controller/RestApiController.php) handles all registered REST API resources, and in the most cases you do not need to change this.
+As described in [Add a Custom Controller](#add-a-custom-controller), [RestApiController](../../Controller/RestApiController.php) handles all registered REST API resources, and in the most cases you do not need to change this.
 But sometimes you need to change default mapping between URI and an action of this controller for some
 REST API resources.
 For example, imagine REST API resource for a profile of the logged in user. Let's imagine that URI of this
@@ -489,13 +554,13 @@ Here is an example of the `Resources/config/oro/routing.yml` configuration file:
 
 ```yaml
 acme_rest_api_user_profile:
-    path: /api/userprofile
+    path: '%oro_api.rest.prefix%userprofile'
     defaults:
         _controller: OroApiBundle:RestApi:item
         entity: userprofile
     options:
         group: rest_api
-        override_path: /api/userprofile/{id}
+        override_path: '%oro_api.rest.prefix%userprofile/{id}'
 ```
 
 ## Using a Non-primary Key to Identify an Entity
@@ -530,7 +595,7 @@ can be resources for registering a new account or logging in a user.
 
 The following steps describes how to create such API resources:
 
-- Create a PHP class that will represent API resource. Usualy such classes are named as models and located in
+- Create a PHP class that will represent API resource. Usually such classes are named as models and located in
   `Api/Model` directory. For example:
 
   ```php
@@ -561,7 +626,7 @@ The following steps describes how to create such API resources:
   }
   ```
 
-- Desctibe the model via `Resources/config/oro/api.yml` configuration file in your bundle, e.g.:
+- Describe the model via `Resources/config/oro/api.yml` configuration file in your bundle, e.g.:
 
   ```yaml
   api:
@@ -591,7 +656,7 @@ The following steps describes how to create such API resources:
 
   ```yml
   acme_rest_api_register_account:
-      path: /api/registeraccount
+      path: '%oro_api.rest.prefix%registeraccount'
       defaults:
           _controller: OroApiBundle:RestApi:itemWithoutId
           entity: registeraccount
@@ -625,7 +690,7 @@ The following steps describes how to create such API resources:
   }
   ```
 
-- Register a processor in the depencency injection container, e.g.:
+- Register a processor in the dependency injection container, e.g.:
 
   ```yaml
   services:
@@ -756,3 +821,181 @@ for `oro.api.processor` tag, e.g.:
 
 For more details about the configuration and processors see [Configuration Reference](./configuration.md),
 [Actions](./actions.md) and [Processors](./processors.md).
+
+## Add a Predefined Identifier for API Resource
+
+Imagine that you want to provide an API resource for the current authenticated user. There are several ways to do this:
+
+- [add a custom route](#add-a-custom-route)
+- [add a custom controller](#add-a-custom-controller)
+- create a model inherited from an User entity and expose it as a separate API resource
+- reserve some word, e.g. **mine**, as an predefined identifier of the current authenticated user
+
+The last approach is simplest to implement and more preferred in the most cases, because it gives a possibility
+to use such identifier in a resource path, filters and request data.
+
+To implement this approach you need to do the following:
+
+- create a class that implements [EntityIdResolverInterface](../../Request/EntityIdResolverInterface.php), e.g.:
+
+```php
+<?php
+
+namespace Oro\Bundle\UserBundle\Api;
+
+use Oro\Bundle\ApiBundle\Request\EntityIdResolverInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
+
+/**
+ * Resolves "mine" identifier for User entity.
+ * This identifier can be used to identify the current authenticated user.
+ */
+class MineUserEntityIdResolver implements EntityIdResolverInterface
+{
+    /** @var TokenAccessorInterface */
+    private $tokenAccessor;
+
+    /**
+     * @param TokenAccessorInterface $tokenAccessor
+     */
+    public function __construct(TokenAccessorInterface $tokenAccessor)
+    {
+        $this->tokenAccessor = $tokenAccessor;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDescription(): string
+    {
+        return <<<MARKDOWN
+**mine** can be used to identify the current authenticated user.
+MARKDOWN;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resolve()
+    {
+        $user = $this->tokenAccessor->getUser();
+
+        return $user instanceof User
+            ? $user->getId()
+            : null;
+    }
+}
+```
+
+- register this class as a service and tag it with `oro.api.entity_id_resolver`, e.g.:
+
+```yaml
+    oro_user.api.mine_user_entity_id_resolver:
+        class: Oro\Bundle\UserBundle\Api\MineUserEntityIdResolver
+        arguments:
+            - '@oro_security.token_accessor'
+        tags:
+            - { name: oro.api.entity_id_resolver, id: mine, class: Oro\Bundle\UserBundle\Entity\User }
+```
+
+If a predefined identifier should be available only for a specific request type
+the [requestType](./request_type.md) attribute of the tag can be used, e.g.:
+
+```yaml
+        tags:
+            - { name: oro.api.entity_id_resolver, id: mine, class: Oro\Bundle\UserBundle\Entity\User, requestType: json_api }
+```
+
+## Add a Computed Field
+
+Sometimes it is required to add to API a field that does not exist in an entity for which API is created.
+In this case such field should be added to API via
+[Resources/config/oro/api.yml](./configuration.md#fields-configuration-section) and
+the [customize_loaded_data](./actions.md#customize_loaded_data-action) action should be used to set a value
+of this field.
+
+For example, imagine that a "price" field need to be added to a product API. The following steps show how to do this:
+
+- add the "price" field to the product API via `Resources/config/oro/api.yml`
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AppBundle\Entity\Product:
+            fields:
+                price:
+                    data_type: money
+```
+
+- create a processor for `customize_loaded_data` action that will set a value for the "price" field
+
+```php
+<?php
+
+namespace Acme\Bundle\AppBundle\Api\Processor;
+
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+
+class ComputeProductPriceField implements ProcessorInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function process(ContextInterface $context)
+    {
+        /** @var CustomizeLoadedDataContext $context */
+
+        $data = $context->getResult();
+        if (!is_array($data)) {
+            return;
+        }
+
+        $priceFieldName = $context->getResultFieldName('price');
+        if (!$context->isFieldRequested($priceFieldName, $data)) {
+            return;
+        }
+
+        $productIdFieldName = $context->getResultFieldName('id');
+        if (!$productIdFieldName || empty($data[$productIdFieldName])) {
+            return;
+        }
+
+        $data[$priceFieldName] = $this->loadProductPrice($data[$productIdFieldName]);
+        $context->setResult($data);
+    }
+
+    /**
+     * @param int $productId
+     *
+     * @return float|null
+     */
+    private function loadProductPrice($productId)
+    {
+        // load the product price in this method
+    }
+}
+```
+
+- register the processor in the dependency injection container
+
+```yamp
+services:
+    acme.api.compute_product_price_field:
+        class: Acme\Bundle\AppBundle\Api\Processor\ComputeProductPriceField
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Acme\Bundle\AppBundle\Entity\Product }
+```
+
+## Disable HATEOAS
+
+It is not possible to disable [HATEOAS](https://restfulapi.net/hateoas/) via a configuration.
+But you can send API request with `noHateoas` value in [X-Include header](./headers.md#existing-x-include-keys)
+to exclude HATEOAS links from a response of a particular request.
+

@@ -1,0 +1,35 @@
+/* @theme: admin.oro; */
+
+.enum-value-collection {
+    position: relative;
+    width: 297px;
+
+    &__clear-default {
+        position: absolute;
+        bottom: $content-padding-small;
+        #{$end}: 0;
+
+        &.disabled {
+            display: none;
+        }
+    }
+
+    .removeRow,
+    .tooltip-icon-container {
+        position: absolute;
+        top: 0;
+        #{$end}: -$tooltip-icon-container-size;
+    }
+
+    .tooltip-icon-container {
+        width: $tooltip-icon-container-size;
+        height: $tooltip-icon-container-size;
+
+        .tooltip-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+}

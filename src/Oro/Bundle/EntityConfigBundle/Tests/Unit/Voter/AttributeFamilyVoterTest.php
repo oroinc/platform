@@ -10,7 +10,7 @@ use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class AttributeFamilyVoterTest extends \PHPUnit_Framework_TestCase
+class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CLASS_NAME = 'stdClass';
     const FAMILY_ID = 777;
@@ -18,17 +18,17 @@ class AttributeFamilyVoterTest extends \PHPUnit_Framework_TestCase
     use EntityTrait;
 
     /**
-     * @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $token;
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $doctrineHelper;
 
     /**
-     * @var AttributeFamilyManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var AttributeFamilyManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $familyManager;
 

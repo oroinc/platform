@@ -136,7 +136,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
      */
     public function goToNewerOrOlderActivities($linkLocator)
     {
-        $link = $this->createElement('Activity List')->findLink(ucfirst($linkLocator));
+        $link = $this->createElement('Activity List')->findButton(ucfirst($linkLocator));
 
         if (!$link) {
             self::fail(sprintf('Can\'t find "%s" button', $linkLocator));
@@ -210,7 +210,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
         /** @var ActivityList $activityList */
         $activityList = $this->createElement('Activity List');
         $item = $activityList->getActivityListItem($content);
-        $icon = $item->find('css', 'div.icon i');
+        $icon = $item->find('css', 'div.icon span');
 
         self::assertTrue(
             $icon->hasClass('icon-email-thread'),

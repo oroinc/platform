@@ -4,7 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-class OwnershipTypeTest extends \PHPUnit_Framework_TestCase
+class OwnershipTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OwnershipType
@@ -27,13 +27,10 @@ class OwnershipTypeTest extends \PHPUnit_Framework_TestCase
 
         $optionResolver->expects($this->once())
             ->method('setDefaults')
-            ->with(array('choices' => $this->type->getOwnershipsArray()));
+            ->with([
+                'choices' => array_flip($this->type->getOwnershipsArray()),
+            ]);
         $this->type->configureOptions($optionResolver);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(OwnershipType::NAME, $this->type->getName());
     }
 
     public function testGetParent()

@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowReplacementTypeTest extends FormIntegrationTestCase
 {
-    /** @var WorkflowDeactivationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowDeactivationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $helper;
 
     /** @var WorkflowReplacementType */
@@ -40,7 +40,7 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /* @var $optionsResolver OptionsResolver|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $optionsResolver OptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
         $optionsResolver = $this->createMock(OptionsResolver::class);
 
         $optionsResolver->expects($this->once())->method('setDefault')->with('workflow', null);
@@ -140,7 +140,7 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
 
     /**
      * @param string $name
-     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getWorkflow($name)
     {

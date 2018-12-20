@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authentication\Token;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 
-abstract class OrganizationTokenTestAbstract extends \PHPUnit_Framework_TestCase
+abstract class OrganizationTokenTestAbstract extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OrganizationContextTokenInterface

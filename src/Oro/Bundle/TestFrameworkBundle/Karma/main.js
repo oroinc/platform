@@ -21,7 +21,7 @@
 
     requirejs.config({
         // Karma serves files from '/base'
-        baseUrl: '/base/web/bundles',
+        baseUrl: '/base/public/bundles',
 
         paths: libs,
 

@@ -1,0 +1,205 @@
+/* @theme: admin.oro; */
+
+.inner-permissions-grid {
+    .oro-datagrid {
+        margin: 0;
+    }
+
+    .grid,
+    .grid-scrollable-container {
+        overflow: visible;
+    }
+
+    .grid-header-cell:first-child {
+        width: $role-collapse-action-container-width + $capabilities-offset; // plus grid-header inner offset
+    }
+
+    .collapse-expand-action-container {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        width: $role-collapse-action-container-width;
+
+        .collapse-action {
+            margin-#{$end}: $inner-permissions-grid-collapse-action-offset;
+
+            font-size: $role-capability-icon-size;
+            text-align: center;
+            line-height: 1;
+
+            color: $role-capability-icon-expand-color;
+
+            @include fa-icon($fa-var-minus-square-o);
+
+            &.collapsed {
+                @include fa-icon($fa-var-plus-square-o);
+            }
+        }
+    }
+
+    .entity-name {
+        padding-#{$end}: $inner-permissions-grid-entity-name-offset;
+
+        font-weight: $inner-permissions-grid-entity-name-weight;
+    }
+
+    .entity-row-action {
+        margin-#{$start}: auto;
+    }
+
+    .fields-list {
+        > :first-child {
+            margin-top: $inner-permissions-grid-fields-list-offset;
+        }
+
+        > :last-child {
+            margin-bottom: $inner-permissions-grid-fields-list-offset;
+        }
+    }
+
+    .collapse {
+        @include clearfix();
+    }
+
+    .role-permissions-action-launcher {
+        max-height: $inner-permissions-grid-launcher-min-height;
+    }
+
+    .grid-header-cell-label {
+        min-width: $role-collapse-action-container-width;
+    }
+}
+.field-less .collapse-action {
+    display: none;
+}
+
+.entity-permission-container {
+    display: flex;
+    justify-content: flex-start;
+
+    padding: $entity-permission-container-offset 0;
+
+    .action-permissions {
+        flex-grow: 1;
+        flex-wrap: wrap;
+    }
+
+    + .collapsing,
+    + .collapse {
+        padding-top: $entity-permission-collapse-offset; // datagrid row bottom offset
+    }
+}
+
+.action-permissions {
+    display: flex;
+    align-items: center;
+    margin: 0;
+
+    list-style: none;
+
+    @include clearfix();
+
+    &__item {
+        width: $action-permissions-item-width;
+        padding-#{$end}: $action-permissions-item-offset;
+
+        .dropdown-toggle {
+            position: relative;
+
+            vertical-align: middle;
+
+            cursor: pointer;
+
+            &:hover,
+            &.active {
+                @include fa-icon($role-capability-icon-action, after, true) {
+                    position: absolute;
+                    top: 2px;
+                    #{$end}: 0;
+
+                    // Reset Bootstrap styles
+                    width: auto;
+                    height: auto;
+                    border: 0;
+
+                    font-size: $role-capability-icon-size;
+                    line-height: 1;
+
+                    color: $role-capability-icon-action-color;
+                }
+            }
+        }
+    }
+
+    &__item-wrapper {
+        display: inline-block;
+        padding-#{$end}: $action-permissions-item-wrapper-offset;
+        max-width: 100%;
+
+        color: $role-capability-item-color;
+
+        overflow: hidden;
+        white-space: nowrap;
+
+        vertical-align: middle;
+
+        &.readonly {
+            padding-top: $entity-permission-container-offset;
+            padding-bottom: $entity-permission-container-offset;
+        }
+    }
+
+    &__item-wrapper--no-access {
+        color: $role-capability-item-no-access-color;
+    }
+
+    &__item-wrapper_changed {
+        background-color: $role-capability-item-changed-color;
+    }
+
+    &__label {
+        display: inline-block;
+        vertical-align: middle;
+
+        @include text-line-truncate($action-permissions-label-trim-width, true);
+    }
+
+    &__value,
+    &__dropdown-toggle {
+        display: inline-block;
+        vertical-align: middle;
+
+        @include text-line-truncate($action-permissions-toggle-trim-width, true);
+
+        &:focus {
+            font-weight: normal;
+        }
+    }
+}
+
+.launchers-list .launcher-item {
+    a.role-permissions-action-launcher {
+        &:hover,
+        &:focus {
+            background: transparent !important;
+        }
+    }
+}
+
+.dropdown-menu__role-permissions-action {
+    .grid .entity-row-action {
+        padding: $entity-permission-entity-row-action-offset;
+    }
+}
+
+@include media-breakpoint-down(xs) {
+    .inner-permissions-grid {
+        .grid-header-cell:first-child {
+            width: $inner-permissions-grid-grid-header-cell-xs-width + $capabilities-offset;
+        }
+
+        .collapse-expand-action-container {
+            width: $inner-permissions-grid-grid-header-cell-xs-width;
+        }
+    }
+}

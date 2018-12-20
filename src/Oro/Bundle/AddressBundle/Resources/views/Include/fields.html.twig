@@ -64,8 +64,7 @@
 {% block oro_email_widget %}
     <div class="float-holder {% if form.email.vars.errors|length > 0 %} validation-error{% endif %}">
         <div class="input-append collection-element-primary">
-            {{ form_widget(form.email) }}
-            <label class="add-on" title="{{ 'Primary'|trans }}">
+            {{ form_widget(form.email) }}<label class="add-on" title="{{ 'Primary'|trans }}">
                 {{ form_widget(form.primary) }}
             </label>
         </div>
@@ -83,8 +82,7 @@
 {% block oro_phone_widget %}
     <div class="float-holder {% if form.phone.vars.errors|length > 0 %} validation-error{% endif %}">
         <div class="input-append collection-element-primary">
-            {{ form_widget(form.phone) }}
-            <label class="add-on" title="{{ 'Primary'|trans }}">
+            {{ form_widget(form.phone) }}<label class="add-on" title="{{ 'Primary'|trans }}">
                 {{ form_widget(form.primary) }}
             </label>
         </div>
@@ -139,7 +137,7 @@
 {%  endblock %}
 
 {% block oro_address_collection_widget %}
-    {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-address-collection' }) %}
+    {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'collection-fields-list-bg oro-address-collection' }) %}
     {{ block('oro_collection_widget') }}
     {% set id = id ~ '_collection' %}
     {{ _self.oro_collection_validate_types_js(_context) }}

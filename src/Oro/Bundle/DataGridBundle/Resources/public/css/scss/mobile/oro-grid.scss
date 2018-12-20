@@ -1,0 +1,11 @@
+/* @theme: admin.oro; */
+
+.grid-scrollable-container {
+    width: auto;
+
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+
+    -ms-touch-action: auto;
+    touch-action: auto;
+}

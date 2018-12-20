@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Fixture\AbstractEnumFixture;
 
-class AbstractEnumFixtureTest extends \PHPUnit_Framework_TestCase
+class AbstractEnumFixtureTest extends \PHPUnit\Framework\TestCase
 {
     const ID_1 = 'id1';
     const ID_2 = 'id2';
@@ -16,7 +16,7 @@ class AbstractEnumFixtureTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadData()
     {
-        /** @var AbstractEnumFixture|\PHPUnit_Framework_MockObject_MockObject $stub */
+        /** @var AbstractEnumFixture|\PHPUnit\Framework\MockObject\MockObject $stub */
         $stub = $this
             ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\Fixture\AbstractEnumFixture')
             ->setMethods(['getDefaultValue'])
@@ -49,7 +49,7 @@ class AbstractEnumFixtureTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ObjectManager|\PHPUnit_Framework_MockObject_MockObject
+     * @return ObjectManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function mockObjectManager()
     {

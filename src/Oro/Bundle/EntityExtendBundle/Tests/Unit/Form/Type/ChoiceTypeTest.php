@@ -31,7 +31,7 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
             ChoiceType::class,
             [
                 'config_id' => new EntityConfigId('test', 'Test\Entity'),
-                'choices'   => [false => 'No', true => 'Yes']
+                'choices'   => ['No' => false, 'Yes' => true]
             ],
             [],
             $newVal,

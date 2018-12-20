@@ -7,12 +7,12 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class TranslationContextResolverTest extends \PHPUnit_Framework_TestCase
+class TranslationContextResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var KeyTemplateParametersResolver|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var KeyTemplateParametersResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $resolver;
 
     /** @var TranslationContextResolver */

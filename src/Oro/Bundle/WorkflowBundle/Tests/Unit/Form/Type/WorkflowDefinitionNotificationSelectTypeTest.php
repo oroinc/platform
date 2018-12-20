@@ -20,7 +20,7 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
 
     const WORKFLOW_NAME = 'test_workflow';
 
-    /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowRegistry;
 
     /** @var WorkflowDefinitionNotificationSelectType */
@@ -59,11 +59,6 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
 
         $this->assertTrue($form->isValid());
         $this->assertEquals($workflow->getDefinition(), $form->getData());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(WorkflowDefinitionNotificationSelectType::NAME, $this->type->getName());
     }
 
     public function testConfigureOptions()

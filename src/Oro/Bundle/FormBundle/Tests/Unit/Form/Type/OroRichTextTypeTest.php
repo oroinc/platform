@@ -6,6 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\PathPackage;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -16,13 +17,16 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     /** @var OroRichTextType */
     protected $formType;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Packages */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Packages */
     protected $assetsHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|HtmlTagProvider */
+    /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $context;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|HtmlTagProvider */
     protected $htmlTagProvider;
 
     protected function setUp()
@@ -30,8 +34,9 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->assetsHelper = $this->createMock(Packages::class);
         $this->htmlTagProvider = $this->createMock(HtmlTagProvider::class);
+        $this->context = $this->createMock(ContextInterface::class);
 
-        $this->formType = new OroRichTextType($this->configManager, $this->htmlTagProvider);
+        $this->formType = new OroRichTextType($this->configManager, $this->htmlTagProvider, $this->context);
         $this->formType->setAssetHelper($this->assetsHelper);
         parent::setUp();
     }
@@ -91,11 +96,11 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             ->with('oro_form.wysiwyg_enabled')
             ->will($this->returnValue($globalEnable));
 
-        $routing = $this->createMock(PathPackage::class);
-        $routing->expects($this->any())
+        $this->context->expects($this->any())
             ->method('getBasePath')
             ->willReturn($subfolder);
-        $routing->expects($this->any())
+
+        $this->assetsHelper->expects($this->any())
             ->method('getUrl')
             ->will(
                 $this->returnCallback(
@@ -104,10 +109,6 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                     }
                 )
             );
-
-        $this->assetsHelper->expects($this->once())
-            ->method('getPackage')
-            ->willReturn($routing);
 
         $this->htmlTagProvider->expects($this->once())
             ->method('getAllowedElements')
@@ -191,7 +192,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                 'convert_urls' => true,
                 'cache_suffix' => '',
                 'document_base_url' => '/prefix//',
-                'paste_data_images' => true,
+                'paste_data_images' => false,
             ]
         ];
 
@@ -274,15 +275,15 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                                     'fullscreen'
                                 ],
                                 'valid_elements' => implode(',', $elements),
-                                'content_css' => '/subfolder/bundles/oroform/css/wysiwyg-editor.css',
-                                'skin_url' => '/subfolder/bundles/oroform/css/tinymce'
+                                'content_css' => 'subfolder/bundles/oroform/css/wysiwyg-editor.css',
+                                'skin_url' => 'subfolder/bundles/oroform/css/tinymce'
                             ]
                         )
                     ]
                 ],
                 $elements,
                 true,
-                '/subfolder/'
+                '/subfolder'
             ],
         ];
     }

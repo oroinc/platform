@@ -1,0 +1,19 @@
+/* @theme: admin.oro; */
+
+$currency-select-enabled-base-currency-select-width: 62px;
+
+$currency-select-enabled-base-currency-input-width: $field-width - 60px;
+
+$currency-select-enabled-base-currency-selector-font-size: $base-font-size;
+$currency-select-enabled-base-currency-selector-offset-left: -2px;
+$currency-select-enabled-base-currency-selector-active-outline: 0 none;
+
+$currency-select-enabled-default-currency-equivalent-offset-top: 4px;
+$currency-select-enabled-default-currency-equivalent-color: $primary-500;
+
+$currency-select-enabled-base-currency-field-offset-top: 4px;
+
+$currency-select-enabled-base-currency-field-add-on-display: inline-block;
+$currency-select-enabled-base-currency-field-add-on-width: 62px;
+$currency-select-enabled-base-currency-field-add-on-inner-offset: ($content-padding-small / 2) $content-padding-small;
+$currency-select-enabled-base-currency-field-add-on-text-align: #{$start};

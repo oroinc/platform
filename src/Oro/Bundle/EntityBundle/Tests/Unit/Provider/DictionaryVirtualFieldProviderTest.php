@@ -9,18 +9,18 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
-class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
+class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $groupingConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $dictionaryConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $entityConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /** @var DictionaryVirtualFieldProvider */
@@ -431,7 +431,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array  $fields key = fieldName, value = fieldType
      * @param string $idFieldName
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createDictionaryMetadata($fields = [], $idFieldName = 'id')
     {

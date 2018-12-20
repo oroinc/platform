@@ -9,18 +9,18 @@ use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 
-class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
+class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigInterface */
     protected $config;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
     protected $groupProvider;
 
     /** @var EntityConfigHelper */

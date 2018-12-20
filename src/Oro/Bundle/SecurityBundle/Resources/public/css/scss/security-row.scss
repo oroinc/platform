@@ -1,0 +1,12 @@
+/* @theme: admin.oro; */
+
+.security-row {
+    > .span8 {
+        max-width: calc("100% - 116px");
+        margin-#{$end}: 0;
+    }
+
+    .select2-container {
+        width: 100px;
+    }
+}

@@ -57,12 +57,6 @@ services:
         tags:
             - { name: 'context.initializer' }
 
-    oro_behat_extension.message_queue_isolator_initializer:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\MessageQueueIsolatorInitializer
-        tags:
-            - { name: 'context.initializer' }
-            - { name: 'message_queue_isolator_aware' }
-
     oro_test.context.fixture_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader
         arguments:
@@ -111,8 +105,8 @@ services:
     oro_test.provider.xss_payload_provider:
         class: Oro\Bundle\TestFrameworkBundle\Provider\XssPayloadProvider
 
-    oro_test.encoder.mcrypt:
-        class: Oro\Bundle\SecurityBundle\Encoder\Mcrypt
+    oro_test.encoder.default:
+        class: Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter
         arguments: [ '%kernel.secret%' ]
 
     oro_test.faker.provider.xss:
@@ -120,7 +114,7 @@ services:
         arguments:
             - '@oro_test.faker_generator'
             - '@oro_test.provider.xss_payload_provider'
-            - '@oro_test.encoder.mcrypt'
+            - '@oro_test.encoder.default'
 
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader
@@ -143,3 +137,20 @@ services:
             - '@symfony2_extension.kernel'
         tags:
             - { name: 'context.class_resolver' }
+
+    oro_test.processor.message_queue:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessor
+        arguments:
+            - '@symfony2_extension.kernel'
+
+    oro_test.processor.message_queue.dbal:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\DbalMessageQueueProcessor
+        arguments:
+            - '@symfony2_extension.kernel'
+            - '@oro_test.processor.message_queue'
+
+    oro_test.processor.message_queue.amqp:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\AmqpMessageQueueProcessor
+        arguments:
+            - '@symfony2_extension.kernel'
+            - '@oro_test.processor.message_queue'

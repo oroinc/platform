@@ -3,6 +3,8 @@
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -99,9 +101,9 @@ class DictionaryFilterType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'field_type' => 'text',
+                'field_type' => TextType::class,
                 'field_options' => [],
-                'operator_type' => 'choice',
+                'operator_type' => ChoiceType::class,
                 'operator_options' => [],
                 'show_filter' => false,
                 'populate_default' => false,
@@ -109,8 +111,8 @@ class DictionaryFilterType extends AbstractType
                 'null_value' => null,
                 'class' => '',
                 'operator_choices' => [
-                    self::TYPE_IN => $this->translator->trans('oro.filter.form.label_type_in'),
-                    self::TYPE_NOT_IN => $this->translator->trans('oro.filter.form.label_type_not_in'),
+                    $this->translator->trans('oro.filter.form.label_type_in') => self::TYPE_IN,
+                    $this->translator->trans('oro.filter.form.label_type_not_in') => self::TYPE_NOT_IN,
                 ],
             ]
         )->setRequired(

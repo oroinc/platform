@@ -13,10 +13,10 @@ class GenderTypeTest extends FormIntegrationTestCase
     /**
      * @var array
      */
-    protected $genderChoices = array(
-        Gender::MALE   => 'Male',
-        Gender::FEMALE => 'Female',
-    );
+    protected $genderChoices = [
+        'Male' => Gender::MALE,
+        'Female' => Gender::FEMALE,
+    ];
 
     /**
      * @var GenderType
@@ -70,7 +70,7 @@ class GenderTypeTest extends FormIntegrationTestCase
         $view = $form->createView();
         $this->assertFalse($view->vars['multiple']);
         $this->assertFalse($view->vars['expanded']);
-        $this->assertNotEmpty($view->vars['empty_value']);
+        $this->assertNotEmpty($view->vars['placeholder']);
         $this->assertNotEmpty($view->vars['choices']);
 
         $actualChoices = array();
@@ -78,12 +78,7 @@ class GenderTypeTest extends FormIntegrationTestCase
         foreach ($view->vars['choices'] as $choiceView) {
             $actualChoices[$choiceView->value] = $choiceView->label;
         }
-        $this->assertEquals($this->genderChoices, $actualChoices);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(GenderType::NAME, $this->type->getName());
+        $this->assertEquals(array_flip($this->genderChoices), $actualChoices);
     }
 
     public function testGetParent()

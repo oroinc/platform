@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 
 /**
  * Sets default sorting for JSON API requests.
- * The sort filter name is "sort", the default sorting expression is "id ASC".
+ * The default sorting expression is "id ASC".
  */
 class SetDefaultSorting extends BaseSetDefaultSorting
 {
@@ -18,6 +18,14 @@ class SetDefaultSorting extends BaseSetDefaultSorting
      */
     protected function getDefaultValue(EntityDefinitionConfig $config): array
     {
-        return [JsonApiDoc::ID => Criteria::ASC];
+        $orderBy = $config->getOrderBy();
+        if (empty($orderBy)) {
+            $idFieldNames = $config->getIdentifierFieldNames();
+            if (!empty($idFieldNames)) {
+                $orderBy = [JsonApiDoc::ID => Criteria::ASC];
+            }
+        }
+
+        return $orderBy;
     }
 }

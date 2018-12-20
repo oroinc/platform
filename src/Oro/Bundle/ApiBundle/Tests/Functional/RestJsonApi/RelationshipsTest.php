@@ -4,7 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @group regression
+ */
 class RelationshipsTest extends RestJsonApiTestCase
 {
     /**
@@ -98,9 +102,14 @@ class RelationshipsTest extends RestJsonApiTestCase
         $response = $this->getRelationship($parameters, [], [], false);
 
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
-        self::assertApiResponseStatusCodeEquals($response, [200, 404, 405], $resourceKey, 'get relationship');
+        self::assertApiResponseStatusCodeEquals(
+            $response,
+            [Response::HTTP_OK, Response::HTTP_NOT_FOUND, Response::HTTP_METHOD_NOT_ALLOWED],
+            $resourceKey,
+            'get relationship'
+        );
 
-        if (200 !== $response->getStatusCode()) {
+        if (Response::HTTP_OK !== $response->getStatusCode()) {
             return null;
         }
 
@@ -161,7 +170,7 @@ class RelationshipsTest extends RestJsonApiTestCase
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
         self::assertUpdateApiResponseStatusCodeEquals(
             $response,
-            [204, 404, 405],
+            [Response::HTTP_NO_CONTENT, Response::HTTP_NOT_FOUND, Response::HTTP_METHOD_NOT_ALLOWED],
             $resourceKey,
             'update relationship',
             $data
@@ -200,7 +209,7 @@ class RelationshipsTest extends RestJsonApiTestCase
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
         self::assertUpdateApiResponseStatusCodeEquals(
             $response,
-            [204, 404, 405],
+            [Response::HTTP_NO_CONTENT, Response::HTTP_NOT_FOUND, Response::HTTP_METHOD_NOT_ALLOWED],
             $resourceKey,
             'add relationship',
             $data
@@ -238,7 +247,12 @@ class RelationshipsTest extends RestJsonApiTestCase
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
         self::assertApiResponseStatusCodeEquals(
             $response,
-            [204, 400, 404, 405],
+            [
+                Response::HTTP_NO_CONTENT,
+                Response::HTTP_BAD_REQUEST,
+                Response::HTTP_NOT_FOUND,
+                Response::HTTP_METHOD_NOT_ALLOWED
+            ],
             $resourceKey,
             'delete relationship'
         );

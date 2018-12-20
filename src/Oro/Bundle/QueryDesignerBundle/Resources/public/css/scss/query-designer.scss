@@ -1,0 +1,150 @@
+/* @theme: admin.oro; */
+
+.form-horizontal {
+    .query-designer-form {
+        margin-bottom: $query-designer-controls-group-margin-start;
+    }
+
+    .query-designer-row {
+        display: flex;
+        flex-wrap: wrap;
+
+        .control-group {
+            float: #{$start};
+            flex-direction: column;
+            margin-#{$end}: $query-designer-controls-group-margin-start;
+            margin-bottom: $query-designer-controls-group-margin-start;
+
+            .control-label {
+                width: auto;
+                padding-top: 0;
+                padding-bottom: $form-horizontal-control-label-offset;
+
+                text-align: #{$start};
+            }
+
+            .controls {
+                float: #{$start};
+                margin-#{$start}: 0;
+
+                .select2-container {
+                    order: -1;
+                }
+            }
+        }
+
+        .control-group-hidden,
+        .control-group-text,
+        .control-group-choice {
+            width: $query-designer-control-group-width;
+        }
+
+        .control-group-choice {
+            max-width: $query-designer-control-group-width;
+        }
+
+        .control-group-hidden {
+            .controls {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+
+        .select2-container,
+        input.label-text,
+        .function-selector .controls select,
+        .function-selector .controls .selector {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .sorting-selector .controls select {
+            width: $query-designer-sorting-selector-width;
+        }
+
+        @include selector-width($query-designer-sorting-selector-width);
+
+        .submit-cancel-buttons {
+            margin-#{$start}: auto;
+            margin-bottom: $query-designer-controls-group-margin-start;
+
+            @include clearfix();
+
+            &:before {
+                display: block;
+                height: $form-horizontal-control-label-line-height + $form-horizontal-control-label-offset;
+
+                content: '';
+            }
+
+            .btn-group {
+                float: none;
+            }
+
+            .btn {
+                margin-#{$start}: $query-designer-submit-cancel-buttons-margin-start;
+            }
+        }
+
+        .filter-box {
+            padding: $query-designer-filter-box-padding;
+            background: $query-designer-filter-box-background;
+
+            > .btn-group {
+                margin: 0;
+            }
+
+            .filter-item {
+                padding: 0;
+
+                > .btn {
+                    border-top-#{$end}-radius: $query-designer-filter-item-border-radius;
+                    border-bottom-#{$end}-radius: $query-designer-filter-item-border-radius;
+                }
+
+                .filter-select .select-filter-widget,
+                .filter-criteria-hint {
+                    font-weight: normal;
+                }
+            }
+        }
+    }
+}
+
+.query-designer-grid-container {
+    .grid {
+        th {
+            font-size: $query-designer-grid-th-font-size;
+        }
+
+        .label-column,
+        .label-cell {
+            width: $query-designer-grid-label-cell-width;
+        }
+
+        .function-column,
+        .function-cell {
+            width: $query-designer-grid-function-cell-width;
+        }
+
+        .sorting-column,
+        .sorting-cell {
+            width: $query-designer-grid-sorting-cell-width;
+        }
+
+        .index-column,
+        .index-cell {
+            width: $query-designer-grid-index-cell-width;
+        }
+
+        .action-column {
+            text-align: #{$end};
+        }
+
+        .action-cell {
+            padding-#{$end}: 0;
+
+            white-space: nowrap;
+        }
+    }
+}

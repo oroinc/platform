@@ -9,14 +9,14 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Helper\TranslationHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class TranslationHelperTest extends \PHPUnit_Framework_TestCase
+class TranslationHelperTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var TranslationRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslationRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
     /** @var TranslationHelper */

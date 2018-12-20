@@ -4,9 +4,9 @@ namespace Oro\Component\Testing\Tests\Unit\Assert;
 
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 
-class ArrayContainsConstraintTest extends \PHPUnit_Framework_TestCase
+class ArrayContainsConstraintTest extends \PHPUnit\Framework\TestCase
 {
-    public function testNull()
+    public function testNullActualData()
     {
         $expected = ['key' => 'value'];
         $actual = null;
@@ -16,14 +16,14 @@ Errors:
 Path: "". Error: Failed asserting that null is of type "array".
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
         $constraint->evaluate($actual);
     }
 
-    public function testNotArray()
+    public function testNotArrayActualData()
     {
         $expected = ['key' => 'value'];
         $actual = 'test';
@@ -33,7 +33,7 @@ Errors:
 Path: "". Error: Failed asserting that 'test' is of type "array".
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
@@ -71,6 +71,40 @@ TEXT;
     {
         $expected = ['value'];
         $actual = ['value', 'anotherValue'];
+
+        $constraint = new ArrayContainsConstraint($expected);
+        $constraint->evaluate($actual);
+    }
+
+    public function testArrayContainsWhenExpectedArrayHasMoreItemsThanActualArray()
+    {
+        $expected = ['key' => 'value', 'anotherKey' => 'anotherValue'];
+        $actual = ['key' => 'value'];
+        $expectedMessage = <<<TEXT
+Failed asserting that the array contains other array.
+Errors:
+Path: "anotherKey". Error: Failed asserting that an array has the key 'anotherKey'.
+TEXT;
+
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $constraint = new ArrayContainsConstraint($expected);
+        $constraint->evaluate($actual);
+    }
+
+    public function testArrayContainsWhenExpectedArrayHasMoreItemsThanActualArrayForIntKey()
+    {
+        $expected = ['value', 'anotherValue'];
+        $actual = ['value'];
+        $expectedMessage = <<<TEXT
+Failed asserting that the array contains other array.
+Errors:
+Path: "1". Error: Failed asserting that an array has the key 1.
+TEXT;
+
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
         $constraint->evaluate($actual);
@@ -192,7 +226,7 @@ Errors:
 Path: "1". Error: Failed asserting that 'anotherValue' is identical to 'value2'.
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
@@ -219,7 +253,7 @@ Path: "0". Error: Failed asserting that 'value2' is identical to 'value1'.
 Path: "1". Error: Failed asserting that 'anotherValue' is identical to 'value2'.
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
@@ -268,14 +302,14 @@ Path: "9". Error: Failed asserting that an array has the key 9.
 and others ...
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
         $constraint->evaluate($actual);
     }
 
-    public function testArrayContainsWhenMultiDimensionalArraysAreDifferent()
+    public function testStrictArrayContainsWhenMultiDimensionalArraysAreDifferent()
     {
         $expected = [
             'key1' => 'value1',
@@ -301,7 +335,7 @@ Errors:
 Path: "key2.key22.key221". Error: Failed asserting that 'value221_other' is identical to 'value221'.
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
@@ -331,7 +365,7 @@ Path: "key2.0.key". Error: Failed asserting that 'value222' is identical to 'val
 Path: "key2.1.key". Error: Failed asserting that 'value221' is identical to 'value222'.
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
@@ -386,7 +420,7 @@ Path: "key2.1.key". Error: Failed asserting that Array &0 (
 ) is identical to 'value222'.
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected, false);
@@ -415,7 +449,208 @@ Errors:
 Path: "key2.0.key2". Error: Failed asserting that an array has the key 'key2'.
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $constraint = new ArrayContainsConstraint($expected, false);
+        $constraint->evaluate($actual);
+    }
+
+    public function testNotStrictArraysNotEqualForWhenSeveralNotMatchedItemsFoundBeforeCallOfTryMatchIndexedElement()
+    {
+        $expected = [
+            [
+                'key1' => 'value1',
+                'key2' => [
+                    'key21' => 'value21',
+                    'key22' => [
+                        'key221' => 'value221',
+                        'key222' => 'value222',
+                        'key223' => 'value223'
+                    ]
+                ],
+                'key3' => [
+                    'key31' => [
+                        ['type' => 'test', 'key' => '1'],
+                        ['type' => 'test', 'key' => '2']
+                    ]
+                ]
+            ]
+        ];
+        $actual = [
+            [
+                'key1' => 'value1',
+                'key2' => [
+                    'key21' => 'value21',
+                    'key22' => [
+                        'key221' => 'value221',
+                        'key222' => 'value222_a',
+                        'key223' => 'value223_a'
+                    ]
+                ],
+                'key3' => [
+                    'key31' => [
+                        ['type' => 'test', 'key' => '2'],
+                        ['type' => 'test', 'key' => '1']
+                    ]
+                ]
+            ]
+        ];
+        $expectedMessage = <<<TEXT
+Failed asserting that the array contains other array.
+Errors:
+Path: "0.key2.key22.key222". Error: Failed asserting that 'value222_a' is identical to 'value222'.
+Path: "0.key2.key22.key223". Error: Failed asserting that 'value223_a' is identical to 'value223'.
+TEXT;
+
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $constraint = new ArrayContainsConstraint($expected, false);
+        $constraint->evaluate($actual);
+    }
+
+    public function testNotStrictArrayContainsWithNestedAttributesAndAndOrderOfElementIsDifferent()
+    {
+        $expected = [
+            'data' => [
+                ['id' => '3', 'attributes' => ['attr1' => 'val31']],
+                ['id' => '1', 'attributes' => ['attr1' => 'val11']],
+                ['id' => '2', 'attributes' => ['attr1' => 'val21']]
+            ]
+        ];
+        $actual = [
+            'data' => [
+                ['id' => '1', 'attributes' => ['attr1' => 'val11']],
+                ['id' => '2', 'attributes' => ['attr1' => 'val21']],
+                ['id' => '3', 'attributes' => ['attr1' => 'val31']]
+            ]
+        ];
+
+        $constraint = new ArrayContainsConstraint($expected, false);
+        $constraint->evaluate($actual);
+    }
+
+    public function testNotStrictArrayContainsWhenNestedAttributeOfFirstItemIsNotEqualAndOrderOfNextItemsAreDifferent()
+    {
+        $expected = [
+            'data' => [
+                ['id' => '1', 'attributes' => ['attr1' => 'val11', 'attr2' => 'val12']],
+                ['id' => '3', 'attributes' => ['attr1' => 'val31']],
+                ['id' => '2', 'attributes' => ['attr1' => 'val21']]
+            ]
+        ];
+        $actual = [
+            'data' => [
+                ['id' => '1', 'attributes' => ['attr1' => 'val11']],
+                ['id' => '2', 'attributes' => ['attr1' => 'val21']],
+                ['id' => '3', 'attributes' => ['attr1' => 'val31']]
+            ]
+        ];
+        $expectedMessage = <<<TEXT
+Failed asserting that the array contains other array.
+Errors:
+Path: "data.0.attributes.attr2". Error: Failed asserting that an array has the key 'attr2'.
+TEXT;
+
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $constraint = new ArrayContainsConstraint($expected, false);
+        $constraint->evaluate($actual);
+    }
+
+    public function testNotStrictArrayContainsForTwoSimilarItemAndSameOrderOfItems()
+    {
+        $expected = [
+            'data' => [
+                ['attributes' => ['attr1' => 'val11']],
+                ['attributes' => ['attr1' => 'val41']],
+                ['attributes' => ['attr1' => 'val31']],
+                ['attributes' => ['attr1' => 'val41', 'attr2' => 'val42']]
+            ]
+        ];
+        $actual = [
+            'data' => [
+                ['attributes' => ['attr1' => 'val11', 'attr2' => 'val12']],
+                ['attributes' => ['attr1' => 'val21', 'attr2' => 'val22']],
+                ['attributes' => ['attr1' => 'val31', 'attr2' => 'val32']],
+                ['attributes' => ['attr1' => 'val41', 'attr2' => 'val42']]
+            ]
+        ];
+        $expectedMessage = <<<TEXT
+Failed asserting that the array contains other array.
+Errors:
+Path: "data.1.attributes.attr1". Error: Failed asserting that 'val21' is identical to 'val41'.
+TEXT;
+
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $constraint = new ArrayContainsConstraint($expected, false);
+        $constraint->evaluate($actual);
+    }
+
+    public function testNotStrictArrayContainsForTwoSimilarItemAndDifferentOrderOfItems()
+    {
+        $expected = [
+            'data' => [
+                ['attributes' => ['attr1' => 'val31']],
+                ['attributes' => ['attr1' => 'val41']],
+                ['attributes' => ['attr1' => 'val11']],
+                ['attributes' => ['attr1' => 'val41', 'attr2' => 'val42']],
+                ['attributes' => ['attr1' => 'val21']]
+            ]
+        ];
+        $actual = [
+            'data' => [
+                ['attributes' => ['attr1' => 'val11', 'attr2' => 'val12']],
+                ['attributes' => ['attr1' => 'val21', 'attr2' => 'val22']],
+                ['attributes' => ['attr1' => 'val31', 'attr2' => 'val32']],
+                ['attributes' => ['attr1' => 'val41', 'attr2' => 'val42']],
+                ['attributes' => ['attr1' => 'val51', 'attr2' => 'val52']]
+            ]
+        ];
+        $expectedMessage = <<<TEXT
+Failed asserting that the array contains other array.
+Errors:
+Path: "data.1.attributes.attr1". Error: Failed asserting that 'val21' is identical to 'val41'.
+Path: "data.4.attributes.attr1". Error: Failed asserting that 'val51' is identical to 'val21'.
+TEXT;
+
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $constraint = new ArrayContainsConstraint($expected, false);
+        $constraint->evaluate($actual);
+    }
+
+    public function testNotStrictArrayContainsForTwoSimilarItemAndTheseItemsKeysDifferentThanInActualData()
+    {
+        $expected = [
+            'data' => [
+                ['attributes' => ['attr1' => 'val11']],
+                ['attributes' => ['attr1' => 'val31']],
+                ['attributes' => ['attr1' => 'val21']],
+                ['attributes' => ['attr1' => 'val31', 'attr2' => 'val32']]
+            ]
+        ];
+        $actual = [
+            'data' => [
+                ['attributes' => ['attr1' => 'val11', 'attr2' => 'val12']],
+                ['attributes' => ['attr1' => 'val21', 'attr2' => 'val22']],
+                ['attributes' => ['attr1' => 'val31', 'attr2' => 'val32']],
+                ['attributes' => ['attr1' => 'val41', 'attr2' => 'val42']]
+            ]
+        ];
+        $expectedMessage = <<<TEXT
+Failed asserting that the array contains other array.
+Errors:
+Path: "data.3.attributes.attr1". Error: Failed asserting that 'val41' is identical to 'val31'.
+Path: "data.3.attributes.attr2". Error: Failed asserting that 'val42' is identical to 'val32'.
+TEXT;
+
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected, false);

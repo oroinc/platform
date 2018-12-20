@@ -4,7 +4,7 @@ namespace Oro\Bundle\WindowsBundle\Tests\Entity;
 
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 
-class WindowsStateTest extends \PHPUnit_Framework_TestCase
+class WindowsStateTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var WindowsState
@@ -54,11 +54,10 @@ class WindowsStateTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testGetJsonData()
+    public function testGetData()
     {
         $data = ['test' => true];
         $this->windowState->setData($data);
         $this->assertEquals($data, $this->windowState->getData());
-        $this->assertEquals(json_encode($data), $this->windowState->getJsonData());
     }
 }

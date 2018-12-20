@@ -97,7 +97,10 @@ define(function(require) {
                 autoRender: true,
                 el: this.$('.board-header'),
                 collection: this.columns,
-                itemView: this.columnHeaderView,
+                itemView: function(options) {
+                    options = _.extend(_.pick(board, 'boardCollection'), options);
+                    return new board.columnHeaderView(options);
+                },
                 readonly: this.readonly
             }));
             this.subview('body', new BaseCollectionView({
@@ -163,17 +166,26 @@ define(function(require) {
          * Updates no-data block
          */
         updateNoDataBlock: function() {
+            var messageHTML;
+            var grid = this.boardPlugin.main.grid;
             var noDataVisible = this.serverCollection.models.length <= 0;
             if (noDataVisible) {
                 var placeholders = {
-                    entityHint: (this.boardPlugin.main.grid.entityHint || __('oro.datagrid.entityHint')).toLowerCase()
+                    entityHint: (grid.entityHint || __(grid.noDataTranslations.entityHint)).toLowerCase()
                 };
-                var message = _.isEmpty(this.serverCollection.state.filters)
-                    ? 'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
 
-                this.$('.no-data').html(this.boardPlugin.main.grid.noDataTemplate({
-                    hint: __(message, placeholders).replace('\n', '<br />')
-                }));
+                if (_.isEmpty(this.serverCollection.state.filters)) {
+                    messageHTML = grid.noDataTemplate({
+                        text: __(grid.noDataTranslations.noEntities, placeholders)
+                    });
+                } else {
+                    messageHTML = grid.noSearchResultsTemplate({
+                        title: __(grid.noDataTranslations.noResultsTitle),
+                        text: __(grid.noDataTranslations.noResults, placeholders)
+                    });
+                }
+
+                this.$('.no-data').html(messageHTML);
             }
             this.$el.toggleClass('no-data-visible', noDataVisible);
         },

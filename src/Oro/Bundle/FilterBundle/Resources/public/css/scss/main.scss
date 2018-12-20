@@ -1,0 +1,16 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/variables";
+@import "oroui/css/scss/oro/variables/form-variables";
+@import "oroui/css/scss/mixins";
+
+@import "variables";
+
+@import "filter-button";
+@import "filter";
+
+// desktop resolution
+@import "desktop/main";
+
+// mobile resolution
+@import "mobile/main";

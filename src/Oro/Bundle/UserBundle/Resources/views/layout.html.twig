@@ -12,13 +12,13 @@
     {% endblock %}
 </head>
 <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version {% block bodyClass %}{% endblock %}">
-    <div id="page">
-        <div id="top-page">
+    <div id="page" class="app-page">
+        <div id="central-panel" class="app-page__central-panel">
             {% set messagesContent %}
             {% if app.session.flashbag.peekAll|length > 0 %}
                 {% for type, messages in app.session.flashbag.all %}
                     {% for message in messages %}
-                    <div class="alert{{ type ? ' alert-'~type : '' }}">
+                    <div class="alert{{ type ? ' alert-'~type : '' }}" role="alert">
                     {{ message|trans|raw }}
                     </div>
                     {% endfor %}

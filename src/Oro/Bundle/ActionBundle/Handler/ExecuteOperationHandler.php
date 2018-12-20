@@ -94,7 +94,7 @@ class ExecuteOperationHandler
         if (null !== $request) {
             $executionForm = $this->formProvider->getOperationExecutionForm($operation, $data);
             $executionForm->handleRequest($request);
-            $isValidForm = $executionForm->isValid();
+            $isValidForm = $executionForm->isSubmitted() && $executionForm->isValid();
         }
         if (!$isValidForm || !$operation->isAvailable($data, $result->getValidationErrors())) {
             throw new ForbiddenOperationException(

@@ -6,29 +6,27 @@ use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganization;
 use Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganizationValidator;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class NameOrOrganizationValidatorTest extends \PHPUnit_Framework_TestCase
+class NameOrOrganizationValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var NameOrOrganization */
-    private $constraint;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContextInterface */
-    private $context;
-
-    /** @var NameOrOrganizationValidator */
-    private $validator;
+    /**
+     * {@inheritdoc}
+     */
+    protected function createValidator()
+    {
+        return new NameOrOrganizationValidator();
+    }
 
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function createContext()
     {
-        $this->context = $this->createMock(ExecutionContextInterface::class);
         $this->constraint = new NameOrOrganization();
-        $this->validator = new NameOrOrganizationValidator();
-        $this->validator->initialize($this->context);
+        $this->propertyPath = null;
+
+        return parent::createContext();
     }
 
     public function testConfiguration()
@@ -47,93 +45,76 @@ class NameOrOrganizationValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider validateProvider
+     * @dataProvider validDataProvider
      *
      * @param mixed $data
-     * @param boolean $valid
      */
-    public function testValidate($data, $valid)
+    public function testValidData($data)
     {
-        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $this->context->expects($valid ? $this->never() : $this->at(0))
-            ->method('buildViolation')
-            ->with($this->constraint->firstNameMessage)
-            ->willReturn($builder);
-        $builder->expects($valid ? $this->never() : $this->once())
-            ->method('atPath')
-            ->with('firstName')
-            ->willReturnSelf();
-        $builder->expects($valid ? $this->never() : $this->once())
-            ->method('addViolation');
-
-        $builder2 = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $this->context->expects($valid ? $this->never() : $this->at(1))
-            ->method('buildViolation')
-            ->with($this->constraint->lastNameMessage)
-            ->willReturn($builder2);
-        $builder2->expects($valid ? $this->never() : $this->once())
-            ->method('atPath')
-            ->with('lastName')
-            ->willReturnSelf();
-        $builder2->expects($valid ? $this->never() : $this->once())
-            ->method('addViolation');
-
-        $builder3 = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $this->context->expects($valid ? $this->never() : $this->at(2))
-            ->method('buildViolation')
-            ->with($this->constraint->organizationMessage)
-            ->willReturn($builder3);
-        $builder3->expects($valid ? $this->never() : $this->once())
-            ->method('atPath')
-            ->with('organization')
-            ->willReturnSelf();
-        $builder3->expects($valid ? $this->never() : $this->once())
-            ->method('addViolation');
-
         $this->validator->validate($data, $this->constraint);
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider invalidDataProvider
+     *
+     * @param mixed $data
+     */
+    public function testInvalidData($data)
+    {
+        $this->validator->validate($data, $this->constraint);
+        $this
+            ->buildViolation($this->constraint->firstNameMessage)
+            ->atPath('firstName')
+            ->buildNextViolation($this->constraint->lastNameMessage)
+            ->atPath('lastName')
+            ->buildNextViolation($this->constraint->organizationMessage)
+            ->atPath('organization')
+            ->assertRaised();
     }
 
     /**
      * @return array
      */
-    public function validateProvider()
+    public function validDataProvider()
     {
         return [
-            'empty' => [
-                'data' => new Address(),
-                'valid' => false,
-            ],
             'empty first name' => [
-                'data' => (new Address())->setLastName('test last name')->setOrganization('test organization'),
-                'valid' => true,
+                'data' => (new Address())->setLastName('test last name')->setOrganization('test organization')
             ],
             'empty last name' => [
-                'data' => (new Address())->setFirstName('test first name')->setOrganization('test organization'),
-                'valid' => true,
+                'data' => (new Address())->setFirstName('test first name')->setOrganization('test organization')
             ],
             'empty organization' => [
-                'data' => (new Address())->setFirstName('test first name')->setLastName('test last name'),
-                'valid' => true,
-            ],
-            'empty first name and organization' => [
-                'data' => (new Address())->setLastName('test last name'),
-                'valid' => false,
-            ],
-            'empty last name and organization' => [
-                'data' => (new Address())->setFirstName('test first name'),
-                'valid' => false,
+                'data' => (new Address())->setFirstName('test first name')->setLastName('test last name')
             ],
             'empty first name and last name' => [
-                'data' => (new Address())->setOrganization('test organization'),
-                'valid' => true,
+                'data' => (new Address())->setOrganization('test organization')
             ],
             'filled' => [
                 'data' => (new Address())
                     ->setFirstName('test first name')
                     ->setLastName('test last name')
-                    ->setOrganization('test organization'),
-                'valid' => true,
+                    ->setOrganization('test organization')
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidDataProvider()
+    {
+        return [
+            'empty' => [
+                'data' => new Address()
             ],
+            'empty first name and organization' => [
+                'data' => (new Address())->setLastName('test last name')
+            ],
+            'empty last name and organization' => [
+                'data' => (new Address())->setFirstName('test first name')
+            ]
         ];
     }
 }

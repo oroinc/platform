@@ -1,0 +1,37 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/mixins/direction";
+
+.entity-pagination {
+    display: flex;
+    align-items: baseline;
+    line-height: $entity-pagination-line-height;
+
+    .pagination .page-link {
+        padding: $entity-pagination-page-link-padding;
+        line-height: 1;
+
+        [class*="fa-"]{
+            padding: $entity-pagination-arrow-icon-padding;
+
+            &:before {
+                font-size: $entity-pagination-arrow-icon-font-size;
+            }
+        }
+    }
+
+    .page-current {
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        line-height: 1;
+        width: $entity-pagination-page-current-width;
+        color: $entity-pagination-page-current-color;
+    }
+
+    &_total {
+        margin-#{$start}: $entity-pagination-total-margin-start;
+        color: $entity-pagination-total-color;
+        font-size: $entity-pagination-total-font-size;
+    }
+}

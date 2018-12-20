@@ -1,0 +1,18 @@
+/* @theme: admin.oro; */
+
+.expression-editor {
+    &-autocomplete {
+        &.typeahead {
+            &.dropdown-menu {
+                max-height: 152px;
+                overflow-y: auto;
+            }
+        }
+    }
+
+    &-data-source {
+        .input-append {
+            margin-top: 10px;
+        }
+    }
+}

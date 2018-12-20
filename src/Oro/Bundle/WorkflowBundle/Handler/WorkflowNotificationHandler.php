@@ -7,12 +7,15 @@ use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
 
+/**
+ * Sends emails for workflow related notification events defined by notification rules.
+ */
 class WorkflowNotificationHandler extends EmailNotificationHandler
 {
     /**
      * {@inheritdoc}
      */
-    public function handle(NotificationEvent $event, $matchedNotifications)
+    public function handle(NotificationEvent $event, array $matchedNotifications)
     {
         if (!$event instanceof WorkflowNotificationEvent) {
             return;
@@ -33,7 +36,6 @@ class WorkflowNotificationHandler extends EmailNotificationHandler
         if ($notifications) {
             // send notifications
             $this->manager->process(
-                $event->getEntity(),
                 $notifications,
                 null,
                 [

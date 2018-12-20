@@ -5,6 +5,7 @@ namespace Oro\Bundle\TagBundle\Form\Type;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AbstractConfigType;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -20,7 +21,10 @@ class TagConfigChoiceType extends AbstractConfigType
         $resolver->setDefaults(
             [
                 'placeholder' => false,
-                'choices'     => ['No', 'Yes']
+                'choices' => [
+                    'No' => 0,
+                    'Yes' => 1,
+                ],
             ]
         );
 
@@ -37,7 +41,7 @@ class TagConfigChoiceType extends AbstractConfigType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**

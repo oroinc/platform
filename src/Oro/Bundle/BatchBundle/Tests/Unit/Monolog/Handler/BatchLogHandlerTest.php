@@ -3,26 +3,24 @@
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Monolog\Handler;
 
 use Oro\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler;
+use Oro\Component\Testing\TempDirExtension;
 
-class BatchLogHandlerTest extends \PHPUnit_Framework_TestCase
+class BatchLogHandlerTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var BatchLogHandler */
     protected $batchLogHandler;
 
     protected function setUp()
     {
-        $this->batchLogHandler = new BatchLogHandler(sys_get_temp_dir());
+        $this->batchLogHandler = new BatchLogHandler($this->getTempDir('batch_log_handler'));
         $this->batchLogHandler->setSubDirectory('batch_test');
     }
 
     protected function tearDown()
     {
-        if (is_file($this->batchLogHandler->getFilename())) {
-            unlink($this->batchLogHandler->getFilename());
-            rmdir(dirname($this->batchLogHandler->getFilename()));
-        }
-
-        unset($this->batchLogHandler);
+        $this->batchLogHandler->close();
     }
 
     public function testGetIsActive()

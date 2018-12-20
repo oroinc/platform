@@ -1,0 +1,171 @@
+/* @theme: admin.oro; */
+
+.short-emails-list {
+    display: flex;
+    flex-direction: column;
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2px 18px;
+
+        > a {
+            padding: 0 !important;
+            font-size: 12px;
+            line-height: 20px;
+        }
+    }
+
+    .mark-as-read,
+    .mark-visible-as-read {
+        cursor: pointer;
+        height: 19px;
+        padding: 0;
+        font-size: 12px;
+        line-height: 15px;
+
+        [class^="fa-"] {
+            float: left;
+            margin-#{$end}: 5px;
+            font-size: 13px;
+            line-height: inherit;
+
+            &:before {
+                margin: 0;
+                line-height: inherit;
+            }
+        }
+    }
+
+    .items {
+        list-style-type: none;
+        margin: 0;
+
+        li {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border-top: 1px solid $primary-830;
+            padding: 14px $content-padding-medium 13px;
+
+            .mail-icon {
+                @include fa-icon($email-inactive-mail-icon);
+
+                color: $primary-400;
+                font-size: 16px;
+                font-style: normal;
+                line-height: 1;
+                cursor: pointer;
+                position: absolute;
+                #{$end}: 16px;
+                top: 16px;
+            }
+
+            .info {
+                min-height: 12px;
+
+                .title,
+                .empty-subject {
+                    cursor: pointer;
+                }
+            }
+
+            .body {
+                padding-#{$end}: 20px;
+
+                font-size: $base-font-size--s + 1px;
+            }
+
+            .title,
+            .empty-subject {
+                color: $email-default-text-color;
+                width: 100%;
+                line-height: 16px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            .description {
+                color: $primary-550;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+                line-height: 1.69;
+            }
+
+            .footer {
+                font-size: $base-font-size--s;
+                margin-top: 12px;
+                line-height: 1.15;
+
+                .reply-action,
+                .reply-all-action,
+                .forward-action {
+                    display: none;
+                    margin-#{$start}: 12px;
+                }
+            }
+
+            &.highlight {
+                background: $email-highlight-bg;
+
+                .title {
+                    font-weight: bold;
+                }
+
+                .description {
+                    color: $email-default-text-color;
+                }
+
+                .mail-icon {
+                    @include fa-icon($email-active-mail-icon);
+
+                    color: $extra;
+                }
+
+                .from-name {
+                    max-width: 100%;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+
+    .notification,
+    .more-unread {
+        display: none;
+    }
+
+    .empty {
+        text-align: center;
+        padding: 4px 0;
+        color: $primary-400;
+    }
+
+    .my-emails,
+    .from-name {
+        float: #{$start};
+    }
+
+    .mark-as-read,
+    .mark-visible-as-read,
+    .forward-action-wrapper {
+        float: #{$end};
+        text-transform: none;
+    }
+}
+
+.default-reply-action .items li .footer .reply-action,
+.default-reply-all-action .items li .footer .reply-all-action,
+.default-forward-action .items li .footer .forward-action {
+    display: inline;
+}
+
+.widget-setup .recent-emails-setup {
+    padding: side-values(15px 15px 15px 20px);
+    margin: side-values(-15px -15px -15px -20px);
+}

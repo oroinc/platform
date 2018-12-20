@@ -1,7 +1,7 @@
 dashboards:
     widgets_configuration:
         title:
-            type: oro_type_widget_title
+            type: Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType
             options:
                label: oro.dashboard.title.label
                required: false
@@ -12,6 +12,7 @@ dashboards:
             route_parameters: { bundle: OroDashboardBundle, name: quickLaunchpad }
             description: oro.dashboard.quick_launchpad_widget_description
             icon:       bundles/orodashboard/img/quick_launchpad.png
+            icon_class: fa-rocket
 
     dashboards:
         main:

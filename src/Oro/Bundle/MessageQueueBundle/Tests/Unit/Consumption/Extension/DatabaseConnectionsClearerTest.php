@@ -7,9 +7,9 @@ use Oro\Bundle\MessageQueueBundle\Consumption\Extension\DatabaseConnectionsClear
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 
-class DatabaseConnectionsClearerTest extends \PHPUnit_Framework_TestCase
+class DatabaseConnectionsClearerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Container */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Container */
     private $container;
 
     /** @var DatabaseConnectionsClearer */

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -17,22 +18,28 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class CorrectSortValue implements ProcessorInterface
 {
-    const SORT_FILTER_KEY = 'sort';
-
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
+
+    /** @var FilterNamesRegistry */
+    private $filterNamesRegistry;
 
     /**
      * @param DoctrineHelper  $doctrineHelper
      * @param ValueNormalizer $valueNormalizer
+     * @param FilterNamesRegistry $filterNamesRegistry
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ValueNormalizer $valueNormalizer)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ValueNormalizer $valueNormalizer,
+        FilterNamesRegistry $filterNamesRegistry
+    ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->valueNormalizer = $valueNormalizer;
+        $this->filterNamesRegistry = $filterNamesRegistry;
     }
 
     /**
@@ -53,10 +60,13 @@ class CorrectSortValue implements ProcessorInterface
             return;
         }
 
+        $sortFilterName = $this->filterNamesRegistry
+            ->getFilterNames($context->getRequestType())
+            ->getSortFilterName();
         $filterValues = $context->getFilterValues();
-        $sortFilterValue = $filterValues->get(self::SORT_FILTER_KEY);
+        $sortFilterValue = $filterValues->get($sortFilterName);
         if (null === $sortFilterValue) {
-            $sortFilter = $context->getFilters()->get(self::SORT_FILTER_KEY);
+            $sortFilter = $context->getFilters()->get($sortFilterName);
             if ($sortFilter instanceof StandaloneFilterWithDefaultValue) {
                 $defaultValue = $sortFilter->getDefaultValueString();
                 if (!empty($defaultValue)) {
@@ -66,8 +76,8 @@ class CorrectSortValue implements ProcessorInterface
                         $context->getRequestType(),
                         $sortFilter->isArrayAllowed()
                     );
-                    $sortFilterValue = new FilterValue(self::SORT_FILTER_KEY, $defaultValue);
-                    $filterValues->set(self::SORT_FILTER_KEY, $sortFilterValue);
+                    $sortFilterValue = new FilterValue($sortFilterName, $defaultValue);
+                    $filterValues->set($sortFilterName, $sortFilterValue);
                 }
             }
         }
@@ -85,7 +95,7 @@ class CorrectSortValue implements ProcessorInterface
      *
      * @return mixed
      */
-    protected function normalizeValue($value, $entityClass, EntityDefinitionConfig $config = null)
+    private function normalizeValue($value, $entityClass, ?EntityDefinitionConfig $config)
     {
         if (empty($value) || !is_array($value)) {
             return $value;
@@ -109,11 +119,11 @@ class CorrectSortValue implements ProcessorInterface
      * @param string                      $direction
      * @param EntityDefinitionConfig|null $config
      */
-    protected function addEntityIdentifierFieldNames(
+    private function addEntityIdentifierFieldNames(
         array &$result,
         $entityClass,
         $direction,
-        EntityDefinitionConfig $config = null
+        ?EntityDefinitionConfig $config
     ) {
         if (null === $config) {
             $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);

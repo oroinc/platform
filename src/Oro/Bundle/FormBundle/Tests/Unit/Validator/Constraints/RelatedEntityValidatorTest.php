@@ -7,12 +7,12 @@ use Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntity;
 use Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntityValidator;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
-class RelatedEntityValidatorTest extends \PHPUnit_Framework_TestCase
+class RelatedEntityValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityClassNameHelper;
 
     /** @var RelatedEntityValidator */

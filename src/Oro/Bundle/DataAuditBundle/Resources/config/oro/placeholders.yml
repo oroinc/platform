@@ -3,9 +3,6 @@ placeholders:
         change_history_block:
             items:
                 change_history_link: ~
-        scripts_before:
-            items:
-                template_audit_condition_type_select: ~
         segment_criteria_list:
             items:
                 data_audit_condition: ~
@@ -17,8 +14,6 @@ placeholders:
                 - "@oro_dataaudit.placeholder.filter->isEntityAuditable($entity$, $audit_show_change_history$)"
                 - "@oro_user.placeholder.filter->isUserApplicable()"
             acl: oro_dataaudit_view
-        template_audit_condition_type_select:
-            template: OroDataAuditBundle:js:audit-condition-type-select.html.twig
         data_audit_condition:
             acl: oro_dataaudit_view
             applicable:

@@ -8,14 +8,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Adds possible status codes for the following actions executed in scope of REST API:
- * "get_list", "get", "update", "create", "delete", "delete_list", "get_subresource",
- * "get_relationship", "update_relationship", "add_relationship", "delete_relationship".
+ * "get_list", "get", "update", "create", "delete", "delete_list",
+ * "get_subresource", "update_subresource", "add_subresource", "delete_subresource",
+ * "get_relationship", "update_relationship", "add_relationship", "delete_relationship"
+ * and "options".
  * By performance reasons it is done in one processor.
  */
 class CompleteStatusCodes extends AbstractCompleteStatusCodes
 {
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addStatusCodes(StatusCodesConfig $statusCodes, $targetAction)
     {
@@ -41,6 +44,15 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
             case ApiActions::GET_SUBRESOURCE:
                 $this->addStatusCodesForGetSubresource($statusCodes);
                 break;
+            case ApiActions::UPDATE_SUBRESOURCE:
+                $this->addStatusCodesForUpdateSubresource($statusCodes);
+                break;
+            case ApiActions::ADD_SUBRESOURCE:
+                $this->addStatusCodesForAddSubresource($statusCodes);
+                break;
+            case ApiActions::DELETE_SUBRESOURCE:
+                $this->addStatusCodesForDeleteSubresource($statusCodes);
+                break;
             case ApiActions::GET_RELATIONSHIP:
                 $this->addStatusCodesForGetRelationship($statusCodes);
                 break;
@@ -52,6 +64,9 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
                 break;
             case ApiActions::DELETE_RELATIONSHIP:
                 $this->addStatusCodesForDeleteRelationship($statusCodes);
+                break;
+            case ApiActions::OPTIONS:
+                $this->addStatusCodesForOptions($statusCodes);
                 break;
         }
         
@@ -111,7 +126,7 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
         $this->addStatusCode(
             $statusCodes,
             Response::HTTP_OK,
-            'Returned when entity was successfully updated'
+            'Returned when the entity was successfully updated'
         );
         $this->addStatusCode(
             $statusCodes,
@@ -140,7 +155,7 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
         $this->addStatusCode(
             $statusCodes,
             Response::HTTP_CREATED,
-            'Returned when entity was successfully created'
+            'Returned when the entity was successfully created'
         );
         $this->addStatusCode(
             $statusCodes,
@@ -217,7 +232,79 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
         $this->addStatusCode(
             $statusCodes,
             Response::HTTP_NOT_FOUND,
-            'Returned when when the parent entity does not exist'
+            'Returned when the parent entity does not exist'
+        );
+    }
+
+    /**
+     * Adds status codes for "update_subresource" action
+     *
+     * @param StatusCodesConfig $statusCodes
+     */
+    protected function addStatusCodesForUpdateSubresource(StatusCodesConfig $statusCodes)
+    {
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_OK,
+            'Returned when the parent entity was successfully updated'
+        );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_FORBIDDEN,
+            'Returned when no permissions to update the parent entity'
+        );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_NOT_FOUND,
+            'Returned when the parent entity does not exist'
+        );
+    }
+
+    /**
+     * Adds status codes for "add_subresource" action
+     *
+     * @param StatusCodesConfig $statusCodes
+     */
+    protected function addStatusCodesForAddSubresource(StatusCodesConfig $statusCodes)
+    {
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_OK,
+            'Returned when the parent entity was successfully updated'
+        );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_FORBIDDEN,
+            'Returned when no permissions to update the parent entity'
+        );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_NOT_FOUND,
+            'Returned when the parent entity does not exist'
+        );
+    }
+
+    /**
+     * Adds status codes for "delete_subresource" action
+     *
+     * @param StatusCodesConfig $statusCodes
+     */
+    protected function addStatusCodesForDeleteSubresource(StatusCodesConfig $statusCodes)
+    {
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_OK,
+            'Returned when the parent entity was successfully updated'
+        );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_FORBIDDEN,
+            'Returned when no permissions to update the parent entity'
+        );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_NOT_FOUND,
+            'Returned when the parent entity does not exist'
         );
     }
 
@@ -241,7 +328,7 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
         $this->addStatusCode(
             $statusCodes,
             Response::HTTP_NOT_FOUND,
-            'Returned when when the parent entity of the relationship does not exist'
+            'Returned when the parent entity of the relationship does not exist'
         );
     }
 
@@ -299,6 +386,30 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
             $statusCodes,
             Response::HTTP_FORBIDDEN,
             'Returned when no permissions to update the relationship'
+        );
+    }
+
+    /**
+     * Adds status codes for "options" action
+     *
+     * @param StatusCodesConfig $statusCodes
+     */
+    protected function addStatusCodesForOptions(StatusCodesConfig $statusCodes)
+    {
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_OK,
+            'Returned when successful'
+        );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_BAD_REQUEST,
+            'Returned when the request data is not valid'
+        );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_NOT_FOUND,
+            'Returned when the entity is not found'
         );
     }
 }

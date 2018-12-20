@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+/**
+ * An interface for configuration sections that represent a field.
+ */
 interface FieldConfigInterface extends ConfigBagInterface
 {
     /**
@@ -28,7 +31,7 @@ interface FieldConfigInterface extends ConfigBagInterface
     /**
      * Indicates whether the path of the field value exists.
      *
-     * @return string
+     * @return bool
      */
     public function hasPropertyPath();
 

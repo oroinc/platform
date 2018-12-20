@@ -29,7 +29,7 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
             //float
             $item->floatValue = $ind / 10.0 + 10;
             //boolean
-            $item->booleanValue = rand(0, 1) == true;
+            $item->booleanValue = $ind % 3 === 0;
             //blob
             $item->blobValue = "blob-{$ind}";
             //array

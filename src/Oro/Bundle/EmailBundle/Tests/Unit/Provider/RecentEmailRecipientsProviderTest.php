@@ -8,7 +8,7 @@ use Oro\Bundle\EmailBundle\Provider\RecentEmailRecipientsProvider;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class RecentEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
+class RecentEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
 {
     protected $tokenAccessor;
     protected $aclHelper;

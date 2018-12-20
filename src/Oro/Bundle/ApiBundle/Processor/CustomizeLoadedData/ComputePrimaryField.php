@@ -8,6 +8,11 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Computes a value of "primary" field based on a "primary" flag in a collection.
+ * For example this processor can be used to compute a value of a primary email based on
+ * a collection of emails where each element of this collection has a "primary" boolean
+ * property indicates whether an email is a primary one or not.
+ * @see \Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter
+ * @see \Oro\Bundle\ApiBundle\Processor\CustomizeFormData\MapPrimaryField
  */
 class ComputePrimaryField implements ProcessorInterface
 {
@@ -53,19 +58,11 @@ class ComputePrimaryField implements ProcessorInterface
             return;
         }
 
-        $config = $context->getConfig();
-
-        $primaryFieldName = $config->findFieldNameByPropertyPath($this->primaryFieldName);
-        if (!$primaryFieldName
-            || $config->getField($primaryFieldName)->isExcluded()
-            || array_key_exists($primaryFieldName, $data)
-        ) {
-            // the primary field is undefined, excluded or already added
-            return;
+        $primaryFieldName = $context->getResultFieldName($this->primaryFieldName);
+        if ($context->isFieldRequested($primaryFieldName, $data)) {
+            $data[$primaryFieldName] = $this->getPrimaryValue($context->getConfig(), $data);
+            $context->setResult($data);
         }
-
-        $data[$primaryFieldName] = $this->getPrimaryValue($config, $data);
-        $context->setResult($data);
     }
 
     /**

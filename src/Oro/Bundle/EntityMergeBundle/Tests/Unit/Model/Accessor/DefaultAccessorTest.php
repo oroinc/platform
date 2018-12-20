@@ -6,7 +6,7 @@ use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
-class DefaultAccessorTest extends \PHPUnit_Framework_TestCase
+class DefaultAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DefaultAccessor $fieldAccessor;

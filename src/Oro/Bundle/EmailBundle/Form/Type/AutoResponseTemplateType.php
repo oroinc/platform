@@ -7,6 +7,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -74,8 +75,8 @@ class AutoResponseTemplateType extends AbstractType
                 'multiple' => false,
                 'expanded' => true,
                 'choices'  => [
-                    'html' => 'oro.email.datagrid.emailtemplate.filter.type.html',
-                    'txt'  => 'oro.email.datagrid.emailtemplate.filter.type.txt'
+                    'oro.email.datagrid.emailtemplate.filter.type.html' => 'html',
+                    'oro.email.datagrid.emailtemplate.filter.type.txt' => 'txt',
                 ],
                 'required' => true
             ])

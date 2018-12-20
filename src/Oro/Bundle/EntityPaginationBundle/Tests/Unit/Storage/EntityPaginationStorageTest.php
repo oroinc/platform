@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
-class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
+class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_NAME = 'stdClass';
     const FIELD_NAME  = 'id';
@@ -17,10 +17,10 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
 
     public static $entityIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $paginationManager;
 
     /** @var EntityPaginationStorage */

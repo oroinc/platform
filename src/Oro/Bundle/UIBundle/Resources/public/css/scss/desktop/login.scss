@@ -1,0 +1,11 @@
+/* @theme: admin.oro; */
+
+.login-page {
+    .app-page {
+        height: auto;
+
+        &__central-panel {
+            overflow: visible;
+        }
+    }
+}

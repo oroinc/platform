@@ -9,6 +9,9 @@ use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
 
+/**
+ * Add attributes to view for entity view and edit pages.
+ */
 class AttributeFormViewListener
 {
     /**
@@ -38,6 +41,7 @@ class AttributeFormViewListener
         $scrollData = $event->getScrollData();
         $formView = $event->getFormView();
         $groupsData = $this->attributeManager->getGroupsWithAttributes($entity->getAttributeFamily());
+        $this->filterGroupAttributes($groupsData, 'form', 'is_enabled');
         $this->addNotEmptyGroupBlocks($scrollData, $groupsData);
 
         foreach ($groupsData as $groupsDatum) {
@@ -122,6 +126,7 @@ class AttributeFormViewListener
 
         $groups = $this->attributeManager->getGroupsWithAttributes($entity->getAttributeFamily());
         $scrollData = $event->getScrollData();
+        $this->filterGroupAttributes($groups, 'view', 'is_displayable');
         $this->addNotEmptyGroupBlocks($scrollData, $groups);
 
         /** @var AttributeGroup $group */
@@ -161,5 +166,23 @@ class AttributeFormViewListener
     protected function moveFieldToBlock(ScrollData $scrollData, $fieldName, $blockId)
     {
         $scrollData->moveFieldToBlock($fieldName, $blockId);
+    }
+
+    /**
+     * @param array $groups
+     * @param string $scope
+     * @param string $option
+     */
+    private function filterGroupAttributes(array &$groups, $scope, $option)
+    {
+        foreach ($groups as &$group) {
+            $group['attributes'] = array_filter(
+                $group['attributes'],
+                function (FieldConfigModel $attribute) use ($scope, $option) {
+                    $attributeScopedConfig = $attribute->toArray($scope);
+                    return !empty($attributeScopedConfig[$option]);
+                }
+            );
+        }
     }
 }

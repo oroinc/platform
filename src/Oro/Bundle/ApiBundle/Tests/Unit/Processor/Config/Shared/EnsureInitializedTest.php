@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 class EnsureInitializedTest extends ConfigProcessorTestCase
 {
     /** @var EnsureInitialized */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -24,12 +24,10 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
 
     public function testProcessForNotInitializedConfigs()
     {
-        $this->context->setExtras(
-            [
-                new TestConfigSection('test_section'),
-                new TestConfigExtra('test')
-            ]
-        );
+        $this->context->setExtras([
+            new TestConfigSection('test_section'),
+            new TestConfigExtra('test')
+        ]);
         $this->processor->process($this->context);
 
         $this->assertConfig(
@@ -40,7 +38,7 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
             [],
             $this->context->get('test_section')
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->context->has('test')
         );
     }
@@ -49,12 +47,10 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
     {
         $this->context->setResult($this->createConfigObject(['exclusion_policy' => 'all']));
         $this->context->set('test_section', $this->createConfigObject(['attr' => 'val']));
-        $this->context->setExtras(
-            [
-                new TestConfigSection('test_section'),
-                new TestConfigExtra('test')
-            ]
-        );
+        $this->context->setExtras([
+            new TestConfigSection('test_section'),
+            new TestConfigExtra('test')
+        ]);
         $this->processor->process($this->context);
 
         $this->assertConfig(
@@ -69,7 +65,7 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
             ],
             $this->context->get('test_section')
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->context->has('test')
         );
     }

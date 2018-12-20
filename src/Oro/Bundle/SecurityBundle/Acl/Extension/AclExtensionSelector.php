@@ -11,7 +11,7 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 /**
- * This class provides a functionality to find ACL extension
+ * Provides a functionality to find ACL extension.
  */
 class AclExtensionSelector
 {
@@ -147,7 +147,7 @@ class AclExtensionSelector
             try {
                 $id = $this->objectIdAccessor->getId($object);
                 $type = ClassUtils::getRealClass($object);
-            } catch (InvalidDomainObjectException $e) {
+            } catch (\Throwable $e) {
                 $id = null;
                 $type = null;
             }

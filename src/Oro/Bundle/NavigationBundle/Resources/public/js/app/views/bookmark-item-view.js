@@ -1,12 +1,9 @@
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/app/views/base/view',
-    'oroui/js/mediator'
-], function($, _, BaseView, mediator) {
+define(function(require) {
     'use strict';
 
     var BookmarkItemView;
+    var mediator = require('oroui/js/mediator');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     BookmarkItemView = BaseView.extend({
         tagName: 'li',

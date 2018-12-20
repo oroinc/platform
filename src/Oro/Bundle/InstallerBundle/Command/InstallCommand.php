@@ -104,8 +104,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $output->writeln(
                 'To proceed with install: '
             );
-            $output->writeln(' - set parameter <info>installed: false</info> in app/config/parameters.yml.');
-            $output->writeln(' - remove caches in app/cache folder manually');
+            $output->writeln(' - set parameter <info>installed: false</info> in config/parameters.yml.');
+            $output->writeln(' - remove caches in var/cache folder manually');
             $output->writeln(' - drop database manually or reinstall over existing database.');
             $output->writeln(
                 'To reinstall over existing database - run command with <info>--drop-database</info> option:'
@@ -519,9 +519,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     ) {
         $output->writeln('<info>Preparing application.</info>');
 
-        $assetsOptions = [
-            '--exclude' => ['OroInstallerBundle']
-        ];
+        $assetsOptions = [];
         if ($input->hasOption('symlink') && $input->getOption('symlink')) {
             $assetsOptions['--symlink'] = true;
         }
@@ -537,15 +535,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             )
                 ->runCommand('oro:localization:dump')
                 ->runCommand(
-                    'oro:assets:install',
+                    'assets:install',
                     $assetsOptions
                 )
-                ->runCommand(
-                    'assetic:dump',
-                    [
-                        '--process-isolation' => true,
-                    ]
-                )
+                ->runCommand('oro:assets:build', ['--npm-install'=> true])
                 ->runCommand(
                     'oro:requirejs:build',
                     [
@@ -570,9 +563,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
 
         if (!$skipAssets) {
-            /**
-             * @todo Place this launch of command after the launch of 'assetic-dump' in BAP-16333
-             */
             $commandExecutor->runCommand(
                 'oro:translation:dump',
                 [

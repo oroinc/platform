@@ -1,0 +1,17 @@
+/* @theme: blank; */
+
+// Mixin for include caret triangle anywhere
+// @param $size set caret size
+// @param $color set caret color
+@mixin custom-caret($size: 4px, $color: null) {
+    &:after {
+        content: '';
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-top: $size solid $color;
+        border-right: $size solid transparent;
+        border-left: $size solid transparent;
+        vertical-align: middle;
+    }
+}

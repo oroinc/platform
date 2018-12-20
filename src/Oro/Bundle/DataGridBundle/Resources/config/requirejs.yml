@@ -48,6 +48,7 @@ config:
         'orodatagrid/js/datagrid/editor/select-cell-radio-editor': 'bundles/orodatagrid/js/datagrid/editor/select-cell-radio-editor.js'
         'orodatagrid/js/datagrid/grid': 'bundles/orodatagrid/js/datagrid/grid.js'
         'orodatagrid/js/datagrid/header-cell/header-cell': 'bundles/orodatagrid/js/datagrid/header-cell/header-cell.js'
+        'orodatagrid/js/datagrid/header-cell/action-header-cell': 'bundles/orodatagrid/js/datagrid/header-cell/action-header-cell.js'
         'orodatagrid/js/datagrid/header-cell/select-all-header-cell': 'bundles/orodatagrid/js/datagrid/header-cell/select-all-header-cell.js'
         'orodatagrid/js/datagrid/header': 'bundles/orodatagrid/js/datagrid/header.js'
 
@@ -95,3 +96,11 @@ config:
         'orodatagrid/js/app/components/multi-grid-component': 'bundles/orodatagrid/js/app/components/multi-grid-component.js'
         'orodatagrid/js/app/views/multi-grid-view': 'bundles/orodatagrid/js/app/views/multi-grid-view.js'
         'orodatagrid/js/row-select-for-widget/builder': 'bundles/orodatagrid/js/row-select-for-widget/builder.js'
+
+        'orodatagrid/js/app/models/datagrid-settings-list/datagrid-settings-list-filter-model':  'bundles/orodatagrid/js/app/models/datagrid-settings-list/datagrid-settings-list-filter-model.js'
+        'orodatagrid/js/app/models/datagrid-settings-list/datagrid-settings-list-collection':  'bundles/orodatagrid/js/app/models/datagrid-settings-list/datagrid-settings-list-collection'
+
+        'orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-collection-view': 'bundles/orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-collection-view.js'
+        'orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-filter-view': 'bundles/orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-filter-view.js'
+        'orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-item-view': 'bundles/orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-item-view.js'
+        'orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-view': 'bundles/orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-view.js'

@@ -1,0 +1,30 @@
+/* @theme: admin.oro; */
+
+@media only screen and (max-width: $small-devices-media-breakpoint) {
+    .modal--fullscreen-small-device {
+        .modal {
+            &-dialog {
+                margin: 0;
+            }
+
+            &-content {
+                height: 100vh;
+            }
+
+            &-header {
+                flex-shrink: 0;
+            }
+
+            &-body {
+                padding: $content-padding;
+                overflow: auto;
+            }
+
+            &-footer {
+                flex-shrink: 0;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    }
+}

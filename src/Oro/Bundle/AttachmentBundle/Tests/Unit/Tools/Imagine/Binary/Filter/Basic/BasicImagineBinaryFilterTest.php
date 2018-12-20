@@ -6,10 +6,10 @@ use Liip\ImagineBundle\Binary\BinaryInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterManager;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\Basic\BasicImagineBinaryFilter;
 
-class BasicImagineBinaryFilterTest extends \PHPUnit_Framework_TestCase
+class BasicImagineBinaryFilterTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var FilterManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var FilterManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $filterManager;
 
@@ -44,7 +44,7 @@ class BasicImagineBinaryFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return BinaryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return BinaryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createBinaryMock()
     {

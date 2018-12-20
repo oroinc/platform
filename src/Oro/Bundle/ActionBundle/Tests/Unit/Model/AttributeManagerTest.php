@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 
-class AttributeManagerTest extends \PHPUnit_Framework_TestCase
+class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetAttributes()
     {

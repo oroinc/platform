@@ -4,15 +4,15 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateValueFormatter;
 
-class DateValueFormatterTest extends \PHPUnit_Framework_TestCase
+class DateValueFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DateValueFormatter */
     protected $formatter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $datetimeFormatter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     protected function setUp()

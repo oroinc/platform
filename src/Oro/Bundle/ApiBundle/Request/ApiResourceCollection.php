@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
+/**
+ * Represents a collection of Data API resources.
+ */
 class ApiResourceCollection implements \Countable, \IteratorAggregate
 {
     /** @var ApiResource[] [entity class => ApiResource, ...] */
-    protected $resources = [];
+    private $resources = [];
 
     /**
      * Checks whether a resource for a given entity exists in the collection.
@@ -28,9 +31,7 @@ class ApiResourceCollection implements \Countable, \IteratorAggregate
      */
     public function get($entityClass)
     {
-        return isset($this->resources[$entityClass])
-            ? $this->resources[$entityClass]
-            : null;
+        return $this->resources[$entityClass] ?? null;
     }
 
     /**
@@ -44,7 +45,7 @@ class ApiResourceCollection implements \Countable, \IteratorAggregate
     {
         $entityClass = $resource->getEntityClass();
         if (isset($this->resources[$entityClass])) {
-            throw new \InvalidArgumentException(sprintf('A resource for "%s" already exists.', $entityClass));
+            throw new \InvalidArgumentException(\sprintf('A resource for "%s" already exists.', $entityClass));
         }
         $this->resources[$entityClass] = $resource;
     }
@@ -110,6 +111,6 @@ class ApiResourceCollection implements \Countable, \IteratorAggregate
      */
     public function count()
     {
-        return count($this->resources);
+        return \count($this->resources);
     }
 }

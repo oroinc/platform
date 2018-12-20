@@ -6,6 +6,11 @@ use Doctrine\Bundle\DoctrineBundle\Registry as BaseRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 
+/**
+ * This manager registry has the following improvements:
+ * * allows to configure the default lifetime of cached ORM queries
+ * * implements caching of entity managers and other performance related improvements
+ */
 class Registry extends BaseRegistry
 {
     /** @var string[] [entity class => manager hash, ...] */
@@ -16,6 +21,17 @@ class Registry extends BaseRegistry
 
     /** @var array [service id => manager, ...] */
     private $cachedManagerServices = [];
+
+    /** @var int|null */
+    private $defaultQueryCacheLifetime;
+
+    /**
+     * @param int|null
+     */
+    public function setDefaultQueryCacheLifetime($defaultQueryCacheLifetime)
+    {
+        $this->defaultQueryCacheLifetime = $defaultQueryCacheLifetime;
+    }
 
     /**
      * {@inheritdoc}
@@ -28,9 +44,10 @@ class Registry extends BaseRegistry
 
         $manager = parent::getService($name);
         if ($manager instanceof OroEntityManager) {
-            $manager->setDefaultQueryCacheLifetime(
-                $this->container->getParameter('oro_entity.default_query_cache_lifetime')
-            );
+            $configuration = $manager->getConfiguration();
+            if ($configuration instanceof OrmConfiguration) {
+                $this->initializeEntityManagerConfiguration($configuration);
+            }
         }
 
         $this->cachedManagerServices[$name] = $manager;
@@ -94,6 +111,14 @@ class Registry extends BaseRegistry
         }
 
         throw ORMException::unknownEntityNamespace($alias);
+    }
+
+    /**
+     * @param OrmConfiguration $configuration
+     */
+    protected function initializeEntityManagerConfiguration(OrmConfiguration $configuration)
+    {
+        $configuration->setAttribute('DefaultQueryCacheLifetime', $this->defaultQueryCacheLifetime);
     }
 
     /**

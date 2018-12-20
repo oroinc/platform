@@ -5,15 +5,15 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Formatter;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Formatter\ImageEncodedFormatter;
 
-class ImageEncodedFormatterTest extends \PHPUnit_Framework_TestCase
+class ImageEncodedFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImageEncodedFormatter */
     protected $formatter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $fileLocator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $fileManager;
 
     protected function setUp()

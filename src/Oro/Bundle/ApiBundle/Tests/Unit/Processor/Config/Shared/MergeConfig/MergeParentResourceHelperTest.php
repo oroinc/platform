@@ -13,22 +13,20 @@ use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeParentResource
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 
-class MergeParentResourceHelperTest extends \PHPUnit_Framework_TestCase
+class MergeParentResourceHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    private $configProvider;
 
     /** @var ConfigContext */
-    protected $context;
+    private $context;
 
     /** @var MergeParentResourceHelper */
-    protected $mergeParentResourceHelper;
+    private $mergeParentResourceHelper;
 
     protected function setUp()
     {
-        $this->configProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
 
         $this->mergeParentResourceHelper = new MergeParentResourceHelper(
             $this->configProvider
@@ -44,7 +42,7 @@ class MergeParentResourceHelperTest extends \PHPUnit_Framework_TestCase
      * @param string $parentResourceClass
      * @param Config $parentConfig
      */
-    protected function loadParentConfig($parentResourceClass, Config $parentConfig)
+    private function loadParentConfig($parentResourceClass, Config $parentConfig)
     {
         $this->configProvider->expects(self::once())
             ->method('getConfig')
@@ -163,7 +161,7 @@ class MergeParentResourceHelperTest extends \PHPUnit_Framework_TestCase
                 'fields'                => [
                     'field1'              => [
                         'exclude'       => true,
-                        'property_path' => 'field1propertyPath',
+                        'property_path' => 'field1propertyPath'
                     ],
                     'field2'              => null,
                     'field3'              => [
@@ -173,7 +171,7 @@ class MergeParentResourceHelperTest extends \PHPUnit_Framework_TestCase
                     'association1'        => [
                         'fields' => [
                             'association1field1' => null,
-                            'association1field2' => null,
+                            'association1field2' => null
                         ]
                     ],
                     'association2'        => null,
@@ -185,15 +183,15 @@ class MergeParentResourceHelperTest extends \PHPUnit_Framework_TestCase
                     ],
                     'fieldToAssociation1' => [
                         'fields' => [
-                            'fieldToAssociation1Field1' => null,
+                            'fieldToAssociation1Field1' => null
                         ]
                     ],
                     'fieldToAssociation2' => [
                         'exclude' => true,
                         'fields'  => [
-                            'fieldToAssociation2Field1' => null,
+                            'fieldToAssociation2Field1' => null
                         ]
-                    ],
+                    ]
                 ]
             ],
             $parentDefinition->toArray()
@@ -258,7 +256,7 @@ class MergeParentResourceHelperTest extends \PHPUnit_Framework_TestCase
                         'property_path' => 'parentField2'
                     ],
                     'filter3' => null,
-                    'filter4' => null,
+                    'filter4' => null
                 ]
             ],
             $parentFilters->toArray()
@@ -322,7 +320,7 @@ class MergeParentResourceHelperTest extends \PHPUnit_Framework_TestCase
                         'property_path' => 'parentField2'
                     ],
                     'sorter3' => null,
-                    'sorter4' => null,
+                    'sorter4' => null
                 ]
             ],
             $parentSorters->toArray()
@@ -369,7 +367,7 @@ class MergeParentResourceHelperTest extends \PHPUnit_Framework_TestCase
                 ],
                 'action2' => [
                     'description' => 'description 2'
-                ],
+                ]
             ],
             $actions->toArray()
         );
@@ -415,7 +413,7 @@ class MergeParentResourceHelperTest extends \PHPUnit_Framework_TestCase
                 ],
                 'subresource2' => [
                     'target_class' => 'target 2'
-                ],
+                ]
             ],
             $subresources->toArray()
         );

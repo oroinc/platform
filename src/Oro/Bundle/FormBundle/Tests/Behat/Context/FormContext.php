@@ -11,7 +11,6 @@ use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\Select;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
-use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
@@ -196,21 +195,24 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @Then /^(?:|I )should see validation errors:$/
      * @Then /^(?:|I )should see "(?P<formName>(?:[^"]|\\")*)" validation errors:$/
+     * @throws \Exception
      */
     public function iShouldSeeValidationErrors(TableNode $table, $formName = 'OroForm')
     {
-        /** @var OroForm $form */
-        $form = $this->createElement($formName);
+        $this->waitForValidationErrorsAssertion(function () use ($table, $formName) {
+            /** @var OroForm $form */
+            $form = $this->createElement($formName);
 
-        foreach ($table->getRows() as $row) {
-            list($label, $value) = $row;
-            $error = $form->getFieldValidationErrors($label);
-            self::assertEquals(
-                $value,
-                $error,
-                "Failed asserting that $label has error $value"
-            );
-        }
+            foreach ($table->getRows() as $row) {
+                list($label, $value) = $row;
+                $error = $form->getFieldValidationErrors($label);
+                self::assertEquals(
+                    $value,
+                    $error,
+                    "Failed asserting that $label has error $value"
+                );
+            }
+        });
     }
 
     /**
@@ -222,20 +224,24 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @Then /^(?:|I )should not see validation errors:$/
      * @Then /^(?:|I )should not see "(?P<formName>(?:[^"]|\\")*)" validation errors:$/
+     *
+     * @throws \Exception
      */
     public function iShouldNotSeeValidationErrors(TableNode $table, $formName = 'OroForm')
     {
-        /** @var OroForm $form */
-        $form = $this->createElement($formName);
+        $this->waitForValidationErrorsAssertion(function () use ($table, $formName) {
+            /** @var OroForm $form */
+            $form = $this->createElement($formName);
 
-        foreach ($table->getRows() as $row) {
-            list($label, $value) = $row;
-            $errors = $form->getAllFieldValidationErrors($label);
-            self::assertFalse(
-                in_array($value, $errors),
-                sprintf('Failed asserting that "%s" does not contain following error "%s"', $label, $value)
-            );
-        }
+            foreach ($table->getRows() as $row) {
+                list($label, $value) = $row;
+                $errors = $form->getAllFieldValidationErrors($label);
+                self::assertFalse(
+                    in_array($value, $errors),
+                    sprintf('Failed asserting that "%s" does not contain following error "%s"', $label, $value)
+                );
+            }
+        });
     }
 
     /**
@@ -267,6 +273,48 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function setCollectionFieldWith($field, TableNode $table)
     {
         $this->createOroForm()->fillField($field, $table);
+    }
+
+    /**
+     * Check that the field contains the following values.
+     *
+     * Example: Then I should see values in field "Reminders":
+     *            | Value 1 |
+     *            | Value 2 |
+     *
+     * @Then /^(?:|I )should see values in field "(?P<field>(?:[^"]|\\")*)":$/
+     */
+    public function collectionFieldHasValues($field, TableNode $table)
+    {
+        $form = $this->createOroForm();
+        $field = $form->findField($field);
+
+        $value = $field->getValue();
+        $expectedValues = $table->getColumn(0);
+        foreach ($expectedValues as $expectedValue) {
+            self::assertContains($expectedValue, $value);
+        }
+    }
+
+    /**
+     * Check that the field does not contain the following values.
+     *
+     * Example: Then I should not see values in field "Reminders":
+     *            | Value 1 |
+     *            | Value 2 |
+     *
+     * @Then /^(?:|I )should not see values in field "(?P<field>(?:[^"]|\\")*)":$/
+     */
+    public function collectionFieldHasNoValues($field, TableNode $table)
+    {
+        $form = $this->createOroForm();
+        $field = $form->findField($field);
+
+        $value = $field->getValue();
+        $expectedValues = $table->getColumn(0);
+        foreach ($expectedValues as $expectedValue) {
+            self::assertNotContains($expectedValue, $value);
+        }
     }
 
     /**
@@ -340,31 +388,19 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      * Example: When I type "Create" in "Enter shortcut action"
      *
      * @When /^(?:|I )type "(?P<value>(?:[^"]|\\")*)" in "(?P<field>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )type "(?P<value>(?:[^"]|\\")*)" in "(?P<field>(?:[^"]|\\")*)" from "(?P<formName>(?:[^"]|\\")*)"$/
+     * @throws ElementNotFoundException
      */
-    public function iTypeInFieldWith($locator, $value)
+    public function iTypeInFieldWith($locator, $value, $formName = 'OroForm')
     {
         $locator = $this->fixStepArgument($locator);
         $value = $this->fixStepArgument($value);
-        $field = $this->getPage()->find('named', ['field', $locator]);
-        /** @var OroSelenium2Driver $driver */
-        $driver = $this->getSession()->getDriver();
+        $formName = $this->fixStepArgument($formName);
 
-        if (null === $field) {
-            // try to find field among defined elements
-            $field = $this->createElement($locator);
-        }
-        if (null === $field) {
-            throw new ElementNotFoundException(
-                $driver,
-                'form field',
-                'id|name|label|value|placeholder|element',
-                $locator
-            );
-        }
+        /** @var OroForm $form */
+        $form = $this->createElement($formName);
 
-        self::assertTrue($field->isVisible(), "Field with '$locator' was found, but it not visible");
-
-        $driver->typeIntoInput($field->getXpath(), $value);
+        $form->typeInField($locator, $value);
     }
 
     /**
@@ -430,9 +466,9 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select:$/
      *
-     * @param string    $field
+     * @param string $field
      * @param TableNode $options
-     * @param string    $formName
+     * @param string $formName
      */
     public function shouldSeeTheFollowingOptionsForSelect($field, TableNode $options, $formName = 'OroForm')
     {
@@ -453,9 +489,9 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * @Then /^(?:|I )should not see the following options for "(?P<field>[^"]*)" select:$/
      *
-     * @param string    $field
+     * @param string $field
      * @param TableNode $options
-     * @param string    $formName
+     * @param string $formName
      */
     public function shouldNotSeeTheFollowingOptionsForSelect($field, TableNode $options, $formName = 'OroForm')
     {
@@ -495,7 +531,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @param string $selectField
-     * @param array  $optionLabels
+     * @param array $optionLabels
      */
     protected function assertSelectContainsOptions($selectField, array $optionLabels)
     {
@@ -508,7 +544,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @param string $selectField
-     * @param array  $optionLabels
+     * @param array $optionLabels
      */
     protected function assertSelectNotContainsOptions($selectField, array $optionLabels)
     {
@@ -567,5 +603,34 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         }
 
         return $field;
+    }
+
+    /**
+     * This method introduces delay to wait for validation errors to appear.
+     * It's useful when dealing with js validation errors as it can take some time for them to be rendered.
+     *
+     * @param callable $assertionFunction
+     * @throws \Exception
+     */
+    private function waitForValidationErrorsAssertion(callable $assertionFunction)
+    {
+        /** @var \Exception $failureException */
+        $failureException = null;
+
+        $this->spin(function () use ($assertionFunction, &$failureException) {
+            try {
+                $assertionFunction();
+            } catch (\Exception $exception) {
+                $failureException = $exception;
+                return null;
+            }
+
+            $failureException = null;
+            return true;
+        }, 5);
+
+        if ($failureException) {
+            throw $failureException;
+        }
     }
 }

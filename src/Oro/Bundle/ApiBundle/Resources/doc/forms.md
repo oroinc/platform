@@ -10,8 +10,13 @@ The Symfony [Validation Component](http://symfony.com/doc/current/book/validatio
 
 ## Validation
 
-The validation rules are loaded from `Resources/config/validation.yml` and annotations as it is commonly done in Symfony applications. So, all validation rules defined for an entity apply to the data API as well.
+The validation rules are loaded from `Resources/config/validation.yml` and annotations as it is commonly done in Symfony applications. So, all validation rules defined for an entity are applied to the data API as well.
 By default, the data API uses two validation groups: **Default** and **api**. If you need to add validation constraints that should apply to the data API only, add them to the **api** validation group.
+
+In case a validation rule cannot be implemented as a regular validation constraint due to its complexity
+you can implement it as a processor for `post_validate` event of
+[customize_form_data](./actions.md#customize_form_data-action) action.
+Pay your attention on [FormUtil](../../Form/FormUtil.php) class, it contains methods that may be useful in such processor.
 
 If the input data violates validation constraints, they will be automatically converted to [validation errors](./processors.md#error-handling) that help build the correct response of the data API. The conversion is performed by the [CollectFormErrors](../../Processor/Shared/CollectFormErrors.php) processor. By default, the HTTP status code for validation errors is `400 Bad Request`. If you need to change it, you can do it in the following ways:
 
@@ -50,19 +55,20 @@ Consequently, all the data API form types, extensions, and guessers should be re
 - Use the application configuration file.
 - Tag the form elements by appropriate tags in the dependency injection container.
 
-To register a new form elements using the application configuration file, add `Resources/config/oro/app.yml` in any bundle or use `app/config/config.yml` of your application:
+To register a new form elements using the application configuration file, add `Resources/config/oro/app.yml` in any bundle or use `config/config.yml` of your application:
 
 ```yaml
 api:
     form_types:
-        - form.type.date # service id of "date" form type
+        - Symfony\Component\Form\Extension\Core\Type\DateType # the class name of a form type
+        - form.type.date # the service id of a form type
     form_type_extensions:
-        - form.type_extension.form.validator # service id of Symfony form validation extension
+        - form.type_extension.form.http_foundation # service id of a form type extension
     form_type_guessers:
-        - form.type_guesser.validator # service id of Symfony form type guesser based on validation constraints
+        - acme.form.type_guesser # service id of a form type guesser
     form_type_guesses:
         datetime: # data type
-            form_type: datetime # the name of guessed form type
+            form_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType # the guessed form type
             options: # guessed form type options
                 model_timezone: UTC
                 view_timezone: UTC
@@ -70,6 +76,9 @@ api:
                 widget: single_text
                 format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ" # HTML5
 ```
+
+**Please note** that the `form_types` section can contain either the class name or the service id of a form type.
+Usually the service id is used if a form type depends on other services in the dependency injection container.
 
 You can find the already registered data API form elements in [Resources/config/oro/app.yml](../config/oro/app.yml).
 

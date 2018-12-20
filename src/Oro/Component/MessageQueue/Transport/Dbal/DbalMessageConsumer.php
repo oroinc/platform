@@ -1,13 +1,21 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\DriverException;
+use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Types\Type;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Consume messages from DBAL
+ */
 class DbalMessageConsumer implements MessageConsumerInterface
 {
     /**
@@ -41,7 +49,22 @@ class DbalMessageConsumer implements MessageConsumerInterface
     private $pollingInterval = 1000000;
 
     /**
-     * @param DbalSession     $session
+     * @var Statement
+     */
+    private $updateStatement;
+
+    /**
+     * @var Statement
+     */
+    private $selectStatement;
+
+    /**
+     * @var Statement
+     */
+    private $deleteStatement;
+
+    /**
+     * @param DbalSession $session
      * @param DbalDestination $queue
      */
     public function __construct(DbalSession $session, DbalDestination $queue)
@@ -78,7 +101,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
      */
     public function getPollingInterval()
     {
-        return (int) $this->pollingInterval / 1000;
+        return (int)$this->pollingInterval / 1000;
     }
 
     /**
@@ -108,15 +131,17 @@ class DbalMessageConsumer implements MessageConsumerInterface
             }
 
             if ($timeout && (microtime(true) - $startAt) >= $timeout) {
-                return;
+                return null;
             }
 
             usleep($this->pollingInterval);
 
             if ($timeout && (microtime(true) - $startAt) >= $timeout) {
-                return;
+                return null;
             }
         }
+
+        return null;
     }
 
     /**
@@ -137,46 +162,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
     public function acknowledge(MessageInterface $message)
     {
         InvalidMessageException::assertMessageInstanceOf($message, DbalMessage::class);
-
-        $this->dbal->beginTransaction();
-
-        $sql = sprintf(
-            'SELECT id FROM %s WHERE id=:id FOR UPDATE',
-            $this->connection->getTableName()
-        );
-
-        $row = $this->dbal->executeQuery(
-            $sql,
-            ['id' => $message->getId(), ],
-            ['id' => Type::INTEGER, ]
-        )->fetch();
-        $affectedRows = null;
-        if (count($row)) {
-            try {
-                $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()], [
-                    'id' => Type::INTEGER,
-                ]);
-                $this->dbal->commit();
-            } catch (\Exception $e) {
-                sleep(1);
-                try {
-                    $affectedRows = $this->dbal->delete(
-                        $this->connection->getTableName(),
-                        ['id' => $message->getId()],
-                        ['id' => Type::INTEGER, ]
-                    );
-                    $this->dbal->commit();
-                } catch (\Exception $e) {
-                    $this->dbal->rollBack();
-                }
-            }
-        }
-        if (1 !== $affectedRows) {
-            throw new \LogicException(sprintf(
-                'Expected record was removed but it is not. id: "%s"',
-                $message->getId()
-            ));
-        }
+        $this->deleteMessageWithRetry($message);
     }
 
     /**
@@ -187,50 +173,8 @@ class DbalMessageConsumer implements MessageConsumerInterface
     public function reject(MessageInterface $message, $requeue = false)
     {
         InvalidMessageException::assertMessageInstanceOf($message, DbalMessage::class);
+        $this->deleteMessageWithRetry($message);
 
-        $this->dbal->beginTransaction();
-
-        $sql = sprintf(
-            'SELECT id FROM %s WHERE id=:id FOR UPDATE',
-            $this->connection->getTableName()
-        );
-
-        $row = $this->dbal->executeQuery(
-            $sql,
-            [
-                'id' => $message->getId(),
-            ],
-            [
-                'id' => Type::INTEGER,
-            ]
-        )->fetch();
-        $affectedRows = null;
-        if (count($row)) {
-            try {
-                $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()], [
-                    'id' => Type::INTEGER,
-                ]);
-                $this->dbal->commit();
-            } catch (\Exception $e) {
-                sleep(1);
-                try {
-                    $affectedRows = $this->dbal->delete(
-                        $this->connection->getTableName(),
-                        ['id' => $message->getId()],
-                        ['id' => Type::INTEGER, ]
-                    );
-                    $this->dbal->commit();
-                } catch (\Exception $e) {
-                    $this->dbal->rollBack();
-                }
-            }
-        }
-        if (1 !== $affectedRows) {
-            throw new \LogicException(sprintf(
-                'Expected record was removed but it is not. id: "%s"',
-                $message->getId()
-            ));
-        }
         if ($requeue) {
             $dbalMessage = [
                 'body' => $message->getBody(),
@@ -260,97 +204,43 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
+     * Receive message, set consumer for message assigned to current queue
+     * Return data of received message.
+     *
      * @return DbalMessage|null
+     * @throws \Doctrine\DBAL\DBALException
      */
     protected function receiveMessage()
     {
-        /*
-         * Why this query is so terrible.
-         * We need to update only one record ordered by priority and id
-         * but postgres does not support "order by" in update query and
-         * we use sub query but mysql raise error when sub query contains
-         * same table as update query and the solution is to use one
-         * more sub query.
-         */
-        $this->dbal->beginTransaction();
-        $row = null;
-        try {
-            $now = time();
+        $now = time();
+        $this->getUpdateStatement()->execute([
+            'queue' => $this->queue->getQueueName(),
+            'delayedUntil' => $now,
+            'consumerId' => $this->consumerId
+        ]);
+        $affectedRows = $this->getUpdateStatement()->rowCount();
 
-            $sql = sprintf(
-                'SELECT id FROM %s WHERE queue=:queue AND consumer_id IS NULL AND ' .
-                '(delayed_until IS NULL OR delayed_until<=:delayedUntil) ' .
-                'ORDER BY priority DESC, id ASC LIMIT 1 FOR UPDATE',
-                $this->connection->getTableName()
-            );
-
-            $row = $this->dbal->executeQuery(
-                $sql,
+        if (1 === $affectedRows) {
+            $selectStatement = $this->getSelectStatement();
+            $selectStatement->execute(
                 [
+                    'consumerId' => $this->consumerId,
                     'queue' => $this->queue->getQueueName(),
-                    'delayedUntil' => $now,
-                ],
-                [
-                    'queue' => Type::STRING,
-                    'delayedUntil' => Type::INTEGER,
                 ]
-            )->fetch();
+            );
+            $dbalMessage = $selectStatement->fetch(\PDO::FETCH_ASSOC);
 
-            if ($row) {
-                $messageId = $row['id'];
-
-                $sql = sprintf(
-                    'UPDATE %s SET consumer_id=:consumerId  WHERE id = :messageId',
-                    $this->connection->getTableName()
-                );
-
-                $this->dbal->executeUpdate(
-                    $sql,
-                    [
-                        'messageId' => $messageId,
-                        'consumerId' => $this->consumerId
-                    ],
-                    [
-                        'messageId' => Type::STRING,
-                        'consumerId' => Type::STRING
-                    ]
-                );
-
-                $sql = sprintf(
-                    'SELECT * FROM %s WHERE consumer_id=:consumerId AND queue=:queue LIMIT 1',
-                    $this->connection->getTableName()
-                );
-
-                $dbalMessage = $this->dbal->executeQuery(
-                    $sql,
-                    [
-                        'consumerId' => $this->consumerId,
-                        'queue' => $this->queue->getQueueName(),
-                    ],
-                    [
-                        'consumerId' => Type::STRING,
-                        'queue' => Type::STRING,
-                    ]
-                )->fetch();
-
-                if (false == $dbalMessage) {
-                    throw new \LogicException(sprintf(
-                        'Expected one record but got nothing. consumer_id: "%s"',
-                        $this->consumerId
-                    ));
-                }
-                $this->dbal->commit();
-
-                return $this->convertMessage($dbalMessage);
+            if (false === $dbalMessage) {
+                throw new \LogicException(sprintf(
+                    'Expected one record but got nothing. consumer_id: "%s"',
+                    $this->consumerId
+                ));
             }
 
-            $this->dbal->commit();
-        } catch (\LogicException $e) {
-            $this->dbal->rollBack();
-            throw ($e);
-        } catch (\Exception $e) {
-            $this->dbal->rollBack();
+            return $this->convertMessage($dbalMessage);
         }
+
+        return null;
     }
 
     /**
@@ -364,8 +254,8 @@ class DbalMessageConsumer implements MessageConsumerInterface
 
         $message->setId($dbalMessage['id']);
         $message->setBody($dbalMessage['body']);
-        $message->setPriority((int) $dbalMessage['priority']);
-        $message->setRedelivered((bool) $dbalMessage['redelivered']);
+        $message->setPriority((int)$dbalMessage['priority']);
+        $message->setRedelivered((bool)$dbalMessage['redelivered']);
 
         if ($dbalMessage['headers']) {
             $message->setHeaders(JSON::decode($dbalMessage['headers']));
@@ -379,10 +269,113 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
-     * @return string
+     * @return Statement
+     * @throws \Doctrine\DBAL\DBALException
      */
-    public function getId()
+    private function getSelectStatement()
     {
-        return $this->consumerId;
+        if (!$this->selectStatement) {
+            $this->selectStatement = $this->dbal->prepare(
+                sprintf(
+                    'SELECT * FROM %s WHERE consumer_id=:consumerId AND queue=:queue LIMIT 1',
+                    $this->connection->getTableName()
+                )
+            );
+        }
+
+        return $this->selectStatement;
+    }
+
+    /**
+     * @return Statement
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function getUpdateStatement()
+    {
+        if (!$this->updateStatement) {
+            $databasePlatform = $this->dbal->getDatabasePlatform();
+            if (is_a($databasePlatform, MySqlPlatform::class)) {
+                $this->updateStatement = $this->dbal->prepare(sprintf(
+                    'UPDATE %s SET consumer_id=:consumerId'
+                    . ' WHERE consumer_id IS NULL AND queue=:queue'
+                    . ' AND (delayed_until IS NULL OR delayed_until<=:delayedUntil)'
+                    . ' ORDER BY priority DESC, id ASC LIMIT 1',
+                    $this->connection->getTableName()
+                ));
+            } elseif (is_a($databasePlatform, PostgreSqlPlatform::class)) {
+                $this->updateStatement = $this->dbal->prepare(sprintf(
+                    'UPDATE %1$s SET consumer_id=:consumerId'
+                    . ' WHERE id = (SELECT id FROM %1$s WHERE consumer_id IS NULL AND queue=:queue'
+                    . ' AND (delayed_until IS NULL OR delayed_until<=:delayedUntil)'
+                    . ' ORDER BY priority DESC, id ASC LIMIT 1 FOR UPDATE)',
+                    $this->connection->getTableName()
+                ));
+            } else {
+                throw new \LogicException('Unsupported database driver');
+            }
+        }
+
+        return $this->updateStatement;
+    }
+
+    /**
+     * @return Statement
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function getDeleteStatement()
+    {
+        if (!$this->deleteStatement) {
+            $databasePlatform = $this->dbal->getDatabasePlatform();
+            if (is_a($databasePlatform, MySqlPlatform::class)) {
+                $this->deleteStatement = $this->dbal->prepare(
+                    sprintf('DELETE FROM %s WHERE id=:messageId LIMIT 1', $this->connection->getTableName())
+                );
+            } elseif (is_a($databasePlatform, PostgreSqlPlatform::class)) {
+                $this->deleteStatement = $this->dbal->prepare(
+                    sprintf('DELETE FROM %s WHERE id=:messageId', $this->connection->getTableName())
+                );
+            } else {
+                throw new \LogicException('Unsupported database driver');
+            }
+        }
+
+        return $this->deleteStatement;
+    }
+
+    /**
+     * @param DbalMessage|MessageInterface $message
+     * @return int
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function deleteMessage(MessageInterface $message)
+    {
+        $deleteStatement = $this->getDeleteStatement();
+        $deleteStatement->execute(['messageId' => $message->getId()]);
+
+        return $deleteStatement->rowCount();
+    }
+
+    /**
+     * Try to delete message from queue
+     * retry once with delay of 1 second if DB query failed
+     *
+     * @param DbalMessage|MessageInterface $message
+     * @throws \Doctrine\DBAL\DBALException|\LogicException
+     */
+    private function deleteMessageWithRetry(MessageInterface $message)
+    {
+        try {
+            $affectedRows = $this->deleteMessage($message);
+        } catch (DriverException $e) {
+            sleep(1);
+            $affectedRows = $this->deleteMessage($message);
+        }
+
+        if (1 !== $affectedRows) {
+            throw new \LogicException(sprintf(
+                'Expected record was removed but it is not. id: "%s"',
+                $message->getId()
+            ));
+        }
     }
 }

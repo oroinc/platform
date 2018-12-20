@@ -15,16 +15,16 @@ class UnitType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'choices'  => array(
-                    ReminderInterval::UNIT_MINUTE => 'oro.reminder.interval.unit.minute.label',
-                    ReminderInterval::UNIT_HOUR   => 'oro.reminder.interval.unit.hour.label',
-                    ReminderInterval::UNIT_DAY    => 'oro.reminder.interval.unit.day.label',
-                    ReminderInterval::UNIT_WEEK   => 'oro.reminder.interval.unit.week.label',
-                ),
+            [
+                'choices'  => [
+                    'oro.reminder.interval.unit.minute.label' => ReminderInterval::UNIT_MINUTE,
+                    'oro.reminder.interval.unit.hour.label' => ReminderInterval::UNIT_HOUR,
+                    'oro.reminder.interval.unit.day.label' => ReminderInterval::UNIT_DAY,
+                    'oro.reminder.interval.unit.week.label' => ReminderInterval::UNIT_WEEK,
+                ],
                 'expanded' => false,
                 'multiple' => false,
-            )
+            ]
         );
     }
 

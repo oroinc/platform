@@ -1,9 +1,13 @@
-<script type="text/javascript">
-    require({config: {
-        'oroentityconfig/js/sync/attribute-import-sync-notifier': {
-            'topic': '{{ data.topic }}'
-        }
-    }});
+{% if check_ws() %}
+    <script type="text/javascript">
+        require({config: {
+            'oroentityconfig/js/sync/attribute-import-sync-notifier': {
+                'topic': '{{ data.topic }}'
+            }
+        }});
 
-    require(['oroentityconfig/js/sync/attribute-import-sync-notifier']);
-</script>
+        require(['oroentityconfig/js/sync/attribute-import-sync-notifier'], function(subscribeCallback) {
+            subscribeCallback();
+        });
+    </script>
+{% endif %}

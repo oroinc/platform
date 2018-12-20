@@ -1,0 +1,193 @@
+/* @theme: admin.oro; */
+
+.inline-editor__actions {
+    position: absolute;
+    top: 0;
+    #{$end}: 0;
+    z-index: 2;
+
+    padding: $inline-editor-actions-offset;
+
+    &--over-multiselect {
+        z-index: 10004; // to show over .ui-multiselect-menu
+    }
+}
+
+.inline-editor__action-item {
+    padding: $inline-editor-action-item-offset;
+    background: none;
+    border: none;
+    color: $inline-editor-action-item-color;
+
+    &:hover {
+        color: $inline-editor-action-item-color-hover;
+    }
+
+    &[disabled] {
+        cursor: auto;
+        color: $inline-editor-action-item-color-disabled;
+    }
+
+    [class^="fa-"] {
+        margin: 0;
+    }
+}
+
+.inline-editor__fields {
+    input[type="text"] {
+        width: 100%;
+        margin: 0;
+
+        line-height: 1;
+
+        &:first-child {
+            padding-#{$start}: $inline-editor-action-item-input-offset;
+        }
+
+        &:last-child {
+            padding-#{$end}: $inline-editor-action-item-fields-last-offset;
+        }
+    }
+}
+
+.inline-editor-wrapper {
+        position: absolute;
+
+    min-width: $inline-editor-wrapper-width;
+
+    .validation-failed:last-child {
+        margin-bottom: $input-border-width;
+    }
+
+    &.number-editor {
+        // about 10+2 digits
+        min-width: $inline-editor-number-editor-width;
+
+        input[name='value'] {
+            text-align: #{$end};
+        }
+    }
+
+    &.date-editor {
+        .hasDatepicker {
+            padding-#{$start}: $inline-editor-action-item-input-offset;
+        }
+    }
+
+    &.datetime-editor {
+        min-width: $inline-editor-datetime-editor-width;
+        width: auto !important;
+
+        .hasDatepicker {
+            padding-#{$start}: $inline-editor-has-datepicker-offset;
+            width: $inline-editor-has-datepicker-width;
+        }
+
+        .timepicker-input {
+            width: $inline-editor-has-timepicker-input-width;
+            margin-#{$start}: -$input-border-width;
+        }
+
+        .fields-row {
+            display: flex;
+        }
+    }
+
+    .hasDatepicker,
+    .timepicker-input {
+        &:focus {
+            position: relative;
+            z-index: 1;
+        }
+    }
+
+    .select2-container {
+        border-color: $inline-editor-select2-border-color;
+        box-shadow: $inline-editor-select2-box-shadow;
+    }
+
+    &.select-editor {
+        min-width: $inline-editor-select-editor-width;
+    }
+
+    .select2-choice {
+        width: $inline-editor-select2-choice-width;
+
+        &:after {
+            position: absolute;
+            #{$end}: 0;
+            top: 50%;
+
+            height: 12px;
+            width: 1px;
+            margin-top: -6px;
+
+            background-color: $inline-editor-select2-divider-color;
+
+            content: '';
+        }
+    }
+
+    &.multi-select-editor,
+    &.multi-relation-editor {
+        width: auto !important; // ignore cell width
+        min-width: 0; // ignore min-width
+
+        .select2-container {
+            height: auto;
+            width: auto !important;
+        }
+
+        .select2-choices {
+            max-height: 40vh;
+            max-width: 50vw;
+            min-width: $inline-editor-multi-select2-choices-width;
+            overflow: auto;
+        }
+    }
+}
+
+.inline-editor__select2-drop {
+    box-shadow: $inline-editor-select2-drop-box-shadow;
+
+    &:before {
+        position: absolute;
+        bottom: 100%;
+        #{$end}: 0;
+        #{$start}: 0;
+
+        height: $inline-editor-select2-drop-placeholder-height;
+        background-color: $inline-editor-select2-drop-placeholder-color;
+
+        content: '';
+    }
+
+    &.select2-drop-above {
+        box-shadow: $inline-editor-select2-drop-above-box-shadow;
+
+        &:before {
+            top: 100%;
+            bottom: auto;
+        }
+    }
+
+    .select2-input {
+        margin: 0;
+        height: $inline-editor-select2-drop-height;
+    }
+}
+
+.datepicker-focusser {
+    position: absolute;
+
+    width: 0;
+    height: 0;
+
+    background: transparent;
+    border: 0;
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+}

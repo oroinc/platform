@@ -8,10 +8,10 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ErrorCompleterRegistryTest extends \PHPUnit_Framework_TestCase
+class ErrorCompleterRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
-    protected $container;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
+    private $container;
 
     protected function setUp()
     {
@@ -32,7 +32,7 @@ class ErrorCompleterRegistryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSouldReturnErrorCompleterIfItExistsForSpecificRequestType()
+    public function testShouldReturnErrorCompleterIfItExistsForSpecificRequestType()
     {
         $registry = $this->getErrorCompleterRegistry([
             ['errorCompleter1', 'rest&json_api'],
@@ -52,7 +52,7 @@ class ErrorCompleterRegistryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSouldReturnDefaultErrorCompleterIfNoErrorCompleterForSpecificRequestType()
+    public function testShouldReturnDefaultErrorCompleterIfNoErrorCompleterForSpecificRequestType()
     {
         $registry = $this->getErrorCompleterRegistry([
             ['errorCompleter1', 'rest&json_api'],
@@ -76,7 +76,7 @@ class ErrorCompleterRegistryTest extends \PHPUnit_Framework_TestCase
      * @expectedException \LogicException
      * @expectedExceptionMessage Cannot find an error completer for the request "another".
      */
-    public function testSouldThrowExceptionIfNoErrorCompleterForSpecificRequestTypeAndNoDefaultErrorCompleter()
+    public function testShouldThrowExceptionIfNoErrorCompleterForSpecificRequestTypeAndNoDefaultErrorCompleter()
     {
         $registry = $this->getErrorCompleterRegistry([
             ['errorCompleter1', 'rest&json_api']

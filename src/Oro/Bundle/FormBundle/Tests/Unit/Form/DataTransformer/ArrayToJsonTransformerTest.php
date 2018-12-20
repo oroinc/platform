@@ -4,7 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToJsonTransformer;
 
-class ArrayToJsonTransformerTest extends \PHPUnit_Framework_TestCase
+class ArrayToJsonTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider transformDataProvider

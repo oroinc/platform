@@ -13,16 +13,16 @@ use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
 class LoadEntityTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityLoader */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityLoader */
     private $entityLoader;
 
     /** @var LoadEntity */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -38,12 +38,37 @@ class LoadEntityTest extends GetProcessorTestCase
     public function testProcessWhenEntityAlreadyLoaded()
     {
         $this->doctrineHelper->expects(self::never())
-            ->method('isManageableEntityClass');
+            ->method('getManageableEntityClass');
         $this->entityLoader->expects(self::never())
             ->method('findEntity');
 
         $this->context->setResult(new \stdClass());
         $this->processor->process($this->context);
+    }
+
+    public function testProcessForNotExistingEntity()
+    {
+        $entityClass = 'Test\Entity';
+        $entityId = 123;
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata();
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getManageableEntityClass')
+            ->with($entityClass, self::identicalTo($config))
+            ->willReturn($entityClass);
+        $this->entityLoader->expects(self::once())
+            ->method('findEntity')
+            ->with($entityClass, $entityId, $metadata)
+            ->willReturn(null);
+
+        $this->context->setClassName($entityClass);
+        $this->context->setId($entityId);
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasResult());
     }
 
     public function testProcessForNotManageableEntity()
@@ -52,9 +77,9 @@ class LoadEntityTest extends GetProcessorTestCase
         $config = new EntityDefinitionConfig();
 
         $this->doctrineHelper->expects(self::once())
-            ->method('isManageableEntityClass')
-            ->with($entityClass)
-            ->willReturn(false);
+            ->method('getManageableEntityClass')
+            ->with($entityClass, $config)
+            ->willReturn(null);
         $this->entityLoader->expects(self::never())
             ->method('findEntity');
 
@@ -72,9 +97,9 @@ class LoadEntityTest extends GetProcessorTestCase
         $metadata = new EntityMetadata();
 
         $this->doctrineHelper->expects(self::once())
-            ->method('isManageableEntityClass')
-            ->with($entityClass)
-            ->willReturn(true);
+            ->method('getManageableEntityClass')
+            ->with($entityClass, $config)
+            ->willReturn($entityClass);
         $this->entityLoader->expects(self::once())
             ->method('findEntity')
             ->with($entityClass, $entityId, $metadata)
@@ -89,6 +114,31 @@ class LoadEntityTest extends GetProcessorTestCase
         self::assertSame($entity, $this->context->getResult());
     }
 
+    public function testProcessForManageableEntityWhenEntityIsNotLoaded()
+    {
+        $entityClass = 'Test\Entity';
+        $entityId = 123;
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata();
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getManageableEntityClass')
+            ->with($entityClass, $config)
+            ->willReturn($entityClass);
+        $this->entityLoader->expects(self::once())
+            ->method('findEntity')
+            ->with($entityClass, $entityId, $metadata)
+            ->willReturn(null);
+
+        $this->context->setClassName($entityClass);
+        $this->context->setId($entityId);
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasResult());
+    }
+
     public function testProcessForApiResourceBasedOnManageableEntity()
     {
         $entityClass = UserProfile::class;
@@ -99,12 +149,10 @@ class LoadEntityTest extends GetProcessorTestCase
         $config->setParentResourceClass($parentEntityClass);
         $metadata = new EntityMetadata();
 
-        $this->doctrineHelper->expects(self::exactly(2))
-            ->method('isManageableEntityClass')
-            ->willReturnMap([
-                [$entityClass, false],
-                [$parentEntityClass, true]
-            ]);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getManageableEntityClass')
+            ->with($entityClass, $config)
+            ->willReturn($parentEntityClass);
         $this->entityLoader->expects(self::once())
             ->method('findEntity')
             ->with($parentEntityClass, $entityId, $metadata)

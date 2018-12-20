@@ -8,6 +8,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -24,10 +25,11 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     protected function setUp()
     {
         $translator = $this->createMockTranslator();
+        $localeSettings = $this->createMockLocaleSettings();
         $this->type = new NumberRangeFilterType($translator);
         $this->formExtensions[] = new CustomFormExtension([
             new FilterType($translator),
-            new NumberFilterType($translator),
+            new NumberFilterType($translator, $localeSettings),
         ]);
         $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
@@ -42,13 +44,8 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(NumberRangeFilterType::NAME, $this->type->getName());
-    }
-
     /**
-     * @return OptionsResolver|\PHPUnit_Framework_MockObject_MockObject
+     * @return OptionsResolver|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createMockOptionsResolver()
     {
@@ -64,16 +61,16 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
             [
                 'defaultOptions' => [
                     'operator_choices'  => [
-                        NumberRangeFilterType::TYPE_BETWEEN         => 'oro.filter.form.label_type_range_between',
-                        NumberRangeFilterType::TYPE_NOT_BETWEEN     => 'oro.filter.form.label_type_range_not_between',
-                        NumberRangeFilterType::TYPE_EQUAL           => 'oro.filter.form.label_type_range_equals',
-                        NumberRangeFilterType::TYPE_NOT_EQUAL       => 'oro.filter.form.label_type_range_not_equals',
-                        NumberRangeFilterType::TYPE_GREATER_THAN    => 'oro.filter.form.label_type_range_more_than',
-                        NumberRangeFilterType::TYPE_LESS_THAN       => 'oro.filter.form.label_type_range_less_than',
-                        NumberRangeFilterType::TYPE_GREATER_EQUAL   => 'oro.filter.form.label_type_range_more_equals',
-                        NumberRangeFilterType::TYPE_LESS_EQUAL      => 'oro.filter.form.label_type_range_less_equals',
-                        FilterUtility::TYPE_EMPTY     => 'oro.filter.form.label_type_empty',
-                        FilterUtility::TYPE_NOT_EMPTY => 'oro.filter.form.label_type_not_empty',
+                        'oro.filter.form.label_type_range_between' => NumberRangeFilterType::TYPE_BETWEEN,
+                        'oro.filter.form.label_type_range_not_between' => NumberRangeFilterType::TYPE_NOT_BETWEEN,
+                        'oro.filter.form.label_type_range_equals' => NumberRangeFilterType::TYPE_EQUAL,
+                        'oro.filter.form.label_type_range_not_equals' => NumberRangeFilterType::TYPE_NOT_EQUAL,
+                        'oro.filter.form.label_type_range_more_than' => NumberRangeFilterType::TYPE_GREATER_THAN,
+                        'oro.filter.form.label_type_range_less_than' => NumberRangeFilterType::TYPE_LESS_THAN,
+                        'oro.filter.form.label_type_range_more_equals' => NumberRangeFilterType::TYPE_GREATER_EQUAL,
+                        'oro.filter.form.label_type_range_less_equals' => NumberRangeFilterType::TYPE_LESS_EQUAL,
+                        'oro.filter.form.label_type_empty' => FilterUtility::TYPE_EMPTY,
+                        'oro.filter.form.label_type_not_empty' => FilterUtility::TYPE_NOT_EMPTY,
                     ],
                 ]
             ]
@@ -179,5 +176,16 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
                 ],
             ],
         ];
+    }
+
+    private function createMockLocaleSettings()
+    {
+        $localeSettings = $this->createMock(LocaleSettings::class);
+        $localeSettings
+            ->expects($this->any())
+            ->method('getLocale')
+            ->willReturn('en');
+
+        return $localeSettings;
     }
 }

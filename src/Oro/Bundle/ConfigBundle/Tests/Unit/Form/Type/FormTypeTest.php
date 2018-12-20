@@ -13,10 +13,10 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class FormTypeTest extends TypeTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $subscriber;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     /** @var FormType */
@@ -185,11 +185,6 @@ class FormTypeTest extends TypeTestCase
         $form->submit([]);
         $this->assertTrue($form->isSynchronized());
         $this->assertTrue($form->getConfig()->getAttribute('isConfiguratorApplied'));
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_config_form_type', $this->form->getName());
     }
 
     public static function staticConfigurator(FormBuilderInterface $builder, array $options)

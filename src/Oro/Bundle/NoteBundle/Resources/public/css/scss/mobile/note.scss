@@ -1,0 +1,100 @@
+/* @theme: admin.oro; */
+
+.notes {
+    .list-box {
+        .list-item {
+            padding: 7px 0 10px;
+
+            &:first-child {
+                padding-top: 0;
+            }
+
+            &:last-child {
+                padding-bottom: 0;
+            }
+
+            .title-item {
+                position: relative;
+                white-space: normal;
+
+                &:before {
+                    content: '';
+                    float: right;
+                    width: 43px;
+                    height: 21px;
+                }
+
+                .visual {
+                    white-space: nowrap;
+                    max-width: calc(100% - 65px);
+                    overflow: hidden;
+                    display: inline-block;
+                    text-overflow: ellipsis;
+                    line-height: 16px;
+                    vertical-align: text-bottom;
+                    padding-right: 4px;
+                }
+
+                .details {
+                    white-space: nowrap;
+                    padding-left: 0;
+                }
+            }
+
+            .actions {
+                position: absolute;
+                display: inline-block;
+                top: 0;
+                right: 0;
+            }
+
+            .date {
+                white-space: nowrap;
+            }
+
+            .message {
+                padding-top: 5px;
+            }
+
+            .message-item {
+                padding-left: 0;
+
+                .message {
+                    padding-left: 0;
+                    border-left: none;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+        }
+    }
+
+    .accordion {
+        margin: 0;
+
+        .accordion-group {
+            .accordion-heading {
+                display: block;
+
+                .accordion-toggle {
+                    margin-bottom: 3px;
+                    width: 18px;
+                }
+
+                > div {
+                    display: block;
+                }
+
+                &.collapse {
+                    height: auto;
+                }
+            }
+        }
+    }
+}
+
+.note-attachments {
+    .attachment-item {
+        margin: 0;
+    }
+}

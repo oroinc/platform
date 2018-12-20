@@ -25,7 +25,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
+class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 
@@ -340,7 +340,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TypesRegistry
+     * @return \PHPUnit\Framework\MockObject\MockObject|TypesRegistry
      */
     private function createTypeRegistryMock()
     {
@@ -348,7 +348,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ReverseSyncProcessor
+     * @return \PHPUnit\Framework\MockObject\MockObject|ReverseSyncProcessor
      */
     private function createReversSyncProcessorMock()
     {
@@ -363,7 +363,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityManagerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface
      */
     private function createEntityManagerStub()
     {
@@ -385,7 +385,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper
+     * @return \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
      */
     private function createDoctrineHelperStub($entityManager = null)
     {
@@ -399,7 +399,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject | LoggerInterface
      */
     private function createLoggerMock()
     {
@@ -408,7 +408,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | TokenStorageInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject | TokenStorageInterface
      */
     private function createTokenStorageMock()
     {

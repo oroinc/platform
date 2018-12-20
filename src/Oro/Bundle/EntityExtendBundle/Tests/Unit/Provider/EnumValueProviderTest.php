@@ -8,10 +8,10 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 
-class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
+class EnumValueProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 
@@ -21,7 +21,7 @@ class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
     protected $provider;
 
     /**
-     * @var EnumTranslationCache|\PHPUnit_Framework_MockObject_MockObject
+     * @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $cache;
 
@@ -35,7 +35,7 @@ class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetEnumChoices()
     {
         $enumClass = '\stdClass';
-        $expected = ['id' => 'Name'];
+        $expected = ['Name' => 'id'];
 
         $this->assertEnumChoices($enumClass);
         $this->assertEquals($expected, $this->provider->getEnumChoices($enumClass));
@@ -44,7 +44,7 @@ class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetEnumChoicesWithEmptyCache()
     {
         $enumClass = 'FooBar';
-        $expected = ['id' => 'Name'];
+        $expected = ['Name' => 'id'];
 
         $this->cache->expects($this->once())
             ->method('contains')
@@ -87,7 +87,7 @@ class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
     {
         $code = 'test_enum';
         $enumClass = 'Extend\Entity\EV_Test_Enum';
-        $expected = ['id' => 'Name'];
+        $expected = ['Name' => 'id'];
 
         $this->assertEnumChoices($enumClass);
         $this->assertEquals($expected, $this->provider->getEnumChoicesByCode($code));

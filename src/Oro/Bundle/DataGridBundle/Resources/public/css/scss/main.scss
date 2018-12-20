@@ -1,0 +1,20 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/mixins";
+@import "variables";
+
+/* Only for desktop */
+.desktop-version {
+    @import "grid-toolbar";
+}
+
+@import "more-bar-holder";
+@import "oro-datagrid/oro-datagrid";
+@import "grid-views";
+@import "actions-panel";
+@import "datagrid-settings";
+@import "sorting-select-control";
+@import "visible-items-counter";
+
+/* mobile version */
+@import "mobile/main";

@@ -8,7 +8,7 @@ use Oro\Component\ChainProcessor\MatchApplicableChecker;
 use Oro\Component\ChainProcessor\ProcessorApplicableCheckerFactory;
 use Oro\Component\ChainProcessor\SkipGroupApplicableChecker;
 
-class ProcessorApplicableCheckerFactoryTest extends \PHPUnit_Framework_TestCase
+class ProcessorApplicableCheckerFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreateApplicableChecker()
     {

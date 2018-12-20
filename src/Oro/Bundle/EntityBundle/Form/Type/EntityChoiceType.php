@@ -112,7 +112,8 @@ class EntityChoiceType extends AbstractType
     {
         $choices = [];
         foreach ($this->getEntities($showPlural, $applyExclusions) as $entityClass => $entity) {
-            $choices[$entityClass] = $showPlural ? $entity['plural_label'] : $entity['label'];
+            $key = $showPlural ? $entity['plural_label'] : $entity['label'];
+            $choices[$key] = $entityClass;
         }
 
         return $choices;

@@ -4,12 +4,12 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor;
 
-class MigrationQueryExecutorTest extends \PHPUnit_Framework_TestCase
+class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $connection;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
     /** @var MigrationQueryExecutor */

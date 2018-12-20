@@ -16,7 +16,7 @@
     <div class="{% block transition_widget_class %}widget-content{% endblock %}">
         {% block transition_widget %}
             {% if form.vars.errors|length > 0 %}
-                <div class="alert alert-error" {{  UI.renderPageComponentAttributes({
+                <div class="alert alert-error" role="alert" {{  UI.renderPageComponentAttributes({
                     view: 'oroworkflow/js/app/views/transition/transition-error-view',
                     options: {
                         wid: app.request.get('_wid')
@@ -35,7 +35,7 @@
                 {% endif %}
 
                 {% if transitionMessage %}
-                    <div class="alert">{{ transitionMessage }}</div>
+                    <div class="alert" role="alert">{{ transitionMessage }}</div>
                 {% endif %}
                 <form method="post"
                       data-nohash="true"

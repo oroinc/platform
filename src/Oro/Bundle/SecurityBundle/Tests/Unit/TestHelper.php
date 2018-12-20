@@ -21,20 +21,20 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 
 class TestHelper
 {
-    public static function get(\PHPUnit_Framework_TestCase $testCase)
+    public static function get(\PHPUnit\Framework\TestCase $testCase)
     {
         return new TestHelper($testCase);
     }
 
     /**
-     * @var (\PHPUnit_Framework_TestCase
+     * @var (\PHPUnit\Framework\TestCase
      */
     private $testCase;
 
     /**
-     * @param \PHPUnit_Framework_TestCase $testCase
+     * @param \PHPUnit\Framework\TestCase $testCase
      */
-    public function __construct(\PHPUnit_Framework_TestCase $testCase)
+    public function __construct(\PHPUnit\Framework\TestCase $testCase)
     {
         $this->testCase = $testCase;
     }
@@ -299,11 +299,11 @@ class TestHelper
     }
 
     /**
-     * @param \PHPUnit_Framework_TestCase $testCase
+     * @param \PHPUnit\Framework\TestCase $testCase
      *
-     * @return PermissionManager|\PHPUnit_Framework_MockObject_MockObject
+     * @return PermissionManager|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getPermissionManagerMock(\PHPUnit_Framework_TestCase $testCase)
+    protected function getPermissionManagerMock(\PHPUnit\Framework\TestCase $testCase)
     {
         $permissionManager = $testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager')
             ->disableOriginalConstructor()
@@ -323,11 +323,11 @@ class TestHelper
     }
 
     /**
-     * @param \PHPUnit_Framework_TestCase $testCase
+     * @param \PHPUnit\Framework\TestCase $testCase
      *
-     * @return AclGroupProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getGroupProviderMock(\PHPUnit_Framework_TestCase $testCase)
+    protected function getGroupProviderMock(\PHPUnit\Framework\TestCase $testCase)
     {
         $mock = $testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface')->getMock();
         $mock->expects($testCase->any())

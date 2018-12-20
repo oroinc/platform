@@ -1,0 +1,154 @@
+/* @theme: admin.oro; */
+
+.content-with-sidebar {
+    &--sidebar {
+        display: $content-sidebar-sidebar-display;
+        flex-direction: $content-sidebar-sidebar-flex-direction;
+        background: $content-sidebar-sidebar-background;
+        border-radius: $content-sidebar-sidebar-border-radius;
+
+        position: $content-sidebar-sidebar-position;
+        flex-shrink: $content-sidebar-sidebar-flex-shrink;
+        width: $content-sidebar-sidebar-width;
+
+
+        &:not(.ui-resizable-resizing) {
+            transition: $content-sidebar-sidebar-not-ui-resizable-resizing-transition;
+        }
+
+        &.content-sidebar-minimized {
+            padding-left: $content-sidebar-minimized-offset-inner-left;
+            width: $content-sidebar-minimized-width;
+        }
+
+        .resizable-area {
+            position: $content-sidebar-resizable-area-position;
+            top: $content-sidebar-resizable-area-top;
+            right: $content-sidebar-resizable-area-right;
+
+            width: $content-sidebar-resizable-area-width;
+            height: $content-sidebar-resizable-area-height;
+
+            border-right: $content-sidebar-resizable-area-border-right;
+
+            touch-action: $content-sidebar-resizable-area-touch-action;
+
+            cursor: $content-sidebar-resizable-area-cursor;
+
+            opacity: $content-sidebar-resizable-area-opacity;
+
+            transition: $content-sidebar-resizable-area-transition;
+
+            visibility: $content-sidebar-resizable-area-visibility;
+        }
+
+        &:hover {
+            .resizable-area {
+                opacity: $content-sidebar-hover-resizable-area-opacity;
+            }
+        }
+
+        &.resizable-enable {
+            .resizable-area {
+                visibility: visible;
+            }
+        }
+
+        .sidebar-items {
+            padding: $content-sidebar-items-offset-inner;
+        }
+
+        .jstree-wrapper .jstree {
+            margin: $content-sidebar-jstree-offset;
+        }
+
+        .default-price-list-choice {
+            margin-bottom: 22px;
+
+            .control-label {
+                label {
+                    margin-bottom: 6px;
+                }
+            }
+        }
+    }
+
+    &--header-content {
+        white-space: nowrap;
+    }
+
+    &--sidebar-content,
+    &--header-content {
+        .content-sidebar-minimized & {
+            display: none;
+        }
+    }
+
+    &--header {
+        display: $content-sidebar-display;
+        justify-content: $content-sidebar-justify-content;
+        align-items: $content-sidebar-align-items;
+        height: $content-sidebar-height;
+        padding: $content-sidebar-offset-inner;
+
+        .content-sidebar-minimized & {
+            padding: $content-sidebar-minimized-offset-inner;
+        }
+    }
+
+    &--controls {
+        float: $content-sidebar-controls-float;
+    }
+
+    &--control {
+        display: $content-sidebar-control-display;
+        cursor: $content-sidebar-control-cursor;
+
+        i {
+            display: $content-sidebar-control-i-display;
+            padding: $content-sidebar-control-i-padding;
+            color: $content-sidebar-control-i-color;
+            font-size: $content-sidebar-control-i-font-size;
+        }
+    }
+
+    &--minimize {
+        display: block;
+
+        .content-sidebar-minimized & {
+            display: none;
+        }
+    }
+
+    &--maximize {
+        display: none;
+
+        .content-sidebar-minimized & {
+            display: block;
+        }
+    }
+
+    &--container {
+        display: $content-sidebar-container-display;
+        margin-#{$start}: $content-sidebar-container-offset-left;
+    }
+
+    &--content {
+        width: calc(100% - #{$content-sidebar-width});
+        flex: $content-sidebar-container-flex;
+
+        @media only screen and (max-width: 992px) {
+            width: calc(100% - #{$content-sidebar-minimized-width});
+        }
+
+        &.content-sidebar-minimized {
+            width: calc(100% - #{$content-sidebar-minimized-width});
+        }
+
+        .responsive-section {
+            .form-horizontal {
+                padding: $content-sidebar-form-horizontal-offset-inner;
+            }
+        }
+    }
+}

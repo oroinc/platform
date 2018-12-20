@@ -7,7 +7,7 @@ use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\ReplaceStrategy;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
-class ReplaceStrategyTest extends \PHPUnit_Framework_TestCase
+class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ReplaceStrategy $strategy

@@ -6,10 +6,10 @@ use Oro\Bundle\IntegrationBundle\ActionHandler\ChannelDeleteActionHandler;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\DeleteManager;
 
-class ChannelDeleteActionHandlerTest extends \PHPUnit_Framework_TestCase
+class ChannelDeleteActionHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var DeleteManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var DeleteManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $deleteManager;
 

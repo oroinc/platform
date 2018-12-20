@@ -1,0 +1,55 @@
+/* @theme: admin.oro; */
+
+$capabilities-offset: 8px !default;
+
+$role-capability-color: $primary-860 !default;
+$role-capability-offset: side-values(0 0 28px 16px) !default;
+
+$role-capability-item-width: 100% / 3 !default;
+$role-capability-item-offset: side-values(18px 68px 0 0) !default;
+
+$role-capability-label-line-height: 1.5;
+$role-capability-label-offset: 24px !default;
+$role-collapse-label-width: 500px !default;
+
+$role-capability-group-title-offset: 30px 0 0 !default;
+$role-capability-group-title-font-size: 18px !default;
+$role-capability-group-title-weight: bold !default;
+
+$role-collapse-action-container-width: 226px !default;
+$role-collapse-expand-action-container-offset: 30px !default;
+$role-capability-icon-size: 16px !default;
+
+$role-capability-icon-expand-color: $primary-550 !default;
+$role-capability-icon-action: $fa-var-caret-down !default;
+$role-capability-icon-action-color: $primary-100 !default;
+$role-capability-item-color: $primary-200 !default;
+$role-capability-item-no-access-color: $primary-700 !default;
+$role-capability-item-changed-color: $primary-900 !default;
+$role-capability-item-disabled: $primary-700 !default;
+
+$entity-permission-entity-row-action-offset: 5px 0 !default;
+
+$inner-permissions-grid-collapse-action-offset: 16px !default;
+
+$inner-permissions-grid-entity-name-offset: 10px !default;
+$inner-permissions-grid-entity-name-weight: bold !default;
+
+$inner-permissions-grid-fields-list-offset: 8px !default;
+
+$inner-permissions-grid-launcher-min-height: 24px !default;
+
+$entity-permission-container-offset: 1px !default;
+$entity-permission-collapse-offset: 10px !default;
+
+$action-permissions-item-width: 165px !default;
+$action-permissions-item-offset: 10px !default;
+$action-permissions-item-wrapper-offset: 14px !default;
+
+$action-permissions-label-trim-width: 84px !default;
+$action-permissions-toggle-trim-width: 54px !default;
+
+
+// Mobile
+
+$inner-permissions-grid-grid-header-cell-xs-width: 140px !default;

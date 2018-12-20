@@ -1,0 +1,39 @@
+/* @theme: admin.oro; */
+
+.inline-actions-element {
+    top: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+
+    .inline-actions-element_actions {
+        visibility: visible;
+    }
+
+    .inline-actions-element_wrapper {
+        line-height: 28px;
+    }
+}
+
+.inline-actions-element_actions {
+    .btn {
+        width: 28px;
+        height: 28px;
+        margin-left: 5px;
+
+        &:first-of-type {
+            margin-left: 0;
+        }
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            width: 18px;
+            height: 26px;
+
+            &:before {
+                font-size: 17.5px;
+                line-height: 26px;
+                height: 26px;
+            }
+        }
+    }
+}

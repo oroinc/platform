@@ -84,7 +84,7 @@ class EmailNotificationType extends AbstractType
             [
                 'label'         => 'oro.notification.emailnotification.event.label',
                 'class'         => 'OroNotificationBundle:Event',
-                'property'      => 'name',
+                'choice_label'  => 'name',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')->orderBy('c.name', 'ASC');
                 },
@@ -106,6 +106,7 @@ class EmailNotificationType extends AbstractType
             [
                 'label' => 'oro.notification.emailnotification.template.label',
                 'class' => 'OroEmailBundle:EmailTemplate',
+                'choice_label' => 'name',
                 'configs' => [
                     'allowClear' => true,
                     'placeholder' => 'oro.email.form.choose_template',

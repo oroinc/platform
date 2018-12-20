@@ -7,7 +7,7 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 class HTMLAttributeTypeTest extends AttributeTypeTestCase
 {
-    /** @var HtmlTagHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $htmlTagHelper;
 
     protected function setUp()

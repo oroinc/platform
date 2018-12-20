@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
+use Oro\Bundle\NotificationBundle\Event\Handler\TemplateEmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -13,9 +14,10 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowNotificationHandler;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\EmailNotificationStub;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
+class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const WORKFLOW_NAME = 'test_workflow_name';
     const TRANSITION_NAME = 'transition_name';
@@ -23,14 +25,17 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var \stdClass */
     private $entity;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var WorkflowNotificationEvent|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowNotificationEvent|\PHPUnit\Framework\MockObject\MockObject */
     private $event;
 
-    /** @var EmailNotificationManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailNotificationManager|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
+
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
     /** @var WorkflowNotificationHandler */
     private $handler;
@@ -40,15 +45,22 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
         $this->em = $this->createMock(EntityManager::class);
         $this->entity = new \stdClass();
 
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->event = $this->createMock(WorkflowNotificationEvent::class);
         $this->event->expects($this->any())->method('getEntity')->willReturn($this->entity);
 
         $this->manager = $this->createMock(EmailNotificationManager::class);
 
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManager')
+            ->willReturn($this->em);
+
         $this->handler = new WorkflowNotificationHandler(
             $this->manager,
-            $this->em,
-            new PropertyAccessor()
+            $doctrine,
+            new PropertyAccessor(),
+            $this->eventDispatcher
         );
     }
 
@@ -62,11 +74,12 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $expected = array_map(
             function (EmailNotification $notification) {
-                return new EmailNotificationAdapter(
+                return new TemplateEmailNotificationAdapter(
                     $this->entity,
                     $notification,
                     $this->em,
-                    new PropertyAccessor()
+                    new PropertyAccessor(),
+                    $this->eventDispatcher
                 );
             },
             $expected
@@ -78,7 +91,6 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
         $this->manager->expects($expected ? $this->once() : $this->never())
             ->method('process')
             ->with(
-                $this->entity,
                 $expected,
                 null,
                 [
@@ -119,7 +131,7 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $this->manager->expects($this->never())->method('process');
 
-        /** @var NotificationEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var NotificationEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(NotificationEvent::class);
         $event->expects($this->never())->method('stopPropagation');
 
@@ -137,14 +149,14 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return WorkflowTransitionRecord|\PHPUnit_Framework_MockObject_MockObject
+     * @return WorkflowTransitionRecord|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getTransitionRecord()
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn(self::WORKFLOW_NAME);
 
-        /** @var WorkflowTransitionRecord|\PHPUnit_Framework_MockObject_MockObject $transitionRecord */
+        /** @var WorkflowTransitionRecord|\PHPUnit\Framework\MockObject\MockObject $transitionRecord */
         $transitionRecord = $this->createMock(WorkflowTransitionRecord::class);
         $transitionRecord->expects($this->any())->method('getTransitionName')->willReturn(self::TRANSITION_NAME);
         $transitionRecord->expects($this->any())->method('getWorkflowItem')->willReturn($workflowItem);

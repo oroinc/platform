@@ -106,7 +106,7 @@ Your entity is now recognized as the activity entity. To make sure that the acti
 ## How to Configure UI for the Activity Entity
 
 
-Before the new activity entity can be used in ORO platform, you need to configure two things for entities that this activity can be assigned to:
+Before the new activity entity can be used in OroPlatform, you need to configure two things for entities that this activity can be assigned to:
 
  - [The activity list section](#how-to-configure-ui-for-activity-list-section)
  - [The add activity button](#how-to-configure-ui-for-activity-button)
@@ -308,7 +308,7 @@ If these options (`context` or `default`) are not defined for an entity, the gri
 
 For any activity entity grid you can include a column that includes all context entities.
 
-Have a look at the following example of tasks configuration in *datagrid.yml*:
+Have a look at the following example of tasks configuration in *datagrids.yml*:
 
 ``` yml
 datagrids:

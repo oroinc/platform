@@ -7,7 +7,7 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBu
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
 
-class EntityExtendPassTest extends \PHPUnit_Framework_TestCase
+class EntityExtendPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcess()
     {
@@ -45,6 +45,10 @@ class EntityExtendPassTest extends \PHPUnit_Framework_TestCase
         $loaderDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $loaderDef->expects($this->once())
+            ->method('setFactory')
+            ->with('Oro\Bundle\EntityExtendBundle\Validator\Validation::createValidatorBuilder');
 
         $container->expects($this->at(3))
             ->method('hasDefinition')

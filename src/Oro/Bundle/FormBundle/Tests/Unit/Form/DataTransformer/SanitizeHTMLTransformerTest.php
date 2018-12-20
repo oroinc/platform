@@ -4,7 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 
-class SanitizeHTMLTransformerTest extends \PHPUnit_Framework_TestCase
+class SanitizeHTMLTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param string $value
@@ -78,7 +78,12 @@ class SanitizeHTMLTransformerTest extends \PHPUnit_Framework_TestCase
             'prepare or condition' => ['<p>sometext</p>', 'a[href|target=_blank], b/p', '<p>sometext</p>'],
             'prepare empty' => ['<p>sometext</p>', '[href|target=_blank],/', 'sometext'],
             'default attributes set' => ['<p>sometext</p>', '@[style],a', 'sometext'],
-            'default attributes set with allowed' => ['<p>sometext</p>', '@[style],p', '<p>sometext</p>']
+            'default attributes set with allowed' => ['<p>sometext</p>', '@[style],p', '<p>sometext</p>'],
+            'id attribute' => [
+                '<div id="test" data-id="test2">sometext</div>',
+                'div[id]',
+                '<div id="test">sometext</div>'
+            ]
         ];
     }
 }

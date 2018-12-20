@@ -1,46 +1,50 @@
-<div class="customer-info well-small">
-    <div class="visual">
-        {% if recordUrl is defined -%}
-        <a href="{{ recordUrl }}" {% if recordUrlCssClass is defined %}class="{{ recordUrlCssClass }}"{% endif %}>
-        {%- endif -%}
-            <img src="{{ showImage|default(false) and image ? filtered_image_url(image, 'avatar_med') : asset('bundles/oroui/img/info-' ~ iconType|default('user') ~ '.png') }}" alt="{{ title }}" />
-        {%- if recordUrl is defined -%}
-        </a>
-        {%- endif %}
-    </div>
-    <div class="clearfix">
-        <div class="{% if showImage|default(false) %}customer-content{% else %}customer-simple{% endif %} pull-left">
-            <div class="clearfix">
-                <div class="pull-left">
-                    <h1 class="user-name">
-                        {% if recordUrl is defined %}<a href="{{ recordUrl }}" {% if recordUrlCssClass is defined %}class="{{ recordUrlCssClass }}"{% endif %}>{% endif %}
-                            {{ title }}
-                            {% if recordUrl is defined %}</a>{% endif %}
-                    </h1>
-                </div>
-                {% block additional_info %}
-                {% endblock %}
+<div class="page-title">
+    <div class="row clearfix">
+        <div class="pull-left pull-left-extra">
+            <div class="page-title__icon">
+                {% if recordUrl is defined -%}
+                <a href="{{ recordUrl }}" {% if recordUrlCssClass is defined %}class="{{ recordUrlCssClass }}"{% endif %}>
+                {%- endif -%}
+                    <img src="{{ showImage|default(false) and image ? filtered_image_url(image, 'avatar_med') : asset('bundles/oroui/img/info-' ~ iconType|default('user') ~ '.png') }}" alt="{{ title }}" />
+                {%- if recordUrl is defined -%}
+                </a>
+                {%- endif %}
             </div>
-            {%- set searchItemEntityInfo -%}
-                {% placeholder search_item_entity_info with {entity: entity} %}
-            {%- endset -%}
-            {% if (entityInfo is defined and entityInfo|length) or searchItemEntityInfo is not null %}
+            <div class="{% if showImage|default(false) %}page-title__path{% endif %} pull-left">
                 <div class="clearfix">
-                    <ul class="inline">
-                        {% if searchItemEntityInfo is not null %}
-                            {{ searchItemEntityInfo }}
-                        {% endif %}
-                        {% if entityInfo is defined and entityInfo|length %}
-                            {% for info in entityInfo %}
-                                <li>{{ info.title }}: {{ info.value }}</li>
-                            {% endfor %}
-                        {% endif %}
-                    </ul>
+                    <div class="pull-left">
+                        <h1 class="page-title__entity-title">
+                            {% if recordUrl is defined %}<a href="{{ recordUrl }}" {% if recordUrlCssClass is defined %}class="{{ recordUrlCssClass }}"{% endif %}>{% endif %}
+                                {{ title }}
+                            {% if recordUrl is defined %}</a>{% endif %}
+                        </h1>
+                    </div>
+                    {% block additional_info %}
+                    {% endblock %}
                 </div>
-            {% endif %}
+                {%- set searchItemEntityInfo -%}
+                    {% placeholder search_item_entity_info with {entity: entity} %}
+                {%- endset -%}
+            </div>
         </div>
         <div class="pull-right">
             <div class="sub-title">{{ entityType }}</div>
+        </div>
+    </div>
+    <div class="row inline-info">
+        <div class="pull-left-extra">
+            {% if (entityInfo is defined and entityInfo|length) or searchItemEntityInfo is not null %}
+                <ul class="inline">
+                    {% if searchItemEntityInfo is not null %}
+                        {{ searchItemEntityInfo }}
+                    {% endif %}
+                    {% if entityInfo is defined and entityInfo|length %}
+                        {% for info in entityInfo %}
+                            <li>{{ info.title }}: {{ info.value }}</li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            {% endif %}
         </div>
     </div>
 </div>

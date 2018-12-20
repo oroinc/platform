@@ -32,12 +32,12 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: 90 }
 
-    oro_api.update.rest.normalize_entity_id:
+    oro_api.update.normalize_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Update\NormalizeEntityId
         arguments:
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
         tags:
-            - { name: oro.api.processor, action: update, group: normalize_input, requestType: rest, priority: -110 }
+            - { name: oro.api.processor, action: update, group: normalize_input, priority: -110 }
 
     #
     # security_check
@@ -46,9 +46,7 @@ services:
     oro_api.update.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - '@oro_api.doctrine_helper'
-            - '@security.authorization_checker'
-            - '@oro_security.acl.group_provider.chain'
+            - '@oro_api.security.authorization_checker'
             - EDIT
         tags:
             - { name: oro.api.processor, action: update, group: security_check, priority: 10 }
@@ -62,9 +60,9 @@ services:
     #
 
     oro_api.update.entity_object_security_check:
-        class: \Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck
         arguments:
-            - '@security.authorization_checker'
+            - '@oro_api.security.authorization_checker'
             - EDIT
         tags:
             - { name: oro.api.processor, action: update, group: data_security_check, priority: 10 }
@@ -72,13 +70,6 @@ services:
     #
     # transform_data
     #
-
-    oro_api.update.build_form_builder:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder
-        arguments:
-            - '@oro_api.form_helper'
-        tags:
-            - { name: oro.api.processor, action: update, group: transform_data, priority: 100 }
 
     #
     # save_data
@@ -101,6 +92,10 @@ services:
             - '@oro_api.action_processor_bag'
         tags:
             - { name: oro.api.processor, action: update, group: normalize_data, priority: -10 }
+
+    #
+    # finalize
+    #
 
     #
     # normalize_result

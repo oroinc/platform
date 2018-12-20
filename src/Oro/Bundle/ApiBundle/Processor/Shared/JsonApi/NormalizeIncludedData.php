@@ -16,7 +16,9 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
@@ -26,7 +28,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Loads data from "included" section of the request data to the Context.
+ * Loads data from "included" section of the request data to the context.
  */
 class NormalizeIncludedData implements ProcessorInterface
 {
@@ -44,8 +46,8 @@ class NormalizeIncludedData implements ProcessorInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var EntityIdTransformerInterface */
-    protected $entityIdTransformer;
+    /** @var EntityIdTransformerRegistry */
+    protected $entityIdTransformerRegistry;
 
     /** @var ConfigProvider */
     protected $configProvider;
@@ -60,20 +62,20 @@ class NormalizeIncludedData implements ProcessorInterface
     private $entityMetadata;
 
     /**
-     * @param DoctrineHelper               $doctrineHelper
-     * @param EntityInstantiator           $entityInstantiator
-     * @param EntityLoader                 $entityLoader
-     * @param ValueNormalizer              $valueNormalizer
-     * @param EntityIdTransformerInterface $entityIdTransformer
-     * @param ConfigProvider               $configProvider
-     * @param MetadataProvider             $metadataProvider
+     * @param DoctrineHelper              $doctrineHelper
+     * @param EntityInstantiator          $entityInstantiator
+     * @param EntityLoader                $entityLoader
+     * @param ValueNormalizer             $valueNormalizer
+     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
+     * @param ConfigProvider              $configProvider
+     * @param MetadataProvider            $metadataProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityInstantiator $entityInstantiator,
         EntityLoader $entityLoader,
         ValueNormalizer $valueNormalizer,
-        EntityIdTransformerInterface $entityIdTransformer,
+        EntityIdTransformerRegistry $entityIdTransformerRegistry,
         ConfigProvider $configProvider,
         MetadataProvider $metadataProvider
     ) {
@@ -81,7 +83,7 @@ class NormalizeIncludedData implements ProcessorInterface
         $this->entityInstantiator = $entityInstantiator;
         $this->entityLoader = $entityLoader;
         $this->valueNormalizer = $valueNormalizer;
-        $this->entityIdTransformer = $entityIdTransformer;
+        $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
         $this->configProvider = $configProvider;
         $this->metadataProvider = $metadataProvider;
     }
@@ -158,7 +160,7 @@ class NormalizeIncludedData implements ProcessorInterface
                 $data[JsonApiDoc::TYPE]
             );
             if (null !== $entityClass) {
-                $updateFlag = $this->getUpdateFlag($pointer, $data, $entityClass);
+                $updateFlag = $this->getUpdateFlag($pointer, $data);
                 if (null !== $updateFlag) {
                     $entityId = $this->getEntityId(
                         $this->buildPointer($pointer, JsonApiDoc::ID),
@@ -215,37 +217,26 @@ class NormalizeIncludedData implements ProcessorInterface
     /**
      * @param string $pointer
      * @param array  $data
-     * @param string $entityClass
      *
      * @return bool|null
      */
-    protected function getUpdateFlag($pointer, $data, $entityClass)
+    protected function getUpdateFlag($pointer, $data)
     {
         if (empty($data[JsonApiDoc::META]) || !array_key_exists(self::UPDATE_META, $data[JsonApiDoc::META])) {
             return false;
         }
+
         $flag = $data[JsonApiDoc::META][self::UPDATE_META];
-        if (true === $flag || false === $flag) {
-            if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-                $this->addValidationError(
-                    Constraint::VALUE,
-                    $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), self::UPDATE_META),
-                    'Only manageable entity can be updated.'
-                );
-
-                return null;
-            }
-
-            return $flag;
+        if (true !== $flag && false !== $flag) {
+            $this->addValidationError(
+                Constraint::VALUE,
+                $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), self::UPDATE_META),
+                'This value should be boolean.'
+            );
+            $flag = null;
         }
 
-        $this->addValidationError(
-            Constraint::VALUE,
-            $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), self::UPDATE_META),
-            'This value should be boolean.'
-        );
-
-        return null;
+        return $flag;
     }
 
     /**
@@ -286,13 +277,24 @@ class NormalizeIncludedData implements ProcessorInterface
         }
 
         try {
-            return $this->entityIdTransformer->reverseTransform($entityId, $this->getEntityMetadata($entityClass));
+            return $this->getEntityIdTransformer($this->context->getRequestType())
+                ->reverseTransform($entityId, $this->getEntityMetadata($entityClass));
         } catch (\Exception $e) {
             $this->addValidationError(Constraint::ENTITY_ID, $pointer)
                 ->setInnerException($e);
         }
 
         return null;
+    }
+
+    /**
+     * @param RequestType $requestType
+     *
+     * @return EntityIdTransformerInterface
+     */
+    protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
+    {
+        return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 
     /**
@@ -305,11 +307,19 @@ class NormalizeIncludedData implements ProcessorInterface
      */
     protected function getEntity($pointer, $entityClass, $entityId, $updateFlag)
     {
+        $resolvedEntityClass = $this->doctrineHelper->resolveManageableEntityClass($entityClass);
+
         if ($updateFlag) {
-            return $this->getExistingEntity($pointer, $entityClass, $entityId);
+            if ($resolvedEntityClass) {
+                return $this->getExistingEntity($pointer, $resolvedEntityClass, $entityId);
+            }
+
+            $this->addValidationError(Constraint::VALUE, $pointer, 'Only manageable entity can be updated.');
+
+            return null;
         }
 
-        return $this->entityInstantiator->instantiate($entityClass);
+        return $this->entityInstantiator->instantiate($resolvedEntityClass ?? $entityClass);
     }
 
     /**
@@ -322,13 +332,11 @@ class NormalizeIncludedData implements ProcessorInterface
     protected function getExistingEntity($pointer, $entityClass, $entityId)
     {
         $entity = $this->entityLoader->findEntity($entityClass, $entityId, $this->getEntityMetadata($entityClass));
-        if (null !== $entity) {
-            return $entity;
+        if (null === $entity) {
+            $this->addValidationError(Constraint::ENTITY, $pointer, 'The entity does not exist.');
         }
 
-        $this->addValidationError(Constraint::ENTITY, $pointer, 'The entity does not exist.');
-
-        return null;
+        return $entity;
     }
 
     /**

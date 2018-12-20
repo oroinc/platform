@@ -1,0 +1,97 @@
+/* @theme: admin.oro; */
+
+@import "bowerassets/bootstrap/scss/popover";
+
+.popover {
+    box-shadow: $popover-box-shadow;
+
+    .arrow {
+        z-index: $popover-arrow-z-index;
+
+        &:before {
+            content: none;
+        }
+
+        &:after {
+            background-color: $popover-arrow-color;
+            width: $popover-arrow-size;
+            height: $popover-arrow-size;
+            display: block;
+            transform: rotate(45deg);
+            border: none;
+        }
+    }
+
+    &.bs-popover-top {
+        .arrow {
+            &:after {
+                bottom: $popover-arrow-offset;
+                box-shadow: $popover-arrow-top-shadow;
+            }
+        }
+    }
+
+    &.bs-popover-bottom {
+        .arrow {
+            &:after {
+                top: $popover-arrow-offset;
+                box-shadow: $popover-arrow-bottom-shadow;
+            }
+        }
+    }
+
+    &.bs-popover-left {
+        .arrow {
+            &:after {
+                right: $popover-arrow-offset;
+                box-shadow: $popover-arrow-left-shadow;
+            }
+        }
+    }
+
+    &.bs-popover-right {
+        .arrow {
+            &:after {
+                left: $popover-arrow-offset;
+                box-shadow: $popover-arrow-right-shadow;
+            }
+        }
+    }
+
+    .oro-popover-content {
+        overflow-y: auto;
+        height: 100%;
+    }
+
+    &-header {
+        padding: 8px 14px;
+        margin: 0;
+        font-size: 14px;
+        font-weight: normal;
+        line-height: 18px;
+        background-color: #f7f7f7;
+        border-bottom: 1px solid #ebebeb;
+        border-radius: 5px 5px 0 0;
+    }
+
+    &-body {
+        background-color: $popover-body-bg;
+        padding-right: $popover-body-offset-right;
+
+        &.popover-no-close-button {
+            padding-right: $popover-body-offset-right-no-close;
+        }
+    }
+
+    &-close {
+        position: $popover-close-position;
+        top: $popover-close-position-y;
+        #{$end}: $popover-close-position-x;
+        cursor: $popover-close-cursor;
+        color: $popover-close-color;
+
+        &:before {
+            font-size: $popover-close-before-font-size;
+        }
+    }
+}

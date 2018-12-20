@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Stub for entity form type.
+ */
 class EntityType extends AbstractType
 {
     /** @var string */
@@ -44,7 +47,7 @@ class EntityType extends AbstractType
             'query_builder' => null,
             'create_enabled' => false,
             'class' => null,
-            'property' => null
+            'acl_options' => []
         ];
 
         if ($this->options) {

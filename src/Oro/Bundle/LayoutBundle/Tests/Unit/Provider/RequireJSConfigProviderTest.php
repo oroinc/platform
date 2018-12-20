@@ -11,7 +11,7 @@ use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\LayoutContext;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
-class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
+class RequireJSConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var RequireJSConfigProvider
@@ -19,12 +19,12 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
     protected $provider;
 
     /**
-     * @var EngineInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EngineInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $engineInterface;
 
     /**
-     * @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $cache;
 
@@ -39,7 +39,7 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
     protected $webRoot;
 
     /**
-     * @var ThemeManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $themeManager;
 
@@ -62,7 +62,7 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $this->webRoot = './web/root';
+        $this->webRoot = './public/root';
 
         $this->provider = new RequireJSConfigProvider(
             $this->engineInterface,
@@ -88,7 +88,7 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetConfig()
     {
         $requireConfig = [
-            'require-config' => './web/root/js/layout/default/require-config',
+            'require-config' => './public/root/js/layout/default/require-config',
             'require-lib' => 'npmassets/requirejs/require'
         ];
 
@@ -106,7 +106,7 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
         $config->setOutputFilePath($path . $this->config['build_path']);
         $config->setConfigFilePath($path . RequireJSConfigProvider::REQUIREJS_CONFIG_FILE);
 
-        /** @var Theme|\PHPUnit_Framework_MockObject_MockObject $theme */
+        /** @var Theme|\PHPUnit\Framework\MockObject\MockObject $theme */
         $theme = $this->createMock('Oro\Component\Layout\Extension\Theme\Model\Theme');
         $theme->expects($this->any())
             ->method('getName')
@@ -125,7 +125,7 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->cache
             ->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
             ->will($this->returnValue(false));
 
@@ -134,13 +134,7 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY, ['default' => $config]);
 
-        $this->cache
-            ->expects($this->once())
-            ->method('fetch')
-            ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
-            ->will($this->returnValue(['default' => $config]));
-
-        /** @var LayoutContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var LayoutContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(LayoutContext::class);
         $context->expects($this->once())
             ->method('get')
@@ -161,9 +155,9 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->cache
             ->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
-            ->will($this->returnValue(true));
+            ->will($this->returnValue([]));
 
         $contextHolder = new LayoutContextHolder();
 
@@ -178,17 +172,11 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->cache
             ->expects($this->once())
-            ->method('contains')
-            ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
-            ->will($this->returnValue(true));
-
-        $this->cache
-            ->expects($this->once())
             ->method('fetch')
             ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
             ->will($this->returnValue(['default' => []]));
 
-        /** @var LayoutContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var LayoutContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(LayoutContext::class);
         $context->expects($this->once())
             ->method('get')

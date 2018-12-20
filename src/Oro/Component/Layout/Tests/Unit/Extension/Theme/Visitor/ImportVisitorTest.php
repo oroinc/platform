@@ -17,21 +17,21 @@ use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\ImportedLayoutUpdateWi
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\LayoutUpdateWithImports;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\NotApplicableImportAwareLayoutUpdateStub;
 
-class ImportVisitorTest extends \PHPUnit_Framework_TestCase
+class ImportVisitorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImportVisitor */
     protected $visitor;
 
-    /** @var LayoutUpdateLoaderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutUpdateLoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $loader;
 
-    /** @var DependencyInitializer|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DependencyInitializer|\PHPUnit\Framework\MockObject\MockObject */
     protected $dependencyInitializer;
 
-    /** @var ResourceProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ResourceProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $resourceProvider;
 
-    /** @var ThemeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $themeManager;
 
     /**
@@ -54,7 +54,7 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
 
     public function testWalkUpdatesWithoutImports()
     {
-        /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
 
         $updates = ['root' => [$this->createMock(LayoutUpdateInterface::class)]];
@@ -67,7 +67,7 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
     {
         $themeName = 'oro-import';
 
-        /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $context->expects($this->once())
             ->method('get')
@@ -87,7 +87,7 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
                 ]
             ));
 
-        /** @var Theme|\PHPUnit_Framework_MockObject_MockObject $theme */
+        /** @var Theme|\PHPUnit\Framework\MockObject\MockObject $theme */
         $theme = $this->getMockBuilder(Theme::class)->setConstructorArgs([$themeName])->getMock();
         $theme->expects($this->any())
             ->method('getName')
@@ -110,7 +110,7 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
             ->with([$path])
             ->will($this->returnValue(['import/file']));
 
-        /** @var ImportedLayoutUpdate|\PHPUnit_Framework_MockObject_MockObject $importUpdate */
+        /** @var ImportedLayoutUpdate|\PHPUnit\Framework\MockObject\MockObject $importUpdate */
         $importUpdate = $this->createMock(ImportedLayoutUpdate::class);
 
         $this->loader
@@ -140,7 +140,7 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
     {
         $themeName = 'oro-import';
 
-        /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $context->expects($this->exactly(2))
             ->method('get')
@@ -170,7 +170,7 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
             ->method('getImports')
             ->will($this->returnValue([]));
 
-        /** @var Theme|\PHPUnit_Framework_MockObject_MockObject $theme */
+        /** @var Theme|\PHPUnit\Framework\MockObject\MockObject $theme */
         $theme = $this->getMockBuilder(Theme::class)->setConstructorArgs([$themeName])->getMock();
         $theme->expects($this->any())
             ->method('getName')
@@ -204,10 +204,10 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
             ->with([$path])
             ->will($this->returnValue(['import/first_file']));
 
-        /** @var ImportedLayoutUpdate|\PHPUnit_Framework_MockObject_MockObject $firstImportUpdate */
+        /** @var ImportedLayoutUpdate|\PHPUnit\Framework\MockObject\MockObject $firstImportUpdate */
         $firstImportUpdate = $this->createMock(ImportedLayoutUpdate::class);
 
-        /** @var ImportedLayoutUpdate|\PHPUnit_Framework_MockObject_MockObject $secondImportUpdate */
+        /** @var ImportedLayoutUpdate|\PHPUnit\Framework\MockObject\MockObject $secondImportUpdate */
         $secondImportUpdate = $this->createMock(ImportedLayoutUpdate::class);
 
         $this->loader
@@ -252,7 +252,7 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
     {
         $themeName = 'oro-import';
 
-        /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $context->expects($this->once())
             ->method('get')
@@ -266,7 +266,7 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
                 ['import_id']
             ));
 
-        /** @var Theme|\PHPUnit_Framework_MockObject_MockObject $theme */
+        /** @var Theme|\PHPUnit\Framework\MockObject\MockObject $theme */
         $theme = $this->getMockBuilder(Theme::class)->setConstructorArgs([$themeName])->getMock();
         $theme->expects($this->any())
             ->method('getName')
@@ -289,7 +289,7 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
             ->with([$path])
             ->will($this->returnValue(['import/file']));
 
-        /** @var ImportedLayoutUpdateWithImports|\PHPUnit_Framework_MockObject_MockObject $importUpdate */
+        /** @var ImportedLayoutUpdateWithImports|\PHPUnit\Framework\MockObject\MockObject $importUpdate */
         $importUpdate = $this->createMock(ImportedLayoutUpdateWithImports::class);
         $importUpdate->expects($this->once())
             ->method('getImports')
@@ -321,7 +321,7 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
      */
     public function testWalkUpdatesWithNonArrayImports()
     {
-        /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
 
         $update = $this->createMock(LayoutUpdateWithImports::class);
@@ -339,7 +339,7 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
         $update = new NotApplicableImportAwareLayoutUpdateStub();
         $updates = ['root' => [$update]];
 
-        /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
 
         $this->themeManager->expects($this->never())->method('getTheme');

@@ -1,0 +1,9 @@
+<% var togglerId = _.uniqueId('dropdown-') %>
+<a href="#" role="button" data-toggle="dropdown" data-placement="bottom-end" data-modifiers="<%- JSON.stringify({preventOverflow: {enabled: false}, hide: {enabled: false}}) %>"
+   class="dropdown-toggle dropdown-toggle--no-caret role-permissions-action-launcher"
+   id="<%- togglerId %>" aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('oro.role.permission.mass_edit_label') %>">
+    <span class="fa-ellipsis-h fa--no-offset " aria-hidden="true"></span>
+</a>
+<div class="dropdown-menu dropdown-menu__action-cell dropdown-menu__role-permissions-action" aria-labelledby="<%- togglerId %>">
+    <div data-role="dropdown-menu-content"></div>
+</div>

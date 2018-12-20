@@ -14,7 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 class FormattingSelectTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LocalizationChoicesProvider
+     * @var \PHPUnit\Framework\MockObject\MockObject|LocalizationChoicesProvider
      */
     protected $provider;
 
@@ -43,8 +43,8 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
     public function testBuildForm()
     {
         $data =  [
-            'en' => 'English',
-            'es' => 'Spain'
+            'English' => 'en',
+            'Spain' => 'es',
         ];
 
         $this->provider->expects($this->once())->method('getFormattingChoices')->willReturn($data);

@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
-use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -13,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -27,7 +27,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
+class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY = 'Test:Entity';
     const ENTITY_FULL_NAME = 'Test\Entity\Full\Name';
@@ -35,29 +35,34 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     const COLUMN = 'workflowStepLabel';
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 
     /**
-     * @var EntityClassResolver|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityClassResolver;
 
     /**
-     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $configProvider;
 
     /**
-     * @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $workflowManager;
 
     /**
-     * @var WorkflowManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var WorkflowManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $workflowManagerRegistry;
+
+    /**
+     * @var DatagridStateProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $filtersStateProvider;
 
     /**
      * @var WorkflowStepColumnListener
@@ -86,22 +91,14 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->filtersStateProvider = $this->createMock(DatagridStateProviderInterface::class);
+
         $this->listener = new WorkflowStepColumnListener(
             $this->doctrineHelper,
             $this->entityClassResolver,
             $this->configProvider,
-            $this->workflowManagerRegistry
-        );
-    }
-
-    protected function tearDown()
-    {
-        unset(
-            $this->listener,
-            $this->doctrineHelper,
-            $this->configProvider,
-            $this->workflowManager,
-            $this->workflowManagerRegistry
+            $this->workflowManagerRegistry,
+            $this->filtersStateProvider
         );
     }
 
@@ -351,7 +348,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'type' => 'entity',
                                 'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN,
                                 'options' => [
-                                    'field_type' => WorkflowDefinitionSelectType::NAME,
+                                    'field_type' => WorkflowDefinitionSelectType::class,
                                     'field_options' => [
                                         'workflow_entity_class' => self::ENTITY_FULL_NAME,
                                         'multiple' => true
@@ -360,10 +357,10 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'label' => 'oro.workflow.workflowdefinition.entity_label'
                             ],
                             WorkflowStepColumnListener::WORKFLOW_STEP_FILTER => [
-                                'type' => 'entity',
+                                'type' => 'workflow_step',
                                 'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN . '.id',
                                 'options' => [
-                                    'field_type' => WorkflowStepSelectType::NAME,
+                                    'field_type' => WorkflowStepSelectType::class,
                                     'field_options' => [
                                         'workflow_entity_class' => self::ENTITY_FULL_NAME,
                                         'multiple' => true,
@@ -455,10 +452,10 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             'innerJoinField' => ['data_name' => 'b.innerJoinField'],
                             'leftJoinField' => ['data_name' => 'c.leftJoinField'],
                             WorkflowStepColumnListener::WORKFLOW_STEP_FILTER => [
-                                'type' => 'entity',
+                                'type' => 'workflow_step',
                                 'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN . '.id',
                                 'options' => [
-                                    'field_type' => WorkflowStepSelectType::NAME,
+                                    'field_type' => WorkflowStepSelectType::class,
                                     'field_options' => [
                                         'workflow_entity_class' => self::ENTITY_FULL_NAME,
                                         'multiple' => true,
@@ -537,7 +534,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'type' => 'entity',
                                 'data_name' => self::ALIAS . '.' . 'workflowStep',
                                 'options' => [
-                                    'field_type' => 'oro_workflow_step_select',
+                                    'field_type' => WorkflowStepSelectType::class,
                                     'field_options' => ['workflow_entity_class' => self::ENTITY_FULL_NAME]
                                 ]
                             ],
@@ -592,7 +589,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider buildAfterNoUpdateDataProvider
      *
-     * @param \PHPUnit_Framework_MockObject_MockObject|DatasourceInterface $datasource
+     * @param \PHPUnit\Framework\MockObject\MockObject|DatasourceInterface $datasource
      * @param DatagridConfiguration $inputConfig
      */
     public function testOnBuildAfterNoUpdate(DatasourceInterface $datasource, DatagridConfiguration $inputConfig)
@@ -601,9 +598,11 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
 
         $event = $this->createBuildAfterEvent($datasource, $inputConfig);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $datagrid */
+        /** @var \PHPUnit\Framework\MockObject\MockObject $datagrid */
         $datagrid = $event->getDatagrid();
         $datagrid->expects($this->any())->method('getParameters')->willReturn(new ParameterBag());
+
+        $this->filtersStateProvider->expects($this->any())->method('getStateFromParameters')->willReturn([]);
 
         $this->listener->onBuildAfter($event);
     }
@@ -694,22 +693,16 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $parameters = new ParameterBag(
-            [
-                '_filter' => [
-                    WorkflowStepColumnListener::WORKFLOW_FILTER => ['value' => 'workflow_filter_value'],
-                    WorkflowStepColumnListener::WORKFLOW_STEP_FILTER => ['value' => 'workflow_step_filter_value']
-                ]
-            ]
-        );
-
-        /** @var \PHPUnit_Framework_MockObject_MockObject $datagrid */
+        /** @var \PHPUnit\Framework\MockObject\MockObject $datagrid */
         $datagrid = $event->getDatagrid();
-        $datagrid->expects($this->exactly(2))->method('getParameters')->willReturn($parameters);
+        $datagrid->expects($this->exactly(2))->method('getParameters')->willReturn(new ParameterBag());
+
+        $this->filtersStateProvider->expects($this->exactly(2))->method('getStateFromParameters')->willReturn([
+            WorkflowStepColumnListener::WORKFLOW_FILTER => ['value' => 'workflow_filter_value'],
+            WorkflowStepColumnListener::WORKFLOW_STEP_FILTER => ['value' => 'workflow_step_filter_value']
+        ]);
 
         $this->listener->onBuildAfter($event);
-
-        $this->assertEquals([], $parameters->get('_filter'));
     }
 
     public function testOnResultAfterNoUpdate()
@@ -806,7 +799,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return WorkflowItemRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @return WorkflowItemRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function setUpWorkflowItemRepository()
     {
@@ -909,7 +902,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param DatagridConfiguration $configuration
-     * @return OrmResultAfter|\PHPUnit_Framework_MockObject_MockObject
+     * @return OrmResultAfter|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createResultAfterEvent(DatagridConfiguration $configuration)
     {
@@ -925,7 +918,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getWorkflowMock()
     {

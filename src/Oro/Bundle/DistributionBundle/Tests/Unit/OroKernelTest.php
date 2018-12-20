@@ -5,7 +5,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit;
 use Oro\Bundle\DistributionBundle\OroKernel;
 use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\OroKernelStub;
 
-class OroKernelTest extends \PHPUnit_Framework_TestCase
+class OroKernelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OroKernel|OroKernelStub

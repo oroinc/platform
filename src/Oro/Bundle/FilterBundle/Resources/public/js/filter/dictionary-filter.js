@@ -94,6 +94,10 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
+            // Each filter should have own copy,
+            // otherwise 2 filters on same page will show same values
+            this.selectedData = {};
+
             if (this.filterParams) {
                 this.dictionaryClass = this.filterParams.class.replace(/\\/g, '_');
             } else {
@@ -250,7 +254,6 @@ define(function(require) {
             }));
 
             this._appendFilter($filter);
-            this._refreshWidth();
         },
 
         /**
@@ -470,19 +473,6 @@ define(function(require) {
         },
 
         /**
-         * Update width of filter
-         */
-        _refreshWidth: function() {
-            var valueFrame = this.$('.value-field-frame');
-            // update left and right margins of value field frame
-            var leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
-            var rightWidth = this.$('.filter-update').outerWidth();
-
-            valueFrame.css('margin-left', leftWidth);
-            valueFrame.css('padding-right', rightWidth);
-        },
-
-        /**
          * @inheritDoc
          */
         _getCriteriaHint: function() {
@@ -555,6 +545,20 @@ define(function(require) {
             }
 
             return true;
+        },
+
+        /**
+         * Checking initialize select2 widget
+         * hide criteria witout applying and validation value if select2 have not been initialize yet
+         * @returns {*|void}
+         * @private
+         */
+        _applyValueAndHideCriteria: function() {
+            if (!this.isInitSelect2) {
+                return this._hideCriteria();
+            }
+
+            DictionaryFilter.__super__._applyValueAndHideCriteria.call(this);
         }
     });
 

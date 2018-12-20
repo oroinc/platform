@@ -5,15 +5,18 @@ namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormRegistryInterface;
 
+/**
+ * Handles logic for creating and manipulation with embedded forms
+ */
 class EmbeddedFormManager
 {
-    /** @var ContainerInterface */
-    protected $container;
+    /** @var FormRegistryInterface */
+    protected $formRegistry;
 
     /** @var FormFactoryInterface */
     protected $formFactory;
@@ -22,12 +25,12 @@ class EmbeddedFormManager
     protected $formTypes = [];
 
     /**
-     * @param ContainerInterface   $container
+     * @param FormRegistryInterface $formRegistry
      * @param FormFactoryInterface $formFactory
      */
-    public function __construct(ContainerInterface $container, FormFactoryInterface $formFactory)
+    public function __construct(FormRegistryInterface $formRegistry, FormFactoryInterface $formFactory)
     {
-        $this->container   = $container;
+        $this->formRegistry   = $formRegistry;
         $this->formFactory = $formFactory;
     }
 
@@ -68,6 +71,14 @@ class EmbeddedFormManager
     public function getAll()
     {
         return $this->formTypes;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllChoices()
+    {
+        return array_flip($this->formTypes);
     }
 
     /**
@@ -139,20 +150,14 @@ class EmbeddedFormManager
     }
 
     /**
-     * @param string $type
+     * Gets FormType instance by its name from  Form Registry
+     * if name is passed
+     * @param string|null $type
      *
-     * @return EmbeddedFormInterface|AbstractType
+     * @return EmbeddedFormInterface|AbstractType|null
      */
     public function getTypeInstance($type)
     {
-        $typeInstance = null;
-        if ($this->container->has($type)) {
-            $typeInstance = $this->container->get($type);
-            return $typeInstance;
-        } elseif (class_exists($type)) {
-            $typeInstance = new $type();
-            return $typeInstance;
-        }
-        return $typeInstance;
+        return ($type ? $this->formRegistry->getType($type) : $type);
     }
 }

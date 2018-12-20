@@ -5,7 +5,7 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 
-class EmailNotificationTest extends \PHPUnit_Framework_TestCase
+class EmailNotificationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailNotification

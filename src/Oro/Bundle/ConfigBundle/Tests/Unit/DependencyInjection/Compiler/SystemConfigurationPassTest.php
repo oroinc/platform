@@ -9,12 +9,12 @@ use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
+class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SystemConfigurationPass */
     protected $compiler;
 
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     protected function setUp()
@@ -211,7 +211,7 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Definition|\PHPUnit_Framework_MockObject_MockObject
+     * @return Definition|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createDefinitionMock()
     {

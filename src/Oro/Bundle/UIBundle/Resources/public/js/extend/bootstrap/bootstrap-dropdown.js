@@ -3,491 +3,290 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var scrollHelper = require('oroui/js/tools/scroll-helper');
-    require('bootstrap');
-    var toggleDropdown = '[data-toggle=dropdown]';
+    var config = require('module').config();
 
-    function getParent($this) {
-        var selector = $this.attr('data-target');
-        var $parent;
-        if (!selector) {
-            selector = $this.attr('href');
-            selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, ''); // strip for ie7
-        }
-        if (selector === '#') {
-            // new Sizzle does not support empty id selector '#'
-            // https://jquery.com/upgrade-guide/3.0/#breaking-change-jquery-quot-quot-and-find-quot-quot-are-invalid-syntax
-            selector = '';
-        }
-        $parent = selector && $(selector);
-        if (!$parent || !$parent.length) {
-            $parent = $this.parent();
-        }
-        return $parent;
-    }
+    var Popper = require('popper');
+    require('bootstrap-dropdown');
 
-    function beforeClearMenus() {
-        $(toggleDropdown).each(function() {
-            var $parent = getParent($(this));
-            if ($parent.hasClass('open')) {
-                $parent.trigger('hide.bs.dropdown');
-            }
-            $(this).dropdown('detach', false);
-        });
-    }
+    var Dropdown = $.fn.dropdown.Constructor;
+    var original = _.clone(Dropdown.prototype);
+    var _clearMenus = Dropdown._clearMenus;
 
-    function clearMenus() {
-        $(toggleDropdown).each(function() {
-            getParent($(this)).removeClass('open');
-        });
-    }
+    var DATA_KEY = 'bs.dropdown';
+    var EVENT_KEY = '.' + DATA_KEY;
+    var DATA_API_KEY = '.data-api';
+    var HIDE_EVENT = 'hide' + EVENT_KEY;
+    var TO_HIDE_EVENT = 'tohide' + EVENT_KEY;
+    var GRID_SCROLLABLE_CONTAINER = '.grid-scrollable-container';
+    var DIALOG_SCROLLABLE_CONTAINER = '.ui-dialog-content';
+    var SCROLLABLE_CONTAINER = [
+        DIALOG_SCROLLABLE_CONTAINER,
+        GRID_SCROLLABLE_CONTAINER
+    ].join(',');
 
-    /**
-     * Override for Dropdown constructor
-     *  - added destroy method, which removes event handlers from <html /> node
-     *  - overloaded click handler on toggleDropdown element
-     *    * executes custom clearMenu method
-     *    * triggers 'shown.bs.dropdown' event on '.dropdown-menu' parent
-     *
-     * @param {HTMLElement} element
-     * @constructor
-     */
-    function Dropdown(element) {
-        var $el = $(element).on('click.dropdown.data-api', this.toggle);
-        var globalHandlers = {
-            'click.dropdown.data-api select2-open.dropdown.data-api showTimepicker.dropdown.data-api': function() {
-                var $dropdown = $el.parent();
-                if ($dropdown.is('.open')) {
-                    $dropdown.trigger('hide.bs.dropdown').removeClass('open');
-                }
-                $el.dropdown('detach', false);
-            }
-        };
-        $el.data('globalHandlers', globalHandlers);
-        $('html').on(globalHandlers);
-    }
+    config = _.extend({
+        displayArrow: true
+    }, config);
 
-    Dropdown.prototype = $.fn.dropdown.Constructor.prototype;
+    _.extend(Dropdown.prototype, {
+        toggle: function() {
+            Dropdown._togglingElement = this._element;
+            Dropdown._isShowing = !$(this._menu).hasClass('show');
 
-    $(document).off('click.dropdown.data-api', toggleDropdown, Dropdown.prototype.toggle);
-    Dropdown.prototype.toggle = function() {
-        beforeClearMenus();
+            original.toggle.call(this);
 
-        /* original toggle method:start */
-        var $this = $(this);
-
-        if ($this.is('.disabled, :disabled')) {
-            return;
-        }
-
-        var $parent = getParent($this);
-        var isActive = $parent.hasClass('open');
-
-        clearMenus();
-
-        if (!isActive) {
-            $parent.toggleClass('open');
-        }
-
-        $this.focus();
-        /* original:end */
-
-        if ($parent.hasClass('open')) {
-            $parent.trigger('shown.bs.dropdown');
-        }
-
-        $(this).dropdown('detach');
-        return false;
-    };
-
-    Dropdown.prototype.detach = function(isActive) {
-        var $this = $(this);
-        var container = $this.data('container');
-        var $container;
-        if (!container || !($container = $this.closest(container)).length) {
-            return;
-        }
-
-        var $parent = getParent($this);
-        isActive = isActive !== undefined ? isActive : $parent.hasClass('open');
-        var $dropdownMenu;
-        var $placeholder;
-
-        if (isActive && ($dropdownMenu = $parent.find('.dropdown-menu:first')).length) {
-            var css = _.extend(_.pick($dropdownMenu.offset(), ['top', 'left']), {
-                display: 'block'
-            });
-
-            var options = $dropdownMenu.data('options');
-            var attachToParent = options.attachToParent || false;
-
-            if (options && options.align === 'right') {
-                css.right = $(window).width() - css.left - ((attachToParent ? $parent : $dropdownMenu).outerWidth());
-                css.left = 'auto';
-
-                if (attachToParent) {
-                    css.width = $parent.outerWidth();
-                }
+            if (Dropdown._isShowing) {
+                // sets focus on first input
+                $(this._menu).find('input[type=text]:first').focus();
             }
 
-            var containerOffset = $container.offset();
-            var dropdownMenuOffset = $dropdownMenu.offset();
-
-            var originalPosition = {
-                parent: $parent.offset(),
-                dropdownMenu: {
-                    left: dropdownMenuOffset.left - containerOffset.left,
-                    top: dropdownMenuOffset.top - containerOffset.top
-                }
-            };
-            $placeholder = $('<div class="dropdown-menu__placeholder"/>');
-            $dropdownMenu.data('related-toggle', $this);
-            $placeholder.data('related-menu', $dropdownMenu);
-
-            /**
-             * Add detach class for dropdown, remember parent and dropdown styles.
-             * Then move dropdown to container and apply styles
-             */
-            $dropdownMenu.addClass('detach');
-            $dropdownMenu.after($placeholder)
-                .appendTo($container)
-                .css(css);
-
-            $this.data('related-data', {
-                $dropdownMenu: $dropdownMenu,
-                $placeholder: $placeholder,
-                originalPosition: originalPosition
-            }).dropdown('updatePosition');
-        } else if (!isActive && ($placeholder = $parent.find('.dropdown-menu__placeholder')).length) {
-            $dropdownMenu = $placeholder.data('related-menu')
-                .removeAttr('style')
-                .removeClass('detach');
-
-            $this.removeData('related-data');
-            $placeholder.before($dropdownMenu).remove();
-        }
-    };
-
-    Dropdown.prototype.updatePosition = function() {
-        /**
-         * Sometimes, when dropdown opens in scrollable content, appears scrollbars.
-         * Scrollbars decrease content height and width, change elements position.
-         * When dropdown moved to container - scrollbars hiding and content returns to old dimensions and position.
-         * Styles that was applied to dropdown are wrong, because dimensions and position are changed.
-         * Following code fixes dropdown styles after that changes.
-         */
-        var obj = $(this).data('related-data');
-        if (typeof obj !== 'object') {
-            return false;
-        }
-        var $parent = obj.$placeholder.parent();
-        var $dropdownMenu = obj.$dropdownMenu;
-        var dropdownMenuOriginalPosition = obj.originalPosition.dropdownMenu;
-        var parentOriginalPosition = obj.originalPosition.parent;
-        var parentPosition = $parent.offset();
-        var css = {
-            top: dropdownMenuOriginalPosition.top + parentPosition.top - parentOriginalPosition.top,
-            left: dropdownMenuOriginalPosition.left + parentPosition.left - parentOriginalPosition.left
-        };
-
-        var options = $dropdownMenu.data('options');
-        var attachToParent = options.attachToParent || false;
-
-        if (options && options.align === 'right') {
-            css.right = $(window).width() - css.left - ((attachToParent ? $parent : $dropdownMenu).outerWidth());
-            css.left = 'auto';
-
-            if (attachToParent) {
-                css.width = $parent.outerWidth();
-            }
-        }
-
-        $dropdownMenu.css(css);
-    };
-
-    (function() {
-        // unbind original clearMenus handler, because it contains a bug in getParent with empty ID selector -- '#'
-        var documentClickEvents = $._data(document, 'events').click;
-        var event = _.find(documentClickEvents, function(event) {
-            // the only named original handler on click event with "data-api.dropdown" NS is "clearMenus"
-            // since minification of javascript code leads to loosing original function names
-            // search just for non anonymous function
-            return event.namespace === 'data-api.dropdown' &&
-                !/^function\s*\(/.test(event.handler.toString());
-        });
-        if (event) {
-            $(document).off('click', event.handler);
-        }
-    })();
-
-    $(document)
-        .on('click.dropdown.data-api', beforeClearMenus)
-        .on('click.dropdown.data-api', clearMenus)
-        .on('click.dropdown.data-api', toggleDropdown, Dropdown.prototype.toggle)
-        .on('tohide.bs.dropdown', toggleDropdown + ', .dropdown.open, .dropup.open', function(e) {
-            /**
-             * Performs safe hide action for dropdown and triggers 'hide.bs.dropdown'
-             * (the event 'tohide.bs.dropdown' have to be triggered on toggleDropdown or dropdown elements)
-             */
-            var $target = $(e.target);
-            if ($target.is(toggleDropdown)) {
-                $target = getParent($target);
-            }
-            if ($target.is('.dropdown.open, .dropup.open')) {
-                $target.trigger('hide.bs.dropdown');
-            }
-            $target.removeClass('open');
-            e.stopImmediatePropagation();
-        });
-
-    Dropdown.prototype.destroy = function() {
-        var globalHandlers = this.data('globalHandlers');
-        $('html').off(globalHandlers);
-        this.removeData('dropdown');
-        this.removeData('globalHandlers');
-    };
-
-    $.fn.dropdown = function(option) {
-        var optionArgs = _.rest(arguments);
-        return this.each(function() {
-            var $this = $(this);
-            var data = $this.data('dropdown');
-            if (!data) {
-                $this.data('dropdown', (data = new Dropdown(this)));
-            }
-            if (typeof option === 'string') {
-                data[option].apply($this, optionArgs);
-            }
-        });
-    };
-
-    $.fn.dropdown.Constructor = Dropdown;
-
-    /**
-     * Extends Bootstrap.Dropdown to process options passed over data-attribute
-     *   <div class="dropdown-menu" data-options="{&quot;container&quot;: true}"> ... </div>
-     * to configure additional behavior
-     *
-     * @param {Object} options
-     * @param {string|boolean} options.container specifies selector of container that dropdown-menu have to be attached
-     *   on open for floating menu. Or just have boolean value that says - container have to be defined automatically.
-     * @param {string} options.align specifies align for floating dropdown-menu,
-     *   by default menu left aligned, and this option allows to set 'right' aligning.
-     */
-    (function() {
-        function makeFloating($toggle, $dropdownMenu) {
-            $toggle.dropdown('detach', true);
-            var $placeholder = $toggle.data('related-data').$placeholder;
-            $dropdownMenu
-                .addClass('dropdown-menu__floating')
-                .one('mouseleave', function(e) {
-                    $placeholder.trigger(e.type);
-                });
-            $toggle.on('mouseleave.floating-dropdown', function(e) {
-                if (!$dropdownMenu.is(e.relatedTarget) && !$dropdownMenu.has(e.relatedTarget).length) {
-                    $placeholder.trigger(e.type);
-                }
-            });
-        }
-
-        function makeEmbedded($toggle, $dropdownMenu) {
-            $dropdownMenu.removeClass('dropdown-menu__floating');
-            $toggle.dropdown('detach', false)
-                .off('.floating-dropdown');
-        }
-
-        function updatePosition($toggle, $dropdownMenu, e) {
-            if (e && e.type === 'scroll') {
-                var scrollableRect = scrollHelper.getFinalVisibleRect(e.target);
-                var dropdownRect = $dropdownMenu[0].getBoundingClientRect();
-                var inRange = scrollableRect.top < dropdownRect.top &&
-                    scrollableRect.left < dropdownRect.left &&
-                    scrollableRect.right > dropdownRect.right &&
-                    scrollableRect.bottom > dropdownRect.bottom;
-                if ($dropdownMenu.is('.dropdown-menu__floating')) {
-                    // floating mode
-                    if (!inRange) {
-                        makeEmbedded($toggle, $dropdownMenu);
-                    } else {
-                        $toggle.dropdown('updatePosition');
-                    }
-                } else {
-                    // embedded mode
-                    if (inRange) {
-                        makeFloating($toggle, $dropdownMenu);
-                    }
-                }
-            } else {
-                $toggle.dropdown('updatePosition');
-            }
-        }
-
-        $(document)
-            .on('shown.bs.dropdown', '.dropdown, .dropup', function(e) {
-                if (e.namespace !== 'bs.dropdown') {
-                    // handle only events triggered with proper NS (omit just any shown events)
-                    return;
-                }
-                var $toggle = $(toggleDropdown, this);
-                var $dropdownMenu = $('>.dropdown-menu', this);
-                var options = $dropdownMenu.data('options');
-                if (options && options.container) {
-                    if (options.container === true) {
-                        // automatic definition of container selector
-                        options.container = 'body, .ui-dialog';
-                    }
-                    $toggle.data('container', options.container);
-                    var handlePositionChange = _.partial(updatePosition, $toggle, $dropdownMenu);
-                    $(window).on('resize.floating-dropdown', handlePositionChange);
-                    $dropdownMenu.parents().on('scroll.floating-dropdown', handlePositionChange);
-                    mediator.on('layout:adjustHeight', handlePositionChange, this);
-                    makeFloating($toggle, $dropdownMenu);
-                }
-            })
-            .on('hide.bs.dropdown', '.dropdown.open, .dropup.open', function(e) {
-                if (e.namespace !== 'bs.dropdown') {
-                    // handle only events triggered with proper NS (omit just any hide events)
-                    return;
-                }
-                var $toggle = $(toggleDropdown, this);
-                var $dropdownMenu = $('>.dropdown-menu__placeholder', this).data('related-menu');
-                if ($dropdownMenu && $dropdownMenu.length) {
-                    makeEmbedded($toggle, $dropdownMenu);
-                    mediator.off('layout:adjustHeight', null, this);
-                    $dropdownMenu.parents().add(window).off('.floating-dropdown');
-                }
-            });
-    })();
-
-    /**
-     * Extends Bootstrap.Dropdown and makes dropdown floating with "position: fixed",
-     * - update its position if it was with "position: absolute"
-     * - converts dropdown to dropup and vice versa if it better fit visible area
-     */
-    (function() {
-        function isInRange(parent, child) {
-            var parentRect = parent.getBoundingClientRect();
-            var childRect = child.getBoundingClientRect();
-            return parentRect.top < childRect.top &&
-                parentRect.left < childRect.left &&
-                parentRect.right > childRect.right &&
-                parentRect.bottom > childRect.bottom;
-        }
-
-        function flipToInitial($dropdown) {
-            var originalDropState = $dropdown.data('original-dropstate');
-            $dropdown
-                .toggleClass('dropdown', originalDropState === 'dropdown')
-                .toggleClass('dropup', originalDropState === 'dropup');
-        }
-
-        function flipToOpposite($dropdown) {
-            $dropdown.toggleClass('dropdown').toggleClass('dropup');
-        }
-
-        function updatePosition($dropdown, e) {
-            var eventData = e && e.data || {};
-            var $toggle = $(toggleDropdown, $dropdown);
-            var $dropdownMenu = $('>.dropdown-menu', $dropdown);
-            var dropdownMenuContainer = $toggle.closest('.ui-dialog-content')[0] ||
-                $toggle.closest('.scrollable-container')[0] ||
-                $toggle.closest('.grid-scrollable-container')[0];
-            var scrollableRect = scrollHelper.getFinalVisibleRect(dropdownMenuContainer);
-            var toggleRect = $toggle[0].getBoundingClientRect();
-
-            $dropdownMenu.css({position: 'absolute', display: '', top: '', left: '', bottom: '', right: ''});
-
-            var dropdownMenuRect = $dropdownMenu[0].getBoundingClientRect();
-
-            if ($dropdown.is('.dropdown') && scrollableRect.top > Math.min(dropdownMenuRect.top, toggleRect.bottom)) {
-                // whole toggle-item is hidden at the top of scrollable container
-                flipToOpposite($dropdown);
+            if (this._displayArrow()) {
+                $(this._menu).attr('x-displayed-arrow', Dropdown._isShowing ? '' : null);
             }
 
-            if ($dropdown.is('.dropdown') && scrollableRect.bottom < dropdownMenuRect.bottom) {
-                // dropdown menu goes beyond the bottom of scrollable container
-                flipToOpposite($dropdown);
-            }
+            delete Dropdown._togglingElement;
+            delete Dropdown._isShowing;
+        },
 
-            if ($dropdown.is('.dropup') && scrollableRect.bottom < Math.max(dropdownMenuRect.bottom, toggleRect.top)) {
-                // whole toggle-item is hidden at the bottom of scrollable container
-                flipToOpposite($dropdown);
+        dispose: function() {
+            var parent = Dropdown._getParentFromElement(this._element);
+            $(parent).off(EVENT_KEY);
+            $(document).off('mCSB.scroll' + EVENT_KEY, this._popperUpdate);
+
+            if (this._dialog) {
+                $(this._dialog).off(EVENT_KEY);
+                delete this._dialog;
             }
+            original.dispose.call(this);
+        },
+
+        _getConfig: function() {
+            var config = original._getConfig.call(this);
+            var placement = config.placement;
 
             if (
-                $dropdown.is('.dropdown') && scrollableRect.bottom < toggleRect.bottom ||
-                $dropdown.is('.dropup') && scrollableRect.top > toggleRect.top
+                placement && _.isRTL() &&
+                (placement = placement.split('-')).length === 2 &&
+                ['auto', 'top', 'bottom'].indexOf(placement[0]) !== -1 &&
+                ['start', 'end'].indexOf(placement[1]) !== -1
             ) {
-                // dropdown menu is completely hidden behind scrollable container
-                $dropdownMenu.hide();
+                placement[1] = {start: 'end', end: 'start'}[placement[1]];
+                config.placement = placement.join('-');
+            }
+
+            return config;
+        },
+
+        _getMenuElement: function() {
+            original._getMenuElement.call(this);
+
+            if (!this._menu) {
+                // if the menu element wasn't found by selector `.dropdown-menu`,
+                // the element next to toggler button is considered as menu
+                this._menu = $(this._element).next();
+            }
+
+            return this._menu;
+        },
+
+        _addEventListeners: function() {
+            this._popperUpdate = this._popperUpdate.bind(this);
+
+            original._addEventListeners.call(this);
+
+            var parent = Dropdown._getParentFromElement(this._element);
+            var dialogContent = $(this._element).closest(DIALOG_SCROLLABLE_CONTAINER);
+
+            this._dialog = dialogContent.length && dialogContent.parent() || null;
+
+            $(this._element).add(parent).on(TO_HIDE_EVENT, function(event) {
+                event.stopImmediatePropagation();
+                if ($(this._menu).hasClass('show')) {
+                    this.toggle();
+                }
+            }.bind(this));
+
+            $(parent).on(HIDE_EVENT, this._onHide.bind(this));
+            $(document).on('mCSB.scroll' + EVENT_KEY, this._popperUpdate);
+
+            if (this._dialog) {
+                $(this._dialog).on(
+                    _events(['dialogresize', 'dialogdrag', 'dialogreposition']),
+                    this._popperUpdate
+                );
+            }
+        },
+
+        _popperUpdate: function(e) {
+            if (this._popper) {
+                // When scrolling leads to hidden dropdown appears again, single call of scroll handler
+                // shows dropdown menu in wrong position. But since single scroll event happens very
+                // rarely in real life the next scroll event sets dropdown menu correctly.
+                // To emulate similar effect for custom scroll just call `scheduleUpdate` twice
+                this._popper.scheduleUpdate();
+                this._popper.scheduleUpdate();
+            }
+        },
+
+        /**
+         * Handles 'hide' event triggered from _clearMenus
+         *
+         * @param event
+         * @protected
+         */
+        _onHide: function(event) {
+            var form;
+
+            if (this._element !== event.relatedTarget) {
                 return;
             }
 
-            if (!eventData.preferCurrentState) {
-                flipToInitial($dropdown);
+            if (Dropdown._isShowing && $.contains(this._menu, Dropdown._togglingElement)) {
+                // prevent parent menu close on opening nested dropdown
+                event.preventDefault();
             }
 
-            if (!isInRange(document.body, $dropdownMenu[0])) {
-                flipToOpposite($dropdown);
-                if (!isInRange(document.body, $dropdownMenu[0])) {
-                    flipToInitial($dropdown);
+            if (
+                Dropdown._clickEvent &&
+                (form = $(Dropdown._clickEvent.target).closest('form')[0]) &&
+                $.contains(this._menu, form)
+            ) {
+                // prevent parent menu close on click inside its form
+                event.preventDefault();
+            }
+        },
+
+        _getPopperConfig: function() {
+            var config = original._getPopperConfig.call(this);
+
+            if (!config.positionFixed && $(this._element).closest(SCROLLABLE_CONTAINER).length) {
+                // dropdowns are shown with position fixed inside scrollable container, to fix overflow
+                config.positionFixed = true;
+            }
+
+            if (this._config.inheritParentWidth) {
+                var inheritParentWidth = this._config.inheritParentWidth;
+                config.positionFixed = true;
+                config.modifiers.offset = {
+                    fn: function(data, options) {
+                        var popper = data.instance.popper;
+                        var offset = data.offsets.popper;
+
+                        if (
+                            offset.width &&
+                            (inheritParentWidth === 'strictly' || offset.width < popper.parentElement.clientWidth)
+                        ) {
+                            popper.style.width = popper.parentElement.clientWidth + 'px';
+                            _.extend(offset, _.pick(
+                                popper.parentElement.getBoundingClientRect(),
+                                'left',
+                                'right',
+                                'width')
+                            );
+                        }
+
+                        Popper.Defaults.modifiers.offset.fn(data, options);
+
+                        return data;
+                    }
+                };
+            }
+
+            // https://popper.js.org/popper-documentation.html#Popper.Defaults
+            _.extend(config, _.pick(this._config, 'placement', 'positionFixed', 'eventsEnabled'));
+            _.extend(config.modifiers, _.pick(this._config.modifiers, 'shift', 'offset', 'preventOverflow',
+                'keepTogether', 'arrow', 'flip', 'inner', 'hide', 'computeStyle', 'applyStyle'));
+
+            if (this._popper !== null) {
+                // the fix deletes previews instance to prevent memory leaks
+                // _getPopperConfig is invoked only before creating a new Popper instance
+                this._popper.destroy();
+                this._popper = null;
+            }
+
+            if (this._displayArrow()) {
+                var menu = this._getMenuElement();
+                var arrow = $(menu).children('.arrow')[0];
+
+                if (!arrow) {
+                    arrow = document.createElement(menu.tagName.toLowerCase() === 'ul' ? 'li' : 'span');
+                    arrow.classList.add('arrow');
+                    menu.insertBefore(arrow, menu.firstChild);
                 }
+
+                config.modifiers.arrow = _.extend(config.modifiers.arrow || {}, {
+                    element: arrow
+                });
             }
 
-            var dropdownRect = $dropdownMenu[0].getBoundingClientRect();
-            $dropdownMenu.css({
-                position: 'fixed',
-                top: dropdownRect.top,
-                left: dropdownRect.left,
-                bottom: 'auto',
-                right: 'auto'
-            });
-        }
+            if (_.result(config.modifiers, 'preventOverflow')) {
+                var boundariesElement = config.modifiers.preventOverflow.boundariesElement;
+
+                if (boundariesElement && ['scrollParent', 'window', 'viewport'].indexOf(boundariesElement) === -1) {
+                    config.modifiers.preventOverflow.boundariesElement = $(this._element).closest(boundariesElement)[0];
+                }
+
+                config.modifiers.preventOverflow.escapeWithReference = true;
+            }
+
+            return config;
+        },
 
         /**
-         * On open/close dropdown-menu initializes/disposes auto flip menu functionality
+         * Defined property `_inNavbar` is used only for
+         *
+         * @return {boolean}
+         * @protected
          */
-        $(document)
-            .on('shown.bs.dropdown', '.dropdown, .dropup', function(e) {
-                if (e.namespace !== 'bs.dropdown') {
-                    // handle only events triggered with proper NS (omit just any shown events)
-                    return;
-                }
-                var $dropdown = $(this);
-                var $dropdownMenu = $('>.dropdown-menu', $dropdown);
-                var options = $dropdownMenu.data('options');
-                if ($dropdownMenu.length === 0 || ($dropdown.closest('.ui-dialog').length === 0 &&
-                    !_.result(options, 'flipMode'))) {
-                    // handles only case when dropdown id opened in dialog
-                    return;
-                }
+        _detectNavbar: function() {
+            return original._detectNavbar.call(this) ||
+                this._config.popper === false || // popper plugin is turned off intentionally
+                $(this._element).closest('.app-header').length > 0; // app-header is considered as navbar as well
+        },
 
-                $dropdown.data('original-dropstate', $dropdown.hasClass('dropup') ? 'dropup' : 'dropdown');
+        _displayArrow: function() {
+            return _.isBoolean(this._config.displayArrow) ? this._config.displayArrow : config.displayArrow;
+        }
+    });
 
-                var dialogEvents = _.map(['dialogresize', 'dialogdrag', 'dialogreposition'], function(item) {
-                    return item + '.autoflip-dropdown';
-                });
-                var handlePositionChange = _.partial(updatePosition, $dropdown);
+    Dropdown._clearMenus = function(event) {
+        if (event && event.type === 'click') {
+            var $target = $(event.target);
+            if ($target.closest('[data-toggle]').length && $target.closest('.dropdown-menu.show').length) {
+                // click on toggle element inside active dropdown-menu
+                return;
+            }
 
-                $dropdown.on('shown.autoflip-dropdown', null, {preferCurrentState: true}, handlePositionChange);
-                $dropdown.closest('.ui-dialog').on(dialogEvents.join(' '), handlePositionChange);
-                $dropdown.parents().on('scroll.autoflip-dropdown', handlePositionChange);
-                $dropdown.on('content:changed.autoflip-dropdown', handlePositionChange);
-                $(window).on('resize.autoflip-dropdown', handlePositionChange);
-                handlePositionChange();
-            })
-            .on('hide.bs.dropdown', '.dropdown.open, .dropup.open', function(e) {
-                if (e.namespace !== 'bs.dropdown') {
-                    // handle only events triggered with proper NS (omit just any hide events)
-                    return;
-                }
-                var $dropdown = $(this);
-                var originalDropState = $dropdown.data('original-dropstate');
-                if (originalDropState) {
-                    flipToInitial($dropdown);
-                    $dropdown.parents().addBack().add(window).off('.autoflip-dropdown');
+            if ($target.closest('.dropdown-menu.show').length) {
+                // original click event is used in the hide event handler
+                Dropdown._clickEvent = event;
+            }
+        }
+
+        _clearMenus(event);
+
+        delete Dropdown._clickEvent;
+    };
+
+    function _events(names) {
+        return names.map(function(name) {
+            return name + EVENT_KEY + DATA_API_KEY;
+        }).join(' ');
+    }
+
+    $(document)
+        // replaced _clearMenus handler with custom one
+        .off(_events(['click', 'keyup']), _clearMenus)
+        .on(_events(['click', 'keyup', 'clearMenus']), Dropdown._clearMenus)
+
+        // nested form click events are processed in _clearMenus method extend
+        .off(_events(['click']), '.dropdown form')
+        .on(_events(['disposeLayout']), function(event) {
+            $('[data-toggle="dropdown"]', event.target).each(function() {
+                var $toogler = $(this);
+                if ($toogler.data('bs.dropdown')) {
+                    $toogler.dropdown('dispose');
                 }
             });
-    })();
+        });
 });

@@ -1,5 +1,4 @@
 config:
     paths:
         'oroconfig/js/form/config-form': 'bundles/oroconfig/js/form/config-form.js'
-        'oroconfig/js/configuration': 'bundles/oroconfig/js/configuration.js'
         'oroconfig/js/app/views/configuration-tree-view': 'bundles/oroconfig/js/app/views/configuration-tree-view.js'

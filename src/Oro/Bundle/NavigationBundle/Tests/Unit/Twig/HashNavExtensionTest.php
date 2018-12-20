@@ -5,7 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Oro\Bundle\NavigationBundle\Twig\HashNavExtension;
 
-class HashNavExtensionTest extends \PHPUnit_Framework_TestCase
+class HashNavExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Oro\Bundle\NavigationBundle\Twig\HashNavExtension

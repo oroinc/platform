@@ -4,20 +4,20 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\WorkflowBundle\Datagrid\GridEntityNameProvider;
 
-class GridEntityNameProviderTest extends \PHPUnit_Framework_TestCase
+class GridEntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 
@@ -77,7 +77,7 @@ class GridEntityNameProviderTest extends \PHPUnit_Framework_TestCase
             ->with('untranslated.label')
             ->will($this->returnValue($label));
 
-        $expected = array($entity => $label);
+        $expected = array($label => $entity);
         $this->assertEquals($expected, $this->provider->getRelatedEntitiesChoice());
     }
 

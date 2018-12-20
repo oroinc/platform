@@ -5,12 +5,12 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\CompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\GeneratedValueStrategyListenerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class GeneratedValueStrategyListenerPassTest extends \PHPUnit_Framework_TestCase
+class GeneratedValueStrategyListenerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var GeneratedValueStrategyListenerPass */
     protected $compiler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder */
     protected $container;
 
     protected function setUp()
@@ -35,7 +35,7 @@ class GeneratedValueStrategyListenerPassTest extends \PHPUnit_Framework_TestCase
 
         $definition->expects($this->once())->method('clearTag')->with($this->isType('string'));
         $definition
-            ->expects($this->exactly(count($parameterValue)))
+            ->expects($this->exactly(count((array) $parameterValue)))
             ->method('addTag')
             ->with(
                 $this->isType('string'),

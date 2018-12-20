@@ -17,14 +17,13 @@ Retrieve a collection of user records.
 ### create
 
 Create a new user record.
+
 The created record is returned in the response.
 
 {@inheritdoc}
 
 {@request:json_api}
 Example:
-
-`</api/users>`
 
 ```JSON
 {  
@@ -63,8 +62,6 @@ Edit a specific user record.
 
 {@request:json_api}
 Example:
-
-`</api/users/54>`
 
 ```JSON
 {  
@@ -129,7 +126,6 @@ Delete a specific user record.
 ### delete_list
 
 Delete a collection of user records.
-The list of records that will be deleted, could be limited by filters.
 
 {@inheritdoc}
 
@@ -147,15 +143,21 @@ The list of records that will be deleted, could be limited by filters.
 
 An array of email addresses.
 
-Format of data: [{"email": first@email.com}, {"email": second@email.com}]
+The **email** property is a string contains an email address.
+
+Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}\]**
 
 #### create, update
 
 An array of email addresses.
 
-Format of data: [{"email": first@email.com}, {"email": second@email.com}]
+The **email** property is a string contains an email address.
 
-Data should contain full collection of email addresses of the business customer.
+Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}\]**
+
+**Please note:**
+
+*Data should contain all of email addresses of the user.*
 
 ### username
 
@@ -240,8 +242,6 @@ Replace the avatar for a specific user.
 {@request:json_api}
 Example:
 
-`</api/users/1/relationships/avatar>`
-
 ```JSON
 {
   "data": {
@@ -269,8 +269,6 @@ Set the business units that a specific user has access to.
 {@request:json_api}
 Example:
 
-`</api/users/1/relationships/businessUnits>`
-
 ```JSON
 {
   "data": [
@@ -293,8 +291,6 @@ Replace the business units that a specific user has access to.
 
 {@request:json_api}
 Example:
-
-`</api/users/1/relationships/businessUnits>`
 
 ```JSON
 {
@@ -333,8 +329,6 @@ Set the groups that a specific user belongs to.
 {@request:json_api}
 Example:
 
-`</api/users/1/relationships/groups>`
-
 ```JSON
 {
   "data": [
@@ -357,8 +351,6 @@ Replace the groups that a specific user belongs to.
 
 {@request:json_api}
 Example:
-
-`</api/users/1/relationships/groups>`
 
 ```JSON
 {
@@ -397,8 +389,6 @@ Replace the organization that a specific user belongs to.
 {@request:json_api}
 Example:
 
-`</api/users/1/relationships/organization>`
-
 ```JSON
 {
   "data": {
@@ -426,8 +416,6 @@ Set the organizations that a specific user has access to.
 {@request:json_api}
 Example:
 
-`</api/users/1/relationships/organizations>`
-
 ```JSON
 {
   "data": [
@@ -454,8 +442,6 @@ Replace the organizations that a specific user has access to.
 
 {@request:json_api}
 Example:
-
-`</api/users/1/relationships/organizations>`
 
 ```JSON
 {
@@ -498,8 +484,6 @@ Replace the owner of a specific user record.
 {@request:json_api}
 Example:
 
-`</api/users/1/relationships/owner>`
-
 ```JSON
 {
   "data": {
@@ -527,8 +511,6 @@ Set the roles that will be assigned to a specific user.
 {@request:json_api}
 Example:
 
-`</api/users/1/relationships/roles>`
-
 ```JSON
 {
   "data": [
@@ -547,8 +529,6 @@ Replace the roles for a specific user.
 
 {@request:json_api}
 Example:
-
-`</api/users/1/relationships/roles>`
 
 ```JSON
 {
@@ -582,8 +562,6 @@ Replace the user's authentication status.
 
 {@request:json_api}
 Example:
-
-`</api/users/1/relationships/auth_status>`
 
 ```JSON
 {

@@ -10,6 +10,10 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
 class ResourceDocProvider
 {
     private const TEMPLATES = [
+        ApiActions::OPTIONS             => [
+            'description'   => 'Get options',
+            'documentation' => 'Get communication options for a resource'
+        ],
         ApiActions::GET                 => [
             'description'   => 'Get {name}',
             'documentation' => 'Get an entity'
@@ -39,6 +43,27 @@ class ResourceDocProvider
             'documentation' => [
                 'single_item' => 'Get a related entity',
                 'collection'  => 'Get a list of related entities'
+            ]
+        ],
+        ApiActions::DELETE_SUBRESOURCE  => [
+            'description'   => 'Delete {association}',
+            'documentation' => [
+                'single_item' => 'Delete the specified related entity',
+                'collection'  => 'Delete the specified related entities'
+            ]
+        ],
+        ApiActions::ADD_SUBRESOURCE     => [
+            'description'   => 'Add {association}',
+            'documentation' => [
+                'single_item' => 'Add the specified related entity',
+                'collection'  => 'Add the specified related entities'
+            ]
+        ],
+        ApiActions::UPDATE_SUBRESOURCE  => [
+            'description'   => 'Update {association}',
+            'documentation' => [
+                'single_item' => 'Update the specified related entity',
+                'collection'  => 'Update the specified related entities'
             ]
         ],
         ApiActions::GET_RELATIONSHIP    => [

@@ -4,12 +4,12 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider;
 
-class ChainExclusionProviderTest extends \PHPUnit_Framework_TestCase
+class ChainExclusionProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  ChainExclusionProvider */
     protected $chainProvider;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject[] */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject[] */
     protected $providers = [];
 
     protected function setUp()

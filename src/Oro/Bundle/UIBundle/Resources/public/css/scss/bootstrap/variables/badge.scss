@@ -1,0 +1,30 @@
+/* @theme: admin.oro; */
+
+$badge-theme-success: (
+    'background': $success-ultra-light,
+    'color': $success-darken,
+    'icon-color': $success-light
+) !default;
+
+$badge-theme-danger: (
+    'background': $danger-lighten,
+    'color': $danger-ultra-dark,
+    'icon-color': $danger-darken
+) !default;
+
+$badge-theme-warning: (
+    'background': $warning-light,
+    'color': $warning-darken,
+    'icon-color': $warning-darken
+) !default;
+
+$badge-theme-keys: () !default;
+$badge-theme-keys: map-merge(
+    (
+        'enabled': $badge-theme-success,
+        'disabled': $badge-theme-danger,
+        'tentatively': $badge-theme-warning,
+        'warning': $badge-theme-warning
+    ),
+    $badge-theme-keys
+);

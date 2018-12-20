@@ -20,18 +20,18 @@ class EntityScalarCollectionTypeTest extends TypeTestCase
     protected function getExtensions()
     {
         return [
-            new ValidatorExtension(Validation::createValidator()),
+            new ValidatorExtension(Validation::createValidator())
         ];
     }
 
     public function testShouldClearCollectionWhenRemoveAllItems()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ArrayCollection $groups */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ArrayCollection $groups */
         $groups = $this->getMockBuilder(ArrayCollection::class)
             ->setMethods(['clear'])
             ->getMock();
 
-        $groups->expects($this->once())
+        $groups->expects(self::once())
             ->method('clear');
 
         $entity = new User();
@@ -60,12 +60,6 @@ class EntityScalarCollectionTypeTest extends TypeTestCase
 
         $form->submit(['groups' => []]);
         self::assertTrue($form->isSynchronized());
-    }
-
-    public function testGetName()
-    {
-        $type = new EntityScalarCollectionType();
-        self::assertEquals('oro_api_entity_scalar_collection', $type->getName());
     }
 
     public function testGetParent()

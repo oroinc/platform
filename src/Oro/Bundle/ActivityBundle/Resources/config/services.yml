@@ -91,7 +91,7 @@ services:
             - '@oro_entity_config.provider.grouping'
             - '@oro_entity.entity_alias_resolver'
         tags:
-            - { name: routing.options_resolver }
+            - { name: oro.api.routing_options_resolver, view: default }
 
     oro_activity.exclusion_provider:
         class: Oro\Bundle\ActivityBundle\Provider\ActivityExclusionProvider

@@ -17,16 +17,16 @@ class AddLanguageTypeTest extends FormIntegrationTestCase
     /** @var AddLanguageType */
     protected $formType;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LanguageRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LanguageRepository */
     protected $repository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LocaleSettings */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
     protected $localeSettings;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslationStatisticProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationStatisticProvider */
     protected $translationStatisticProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     protected $translator;
 
     protected function setUp()
@@ -67,11 +67,6 @@ class AddLanguageTypeTest extends FormIntegrationTestCase
         );
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_translation_add_language', $this->formType->getName());
-    }
-
     public function testGetBlockPrefix()
     {
         $this->assertEquals('oro_translation_add_language', $this->formType->getBlockPrefix());
@@ -101,13 +96,13 @@ class AddLanguageTypeTest extends FormIntegrationTestCase
         $choices = $form->getConfig()->getOption('choices');
 
         foreach ($codesExpected as $value) {
-            $this->assertArrayHasKey($value, $choices['oro.translation.language.form.select.group.crowdin']);
-            $this->assertArrayNotHasKey($value, $choices['oro.translation.language.form.select.group.intl']);
+            $this->assertContains($value, $choices['oro.translation.language.form.select.group.crowdin']);
+            $this->assertNotContains($value, $choices['oro.translation.language.form.select.group.intl']);
         }
 
         foreach ($currentCodes as $value) {
-            $this->assertArrayNotHasKey($value, $choices['oro.translation.language.form.select.group.crowdin']);
-            $this->assertArrayNotHasKey($value, $choices['oro.translation.language.form.select.group.intl']);
+            $this->assertNotContains($value, $choices['oro.translation.language.form.select.group.crowdin']);
+            $this->assertNotContains($value, $choices['oro.translation.language.form.select.group.intl']);
         }
     }
 

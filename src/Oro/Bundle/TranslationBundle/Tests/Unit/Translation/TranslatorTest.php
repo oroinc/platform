@@ -2,22 +2,25 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
+use Oro\Bundle\TranslationBundle\Event\AfterCatalogueDump;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Component\TestUtils\Mocks\ServiceLink;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\MessageSelector;
 
-class TranslatorTest extends \PHPUnit_Framework_TestCase
+class TranslatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array
      */
-    protected $messages = [
+    private $messages = [
         'fr' => [
             'jsmessages' => [
                 'foo' => 'foo (FR)',
@@ -68,14 +71,20 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testGetTranslations($locale, array $expected)
     {
         $locales = array_keys($this->messages);
-        $_locale = !is_null($locale) ? $locale : reset($locales);
-        $fallbackLocales = array_slice($locales, array_search($_locale, $locales) + 1);
+        $_locale = $locale ?? reset($locales);
+        $fallbackLocales = \array_slice($locales, \array_search($_locale, $locales, true) + 1);
+
+        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
         $translator = $this->getTranslator(
             $this->getLoader(),
-            $this->getStrategyProvider($_locale, $fallbackLocales)
+            $this->getStrategyProvider($_locale, $fallbackLocales),
+            $eventDispatcher
         );
         $translator->setLocale($_locale);
-        $result = $translator->getTranslations(array('jsmessages', 'validators'), $locale);
+
+        $result = $translator->getTranslations(['jsmessages', 'validators'], $locale);
 
         $this->assertEquals($expected, $result);
     }
@@ -174,122 +183,71 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * Create a catalog and fills it in with messages
-     *
-     * @param string $locale
-     * @param array $dictionary
-     * @return MessageCatalogue
-     */
-    public function getCatalogue($locale, $dictionary)
+    public function testGetTranslationsWhenStrategyChanged()
     {
-        $catalogue = new MessageCatalogue($locale);
-        foreach ($dictionary as $domain => $messages) {
-            foreach ($messages as $key => $translation) {
-                $catalogue->set($key, $translation, $domain);
-            }
-        }
-        return $catalogue;
-    }
+        $locale = 'pt_BR';
+        $expectedMessages = $this->messages[$locale];
+        $fallbackLocales = [];
 
-    /**
-     * Creates a mock of Loader
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getLoader()
-    {
-        $messages = $this->messages;
-        $loader = $this->createMock(LoaderInterface::class);
-        $loader->expects($this->any())
-            ->method('load')
-            ->willReturnCallback(function ($resource, $locale, $domain) use ($messages) {
-                return $this->getCatalogue($locale, $messages[$locale]);
-            });
+        $strategyName = 'sampleStrategy';
 
-        return $loader;
-    }
-
-    /**
-     * @param string $locale
-     * @param array  $fallbackLocales
-     * @return TranslationStrategyProvider|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getStrategyProvider($locale, array $fallbackLocales = [])
-    {
+        /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $strategy */
         $strategy = $this->createMock(TranslationStrategyInterface::class);
-        $strategyProvider = $this->createMock(TranslationStrategyProvider::class);
+        $strategy
+            ->expects($this->exactly(2))
+            ->method('getName')
+            ->willReturn($strategyName);
 
-        $strategyProvider->expects($this->any())
+        /** @var TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject $strategyProvider */
+        $strategyProvider = $this->createMock(TranslationStrategyProvider::class);
+        $this->mockStrategyProviderFallbackLocales($strategyProvider, $strategy, $locale, $fallbackLocales);
+        $strategyProvider
+            ->expects($this->exactly(3))
             ->method('getStrategy')
             ->willReturn($strategy);
-        $strategyProvider->expects($this->any())
-            ->method('getFallbackLocales')
-            ->willReturnCallback(function ($strategy, $loc) use ($locale, $fallbackLocales) {
-                if ($loc === $locale) {
-                    return $fallbackLocales;
-                }
 
-                return [];
-            });
+        $strategyProvider
+            ->expects($this->once())
+            ->method('getAllFallbackLocales')
+            ->with($strategy)
+            ->willReturn($fallbackLocales);
 
-        return $strategyProvider;
-    }
-
-    /**
-     * Creates a mock of Container
-     *
-     * @param LoaderInterface $loader
-     * @param TranslationStrategyProvider $strategyProvider
-     * @return ContainerInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getContainer($loader, $strategyProvider)
-    {
-        $exceptionFlag = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
-        $valueMap = [
-            ['loader', $exceptionFlag, $loader],
-            ['oro_translation.strategy.provider', $exceptionFlag, $strategyProvider]
-        ];
-
-        $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->any())
-            ->method('get')
-            ->willReturnMap($valueMap);
-
-        return $container;
-    }
-
-    /**
-     * Creates instance of Translator
-     *
-     * @param LoaderInterface $loader
-     * @param TranslationStrategyProvider $strategyProvider
-     * @param array $options
-     * @return Translator
-     */
-    public function getTranslator($loader, $strategyProvider, $options = array())
-    {
-        $translator = new Translator(
-            $this->getContainer($loader, $strategyProvider),
-            new MessageSelector(),
-            array('loader' => array('loader')),
-            array_merge(['resource_files' => []], $options)
+        $translator = $this->getTranslator(
+            $this->getLoader(),
+            $strategyProvider,
+            $this->getEventDispatcher(
+                $locale,
+                [
+                    'validators' => [
+                        'other choice' =>
+                            '{0} other choice 0 (PT-BR)|{1} other choice 1 (PT-BR)|]1,Inf] other choice inf (PT-BR)'
+                    ],
+                ]
+            )
         );
+        $translator->setLocale($locale);
 
-        $translator->addResource('loader', 'foo', 'fr');
-        $translator->addResource('loader', 'foo', 'en');
-        $translator->addResource('loader', 'foo', 'es');
-        $translator->addResource('loader', 'foo', 'pt-PT'); // European Portuguese
-        $translator->addResource('loader', 'foo', 'pt_BR'); // Brazilian Portuguese
+        $result = $translator->getTranslations(['validators'], $locale);
 
-        return $translator;
+        $this->assertEquals($expectedMessages, $result);
     }
 
     public function testHasTrans()
     {
         $locale = 'en';
         $locales = array_keys($this->messages);
-        $translator = $this->getTranslator($this->getLoader(), $this->getStrategyProvider($locale));
+        $translator = $this->getTranslator(
+            $this->getLoader(),
+            $this->getStrategyProvider($locale),
+            $this->getEventDispatcher(
+                $locale,
+                [
+                    'jsmessages' => ['foo' => 'foo (EN)', 'bar' => 'bar (EN)', 'baz' => 'baz (EN)'],
+                    'messages' => ['foo' => 'foo messages (EN)'],
+                    'validators' => ['choice' => '{0} choice 0 (EN)|{1} choice 1 (EN)|]1,Inf] choice inf (EN)'],
+                ]
+            )
+        );
 
         $translator->setLocale($locale);
         $translator->setFallbackLocales($locales);
@@ -313,7 +271,14 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translateKey = 'baz';
         $message = $this->messages['en']['jsmessages'][$translateKey];
 
-        $translator = $this->getTranslator($this->getLoader(), $this->getStrategyProvider($locale, $locales));
+        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $translator = $this->getTranslator(
+            $this->getLoader(),
+            $this->getStrategyProvider($locale, $locales),
+            $eventDispatcher
+        );
         $translator->setLocale($locale);
         $result = $translator->trans($translateKey, [], 'jsmessages', $locale);
 
@@ -323,15 +288,30 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     public function testDynamicResourcesWithoutDatabaseTranslationMetadataCache()
     {
-        $locale     = 'en';
+        $locale = 'en';
         $container  = $this->createMock(ContainerInterface::class);
-        $container->expects($this->any())
-            ->method('get')
-            ->willReturn($this->getStrategyProvider($locale));
+        /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
+        $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
+        $strategyProvider = $this->getStrategyProvider($locale);
+        $strategyProviderLink = new ServiceLink($strategyProvider);
+
+        /** @var Translator|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->getMockBuilder(Translator::class)
-                ->setConstructorArgs([$container, new MessageSelector(), [], ['resource_files' => []]])
-                ->setMethods(['addResource'])
-                ->getMock();
+            ->setConstructorArgs([
+                $container,
+                new MessageFormatter(),
+                'en',
+                [],
+                ['resource_files' => []]
+            ])
+            ->setMethods(['addResource'])
+            ->getMock();
+
+        $translator->setTranslationDomainProvider($translationDomainProvider);
+        $translator->setStrategyProviderLink($strategyProviderLink);
+        $translator->setInstalled(true);
+        $translator->setEventDispatcher($this->getEventDispatcher());
+
         $translator->setLocale($locale);
 
         $translator->expects($this->never())->method('addResource');
@@ -348,44 +328,42 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         ];
 
         $container = $this->createMock(ContainerInterface::class);
+        /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
+        $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
+        $translationDomainProvider->expects($this->once())
+            ->method('getAvailableDomainsForLocales')
+            ->willReturn($domains);
+        $strategyProvider = $this->getStrategyProvider($locale);
+        $strategyProviderLink = new ServiceLink($strategyProvider);
 
+        /** @var DynamicTranslationMetadataCache|\PHPUnit\Framework\MockObject\MockObject $databaseCache */
         $databaseCache = $this->createMock(DynamicTranslationMetadataCache::class);
+
+        /** @var Translator|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->getMockBuilder(Translator::class)
-            ->setConstructorArgs([$container, new MessageSelector(), [], ['resource_files' => []]])
+            ->setConstructorArgs([
+                $container,
+                new MessageFormatter(),
+                'en',
+                [],
+                ['resource_files' => []]
+            ])
             ->setMethods(['addResource'])
             ->getMock();
-        $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
+
+        $translator->setTranslationDomainProvider($translationDomainProvider);
+        $translator->setStrategyProviderLink($strategyProviderLink);
+        $translator->setEventDispatcher($this->getEventDispatcher());
+        $translator->setInstalled(true);
 
         $translator->setLocale($locale);
         $translator->setDatabaseMetadataCache($databaseCache);
 
-        $exceptionFlag = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
-        $valueMap = [
-            ['oro_translation.strategy.provider', $exceptionFlag, $this->getStrategyProvider($locale)],
-            ['oro_translation.provider.translation_domain', $exceptionFlag, $translationDomainProvider],
-        ];
-
-        $container
-            ->expects($this->any())
-            ->method('hasParameter')
-            ->with('installed')
-            ->willReturn(true);
-        $container
-            ->expects($this->any())
-            ->method('getParameter')
-            ->with('installed')
-            ->willReturn(true);
-        $container
-            ->expects($this->any())
-            ->method('get')
-            ->willReturnMap($valueMap);
-
-        $translationDomainProvider->expects($this->once())
-            ->method('getAvailableDomainsForLocales')
-            ->willReturn($domains);
-
         $translator->expects($this->exactly(count($domains)))->method('addResource');
         $translator->hasTrans('foo');
+
+        // To ensure that addResource is not called again.
+        $translator->hasTrans('bar');
     }
 
     public function testGetCatalogue()
@@ -396,30 +374,25 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $fallbackLocales = ['en'];
 
         $strategy = $this->createMock(TranslationStrategyInterface::class);
-        $strategy->expects($this->any())
+        $strategy->expects($this->exactly(2))
             ->method('getName')
             ->willReturn($strategyName);
 
+        /** @var TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject $strategyProvider */
         $strategyProvider = $this->createMock(TranslationStrategyProvider::class);
-        $strategyProvider->expects($this->any())
+        $strategyProvider->expects($this->exactly(4))
             ->method('getStrategy')
             ->willReturn($strategy);
-        $strategyProvider->expects($this->any())
+        $strategyProvider->expects($this->once())
             ->method('getAllFallbackLocales')
             ->with($strategy)
             ->willReturn($allFallbackLocales);
-        $strategyProvider->expects($this->any())
-            ->method('getFallbackLocales')
-            ->with($strategy)
-            ->willReturnCallback(function ($strategy, $loc) use ($locale, $fallbackLocales) {
-                if ($loc === $locale) {
-                    return $fallbackLocales;
-                }
+        $this->mockStrategyProviderFallbackLocales($strategyProvider, $strategy, $locale, $fallbackLocales);
 
-                return [];
-            });
+        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $translator = $this->getTranslator($this->getLoader(), $strategyProvider);
+        $translator = $this->getTranslator($this->getLoader(), $strategyProvider, $eventDispatcher);
 
         $this->assertAttributeEmpty('strategyName', $translator);
         $this->assertEmpty($translator->getFallbackLocales());
@@ -437,31 +410,37 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $firstStrategyName = 'first';
         $secondStrategyName = 'second';
 
+        /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $firstStrategy */
         $firstStrategy = $this->createMock(TranslationStrategyInterface::class);
-        $firstStrategy->expects($this->any())
+        $firstStrategy->expects($this->exactly(3))
             ->method('getName')
             ->willReturn($firstStrategyName);
 
+        /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $secondStrategy */
         $secondStrategy = $this->createMock(TranslationStrategyInterface::class);
-        $secondStrategy->expects($this->any())
+        $secondStrategy->expects($this->exactly(3))
             ->method('getName')
             ->willReturn($secondStrategyName);
 
+        /** @var TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject $strategyProvider */
         $strategyProvider = $this->getMockBuilder(TranslationStrategyProvider::class)
             ->disableOriginalConstructor()
             ->setMethods(['getAllFallbackLocales', 'getFallbackLocales'])
             ->getMock();
-        $strategyProvider->expects($this->any())
+        $strategyProvider->expects($this->exactly(2))
             ->method('getAllFallbackLocales')
             ->willReturn([]);
-        $strategyProvider->expects($this->any())
+        $strategyProvider->expects($this->exactly(2))
             ->method('getFallbackLocales')
             ->willReturn([]);
 
         $strategyProvider->addStrategy($firstStrategy);
         $strategyProvider->addStrategy($secondStrategy);
 
-        $translator = $this->getTranslator($this->getLoader(), $strategyProvider);
+        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $translator = $this->getTranslator($this->getLoader(), $strategyProvider, $eventDispatcher);
 
         $strategyProvider->setStrategy($firstStrategy);
         $translator->getCatalogue('en');
@@ -472,5 +451,167 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->getCatalogue('ru');
         $this->assertAttributeEquals($secondStrategyName, 'strategyName', $translator);
         $this->assertAttributeCount(1, 'catalogues', $translator);
+    }
+
+    /**
+     * Creates instance of Translator
+     *
+     * @param LoaderInterface $loader
+     * @param TranslationStrategyProvider $strategyProvider
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param array $options
+     * @return Translator
+     */
+    private function getTranslator(
+        LoaderInterface $loader,
+        TranslationStrategyProvider $strategyProvider,
+        EventDispatcherInterface $eventDispatcher,
+        array $options = []
+    ) {
+        $strategyProviderServiceLink = new ServiceLink($strategyProvider);
+
+        /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
+        $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
+
+        $translator = new Translator(
+            $this->getContainer($loader),
+            new MessageFormatter(),
+            'en',
+            ['loader' => ['loader']],
+            array_merge(['resource_files' => []], $options)
+        );
+
+        $translator->setTranslationDomainProvider($translationDomainProvider);
+        $translator->setStrategyProviderLink($strategyProviderServiceLink);
+        $translator->setInstalled(true);
+        $translator->setEventDispatcher($eventDispatcher);
+
+        $translator->addResource('loader', 'foo', 'fr');
+        $translator->addResource('loader', 'foo', 'en');
+        $translator->addResource('loader', 'foo', 'es');
+        $translator->addResource('loader', 'foo', 'pt-PT'); // European Portuguese
+        $translator->addResource('loader', 'foo', 'pt_BR'); // Brazilian Portuguese
+
+        return $translator;
+    }
+
+    /**
+     * Creates a mock of Container
+     *
+     * @param LoaderInterface $loader
+     * @return ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function getContainer($loader)
+    {
+        $container = $this->createMock(ContainerInterface::class);
+        $container->expects($this->any())
+            ->method('get')
+            ->with('loader')
+            ->willReturn($loader);
+
+        return $container;
+    }
+
+    /**
+     * Creates a mock of Loader
+     *
+     * @return LoaderInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function getLoader()
+    {
+        $messages = $this->messages;
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader->expects($this->any())
+            ->method('load')
+            ->willReturnCallback(function ($resource, $locale, $domain) use ($messages) {
+                return $this->getCatalogue($locale, $messages[$locale]);
+            });
+
+        return $loader;
+    }
+
+    /**
+     * Create a catalog and fills it in with messages
+     *
+     * @param string $locale
+     * @param array $dictionary
+     * @return MessageCatalogue
+     */
+    private function getCatalogue($locale, $dictionary)
+    {
+        $catalogue = new MessageCatalogue($locale);
+        foreach ($dictionary as $domain => $messages) {
+            foreach ($messages as $key => $translation) {
+                $catalogue->set($key, $translation, $domain);
+            }
+        }
+
+        return $catalogue;
+    }
+
+    /**
+     * @param string $locale
+     * @param array  $fallbackLocales
+     * @return TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function getStrategyProvider($locale, array $fallbackLocales = [])
+    {
+        /** @var TranslationStrategyInterface $strategy */
+        $strategy = $this->createMock(TranslationStrategyInterface::class);
+        $strategyProvider = $this->createMock(TranslationStrategyProvider::class);
+
+        $strategyProvider->expects($this->any())
+            ->method('getStrategy')
+            ->willReturn($strategy);
+
+        $this->mockStrategyProviderFallbackLocales($strategyProvider, $strategy, $locale, $fallbackLocales);
+
+        return $strategyProvider;
+    }
+
+    /**
+     * @param TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject $strategyProvider
+     * @param TranslationStrategyInterface $strategy
+     * @param string $locale
+     * @param array $fallbackLocales
+     */
+    private function mockStrategyProviderFallbackLocales(
+        $strategyProvider,
+        TranslationStrategyInterface $strategy,
+        string $locale,
+        array $fallbackLocales = []
+    ) {
+        $strategyProvider
+            ->expects($this->any())
+            ->method('getFallbackLocales')
+            ->with($strategy)
+            ->willReturnCallback(function ($strategy, $loc) use ($locale, $fallbackLocales) {
+                if ($loc === $locale) {
+                    return $fallbackLocales;
+                }
+
+                return [];
+            });
+    }
+
+    /**
+     * @param string $expectedLocale
+     * @param array $expectedMessages
+     * @return \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
+     */
+    private function getEventDispatcher(string $expectedLocale = 'en', array $expectedMessages = [])
+    {
+        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                AfterCatalogueDump::NAME,
+                new AfterCatalogueDump(
+                    new MessageCatalogue($expectedLocale, $expectedMessages)
+                )
+            );
+
+        return $eventDispatcher;
     }
 }

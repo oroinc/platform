@@ -19,6 +19,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Controller for IMAP configuration page
+ */
 class ConnectionController extends Controller
 {
     /**
@@ -28,6 +31,8 @@ class ConnectionController extends Controller
 
     /**
      * @Route("/connection/check", name="oro_imap_connection_check", methods={"POST"})
+     * @param Request $request
+     * @return JsonResponse|Response
      */
     public function checkAction(Request $request)
     {
@@ -49,9 +54,9 @@ class ConnectionController extends Controller
         /** @var UserEmailOrigin $origin */
         $origin = $form->getData();
 
-        if ($form->isValid() && null !== $origin) {
+        if ($form->isSubmitted() && $form->isValid() && null !== $origin) {
             $response = [];
-            $password = $this->get('oro_security.encoder.mcrypt')->decryptData($origin->getPassword());
+            $password = $this->get('oro_security.encoder.default')->decryptData($origin->getPassword());
 
             if ($origin->getImapHost() !== null) {
                 $response['imap'] = [];

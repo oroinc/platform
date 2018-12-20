@@ -5,10 +5,10 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Cache;
 use Oro\Bundle\FeatureToggleBundle\Cache\CacheWarmer;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
 
-class CacheWarmerTest extends \PHPUnit_Framework_TestCase
+class CacheWarmerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $configurationProvider;
 

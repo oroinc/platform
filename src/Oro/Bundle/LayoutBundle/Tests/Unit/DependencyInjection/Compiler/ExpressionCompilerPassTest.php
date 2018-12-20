@@ -7,11 +7,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ExpressionCompilerPassTest extends \PHPUnit_Framework_TestCase
+class ExpressionCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcess()
     {
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container */
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
         $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
 
         $encodingServiceDef = $this->getMockBuilder(Definition::class)->getMock();

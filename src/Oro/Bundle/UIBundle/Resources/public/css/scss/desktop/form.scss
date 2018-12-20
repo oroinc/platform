@@ -1,0 +1,94 @@
+/* @theme: admin.oro; */
+
+.oro-item-collection {
+    &input[type="email"],
+    &input[type="text"] {
+        width: $form-item-collection-field-width;
+    }
+
+    .input-append,
+    .input-prepend {
+        input[type="email"],
+        input[type="text"] {
+            width: $form-item-collection-field-append-width;
+        }
+    }
+
+    .input-append-sortable,
+    .input-prepend-sortable {
+        input[type="email"],
+        input[type="text"] {
+            width: $form-item-collection-field-append-sortable-width;
+        }
+    }
+
+    .collection-element-other {
+        margin-bottom: $form-item-collection-element-offset-bottom;
+
+        input[type='email'],
+        input[type='text'],
+        textarea {
+            width: $form-item-collection-element-width;
+        }
+
+        select,
+        .selector {
+            width: $form-item-collection-selector-width;
+            margin-left: $form-item-collection-selector-offset-left;
+        }
+
+        .select2-container {
+            width: $form-item-collection-select2-width;
+        }
+    }
+
+    .action-cell {
+        text-align: center;
+    }
+}
+
+.oro-item-collection.not-removable {
+    input[type="email"],
+    input[type="text"] {
+        width: $form-item-collection-removable-field-width;
+    }
+
+    .input-append,
+    .input-prepend {
+        input[type="email"],
+        input[type="text"] {
+            width: $form-item-collection-removable-append-field-width;
+        }
+    }
+
+    .input-append-sortable,
+    .input-prepend-sortable {
+        input[type="email"],
+        input[type="text"] {
+            width: $form-item-collection-removable-append-sortable-field-width;
+        }
+    }
+}
+
+input[type="text"].hasDatepicker {
+    min-width: $form-item-collection-datepicker-field-min-width;
+}
+
+.clearable-input {
+
+    &__container--clear .clearable-input__placeholder-icon {
+        font-size: $icon-font-size;
+        top: ($field-size - $icon-font-size) / -2;
+        width: $field-size;
+        height: $field-size;
+        line-height: $field-size;
+    }
+
+    &__clear {
+        top: ($field-size - $icon-font-size) / -2;
+    }
+
+    &__container > input {
+        padding-#{$end}: $field-size;
+    }
+}

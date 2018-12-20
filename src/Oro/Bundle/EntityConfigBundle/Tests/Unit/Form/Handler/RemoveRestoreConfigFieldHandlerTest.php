@@ -2,23 +2,23 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Handler;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Event\AfterRemoveFieldEvent;
-use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
+class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const SAMPLE_ERROR_MESSAGE = 'Restore error message';
     const SAMPLE_SUCCESS_MESSAGE = 'Entity config was successfully saved';
@@ -26,27 +26,27 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
     const SAMPLE_VALIDATION_ERROR_MESSAGE2 = 'Validation error 2';
 
     /**
-     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configManager;
 
     /**
-     * @var FieldNameValidationHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldNameValidationHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $validationHelper;
 
     /**
-     * @var ConfigHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configHelper;
 
     /**
-     * @var Session|\PHPUnit_Framework_MockObject_MockObject
+     * @var Session|\PHPUnit\Framework\MockObject\MockObject
      */
     private $session;
 
     /**
-     * @var FieldConfigModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldConfigModel|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fieldConfigModel;
 
@@ -55,39 +55,24 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
      */
     private $handler;
 
-    /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $eventDispatcher;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->validationHelper = $this->getMockBuilder(FieldNameValidationHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configHelper = $this->getMockBuilder(ConfigHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->session = $this->getMockBuilder(Session::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->fieldConfigModel = $this->getMockBuilder(FieldConfigModel::class)->getMock();
-
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->validationHelper = $this->createMock(FieldNameValidationHelper::class);
+        $this->configHelper = $this->createMock(ConfigHelper::class);
+        $this->session = $this->createMock(Session::class);
+        $this->fieldConfigModel = $this->createMock(FieldConfigModel::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
 
         $this->handler = new RemoveRestoreConfigFieldHandler(
             $this->configManager,
             $this->validationHelper,
             $this->configHelper,
             $this->session,
-            $this->eventDispatcher
+            $this->registry
         );
     }
 
@@ -103,8 +88,8 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param ConfigInterface|\PHPUnit_Framework_MockObject_MockBuilder $fieldConfig
-     * @param ConfigInterface|\PHPUnit_Framework_MockObject_MockBuilder $entityConfig
+     * @param ConfigInterface|\PHPUnit\Framework\MockObject\MockBuilder $fieldConfig
+     * @param ConfigInterface|\PHPUnit\Framework\MockObject\MockBuilder $entityConfig
      */
     private function expectsConfigManagerPersistAndFlush(ConfigInterface $fieldConfig, ConfigInterface $entityConfig)
     {
@@ -125,30 +110,12 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($this->fieldConfigModel)
             ->willReturn([]);
 
-        $entityConfig = $this->createMock(ConfigInterface::class);
-        $entityConfig
-            ->expects($this->once())
-            ->method('set')
-            ->with('upgradeable', true);
-
-        $this->configHelper
-            ->expects($this->once())
-            ->method('getEntityConfigByField')
-            ->with($this->fieldConfigModel, 'extend')
-            ->willReturn($entityConfig);
-
-        $fieldConfig = $this->createMock(ConfigInterface::class);
-
+        $entityConfig = $this->prepareEntityConfig();
+        $fieldConfig = $this->prepareFieldConfig();
         $fieldConfig
             ->expects($this->once())
             ->method('set')
             ->with('state', ExtendScope::STATE_DELETE);
-
-        $this->configHelper
-            ->expects($this->once())
-            ->method('getFieldConfig')
-            ->with($this->fieldConfigModel, 'extend')
-            ->willReturn($fieldConfig);
 
         $this->configManager
             ->expects($this->exactly(2))
@@ -169,10 +136,6 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getFlashBag')
             ->willReturn($flashBag);
-
-        $this->eventDispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(Events::AFTER_REMOVE_FIELD, new AfterRemoveFieldEvent($this->fieldConfigModel));
 
         $expectedContent = [
             'message' => self::SAMPLE_SUCCESS_MESSAGE,
@@ -279,48 +242,33 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
         $entityClassName = 'ClassNotExists';
         $expectedState = ExtendScope::STATE_NEW;
 
-        $this->validationHelper
-            ->expects($this->once())
-            ->method('canFieldBeRestored')
-            ->with($this->fieldConfigModel)
-            ->willReturn(true);
+        $this->prepareConfigMocksForRestoreCalls($entityClassName, $expectedState);
 
-        $entity = $this->createMock(EntityConfigModel::class);
-        $entity
-            ->expects($this->once())
-            ->method('getClassName')
-            ->willReturn($entityClassName);
+        $expectedContent = [
+            'message' => self::SAMPLE_SUCCESS_MESSAGE,
+            'successful' => true
+        ];
 
-        $this->fieldConfigModel
-            ->expects($this->once())
-            ->method('getEntity')
-            ->willReturn($entity);
+        $response = $this->handler->handleRestore(
+            $this->fieldConfigModel,
+            self::SAMPLE_ERROR_MESSAGE,
+            self::SAMPLE_SUCCESS_MESSAGE
+        );
 
-        $entityConfig = $this->createMock(ConfigInterface::class);
-        $entityConfig
-            ->expects($this->once())
-            ->method('set')
-            ->with('upgradeable', true);
+        $this->expectsJsonResponseWithContent($response, $expectedContent);
+    }
 
-        $this->configHelper
-            ->expects($this->once())
-            ->method('getEntityConfigByField')
-            ->with($this->fieldConfigModel, 'extend')
-            ->willReturn($entityConfig);
+    public function testHandleRestoreWhenFieldCanBeRestoredAndEntityClassNotManaged()
+    {
+        $entityClassName = '\stdClass';
+        $expectedState = ExtendScope::STATE_NEW;
 
-        $fieldConfig = $this->createMock(ConfigInterface::class);
-        $fieldConfig
-            ->expects($this->once())
-            ->method('set')
-            ->with('state', $expectedState);
+        $this->prepareConfigMocksForRestoreCalls($entityClassName, $expectedState);
 
-        $this->configHelper
-            ->expects($this->once())
-            ->method('getFieldConfig')
-            ->with($this->fieldConfigModel, 'extend')
-            ->willReturn($fieldConfig);
-
-        $this->expectsConfigManagerPersistAndFlush($fieldConfig, $entityConfig);
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($entityClassName)
+            ->willReturn(null);
 
         $expectedContent = [
             'message' => self::SAMPLE_SUCCESS_MESSAGE,
@@ -341,53 +289,31 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
         $entityClassName = TestActivityTarget::class;
         $expectedState = ExtendScope::STATE_NEW;
 
-        $this->validationHelper
-            ->expects($this->once())
-            ->method('canFieldBeRestored')
-            ->with($this->fieldConfigModel)
-            ->willReturn(true);
-
-        $entity = $this->createMock(EntityConfigModel::class);
-        $entity
-            ->expects($this->exactly(2))
-            ->method('getClassName')
-            ->willReturn($entityClassName);
+        $this->prepareConfigMocksForRestoreCalls($entityClassName, $expectedState);
 
         $this->fieldConfigModel
-            ->expects($this->exactly(2))
-            ->method('getEntity')
-            ->willReturn($entity);
-
-        $this->fieldConfigModel
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getFieldName')
             ->willReturn('NotExistentProperty');
 
-        $entityConfig = $this->createMock(ConfigInterface::class);
-        $entityConfig
-            ->expects($this->once())
-            ->method('set')
-            ->with('upgradeable', true);
-
-        $this->configHelper
-            ->expects($this->once())
-            ->method('getEntityConfigByField')
-            ->with($this->fieldConfigModel, 'extend')
-            ->willReturn($entityConfig);
-
-        $fieldConfig = $this->createMock(ConfigInterface::class);
-        $fieldConfig
-            ->expects($this->once())
-            ->method('set')
-            ->with('state', $expectedState);
-
-        $this->configHelper
-            ->expects($this->once())
-            ->method('getFieldConfig')
-            ->with($this->fieldConfigModel, 'extend')
-            ->willReturn($fieldConfig);
-
-        $this->expectsConfigManagerPersistAndFlush($fieldConfig, $entityConfig);
+        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata->expects($this->any())
+            ->method('hasField')
+            ->with('NotExistentProperty')
+            ->willReturn(false);
+        $metadata->expects($this->any())
+            ->method('hasAssociation')
+            ->with('NotExistentProperty')
+            ->willReturn(false);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityClassName)
+            ->willReturn($metadata);
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($entityClassName)
+            ->willReturn($em);
 
         $expectedContent = [
             'message' => self::SAMPLE_SUCCESS_MESSAGE,
@@ -403,58 +329,42 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
         $this->expectsJsonResponseWithContent($response, $expectedContent);
     }
 
-    public function testHandleRestoreWhenFieldCanBeRestoredAndClassNameAndFieldExist()
+    /**
+     * @dataProvider fieldExistenceDataProvider
+     * @param bool $hasField
+     * @param bool $hasAssociation
+     */
+    public function testHandleRestoreWhenFieldCanBeRestoredAndClassNameAndFieldExist($hasField, $hasAssociation)
     {
         $entityClassName = TestActivityTarget::class;
         $expectedState = ExtendScope::STATE_RESTORE;
+        $fieldName = 'id';
 
-        $this->validationHelper
-            ->expects($this->once())
-            ->method('canFieldBeRestored')
-            ->with($this->fieldConfigModel)
-            ->willReturn(true);
-
-        $entity = $this->createMock(EntityConfigModel::class);
-        $entity
-            ->expects($this->exactly(2))
-            ->method('getClassName')
-            ->willReturn($entityClassName);
-
-        $this->fieldConfigModel
-            ->expects($this->exactly(2))
-            ->method('getEntity')
-            ->willReturn($entity);
+        $this->prepareConfigMocksForRestoreCalls($entityClassName, $expectedState);
 
         $this->fieldConfigModel
             ->expects($this->once())
             ->method('getFieldName')
-            ->willReturn('id');
+            ->willReturn($fieldName);
 
-        $entityConfig = $this->createMock(ConfigInterface::class);
-        $entityConfig
-            ->expects($this->once())
-            ->method('set')
-            ->with('upgradeable', true);
-
-        $this->configHelper
-            ->expects($this->once())
-            ->method('getEntityConfigByField')
-            ->with($this->fieldConfigModel, 'extend')
-            ->willReturn($entityConfig);
-
-        $fieldConfig = $this->createMock(ConfigInterface::class);
-        $fieldConfig
-            ->expects($this->once())
-            ->method('set')
-            ->with('state', $expectedState);
-
-        $this->configHelper
-            ->expects($this->once())
-            ->method('getFieldConfig')
-            ->with($this->fieldConfigModel, 'extend')
-            ->willReturn($fieldConfig);
-
-        $this->expectsConfigManagerPersistAndFlush($fieldConfig, $entityConfig);
+        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata->expects($this->any())
+            ->method('hasField')
+            ->with($fieldName)
+            ->willReturn(true);
+        $metadata->expects($this->any())
+            ->method('hasAssociation')
+            ->with($fieldName)
+            ->willReturn(false);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityClassName)
+            ->willReturn($metadata);
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($entityClassName)
+            ->willReturn($em);
 
         $expectedContent = [
             'message' => self::SAMPLE_SUCCESS_MESSAGE,
@@ -468,5 +378,94 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->expectsJsonResponseWithContent($response, $expectedContent);
+    }
+
+    /**
+     * @return array
+     */
+    public function fieldExistenceDataProvider()
+    {
+        return [
+            'field' => [true, false],
+            'association' => [false, true]
+        ];
+    }
+
+    /**
+     * @param string $entityClassName
+     */
+    protected function prepareEntityConfigModel($entityClassName)
+    {
+        $entity = $this->createMock(EntityConfigModel::class);
+        $entity
+            ->expects($this->any())
+            ->method('getClassName')
+            ->willReturn($entityClassName);
+
+        $this->fieldConfigModel
+            ->expects($this->any())
+            ->method('getEntity')
+            ->willReturn($entity);
+    }
+
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject
+     */
+    protected function prepareEntityConfig(): \PHPUnit\Framework\MockObject\MockObject
+    {
+        $entityConfig = $this->createMock(ConfigInterface::class);
+        $entityConfig
+            ->expects($this->once())
+            ->method('set')
+            ->with('upgradeable', true);
+
+        $this->configHelper
+            ->expects($this->once())
+            ->method('getEntityConfigByField')
+            ->with($this->fieldConfigModel, 'extend')
+            ->willReturn($entityConfig);
+
+        return $entityConfig;
+    }
+
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject
+     */
+    protected function prepareFieldConfig(): \PHPUnit\Framework\MockObject\MockObject
+    {
+        $fieldConfig = $this->createMock(ConfigInterface::class);
+
+        $this->configHelper
+            ->expects($this->once())
+            ->method('getFieldConfig')
+            ->with($this->fieldConfigModel, 'extend')
+            ->willReturn($fieldConfig);
+
+        return $fieldConfig;
+    }
+
+    /**
+     * @param string $entityClassName
+     * @param string $expectedState
+     */
+    protected function prepareConfigMocksForRestoreCalls($entityClassName, $expectedState)
+    {
+        $this->validationHelper
+            ->expects($this->once())
+            ->method('canFieldBeRestored')
+            ->with($this->fieldConfigModel)
+            ->willReturn(true);
+
+        $this->prepareEntityConfigModel($entityClassName);
+        $entityConfig = $this->prepareEntityConfig();
+        $fieldConfig = $this->prepareFieldConfig($expectedState);
+        $fieldConfig->expects($this->exactly(2))
+            ->method('set')
+            ->withConsecutive(
+                ['state'],
+                ['is_deleted', false]
+            );
+
+        $this->expectsConfigManagerPersistAndFlush($fieldConfig, $entityConfig);
     }
 }

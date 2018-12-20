@@ -1,0 +1,9 @@
+/* @theme: admin.oro; */
+
+.mobile-version {
+    @import "variables";
+
+    @import "thread-view";
+    @import "user-emails";
+    @import "styles";
+}

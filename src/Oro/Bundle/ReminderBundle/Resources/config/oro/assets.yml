@@ -1,4 +1,4 @@
 assets:
     css:
-        ororeminder:
-            - 'bundles/ororeminder/less/style.less'
+        inputs:
+            - 'bundles/ororeminder/css/scss/main.scss'

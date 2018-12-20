@@ -8,18 +8,18 @@ use Oro\Component\Duplicator\DuplicatorFactory;
 use Oro\Component\Duplicator\Filter\FilterFactory;
 use Oro\Component\Duplicator\Matcher\MatcherFactory;
 
-class DuplicatorFactoryTest extends \PHPUnit_Framework_TestCase
+class DuplicatorFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {
         $factory = new DuplicatorFactory();
         $filter = new SetNullFilter();
         $matcher = new PropertyNameMatcher('firstField');
-        /** @var FilterFactory|\PHPUnit_Framework_MockObject_MockObject $filterFactory */
+        /** @var FilterFactory|\PHPUnit\Framework\MockObject\MockObject $filterFactory */
         $filterFactory = $this->createMock('Oro\Component\Duplicator\Filter\FilterFactory');
         $filterFactory->expects($this->once())->method('create')->with('setNull', [])->willReturn($filter);
 
-        /** @var MatcherFactory|\PHPUnit_Framework_MockObject_MockObject $matcherFactory */
+        /** @var MatcherFactory|\PHPUnit\Framework\MockObject\MockObject $matcherFactory */
         $matcherFactory = $this->createMock('Oro\Component\Duplicator\Matcher\MatcherFactory');
         $matcherFactory->expects($this->once())
             ->method('create')

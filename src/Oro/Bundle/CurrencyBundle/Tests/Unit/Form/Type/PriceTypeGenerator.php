@@ -9,10 +9,10 @@ use Oro\DBAL\Types\MoneyType;
 class PriceTypeGenerator
 {
     /**
-     * @param \PHPUnit_Framework_TestCase $testCase
+     * @param \PHPUnit\Framework\TestCase $testCase
      * @return PriceType
      */
-    public static function createPriceType(\PHPUnit_Framework_TestCase $testCase)
+    public static function createPriceType(\PHPUnit\Framework\TestCase $testCase)
     {
         $priceType = new PriceType(self::getPriceRoundingService($testCase));
         $priceType->setDataClass('Oro\Bundle\CurrencyBundle\Entity\Price');
@@ -21,10 +21,10 @@ class PriceTypeGenerator
     }
 
     /**
-     * @param \PHPUnit_Framework_TestCase $testCase
-     * @return RoundingServiceInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @param \PHPUnit\Framework\TestCase $testCase
+     * @return RoundingServiceInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected static function getPriceRoundingService(\PHPUnit_Framework_TestCase $testCase)
+    protected static function getPriceRoundingService(\PHPUnit\Framework\TestCase $testCase)
     {
         $roundingService = $testCase->getMockBuilder('Oro\Bundle\CurrencyBundle\Rounding\PriceRoundingService')
             ->disableOriginalConstructor()

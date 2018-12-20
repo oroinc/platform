@@ -13,7 +13,7 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 class EntityHandler
 {
     /** @var ActionProcessorInterface */
-    protected $customizationProcessor;
+    private $customizationProcessor;
 
     /** @var string */
     private $version;
@@ -27,6 +27,9 @@ class EntityHandler
     /** @var EntityDefinitionConfig */
     private $config;
 
+    /** @var bool */
+    private $collection;
+
     /** @var callable|null */
     private $previousHandler;
 
@@ -36,6 +39,7 @@ class EntityHandler
      * @param RequestType              $requestType
      * @param string                   $entityClass
      * @param EntityDefinitionConfig   $config
+     * @param bool                     $collection
      * @param callable|null            $previousHandler
      */
     public function __construct(
@@ -44,6 +48,7 @@ class EntityHandler
         RequestType $requestType,
         string $entityClass,
         EntityDefinitionConfig $config,
+        bool $collection,
         ?callable $previousHandler = null
     ) {
         $this->customizationProcessor = $customizationProcessor;
@@ -51,6 +56,7 @@ class EntityHandler
         $this->requestType = $requestType;
         $this->entityClass = $entityClass;
         $this->config = $config;
+        $this->collection = $collection;
         $this->previousHandler = $this->getPreviousHandler($previousHandler);
     }
 
@@ -69,6 +75,15 @@ class EntityHandler
 
         $customizationContext = $this->createCustomizationContext();
         $customizationContext->setResult($data);
+        $customizationContext->setIdentifierOnly(
+            $this->isIdentifierOnly($customizationContext->getConfig())
+        );
+
+        /** @see \Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ProcessorBagCompilerPass */
+        $group = $this->collection ? 'collection' : 'item';
+        $customizationContext->setFirstGroup($group);
+        $customizationContext->setLastGroup($group);
+
         $this->customizationProcessor->process($customizationContext);
 
         return $customizationContext->getResult();
@@ -131,5 +146,35 @@ class EntityHandler
         }
 
         return $result;
+    }
+
+    /**
+     * @param EntityDefinitionConfig|null $config
+     *
+     * @return bool
+     */
+    private function isIdentifierOnly(?EntityDefinitionConfig $config): bool
+    {
+        if (null === $config) {
+            return false;
+        }
+        $idFieldNames = $config->getIdentifierFieldNames();
+        if (empty($idFieldNames)) {
+            return false;
+        }
+        $fields = $config->getFields();
+        if (\count($fields) !== \count($idFieldNames)) {
+            return false;
+        }
+
+        $isIdentifierOnly = true;
+        foreach ($idFieldNames as $idFieldName) {
+            if (!isset($fields[$idFieldName])) {
+                $isIdentifierOnly = false;
+                break;
+            }
+        }
+
+        return $isIdentifierOnly;
     }
 }

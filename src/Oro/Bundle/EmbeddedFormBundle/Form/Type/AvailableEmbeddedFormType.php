@@ -29,7 +29,7 @@ class AvailableEmbeddedFormType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices' => $this->manager->getAll()
+                'choices' => array_flip($this->manager->getAll()),
             ]
         );
     }

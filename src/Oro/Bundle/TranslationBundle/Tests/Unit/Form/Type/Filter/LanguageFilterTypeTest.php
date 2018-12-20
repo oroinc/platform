@@ -12,7 +12,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class LanguageFilterTypeTest extends FormIntegrationTestCase
 {
-    /** @var LanguageCodeFormatter|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageCodeFormatter|\PHPUnit\Framework\MockObject\MockObject */
     protected $formatter;
 
     /** @var LanguageFilterType */
@@ -36,11 +36,6 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
     protected function tearDown()
     {
         unset($this->formatter, $this->type);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(LanguageFilterType::NAME, $this->type->getName());
     }
 
     public function testGetBlockPrefix()

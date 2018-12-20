@@ -39,7 +39,7 @@ class WorkflowReplacementType extends AbstractType
                 'configs' => [
                     'placeholder' => 'oro.workflow.workflowdefinition.placeholder.select_replacement'
                 ],
-                'choices' => $this->helper->getWorkflowsForManualDeactivation($options['workflow']),
+                'choices' => array_flip($this->helper->getWorkflowsForManualDeactivation($options['workflow'])),
                 'multiple' => true,
                 'required' => false
             ]

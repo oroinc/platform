@@ -32,13 +32,13 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class LoadFromConfigBagTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigBagInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
     private $configBag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
     private $resourcesProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     private $configProvider;
 
     /** @var LoadFromConfigBag */
@@ -942,7 +942,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             'fields'   => [
                 'field1' => [
                     'property_path' => 'realField1'
-                ],
+                ]
             ],
             'filters'  => [
                 'fields' => [
@@ -953,7 +953,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                 'fields' => [
                     'field1' => null
                 ]
-            ],
+            ]
         ];
 
         $this->configBag->expects(self::exactly(2))

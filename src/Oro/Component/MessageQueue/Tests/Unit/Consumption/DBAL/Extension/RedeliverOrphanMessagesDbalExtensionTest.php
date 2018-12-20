@@ -13,7 +13,7 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Psr\Log\LoggerInterface;
 
-class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCase
+class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithoutAnyArgument()
     {
@@ -35,7 +35,8 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
             ':console'
         );
 
-        $this->setExpectedException(\LogicException::class, 'Unexpected instance of session. expected:'.
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unexpected instance of session. expected:'.
             '"Oro\Component\MessageQueue\Transport\Dbal\DbalSession", actual:"Mock_NullSession_');
 
         $extension->onBeforeReceive($context);
@@ -170,7 +171,8 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
             ':console'
         );
 
-        $this->setExpectedException(\LogicException::class, 'Unexpected instance of session. expected:'.
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unexpected instance of session. expected:'.
             '"Oro\Component\MessageQueue\Transport\Dbal\DbalSession", actual:"Mock_NullSession_');
 
         $extension->onInterrupted($context);
@@ -207,7 +209,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalSession
+     * @return \PHPUnit\Framework\MockObject\MockObject|DbalSession
      */
     private function createNullSessionMock()
     {
@@ -215,7 +217,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     private function createLoggerMock()
     {
@@ -223,7 +225,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalSession
+     * @return \PHPUnit\Framework\MockObject\MockObject|DbalSession
      */
     private function createSessionMock()
     {
@@ -231,7 +233,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalConnection
+     * @return \PHPUnit\Framework\MockObject\MockObject|DbalConnection
      */
     private function createConnectionMock()
     {
@@ -239,7 +241,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     * @return \PHPUnit\Framework\MockObject\MockObject|Connection
      */
     private function createDBALConnection()
     {
@@ -247,7 +249,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalMessageConsumer
+     * @return \PHPUnit\Framework\MockObject\MockObject|DbalMessageConsumer
      */
     private function createDbalMessageConsumerMock()
     {
@@ -255,7 +257,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalPidFileManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|DbalPidFileManager
      */
     private function createDbalPidFileManagerMock()
     {
@@ -263,7 +265,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalCliProcessManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|DbalCliProcessManager
      */
     private function createDbalCliProcessManagerMock()
     {

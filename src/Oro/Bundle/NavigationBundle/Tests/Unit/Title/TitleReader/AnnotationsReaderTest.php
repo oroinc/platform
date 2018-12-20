@@ -6,19 +6,18 @@ use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\NavigationBundle\Annotation\TitleTemplate;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Router;
 
-class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
+class AnnotationsReaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Reader|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Reader|\PHPUnit\Framework\MockObject\MockObject */
     private $reader;
 
-    /** @var Router|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
     private $router;
 
-    /** @var Cache|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var AnnotationsReader */
@@ -50,7 +49,7 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
 
         $this->cache
             ->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(AnnotationsReader::CACHE_KEY)
             ->willReturn(false);
 
@@ -91,12 +90,6 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
 
         $this->cache
             ->expects($this->once())
-            ->method('contains')
-            ->with(AnnotationsReader::CACHE_KEY)
-            ->willReturn(true);
-
-        $this->cache
-            ->expects($this->once())
             ->method('fetch')
             ->with(AnnotationsReader::CACHE_KEY)
             ->willReturn($classes);
@@ -118,12 +111,6 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
         $routeName = 'test_route';
 
         $classes = [$routeName => AnnotationsReaderTest::class . '::testGetTitleEmpty'];
-
-        $this->cache
-            ->expects($this->once())
-            ->method('contains')
-            ->with(AnnotationsReader::CACHE_KEY)
-            ->willReturn(true);
 
         $this->cache
             ->expects($this->once())
@@ -150,12 +137,6 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
 
         $this->cache
             ->expects($this->once())
-            ->method('contains')
-            ->with(AnnotationsReader::CACHE_KEY)
-            ->willReturn(true);
-
-        $this->cache
-            ->expects($this->once())
             ->method('fetch')
             ->with(AnnotationsReader::CACHE_KEY)
             ->willReturn($classes);
@@ -172,12 +153,6 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
         $routeName = 'test_route';
 
         $classes = [$routeName => 'WrongControllerAndMethod'];
-
-        $this->cache
-            ->expects($this->once())
-            ->method('contains')
-            ->with(AnnotationsReader::CACHE_KEY)
-            ->willReturn(true);
 
         $this->cache
             ->expects($this->once())

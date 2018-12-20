@@ -1,0 +1,38 @@
+id: sync_selected_origin_with_encoded_multi_string_subject
+description: Sync selected origin with one folder and one simple email with encoded multi string subject that should be fully decoded with installed IMAP PHP extension
+params:
+    --id: origin_two
+log_info:
+    - 'Finding an email origin (id:'
+    - 'Found " ()" email origin. Id: '
+    - 'Get folders enabled for sync...'
+    - 'Got 1 folder(s)'
+    - 'The folder "Folder 1" is selected.'
+    - 'Previous max email UID "0"'
+    - 'Found 1 email(s).'
+total: 1
+data:
+    id: 91
+    UID: 123
+    INTERNALDATE: 121212
+    FLAGS: []
+    BODY[HEADER]: |
+        Return-path: <azmllyaec@test.com>
+        Envelope-to: info@test.com
+        Delivery-date: Sat, 16 Jun 2018 10:42:29 +0300
+        Received: from [203.91.116.120] (helo=188.40.135.18)
+        	by srv.test.com with smtp (Exim 4.76)
+        	(envelope-from <azmllyaec@test.com>)
+        	id 1fU5qu-0005sh-9M
+        	for info@test.com; Sat, 16 Jun 2018 10:42:29 +0300
+        Message-ID: <998403025185530-WHBQEOWKFAAOIPALZOJEHJC@e7.test.com>
+        From: "Ira Miers" <Miers_Ira@test.com>
+        Subject: =?utf-8?B?0K7RgNC40YHRgtGDLCDQsNC00LLQvtC60LDRgtGDISDQn9GA?=
+                  =?utf-8?B?0LDQutGC0LjRh9C10YHQutC40Lkg0YHQtdC80LjQvdCw0YAgKNCU0JLQ?=
+                  =?utf-8?B?kCDQm9CV0JrQotCe0KDQkCkuwqDQpdC+0LfRj9C50YHRgtCy0LXQvdC9?=
+        To: info@test.com
+        Date: Sat, 16 Jun 2018 06:40:28 -0200
+        Mime-Version: 1.0
+        Content-Type: text/html; charset=utf-8
+expectedEmailData:
+    subject@imap: Юристу, адвокату! Практический семинар (ДВА ЛЕКТОРА). Хозяйственн

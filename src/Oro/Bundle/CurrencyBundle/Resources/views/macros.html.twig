@@ -10,7 +10,7 @@
     {% import 'OroUIBundle::macros.html.twig' as ui %}
     {% set value = oro_multicurrency_rate_converter(multicurrency) %}
     {% if value|length %}
-        <div class="base-currency-wrapper">
+        <div class="base-currency-wrapper base-currency-wrapper--convert">
             {{ ui.renderProperty(title ? title : '', value, entity, fieldName) }}
         </div>
     {% endif %}

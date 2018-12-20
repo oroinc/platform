@@ -8,9 +8,9 @@ use Oro\Bundle\TranslationBundle\Filter\LanguageFilter;
 use Oro\Bundle\TranslationBundle\Form\Type\Filter\LanguageFilterType;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class LanguageFilterTest extends \PHPUnit_Framework_TestCase
+class LanguageFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formFactory;
 
     /** @var LanguageFilter */
@@ -42,7 +42,7 @@ class LanguageFilterTest extends \PHPUnit_Framework_TestCase
                 FilterUtility::FORM_OPTIONS_KEY => [
                     'field_options' => [
                         'class' => Language::class,
-                        'property' => 'code',
+                        'choice_label' => 'code',
                     ],
                 ],
                 FilterUtility::FRONTEND_TYPE_KEY => 'choice',
@@ -56,7 +56,7 @@ class LanguageFilterTest extends \PHPUnit_Framework_TestCase
     {
         $this->formFactory->expects($this->once())
             ->method('create')
-            ->with(LanguageFilterType::NAME);
+            ->with(LanguageFilterType::class);
 
         $this->filter->getForm();
     }

@@ -26,7 +26,7 @@ api:
         Acme\Bundle\ProductBundle\Product: ~
 ```
 
-If an auto-generated alias for your entity does not look good enaough for you, change it in `Resources/config/oro/entity.yml`. For more details, see the [entity aliases documentation](../../../EntityBundle/Resources/doc/entity_aliases.md).
+If an auto-generated alias for your entity does not look good enough for you, change it in `Resources/config/oro/entity.yml`. For more details, see the [entity aliases documentation](../../../EntityBundle/Resources/doc/entity_aliases.md).
 
 **Important:**
 Run the `oro:api:cache:clear` CLI command to immediately make an entity accessible via the data API. If you use the API sandbox, run the `oro:api:doc:cache:clear` CLI command to apply the changes for it. 
@@ -39,19 +39,19 @@ For additional information, see [CLI commands](./commands.md).
 To get the overall configuration structure, execute the following command:
 
 ```bash
-php app/console oro:api:config:dump-reference
+php bin/console oro:api:config:dump-reference
 ```
 
 By default, this command shows configuration of nesting entities. To simplify the output, use the `--max-nesting-level` option:
 
 ```bash
-php app/console oro:api:config:dump-reference --max-nesting-level=0
+php bin/console oro:api:config:dump-reference --max-nesting-level=0
 ```
 
 The default nesting level is `3`. It is specified in the configuration of ApiBundle via the `config_max_nesting_level` parameter. If needed, change this value:
 
 ```yaml
-# app/config/config.yml
+# config/config.yml
 
 oro_api:
     config_max_nesting_level: 3
@@ -150,7 +150,11 @@ oro_entity:
 
 ## entity_aliases Configuration Section
 
-Use the `entity_aliases` section to override the existing system-wide entity aliases or add aliases for models to be used only in the data API.
+The `entity_aliases` section can be used to:
+
+- override the existing system-wide entity aliases
+- add aliases for models to be used only in the data API
+- completely replace an ORM entity with a model
 
 Use it when you need to provide entity aliases for the data API, but it is not possible to share them system-wide. For example, because of the backward compatibility promise or because your models were created for use only in the data API.
 
@@ -166,7 +170,51 @@ api:
             plural_alias: acmeentities
 ```
 
-## entities" Configuration Section
+To completely replace an ORM entity with a model in the API, use the `override_class` option. As a result,
+instead of the overridden ORM entity, the model will be used in the primary API resource, sub-resources,
+and relationships. This is helpful when creating and using a model can significantly simplify implementation
+of the API, for example, when the schema of the API resource is very different from the schema of the ORM entity.
+
+**Example:**
+
+```yaml
+api:
+    entity_aliases:
+        Acme\Bundle\AcmeBundle\Api\Model\AcmeModel:
+            alias: acmeentity
+            plural_alias: acmeentities
+            override_class: Acme\Bundle\AcmeBundle\Entity\AcmeEntity
+```
+
+**Note:** When `override_class` option is used, some entity specific configuration,
+like [Extended Associations](./how_to.md#configure-an-extended-many-to-one-association), need to be done
+for an overridden ORM entity, not for a model.
+
+**Example of correct configuration:**
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Api\Model\AcmeModel: ~
+
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            fields:
+                target:
+                    data_type: association:manyToOne
+```
+
+**Example of incorrect configuration:**
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Api\Model\AcmeModel: ~
+            fields:
+                target:
+                    data_type: association:manyToOne
+```
+
+## entities Configuration Section
 
 The `entities` section describes a configuration of entities.
 
@@ -175,7 +223,7 @@ The `entities` section describes a configuration of entities.
   Please note that the same entity can be configured in different `Resources/config/oro/api.yml` files, e.g. when some bundle needs to add a field to an entity declared in another bundle. In this case, all configuration files for this entity can have **documentation_resource** option and all documentation files declared there are merged. Pay attention that if the same field is documented in several documentation files, they are be merged and only a documentation from one file is used.
 * **exclude** (*boolean*) - Indicates whether the entity should be excluded from the data API. By default, `false`.
 * **inherit** (*boolean*) - Indicates whether the configuration for certain entity should be merged with the configuration of a parent entity. By default, `true`. Set to `false` if a derived entity should have completely different configuration to the parent entity and merging with the parent configuration is not needed.
-* **exclusion_policy** (*string*) - Indicates the exclusion strategy to use for the entity. Possible values: `all` or `none`. By default, `none`. `none` - Exclude fields marked with the `exclude` flag. `all` - Exclude both marked and not marked fields. 
+* **exclusion_policy** (*string*) - Indicates the exclusion strategy to use for the entity. Possible values: `all`, `custom_fields` or `none`. By default, `none`. `none` - exclude fields marked with the `exclude` flag. `all` - exclude all fields that are not configured explicitly. `custom_fields` - exclude all custom fields (fields with `is_extend` = `true` and `owner` = `Custom` in `extend` scope in entity configuration) that are not configured explicitly.
 * **max_results** (*integer*) - The maximum number of entities in the result. Set `-1` (it means unlimited), zero, or positive number to define the limit. Use to set the limit for both the parent and related entities.
 * **order_by** (*array*) - The property can be used to configure the default ordering of the result. The item key is the name of a field. The value can be `ASC` or `DESC`. By default, the result is ordered by an identifier field.
 * **disable_inclusion** (*boolean*) - Indicates whether the inclusion of related entities is disabled. In JSON.API, the [**include** request parameter](http://jsonapi.org/format/#fetching-includes) is used to customize which related entities to return. By default, `false`.
@@ -184,7 +232,7 @@ The `entities` section describes a configuration of entities.
 * **hints** (*array*) - Sets thr [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with the `name` and `value` keys. The string value is a short form of `[name: hint name]`.
 * **identifier_field_names** (*string[]*) - The names of identifier fields of the entity. Use this option to override names set in a configuration file (for the data API resource that are not based on ORM entity) or retrieved from an entity metadata (for ORM entities). This option is helpful when you do not want to use the primary key as an entity identifier in the data API.
 * **delete_handler** (*string*) - The identifier of a service that should be used to delete the entity via the [delete](./actions.md#delete-action) and [delete_list](./actions.md#delete_list-action) actions. By default, the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
-* **form_type** (*string*) - The form type to use for the entity in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. By default, the `form` form type is used.
+* **form_type** (*string*) - The form type to use for the entity in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. By default, the `Symfony\Component\Form\Extension\Core\Type\FormType` form type is used.
 * **form_options** (*array*) - The form options to use for the entity in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
 * **form_event_subscriber** - The form event subscribers that to use for the entity in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. When the `form_type` option is not specified, this event subscriber is also used for the [update_relationship](./actions.md#update_relationship-action), [add_relationship](./actions.md#add_relationship-action), and [delete_relationship](./actions.md#delete_relationship-action) actions. For custom form types, this event subscriber is not used. Can be specified as service name or array of service names. An event subscriber service should implement the `Symfony\Component\EventDispatcher\EventSubscriberInterface` interface.
 
@@ -215,7 +263,7 @@ api:
                 - { name: HINT_CUSTOM_OUTPUT_WALKER, value: 'Acme\Bundle\AcmeBundle\AST_Walker_Class'}
             delete_handler:       acme.demo.test_entity.delete_handler
             excluded:             false
-            form_type: acme_entity.api_form
+            form_type: Acme\Bundle\AcmeBundle\Api\Form\Type\AcmeEntityType
             form_options:
                 validation_groups: ['Default', 'api', 'my_group']
             form_event_subscriber: acme.api.form_listener.test_entity
@@ -284,7 +332,7 @@ api:
 
                 # A form type and form options for a field
                 field6:
-                    form_type: text
+                    form_type: Symfony\Component\Form\Extension\Core\Type\TextType
                     form_options:
                         trim: false
                         constraints:
@@ -320,6 +368,7 @@ This section describes fields by which the result data can be filtered. It conta
     * **data_type** (*string*) - The data type of the filter value. Can be `boolean`, `integer`, `string`, etc.
     * **allow_array** (*boolean*) - Indicates whether the filter can contains several values. By default, `false` for `string`, `boolean`, `datetime`, `date`, `time` fields. and `true` for other fields.
     * **allow_range** (*boolean*) - Indicates whether the filter can contains a pair of "from" and "to" values. By default, `false` for `string`, `boolean`, `guid`, `currency` fields. and `true` for other fields.
+    * **collection** (*boolean*) - Indicates whether the filter represents a collection valued association. By default, `false` for filters by fields and *to-one* associations, and `true` for filters by *to-many* associations.
     * **type** (*string*) - The filter type. By default, the filter type is equal to the **data_type** property value.
     * **options** (*array*) - The filter options.
     * **operators** (*array*) - A list of operators supported by the filter. By default, the list of operators depends on the filter type. For example a string filter supports **=** and **!=** operators, a number filter supports **=**, **!=**, **<**, **<=**, **>**, and **>=** operators, etc. Use this parameter when you need to limit a list of supported operators.
@@ -353,6 +402,12 @@ api:
                         operators: ['=']
 ```
 
+Please note that filters for fields that have a database index are enabled automatically. Filters by all other fields
+should be enabled explicitly, if necessary.
+
+See [Filters](./filters.md) for more information on the existing filter types and instructions on how to create
+custom filters.
+
 ## sorters Configuration Section
 
 This section describes fields by which the result data can be sorted. It contains two properties: `exclusion_policy` and `fields`.
@@ -376,7 +431,10 @@ api:
                         exclude: true
 ```
 
-## actions" Configuration Section
+Please note that sorters for fields that have a database index are enabled automatically. Sorters by all other fields
+should be enabled explicitly, if necessary.
+
+## actions Configuration Section
 
 The `actions` configuration section serves to specify action-specific options. The options from this section are added to the entity configuration. If an option exists in both the entity and action configurations, the action option wins. The exception is the `exclude` option. This option is used to disable an action for a specific entity and it is not copied to the entity configuration.
 
@@ -399,6 +457,7 @@ The `actions` configuration section serves to specify action-specific options. T
     * **description** (*string*) - A human-readable description of the status code. Used in the auto-generated documentation only.
 * **fields** - This section describes entity field configuration specific to the particular action.
     * **exclude** (*boolean*) - Indicates whether to exclude the field for the particular action. See the [Exclude" option](#exclude-option) section for the description.
+    * **direction** (*string*) - Indicates whether the field is `input-only`, `output-only` or `bidirectional`. The `input-only` means that the request data can contain this field, but the response data cannot. The `output-only` means that the response data can contain this field, but the request data cannot. The `bidirectional` is the default behaviour and means that both the request data and the response data can contain this field.
     * **form_type** (*string*) - The form type to use for the field.
     * **form_options** (*array*) - The form options to use for the field.
 

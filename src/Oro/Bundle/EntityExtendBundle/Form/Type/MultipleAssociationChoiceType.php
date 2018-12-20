@@ -133,7 +133,7 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
         $entityConfigProvider = $this->configManager->getProvider('entity');
         $owningSideEntities   = $this->typeHelper->getOwningSideEntities($groupName);
         foreach ($owningSideEntities as $className) {
-            $choices[$className] = $entityConfigProvider->getConfig($className)->get('plural_label');
+            $choices[$entityConfigProvider->getConfig($className)->get('plural_label')] = $className;
         }
 
         return $choices;

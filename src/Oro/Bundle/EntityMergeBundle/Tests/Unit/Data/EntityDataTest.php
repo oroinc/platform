@@ -4,15 +4,15 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Data;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 
-class EntityDataTest extends \PHPUnit_Framework_TestCase
+class EntityDataTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityMetadata;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $fieldMetadata;
 

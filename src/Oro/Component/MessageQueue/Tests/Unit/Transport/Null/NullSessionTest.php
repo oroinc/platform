@@ -10,7 +10,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullTopic;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class NullSessionTest extends \PHPUnit_Framework_TestCase
+class NullSessionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 

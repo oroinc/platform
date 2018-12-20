@@ -64,7 +64,7 @@ trait MessageProcessTrait
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionInterfaceMock()
     {

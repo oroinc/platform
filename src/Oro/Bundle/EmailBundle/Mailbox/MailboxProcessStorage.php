@@ -100,7 +100,7 @@ class MailboxProcessStorage
                 continue;
             }
 
-            $choices[$type] = $provider->getLabel();
+            $choices[$provider->getLabel()] = $type;
         }
 
         return $choices;

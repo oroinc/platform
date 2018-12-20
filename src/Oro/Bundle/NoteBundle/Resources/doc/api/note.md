@@ -17,14 +17,13 @@ Retrieve a collection of note records.
 ### create
 
 Create a new note record.
+
 The created record is returned in the response.
 
 {@inheritdoc}
 
 {@request:json_api}
 Example:
-
-`</api/notes>`
 
 ```JSON
 {  
@@ -56,8 +55,6 @@ Edit a specific note record.
 
 {@request:json_api}
 Example:
-
-`</api/notes/2>`
 
 ```JSON
 {  
@@ -103,7 +100,6 @@ Delete a specific note record.
 ### delete_list
 
 Delete a collection of note records.
-The list of records that will be deleted, could be limited by filters.
 
 {@inheritdoc}
 
@@ -162,8 +158,6 @@ Replace the file attached to a specific note.
 {@request:json_api}
 Example:
 
-`</api/notes/3/relationships/attachment>`
-
 ```JSON
 {
   "data": {
@@ -190,8 +184,6 @@ Replace the organization a specific note record belongs to.
 
 {@request:json_api}
 Example:
-
-`</api/notes/1/relationships/organization>`
 
 ```JSON
 {
@@ -220,8 +212,6 @@ Replace the owner of a specific note record.
 {@request:json_api}
 Example:
 
-`</api/notes/1/relationships/owner>`
-
 ```JSON
 {
   "data": {
@@ -248,8 +238,6 @@ Replace the user who updated a specific note record.
 
 {@request:json_api}
 Example:
-
-`</api/notes/2/relationships/updatedBy>`
 
 ```JSON
 {

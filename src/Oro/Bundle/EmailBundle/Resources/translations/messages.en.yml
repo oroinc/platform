@@ -8,7 +8,7 @@ oro:
             view_all:    View All
             view_email:  View Email
             reply:       Reply
-            description: This widget allows you to see most recent additions to your inbox and outbox
+            description: This widget enables you to see the most recent additions to your inbox and outbox
 
     email:
         imap.folder.checkAll: All
@@ -22,12 +22,13 @@ oro:
             job_scheduled.message: "The job has been added to the queue"
             job_progress: Check progress
         recent_emails_widget:
+            title: Recent emails
             no_subject: "no subject"
         form:
             choose_template:                     Choose a Template
             add_signature:                       Add Signature
-            attach_file:                         Attach file
-            from_record:                         From record
+            attach_file:                         Attach File
+            from_record:                         From Record
             upload:                              Upload
             attach:                              Attach
             no_attachments:                      No available attachments
@@ -36,9 +37,9 @@ oro:
 
             tooltip:
                 attachment_sync:
-                    enable: Enable load attachments on email sync.
+                    enable: Enable loading attachments on email sync.
                     max_size: Maximum sync attachment size, Mb. Attachments with exceeding size will not be downloaded. To unlimit size set to 0.
-                    preview_limit: Limit to show preview for attachments (thumbnail for images and big file icon for other files). Set to 0 to see a list with file names only.
+                    preview_limit: Limit to show preview for attachments (thumbnail for images and a big file icon for other files). Set to 0 to see a list with file names only.
 
         variable.not.found:                     N/A
 
@@ -175,6 +176,9 @@ oro:
             current_time:        Current time
             siganture:           Signature (|oro_html_strip_tags should be removed to allow usage of it's html view)
 
+            # errors
+            failed_to_compile: This email template can't be used
+
         attachment:
             copy_to_record: Copy to Record
             save: Download
@@ -289,7 +293,9 @@ oro:
         seen.label:               Is Seen
         thread_id.label:          Thread ID
         show_details.tooltip:     Show details
+        show_details.label:       Email details
         contexts:
+            label:                Contexts
             tooltip:              Context is any record or records that have meaningful relation to an email conversation. When you add context of a record to the email conversation, it will be displayed in the Activity list of that record.
         not_found:                Email with id "%id%" can not be found
         forbidden:                Action forbidden

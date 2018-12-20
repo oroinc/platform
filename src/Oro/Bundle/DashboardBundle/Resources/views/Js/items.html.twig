@@ -10,29 +10,30 @@
 </script>
 
 <script id="widget-items-item-template" type="text/template">
-    <tr data-cid="<%= cid %>">
+    <tr class="widget-items-item-row" data-cid="<%= cid %>">
         <td><%= label %></td>
         <td class="action-cell">
             <input type="hidden" name="<%= namePrefix %>[id]" value="<%= id %>">
             <input data-name="order" type="hidden" class="order" name="<%= namePrefix %>[order]" value="<%= order %>">
             <input class="hide" data-name="show" type="checkbox" name="<%= namePrefix %>[show]" <%= show ? 'checked' : '' %>>
             <% if (_.isMobile()) { %>
-            <span class="btn delete-button" data-collection-action="delete" title="{{ 'oro.dashboard.datagrid.actions.move_column_up.label'|trans }}">
-                <i class="fa-trash-o hide-text"></i>
+            <span class="btn btn-icon delete-button" data-collection-action="delete" title="{{ 'oro.dashboard.datagrid.actions.move_column_up.label'|trans }}" aria-hidden="true">
+                <i class="fa-trash-o"></i>
             </span>
-            <span class="btn move-up<% if (isFirst) { %> disabled<% } %>" data-collection-action="moveUp" title="{{ 'oro.dashboard.datagrid.actions.move_column_up.label'|trans }}">
+            <span class="btn btn-icon move-up<% if (isFirst) { %> disabled<% } %>" data-collection-action="moveUp" title="{{ 'oro.dashboard.datagrid.actions.move_column_up.label'|trans }}" aria-hidden="true">
                 <i class="fa-chevron-up"></i>
             </span>
-            <span class="btn move-down<% if (isLast) { %> disabled<% } %>" data-collection-action="moveDown" title="{{ 'oro.dashboard.datagrid.actions.move_column_down.label'|trans }}">
+            <span class="btn btn-icon move-down<% if (isLast) { %> disabled<% } %>" data-collection-action="moveDown" title="{{ 'oro.dashboard.datagrid.actions.move_column_down.label'|trans }}" aria-hidden="true">
                 <i class="fa-chevron-down"></i>
             </span>
             <% } else { %>
-            <a href="javascript: void(0);" class="action no-hash delete-button"
+            <a href="#" role="button" class="action btn-icon no-hash delete-button"
                title="{{ 'oro.dashboard.datagrid.actions.delete.label'|trans }}"
-               data-collection-action="delete">
+               data-collection-action="delete"
+               aria-hidden="true">
                 <i class="fa-trash-o hide-text"></i>
             </a>
-            <span title="{{ 'oro.dashboard.datagrid.actions.move_column.label'|trans }}">
+            <span class="btn-icon" title="{{ 'oro.dashboard.datagrid.actions.move_column.label'|trans }}" aria-hidden="true">
                 <i class="fa-arrows-v handle"></i>
             </span>
             <% } %>

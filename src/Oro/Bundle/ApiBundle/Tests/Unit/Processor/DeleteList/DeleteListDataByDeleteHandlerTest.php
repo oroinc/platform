@@ -12,10 +12,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
     /** @var DeleteListDataByDeleteHandler */
@@ -46,9 +46,9 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
         $config = new EntityDefinitionConfig();
 
         $this->doctrineHelper->expects(self::once())
-            ->method('isManageableEntityClass')
-            ->with($entityClass)
-            ->willReturn(false);
+            ->method('getManageableEntityClass')
+            ->with($entityClass, $config)
+            ->willReturn(null);
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManagerForClass');
         $this->container->expects(self::never())
@@ -64,7 +64,7 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage The result property of the Context should be array or Traversable, "stdClass" given.
+     * @expectedExceptionMessage The result property of the context should be array or Traversable, "stdClass" given.
      */
     public function testProcessForNotArrayResult()
     {
@@ -74,9 +74,9 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
         $deleteHandler = $this->createMock(DeleteHandler::class);
 
         $this->doctrineHelper->expects(self::once())
-            ->method('isManageableEntityClass')
-            ->with($entityClass)
-            ->willReturn(true);
+            ->method('getManageableEntityClass')
+            ->with($entityClass, $config)
+            ->willReturn($entityClass);
         $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManagerForClass')
@@ -104,9 +104,9 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
         $deleteHandler = $this->createMock(DeleteHandler::class);
 
         $this->doctrineHelper->expects(self::once())
-            ->method('isManageableEntityClass')
-            ->with($entityClass)
-            ->willReturn(true);
+            ->method('getManageableEntityClass')
+            ->with($entityClass, $config)
+            ->willReturn($entityClass);
         $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManagerForClass')
@@ -147,9 +147,9 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
         $config->setDeleteHandler($deleteHandlerServiceId);
 
         $this->doctrineHelper->expects(self::once())
-            ->method('isManageableEntityClass')
-            ->with($entityClass)
-            ->willReturn(true);
+            ->method('getManageableEntityClass')
+            ->with($entityClass, $config)
+            ->willReturn($entityClass);
         $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManagerForClass')
@@ -192,9 +192,9 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
         $deleteHandler = $this->createMock(DeleteHandler::class);
 
         $this->doctrineHelper->expects(self::once())
-            ->method('isManageableEntityClass')
-            ->with($entityClass)
-            ->willReturn(true);
+            ->method('getManageableEntityClass')
+            ->with($entityClass, $config)
+            ->willReturn($entityClass);
         $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManagerForClass')
@@ -225,5 +225,48 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
         $this->context->setResult([$entity]);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
+    }
+
+    public function testProcessForModelInheritedFromManageableEntity()
+    {
+        $entity = new \stdClass();
+        $entityClass = \get_class($entity);
+        $parentEntityClass = 'Test\Parent';
+        $config = new EntityDefinitionConfig();
+        $config->setParentResourceClass($parentEntityClass);
+        $deleteHandler = $this->createMock(DeleteHandler::class);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getManageableEntityClass')
+            ->with($entityClass, $config)
+            ->willReturn($parentEntityClass);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityManagerForClass')
+            ->with($parentEntityClass)
+            ->willReturn($em);
+        $connection = $this->createMock(Connection::class);
+        $em->expects(self::exactly(2))
+            ->method('getConnection')
+            ->willReturn($connection);
+        $connection->expects(self::once())
+            ->method('beginTransaction');
+        $connection->expects(self::once())
+            ->method('commit');
+
+        $this->container->expects(self::once())
+            ->method('get')
+            ->with('oro_soap.handler.delete')
+            ->willReturn($deleteHandler);
+        $deleteHandler->expects(self::once())
+            ->method('processDelete')
+            ->with($entity, $em);
+
+        $this->context->setClassName($entityClass);
+        $this->context->setResult([$entity]);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasResult());
     }
 }

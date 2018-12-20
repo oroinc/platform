@@ -1,0 +1,19 @@
+/* @theme: admin.demo; */
+
+@import "../../../../css/scss/mixins";
+
+@import "colors";
+@import "../../../../css/scss/variables";
+@import "../../../../css/scss/oro/variables";
+
+@import "app-header";
+@import "error-page";
+@import "loading-bar";
+@import "loading-mask";
+@import "widget-picker";
+
+// desktop resolution
+@import "desktop/main";
+
+// mobile resolution
+@import "mobile/main";

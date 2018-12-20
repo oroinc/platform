@@ -1,0 +1,154 @@
+/* @theme: admin.oro; */
+
+.oro_attachment_file {
+    margin-top: $attachment-file-offset-top;
+    padding: side-values($attachment-file-inner-offset);
+    line-height: 1.3;
+    text-align: #{$start};
+
+    @include text-line-truncate($attachment-section-width);
+
+    .filename {
+        @include text-line-truncate($attachment-section-width);
+    }
+
+    .delete {
+        float: #{$end};
+        margin-top: -4px;
+        line-height: 20px;
+
+        @include fa-icon($fa-var-trash-o);
+
+        &:hover {
+            &:after {
+                color: $primary-550;
+            }
+        }
+    }
+
+    [class^="fa-"],
+    [class*="fa-"] {
+        margin-#{$end}: $attachment-item-fa-right / 2;
+    }
+}
+
+.attachment-file {
+    max-width: 100%;
+
+    .uploader {
+        display: flex;
+        height: auto;
+        max-width: $attachment-file-uploader-width;
+        float: none;
+
+        align-items: center;
+        border: none;
+
+        input {
+            cursor: pointer;
+
+            &:hover ~ .action {
+                color: $link-color-hover;
+            }
+        }
+
+        .action {
+            border: none;
+            background: none;
+            color: $link-color;
+            cursor: pointer;
+        }
+
+        .active .action {
+            background: none;
+        }
+
+        .filename {
+            padding: 0;
+            flex-shrink: 1;
+
+            @include text-line-truncate(auto);
+        }
+
+        .focus {
+            border: none;
+            box-shadow: none;
+        }
+
+        &.focus {
+            border: none;
+            box-shadow: none;
+
+            .action {
+                color: $link-color;
+            }
+        }
+    }
+}
+
+.attachment-item {
+    display: $attachment-item-display;
+    align-items: baseline;
+    margin-top: $attachment-item-offset-top;
+    max-width: $attachment-item-max-width;
+
+    &--note {
+        margin: 0;
+        flex-direction: $attachment-item-note-flex-direction;
+        align-items: $attachment-item-note-align-items;
+
+        .link-to-record {
+            @include text-line-truncate(100%);
+        }
+    }
+
+    &__filename {
+        @include text-line-truncate(auto);
+    }
+
+    &__file-size {
+        margin-#{$start}: $attachment-offset-global;
+        white-space: nowrap;
+    }
+
+    [class^="fa-"],
+    [class*="fa-"] {
+        margin-#{$end}: $attachment-item-fa-right;
+        padding: 0;
+        line-height: 1.3;
+        font-size: $base-font-size--m;
+    }
+
+    .remove-attachment {
+        margin: side-values(0 0 0 $attachment-offset-global);
+    }
+}
+
+.attachment-container {
+    margin-top: -($content-padding-medium - $attachment-offset-global);
+
+    .attachment-item {
+        margin-top: $attachment-offset-global - 1px;
+    }
+}
+
+.attachment-items {
+    input {
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 0 !important;
+        height: 0 !important;
+        border: none;
+        z-index: -1;
+    }
+}
+
+.ui-dialog {
+    .attachment-item {
+        max-width: $attachment-item-dialog-max-width;
+    }
+}

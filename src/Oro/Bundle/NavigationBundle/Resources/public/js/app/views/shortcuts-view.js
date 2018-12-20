@@ -9,18 +9,14 @@ define(function(require) {
     var routing = require('routing');
     require('bootstrap');
 
-    /**
-     * @export  oronavigation/js/app/views/shortcuts-view
-     * @class   oronavigation.shortcuts.View
-     * @extends BaseView
-     */
     ShortcutsView = BaseView.extend({
-        options: {
-            el: '.shortcuts .input-large'
-        },
+        autoRender: true,
 
         events: {
-            change: 'onChange'
+            'change': 'onChange',
+            'focus [data-role="shortcut-search"]': 'onFocus',
+            'hide.bs.dropdown': 'onDropdownHide',
+            'click .nav-content': 'stopPropagation'
         },
 
         data: {},
@@ -42,15 +38,36 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
+            this.options = options || {};
+
+            var $input = this.getTypeaheadInput();
+            this.sourceUrl = $input.data('source-url') ? $input.data('source-url') : null;
+            this.entityClass = $input.data('entity-class') ? $input.data('entity-class') : null;
+            this.entityId = $input.data('entity-id') ? $input.data('entity-id') : null;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        render: function() {
+            var $input = this.getTypeaheadInput();
+
+            if (!$input.data('typeahead')) {
+                this.initTypeahead();
+            }
+
+            this.initLayout();
+
+            return this;
+        },
+
+        getTypeaheadInput: function() {
+            return this.$('[data-role="shortcut-search"]');
+        },
+
+        initTypeahead: function() {
             var self = this;
-            this.options = _.defaults(options || {}, this.options);
-            this.sourceUrl = this.$el.data('source-url') ? this.$el.data('source-url') : null;
-            this.entityClass = this.$el.data('entity-class') ? this.$el.data('entity-class') : null;
-            this.entityId = this.$el.data('entity-id') ? this.$el.data('entity-id') : null;
-
-            this.$el.val('');
-
-            this.$el.typeahead({
+            this.getTypeaheadInput().typeahead({
                 source: _.bind(this.source, this),
                 matcher: function(item) {
                     return item.key.toLowerCase().indexOf(this.query.toLowerCase()) !== -1;
@@ -112,8 +129,11 @@ define(function(require) {
                                 .attr('title', __(config.label))
                                 .attr('data-page-component-module', 'oroui/js/app/components/widget-component')
                                 .attr('data-page-component-options', JSON.stringify(options))
-                                .html('<i class="' + config.iCss + ' hide-text">' + item.key + '</i>' +
-                                    that.highlighter(item.key));
+                                .html(that.highlighter(item.key));
+
+                            if (config.iCss) {
+                                view.prepend('<i class="' + config.iCss + ' hide-text">' + item.key + '</i>');
+                            }
                         } else {
                             view = $(that.options.item).attr('data-value', item.key);
                             view.find('a').html(that.highlighter(item.key));
@@ -125,7 +145,8 @@ define(function(require) {
                     items.first().addClass('active');
                     this.$menu.html(items);
                     return this;
-                }, click: function(e) {
+                },
+                click: function(e) {
                     e.stopPropagation();
                     e.preventDefault();
                     if (!this.$menu.find('.active').data('isDialog')) {
@@ -134,8 +155,6 @@ define(function(require) {
                     }
                 }
             });
-            this.$form = this.$el.closest('form');
-            this.render();
         },
 
         source: function(query, process) {
@@ -165,26 +184,31 @@ define(function(require) {
         },
 
         onChange: function() {
-            var key = this.$el.val();
-            var dataItem;
-            this.$el.val('');
-            if (!_.isUndefined(this.data[key])) {
-                dataItem = this.data[key];
+            var $input = this.getTypeaheadInput();
+            var key = $input.val();
+            var dataItem = this.data[key];
+
+            if (dataItem !== void 0) {
+                $input.val('').inputWidget('refresh');
+
                 if (!dataItem.dialog) {
-                    this.$form.attr('action', dataItem.url).submit();
+                    $input.closest('form').attr('action', dataItem.url).submit();
                 } else {
-                    this.$el.parent().find('li.active > a').click();
+                    $input.parent().find('li.active > a').click();
                 }
             }
         },
 
-        getLayoutElement: function() {
-            return this.$el.closest('.shortcuts');
+        onFocus: function() {
+            this.getTypeaheadInput().typeahead('lookup');
         },
 
-        render: function() {
-            this.initLayout();
-            return this;
+        onDropdownHide: function() {
+            this.getTypeaheadInput().val('').inputWidget('refresh');
+        },
+
+        stopPropagation: function(e) {
+            e.stopPropagation();
         }
     });
 

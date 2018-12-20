@@ -95,7 +95,7 @@ class WorkflowSelectType extends AbstractType
                     foreach ($definitions as $definition) {
                         $name = $definition->getName();
                         $label = $definition->getLabel();
-                        $choices[$name] = $label;
+                        $choices[$label] = $name;
                     }
                 }
 

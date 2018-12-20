@@ -4,11 +4,14 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Knp\Menu\MenuFactory;
 use Oro\Bundle\NavigationBundle\Menu\RoutingAwareMenuFactoryExtension;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 
-class RoutingAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
+class RoutingAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RouterInterface */
+    const INDEX_PHP_FILE = 'index.php';
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface */
     protected $router;
 
     /** @var MenuFactory */
@@ -43,9 +46,15 @@ class RoutingAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $route   = 'test';
         $uri     = '#';
         $options = ['route' => $route];
+
+        $context = new RequestContext();
+        $this->router->expects($this->any())
+            ->method('getContext')
+            ->willReturn($context);
+
         $this->router->expects($this->once())
             ->method('generate')
-            ->with($route, [], false)
+            ->with($route, [], RouterInterface::ABSOLUTE_PATH)
             ->willReturn($uri);
 
         $item = $this->factory->createItem('test', $options);
@@ -66,9 +75,15 @@ class RoutingAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             'extras' => ['acl_resource_id' => 'id', 'isAllowed' => true, 'routes' => $routes],
             'routeParameters' => $routeParams
         ];
+
+        $context = new RequestContext();
+        $this->router->expects($this->any())
+            ->method('getContext')
+            ->willReturn($context);
+
         $this->router->expects($this->once())
             ->method('generate')
-            ->with($route, $routeParams, false)
+            ->with($route, $routeParams, RouterInterface::ABSOLUTE_PATH)
             ->willReturn($uri);
 
         $item = $this->factory->createItem('test', $options);

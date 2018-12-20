@@ -1,0 +1,136 @@
+/* @theme: admin.oro; */
+
+.left-panel-container {
+    background-color: #fff;
+
+    & > .placeholder {
+        margin-left: 334px;
+        background-color: #f1f1f1;
+        border-left: 1px solid #e2e2e2;
+
+        & > * {
+            margin-left: -335px;
+
+            & > .left-panel {
+                float: left;
+                width: 334px;
+                border-top: 1px solid #f2f2f2;
+                margin: 0;
+            }
+
+            & > .content {
+                margin-left: 335px;
+                padding: $content-padding-medium $content-padding-medium 0;
+                box-sizing: border-box;
+            }
+        }
+    }
+}
+
+.system-configuration-container {
+    padding: 0 $content-padding;
+
+    .control-group {
+        .controls, &.controls {
+            .control-subgroup {
+                margin-#{$end}: $content-padding-medium;;
+            }
+        }
+    }
+
+    .controls {
+        &.control-subgroup {
+            width: auto;
+            margin: side-values( 0 $content-padding-medium 0 0);
+            float: #{$start};
+
+            input,
+            textarea {
+                min-width: $field-width;
+            }
+        }
+    }
+
+    .control-subgroup {
+        &:not(.parent-scope-checkbox) {
+            .checkbox-view {
+                margin-top: $content-padding-small;
+            }
+        }
+    }
+
+    .controls .control-subgroup {
+        &.parent-scope-checkbox {
+            margin-top: ($content-padding-small / 2);
+            margin-#{$end}: $content-padding-small;
+
+            label, .checkbox-view__text {
+                margin: side-values(0 $content-padding-small 0 0);
+                line-height: 1.75;
+            }
+        }
+
+        .parent-scope-checkbox__wrapper {
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: center;
+        }
+    }
+
+    .container-fluid:after {
+        clear: none;
+    }
+
+    .ping-holder {
+        margin-top: -7px;
+        width: $field-width;
+
+        .btn {
+            width: 100%;
+        }
+    }
+
+    .form-text,
+    .description-container {
+        margin-top: $content-padding-small;
+    }
+}
+
+.system-configuration-content-inner {
+    .form-horizontal {
+        margin-bottom: 26px;
+    }
+
+    .control-group-oro_warehouse_system_config {
+        .add-list-item {
+            margin-top: $content-padding-small;
+        }
+    }
+}
+
+.system-configuration-content {
+    &-wrapper {
+        padding-#{$start}: $content-padding-medium;
+        margin-bottom: 15px;
+    }
+
+    &-inner {
+        padding: $content-padding $content-padding $content-padding-medium;
+        width: 100%;
+        overflow-y: auto;
+    }
+
+    &-header {
+        display: flex;
+        justify-content: space-between;
+        background: $primary-900;
+        border-radius: 4px;
+        padding: 6px 16px 5px;
+    }
+
+    &-title {
+        font-size: 14px;
+        font-weight: bold;
+    }
+}
+

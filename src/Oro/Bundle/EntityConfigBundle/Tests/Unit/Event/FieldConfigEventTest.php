@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 
-class FieldConfigEventTest extends \PHPUnit_Framework_TestCase
+class FieldConfigEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

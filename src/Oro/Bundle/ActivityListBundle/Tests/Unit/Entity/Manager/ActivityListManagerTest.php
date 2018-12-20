@@ -20,42 +20,42 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
+class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActivityListManager */
     protected $activityListManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityNameResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $config;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $provider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $activityListIdProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $commentManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
     /** @var WorkflowDataHelper */
     protected $workflowHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $htmlTagHelper;
 
     public function setUp()
@@ -119,12 +119,12 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $testItem->setId(105);
         $owner = new TestUser();
         $owner->setId(15);
-        $editor = new TestUser();
-        $editor->setId(142);
+        $updatedBy = new TestUser();
+        $updatedBy->setId(142);
         $organization = new TestOrganization();
         $organization->setId(584);
         $testItem->setOwner($owner);
-        $testItem->setEditor($editor);
+        $testItem->setUpdatedBy($updatedBy);
         $testItem->setOrganization($organization);
         $testItem->setCreatedAt(new \DateTime('2012-01-01', new \DateTimeZone('UTC')));
         $testItem->setUpdatedAt(new \DateTime('2014-01-01', new \DateTimeZone('UTC')));

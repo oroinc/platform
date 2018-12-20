@@ -7,17 +7,17 @@ use Oro\Bundle\EmailBundle\EventListener\EmailAssociationsDemoDataFixturesListen
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 
-class EmailAssociationsDemoDataFixturesListenerTest extends \PHPUnit_Framework_TestCase
+class EmailAssociationsDemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
 {
     const LISTENERS = [
         'test_listener_1',
         'test_listener_2',
     ];
 
-    /** @var OptionalListenerManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $listenerManager;
 
-    /** @var AssociationManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AssociationManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $associationManager;
 
     /** @var EmailAssociationsDemoDataFixturesListener */

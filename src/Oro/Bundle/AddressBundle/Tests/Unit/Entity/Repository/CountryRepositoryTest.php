@@ -11,9 +11,9 @@ use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository;
 
-class CountryRepositoryTest extends \PHPUnit_Framework_TestCase
+class CountryRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
     /** @var CountryRepository */

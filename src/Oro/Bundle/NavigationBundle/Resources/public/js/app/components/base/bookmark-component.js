@@ -1,12 +1,12 @@
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/mediator',
-    'oroui/js/app/components/base/component'
-], function($, _, mediator, BaseComponent) {
+define(function(require) {
     'use strict';
 
     var BaseBookmarkComponent;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
+    var Collection = require('oronavigation/js/app/models/base/collection');
+    var BaseComponent = require('oroui/js/app/components/base/component');
 
     BaseBookmarkComponent = BaseComponent.extend({
         /**
@@ -25,8 +25,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function BaseBookmarkComponent() {
-            BaseBookmarkComponent.__super__.constructor.apply(this, arguments);
+        constructor: function BaseBookmarkComponent(options) {
+            BaseBookmarkComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -38,18 +38,19 @@ define([
             var extraOptions = $dataEl.data('options');
             $dataEl.remove();
 
+            this.collection = new Collection();
+
             // create own property _options (not spoil prototype)
-            this._options = _.defaults({}, options || {}, extraOptions);
+            this._options = _.defaults(_.omit(options, '_subPromises'), extraOptions);
 
             BaseBookmarkComponent.__super__.initialize.call(this, options);
 
-            var $button = $(this._options.buttonOptions.el);
-            var route = $button.data('navigation-items-route');
+            var route = options._sourceElement.data('navigation-items-route');
             if (!_.isEmpty(route)) {
                 this.collection.model.prototype.route = route;
             }
 
-            var typeName = $button.data('type-name');
+            var typeName = options._sourceElement.data('type-name');
             if (!_.isEmpty(typeName)) {
                 this.typeName = typeName;
             }

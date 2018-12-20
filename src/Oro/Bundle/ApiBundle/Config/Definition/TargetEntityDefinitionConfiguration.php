@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
+/**
+ * The base class for "entities" and "relations" configuration section builders.
+ */
 class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
 {
     /** @var string */
@@ -18,7 +20,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
     /**
      * @param string $sectionName
      */
-    public function __construct($sectionName = 'entity')
+    public function __construct(string $sectionName = 'entity')
     {
         $this->sectionName = $sectionName;
     }
@@ -28,7 +30,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
      *
      * @return string
      */
-    public function getSectionName()
+    public function getSectionName(): string
     {
         return $this->sectionName;
     }
@@ -38,7 +40,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
      *
      * @return string|null
      */
-    public function getParentSectionName()
+    public function getParentSectionName(): ?string
     {
         return $this->parentSectionName;
     }
@@ -48,7 +50,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
      *
      * @param string $sectionName
      */
-    public function setParentSectionName($sectionName)
+    public function setParentSectionName(string $sectionName): void
     {
         $this->parentSectionName = $sectionName;
     }
@@ -56,7 +58,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
     /**
      * {@inheritdoc}
      */
-    public function configure(NodeBuilder $node)
+    public function configure(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName;
         if (!empty($this->parentSectionName)) {
@@ -77,7 +79,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
 
         $this->configureEntityNode($node);
         $fieldNode = $node
-            ->arrayNode(EntityDefinitionConfig::FIELDS)
+            ->arrayNode(ConfigUtil::FIELDS)
                 ->useAttributeAsKey('name')
                 ->normalizeKeys(false)
                 ->prototype('array')
@@ -90,28 +92,25 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
      *
      * @return array
      */
-    protected function postProcessConfig(array $config)
+    protected function postProcessConfig(array $config): array
     {
-        if (empty($config[EntityDefinitionConfig::ORDER_BY])) {
-            unset($config[EntityDefinitionConfig::ORDER_BY]);
+        if (empty($config[ConfigUtil::ORDER_BY])) {
+            unset($config[ConfigUtil::ORDER_BY]);
         }
-        if (empty($config[EntityDefinitionConfig::HINTS])) {
-            unset($config[EntityDefinitionConfig::HINTS]);
+        if (empty($config[ConfigUtil::HINTS])) {
+            unset($config[ConfigUtil::HINTS]);
         }
-        if (empty($config[EntityDefinitionConfig::POST_SERIALIZE])) {
-            unset($config[EntityDefinitionConfig::POST_SERIALIZE]);
+        if (empty($config[ConfigUtil::FORM_TYPE])) {
+            unset($config[ConfigUtil::FORM_TYPE]);
         }
-        if (empty($config[EntityDefinitionConfig::FORM_TYPE])) {
-            unset($config[EntityDefinitionConfig::FORM_TYPE]);
+        if (empty($config[ConfigUtil::FORM_OPTIONS])) {
+            unset($config[ConfigUtil::FORM_OPTIONS]);
         }
-        if (empty($config[EntityDefinitionConfig::FORM_OPTIONS])) {
-            unset($config[EntityDefinitionConfig::FORM_OPTIONS]);
+        if (empty($config[ConfigUtil::FORM_EVENT_SUBSCRIBER])) {
+            unset($config[ConfigUtil::FORM_EVENT_SUBSCRIBER]);
         }
-        if (empty($config[EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER])) {
-            unset($config[EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER]);
-        }
-        if (empty($config[EntityDefinitionConfig::FIELDS])) {
-            unset($config[EntityDefinitionConfig::FIELDS]);
+        if (empty($config[ConfigUtil::FIELDS])) {
+            unset($config[ConfigUtil::FIELDS]);
         }
 
         return $config;
@@ -120,21 +119,23 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
     /**
      * @param NodeBuilder $node
      */
-    public function configureEntityNode(NodeBuilder $node)
+    public function configureEntityNode(NodeBuilder $node): void
     {
         $node
-            ->enumNode(EntityDefinitionConfig::EXCLUSION_POLICY)
-                ->values(
-                    [EntityDefinitionConfig::EXCLUSION_POLICY_ALL, EntityDefinitionConfig::EXCLUSION_POLICY_NONE]
-                )
+            ->enumNode(ConfigUtil::EXCLUSION_POLICY)
+                ->values([
+                    ConfigUtil::EXCLUSION_POLICY_ALL,
+                    ConfigUtil::EXCLUSION_POLICY_CUSTOM_FIELDS,
+                    ConfigUtil::EXCLUSION_POLICY_NONE
+                ])
             ->end()
-            ->integerNode(EntityDefinitionConfig::MAX_RESULTS)->min(-1)->end()
-            ->arrayNode(EntityDefinitionConfig::ORDER_BY)
+            ->integerNode(ConfigUtil::MAX_RESULTS)->min(-1)->end()
+            ->arrayNode(ConfigUtil::ORDER_BY)
                 ->performNoDeepMerging()
                 ->useAttributeAsKey('name')
                 ->prototype('enum')->values(['ASC', 'DESC'])->end()
             ->end()
-            ->arrayNode(EntityDefinitionConfig::HINTS)
+            ->arrayNode(ConfigUtil::HINTS)
                 ->prototype('array')
                     ->beforeNormalization()
                         ->ifString()
@@ -148,20 +149,19 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
                     ->end()
                 ->end()
             ->end()
-            ->variableNode(EntityDefinitionConfig::POST_SERIALIZE)->end()
-            ->scalarNode(EntityDefinitionConfig::FORM_TYPE)->end()
-            ->arrayNode(EntityDefinitionConfig::FORM_OPTIONS)
+            ->scalarNode(ConfigUtil::FORM_TYPE)->end()
+            ->arrayNode(ConfigUtil::FORM_OPTIONS)
                 ->useAttributeAsKey('name')
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
             ->end()
-            ->variableNode(EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER)
+            ->variableNode(ConfigUtil::FORM_EVENT_SUBSCRIBER)
                 ->validate()
                     ->always(function ($v) {
-                        if (is_string($v)) {
+                        if (\is_string($v)) {
                             return [$v];
                         }
-                        if (is_array($v)) {
+                        if (\is_array($v)) {
                             return $v;
                         }
                         throw new \InvalidArgumentException(
@@ -175,7 +175,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
     /**
      * @param NodeBuilder $node
      */
-    protected function configureFieldNode(NodeBuilder $node)
+    protected function configureFieldNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName . '.field';
         if (!empty($this->parentSectionName)) {
@@ -195,22 +195,22 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
         );
 
         $node
-            ->booleanNode(EntityDefinitionFieldConfig::EXCLUDE)->end()
-            ->scalarNode(EntityDefinitionFieldConfig::DESCRIPTION)->cannotBeEmpty()->end()
-            ->scalarNode(EntityDefinitionFieldConfig::PROPERTY_PATH)->cannotBeEmpty()->end()
-            ->scalarNode(EntityDefinitionFieldConfig::DATA_TYPE)->cannotBeEmpty()->end()
-            ->scalarNode(EntityDefinitionFieldConfig::TARGET_CLASS)->end()
-            ->enumNode(EntityDefinitionFieldConfig::TARGET_TYPE)
+            ->booleanNode(ConfigUtil::EXCLUDE)->end()
+            ->scalarNode(ConfigUtil::DESCRIPTION)->cannotBeEmpty()->end()
+            ->scalarNode(ConfigUtil::PROPERTY_PATH)->cannotBeEmpty()->end()
+            ->scalarNode(ConfigUtil::DATA_TYPE)->cannotBeEmpty()->end()
+            ->scalarNode(ConfigUtil::TARGET_CLASS)->end()
+            ->enumNode(ConfigUtil::TARGET_TYPE)
                 ->values(['to-many', 'to-one', 'collection'])
             ->end()
-            ->booleanNode(EntityDefinitionFieldConfig::COLLAPSE)->end()
-            ->scalarNode(EntityDefinitionFieldConfig::FORM_TYPE)->end()
-            ->arrayNode(EntityDefinitionFieldConfig::FORM_OPTIONS)
+            ->booleanNode(ConfigUtil::COLLAPSE)->end()
+            ->scalarNode(ConfigUtil::FORM_TYPE)->end()
+            ->arrayNode(ConfigUtil::FORM_OPTIONS)
                 ->useAttributeAsKey('name')
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
             ->end()
-            ->arrayNode(EntityDefinitionFieldConfig::DEPENDS_ON)
+            ->arrayNode(ConfigUtil::DEPENDS_ON)
                 ->prototype('scalar')->end()
             ->end();
     }
@@ -220,23 +220,23 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
      *
      * @return array
      */
-    protected function postProcessFieldConfig(array $config)
+    protected function postProcessFieldConfig(array $config): array
     {
-        if (empty($config[EntityDefinitionFieldConfig::FORM_TYPE])) {
-            unset($config[EntityDefinitionFieldConfig::FORM_TYPE]);
+        if (empty($config[ConfigUtil::FORM_TYPE])) {
+            unset($config[ConfigUtil::FORM_TYPE]);
         }
-        if (empty($config[EntityDefinitionFieldConfig::FORM_OPTIONS])) {
-            unset($config[EntityDefinitionFieldConfig::FORM_OPTIONS]);
+        if (empty($config[ConfigUtil::FORM_OPTIONS])) {
+            unset($config[ConfigUtil::FORM_OPTIONS]);
         }
-        if (!empty($config[EntityDefinitionFieldConfig::TARGET_TYPE])) {
-            if ('collection' === $config[EntityDefinitionFieldConfig::TARGET_TYPE]) {
-                $config[EntityDefinitionFieldConfig::TARGET_TYPE] = 'to-many';
+        if (!empty($config[ConfigUtil::TARGET_TYPE])) {
+            if ('collection' === $config[ConfigUtil::TARGET_TYPE]) {
+                $config[ConfigUtil::TARGET_TYPE] = 'to-many';
             }
-        } elseif (!empty($config[EntityDefinitionFieldConfig::TARGET_CLASS])) {
-            $config[EntityDefinitionFieldConfig::TARGET_TYPE] = 'to-one';
+        } elseif (!empty($config[ConfigUtil::TARGET_CLASS])) {
+            $config[ConfigUtil::TARGET_TYPE] = 'to-one';
         }
-        if (empty($config[EntityDefinitionFieldConfig::DEPENDS_ON])) {
-            unset($config[EntityDefinitionFieldConfig::DEPENDS_ON]);
+        if (empty($config[ConfigUtil::DEPENDS_ON])) {
+            unset($config[ConfigUtil::DEPENDS_ON]);
         }
 
         return $config;

@@ -15,7 +15,6 @@ parameters:
     oro_datagrid.configuration.provider.class:                    Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider
     oro_datagrid.configuration.provider.chain.class:              Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider
     oro_datagrid.event.dispatcher.class:                          Oro\Bundle\DataGridBundle\Event\EventDispatcher
-    oro_datagrid.event_listener.base_orm_relation.class:          Oro\Bundle\DataGridBundle\EventListener\BaseOrmRelationDatagridListener
     oro_datagrid.event_listener.datasource_bind_parameters.class: Oro\Bundle\DataGridBundle\EventListener\DatasourceBindParametersListener
     oro_datagrid.event_listener.ormdatasource_acl.class:          Oro\Bundle\DataGridBundle\EventListener\OrmDatasourceAclListener
     oro_datagrid.event_listener.row_selection.class:              Oro\Bundle\DataGridBundle\EventListener\RowSelectionListener
@@ -27,7 +26,6 @@ parameters:
     oro_datagrid.grid_view.entity.class:                          Oro\Bundle\DataGridBundle\Entity\GridView
     oro_datagrid.grid_view_user.entity.class:                     Oro\Bundle\DataGridBundle\Entity\GridViewUser
     oro_datagrid.grid_view.form.handler.api.class:                Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler
-    oro_datagrid.columns.helper.class:                            Oro\Bundle\DataGridBundle\Tools\ColumnsHelper
     oro_datagrid.choice.helper.class:                            Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper
 
     oro_datagrid.datagrid.inline_edit_column_options_guesser.class:          Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGuesser
@@ -256,9 +254,6 @@ services:
             - [setFileManager, ['@oro_importexport.file.file_manager']]
             - [setLogger, ['@logger']]
 
-    oro_datagrid.columns.helper:
-        class: '%oro_datagrid.columns.helper.class%'
-
     oro_datagrid.grid_configuration.helper:
         class: Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper
         arguments:
@@ -346,3 +341,14 @@ services:
     oro_datagrid.multi_grid_provider.link:
         tags:
             - { name: oro_service_link, service: oro_datagrid.multi_grid_provider }
+
+    oro_datagrid.helper.date:
+        class: Oro\Bundle\DataGridBundle\Tools\DateHelper
+        arguments:
+            - '@oro_locale.settings'
+
+    oro_datagrid.converter.url_converter:
+        class: Oro\Bundle\DataGridBundle\Converter\UrlConverter
+        public: false
+        arguments:
+            - '@router'

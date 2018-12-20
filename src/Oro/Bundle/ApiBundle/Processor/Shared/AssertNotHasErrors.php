@@ -8,7 +8,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Checks if there are any errors in the Context,
+ * Checks if there are any errors in the context,
  * and if so, throws UnhandledErrorsException exception.
  */
 class AssertNotHasErrors implements ProcessorInterface

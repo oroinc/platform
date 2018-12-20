@@ -1,11 +1,10 @@
 <div class="comments-view-header"></div>
+<div class="comments-view-no-data"></div>
 <ul class="comments-view-body comments-block"></ul>
 <% if (canCreate) { %>
-<div class="comments-view-footer clearfix">
-    <div class="pull-right">
-        <button class="btn add-comment-button" type="button">
-            <%= _.__('oro.comment.from.button.add_comment.label') %>
-        </button>
-    </div>
+<div class="comments-view-footer">
+    <button class="btn btn-sm add-comment-button">
+        <%= _.__('oro.comment.from.button.add_comment.label') %>
+    </button>
 </div>
 <% } %>

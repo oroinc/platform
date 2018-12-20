@@ -2,6 +2,9 @@
 
 namespace Oro\Component\EntitySerializer;
 
+/**
+ * Provides a set of configuration related reusable constants and static methods.
+ */
 class ConfigUtil
 {
     /**
@@ -15,7 +18,7 @@ class ConfigUtil
      *      '__discriminator__' => null
      *  ]
      */
-    const DISCRIMINATOR = '__discriminator__';
+    public const DISCRIMINATOR = '__discriminator__';
 
     /**
      * The field name or property path of the field which can be used to get FQCN of the entity.
@@ -28,32 +31,78 @@ class ConfigUtil
      *      '__class__' => null
      *  ]
      */
-    const CLASS_NAME = '__class__';
+    public const CLASS_NAME = '__class__';
 
-    const FIELDS = EntityConfig::FIELDS;
+    /**
+     * a key of a record contains an additional information about a collection,
+     * e.g. "has_more" flag indicates whether a collection has more records than it was requested.
+     */
+    public const INFO_RECORD_KEY = '_';
 
-    const EXCLUSION_POLICY      = EntityConfig::EXCLUSION_POLICY;
-    const EXCLUSION_POLICY_ALL  = EntityConfig::EXCLUSION_POLICY_ALL;
-    const EXCLUSION_POLICY_NONE = EntityConfig::EXCLUSION_POLICY_NONE;
-    const DISABLE_PARTIAL_LOAD  = EntityConfig::DISABLE_PARTIAL_LOAD;
-    const HINTS                 = EntityConfig::HINTS;
-    const ORDER_BY              = EntityConfig::ORDER_BY;
-    const MAX_RESULTS           = EntityConfig::MAX_RESULTS;
-    const POST_SERIALIZE        = EntityConfig::POST_SERIALIZE;
+    /** a list of fields */
+    public const FIELDS = 'fields';
 
-    const PATH_DELIMITER = '.';
+    /** a type of the exclusion strategy that should be used for the entity */
+    public const EXCLUSION_POLICY = 'exclusion_policy';
 
-    const PROPERTY_PATH    = FieldConfig::PROPERTY_PATH;
-    const EXCLUDE          = FieldConfig::EXCLUDE;
-    const COLLAPSE         = FieldConfig::COLLAPSE;
-    const DATA_TRANSFORMER = FieldConfig::DATA_TRANSFORMER;
+    /** exclude all fields are not configured explicitly */
+    public const EXCLUSION_POLICY_ALL = 'all';
 
-    /** @internal filled automatically by ConfigNormalizer and used only during serialization */
-    const COLLAPSE_FIELD = '_collapse_field';
-    /** @internal filled automatically by ConfigNormalizer and used only during serialization */
-    const EXCLUDED_FIELDS = '_excluded_fields';
-    /** @internal filled automatically by ConfigNormalizer and used only during serialization */
-    const RENAMED_FIELDS = '_renamed_fields';
+    /** exclude only fields are marked as excluded */
+    public const EXCLUSION_POLICY_NONE = 'none';
+
+    /** a flag indicates whether using of Doctrine partial object is disabled */
+    public const DISABLE_PARTIAL_LOAD = 'disable_partial_load';
+
+    /** a list Doctrine query hints */
+    public const HINTS = 'hints';
+
+    /** the ordering of the result */
+    public const ORDER_BY = 'order_by';
+
+    /** the maximum number of items in the result */
+    public const MAX_RESULTS = 'max_results';
+
+    /**
+     * a flag indicates whether an additional element with
+     * key "_" {@see ConfigUtil::INFO_RECORD_KEY} and value ['has_more' => true]
+     * should be added to a collection if it has more records than it was requested.
+     */
+    public const HAS_MORE = 'has_more';
+
+    /** a handler that can be used to modify serialized data for a single item */
+    public const POST_SERIALIZE = 'post_serialize';
+
+    /** a handler that can be used to modify serialized data for a list of items */
+    public const POST_SERIALIZE_COLLECTION = 'post_serialize_collection';
+
+    /** a flag indicates whether the field should be excluded */
+    public const EXCLUDE = 'exclude';
+
+    /** the path of the field value */
+    public const PROPERTY_PATH = 'property_path';
+
+    /**
+     * a flag indicates whether the target entity should be collapsed;
+     * it means that target entity should be returned as a value, instead of an array with values of entity fields;
+     * usually it is used to get identifier of the related entity
+     */
+    public const COLLAPSE = 'collapse';
+
+    /** the data transformer to be applies to the field value */
+    public const DATA_TRANSFORMER = 'data_transformer';
+
+    /** a symbol that is used to delimit element in a path */
+    public const PATH_DELIMITER = '.';
+
+    /** @internal filled automatically by ConfigConverter and used only during serialization */
+    public const COLLAPSE_FIELD = '_collapse_field';
+
+    /** @internal filled automatically by ConfigConverter and used only during serialization */
+    public const EXCLUDED_FIELDS = '_excluded_fields';
+
+    /** @internal filled automatically by ConfigConverter and used only during serialization */
+    public const RENAMED_FIELDS = '_renamed_fields';
 
     /**
      * @param array  $config A config
@@ -68,19 +117,17 @@ class ConfigUtil
         }
 
         $value = $config[$key];
-        if (is_string($value)) {
+        if (\is_string($value)) {
             return [$value => null];
         }
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return $value;
         }
 
-        throw new \UnexpectedValueException(
-            sprintf(
-                'Expected value of type "array, string or nothing", "%s" given.',
-                is_object($value) ? get_class($value) : gettype($value)
-            )
-        );
+        throw new \UnexpectedValueException(\sprintf(
+            'Expected value of type "array, string or nothing", "%s" given.',
+            \is_object($value) ? \get_class($value) : \gettype($value)
+        ));
     }
 
     /**
@@ -90,9 +137,7 @@ class ConfigUtil
      */
     public static function getExclusionPolicy(array $config)
     {
-        return isset($config[self::EXCLUSION_POLICY])
-            ? $config[self::EXCLUSION_POLICY]
-            : self::EXCLUSION_POLICY_NONE;
+        return $config[self::EXCLUSION_POLICY] ?? self::EXCLUSION_POLICY_NONE;
     }
 
     /**
@@ -155,7 +200,7 @@ class ConfigUtil
     {
         return
             !empty($config[self::FIELDS])
-            && array_key_exists($field, $config[self::FIELDS]);
+            && \array_key_exists($field, $config[self::FIELDS]);
     }
 
     /**
@@ -168,23 +213,7 @@ class ConfigUtil
      */
     public static function getFieldConfig($config, $field)
     {
-        return isset($config[self::FIELDS][$field])
-            ? $config[self::FIELDS][$field]
-            : [];
-    }
-
-    /**
-     * Checks whether a property path represents some metadata property like '__class__' or '__discriminator__'
-     *
-     * @param string $propertyPath
-     *
-     * @return bool
-     *
-     * @deprecated since 2.0. Use Oro\Component\EntitySerializer\FieldAccessor::isMetadataProperty instead
-     */
-    public static function isMetadataProperty($propertyPath)
-    {
-        return strpos($propertyPath, '__') === 0;
+        return $config[self::FIELDS][$field] ?? [];
     }
 
     /**
@@ -196,7 +225,7 @@ class ConfigUtil
      */
     public static function explodePropertyPath($propertyPath)
     {
-        return explode(self::PATH_DELIMITER, $propertyPath);
+        return \explode(self::PATH_DELIMITER, $propertyPath);
     }
 
     /**
@@ -227,7 +256,7 @@ class ConfigUtil
     {
         $result = [];
         foreach ($items as $key => $val) {
-            if (is_object($val)) {
+            if (\is_object($val)) {
                 $val = clone $val;
             }
             $result[$key] = $val;

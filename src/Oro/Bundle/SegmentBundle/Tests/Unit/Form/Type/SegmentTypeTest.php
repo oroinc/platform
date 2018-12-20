@@ -7,8 +7,11 @@ use Oro\Bundle\SegmentBundle\Form\Type\SegmentEntityChoiceType;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class SegmentTypeTest extends \PHPUnit_Framework_TestCase
+class SegmentTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var SegmentType
@@ -30,7 +33,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'name',
-                'text',
+                TextType::class,
                 ['required' => true]
             )
             ->will($this->returnSelf());
@@ -63,7 +66,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'recordsLimit',
-                'integer',
+                IntegerType::class,
                 ['required' => false]
             )
             ->will($this->returnSelf());
@@ -72,7 +75,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'description',
-                'textarea',
+                TextareaType::class,
                 ['required' => false]
             )
             ->will($this->returnSelf());
@@ -97,9 +100,9 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 [
                     'column_column_field_choice_options' => [
-                        'exclude_fields' => ['relation_type'],
+                        'exclude_fields' => ['relationType'],
                     ],
-                    'column_column_choice_type'   => 'hidden',
+                    'column_column_choice_type'   => HiddenType::class,
                     'filter_column_choice_type'   => EntityFieldSelectType::class,
                     'data_class'                  => 'Oro\Bundle\SegmentBundle\Entity\Segment',
                     'csrf_token_id'               => 'segment',
@@ -108,10 +111,5 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->type->configureOptions($resolver);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_segment', $this->type->getName());
     }
 }

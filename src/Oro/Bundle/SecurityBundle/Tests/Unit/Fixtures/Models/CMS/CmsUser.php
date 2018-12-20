@@ -3,47 +3,48 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @Entity
- * @Table(name="cms_users")
+ * @ORM\Entity()
+ * @ORM\Table(name="cms_users")
  */
 class CmsUser
 {
     /**
-     * @Id @Column(type="integer")
-     * @GeneratedValue
+     * @ORM\Id @ORM\Column(type="integer")
+     * @ORM\GeneratedValue
      */
     public $id;
 
     /**
-     * @Column(type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     public $status;
 
     /**
-     * @Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", length=255, unique=true)
      */
     public $username;
 
     /**
-     * @Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255)
      */
     public $name;
 
     /**
-     * @OneToMany(targetEntity="CmsArticle", mappedBy="user", cascade={"detach"})
+     * @ORM\OneToMany(targetEntity="CmsArticle", mappedBy="user", cascade={"detach"})
      */
     public $articles;
 
     /**
-     * @OneToOne(targetEntity="CmsAddress", mappedBy="user", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToOne(targetEntity="CmsAddress", mappedBy="user", cascade={"persist"}, orphanRemoval=true)
      */
     public $address;
 
     /**
-     * @OneToOne(targetEntity="CmsOrganization", inversedBy="address")
-     * @JoinColumn(name="organization", referencedColumnName="id")
+     * @ORM\OneToOne(targetEntity="CmsOrganization", inversedBy="address")
+     * @ORM\JoinColumn(name="organization", referencedColumnName="id")
      */
     public $organization;
 

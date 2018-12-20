@@ -13,15 +13,15 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationT
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
-class RecordOwnerDataListenerTest extends \PHPUnit_Framework_TestCase
+class RecordOwnerDataListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**  @var RecordOwnerDataListener */
     protected $listener;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configProvider;
 
     protected function setUp()

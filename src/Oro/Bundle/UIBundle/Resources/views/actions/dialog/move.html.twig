@@ -23,8 +23,8 @@
                     {% set formErrors = form_errors(form) %}
 
                     {% if formErrors %}
-                        <div class="alert alert-error">
-                            <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap">×</button>
+                        <div class="alert alert-error alert-dismissible" role="alert">
+                            <button class="close" type="button" data-dismiss="alert" aria-label="{{ 'Close'|trans }}"><span aria-hidden="true">&times;</span></button>
                             {{ formErrors|raw }}
                         </div>
                     {% endif %}

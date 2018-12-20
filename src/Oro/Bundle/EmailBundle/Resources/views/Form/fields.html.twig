@@ -14,7 +14,7 @@
     }) %}
     {{ form_widget(form) }}
     {% if is_granted('oro_config_system') %}
-        <span class="help-block">
+        <span class="form-text">
             <button class="btn btn-primary check-connection-messages"
                data-role="check-smtp-connection"
                data-page-component-module="{{ 'oroemail/js/app/components/check-smtp-connection-component' }}"
@@ -28,8 +28,8 @@
 {% block _email_configuration_oro_email___attachment_sync_max_size_value_widget %}
     {{ form_widget(form) }}
     {% if is_granted('oro_config_system') %}
-    <span class="help-block">
-        <a class="btn btn-danger"
+    <span class="form-text">
+        <a class="btn btn-block btn-danger"
            href="{{ path('oro_email_purge_emails_attachments') }}"
            data-page-component-module="{{ 'oroui/js/app/components/hidden-redirect-component' }}"
            data-page-component-options="{{ {showLoading: true}|json_encode }}"
@@ -125,7 +125,8 @@
     }) %}
 
     <div data-page-component-module="oroemail/js/app/components/email-attachment-component"
-         data-page-component-options="{{ options|json_encode }}">
+         data-page-component-options="{{ options|json_encode }}"
+         class="attachment-container">
         {{ form_row(form) }}
     </div>
 {% endblock %}
@@ -135,35 +136,47 @@
     <div class="emailtemplate-translatation oro-tabs tabbable" {{ UI.renderPageComponentAttributes({
         view: 'oroemail/js/app/views/email-translation-view'
     }) }}>
-        <ul class="nav nav-tabs">
-            {% spaceless %}
-                {% if simple_way %}
-                    {% for translationsField in form %}
-                        {{ _self.renderTabNavItem(translationsField, labels) }}
-                    {% endfor %}
-                {% else %}
-                    {% for translationsLocales in form %}
-                        {% for translationsField in translationsLocales %}
-                            {{ _self.renderTabNavItem(translationsField, labels, ('defaultLocale' == translationsLocales.vars.name)) }}
+        {% set tabId = 'email-translation-'|uniqid %}
+        {% set tabContentId = tabId %}
+        <div class="oro-tabs__head">
+            <ul class="nav nav-tabs" role="tablist">
+                {% spaceless %}
+                    {% if simple_way %}
+                        {% for translationsField in form %}
+                            {% set tabId = tabId ~ '-' ~ loop.index %}
+                            {{ _self.renderTabNavItem(translationsField, labels, null, tabId) }}
                         {% endfor %}
-                    {% endfor %}
-                {% endif %}
-            {% endspaceless %}
-        </ul>
-        <div class="tab-content">
-            {% spaceless %}
-                {% if simple_way %}
-                    {% for translationsField in form %}
-                        {{ _self.renderTab(translationsField) }}
-                    {% endfor %}
-                {% else %}
-                    {% for translationsLocales in form %}
-                        {% for translationsField in translationsLocales %}
-                            {{ _self.renderTab(translationsField) }}
+                    {% else %}
+                        {% for translationsLocales in form %}
+                            {% set tabId = tabId ~ '-' ~ loop.index %}
+                            {% for translationsField in translationsLocales %}
+                                {% set tabId = tabId ~ '-' ~ loop.index %}
+                                {{ _self.renderTabNavItem(translationsField, labels, ('defaultLocale' == translationsLocales.vars.name), tabId) }}
+                            {% endfor %}
                         {% endfor %}
-                    {% endfor %}
-                {% endif %}
-            {% endspaceless %}
+                    {% endif %}
+                {% endspaceless %}
+            </ul>
+        </div>
+        <div class="oro-tabs__content">
+            <div class="tab-content">
+                {% spaceless %}
+                    {% if simple_way %}
+                        {% for translationsField in form %}
+                            {% set tabContentId = tabContentId ~ '-' ~ loop.index %}
+                            {{ _self.renderTab(translationsField, tabContentId) }}
+                        {% endfor %}
+                    {% else %}
+                        {% for translationsLocales in form %}
+                            {% set tabContentId = tabContentId ~ '-' ~ loop.index %}
+                            {% for translationsField in translationsLocales %}
+                                {% set tabContentId = tabContentId ~ '-' ~ loop.index %}
+                                {{ _self.renderTab(translationsField, tabContentId) }}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endif %}
+                {% endspaceless %}
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -208,7 +221,7 @@
         'parameters': app.request.attributes.get('_route_params'),
     } %}
     {% if is_granted('oro_organization_update') %}
-        <div class="row" style="margin-top: -42px;">
+        <div class="row">
             <div class="pull-right">
                 <div class="btn-group">
                     {{ UI.addButton({
@@ -296,12 +309,26 @@
         form         - instance of FormView, it's a view for localized field
         localeLabels - array with user friendly labels for locale codes
         isDefault    - is current locale's tab label should be marked as default
+        uniqid       - is unique identifier
 #}
-{% macro renderTabNavItem(form, localeLabels, isDefault = false) %}
+{% macro renderTabNavItem(form, localeLabels, isDefault = false, uniqid = null) %}
     {% set locale = form.vars.name %}
+    {% set selected = (app.request.locale == locale) ? 'true' : 'false' %}
 
-    <li {% if (app.request.locale == locale) %}class="active"{% endif %}>
-        <a href="javascript:void(0);" data-role="change-language" data-target=".emailtemplate-translatation-fields-{{ locale }}" data-toggle="tab" data-related="{{ locale }}">
+    <li class="nav-item">
+        <a href="javascript:void(0);"
+           class="nav-link {% if (app.request.locale == locale) %}active{% endif %}"
+           data-role="change-language"
+           data-target=".emailtemplate-translatation-fields-{{ locale }}"
+           data-toggle="tab"
+           data-related="{{ locale }}"
+           role="tab"
+           aria-selected="{{ selected }}"
+       {% if uniqid %}
+           id="{{ uniqid ~ '-tab'}}"
+           aria-controls="{{ uniqid }}"
+       {% endif %}
+        >
             {{- localeLabels[locale]|default('N/A')|trans -}}{% if isDefault %} {% trans %}[Default]{% endtrans %}{% endif -%}
         </a>
     </li>
@@ -310,12 +337,19 @@
 {#
     Renders content of bootstrap tab panel
     paramters:
-        form - instance of FormView, it's a view for localized field
+        form   - instance of FormView, it's a view for localized field
+        uniqid - is unique identifier
 #}
-{% macro renderTab(form) %}
+{% macro renderTab(form, uniqid = null) %}
     {% set locale = form.vars.name %}
 
-    <div class="emailtemplate-translatation-fields-{{ locale }} tab-pane{% if (app.request.locale == locale) %} active{% endif %}">
+    <div class="emailtemplate-translatation-fields-{{ locale }} tab-pane{% if (app.request.locale == locale) %} active{% endif %}"
+         role="tabpanel"
+        {% if uniqid %}
+            id="{{ uniqid }}"
+            aria-labelledby="{{ uniqid ~ '-tab' }}"
+        {% endif %}
+    >
         {{ form_widget(form) }}
     </div>
 {% endmacro %}

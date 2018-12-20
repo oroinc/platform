@@ -9,14 +9,14 @@ use Oro\Bundle\SegmentBundle\Form\Type\SegmentChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SegmentChoiceTypeTest extends \PHPUnit_Framework_TestCase
+class SegmentChoiceTypeTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CLASS = 'TestEntityClass';
 
     /** @var SegmentChoiceType */
     protected $formType;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
     protected function setUp()
@@ -31,8 +31,7 @@ class SegmentChoiceTypeTest extends \PHPUnit_Framework_TestCase
         $expectedOptions = [
             'placeholder' => 'oro.segment.form.segment_choice.placeholder',
             'entityClass' => 'TestEntityClass',
-            'choices' => [1 => 'First Segment', 5 => 'Second Segment'],
-            'choices_as_values' => true
+            'choices' => ['First Segment' => 1, 'Second Segment' => 5],
         ];
 
         $repo = $this->getMockBuilder(ObjectRepository::class)
@@ -41,7 +40,7 @@ class SegmentChoiceTypeTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $repo->expects($this->once())
             ->method('findByEntity')
-            ->willReturn([1 => 'First Segment', 5 => 'Second Segment']);
+            ->willReturn(['First Segment' => 1, 'Second Segment' => 5]);
         $manager = $this->createMock(ObjectManager::class);
         $manager->expects($this->once())
             ->method('getRepository')

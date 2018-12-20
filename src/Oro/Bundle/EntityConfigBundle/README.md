@@ -17,7 +17,7 @@ entity_config:
 This configuration adds 'demo_attr' attribute with 'Demo' value to all configurable entities. The configurable entity is an entity marked with `@Config` annotation. Also this code automatically adds a service named **oro_entity_config.provider.acme** into DI container. You can use this service to get a value of 'demo_attr' attribute for particular entity.
 To apply this changes execute **oro:entity-config:update** command:
 ```bash
-php app/console oro:entity-config:update
+php bin/console oro:entity-config:update
 ```
 An example how to get a value of a configuration attribute:
 ``` php
@@ -86,7 +86,7 @@ entity_config:
                         type:          text         # sets the attribute type
                         options:
                             block:     entity       # specifies in which block on the form this attribute should be displayed
-                            label:     'Demo Attr'  # sets the the label name
+                            label:     'Demo Attr'  # sets the label name
 ```
 Now you may go to System > Entities. The 'Demo Attr' column should be displayed in the grid. Click Edit on any entity to go to edit entity form. 'Demo Attr' field should be displayed there.
 
@@ -139,7 +139,6 @@ This class is the central access point to entity configuration functionality. It
  - Events::CREATE_FIELD        - This event occurs when a new configurable field is found and its configuration attributes are loaded, but before they are stored in a database.
  - Events::UPDATE_FIELD        - This event occurs when default values of configuration attributes of existing field are merged with existing configuration data, but before they are stored in a database.
  - Events::RENAME_FIELD        - This event occurs when the name of existing field is being changed.
- - Events::AFTER_REMOVE_FIELD  - This event occurs after the field is deleted.
  - Events::PRE_FLUSH           - This event occurs before changes of configuration data is flushed into a database.
  - Events::POST_FLUSH          - This event occurs after all changes of configuration data is flushed into a database.
 
@@ -147,7 +146,7 @@ This class is the central access point to entity configuration functionality. It
 
 The following command can be used to update configurable entities:
 ```bash
-php app/console oro:entity-config:update
+php bin/console oro:entity-config:update
 ```
 Usually you need to execute this command only in 'dev' mode when new new configuration attribute or whole configuration scope is added.
 
@@ -155,14 +154,14 @@ Usually you need to execute this command only in 'dev' mode when new new configu
 
 The following command removes all data related to configurable entities from the application cache:
 ```bash
-php app/console oro:entity-config:cache:clear --no-warmup
+php bin/console oro:entity-config:cache:clear --no-warmup
 ```
 
 ## Debugging configuration data
 
 You can use `oro:entity-config:debug` command to get a different kind of configuration data as well as add/remove/update configuration of entities. To see all available options run this command with `--help` option. As an example the following command shows all configuration data for User entity:
 ```bash
-php app/console oro:entity-config:debug "Oro\Bundle\UserBundle\Entity\User"
+php bin/console oro:entity-config:debug "Oro\Bundle\UserBundle\Entity\User"
 ```
 
 ## Special case

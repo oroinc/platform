@@ -7,7 +7,7 @@ use Oro\Bundle\QueryDesignerBundle\Validator\NotBlankFilters;
 use Oro\Bundle\QueryDesignerBundle\Validator\NotBlankFiltersValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class NotBlankFiltersValidatorTest extends \PHPUnit_Framework_TestCase
+class NotBlankFiltersValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var NotBlankFiltersValidator
@@ -15,7 +15,7 @@ class NotBlankFiltersValidatorTest extends \PHPUnit_Framework_TestCase
     protected $validator;
 
     /**
-     * @var ExecutionContextInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $context;
 
@@ -40,7 +40,7 @@ class NotBlankFiltersValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateInvalid(array $definition)
     {
-        /** @var AbstractQueryDesigner|\PHPUnit_Framework_MockObject_MockObject $value */
+        /** @var AbstractQueryDesigner|\PHPUnit\Framework\MockObject\MockObject $value */
         $value = $this->getMockForAbstractClass(AbstractQueryDesigner::class);
 
         $value->expects($this->any())
@@ -113,7 +113,7 @@ class NotBlankFiltersValidatorTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        /** @var AbstractQueryDesigner|\PHPUnit_Framework_MockObject_MockObject $value */
+        /** @var AbstractQueryDesigner|\PHPUnit\Framework\MockObject\MockObject $value */
         $value = $this->getMockForAbstractClass(AbstractQueryDesigner::class);
 
         $value->expects($this->any())

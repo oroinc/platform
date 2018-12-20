@@ -60,6 +60,7 @@ oro:
             user_groupes.description: List of system groups
             users_management.label: User Management
             user_create.label: Create User
+            user_menu.label: User menu
             shortcut_new_user.label: Create new User
             shortcut_new_user.description: Create new user instance
             shortcut_list_users.label: Show Users list
@@ -200,6 +201,17 @@ oro:
             label:                   Roles
             description:             The roles assigned to the user.
         datagrid:
+            user:
+                columns:
+                    enabled: Enabled
+                    disabled: Disabled
+                filters:
+                    enabled: Enabled
+                    disabled: Disabled
+            role_permission:
+                columns:
+                    label: 'Entity'
+                    permissions.label: 'Permissions'
             views:
                 active: Active Users
                 cannot_login: Cannot login
@@ -379,6 +391,7 @@ oro:
             groups:
                 user_settings.title: User Settings
                 password_complexity_rules.title: Password restrictions
+                email_settings.title: Email Settings
             fields:
                 password_min_length.label: Minimal password length
                 password_numbers.label: Require a number
@@ -389,6 +402,9 @@ oro:
                     tooltip: >
                         Special chars: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space
                 send_password_in_invitation_email.label: 'Send plain text password in invitation emails'
+                case_insensitive_email_addresses_enabled:
+                    label: 'Case-Insensitive Email Addresses'
+                    tooltip: 'If this option is enabled, the letter case will be ignored when comparing email addresses. For example, john.doe@example.com and John.Doe@example.com will be considered equal.'
         mass_actions:
             enable_users:
                 success_message: '%count% user(s) were enabled'

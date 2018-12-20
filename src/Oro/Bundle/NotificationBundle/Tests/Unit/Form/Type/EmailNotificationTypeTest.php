@@ -44,10 +44,10 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $configProvider;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $registry */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry */
     protected $registry;
 
     /** @var EmailNotificationType */
@@ -55,13 +55,13 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject $tokenStorage */
+        /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject $tokenStorage */
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->expects($this->any())->method('getToken')->willReturn($this->getToken());
 
         $this->configProvider = $this->createMock(ConfigProvider::class);
 
-        /** @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject $router */
+        /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject $router */
         $router = $this->createMock(RouterInterface::class);
         $router->expects($this->any())
             ->method('generate')
@@ -81,7 +81,7 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($entityManager);
-        /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
+        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
         $configManager = $this->createMock(ConfigManager::class);
 
         $contactInformationEmailsProvider = $this->createMock(ContactInformationEmailsProvider::class);
@@ -94,11 +94,6 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
         );
 
         parent::setUp();
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(EmailNotificationType::NAME, $this->formType->getName());
     }
 
     /**
@@ -230,7 +225,7 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    EmailNotificationType::class => $this->formType,
+                    $this->formType,
                     EmailNotificationEntityChoiceType::class => new EntityTypeStub(
                         ['user' => User::class, 'stdClass' => \stdClass::class],
                         EmailNotificationEntityChoiceType::NAME,

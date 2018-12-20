@@ -3,11 +3,11 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\LocaleBundle\Form\Type\LocaleType;
+use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType as BaseLocaleType;
-use Symfony\Component\Intl\Intl;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class LocaleTypeTest extends \PHPUnit_Framework_TestCase
+class LocaleTypeTest extends FormIntegrationTestCase
 {
     /**
      * @var LocaleType
@@ -19,20 +19,24 @@ class LocaleTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+        parent::setUp();
         $this->formType = new LocaleType();
     }
 
-    public function testConfigureOptions()
+    public function testChoices()
     {
-        /* @var $resolver OptionsResolver|\PHPUnit_Framework_MockObject_MockObject */
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
-        $resolver->expects($this->once())
-            ->method('setDefaults')
-            ->with([
-                'choices' => array_flip(Intl::getLocaleBundle()->getLocaleNames('en')),
-            ]);
+        $view = $this->factory->create(LocaleType::class)->createView();
+        $choices = $view->vars['choices'];
 
-        $this->formType->configureOptions($resolver);
+        $this->assertContains(new ChoiceView('en', 'en', 'English'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'English (United Kingdom)'), $choices, '', false, false);
+        $this->assertContains(
+            new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'Chinese (Traditional, Macau SAR China)'),
+            $choices,
+            '',
+            false,
+            false
+        );
     }
 
     public function testGetParent()

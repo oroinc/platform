@@ -1,0 +1,255 @@
+/* @theme: admin.oro; */
+@import "oroui/css/scss/mixins";
+
+.app-logo {
+    display: inline-block;
+    text-indent: -9999px;
+    background: $app-logo-background;
+    background-size: contain;
+}
+
+.app-header {
+    font-size: $app-header-font-size;
+    color: $app-header-text-color;
+    background-color: $app-header-bg-color;
+    position: relative;
+    z-index: $desktop-app-header-z-index;
+
+    &__inner {
+        padding: 0 $app-header-h-padding;
+    }
+
+    &__container {
+        display: flex;
+        position: relative;
+        line-height: $app-header-height;
+        height: $app-header-height;
+    }
+
+    &.thick .app-header__container {
+        line-height: $app-header-thick-height;
+        height: $app-header-thick-height;
+    }
+
+    &.thick {
+        .user-menu {
+            .avatar {
+                display: initial;
+                max-height: $app-header-avatar-size;
+                max-width: $app-header-avatar-size;
+                border-radius: $app-header-avatar-border-radius;
+                margin: $app-header-avatar-margin;
+            }
+        }
+
+        .app-logo {
+            display: none;
+        }
+    }
+
+    .organization-logo-wrapper {
+        overflow: hidden;
+    }
+
+    .app-logo {
+        width: $app-header-app-logo-width;
+        margin-#{$end}: $app-header-app-logo-margin-end;
+        flex-shrink: 0;
+    }
+
+    .logo-wrapper {
+        display: flex;
+        margin-#{$start}: 0;
+        margin-#{$end}: $app-header-logo-wrapper-margin-end;
+        flex-wrap: nowrap;
+        position: static;   //  necessary for showing menu outside of overflow hidden block
+        height: 100%;
+    }
+
+    .logo {
+        color: $app-header-logo-text-color;
+        font-weight: bold;
+        font-size: $app-header-logo-font-size;
+        line-height: inherit;
+        margin: 0;
+        display: inline-block;
+        @include text-line-truncate($app-header-max-width, true);
+
+        a {
+            color: inherit;
+            text-transform: uppercase;
+            display: inline-block;
+            max-width: $app-header-max-width;
+
+            [class^="fa-"] {
+                font-size: $app-header-logo-link-font-size;
+            }
+        }
+    }
+
+    &__search-and-shortcuts {
+        padding: $app-header-search-and-shortcuts-container-padding;
+        margin: 0;
+        flex-shrink: 0;
+        order: if-ltr(0, auto);
+
+        > .dropdown {
+            margin: $app-header-search-and-shortcuts-margin;
+        }
+
+        .header-dropdown-search .dropdown-menu {
+            padding: $desktop-app-header-search-dropdown-menu-padding;
+        }
+
+        .dropdown-toggle {
+            color: inherit;
+            text-align: center;
+            border: 0 none;
+            background-color: transparent;
+            padding: 0;
+
+            &:hover,
+            &:active {
+                color: $app-header-text-hover-color;
+            }
+
+            > [class^="fa-"] {
+                margin: 0;
+                width: $app-header-icon-font-width;
+                font-size: $app-header-icon-font-size;
+            }
+        }
+
+        .dropdown-menu {
+            padding: $desktop-app-header-dropdown-menu-padding;
+            #{$start}: $app-header-search-and-shortcuts-dropdown-start;
+
+            @include if-rtl() {
+                #{$end}: auto;
+            }
+
+            &:before {
+                #{$start}: $app-header-search-and-shortcuts-arrow-start;
+            }
+        }
+
+        .nav-header { /* Dropdown smaller section title */
+            font-size: $app-header-title-font-size;
+            line-height: $app-header-title-line-height;
+        }
+
+        .nav-header-title { /* Dropdown main title */
+            text-transform: $app-header-dropdown-title-text-transform;
+            display: block;
+        }
+
+        .select2-container {
+            width: auto;
+            max-width: $app-header-search-select-max-width;
+            height: $field-size;
+        }
+
+        .select2-container-active {
+            z-index: 1; // to show active border over near input
+        }
+
+        .search-field-container {
+            min-width: $app-header-search-input-min-width;
+            margin-#{$start}: -$input-border-width;
+        }
+
+        .search-suggestion-list {
+            top: $field-size - $input-border-width;
+
+            font-size: $app-header-search-suggestion-item-font-size;
+
+            .description {
+                font-size: $app-header-search-suggestion-item-description-font-size;
+            }
+        }
+
+        .no-data {
+            top: $field-size - $input-border-width;
+        }
+
+        .dropdown-item {
+            padding: $desktop-app-header-shortcut-dropdown-item-padding;
+        }
+    }
+
+    .user-menu {
+        display: flex;
+        order: 1;
+        flex-shrink: 0;
+        float: none;
+        background-color: inherit;
+        margin-#{$start}: $desktop-app-header-user-menu-margin-start;
+        height: 100%;
+
+        .avatar {
+            display: none;
+        }
+
+        > li {
+            line-height: inherit;
+            margin: $desktop-app-header-user-menu-item-margin;
+
+            &:last-of-type {
+                margin-#{$end}: $desktop-app-header-user-menu-last-item-margin-end;
+            }
+
+            > .dropdown-toggle,
+            > .help {
+                padding: 0;
+                color: inherit;
+                border: 0 none;
+                background-color: transparent;
+                text-shadow: none;
+                font-size: $app-header-font-size;
+
+                [class^="fa-"],
+                [class*=" fa-"] {
+                    font-size: $app-header-icon-font-size;
+                }
+
+                &:hover {
+                    color: $app-header-text-hover-color;
+                }
+            }
+        }
+
+        .dropdown {
+            > .dropdown-menu {
+                #{$end}: $desktop-app-header-user-menu-offset;
+                #{$start}: auto;
+                z-index: $zindex-dropdown;
+
+                &:before {
+                    #{$end}: -$desktop-app-header-user-menu-offset;
+                    #{$start}: auto;
+                }
+            }
+        }
+    }
+
+    .user-menu-dropdown {
+        &:before {
+            content: '';
+            display: inline-block;
+            border-#{$start}: $app-header-divider-width solid $app-header-divider-color;
+            height: $app-header-font-size;
+        }
+
+        > .dropdown-toggle {
+            display: inline-block;
+            margin-#{$start}: $desktop-app-header-user-menu-margin-start;
+        }
+
+        .dropdown-menu {
+            .divider {
+                border-bottom: $desktop-app-header-user-menu-divider-border-bottom;
+                margin: $desktop-app-header-user-menu-divider-margin;
+            }
+        }
+    }
+}

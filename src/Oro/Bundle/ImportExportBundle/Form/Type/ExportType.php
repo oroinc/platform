@@ -66,7 +66,7 @@ class ExportType extends AbstractType
 
         $result = [];
         foreach ($aliases as $alias) {
-            $result[$alias] = $this->generateProcessorLabel($alias);
+            $result[$this->generateProcessorLabel($alias)] = $alias;
         }
 
         return $result;

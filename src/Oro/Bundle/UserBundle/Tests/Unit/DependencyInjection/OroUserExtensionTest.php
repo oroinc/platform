@@ -56,7 +56,7 @@ class OroUserExtensionTest extends ExtensionTestCase
             ]
         ];
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ExtendedContainerBuilder $containerBuilder */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ExtendedContainerBuilder $containerBuilder */
         $containerBuilder = $this->getMockBuilder('Oro\Component\DependencyInjection\ExtendedContainerBuilder')
             ->disableOriginalConstructor()
             ->getMock();

@@ -13,24 +13,24 @@ use Oro\Bundle\NoteBundle\Tests\Unit\Stub\AttachmentProviderStub;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class NoteManagerTest extends \PHPUnit_Framework_TestCase
+class NoteManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $aclHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityNameResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $attachmentManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $attachmentAssociationHelper;
 
     /** @var NoteManager */
@@ -92,7 +92,7 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
         $this->aclHelper->expects($this->once())
             ->method('apply')
-            ->with($this->identicalTo($qb))
+            ->with($this->identicalTo($qb), 'VIEW', ['checkRelations' => false])
             ->will($this->returnValue($query));
         $query->expects($this->once())
             ->method('getResult')

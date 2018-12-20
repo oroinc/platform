@@ -108,7 +108,7 @@ class RouteChoiceType extends AbstractType
                     }
                 }
 
-                return $choices;
+                return array_flip($choices);
             }
         );
     }

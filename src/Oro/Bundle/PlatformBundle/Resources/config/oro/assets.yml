@@ -1,4 +1,4 @@
 assets:
     css:
-      'oroplatform':
-          - 'bundles/oroplatform/css/style.css'
+        inputs:
+          - 'bundles/oroplatform/css/scss/main.scss'

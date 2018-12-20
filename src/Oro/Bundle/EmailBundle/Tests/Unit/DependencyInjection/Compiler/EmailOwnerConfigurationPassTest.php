@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
 
-class EmailOwnerConfigurationPassTest extends \PHPUnit_Framework_TestCase
+class EmailOwnerConfigurationPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessNoServices()
     {

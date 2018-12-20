@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Makes sure that the valid result was added to the Context.
+ * Makes sure that the valid result was added to the context.
  */
 class AssertHasResult implements ProcessorInterface
 {

@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 class Configuration implements ConfigurationInterface
 {
@@ -17,16 +19,18 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('oro_api');
 
         $node = $rootNode->children();
-        $this->appendConfigOptions($node);
+        $this->appendOptions($node);
         $this->appendConfigFilesNode($node);
         $this->appendApiDocViewsNode($node);
         $this->appendConfigExtensionsNode($node);
         $this->appendActionsNode($node);
+        $this->appendFilterOperatorsNode($node);
         $this->appendFiltersNode($node);
         $this->appendFormTypesNode($node);
         $this->appendFormTypeExtensionsNode($node);
         $this->appendFormTypeGuessersNode($node);
         $this->appendFormTypeGuessesNode($node);
+        $this->appendCorsNode($node);
 
         return $treeBuilder;
     }
@@ -34,9 +38,19 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
-    private function appendConfigOptions(NodeBuilder $node)
+    private function appendOptions(NodeBuilder $node)
     {
         $node
+            ->scalarNode('rest_api_prefix')
+                ->info('The prefix of REST API URLs.')
+                ->cannotBeEmpty()
+                ->defaultValue('/api/')
+            ->end()
+            ->scalarNode('rest_api_pattern')
+                ->info('The regular expression pattern to which REST API URLs are matched.')
+                ->cannotBeEmpty()
+                ->defaultValue('^/api/(?!(rest|doc)($|/.*))')
+            ->end()
             ->integerNode('config_max_nesting_level')
                 ->info(
                     'The maximum number of nesting target entities'
@@ -124,7 +138,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('api_doc_views')
-                ->info('All supported API views')
+                ->info('All supported API views.')
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                     ->children()
@@ -132,7 +146,7 @@ class Configuration implements ConfigurationInterface
                             ->info('The view label.')
                         ->end()
                         ->booleanNode('default')
-                            ->info('Is the given view is default.')
+                            ->info('Whether this view is default one.')
                             ->defaultFalse()
                         ->end()
                         ->arrayNode('request_type')
@@ -147,14 +161,44 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue('oro_api.api_doc.formatter.html_formatter')
                         ->end()
                         ->booleanNode('sandbox')
-                            ->info('Should the sandbox have a link to this view.')
+                            ->info('Whether the sandbox should have a link to this view.')
                             ->defaultTrue()
                         ->end()
                         ->arrayNode('headers')
-                            ->info('Headers should be sent with request in Sandbox.')
+                            ->info('Headers that should be sent with requests from the sandbox.')
+                            ->example([
+                                'Content-Type' => 'application/vnd.api+json',
+                                'X-Include'    => [
+                                    ['value' => 'totalCount', 'actions' => ['get_list', 'delete_list']],
+                                    ['value' => 'deletedCount', 'actions' => ['delete_list']]
+                                ]
+                            ])
                             ->useAttributeAsKey('name')
                             ->normalizeKeys(false)
-                            ->prototype('variable')->end()
+                            ->prototype('array')
+                                ->beforeNormalization()
+                                    ->always(function ($value) {
+                                        if (is_string($value)) {
+                                            $value = [['value' => $value, 'actions' => []]];
+                                        }
+
+                                        return $value;
+                                    })
+                                ->end()
+                                ->prototype('array')
+                                    ->children()
+                                        ->scalarNode('value')
+                                            ->info('The header value.')
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        ->arrayNode('actions')
+                                            ->info('API actions for which this value should be used.')
+                                            ->prototype('scalar')->end()
+                                            ->defaultValue([])
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
@@ -261,6 +305,28 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
+    private function appendFilterOperatorsNode(NodeBuilder $node)
+    {
+        $node
+            ->arrayNode('filter_operators')
+                ->info(
+                    'A definition of operators for filters.'
+                    . ' The key is the name of an operator.'
+                    . ' The value is optional and it is a short name of an operator.'
+                )
+                ->example([
+                    'eq'     => '=',
+                    'regexp' => null
+                ])
+                ->useAttributeAsKey('name')
+                ->prototype('scalar')
+                ->end()
+            ->end();
+    }
+
+    /**
+     * @param NodeBuilder $node
+     */
     private function appendFiltersNode(NodeBuilder $node)
     {
         $node
@@ -269,7 +335,7 @@ class Configuration implements ConfigurationInterface
                 ->example(
                     [
                         'integer' => [
-                            'supported_operators' => ['=', '!=', '<', '<=', '>', '>=']
+                            'supported_operators' => ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
                         ],
                         'primaryField' => [
                             'class' => 'Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter'
@@ -315,7 +381,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('supported_operators')
                             ->prototype('scalar')->end()
                             ->cannotBeEmpty()
-                            ->defaultValue(['=', '!='])
+                            ->defaultValue(['=', '!=', '*', '!*'])
                         ->end()
                     ->end()
                 ->end()
@@ -330,7 +396,10 @@ class Configuration implements ConfigurationInterface
         $node
             ->arrayNode('form_types')
                 ->info('The form types that can be reused in Data API')
-                ->example(['form.type.form', 'form.type.integer', 'form.type.text'])
+                ->example([
+                    'Symfony\Component\Form\Extension\Core\Type\FormType',
+                    'oro_api.form.type.entity'
+                ])
                 ->prototype('scalar')
                 ->end()
             ->end();
@@ -344,7 +413,7 @@ class Configuration implements ConfigurationInterface
         $node
             ->arrayNode('form_type_extensions')
                 ->info('The form type extensions that can be reused in Data API')
-                ->example(['form.type_extension.form.http_foundation', 'form.type_extension.form.validator'])
+                ->example(['form.type_extension.form.http_foundation'])
                 ->prototype('scalar')
                 ->end()
             ->end();
@@ -375,10 +444,10 @@ class Configuration implements ConfigurationInterface
                 ->example(
                     [
                         'integer' => [
-                            'form_type' => 'integer'
+                            'form_type' => IntegerType::class,
                         ],
                         'datetime' => [
-                            'form_type' => 'datetime',
+                            'form_type' => DateTimeType::class,
                             'options'   => ['model_timezone' => 'UTC', 'view_timezone' => 'UTC']
                         ],
                     ]
@@ -394,6 +463,44 @@ class Configuration implements ConfigurationInterface
                             ->useAttributeAsKey('name')
                             ->prototype('variable')->end()
                         ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    /**
+     * @param NodeBuilder $node
+     */
+    private function appendCorsNode(NodeBuilder $node)
+    {
+        $node
+            ->arrayNode('cors')
+                ->info('The configuration of CORS requests')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->integerNode('preflight_max_age')
+                        ->info('The amount of seconds the user agent is allowed to cache CORS preflight requests')
+                        ->defaultValue(600)
+                        ->min(0)
+                    ->end()
+                    ->arrayNode('allow_origins')
+                        ->info('The list of origins that are allowed to send CORS requests')
+                        ->example(['https://foo.com', 'https://bar.com'])
+                        ->prototype('scalar')->cannotBeEmpty()->end()
+                    ->end()
+                    ->booleanNode('allow_credentials')
+                        ->info('Indicates whether CORS request can include user credentials')
+                        ->defaultValue(false)
+                    ->end()
+                    ->arrayNode('allow_headers')
+                        ->info('The list of headers that are allowed to send by CORS requests')
+                        ->example(['X-Foo', 'X-Bar'])
+                        ->prototype('scalar')->cannotBeEmpty()->end()
+                    ->end()
+                    ->arrayNode('expose_headers')
+                        ->info('The list of headers that can be exposed by CORS responses')
+                        ->example(['X-Foo', 'X-Bar'])
+                        ->prototype('scalar')->cannotBeEmpty()->end()
                     ->end()
                 ->end()
             ->end();

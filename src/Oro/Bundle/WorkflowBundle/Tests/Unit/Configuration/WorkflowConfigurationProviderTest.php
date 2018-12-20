@@ -21,7 +21,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
+class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var WorkflowListConfiguration

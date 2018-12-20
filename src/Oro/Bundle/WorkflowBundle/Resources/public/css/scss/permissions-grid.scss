@@ -1,0 +1,128 @@
+/* @theme: admin.oro; */
+
+.workflow-permission-grid {
+    .grid-header-cell:first-child {
+        width: $workflow-permission-grid-header-cell-width;
+    }
+
+    .collapse-expand-action-container,
+    .entity-name {
+        width: $workflow-permission-grid-entity-name-width;
+    }
+
+    .field-permission-container {
+        margin-#{$start}: $workflow-permission-grid-permission-offset;
+        padding: $workflow-permission-grid-permission-inner-offset;
+
+        border-top: $workflow-permission-grid-permission-border;
+
+        @include clearfix();
+
+        &:first-child {
+            border-top: 0 none;
+        }
+    }
+
+    .field-name {
+        width: $workflow-permission-grid-entity-name-width - $workflow-permission-grid-permission-offset;
+        float: #{$start};
+    }
+
+    .entity-name,
+    .field-name {
+        padding-#{$end}: $workflow-permission-grid-field-name-offset;
+    }
+
+    .action-permissions__item {
+        width: $workflow-permission-grid-item-width;
+        margin-#{$end}: 0;
+        padding-#{$end}: $workflow-permission-grid-field-name-offset;
+    }
+
+    .action-permissions__label {
+        max-width: $workflow-permission-grid-label-width;
+    }
+
+    .action-permissions__dropdown-toggle {
+        max-width: $workflow-permission-grid-toggle-width;
+    }
+}
+
+@include media-breakpoint-down(lg) {
+    .workflow-permission-grid {
+        .grid-header-cell:first-child {
+            width: $workflow-permission-grid-header-cell-width-lg;
+        }
+
+        .collapse-expand-action-container,
+        .entity-name {
+            width: $workflow-permission-grid-entity-name-width-lg;
+        }
+
+        .field-name {
+            width: $workflow-permission-grid-entity-name-width-lg - $workflow-permission-grid-permission-offset;
+        }
+
+        .action-permissions__item {
+            width: $workflow-permission-grid-item-width-lg;
+        }
+
+        .action-permissions__label {
+            max-width: $workflow-permission-grid-label-width-lg;
+        }
+
+        .action-permissions__dropdown-toggle {
+            max-width: $workflow-permission-grid-toggle-width-lg;
+        }
+    }
+}
+
+@include media-breakpoint-down(md) {
+    .workflow-permission-grid {
+        .grid-header-cell:first-child {
+            width: $workflow-permission-grid-header-cell-width-md;
+        }
+
+        .collapse-expand-action-container,
+        .entity-name {
+            width: $workflow-permission-grid-entity-name-width-md;
+        }
+
+        .field-name {
+            width: $workflow-permission-grid-entity-name-width-md - $workflow-permission-grid-permission-offset;
+        }
+
+        .action-permissions__label {
+            max-width: $workflow-permission-grid-label-width-md;
+        }
+
+        .action-permissions__dropdown-toggle {
+            max-width: $workflow-permission-grid-toggle-width-md;
+        }
+    }
+}
+
+@include media-breakpoint-down(sm) {
+    .workflow-permission-grid {
+        .action-permissions__item {
+            width: $workflow-permission-grid-item-width-sm;
+        }
+    }
+}
+
+@include media-breakpoint-down(xs) {
+    .workflow-permission-grid {
+        .grid-header-cell:first-child {
+            width: $workflow-permission-grid-header-cell-width-xs;
+        }
+
+        .collapse-expand-action-container,
+        .entity-name {
+            width: $workflow-permission-grid-entity-name-width-xs;
+        }
+
+        .field-name {
+            width: $workflow-permission-grid-entity-name-width-xs - $workflow-permission-grid-permission-offset;
+        }
+    }
+}

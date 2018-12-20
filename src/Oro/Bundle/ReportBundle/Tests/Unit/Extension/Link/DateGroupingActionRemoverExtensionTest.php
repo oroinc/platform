@@ -7,10 +7,10 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\ReportBundle\Extension\Link\DateGroupingActionRemoverExtension;
 
-class DateGroupingActionRemoverExtensionTest extends \PHPUnit_Framework_TestCase
+class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var DatagridConfiguration|\PHPUnit_Framework_MockObject_MockObject
+     * @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $config;
 
@@ -76,7 +76,7 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testVisitResult($inputRows, $expectedRows)
     {
-        /** @var ResultsObject|\PHPUnit_Framework_MockObject_MockObject $result * */
+        /** @var ResultsObject|\PHPUnit\Framework\MockObject\MockObject $result * */
         $result = $this->getMockBuilder(ResultsObject::class)
             ->disableOriginalConstructor()
             ->getMock();

@@ -56,9 +56,9 @@ services:
         arguments:
             - "@oro_config.user"
             - "@oro_activity_list.provider.chain"
-            - "@oro_activity_list.helper.acl_criteria"
             - "@oro_activity_list.filter.helper"
             - "@oro_activity_list.helper.activity_inheritance_targets"
+            - "@oro_security.acl_helper"
 
     oro_activity_list.collect_manager:
         class: '%oro_activity_list.collect_manager.class%'
@@ -106,8 +106,7 @@ services:
             - "@doctrine"
             - "@oro_activity.manager"
             - "@oro_email.related_emails.provider"
-            - "@oro_activity_list.helper.acl_criteria"
-            - "@oro_activity_list.provider.chain"
+            - "@oro_security.acl_helper"
         tags:
             - { name: oro_email.recipients_provider, priority: 10 }
 
@@ -185,12 +184,6 @@ services:
             - "@oro_activity_list.datagrid.builder.link"
             - "@event_dispatcher"
 
-    oro_activity_list.helper.acl_criteria:
-        class: '%oro_activity_list.helper.acl_criteria.class%'
-        arguments:
-            - "@oro_security.acl_helper"
-            - "@security.authorization_checker"
-
     oro_activity_list.helper.activity_inheritance_targets:
         class: '%oro_activity_list.helper.activity_inheritance_targets.class%'
         arguments:
@@ -232,3 +225,11 @@ services:
           - "@oro_activity.manager"
         tags:
           - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata, priority: -10 }
+
+    oro_activity_list.access_rule.activity_list:
+        class: Oro\Bundle\ActivityListBundle\AccessRule\ActivityListAccessRule
+        arguments:
+            - "@oro_security.orm.ownership_sql_walker_builder"
+            - "@oro_activity_list.provider.chain"
+        tags:
+            - { name: oro_security.access_rule }

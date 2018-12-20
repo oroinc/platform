@@ -5,7 +5,7 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\Provider;
 use Oro\Bundle\SoapBundle\Provider\ChainMetadataProvider;
 use Oro\Bundle\SoapBundle\Tests\Unit\Provider\Stub\StubMetadataProvider;
 
-class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
+class ChainMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructionWithoutProviders()
     {

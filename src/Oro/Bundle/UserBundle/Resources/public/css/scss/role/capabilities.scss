@@ -1,0 +1,81 @@
+/* @theme: admin.oro; */
+
+
+.role-capability {
+    padding: $role-capability-offset;
+
+    border-bottom: 1px solid $role-capability-color;
+
+    &:last-child {
+        padding-bottom: 0;
+
+        border-bottom: none;
+    }
+
+    &__items {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    &__empty-items {
+        color: $role-capability-item-no-access-color;
+    }
+
+    &__item {
+        display: inline-block;
+        width: $role-capability-item-width;
+        padding: $role-capability-item-offset;
+    }
+
+    &__item-label {
+        margin: 0;
+    }
+
+    &__item-label {
+        position: relative;
+
+        display: inline-block;
+        padding-#{$start}: $role-capability-label-offset;
+
+        line-height: $role-capability-label-line-height;
+    }
+
+    &__item-label--no-access {
+        color: $role-capability-item-no-access-color;
+    }
+
+    &__item-label_changed {
+        background-color: $role-capability-item-changed-color;
+    }
+
+    &__select-all {
+        float: #{$end};
+
+        &.disabled {
+            color: $role-capability-item-disabled;
+
+            pointer-events: none;
+        }
+    }
+
+    &__group-common-title {
+        display: none;
+
+        .role-capabilities_single-group & {
+            display: inline;
+        }
+    }
+
+    &__group-title {
+        margin: $role-capability-group-title-offset;
+
+        font-size: $role-capability-group-title-font-size;
+        font-weight: $role-capability-group-title-weight;
+    }
+
+    &__group-own-title {
+        .role-capabilities_single-group & {
+            display: none;
+        }
+    }
+}

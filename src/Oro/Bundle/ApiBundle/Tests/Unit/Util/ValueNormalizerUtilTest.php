@@ -4,16 +4,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
-class ValueNormalizerUtilTest extends \PHPUnit_Framework_TestCase
+class ValueNormalizerUtilTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider humanizeClassNameDataProvider
      */
     public function testHumanizeClassName($className, $classSuffix, $expected)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             ValueNormalizerUtil::humanizeClassName($className, $classSuffix)
         );
@@ -22,17 +23,20 @@ class ValueNormalizerUtilTest extends \PHPUnit_Framework_TestCase
     public function humanizeClassNameDataProvider()
     {
         return [
-            ['\Exception', null, 'exception'],
-            ['\Exception', 'Exception', 'exception'],
-            ['\LogicException', null, 'logic exception'],
-            ['\LogicException', 'Exception', 'logic exception'],
-            ['\InvalidArgumentException', null, 'invalid argument exception'],
-            ['\InvalidArgumentException', 'Exception', 'invalid argument exception'],
+            [\Exception::class, null, 'exception'],
+            [\Exception::class, 'Exception', 'exception'],
+            [\LogicException::class, null, 'logic exception'],
+            [\LogicException::class, 'Exception', 'logic exception'],
+            [\InvalidArgumentException::class, null, 'invalid argument exception'],
+            [\InvalidArgumentException::class, 'Exception', 'invalid argument exception'],
             ['Test\InvalidArgumentException', null, 'invalid argument exception'],
             ['Test\InvalidArgumentException', 'Exception', 'invalid argument exception'],
             ['Test\Invalid_Argument_Exception', 'Exception', 'invalid argument exception'],
+            ['Test\invalid_argument_exception', 'Exception', 'invalid argument exception'],
+            ['Test\Invalid__Argument__Exception', 'Exception', 'invalid argument exception'],
+            ['Test\invalid__argument__exception', 'Exception', 'invalid argument exception'],
             ['Test\IOException', 'Exception', 'io exception'],
-            ['Test\AnotherPHPException', 'Exception', 'another php exception'],
+            ['Test\AnotherPHPException', 'Exception', 'another php exception']
         ];
     }
 
@@ -42,15 +46,13 @@ class ValueNormalizerUtilTest extends \PHPUnit_Framework_TestCase
         $entityType = 'test_class';
         $requestType = new RequestType([RequestType::REST]);
 
-        $valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $valueNormalizer->expects($this->once())
+        $valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with($entityClass, DataType::ENTITY_TYPE, $requestType)
             ->willReturn($entityType);
 
-        $this->assertEquals(
+        self::assertEquals(
             $entityType,
             ValueNormalizerUtil::convertToEntityType($valueNormalizer, $entityClass, $requestType)
         );
@@ -64,10 +66,8 @@ class ValueNormalizerUtilTest extends \PHPUnit_Framework_TestCase
         $entityClass = 'Test\Class';
         $requestType = new RequestType([RequestType::REST]);
 
-        $valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $valueNormalizer->expects($this->once())
+        $valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with($entityClass, DataType::ENTITY_TYPE, $requestType)
             ->willThrowException(new \InvalidArgumentException());
@@ -80,15 +80,13 @@ class ValueNormalizerUtilTest extends \PHPUnit_Framework_TestCase
         $entityClass = 'Test\Class';
         $requestType = new RequestType([RequestType::REST]);
 
-        $valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $valueNormalizer->expects($this->once())
+        $valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with($entityClass, DataType::ENTITY_TYPE, $requestType)
             ->willThrowException(new \InvalidArgumentException());
 
-        $this->assertNull(
+        self::assertNull(
             ValueNormalizerUtil::convertToEntityType($valueNormalizer, $entityClass, $requestType, false)
         );
     }

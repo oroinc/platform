@@ -1,0 +1,25 @@
+/* @theme: admin.oro; */
+
+.toolbar-mass-actions {
+    display: inline-block;
+
+    .dropdown-toggle {
+        display: inline-block;
+        margin-#{$end}: 0;
+
+        line-height: $toolbar-mass-actions-toggle-line-height;
+    }
+
+    .dropdown-menu {
+        .action {
+            display: block;
+            padding: $toolbar-mass-actions-action-offset;
+            margin: 0;
+
+            line-height: $line-height-base;
+            font-family: $font-family-sans-serif;
+
+            color: $body-color;
+        }
+    }
+}

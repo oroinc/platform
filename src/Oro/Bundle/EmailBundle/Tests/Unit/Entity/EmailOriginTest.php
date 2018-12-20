@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 
-class EmailOriginTest extends \PHPUnit_Framework_TestCase
+class EmailOriginTest extends \PHPUnit\Framework\TestCase
 {
     public function testIdGetter()
     {

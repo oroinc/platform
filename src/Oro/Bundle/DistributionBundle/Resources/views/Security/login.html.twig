@@ -11,7 +11,7 @@
         </div>
         <fieldset>
             {% if error %}
-                <div class="alert alert-error">
+                <div class="alert alert-error" role="alert">
                     <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                 </div>
             {% endif %}

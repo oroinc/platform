@@ -8,11 +8,11 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Statement;
 use Oro\Bundle\DistributionBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\MessageSelector;
 
-class TranslatorTest extends \PHPUnit_Framework_TestCase
+class TranslatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Translator */
     protected $translator;
@@ -33,22 +33,22 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->any())->method('from')->willReturnSelf();
         $qb->expects($this->any())->method('execute')->willReturn($statement);
 
-        /** @var Connection|\PHPUnit_Framework_MockObject_MockObject $connection */
+        /** @var Connection|\PHPUnit\Framework\MockObject\MockObject $connection */
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->any())->method('createQueryBuilder')->willReturn($qb);
 
-        /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $registry */
+        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry */
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())->method('getConnection')->willReturn($connection);
 
-        /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject $container */
+        /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject $container */
         $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->any())->method('get')->with('doctrine')->willReturn($registry);
 
-        /** @var MessageSelector|\PHPUnit_Framework_MockObject_MockObject $selector */
-        $selector = $this->createMock(MessageSelector::class);
+        /** @var MessageFormatterInterface|\PHPUnit\Framework\MockObject\MockObject $selector */
+        $selector = $this->createMock(MessageFormatterInterface::class);
 
-        $this->translator = new Translator($container, $selector);
+        $this->translator = new Translator($container, $selector, []);
     }
 
     public function testAddResource()
@@ -70,7 +70,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        /** @var LoaderInterface|\PHPUnit_Framework_MockObject_MockObject $loader */
+        /** @var LoaderInterface|\PHPUnit\Framework\MockObject\MockObject $loader */
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->once())
             ->method('load')

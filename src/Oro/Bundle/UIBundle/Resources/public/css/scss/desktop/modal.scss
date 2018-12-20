@@ -1,0 +1,10 @@
+/* @theme: admin.oro; */
+
+.modal {
+    top: $modal-offset-y;
+    left: $modal-offset-x;
+
+    margin: 0;
+
+    transform: translate(-$modal-offset-x, -$modal-offset-y);
+}

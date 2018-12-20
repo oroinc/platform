@@ -4,23 +4,32 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use Oro\Component\Testing\TempDirExtension;
 
-class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
+class UpdateExtendConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    use TempDirExtension;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $commandExecutor;
+
+    /** @var string */
+    protected $temporaryFilePath;
 
     protected function setUp()
     {
         $this->commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->temporaryFilePath = $this->getTempDir('extend_config_migration')
+            . DIRECTORY_SEPARATOR
+            . 'test_options.bin';
     }
 
     public function testGetDescription()
     {
-        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.bin';
-        $options     = ['test'];
+        $options = ['test'];
 
         $this->commandExecutor->expects($this->once())
             ->method('runCommand')
@@ -43,17 +52,17 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
         $migrationQuery = new UpdateExtendConfigMigrationQuery(
             $options,
             $this->commandExecutor,
-            $optionsPath
+            $this->temporaryFilePath
         );
 
-        $this->assertEquals(['test message'], $migrationQuery->getDescription());
+        self::assertEquals(['test message'], $migrationQuery->getDescription());
+        self::assertFileNotExists($this->temporaryFilePath);
     }
 
     public function testExecute()
     {
         $logger = new ArrayLogger();
-        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.bin';
-        $options     = ['test'];
+        $options = ['test'];
 
         $this->commandExecutor->expects($this->once())
             ->method('runCommand')
@@ -76,11 +85,12 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
         $migrationQuery = new UpdateExtendConfigMigrationQuery(
             $options,
             $this->commandExecutor,
-            $optionsPath
+            $this->temporaryFilePath
         );
 
         $migrationQuery->execute($logger);
 
-        $this->assertEquals(['test message'], $logger->getMessages());
+        self::assertEquals(['test message'], $logger->getMessages());
+        self::assertFileNotExists($this->temporaryFilePath);
     }
 }

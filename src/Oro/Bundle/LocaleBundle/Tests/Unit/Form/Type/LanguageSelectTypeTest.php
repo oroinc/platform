@@ -20,10 +20,10 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LocalizationChoicesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LocalizationChoicesProvider */
     protected $provider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     protected $registry;
 
     /** @var LanguageSelectType */
@@ -69,7 +69,7 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
 
     public function testBuildForm()
     {
-        $data =  ['1' => 'English', '2' => 'Spain'];
+        $data =  ['English' => '1', 'Spain' => '2'];
 
         $this->provider->expects($this->once())->method('getLanguageChoices')->with(true)->willReturn($data);
 
@@ -94,7 +94,7 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit($submittedData, $expectedData)
     {
-        $data =  ['42' => 'English', '2' => 'Spain'];
+        $data =  ['English' => 42, 'Spain' => 2];
 
         $this->provider->expects($this->once())->method('getLanguageChoices')->with(true)->willReturn($data);
 

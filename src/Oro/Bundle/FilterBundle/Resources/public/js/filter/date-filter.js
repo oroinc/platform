@@ -75,6 +75,19 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+
+        className: 'date-filter-container',
+
+        /**
+         * CSS class for custom date range
+         *
+         * @property
+         */
+        customClass: 'date-filter-custom',
+
+        /**
          * CSS class for visual date input elements
          *
          * @property
@@ -283,6 +296,7 @@ define(function(require) {
             if (!isNaN(type)) {
                 // it's type
                 this.$(startSeparatorEndSelector).css('display', '');
+                this.$el.addClass(this.customClass);
                 var typeDefinedValues = [
                     this.typeDefinedValues.today,
                     this.typeDefinedValues.this_week,
@@ -293,6 +307,7 @@ define(function(require) {
                 ];
                 if (typeDefinedValues.indexOf(type) > -1) {
                     this.$(startSeparatorEndSelector).hide();
+                    this.$el.removeClass(this.customClass);
                     this.subview('start').setValue('');
                     this.subview('end').setValue('');
                 } else if (this.typeValues.moreThan === type) {
@@ -311,7 +326,7 @@ define(function(require) {
 
                 this.$(this.criteriaValueSelectors.date_type)
                     .closest('.dropdown')
-                    .find('.dropdown-toggle')
+                    .find('[data-toggle="dropdown"]')
                     .html(this.$(this.criteriaValueSelectors.date_type + ' :selected').text());
             } else {
                 // it's part
@@ -322,7 +337,7 @@ define(function(require) {
 
                 this.$(this.criteriaValueSelectors.date_part)
                     .closest('.dropdown')
-                    .find('.dropdown-toggle')
+                    .find('[data-toggle="dropdown"]')
                     .attr('title', this._getPartTooltip(value));
             }
         },
@@ -365,6 +380,8 @@ define(function(require) {
                     this._updateTooltipVisibility(value.part);
                 }
             }, this));
+
+            this.$el.inputWidget('seekAndCreate');
 
             this._criteriaRenderd = true;
         },
@@ -475,6 +492,14 @@ define(function(require) {
                         break;
                     case this.typeValues.lessThan.toString():
                         hint += [__('less than'), end].join(' ');
+                        break;
+                    case this.typeValues.equal.toString():
+                        option = this._getChoiceOption(this.typeValues.equal);
+                        hint += [option.label, start].join(' ');
+                        break;
+                    case this.typeValues.notEqual.toString():
+                        option = this._getChoiceOption(this.typeValues.notEqual);
+                        hint += [option.label, end].join(' ');
                         break;
                     case this.typeValues.notBetween.toString():
                         if (start && end) {

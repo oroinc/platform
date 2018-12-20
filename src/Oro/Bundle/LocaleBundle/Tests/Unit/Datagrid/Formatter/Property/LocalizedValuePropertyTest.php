@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration;
 use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty;
 
-class LocalizedValuePropertyTest extends \PHPUnit_Framework_TestCase
+class LocalizedValuePropertyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LocalizedValueProperty

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
 
@@ -27,6 +28,63 @@ class DoctrineHelper extends BaseHelper
         $this->manageableEntityClasses[$entityClass] = $isManageable;
 
         return $isManageable;
+    }
+
+    /**
+     * Returns the given API resource class if it is a manageable entity;
+     * otherwise, checks if the API resource is based on a manageable entity, and if so,
+     * returns the class name of this entity.
+     * If both the API resource class and its parent are not manageable entities, returns NULL.
+     *
+     * @param string                      $resourceClass The class name of API resource
+     * @param EntityDefinitionConfig|null $config        The API resource configuration
+     *
+     * @return string|null
+     */
+    public function getManageableEntityClass(string $resourceClass, ?EntityDefinitionConfig $config): ?string
+    {
+        if ($this->isManageableEntityClass($resourceClass)) {
+            return $resourceClass;
+        }
+
+        if (null === $config) {
+            return null;
+        }
+
+        $parentResourceClass = $config->getParentResourceClass();
+        if ($parentResourceClass && $this->isManageableEntityClass($parentResourceClass)) {
+            return $parentResourceClass;
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the given API resource class if it is a manageable entity;
+     * otherwise, checks whether one of its parent class is a manageable entity, and if so,
+     * returns the parent class name that is a manageable entity.
+     *
+     * @param string $resourceClass The class name of API resource
+     *
+     * @return string|null
+     */
+    public function resolveManageableEntityClass(string $resourceClass): ?string
+    {
+        if ($this->isManageableEntityClass($resourceClass)) {
+            return $resourceClass;
+        }
+
+        $entityClass = null;
+        $parentClass = (new \ReflectionClass($resourceClass))->getParentClass();
+        while ($parentClass) {
+            if ($this->isManageableEntityClass($parentClass->getName())) {
+                $entityClass = $parentClass->getName();
+                break;
+            }
+            $parentClass = $parentClass->getParentClass();
+        }
+
+        return $entityClass;
     }
 
     /**
@@ -118,13 +176,10 @@ class DoctrineHelper extends BaseHelper
         $relations = [];
         $fieldNames = $metadata->getAssociationNames();
         foreach ($fieldNames as $fieldName) {
-            $mapping = $metadata->getAssociationMapping($fieldName);
-            if ($mapping['type'] & ClassMetadata::TO_ONE) {
-                $targetMetadata = $this->getEntityMetadataForClass($mapping['targetEntity']);
-                $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
-                if (count($targetIdFieldNames) === 1) {
-                    $relations[$fieldName] = $targetMetadata->getTypeOfField(reset($targetIdFieldNames));
-                }
+            $targetMetadata = $this->getEntityMetadataForClass($metadata->getAssociationTargetClass($fieldName));
+            $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
+            if (count($targetIdFieldNames) === 1) {
+                $relations[$fieldName] = $targetMetadata->getTypeOfField(reset($targetIdFieldNames));
             }
         }
 

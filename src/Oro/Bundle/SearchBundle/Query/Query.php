@@ -6,8 +6,8 @@ use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
 /**
- * @TODO: In platform 2.0 this class should be extended from the Doctrine\Common\Collections\Criteria.
- *        We should refactor this class only from platform v2.0 because it will break backward compatibility.
+ * Encapsulates query to search engine using SQL based format
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Query
@@ -173,7 +173,9 @@ class Query
     }
 
     /**
-     * {@inheritdoc}
+     * @param string|string[] $fieldNames
+     * @param string|null $enforcedFieldType
+     * @return $this
      */
     public function addSelect($fieldNames, $enforcedFieldType = null)
     {
@@ -189,7 +191,8 @@ class Query
     }
 
     /**
-     * {@inheritdoc}
+     * @param string|string[] $entities
+     * @return $this
      */
     public function from($entities)
     {
@@ -322,7 +325,7 @@ class Query
     }
 
     /**
-     * Get entities to select from
+     * Get entity aliases to select from
      *
      * @return array
      */
@@ -773,5 +776,10 @@ class Query
         }
 
         return $field;
+    }
+
+    public function __clone()
+    {
+        $this->criteria = clone $this->criteria;
     }
 }

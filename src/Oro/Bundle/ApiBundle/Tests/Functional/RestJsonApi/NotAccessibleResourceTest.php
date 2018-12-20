@@ -4,12 +4,32 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
-use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class NotAccessibleResourceTest extends RestJsonApiTestCase
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->loadFixtures([
+            '@OroApiBundle/Tests/Functional/DataFixtures/test_department.yml',
+            '@OroApiBundle/Tests/Functional/DataFixtures/test_product.yml'
+        ]);
+    }
+
     /**
      * @param string $method
      * @param string $route
@@ -20,24 +40,18 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     public function testNotAccessibleResource($method, $route, array $routeParameters = [])
     {
         $entityType = $this->getEntityType(EntityIdentifier::class);
-
         $response = $this->request(
             $method,
             $this->getUrl($route, array_merge($routeParameters, ['entity' => $entityType]))
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'resource not accessible exception',
-                        'detail' => 'The resource is not accessible.'
-                    ]
-                ]
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -47,17 +61,17 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     public function notAccessibleResourceActionsProvider()
     {
         return [
-            ['GET', 'oro_rest_api_item', ['id' => 123]],
-            ['GET', 'oro_rest_api_list'],
-            ['PATCH', 'oro_rest_api_item', ['id' => 123]],
-            ['POST', 'oro_rest_api_list'],
-            ['DELETE', 'oro_rest_api_item', ['id' => 123]],
-            ['DELETE', 'oro_rest_api_list'],
-            ['GET', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
-            ['GET', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['PATCH', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['POST', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['DELETE', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']]
+            ['GET', $this->getItemRouteName(), ['id' => 123]],
+            ['GET', $this->getListRouteName()],
+            ['PATCH', $this->getItemRouteName(), ['id' => 123]],
+            ['POST', $this->getListRouteName()],
+            ['DELETE', $this->getItemRouteName(), ['id' => 123]],
+            ['DELETE', $this->getListRouteName()],
+            ['GET', $this->getSubresourceRouteName(), ['id' => 123, 'association' => 'test']],
+            ['GET', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['PATCH', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['POST', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['DELETE', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']]
         ];
     }
 
@@ -71,17 +85,22 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     public function testUnknownResource($method, $route, array $routeParameters = [])
     {
         $entityType = 'unknown_entity';
-
         $response = $this->request(
             $method,
             $this->getUrl($route, array_merge($routeParameters, ['entity' => $entityType]))
         );
-        self::assertResponseStatusCodeEquals($response, 404);
+
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         if ('HEAD' === $method) {
             // the HEAD response should not have the content
             self::assertEmpty($response->getContent());
+        } else {
+            $this->assertResponseContains(
+                ['errors' => [['status' => (string)Response::HTTP_NOT_FOUND, 'title' => 'entity type constraint']]],
+                $response
+            );
         }
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
     /**
@@ -90,30 +109,30 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     public function unknownResourceActionsProvider()
     {
         return [
-            ['HEAD', 'oro_rest_api_item', ['id' => 123]],
-            ['HEAD', 'oro_rest_api_list'],
-            ['HEAD', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
-            ['HEAD', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['OPTIONS', 'oro_rest_api_item', ['id' => 123]],
-            ['OPTIONS', 'oro_rest_api_list'],
-            ['OPTIONS', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
-            ['OPTIONS', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['GET', 'oro_rest_api_item', ['id' => 123]],
-            ['GET', 'oro_rest_api_list'],
-            ['GET', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
-            ['GET', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['POST', 'oro_rest_api_item', ['id' => 123]],
-            ['POST', 'oro_rest_api_list'],
-            ['POST', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
-            ['POST', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['PATCH', 'oro_rest_api_item', ['id' => 123]],
-            ['PATCH', 'oro_rest_api_list'],
-            ['PATCH', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
-            ['PATCH', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['DELETE', 'oro_rest_api_item', ['id' => 123]],
-            ['DELETE', 'oro_rest_api_list'],
-            ['DELETE', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
-            ['DELETE', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']]
+            ['HEAD', $this->getItemRouteName(), ['id' => 123]],
+            ['HEAD', $this->getListRouteName()],
+            ['HEAD', $this->getSubresourceRouteName(), ['id' => 123, 'association' => 'test']],
+            ['HEAD', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['OPTIONS', $this->getItemRouteName(), ['id' => 123]],
+            ['OPTIONS', $this->getListRouteName()],
+            ['OPTIONS', $this->getSubresourceRouteName(), ['id' => 123, 'association' => 'test']],
+            ['OPTIONS', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['GET', $this->getItemRouteName(), ['id' => 123]],
+            ['GET', $this->getListRouteName()],
+            ['GET', $this->getSubresourceRouteName(), ['id' => 123, 'association' => 'test']],
+            ['GET', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['POST', $this->getItemRouteName(), ['id' => 123]],
+            ['POST', $this->getListRouteName()],
+            ['POST', $this->getSubresourceRouteName(), ['id' => 123, 'association' => 'test']],
+            ['POST', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['PATCH', $this->getItemRouteName(), ['id' => 123]],
+            ['PATCH', $this->getListRouteName()],
+            ['PATCH', $this->getSubresourceRouteName(), ['id' => 123, 'association' => 'test']],
+            ['PATCH', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['DELETE', $this->getItemRouteName(), ['id' => 123]],
+            ['DELETE', $this->getListRouteName()],
+            ['DELETE', $this->getSubresourceRouteName(), ['id' => 123, 'association' => 'test']],
+            ['DELETE', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']]
         ];
     }
 
@@ -127,24 +146,19 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->get(
-            ['entity' => $entityType, 'id' => '1'],
+            ['entity' => $entityType, 'id' => '@test_department->id'],
             [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'resource not accessible exception',
-                        'detail' => 'The resource is not accessible.'
-                    ]
-                ]
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -163,9 +177,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('POST, DELETE', $response->headers->get('Allow'));
     }
 
     public function testDisabledGetListWhenGetIsDisabled()
@@ -183,8 +196,15 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledCreate()
@@ -198,13 +218,12 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->post(
             ['entity' => $entityType],
-            ['data' => ['type' => $entityType, 'attributes' => ['name' => 'test']]],
+            [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, DELETE', $response->headers->get('Allow'));
     }
 
     public function testDisabledCreateWhenGetIsDisabled()
@@ -218,12 +237,19 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->post(
             ['entity' => $entityType],
-            ['data' => ['type' => $entityType, 'attributes' => ['name' => 'test']]],
+            [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledUpdate()
@@ -236,14 +262,13 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patch(
-            ['entity' => $entityType, 'id' => '1'],
-            ['data' => ['type' => $entityType, 'id' => '1', 'attributes' => ['name' => 'test']]],
+            ['entity' => $entityType, 'id' => '@test_department->id'],
+            [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, DELETE', $response->headers->get('Allow'));
     }
 
     public function testDisabledUpdateWhenGetIsDisabled()
@@ -256,13 +281,20 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patch(
-            ['entity' => $entityType, 'id' => '1'],
-            ['data' => ['type' => $entityType, 'id' => '1', 'attributes' => ['name' => 'test']]],
+            ['entity' => $entityType, 'id' => '@test_department->id'],
+            [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledDelete()
@@ -275,14 +307,13 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->delete(
-            ['entity' => $entityType, 'id' => '1'],
+            ['entity' => $entityType, 'id' => '@test_department->id'],
             [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH', $response->headers->get('Allow'));
     }
 
     public function testDisabledDeleteWhenGetIsDisabled()
@@ -295,13 +326,20 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->delete(
-            ['entity' => $entityType, 'id' => '1'],
+            ['entity' => $entityType, 'id' => '@test_department->id'],
             [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledDeleteList()
@@ -319,9 +357,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, POST');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, POST', $response->headers->get('Allow'));
     }
 
     public function testDisabledDeleteListWhenGetIsDisabled()
@@ -339,11 +376,38 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledGetSubresource()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['subresources' => ['owner' => ['actions' => ['get_subresource' => false]]]],
+            true
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->getSubresource(
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            [],
+            [],
+            false
+        );
+
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+    }
+
+    public function testDisabledGetSubresourceWhenAllSubresourcesAreDisabled()
     {
         $this->appendEntityConfig(
             TestDepartment::class,
@@ -353,13 +417,20 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->getSubresource(
-            ['entity' => $entityType, 'id' => '1', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
             [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledGetSubresourceWhenGetIsDisabled()
@@ -372,16 +443,42 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->getSubresource(
-            ['entity' => $entityType, 'id' => '1', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
             [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledGetRelationship()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['subresources' => ['owner' => ['actions' => ['get_relationship' => false]]]],
+            true
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->getRelationship(
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            [],
+            [],
+            false
+        );
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, PATCH');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+    }
+
+    public function testDisabledGetRelationshipWhenAllGetRelationshipsAreDisabled()
     {
         $this->appendEntityConfig(
             TestDepartment::class,
@@ -391,14 +488,39 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->getRelationship(
-            ['entity' => $entityType, 'id' => '1', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
             [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, PATCH');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('PATCH', $response->headers->get('Allow'));
+    }
+
+    public function testDisabledGetRelationshipWhenAllSubresourcesAreDisabled()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['get_subresource' => false]],
+            true
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->getRelationship(
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            [],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledGetRelationshipWhenGetIsDisabled()
@@ -411,16 +533,42 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->getRelationship(
-            ['entity' => $entityType, 'id' => '1', 'association' => 'owner'],
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
             [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledUpdateRelationship()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['subresources' => ['owner' => ['actions' => ['update_relationship' => false]]]],
+            true
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->patchRelationship(
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            [],
+            [],
+            false
+        );
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+    }
+
+    public function testDisabledUpdateRelationshipWhenAllUpdateRelationshipsAreDisabled()
     {
         $this->appendEntityConfig(
             TestDepartment::class,
@@ -430,14 +578,39 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patchRelationship(
-            ['entity' => $entityType, 'id' => '1', 'association' => 'owner'],
-            ['data' => ['type' => $this->getEntityType(BusinessUnit::class), 'id' => '1']],
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET', $response->headers->get('Allow'));
+    }
+
+    public function testDisabledUpdateRelationshipWhenAllSubresourcesAreDisabled()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['get_subresource' => false]],
+            true
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->patchRelationship(
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            [],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledUpdateRelationshipWhenGetIsDisabled()
@@ -450,16 +623,42 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patchRelationship(
-            ['entity' => $entityType, 'id' => '1', 'association' => 'owner'],
-            ['data' => ['type' => $this->getEntityType(BusinessUnit::class), 'id' => '1']],
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledAddRelationship()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['subresources' => ['staff' => ['actions' => ['add_relationship' => false]]]],
+            true
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->postRelationship(
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            [],
+            [],
+            false
+        );
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, DELETE');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+    }
+
+    public function testDisabledAddRelationshipWhenAllAddRelationshipsAreDisabled()
     {
         $this->appendEntityConfig(
             TestDepartment::class,
@@ -469,14 +668,39 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->postRelationship(
-            ['entity' => $entityType, 'id' => '1', 'association' => 'staff'],
-            ['data' => [['type' => $this->getEntityType(TestEmployee::class), 'id' => '1']]],
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, DELETE', $response->headers->get('Allow'));
+    }
+
+    public function testDisabledAddRelationshipWhenAllSubresourcesAreDisabled()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['get_subresource' => false]],
+            true
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->postRelationship(
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            [],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledAddRelationshipWhenGetIsDisabled()
@@ -489,16 +713,42 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->postRelationship(
-            ['entity' => $entityType, 'id' => '1', 'association' => 'staff'],
-            ['data' => [['type' => $this->getEntityType(TestEmployee::class), 'id' => '1']]],
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledDeleteRelationship()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['subresources' => ['staff' => ['actions' => ['delete_relationship' => false]]]],
+            true
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->deleteRelationship(
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            [],
+            [],
+            false
+        );
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, POST');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+    }
+
+    public function testDisabledDeleteRelationshipWhenAllAddRelationshipsAreDisabled()
     {
         $this->appendEntityConfig(
             TestDepartment::class,
@@ -508,14 +758,39 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->deleteRelationship(
-            ['entity' => $entityType, 'id' => '1', 'association' => 'staff'],
-            ['data' => [['type' => $this->getEntityType(TestEmployee::class), 'id' => '1']]],
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, POST');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, POST', $response->headers->get('Allow'));
+    }
+
+    public function testDisabledDeleteRelationshipWhenAllSubresourcesAreDisabled()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['get_subresource' => false]],
+            true
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->deleteRelationship(
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            [],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledDeleteRelationshipWhenGetIsDisabled()
@@ -528,13 +803,20 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->deleteRelationship(
-            ['entity' => $entityType, 'id' => '1', 'association' => 'staff'],
-            ['data' => [['type' => $this->getEntityType(TestEmployee::class), 'id' => '1']]],
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'resource not accessible exception',
+                'detail' => 'The resource is not accessible.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testDisabledAllRelationshipActions()
@@ -554,12 +836,12 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patchRelationship(
-            ['entity' => $entityType, 'id' => '1', 'association' => 'staff'],
-            ['data' => [['type' => $this->getEntityType(TestEmployee::class), 'id' => '1']]],
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -578,12 +860,12 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->patchRelationship(
-            ['entity' => $entityType, 'id' => '1', 'association' => 'owner'],
-            ['data' => [['type' => $this->getEntityType(BusinessUnit::class), 'id' => '1']]],
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -591,28 +873,26 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->postRelationship(
-            ['entity' => $entityType, 'id' => '1', 'association' => 'owner'],
-            ['data' => ['type' => $this->getEntityType(BusinessUnit::class), 'id' => '1']],
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH', $response->headers->get('Allow'));
     }
 
     public function testDeleteRelationshipToOneAssociation()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->deleteRelationship(
-            ['entity' => $entityType, 'id' => '1', 'association' => 'owner'],
-            ['data' => ['type' => $this->getEntityType(BusinessUnit::class), 'id' => '1']],
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'owner'],
+            [],
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH', $response->headers->get('Allow'));
     }
 
     public function testPostMethodForSingleItemPrimaryResourceRoute()
@@ -620,23 +900,23 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'POST',
-            $this->getUrl('oro_rest_api_item', ['entity' => $entityType, 'id' => '1'])
+            $this->getUrl(
+                $this->getItemRouteName(),
+                self::processTemplateData(['entity' => $entityType, 'id' => '@test_department->id'])
+            )
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, DELETE', $response->headers->get('Allow'));
     }
 
     public function testOptionsMethodForSingleItemPrimaryResourceRoute()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->request(
-            'OPTIONS',
-            $this->getUrl('oro_rest_api_item', ['entity' => $entityType, 'id' => '1'])
+        $response = $this->options(
+            $this->getItemRouteName(),
+            ['entity' => $entityType, 'id' => '@test_department->id']
         );
-        self::assertResponseStatusCodeEquals($response, 405);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, DELETE', $response->headers->get('Allow'));
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH, DELETE');
     }
 
     public function testHeadMethodForSingleItemPrimaryResourceRoute()
@@ -644,11 +924,13 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'HEAD',
-            $this->getUrl('oro_rest_api_item', ['entity' => $entityType, 'id' => '1'])
+            $this->getUrl(
+                $this->getItemRouteName(),
+                self::processTemplateData(['entity' => $entityType, 'id' => '@test_department->id'])
+            )
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, DELETE', $response->headers->get('Allow'));
     }
 
     public function testPatchMethodForListPrimaryResourceRoute()
@@ -656,23 +938,17 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'PATCH',
-            $this->getUrl('oro_rest_api_list', ['entity' => $entityType])
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, POST, DELETE', $response->headers->get('Allow'));
     }
 
     public function testOptionsMethodForListPrimaryResourceRoute()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->request(
-            'OPTIONS',
-            $this->getUrl('oro_rest_api_list', ['entity' => $entityType])
-        );
-        self::assertResponseStatusCodeEquals($response, 405);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, POST, DELETE', $response->headers->get('Allow'));
+        $response = $this->options($this->getListRouteName(), ['entity' => $entityType]);
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET, POST, DELETE');
     }
 
     public function testHeadMethodForListPrimaryResourceRoute()
@@ -680,26 +956,20 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'HEAD',
-            $this->getUrl('oro_rest_api_list', ['entity' => $entityType])
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, POST, DELETE', $response->headers->get('Allow'));
     }
 
     public function testOptionsMethodForRelationshipRoute()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->request(
-            'OPTIONS',
-            $this->getUrl(
-                'oro_rest_api_relationship',
-                ['entity' => $entityType, 'id' => '1', 'association' => 'staff']
-            )
+        $response = $this->options(
+            $this->getRelationshipRouteName(),
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff']
         );
-        self::assertResponseStatusCodeEquals($response, 405);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, POST, DELETE', $response->headers->get('Allow'));
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH, POST, DELETE');
     }
 
     public function testHeadMethodForRelationshipRoute()
@@ -708,73 +978,65 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $response = $this->request(
             'HEAD',
             $this->getUrl(
-                'oro_rest_api_relationship',
-                ['entity' => $entityType, 'id' => '1', 'association' => 'staff']
+                $this->getRelationshipRouteName(),
+                self::processTemplateData([
+                    'entity'      => $entityType,
+                    'id'          => '@test_department->id',
+                    'association' => 'staff'
+                ])
             )
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, POST, DELETE', $response->headers->get('Allow'));
     }
 
     public function testPostMethodForSubresourceRoute()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->request(
-            'POST',
-            $this->getUrl(
-                'oro_rest_api_subresource',
-                ['entity' => $entityType, 'id' => '1', 'association' => 'staff']
-            )
+        $response = $this->postSubresource(
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            [],
+            [],
+            false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET', $response->headers->get('Allow'));
     }
 
     public function testPatchMethodForSubresourceRoute()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl(
-                'oro_rest_api_subresource',
-                ['entity' => $entityType, 'id' => '1', 'association' => 'staff']
-            )
+        $response = $this->patchSubresource(
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            [],
+            [],
+            false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET', $response->headers->get('Allow'));
     }
 
     public function testDeleteMethodForSubresourceRoute()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->request(
-            'DELETE',
-            $this->getUrl(
-                'oro_rest_api_subresource',
-                ['entity' => $entityType, 'id' => '1', 'association' => 'staff']
-            )
+        $response = $this->deleteSubresource(
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff'],
+            [],
+            [],
+            false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET', $response->headers->get('Allow'));
     }
 
     public function testOptionsMethodForSubresourceRoute()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->request(
-            'OPTIONS',
-            $this->getUrl(
-                'oro_rest_api_subresource',
-                ['entity' => $entityType, 'id' => '1', 'association' => 'staff']
-            )
+        $response = $this->options(
+            $this->getSubresourceRouteName(),
+            ['entity' => $entityType, 'id' => '@test_department->id', 'association' => 'staff']
         );
-        self::assertResponseStatusCodeEquals($response, 405);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET', $response->headers->get('Allow'));
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET');
     }
 
     public function testHeadMethodForSubresourceRoute()
@@ -783,12 +1045,215 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $response = $this->request(
             'HEAD',
             $this->getUrl(
-                'oro_rest_api_subresource',
-                ['entity' => $entityType, 'id' => '1', 'association' => 'staff']
+                $this->getSubresourceRouteName(),
+                self::processTemplateData([
+                    'entity'      => $entityType,
+                    'id'          => '@test_department->id',
+                    'association' => 'staff'
+                ])
             )
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET', $response->headers->get('Allow'));
+    }
+
+    public function testGetSubresourceWithUnaccessibleTarget()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+        $response = $this->getSubresource(
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unaccessible-target'],
+            [],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    public function testPostSubresourceWithUnaccessibleTarget()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+        $response = $this->postSubresource(
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unaccessible-target'],
+            [],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    public function testPatchSubresourceWithUnaccessibleTarget()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+        $response = $this->patchSubresource(
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unaccessible-target'],
+            [],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    public function testDeleteSubresourceWithUnaccessibleTarget()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+        $response = $this->deleteSubresource(
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unaccessible-target'],
+            [],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    public function testGetRelationshipWithUnaccessibleTarget()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+        $response = $this->getRelationship(
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unaccessible-target'],
+            [],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    public function testPostRelationshipWithUnaccessibleTarget()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+        $response = $this->postRelationship(
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unaccessible-target'],
+            [],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    public function testPatchRelationshipWithUnaccessibleTarget()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+        $response = $this->patchRelationship(
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unaccessible-target'],
+            [],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    public function testDeleteRelationshipWithUnaccessibleTarget()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+        $response = $this->deleteRelationship(
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unaccessible-target'],
+            [],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    public function testOptionsRelationshipWithUnaccessibleTarget()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+        $response = $this->options(
+            $this->getSubresourceRouteName(),
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unaccessible-target'],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'relationship constraint',
+                'detail' => 'Unsupported subresource.'
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    public function testHeadRelationshipWithUnaccessibleTarget()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+        $response = $this->request(
+            'HEAD',
+            $this->getUrl(
+                $this->getSubresourceRouteName(),
+                self::processTemplateData([
+                    'entity'      => $entityType,
+                    'id'          => '@test_product->id',
+                    'association' => 'unaccessible-target'
+                ])
+            )
+        );
+
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        self::assertEmpty($response->getContent());
     }
 }

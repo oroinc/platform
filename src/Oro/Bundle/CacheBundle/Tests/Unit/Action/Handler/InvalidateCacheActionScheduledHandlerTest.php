@@ -9,20 +9,20 @@ use Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToStringTransformerInterfa
 use Oro\Bundle\CacheBundle\Command\InvalidateCacheScheduleCommand;
 use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
 
-class InvalidateCacheActionScheduledHandlerTest extends \PHPUnit_Framework_TestCase
+class InvalidateCacheActionScheduledHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var DeferredScheduler|\PHPUnit_Framework_MockObject_MockObject
+     * @var DeferredScheduler|\PHPUnit\Framework\MockObject\MockObject
      */
     private $deferredScheduler;
 
     /**
-     * @var InvalidateCacheScheduleArgumentsBuilderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var InvalidateCacheScheduleArgumentsBuilderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $scheduleArgumentsBuilder;
 
     /**
-     * @var DateTimeToStringTransformerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var DateTimeToStringTransformerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $cronFormatTransformer;
 

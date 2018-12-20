@@ -3,9 +3,13 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use NumberFormatter as IntlNumberFormatter;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -13,7 +17,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 class NumberFormatterTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $localeSettings;
 
@@ -26,9 +30,7 @@ class NumberFormatterTest extends TestCase
     {
         IntlTestHelper::requireIntl($this);
 
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
         $this->formatter = new NumberFormatter($this->localeSettings);
     }
 
@@ -177,7 +179,7 @@ class NumberFormatterTest extends TestCase
     {
         $locale = 'en_GB';
         $currency = 'GBP';
-        $currencySymbol = 'Pound';
+        $currencySymbol = '£';
 
         $this->localeSettings->expects($this->any())->method('getLocale')->will($this->returnValue($locale));
         $this->localeSettings->expects($this->any())->method('getCurrency')->will($this->returnValue($currency));
@@ -186,59 +188,36 @@ class NumberFormatterTest extends TestCase
             ->with($currency)
             ->will($this->returnValue($currencySymbol));
 
-        $this->assertEquals('Pound1,234.57', $this->formatter->formatCurrency(1234.56789));
+        $this->assertEquals('£1,234.57', $this->formatter->formatCurrency(1234.56789));
     }
 
     /**
      * @dataProvider formatCurrencyDataProvider
+     *
+     * @param string $expected
+     * @param int|float $value
+     * @param string $currency
+     * @param string $locale
      */
-    public function testFormatCurrency($expected, $value, $currency, $attributes, $textAttributes, $symbols, $locale)
+    public function testFormatCurrency(string $expected, $value, string $currency, string $locale)
     {
-        $currencySymbolMap = array(
-            array('USD', '$'),
-            array('RUB', 'руб.'),
-        );
-        $this->localeSettings->expects($this->any())
-            ->method('getCurrencySymbolByCurrency')
-            ->will($this->returnValueMap($currencySymbolMap));
-
+        $configManager = $this->createMock(ConfigManager::class);
+        $calendarFactory = $this->createMock(CalendarFactoryInterface::class);
+        $formatter = new NumberFormatter(new LocaleSettings($configManager, $calendarFactory));
         $this->assertEquals(
             $expected,
-            $this->formatter->formatCurrency($value, $currency, $attributes, $textAttributes, $symbols, $locale)
+            $formatter->formatCurrency($value, $currency, [], [], [], $locale)
         );
     }
 
-    public function formatCurrencyDataProvider()
+    /**
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function formatCurrencyDataProvider(): array
     {
-        return array(
-            array(
-                'expected' => '$1,234.57',
-                'value' => 1234.56789,
-                'currency' => 'USD',
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en_US'
-            ),
-            array(
-                'expected' => 'руб.1,234.57',
-                'value' => 1234.56789,
-                'currency' => 'RUB',
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en_US'
-            ),
-            array(
-                'expected' => '1 234,57 €',
-                'value' => 1234.56789,
-                'currency' => 'EUR',
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'ru_RU'
-            ),
-        );
+        return Yaml::parse(file_get_contents(__DIR__.'/Data/format_currency_data.yml'));
     }
 
     /**
@@ -367,46 +346,58 @@ class NumberFormatterTest extends TestCase
     /**
      * @dataProvider getAttributeDataProvider
      */
-    public function testGetAttribute($attribute, $style, $locale, $expected)
+    public function testGetAttribute($attribute, $style, $locale, $expected, $attributes)
     {
         $this->assertSame(
             $expected,
             $this->formatter->getAttribute(
                 $attribute,
                 $style,
-                $locale
+                $locale,
+                $attributes
             )
         );
     }
 
+    /**
+     * @return array
+     */
     public function getAttributeDataProvider()
     {
         $intlFormatter = new IntlNumberFormatter('en_US', \NumberFormatter::DECIMAL);
         $maxIntegerDigits = $intlFormatter->getAttribute(\NumberFormatter::MAX_INTEGER_DIGITS);
 
         return array(
-            array('parse_int_only', 'DECIMAL', 'en_US', 0),
-            array('parse_int_only', null, 'en_US', 0),
-            array('GROUPING_USED', 'decimal', 'en_US', 1),
-            array(\NumberFormatter::DECIMAL_ALWAYS_SHOWN, \NumberFormatter::DECIMAL, 'en_US', 0),
-            array(\NumberFormatter::MAX_INTEGER_DIGITS, \NumberFormatter::DECIMAL, 'en_US', $maxIntegerDigits),
-            array(\NumberFormatter::MIN_INTEGER_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 1),
-            array(\NumberFormatter::INTEGER_DIGITS,\NumberFormatter::DECIMAL, 'en_US', 1),
-            array(\NumberFormatter::MAX_FRACTION_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 3),
-            array(\NumberFormatter::MIN_FRACTION_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 0),
-            array(\NumberFormatter::MAX_FRACTION_DIGITS, \NumberFormatter::CURRENCY, 'en_US', 2),
-            array(\NumberFormatter::MIN_FRACTION_DIGITS, \NumberFormatter::CURRENCY, 'en_US', 2),
-            array(\NumberFormatter::FRACTION_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 0),
-            array(\NumberFormatter::MULTIPLIER, \NumberFormatter::DECIMAL, 'en_US', 1),
-            array(\NumberFormatter::GROUPING_SIZE, \NumberFormatter::DECIMAL, 'en_US', 3),
-            array(\NumberFormatter::ROUNDING_MODE, \NumberFormatter::DECIMAL, 'en_US', 4),
-            array(\NumberFormatter::ROUNDING_INCREMENT, \NumberFormatter::DECIMAL, 'en_US', 0.0),
-            array(\NumberFormatter::FORMAT_WIDTH, \NumberFormatter::DECIMAL, 'en_US', 0),
-            array(\NumberFormatter::PADDING_POSITION, \NumberFormatter::DECIMAL, 'en_US', 0),
-            array(\NumberFormatter::SECONDARY_GROUPING_SIZE, \NumberFormatter::DECIMAL, 'en_US', 0),
-            array(\NumberFormatter::SIGNIFICANT_DIGITS_USED, \NumberFormatter::DECIMAL, 'en_US', 0),
-            array(\NumberFormatter::MIN_SIGNIFICANT_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 1),
-            array(\NumberFormatter::MAX_SIGNIFICANT_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 6),
+            array('parse_int_only', 'DECIMAL', 'en_US', 0, []),
+            array('parse_int_only', null, 'en_US', 0, []),
+            array('GROUPING_USED', 'decimal', 'en_US', 1, []),
+            array(\NumberFormatter::DECIMAL_ALWAYS_SHOWN, \NumberFormatter::DECIMAL, 'en_US', 0, []),
+            array(\NumberFormatter::MAX_INTEGER_DIGITS, \NumberFormatter::DECIMAL, 'en_US', $maxIntegerDigits, []),
+            array(\NumberFormatter::MIN_INTEGER_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 1, []),
+            array(\NumberFormatter::INTEGER_DIGITS,\NumberFormatter::DECIMAL, 'en_US', 1, []),
+            array(\NumberFormatter::MAX_FRACTION_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 3, []),
+            array(\NumberFormatter::MIN_FRACTION_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 0, []),
+            array(\NumberFormatter::MAX_FRACTION_DIGITS, \NumberFormatter::CURRENCY, 'en_US', 2, []),
+            array(\NumberFormatter::MIN_FRACTION_DIGITS, \NumberFormatter::CURRENCY, 'en_US', 2, []),
+            array(\NumberFormatter::FRACTION_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 0, []),
+            array(\NumberFormatter::MULTIPLIER, \NumberFormatter::DECIMAL, 'en_US', 1, []),
+            array(\NumberFormatter::GROUPING_SIZE, \NumberFormatter::DECIMAL, 'en_US', 3, []),
+            array(\NumberFormatter::ROUNDING_MODE, \NumberFormatter::DECIMAL, 'en_US', 4, []),
+            array(\NumberFormatter::ROUNDING_INCREMENT, \NumberFormatter::DECIMAL, 'en_US', 0.0, []),
+            array(\NumberFormatter::FORMAT_WIDTH, \NumberFormatter::DECIMAL, 'en_US', 0, []),
+            array(\NumberFormatter::PADDING_POSITION, \NumberFormatter::DECIMAL, 'en_US', 0, []),
+            array(\NumberFormatter::SECONDARY_GROUPING_SIZE, \NumberFormatter::DECIMAL, 'en_US', 0, []),
+            array(\NumberFormatter::SIGNIFICANT_DIGITS_USED, \NumberFormatter::DECIMAL, 'en_US', 0, []),
+            array(\NumberFormatter::MIN_SIGNIFICANT_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 1, []),
+            array(\NumberFormatter::MAX_SIGNIFICANT_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 6, []),
+            array(\NumberFormatter::MAX_FRACTION_DIGITS, \NumberFormatter::PERCENT, 'en_US', 0, [
+                \NumberFormatter::MAX_FRACTION_DIGITS => 4,
+            ]),
+            array(\NumberFormatter::MAX_FRACTION_DIGITS, \NumberFormatter::PERCENT, 'en_US', 4, [
+                \NumberFormatter::FRACTION_DIGITS => 4,
+                \NumberFormatter::MIN_FRACTION_DIGITS => 0,
+                \NumberFormatter::MAX_FRACTION_DIGITS => 4,
+            ]),
         );
     }
 
@@ -431,8 +422,6 @@ class NumberFormatterTest extends TestCase
             array('POSITIVE_PREFIX', 'DECIMAL', 'en_US', ''),
             array('negative_prefix', 'decimal', 'en_US', '-'),
             array(\NumberFormatter::NEGATIVE_SUFFIX, \NumberFormatter::DECIMAL, 'en_US', ''),
-            // TODO BAP-16725
-            // array(\NumberFormatter::PADDING_CHARACTER, \NumberFormatter::DECIMAL, 'en_US', '*'),
             array(\NumberFormatter::CURRENCY_CODE, \NumberFormatter::CURRENCY, 'en_US', 'USD'),
             array(\NumberFormatter::DEFAULT_RULESET, \NumberFormatter::DECIMAL, 'en_US', false),
             array(\NumberFormatter::PUBLIC_RULESETS, \NumberFormatter::DECIMAL, 'en_US', false)

@@ -4,11 +4,11 @@
 
 A **layout update** is a set of actions that should be performed with the **[layout](what_is_layout.md)** in order to
 customize the page look depending on our needs. The **layout update** may be performed manually
-(via the [LayoutBuilder](../../../../Component/Layout/LayoutBuilder.php)), or collected by the *Oro Platform* loaders automatically.
+(via the [LayoutBuilder](../../../../Component/Layout/LayoutBuilder.php)), or collected by the *OroPlatform* loaders automatically.
 
 ## Loaders
 
-A loader is responsible for reading, preparing and caching the content of the update file. Out of the box, *Oro Platform* supports *PHP* and *YAML* loaders that load layout updates matched by the file extension. Each of these loaders generates *PHP* classes in the cache directory (`app/cache/{env}/layouts`). For the production mode, validation and generation of cache files is performed by the *optional cache warmer* and could be enforced by running the `app/console cache:warmup --env=prod` shell command.
+A loader is responsible for reading, preparing and caching the content of the update file. Out of the box, *OroPlatform* supports *PHP* and *YAML* loaders that load layout updates matched by the file extension. Each of these loaders generates *PHP* classes in the cache directory (`var/cache/{env}/layouts`). For the production mode, validation and generation of cache files is performed by the *optional cache warmer* and could be enforced by running the `bin/console cache:warmup --env=prod` shell command.
 
 ## Yaml Syntax
 
@@ -45,11 +45,11 @@ Actions definition is processed as a multidimensional array where the key is the
 ```yaml
 layout:
     actions:
-        - @add: # Sequential list
+        - '@add': # Sequential list
             - block_id
             - parent_block_id
             - block_type
-        - @remove: # Named arguments
+        - '@remove': # Named arguments
             id: content
 ```
 
@@ -67,7 +67,7 @@ Optional parameters can be skipped when named arguments are used. In the followi
 ```yaml
 layout:
     actions:
-        - @move:
+        - '@move':
             id:        block_id
             siblingId: sibling_block_id
 ```
@@ -86,7 +86,7 @@ In the **Tree** node, arrange the items into the desired hierarchy. Use the exis
 ```yaml
 layout:
     actions:
-        - @addTree:
+        - '@addTree':
             items:
                 head:
                     blockType:   head

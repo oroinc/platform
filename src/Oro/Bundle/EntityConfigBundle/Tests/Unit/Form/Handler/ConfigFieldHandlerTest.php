@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
+class ConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -19,17 +19,17 @@ class ConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
     const SAMPLE_SUCCESS_MESSAGE = 'Entity config was successfully saved';
 
     /**
-     * @var ConfigHelperHandler|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigHelperHandler|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configHelperHandler;
 
     /**
-     * @var RequestStack|\PHPUnit_Framework_MockObject_MockObject
+     * @var RequestStack|\PHPUnit\Framework\MockObject\MockObject
      */
     private $requestStack;
 
     /**
-     * @var FieldConfigModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldConfigModel|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fieldConfigModel;
 
@@ -40,13 +40,8 @@ class ConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configHelperHandler = $this->getMockBuilder(ConfigHelperHandler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->requestStack = $this->getMockBuilder(RequestStack::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configHelperHandler = $this->createMock(ConfigHelperHandler::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
 
         $this->fieldConfigModel = $this->getEntity(FieldConfigModel::class, ['id' => 777]);
 
@@ -58,7 +53,7 @@ class ConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param bool $isFormValid
-     * @return FormInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return FormInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function expectsFormCreationSubmissionAndValidation($isFormValid)
     {
@@ -89,12 +84,12 @@ class ConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
         $this->expectsFormCreationSubmissionAndValidation(true);
         $successMessage = 'Success message';
 
-        $response = new RedirectResponse('someurl');
+        $redirectResponse = new RedirectResponse('someurl');
         $this->configHelperHandler
             ->expects($this->once())
             ->method('showSuccessMessageAndRedirect')
             ->with($this->fieldConfigModel, $successMessage)
-            ->willReturn($response);
+            ->willReturn($redirectResponse);
 
         $this->configHelperHandler
             ->expects($this->once())
@@ -102,10 +97,10 @@ class ConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->configHelperHandler);
 
         $formAction = 'formAction';
-        $this->assertEquals(
-            $response,
-            $this->handler->handleUpdate($this->fieldConfigModel, $formAction, $successMessage)
-        );
+        $response = $this->handler->handleUpdate($this->fieldConfigModel, $formAction, $successMessage);
+
+        $this->assertEquals($redirectResponse->getTargetUrl(), $response->getTargetUrl());
+        $this->assertEquals($redirectResponse->getStatusCode(), $response->getStatusCode());
     }
 
     public function testHandleUpdateWhenFormIsNotValid()

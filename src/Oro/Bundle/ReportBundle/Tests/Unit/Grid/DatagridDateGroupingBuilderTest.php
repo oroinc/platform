@@ -15,10 +15,10 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * @SuppressWarnings("PMD.ExcessiveMethodLength")
  */
-class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
+class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var |\PHPUnit_Framework_MockObject_MockObject
+     * @var |\PHPUnit\Framework\MockObject\MockObject
      */
     protected $calendarDateEntity = CalendarDate::class;
 
@@ -28,12 +28,12 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
     protected $datagridDateGroupingBuilder;
 
     /**
-     * @var DatagridConfiguration|\PHPUnit_Framework_MockObject_MockObject $config
+     * @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $config
      */
     protected $config;
 
     /**
-     * @var JoinIdentifierHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var JoinIdentifierHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $joinIdHelper;
 
@@ -288,10 +288,10 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
                         'options' => [
                             'field_options' => [
                                 'choices' => [
-                                    'day' => 'Day',
-                                    'month' => 'Month',
-                                    'quarter' => 'Quarter',
-                                    'year' => 'Year',
+                                    'Day' => 'day',
+                                    'Month' => 'month',
+                                    'Quarter' => 'quarter',
+                                    'Year' => 'year',
                                 ]
                             ],
                             'default_value' => 'Day'
@@ -348,8 +348,8 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
                             'options' => [
                                 'field_options' => [
                                     'choices' => [
-                                        'No',
-                                        'Yes'
+                                        'No' => 0,
+                                        'Yes' => 1,
                                     ]
                                 ],
                                 'default_value' => 'Yes'

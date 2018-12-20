@@ -8,12 +8,12 @@ use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 class TestFilterValueAccessor implements FilterValueAccessorInterface
 {
     /** @var FilterValue[] */
-    protected $values = [];
+    private $values = [];
 
     /**
      * {@inheritdoc}
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return isset($this->values[$key]);
     }
@@ -21,17 +21,15 @@ class TestFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function get($key)
+    public function get(string $key): ?FilterValue
     {
-        return isset($this->values[$key])
-            ? $this->values[$key]
-            : null;
+        return $this->values[$key] ?? null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getGroup($group)
+    public function getGroup(string $group): array
     {
         return [];
     }
@@ -39,7 +37,22 @@ class TestFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getAll()
+    public function getDefaultGroupName(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultGroupName(?string $group): void
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAll(): array
     {
         return $this->values;
     }
@@ -47,7 +60,7 @@ class TestFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function set($key, FilterValue $value = null)
+    public function set(string $key, ?FilterValue $value): void
     {
         if (null === $value) {
             unset($this->values[$key]);
@@ -59,8 +72,16 @@ class TestFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function remove($key)
+    public function remove(string $key): void
     {
         unset($this->values[$key]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getQueryString(): string
+    {
+        return '';
     }
 }

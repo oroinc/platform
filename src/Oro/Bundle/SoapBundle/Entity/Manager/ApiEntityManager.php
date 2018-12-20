@@ -19,6 +19,9 @@ use Oro\Component\EntitySerializer\EntitySerializer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * Provides an entity manager to work from the old REST API
+ */
 class ApiEntityManager
 {
     /** @var string */
@@ -209,28 +212,6 @@ class ApiEntityManager
     }
 
     /**
-     * Returns array of item matching filtering criteria
-     *
-     * In case when limit and offset set to null QueryBuilder instance will be returned.
-     *
-     * @deprecated since 1.4.1 use getListQueryBuilder instead
-     * @param int        $limit
-     * @param int        $page
-     * @param array      $criteria
-     * @param array|null $orderBy
-     *
-     * @return \Traversable
-     */
-    public function getList($limit = 10, $page = 1, $criteria = [], $orderBy = null)
-    {
-        $criteria = $this->prepareQueryCriteria($limit, $page, $criteria, $orderBy);
-
-        return $this->getRepository()
-            ->matching($criteria)
-            ->toArray();
-    }
-
-    /**
      * Returns query builder that could be used for fetching data based on given filtering criteria
      *
      * @param int   $limit
@@ -251,6 +232,24 @@ class ApiEntityManager
         $qb->addCriteria($criteria);
 
         return $qb;
+    }
+
+    /**
+     * Returns array of item matching filtering criteria
+     *
+     * @param int $limit
+     * @param int $page
+     * @param array $criteria
+     * @param array|null $orderBy
+     * @param array $joins
+     *
+     * @return array
+     */
+    public function getList($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
+    {
+        return $this->getListQueryBuilder($limit, $page, $criteria, $orderBy, $joins)
+            ->getQuery()
+            ->getArrayResult();
     }
 
     /**

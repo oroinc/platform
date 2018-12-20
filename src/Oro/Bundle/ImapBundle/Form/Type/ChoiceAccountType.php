@@ -4,6 +4,8 @@ namespace Oro\Bundle\ImapBundle\Form\Type;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
+use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -56,15 +58,15 @@ class ChoiceAccountType extends AbstractType
             'tooltip'  => 'oro.imap.configuration.tooltip',
             'required' => false,
             'choices' => [
-                '' => $this->translator->trans(
+                $this->translator->trans(
                     'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_NO_SELECT
-                ),
-                AccountTypeModel::ACCOUNT_TYPE_GMAIL => $this->translator->trans(
+                ) => '',
+                $this->translator->trans(
                     'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_GMAIL
-                ),
-                AccountTypeModel::ACCOUNT_TYPE_OTHER => $this->translator->trans(
+                ) => AccountTypeModel::ACCOUNT_TYPE_GMAIL,
+                $this->translator->trans(
                     'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_OTHER
-                )
+                ) => AccountTypeModel::ACCOUNT_TYPE_OTHER,
             ],
         ]);
 

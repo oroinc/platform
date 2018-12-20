@@ -33,26 +33,6 @@ class UpdateSchemaEvent extends Event
     }
 
     /**
-     * {@inheritdoc}
-     * Temporarily added method to prevent deprecation notice in test.
-     * TODO: remove deprecated method in scope of BAP-15564
-     */
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    /**
-     * {@inheritdoc}
-     * Temporarily added method to prevent deprecation notice in test.
-     * TODO: remove deprecated method in scope of BAP-15564
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
      * Launches a command as a separate process.
      * @see Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor::runCommand
      *

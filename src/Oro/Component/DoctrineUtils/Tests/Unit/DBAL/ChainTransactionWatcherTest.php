@@ -5,12 +5,12 @@ namespace Oro\Component\DoctrineUtils\Tests\Unit\DBAL;
 use Oro\Component\DoctrineUtils\DBAL\ChainTransactionWatcher;
 use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherInterface;
 
-class ChainTransactionWatcherTest extends \PHPUnit_Framework_TestCase
+class ChainTransactionWatcherTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TransactionWatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TransactionWatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $watcher1;
 
-    /** @var TransactionWatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TransactionWatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $watcher2;
 
     /** @var ChainTransactionWatcher */

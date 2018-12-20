@@ -9,6 +9,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -19,6 +20,9 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 
+/**
+ * Adds workflow and workflow_step columns and filters to datagrids.
+ */
 class WorkflowStepColumnListener
 {
     use WorkflowQueryTrait;
@@ -44,22 +48,28 @@ class WorkflowStepColumnListener
     /** @var array key(Entity Class) => value(array of Workflow instances) */
     protected $workflows = [];
 
+    /** @var DatagridStateProviderInterface */
+    private $filtersStateProvider;
+
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param EntityClassResolver $entityClassResolver
      * @param ConfigProvider $configProvider
      * @param WorkflowManagerRegistry $workflowManagerRegistry
+     * @param DatagridStateProviderInterface $filtersStateProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
         ConfigProvider $configProvider,
-        WorkflowManagerRegistry $workflowManagerRegistry
+        WorkflowManagerRegistry $workflowManagerRegistry,
+        DatagridStateProviderInterface $filtersStateProvider
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityClassResolver = $entityClassResolver;
         $this->configProvider = $configProvider;
         $this->workflowManagerRegistry = $workflowManagerRegistry;
+        $this->filtersStateProvider = $filtersStateProvider;
     }
 
     /**
@@ -222,7 +232,7 @@ class WorkflowStepColumnListener
 
         $isManyWorkflows = $this->isEntityHaveMoreThanOneWorkflow($rootEntity);
 
-        // TODO: add sorting by WorkflowStep Label in scope https://magecore.atlassian.net/browse/BAP-13321
+        // add sorting by WorkflowStep Label in scope https://magecore.atlassian.net/browse/BAP-13321
 
         // add filter (only if there is at least one filter)
         $filters = $config->offsetGetByPath('[filters][columns]', []);
@@ -233,7 +243,7 @@ class WorkflowStepColumnListener
                     'type' => 'entity',
                     'data_name' => self::WORKFLOW_STEP_COLUMN,
                     'options' => [
-                        'field_type' => WorkflowDefinitionSelectType::NAME,
+                        'field_type' => WorkflowDefinitionSelectType::class,
                         'field_options' => [
                             'workflow_entity_class' => $rootEntity,
                             'multiple' => true
@@ -244,10 +254,10 @@ class WorkflowStepColumnListener
 
             $filters[self::WORKFLOW_STEP_FILTER] = [
                 'label' => 'oro.workflow.workflowstep.grid.label',
-                'type' => 'entity',
+                'type' => 'workflow_step',
                 'data_name' => self::WORKFLOW_STEP_COLUMN . '.id',
                 'options' => [
-                    'field_type' => WorkflowStepSelectType::NAME,
+                    'field_type' => WorkflowStepSelectType::class,
                     'field_options' => [
                         'workflow_entity_class' => $rootEntity,
                         'multiple' => true,
@@ -311,8 +321,8 @@ class WorkflowStepColumnListener
      */
     protected function applyFilter(DatagridInterface $datagrid, $filter, $repositoryMethod)
     {
-        $parameters = $datagrid->getParameters();
-        $filters = $parameters->get('_filter', []);
+        $filters = $this->filtersStateProvider
+            ->getStateFromParameters($datagrid->getConfig(), $datagrid->getParameters());
 
         if (array_key_exists($filter, $filters) && array_key_exists('value', $filters[$filter])) {
             $rootEntity = $datagrid->getConfig()->getOrmQuery()->getRootEntity($this->entityClassResolver);
@@ -333,9 +343,6 @@ class WorkflowStepColumnListener
             } else {
                 $qb->setParameter('filteredWorkflowItemIds', array_intersect((array)$param->getValue(), $items));
             }
-
-            unset($filters[$filter]);
-            $parameters->set('_filter', $filters);
         }
     }
 

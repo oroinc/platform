@@ -22,6 +22,13 @@ OroMessageQueueBundle incorporates the OroMessageQueue component into OroPlatfor
  - [Resetting Symfony Container in consumer](Resources/doc/container_in_consumer.md)
  - [Security Context in consumer](Resources/doc/secutity_context.md)
  - [Buffering Messages](Resources/doc/buffering_messages.md)
+* [Logging, Error Handling and Debugging](./Resources/doc/logging.md)
+
+    * [Logs, Output and Verbosity](./Resources/doc/logging.md#logs-output-and-verbosity)
+    * [Consumer Heartbeat](./Resources/doc/logging.md#consumer-heartbeat)
+    * [Consumer Interruption](./Resources/doc/logging.md#consumer-interruption)
+    * [Errors and Crashes](./Resources/doc/logging.md#errors-and-crashes)
+    * [Profiling](./Resources/doc/logging.md#profiling)
 
 ## Overview
 
@@ -39,7 +46,7 @@ a web gui where you can monitor jobs status and interrupt jobs.
 First, you have to configure a transport layer and set one to be default. For the config settings
 
 ```yaml
-# app/config/config.yml
+# config/config.yml
 
 oro_message_queue:
     transport:
@@ -53,7 +60,7 @@ we can configure one of the supported transports via parameters:
 ### DBAL transport 
 
 ```yaml
-# app/config/parameters.yml
+# config/parameters.yml
 
     message_queue_transport: DBAL
     message_queue_transport_config: ~
@@ -107,7 +114,7 @@ oro_channel.async.change_integration_status_processor:
 Now you can start consuming messages:
 
 ```bash
-./app/console oro:message-queue:consume
+./bin/console oro:message-queue:consume
 ```
 
 _**Note**: Add -vvv to find out what is going while you are consuming messages. There is a lot of valuable debug info there._
@@ -123,7 +130,7 @@ the used memory amount after each message processing and terminates if it is exc
 was run:
 
 ```bash
-./app/console oro:message-queue:consume --memory-limit=700
+./bin/console oro:message-queue:consume --memory-limit=700
 ``` 
 
 then:
@@ -138,23 +145,6 @@ limit error during message processing.
 
 We recommend to set the `--time-limit` option to 5-10 minutes if using the `DBAL` transport to avoid database connection issues 
 
-### Consumer interruption
-
-Consumers can normally interrupt the message procession by many reasons:
-
-* Out of memory (if the option is set)
-* Timeout (if the option is set)
-* Messages limit exceeded (if the option is set)
-* Forcefully by an event:
-  * If a cache was cleared
-  * If a schema was updated
-  * If a maintenance mode was turned off
-  
-The normal interruption occurs only after a message was processed. If an event was fired during a message processing a 
-consumer completes the message processing and interrupts after the processing is done.
-  
-Also a consumer interrupts **if an exception was thrown during a message processing**. 
-
 ### Supervisord
 
 As you read before consumers can normally interrupt the message procession by many reasons.
@@ -162,11 +152,11 @@ In the all cases above the interrupted consumer should be re-run. So you must ke
 `oro:message-queue:consume` command and to do this best we advise you to delegate this responsibility 
 to [Supervisord](http://supervisord.org/). With next program configuration supervisord keeps running 
 four simultaneous instances of `oro:message-queue:consume` command and cares about relaunch if instance 
-has dead by any reason.
+has dead by any reason. Pay attention that the [program name](http://supervisord.org/configuration.html#program-x-section-settings) defined in the `[program:oro_message_consumer]` must be unique from any other instances deployed on the same supervisord server even if they are for staging purposes only. As an example, set the following programs `[program:prod_oro_message_consumer]` and `[program:dev_oro_message_consumer]`.
 
 ```ini
 [program:oro_message_consumer]
-command=/path/to/app/console --env=prod --no-debug oro:message-queue:consume
+command=/path/to/bin/console --env=prod --no-debug oro:message-queue:consume
 process_name=%(program_name)s_%(process_num)02d
 numprocs=4
 autostart=true
@@ -181,7 +171,7 @@ redirect_stderr=true
 To use several independent Message Queues on single RabbitMQ instance, configure a name prefix for the Message Queue. For example:
 
 ```yaml
-# app/config/config.yml
+# config/config.yml
 
 oro_message_queue:
     ...
@@ -206,7 +196,7 @@ The component is split into several layers:
 * **Consumption** - the layer provides tools to simplify consumption of messages. It provides a cli command, a queue consumer, message processor and ways to extend it.
 * **Client** - provides a high level abstraction. It provides easy to use abstraction for producing and processing messages. It also reduces a need to configure a broker.
 
-![Component structure](./Resources/doc/component_structure_diagram.png "The Oro MessageQueue component structure")
+![Component structure](./Resources/doc/images/component_structure_diagram.png "The Oro MessageQueue component structure")
 
 ### Flow
 
@@ -215,11 +205,11 @@ It takes the message and search for real recipients who is interested in such a 
 Then, It sends a copy of a message for all of them.
 Each target message processor takes its copy of the message and process it.
 
-![Message flow](./Resources/doc/message_flow_diagram.png "The message flow")
+![Message flow](./Resources/doc/images/message_flow_diagram.png "The message flow")
 
 The message itself has headers and body and they change this way while traveling through the system:
 
-![Message structure](./Resources/doc/message_structure_diagram.png "The message structure")
+![Message structure](./Resources/doc/images/message_structure_diagram.png "The message structure")
 
 ### Custom transport
 
@@ -246,7 +236,7 @@ Also, in case if you need custom logic for manage sent messages, you can use [Or
 Before you start to use traits in functional tests, you need to register `oro_message_queue.test.message_collector` service for `test` environment.
 
 ```yaml
-# app/config/config_test.yml
+# config/config_test.yml
 
 services:
     oro_message_queue.test.message_collector:
@@ -328,7 +318,7 @@ namespace Acme\Bundle\AcmeBundle\Tests\Unit;
 use Acme\Bundle\AcmeBundle\SomeClass;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 
-class SomeTest extends \PHPUnit_Framework_TestCase
+class SomeTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 
@@ -372,29 +362,3 @@ In the example above:
 * **bundle_name.processor_name.other_name.some_job** will **never** be *staled*.
 * **bundle_name.other_processor.other_name.some_job** will be *staled* after **1800** seconds
 * **processor_name.entity_name.user** will be *staled* after **1800** seconds
-
-## Consumer Heartbeat
-
-An administrator must be informed about the state of consumers in the system (whether there is at least one alive). 
-
-This is covered by the Consumer Heartbeat functionality that works in the following way:
-
-- On start and after every configured time period, each consumer calls the `tick` method of the [ConsumerHeartbeat](./Consumption/ConsumerHeartbeat.php)
-service that informs the system that the consumer is alive.
-- The cron command [oro:cron:message-queue:consumer_heartbeat_check](./Command/ConsumerHeartbeatCommand.php)
-is periodically executed to check consumers' state. If it does not find any alive consumers, the `oro/message_queue_state`
-socket message is sent notifying all logged-in users that the system may work incorrectly (because consumers are not available).
-- The same check is also performed when a user logs in. This is done to notify users about the problem as soon as possible.                                 
-                     
-The check period can be changed in the application configuration file using the `consumer_heartbeat_update_period` option:
-
-```yml
-oro_message_queue:
-    consumer:
-        heartbeat_update_period: 20 #the update period was set to 20 minutes 
-
-```                     
-
-The default value of the `heartbeat_update_period` option is 15 minutes.
-
-To disable the Consumer Heartbeat functionality, set the `heartbeat_update_period` option to 0.

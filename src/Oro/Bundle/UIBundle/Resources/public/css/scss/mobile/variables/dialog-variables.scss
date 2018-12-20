@@ -1,0 +1,53 @@
+/* @theme: admin.oro; */
+
+$dialog-mobile-max-width: 100vw !default;
+$dialog-mobile-min-width: initial !default;
+$dialog-mobile-width: 100% !default;
+$dialog-mobile-height: auto !default;
+$dialog-mobile-min-height: 100vh !default;
+$dialog-mobile-box-sizing: border-box !default;
+$dialog-mobile-position: inherit !default;
+$dialog-mobile-top: 0 !default;
+$dialog-mobile-left: 0 !default;
+$dialog-mobile-border: none !default;
+$dialog-mobile-border-radius: 0 !default;
+$dialog-mobile-box-shadow: none !default;
+$dialog-mobile-overflow: visible !default;
+
+$dialog-form-mobile-min-width: initial !default;
+
+$dialog-mobile-header-position: fixed !default;
+$dialog-mobile-header-width: 100% !default;
+$dialog-mobile-header-top: 0 !default;
+$dialog-mobile-header-left: 0 !default;
+$dialog-mobile-header-z-index: $oro-mobile-header-zindex !default;
+$dialog-mobile-header-border-radius: 0 !default;
+$dialog-mobile-header-inner-offset: 10px 21px 10px !default;
+$dialog-mobile-header-outer-offset: 0 !default;
+
+$dialog-mobile-content-position: inherit !default;
+$dialog-mobile-content-min-height: 0 !default;
+$dialog-mobile-content-max-height: none !default;
+$dialog-mobile-content-height: auto !default;
+$dialog-mobile-content-outer-offset: 0 !default;
+$dialog-mobile-content-inner-offset: 64px 16px 0 !default;
+
+$dialog-mobile-titlebar-icons-display: none !default;
+$dialog-mobile-dialog-on-background-display: none !default;
+$dialog-mobile-dialog-not-buttons-display: none !default;
+$dialog-widget-mobile-overlay-display: none !default;
+
+$dialog-mobile-actions-btn-font-size: $base-font-size !default;
+$dialog-mobile-actions-btn-height: 40px !default;
+$dialog-mobile-actions-btn-line-height: 40px !default;
+$dialog-mobile-actions-btn-inner-offset: 0 16px !default;
+$dialog-mobile-actions-btn-border-radius: 20px !default;
+$dialog-mobile-actions-btn-border: none !default;
+$dialog-mobile-actions-btn-outer-offset: 8px !default;
+
+$dialog-mobile-inner-grid-min-width: 0 !default;
+
+$dialog-resizable-handle-mobile-display: none !default;
+
+$dialog-actions-mobile-text-align: center !default;
+$dialog-actions-mobile-float: none !default;

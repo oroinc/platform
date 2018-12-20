@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -18,7 +19,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Loads full configuration of the target entity for associations were requested to expand.
- * For example, in JSON.API the "include" parameter can be used to request related entities.
+ * For example, in JSON.API the "include" filter can be used to request related entities.
  */
 class ExpandRelatedEntities implements ProcessorInterface
 {
@@ -28,14 +29,22 @@ class ExpandRelatedEntities implements ProcessorInterface
     /** @var ConfigProvider */
     private $configProvider;
 
+    /** @var EntityOverrideProviderRegistry */
+    private $entityOverrideProviderRegistry;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ConfigProvider $configProvider
+     * @param DoctrineHelper                 $doctrineHelper
+     * @param ConfigProvider                 $configProvider
+     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ConfigProvider $configProvider)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ConfigProvider $configProvider,
+        EntityOverrideProviderRegistry $entityOverrideProviderRegistry
+    ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->configProvider = $configProvider;
+        $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
     }
 
     /**
@@ -92,6 +101,7 @@ class ExpandRelatedEntities implements ProcessorInterface
         RequestType $requestType,
         array $extras
     ) {
+        $entityOverrideProvider = $this->entityOverrideProviderRegistry->getEntityOverrideProvider($requestType);
         $associations = $this->splitExpandedEntities($expandedEntities);
         foreach ($associations as $fieldName => $targetExpandedEntities) {
             $propertyPath = $this->getPropertyPath($fieldName, $definition);
@@ -109,10 +119,15 @@ class ExpandRelatedEntities implements ProcessorInterface
             }
 
             if (null !== $targetMetadata && $targetMetadata->hasAssociation($targetFieldName)) {
+                $targetClass = $targetMetadata->getAssociationTargetClass($targetFieldName);
+                $substituteTargetClass = $entityOverrideProvider->getSubstituteEntityClass($targetClass);
+                if ($substituteTargetClass) {
+                    $targetClass = $substituteTargetClass;
+                }
                 $this->completeAssociation(
                     $definition,
                     $fieldName,
-                    $targetMetadata->getAssociationTargetClass($targetFieldName),
+                    $targetClass,
                     $targetExpandedEntities,
                     $version,
                     $requestType,

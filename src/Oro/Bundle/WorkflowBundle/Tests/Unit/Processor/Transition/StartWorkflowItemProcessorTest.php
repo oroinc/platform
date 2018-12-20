@@ -11,9 +11,9 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\StartWorkflowItemProcessor;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class StartWorkflowItemProcessorTest extends \PHPUnit_Framework_TestCase
+class StartWorkflowItemProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var StartWorkflowItemProcessor */
@@ -27,7 +27,7 @@ class StartWorkflowItemProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSkipFailures()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('hasError')->willReturn(true);
 
@@ -38,7 +38,7 @@ class StartWorkflowItemProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSkipContextWithWorkflowItem()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('hasWorkflowItem')->willReturn(true);
 
@@ -52,15 +52,15 @@ class StartWorkflowItemProcessorTest extends \PHPUnit_Framework_TestCase
         $entity = (object)['id' => 42];
         $initialData = ['initial_data'];
 
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
 
-        /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject $workflowDefinition */
+        /** @var WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject $workflowDefinition */
         $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         $workflowDefinition->expects($this->once())->method('getRelatedEntity')->willReturn(\stdClass::class);
 
-        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
         $workflow = $this->createMock(Workflow::class);
         $workflow->expects($this->once())->method('getDefinition')->willReturn($workflowDefinition);
         $workflow->expects($this->once())
@@ -88,15 +88,15 @@ class StartWorkflowItemProcessorTest extends \PHPUnit_Framework_TestCase
         $initialData = ['initial_data'];
         $entity = (object)['id' => 1];
 
-        /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject $workflowDefinition */
+        /** @var WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject $workflowDefinition */
         $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         $workflowDefinition->expects($this->once())->method('getRelatedEntity')->willReturn(\stdClass::class);
 
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
 
-        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
         $workflow = $this->createMock(Workflow::class);
         $workflow->expects($this->once())->method('getDefinition')->willReturn($workflowDefinition);
         $workflow->expects($this->once())
@@ -121,11 +121,11 @@ class StartWorkflowItemProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testNotManageableEntityExceptionProcessing()
     {
-        /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject $workflowDefinition */
+        /** @var WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject $workflowDefinition */
         $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         $workflowDefinition->expects($this->once())->method('getRelatedEntity')->willReturn(\stdClass::class);
 
-        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
         $workflow = $this->createMock(Workflow::class);
         $workflow->expects($this->once())->method('getDefinition')->willReturn($workflowDefinition);
         $workflow->expects($this->never())->method('createWorkflowItem');

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\AddressBundle\Entity\Country;
@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
 
-class ItemIdentifierCollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
+class ItemIdentifierCollectionTypeSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ItemIdentifierCollectionTypeSubscriber */
     protected $subscriber;

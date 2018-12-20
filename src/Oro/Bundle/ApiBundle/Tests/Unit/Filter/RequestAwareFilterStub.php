@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 class RequestAwareFilterStub extends ComparisonFilter implements RequestAwareFilterInterface
 {
     /** @var RequestType|null */
-    protected $requestType;
+    private $requestType;
 
     /**
      * @return RequestType|null

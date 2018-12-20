@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessorSupervisor;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import\Stub\StubWorkflowImportCallbackProcessor;
 
-class WorkflowImportProcessorSupervisorTest extends \PHPUnit_Framework_TestCase
+class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var WorkflowImportProcessorSupervisor
@@ -21,7 +21,7 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessProxyParent()
     {
-        /** @var ConfigImportProcessorInterface|\PHPUnit_Framework_MockObject_MockObject $parent */
+        /** @var ConfigImportProcessorInterface|\PHPUnit\Framework\MockObject\MockObject $parent */
         $parent = $this->createMock(ConfigImportProcessorInterface::class);
 
         $first = $this->createImportProcessorMock('targetA', 'resourceA', ['setParent', 'process']);
@@ -200,7 +200,7 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit_Framework_TestCase
      * @param string $target
      * @param string $resource
      * @param array $methods
-     * @return WorkflowImportProcessor|\PHPUnit_Framework_MockObject_MockObject
+     * @return WorkflowImportProcessor|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createImportProcessorMock(string $target, string $resource, array $methods = [])
     {

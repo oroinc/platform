@@ -11,20 +11,20 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
+class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var LocalizationManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $localizationManager;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var LanguageCodeFormatter|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageCodeFormatter|\PHPUnit\Framework\MockObject\MockObject */
     protected $languageFormatter;
 
-    /** @var LanguageProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $languageProvider;
 
     /** @var LocalizationChoicesProvider */
@@ -73,8 +73,8 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                105 => 'formatted_en',
-                110 => 'formatted_de'
+                'formatted_en' => 105,
+                'formatted_de' => 110,
             ],
             $this->provider->getLanguageChoices($onlyEnabled)
         );
@@ -96,9 +96,9 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
         $choices = $this->provider->getFormattingChoices();
 
         $this->assertInternalType('array', $choices);
-        $this->assertArrayHasKey('br_FR', $choices);
-        $this->assertArrayNotHasKey('ho', $choices);
-        $this->assertEquals('bretón (Francia)', $choices['br_FR']);
+        $this->assertContains('br_FR', $choices);
+        $this->assertNotContains('ho', $choices);
+        $this->assertEquals('br_FR', $choices['bretón (Francia)']);
     }
 
     public function testGetLocalizationChoices()
@@ -115,8 +115,8 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                $entity1->getId() => $entity1,
-                $entity2->getId() => $entity2
+                $entity1->getName() => $entity1->getId(),
+                $entity2->getName() => $entity2->getId(),
             ],
             $this->provider->getLocalizationChoices()
         );

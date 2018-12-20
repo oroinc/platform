@@ -1,0 +1,329 @@
+/* @theme: admin.oro; */
+@import "mixins/direction";
+@import "mixins/loading";
+@import "mixins/label";
+@import "mixins/absolute-line-height";
+
+$enable-safe-area: true;
+
+// Helper to clear inner floats
+@mixin clearfix() {
+    &:after {
+        content: '';
+        display: block;
+        clear: both;
+    }
+}
+
+@mixin hide-text {
+    font: 0/0 a;
+    color: transparent;
+    text-shadow: none;
+    background-color: transparent;
+    border: 0;
+}
+
+@mixin cursor-grab() {
+    cursor: url(../../../oroui/img/cursor/grab.cur), move;
+    cursor: -webkit-grab;
+    cursor: -moz-grab;
+}
+
+@mixin cursor-grabbing() {
+    cursor: url(../../../oroui/img/cursor/grabbing.cur), move;
+    cursor: -webkit-grabbing;
+    cursor: -moz-grabbing;
+}
+
+@mixin accordion-toggle() {
+    font-weight: bold;
+    padding-#{$start}: 15px;
+    background: $accordion-heading-background-color;
+}
+
+@mixin accordion-toggle-before() {
+    content: "\f107";
+    font-family: FontAwesome;
+    margin: side-values(0 7px 0 -7px);
+    width: 10px;
+    display: inline-block;
+}
+
+@mixin accordion-toggle-collapsed-before() {
+    content: "\f105";
+    margin: side-values(0 5px 0 -5px);
+}
+
+@mixin accordion-group() {
+    border-radius: 0;
+    margin-bottom: 0;
+    border: none;
+}
+
+@mixin header-cell-dropdown() {
+    > .dropdown {
+        margin-#{$start}: -5px;
+
+        > .dropdown-toggle {
+            padding: 4px;
+            line-height: 12px;
+            height: 22px;
+        }
+
+        .dropdown-menu {
+            min-width: 60px;
+            padding-bottom: 5px;
+        }
+    }
+
+    .btn .caret {
+        margin-top: 5px;
+    }
+}
+
+@mixin horizontal-icon-menu() {
+    .dropdown-menu {
+        > li {
+            display: table-cell;
+        }
+
+        .nav.launchers-list {
+            padding: 0;
+
+            > li:first-child > a {
+                margin-#{$start}: 2px;
+            }
+        }
+    }
+}
+
+@mixin open() {
+    & > .dropdown-menu {
+        display: block;
+    }
+}
+
+@mixin process($loadingImagePath: '../../img/loader-16.gif') {
+    position: relative;
+
+    &:after {
+        content: '';
+        background: transparent url($loadingImagePath) no-repeat center left;
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background-size: 12px 12px;
+        #{$end}: -20px;
+        top: 50%;
+        margin-top: -6px;
+    }
+}
+
+@mixin inline-actions-element-outline($color, $width: 2px) {
+    box-shadow: 0 0 0 $width $color;
+}
+
+@mixin floating-validation-message() {
+    $arrow-height: 6px;
+
+    display: block;
+    position: relative;
+    z-index: 2;
+    width: auto;
+    height: 0;
+    margin: 0;
+
+    &:before {
+        content: normal;
+    }
+
+    &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 100%;
+        margin-top: -($field-size + $arrow-height);
+        #{$start}: 10px;
+        border-style: solid;
+        border-color: $danger-lighten transparent;
+        border-width: $arrow-height ($arrow-height - 1) 0;
+    }
+
+    > span {
+        position: fixed;
+        width: $width-input;
+        margin-top: -($field-size + $arrow-height);
+
+        > span {
+            position: absolute;
+            bottom: 0;
+            padding: side-values(5px 8px 6px 30px);
+            border-radius: $input-field-border-radius;
+            font-size: $base-font-size - 1;
+            background-color: $danger-lighten;
+            color: $danger-ultra-dark;
+
+            @include fa-icon($fa-var-times, before, true) {
+                position: absolute;
+                #{$start}: 9px;
+                top: 3px;
+                font-size: $icon-font-size;
+                color: $danger-darken;
+            }
+        }
+    }
+}
+
+@mixin text-line-truncate($width: 100%, $max-width: false) {
+    @if $max-width {
+        max-width: $width;
+    } @else {
+        width: $width;
+    }
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@mixin clearfix-box() {
+    &:after {
+        display: block;
+        width: 100%;
+        content: '';
+        clear: both;
+    }
+}
+
+// Set inner offset from the edges to include the safe-area
+// iPhone X
+// Use like native padding
+// Ex. @include safe-area-offset(padding, 10px 15px);
+// Ex. @include safe-area-offset(margin, 10px 15px 20px);
+@mixin safe-area-offset($property, $values, $default: true) {
+    @if ($property != null and $values != null and length($values) <= 4) {
+        $safe-area-offset-left: 0;
+        $safe-area-offset-right: 0;
+
+        @if ($default) {
+            #{$property}: #{$values};
+        }
+
+        @if ($enable-safe-area) {
+            @if (length($values) == 1) {
+                $safe-area-offset-left: nth($values, 1);
+                $safe-area-offset-right: nth($values, 1);
+            } @else if (length($values) == 2 or length($values) == 3) {
+                $safe-area-offset-left: nth($values, 2);
+                $safe-area-offset-right: nth($values, 2);
+            } @else if (length($values) == 4) {
+                $safe-area-offset-left: nth($values, 4);
+                $safe-area-offset-right: nth($values, 2);
+            }
+
+            @include safe-area-property-left(#{$property}-left, $safe-area-offset-left, false);
+            @include safe-area-property-right(#{$property}-right, $safe-area-offset-right, false);
+        }
+    } @else if (length($values) > 4) {
+        @warn 'Incorrect arguments of mixin';
+    }
+}
+
+// Set any property with left safe-area zone
+@mixin safe-area-property-left($property, $value: 0, $default: true) {
+    @if ($property != null or $value != null) {
+        @if ($default) {
+            #{$property}: #{$value};
+        }
+
+        @if ($enable-safe-area) {
+            @if (strip-units($value) == 0) {
+                // iOS 11
+                #{$property}: constant(safe-area-inset-left);
+
+                // iOS 11.2+
+                #{$property}: env(safe-area-inset-left);
+            } @else {
+                // iOS 11
+                #{$property}: calc(constant(safe-area-inset-left) + #{$value});
+
+                // iOS 11.2+
+                #{$property}: calc(env(safe-area-inset-left) + #{$value});
+            }
+        }
+    }
+}
+
+// Set any property with right safe-area zone
+@mixin safe-area-property-right($property, $value: 0, $default: true) {
+    @if ($property != null or $value != null) {
+        @if ($default) {
+            #{$property}: #{$value};
+        }
+
+        @if ($enable-safe-area) {
+            @if (strip-units($value) == 0) {
+                // iOS 11
+                #{$property}: constant(safe-area-inset-right);
+
+                // iOS 11.2+
+                #{$property}: env(safe-area-inset-right);
+            } @else {
+                // iOS 11
+                #{$property}: calc(constant(safe-area-inset-right) + #{$value});
+
+                // iOS 11.2+
+                #{$property}: calc(env(safe-area-inset-right) + #{$value});
+            }
+        }
+    }
+}
+
+// Mixin for include font-awesome icons to custom elements
+// List of icons https://github.com/FortAwesome/Font-Awesome/blob/v4.7.0/scss/_variables.scss
+// @param $icon (Font Awesome icon)
+// @param $state {CSS pseudo-element}
+// Use:  @include fa-icon($view-product-gallery-icon, before, true) {
+//  extra rules
+// }
+@mixin fa-icon($icon: null, $state: before, $extra-rules: false) {
+    @if ($icon) {
+        &:#{$state} {
+            content: '#{$icon}';
+            font-family: 'FontAwesome', $font-family-sans-serif;
+
+            @if ($extra-rules) {
+                @content;
+            }
+        }
+    }
+}
+
+// Creates set of keyframes with vendor prefixes
+@mixin keyframe($animation-name) {
+    @-webkit-keyframes $animation-name {
+        @content;
+    }
+
+    @keyframes $animation-name {
+        @content;
+    }
+}
+
+@mixin placeholder {
+    &::-webkit-input-placeholder {@content}
+    &:-moz-placeholder           {@content}
+    &::-moz-placeholder          {@content}
+    &:-ms-input-placeholder      {@content}
+}
+
+// Prevented .selector uniform width
+@mixin selector-width($width: auto, $max-width: null) {
+    .selector {
+        width: $width;
+        max-width: $max-width;
+
+        > span {
+            width: 100%;
+        }
+    }
+}

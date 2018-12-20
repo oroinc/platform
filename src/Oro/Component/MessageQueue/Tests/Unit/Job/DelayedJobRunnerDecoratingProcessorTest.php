@@ -8,7 +8,7 @@ use Oro\Component\MessageQueue\Test\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
-class DelayedJobRunnerDecoratingProcessorTest extends \PHPUnit_Framework_TestCase
+class DelayedJobRunnerDecoratingProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var JobRunner
@@ -16,7 +16,7 @@ class DelayedJobRunnerDecoratingProcessorTest extends \PHPUnit_Framework_TestCas
     private $jobRunner;
 
     /**
-     * @var MessageProcessorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var MessageProcessorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $processor;
 
@@ -40,9 +40,9 @@ class DelayedJobRunnerDecoratingProcessorTest extends \PHPUnit_Framework_TestCas
      */
     public function testProcess($processorResult, $expected)
     {
-        /** @var MessageInterface|\PHPUnit_Framework_MockObject_MockObject $message */
+        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject $message */
         $message = $this->createMock(MessageInterface::class);
-        /** @var SessionInterface|\PHPUnit_Framework_MockObject_MockObject $session */
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
 
         $message->expects($this->any())
@@ -73,9 +73,9 @@ class DelayedJobRunnerDecoratingProcessorTest extends \PHPUnit_Framework_TestCas
 
     public function testProcessRequeue()
     {
-        /** @var MessageInterface|\PHPUnit_Framework_MockObject_MockObject $message */
+        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject $message */
         $message = $this->createMock(MessageInterface::class);
-        /** @var SessionInterface|\PHPUnit_Framework_MockObject_MockObject $session */
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
 
         $message->expects($this->any())
@@ -94,9 +94,9 @@ class DelayedJobRunnerDecoratingProcessorTest extends \PHPUnit_Framework_TestCas
 
     public function testProcessWithoutJobId()
     {
-        /** @var MessageInterface|\PHPUnit_Framework_MockObject_MockObject $message */
+        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject $message */
         $message = $this->createMock(MessageInterface::class);
-        /** @var SessionInterface|\PHPUnit_Framework_MockObject_MockObject $session */
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
 
         $message->expects($this->any())

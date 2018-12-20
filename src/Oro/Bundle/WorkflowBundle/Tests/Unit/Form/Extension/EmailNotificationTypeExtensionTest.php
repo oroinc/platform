@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormView;
 
 class EmailNotificationTypeExtensionTest extends FormIntegrationTestCase
 {
-    /** @var EmailNotificationTypeListener|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailNotificationTypeListener|\PHPUnit\Framework\MockObject\MockObject */
     protected $listener;
 
     /** @var EmailNotificationTypeExtension */
@@ -35,7 +35,7 @@ class EmailNotificationTypeExtensionTest extends FormIntegrationTestCase
 
     public function testBuildForm()
     {
-        /** @var FormBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
+        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->at(0))
             ->method('addEventListener')

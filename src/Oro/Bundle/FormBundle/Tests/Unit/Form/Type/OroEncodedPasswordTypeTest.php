@@ -3,7 +3,7 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroEncodedPasswordType;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -13,12 +13,12 @@ class OroEncodedPasswordTypeTest extends FormIntegrationTestCase
     /** @var OroEncodedPasswordType */
     protected $formType;
 
-    /** @var Mcrypt|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $encryptor;
 
     protected function setUp()
     {
-        $this->encryptor = $this->createMock('Oro\Bundle\SecurityBundle\Encoder\Mcrypt');
+        $this->encryptor = $this->createMock(SymmetricCrypterInterface::class);
         $this->formType = new OroEncodedPasswordType($this->encryptor);
         parent::setUp();
     }
@@ -84,7 +84,7 @@ class OroEncodedPasswordTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /* @var $resolver \PHPUnit_Framework_MockObject_MockObject|OptionsResolver */
+        /* @var $resolver \PHPUnit\Framework\MockObject\MockObject|OptionsResolver */
         $resolver = $this->createMock(OptionsResolver::class);
 
         $options = ['encode' => true, 'browser_autocomplete' => false];

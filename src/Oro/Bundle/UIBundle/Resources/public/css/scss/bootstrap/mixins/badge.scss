@@ -1,0 +1,19 @@
+/* @theme: admin.oro; */
+
+@mixin badge-custom-variant($background, $icon-color, $color: color-yiq($background)) {
+    color: $color;
+    background-color: $background;
+
+    [class^="fa-"],
+    [class*=" fa-"] {
+        color: $icon-color;
+    }
+
+    &[href] {
+        @include hover-focus {
+            color: $color;
+            text-decoration: none;
+            background-color: darken($background, 10%);
+        }
+    }
+}

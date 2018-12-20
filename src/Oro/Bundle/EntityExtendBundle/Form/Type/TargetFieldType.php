@@ -76,8 +76,9 @@ class TargetFieldType extends AbstractType
             $fieldLabel = $entityConfigProvider
                 ->getConfig($fieldId->getClassName(), $fieldId->getFieldName())
                 ->get('label');
+            $fieldName = $fieldId->getFieldName();
 
-            $choices[$fieldId->getFieldName()] = $fieldLabel ?: $fieldId->getFieldName();
+            $choices[$fieldLabel ?: $fieldName] = $fieldName;
         }
 
         return $choices;

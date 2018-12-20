@@ -6,6 +6,7 @@ use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
 use Oro\Bundle\DistributionBundle\Script\Runner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\TempDirExtension;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -13,16 +14,18 @@ use Psr\Log\LoggerInterface;
  */
 class RunnerTest extends WebTestCase
 {
+    use TempDirExtension;
+
     /**
      * @var string
      */
-    protected $applicationRootDir;
+    protected $applicationProjectDir;
 
     protected function setUp()
     {
         $this->initClient();
-        $this->applicationRootDir = $this->client->getKernel()->getRootDir();
-        if (!is_dir($this->applicationRootDir . '/config/dist')) {
+        $this->applicationProjectDir = $this->client->getKernel()->getProjectDir();
+        if (!is_dir($this->applicationProjectDir . '/config/dist')) {
             $this->markTestSkipped('Distribution tests are not compatibility with CRM environment');
         }
     }
@@ -231,11 +234,7 @@ class RunnerTest extends WebTestCase
 
     public function testShouldRemoveCachedFiles()
     {
-        $tempDir = sys_get_temp_dir() . '/platform-app-tmp';
-        if (is_dir($tempDir)) {
-            rmdir($tempDir);
-        }
-        mkdir($tempDir);
+        $tempDir = $this->getTempDir('platform-app-tmp');
 
         $bundlesFileName = $tempDir . '/bundles.php';
         $containerFileName = $tempDir . '/' . uniqid() . 'ProjectContainer.php';
@@ -274,7 +273,7 @@ class RunnerTest extends WebTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PackageInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|PackageInterface
      */
     protected function createPackageMock()
     {
@@ -285,7 +284,7 @@ class RunnerTest extends WebTestCase
      * @param \Composer\Package\PackageInterface $package
      * @param string $targetDir
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|InstallationManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|InstallationManager
      */
     protected function createInstallationManagerMock(PackageInterface $package = null, $targetDir = null)
     {
@@ -316,7 +315,7 @@ class RunnerTest extends WebTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     protected function createLoggerMock()
     {
@@ -327,7 +326,7 @@ class RunnerTest extends WebTestCase
      * @param PackageInterface $package
      * @param LoggerInterface $logger
      * @param string $targetDir
-     * @param string $applicationRootDir
+     * @param string $applicationProjectDir
      *
      * @return Runner
      */
@@ -335,12 +334,12 @@ class RunnerTest extends WebTestCase
         PackageInterface $package = null,
         LoggerInterface $logger = null,
         $targetDir = null,
-        $applicationRootDir = null
+        $applicationProjectDir = null
     ) {
         return new Runner(
             $this->createInstallationManagerMock($package, $targetDir),
             $logger ? : $this->createLoggerMock(),
-            $applicationRootDir ? $applicationRootDir : $this->applicationRootDir,
+            $applicationProjectDir ? $applicationProjectDir : $this->applicationProjectDir,
             'test'
         );
     }

@@ -12,18 +12,18 @@ use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
     protected $entityRepository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     protected $entityManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var StepManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var StepManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $stepManager;
 
     /** @var WorkflowDefinitionHandler */
@@ -50,10 +50,10 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->willReturn($this->entityRepository);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry $managerRegistry */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry $managerRegistry */
         $managerRegistry = $this->createMock(ManagerRegistry::class);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $managerRegistry->expects($this->any())

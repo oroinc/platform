@@ -9,18 +9,18 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueListProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class EnumValueListProviderTest extends \PHPUnit_Framework_TestCase
+class EnumValueListProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $extendConfigProvider;
 
     /** @var EnumValueListProvider */
@@ -241,12 +241,12 @@ class EnumValueListProviderTest extends \PHPUnit_Framework_TestCase
                 'exclusion_policy' => 'all',
                 'hints'            => ['HINT_TRANSLATABLE'],
                 'fields'           => [
-                    'id'       => null,
-                    'name'     => null,
-                    'priority' => [
-                        'result_name' => 'order'
+                    'id'      => null,
+                    'name'    => null,
+                    'order'   => [
+                        'property_path' => 'priority'
                     ],
-                    'default'  => null
+                    'default' => null
                 ]
             ],
             $this->enumValueListProvider->getSerializationConfig($className)

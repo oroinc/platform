@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Grid\Action;
 
 use Oro\Bundle\EntityExtendBundle\Grid\Action\AjaxDeleteFieldAction;
 
-class AjaxDeleteFieldActionTest extends \PHPUnit_Framework_TestCase
+class AjaxDeleteFieldActionTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOptions()
     {

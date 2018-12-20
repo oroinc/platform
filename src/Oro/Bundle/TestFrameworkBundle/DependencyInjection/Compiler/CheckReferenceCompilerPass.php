@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -71,6 +72,9 @@ class CheckReferenceCompilerPass implements CompilerPassInterface
             if ($this->isEntityConfigProviderService($container, $parameter)) {
                 return;
             }
+            if ($definition->getClass() === MemoryCacheChain::class) {
+                return;
+            }
 
             throw new \Exception(sprintf(
                 'Service %s has definition of service %s as parameter in method %s. Should be %s instead of %s',
@@ -101,7 +105,7 @@ class CheckReferenceCompilerPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      * @return array
      */
-    public function getEntityConfigProviders(ContainerBuilder $container)
+    private function getEntityConfigProviders(ContainerBuilder $container)
     {
         if ($this->entityConfigProviders === null) {
             $serviceIds = array_keys($container->getDefinitions());

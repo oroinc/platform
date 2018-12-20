@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemover;
 use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemoverValidator;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class HasAdderAndRemoverValidatorTest extends AbstractConstraintValidatorTest
+class HasAdderAndRemoverValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {
@@ -27,7 +28,7 @@ class HasAdderAndRemoverValidatorTest extends AbstractConstraintValidatorTest
     {
         $constraint = new HasAdderAndRemover(
             [
-                'class'    => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                'class'    => Entity\User::class,
                 'property' => 'groups'
             ]
         );
@@ -41,7 +42,7 @@ class HasAdderAndRemoverValidatorTest extends AbstractConstraintValidatorTest
     {
         $constraint = new HasAdderAndRemover(
             [
-                'class'    => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\EntityWithoutGettersAndSetters',
+                'class'    => Entity\EntityWithoutGettersAndSetters::class,
                 'property' => 'groups'
             ]
         );
@@ -63,7 +64,7 @@ class HasAdderAndRemoverValidatorTest extends AbstractConstraintValidatorTest
     {
         $constraint = new HasAdderAndRemover(
             [
-                'class'    => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\EntityWithoutGettersAndSetters',
+                'class'    => Entity\EntityWithoutGettersAndSetters::class,
                 'property' => 'appendices'
             ]
         );
@@ -87,7 +88,7 @@ class HasAdderAndRemoverValidatorTest extends AbstractConstraintValidatorTest
                     '{{ adder2 }}'   => 'addAppendix',
                     '{{ remover2 }}' => 'removeAppendix',
                     '{{ adder3 }}'   => 'addAppendice',
-                    '{{ remover3 }}' => 'removeAppendice',
+                    '{{ remover3 }}' => 'removeAppendice'
                 ]
             )
             ->assertRaised();

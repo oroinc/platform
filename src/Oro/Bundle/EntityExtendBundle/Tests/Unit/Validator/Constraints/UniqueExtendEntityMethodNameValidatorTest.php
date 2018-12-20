@@ -12,15 +12,16 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityFieldV
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodName;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
+use Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class UniqueExtendEntityMethodNameValidatorTest extends AbstractConstraintValidatorTest
+class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestCase
 {
     const TEST_CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools\TestEntity';
     const TEST_FIELD_NAME = 'testField';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $classMethodNameChecker;
 
     /** @var UniqueExtendEntityFieldValidator */
@@ -43,11 +44,15 @@ class UniqueExtendEntityMethodNameValidatorTest extends AbstractConstraintValida
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject $eventDispatcher */
+        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         return new UniqueExtendEntityMethodNameValidator(
-            new FieldNameValidationHelper(new ConfigProviderMock($configManager, 'extend'), $eventDispatcher),
+            new FieldNameValidationHelper(
+                new ConfigProviderMock($configManager, 'extend'),
+                $eventDispatcher,
+                new NewEntitiesHelper()
+            ),
             $this->classMethodNameChecker
         );
     }

@@ -9,9 +9,9 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
-class EntityHandlerTest extends \PHPUnit_Framework_TestCase
+class EntityHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionProcessorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorInterface */
     private $customizationProcessor;
 
     protected function setUp()
@@ -44,7 +44,8 @@ class EntityHandlerTest extends \PHPUnit_Framework_TestCase
             $version,
             $requestType,
             $entityClass,
-            $config
+            $config,
+            false
         );
 
         $this->customizationProcessor->expects(self::once())
@@ -65,6 +66,9 @@ class EntityHandlerTest extends \PHPUnit_Framework_TestCase
                     self::assertEquals($entityClass, $context->getClassName());
                     self::assertSame($config, $context->getConfig());
                     self::assertEquals($data, $context->getResult());
+                    self::assertEquals('item', $context->getFirstGroup());
+                    self::assertEquals('item', $context->getLastGroup());
+                    self::assertFalse($context->isIdentifierOnly());
 
                     $contextData = $context->getResult();
                     $contextData['anotherKey'] = 'anotherValue';
@@ -92,7 +96,8 @@ class EntityHandlerTest extends \PHPUnit_Framework_TestCase
             $version,
             $requestType,
             Entity\User::class,
-            $config
+            $config,
+            false
         );
         $handler = new EntityHandler(
             $this->customizationProcessor,
@@ -100,6 +105,7 @@ class EntityHandlerTest extends \PHPUnit_Framework_TestCase
             $requestType,
             $entityClass,
             $config,
+            false,
             $previousHandler
         );
 
@@ -138,6 +144,7 @@ class EntityHandlerTest extends \PHPUnit_Framework_TestCase
             $requestType,
             Entity\User::class,
             $config,
+            false,
             $previousHandler1
         );
         $handler = new EntityHandler(
@@ -146,6 +153,7 @@ class EntityHandlerTest extends \PHPUnit_Framework_TestCase
             $requestType,
             $entityClass,
             $config,
+            false,
             $previousHandler2
         );
 
@@ -182,7 +190,8 @@ class EntityHandlerTest extends \PHPUnit_Framework_TestCase
             '1.0',
             $requestType,
             $entityClass,
-            $config
+            $config,
+            false
         );
         $handler = new EntityHandler(
             $this->customizationProcessor,
@@ -190,6 +199,7 @@ class EntityHandlerTest extends \PHPUnit_Framework_TestCase
             $requestType,
             $entityClass,
             $config,
+            false,
             $previousHandler
         );
 
@@ -230,7 +240,8 @@ class EntityHandlerTest extends \PHPUnit_Framework_TestCase
             $version,
             new RequestType(['test1']),
             $entityClass,
-            $config
+            $config,
+            false
         );
         $handler = new EntityHandler(
             $this->customizationProcessor,
@@ -238,6 +249,7 @@ class EntityHandlerTest extends \PHPUnit_Framework_TestCase
             $requestType,
             $entityClass,
             $config,
+            false,
             $previousHandler
         );
 
@@ -278,7 +290,8 @@ class EntityHandlerTest extends \PHPUnit_Framework_TestCase
             $version,
             $requestType,
             Entity\Account::class,
-            $config
+            $config,
+            false
         );
         $handler = new EntityHandler(
             $this->customizationProcessor,
@@ -286,6 +299,7 @@ class EntityHandlerTest extends \PHPUnit_Framework_TestCase
             $requestType,
             $entityClass,
             $config,
+            false,
             $previousHandler
         );
 
@@ -332,6 +346,7 @@ class EntityHandlerTest extends \PHPUnit_Framework_TestCase
             $requestType,
             $entityClass,
             $config,
+            false,
             $previousHandler
         );
 
@@ -351,6 +366,190 @@ class EntityHandlerTest extends \PHPUnit_Framework_TestCase
         $handledData = \call_user_func($handler, $data);
         self::assertEquals(
             ['key' => 'value', 'previousKey' => 'previousValue', 'anotherKey' => 'anotherValue'],
+            $handledData
+        );
+    }
+
+    public function testForIdentifierOnly()
+    {
+        $version = '1.2';
+        $requestType = new RequestType(['test']);
+        $entityClass = Entity\User::class;
+        $data = ['key' => 'value'];
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['id']);
+        $config->addField('id');
+
+        $handler = new EntityHandler(
+            $this->customizationProcessor,
+            $version,
+            $requestType,
+            $entityClass,
+            $config,
+            false
+        );
+
+        $this->customizationProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn(new CustomizeLoadedDataContext());
+        $this->customizationProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CustomizeLoadedDataContext $context) {
+                    self::assertTrue($context->isIdentifierOnly());
+                }
+            );
+
+        \call_user_func($handler, $data);
+    }
+
+    public function testForIdentifierOnlyWithCompositeIdentifier()
+    {
+        $version = '1.2';
+        $requestType = new RequestType(['test']);
+        $entityClass = Entity\User::class;
+        $data = ['key' => 'value'];
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['id1', 'id2']);
+        $config->addField('id1');
+        $config->addField('id2');
+
+        $handler = new EntityHandler(
+            $this->customizationProcessor,
+            $version,
+            $requestType,
+            $entityClass,
+            $config,
+            false
+        );
+
+        $this->customizationProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn(new CustomizeLoadedDataContext());
+        $this->customizationProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CustomizeLoadedDataContext $context) {
+                    self::assertTrue($context->isIdentifierOnly());
+                }
+            );
+
+        \call_user_func($handler, $data);
+    }
+
+    public function testForOneFieldThatIsNotIdentifier()
+    {
+        $version = '1.2';
+        $requestType = new RequestType(['test']);
+        $entityClass = Entity\User::class;
+        $data = ['key' => 'value'];
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['id']);
+        $config->addField('field1');
+
+        $handler = new EntityHandler(
+            $this->customizationProcessor,
+            $version,
+            $requestType,
+            $entityClass,
+            $config,
+            false
+        );
+
+        $this->customizationProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn(new CustomizeLoadedDataContext());
+        $this->customizationProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CustomizeLoadedDataContext $context) {
+                    self::assertFalse($context->isIdentifierOnly());
+                }
+            );
+
+        \call_user_func($handler, $data);
+    }
+
+    public function testForEntityWithoutIdentifier()
+    {
+        $version = '1.2';
+        $requestType = new RequestType(['test']);
+        $entityClass = Entity\User::class;
+        $data = ['key' => 'value'];
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1');
+
+        $handler = new EntityHandler(
+            $this->customizationProcessor,
+            $version,
+            $requestType,
+            $entityClass,
+            $config,
+            false
+        );
+
+        $this->customizationProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn(new CustomizeLoadedDataContext());
+        $this->customizationProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CustomizeLoadedDataContext $context) {
+                    self::assertFalse($context->isIdentifierOnly());
+                }
+            );
+
+        \call_user_func($handler, $data);
+    }
+
+    public function testForCollectionHandler()
+    {
+        $version = '1.2';
+        $requestType = new RequestType(['test']);
+        $entityClass = Entity\User::class;
+        $config = new EntityDefinitionConfig();
+        $data = ['key' => 'value'];
+
+        $handler = new EntityHandler(
+            $this->customizationProcessor,
+            $version,
+            $requestType,
+            $entityClass,
+            $config,
+            true
+        );
+
+        $this->customizationProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn(new CustomizeLoadedDataContext());
+        $this->customizationProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CustomizeLoadedDataContext $context) use (
+                    $version,
+                    $requestType,
+                    $entityClass,
+                    $config,
+                    $data
+                ) {
+                    self::assertEquals($version, $context->getVersion());
+                    self::assertEquals($requestType, $context->getRequestType());
+                    self::assertEquals($entityClass, $context->getClassName());
+                    self::assertSame($config, $context->getConfig());
+                    self::assertEquals($data, $context->getResult());
+                    self::assertEquals('collection', $context->getFirstGroup());
+                    self::assertEquals('collection', $context->getLastGroup());
+                    self::assertFalse($context->isIdentifierOnly());
+
+                    $contextData = $context->getResult();
+                    $contextData['anotherKey'] = 'anotherValue';
+                    $context->setResult($contextData);
+                }
+            );
+
+        $handledData = \call_user_func($handler, $data);
+        self::assertEquals(
+            ['key' => 'value', 'anotherKey' => 'anotherValue'],
             $handledData
         );
     }

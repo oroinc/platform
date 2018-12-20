@@ -1,0 +1,29 @@
+/* @theme: admin.oro; */
+
+$widget-picker-max-width:                       698px !default;
+$widget-picker-search-width:                    208px !default;
+$widget-picker-icon-bg-color:                   $primary-750 !default;
+
+$widget-picker-icon-color:                      $primary-inverse !default;
+$widget-picker-item-separator-width:            1px !default;
+$widget-picker-item-separator-color:            $primary-860 !default;
+$widget-picker-item-cell-padding:               16px 0 !default;
+$widget-picker-item-header-color:               $primary-200 !default;
+$widget-picker-item-header-font-size:           18px !default;
+$widget-picker-description-collapse-icon:       $fa-var-minus-square-o !default;
+$widget-picker-description-collapse-font-size:  $icon-font-size !default;
+$widget-picker-description-expand-icon:         $fa-var-plus-square-o !default;
+$widget-picker-description-collapse-icon-color: $primary-550 !default;
+$widget-picker-description-cell-color:          $primary-550 !default;
+$widget-picker-description-cell-line-height:    1.6 !default;
+$widget-picker-info-column-padding:             side-values(21px 20px 11px 0) !default;
+$widget-picker-actions-column-padding-end:      16px !default;
+$widget-picker-actions-column-width:            74px !default;
+
+$widget-picker-loading-size:                    16px !default;
+$widget-picker-loading-border-size:             4px !default;
+
+$widget-picker-new-badge-color:                 $danger-dark !default;
+$widget-picker-added-badge-color:               $success !default;
+$widget-picker-added-badge-count-color:         $success-lighten !default;
+$widget-picker-added-badge-space:               3px !default;

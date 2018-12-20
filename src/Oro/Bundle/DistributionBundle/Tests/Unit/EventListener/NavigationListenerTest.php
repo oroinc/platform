@@ -5,7 +5,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\EventListener;
 use Oro\Bundle\DistributionBundle\EventListener\NavigationListener;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 
-class NavigationListenerTest extends \PHPUnit_Framework_TestCase
+class NavigationListenerTest extends \PHPUnit\Framework\TestCase
 {
     use MockHelperTrait;
 
@@ -216,7 +216,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createMenuItemMock()
     {
@@ -224,7 +224,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createEventMock()
     {
@@ -232,7 +232,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createAuthorizationCheckerMock()
     {
@@ -240,7 +240,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createTokenStorageMock()
     {
@@ -248,7 +248,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createRequestMock()
     {

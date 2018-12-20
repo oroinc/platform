@@ -11,6 +11,7 @@ define(function(require) {
     var layout = require('oroui/js/layout');
     var AbstractWidget = require('oroui/js/widget/abstract-widget');
     var StateModel = require('orowindows/js/dialog/state/model');
+    var LoadingBarView = require('oroui/js/app/views/loading-bar-view');
     var DialogManager = require('orowindows/js/widget/dialog-manager');
     var dialogManager = new DialogManager();
     require('jquery.dialog.extended');
@@ -21,7 +22,9 @@ define(function(require) {
         stateEnabled: true,
         incrementalPosition: true,
         preventModelRemoval: false,
-        messengerContainerClass: ''
+        messengerContainerClass: '',
+        mobileLoadingBar: true,
+        desktopLoadingBar: false
     }, require('module').config());
 
     /**
@@ -51,7 +54,9 @@ define(function(require) {
         _isEmbedded: false,
 
         events: {
-            'content:changed': 'resetDialogPosition'
+            'content:changed': 'resetDialogPosition',
+            'shown.bs.collapse': 'resetDialogPosition',
+            'hidden.bs.collapse': 'resetDialogPosition'
         },
 
         listen: {
@@ -62,6 +67,11 @@ define(function(require) {
         },
 
         $messengerContainer: null,
+
+        /**
+         * @property {Object}
+         */
+        loadingBar: null,
 
         /**
          * @inheritDoc
@@ -112,6 +122,7 @@ define(function(require) {
             this._initAdjustHeight(content);
             this._setMaxSize();
             this._addMessengerContainer();
+            this._initLoadingBar();
         },
 
         /**
@@ -148,6 +159,20 @@ define(function(require) {
                 }
             } else {
                 this.model = new StateModel();
+            }
+        },
+
+        /**
+         * Create loading bar under titlebar
+         * @private
+         */
+        _initLoadingBar: function() {
+            if ((this.options.mobileLoadingBar && tools.isMobile()) ||
+                (this.options.desktopLoadingBar && !tools.isMobile())) {
+                this.subview('LoadingBarView', new LoadingBarView({
+                    container: this.widget.dialog('instance').uiDialogTitlebar,
+                    ajaxLoading: true
+                }));
             }
         },
 
@@ -218,6 +243,7 @@ define(function(require) {
          * Handles content load event and sets focus on first form input
          */
         onContentUpdated: function() {
+            this._fixScrollableHeight();
             this.focusContent();
         },
 
@@ -312,7 +338,8 @@ define(function(require) {
 
         getActionsElement: function() {
             if (!this.actionsEl) {
-                this.actionsEl = $('<div class="pull-right"/>').appendTo(
+                var className = _.isRTL() ? 'pull-left' : 'pull-right';
+                this.actionsEl = $('<div />', {'class': className}).appendTo(
                     $('<div class="form-actions widget-actions"/>').appendTo(
                         this.widget.dialog('actionsContainer')
                     )
@@ -393,7 +420,6 @@ define(function(require) {
             if (scrollableContent.length) {
                 scrollableContent.css('overflow', 'auto');
                 this.widget.on(resizeEvents, _.bind(this._fixScrollableHeight, this));
-                this._fixScrollableHeight();
             }
         },
 
@@ -499,6 +525,9 @@ define(function(require) {
             this.internalSetDialogPosition(position, leftShift, topShift);
             this.leftAndWidthAdjustments(dialog, containerEl);
             this.topAndHeightAdjustments(dialog, containerEl);
+            if (!_.isMobile()) {
+                mediator.execute('layout:adjustLabelsWidth', this.widget);
+            }
             this.widget.trigger('dialogreposition');
 
             if (tools.isIOS() && initialDialogPosition === 'fixed') {

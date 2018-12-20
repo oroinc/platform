@@ -1,0 +1,175 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * This script aims to help transit to Symfony 3 providing information about form type aliases which need
+ * to be replaced with FQCN of respective form types.
+ */
+if (is_file($autoload = getcwd() . '/vendor/autoload.php')) {
+    require $autoload;
+}
+
+/**
+ * Creates connection based on application configuration.
+ */
+function createConnection(): \Doctrine\DBAL\Connection
+{
+    $config = new \Doctrine\DBAL\Configuration();
+    $parser = new \Symfony\Component\Yaml\Parser();
+    $configParams = $parser->parse(file_get_contents(getcwd() . '/config/parameters.yml'));
+    $configParams = $configParams['parameters'];
+
+    return \Doctrine\DBAL\DriverManager::getConnection([
+        'dbname' => $configParams['database_name'],
+        'user' => $configParams['database_user'],
+        'password' => $configParams['database_password'],
+        'host' => $configParams['database_host'],
+        'driver' => $configParams['database_driver']
+    ], $config);
+}
+
+/**
+ * @param string $encodedArray
+ * @return null
+ */
+function getFormTypeOption(string $encodedArray)
+{
+    $array = unserialize(base64_decode($encodedArray));
+
+    return $array['form']['form_type'] ?? null;
+}
+
+/**
+ * @param $formType
+ * @return bool
+ */
+function isFormAlias($formType): bool
+{
+    return $formType !== null && !is_a($formType, \Symfony\Component\Form\AbstractType::class, true);
+}
+
+/**
+ * Shows entities for which [form][form_type] option needs to be replaced by FQCN in entity config.
+ *
+ * @param \Doctrine\DBAL\Connection $connection
+ * @return array
+ */
+function getEntitiesData(\Doctrine\DBAL\Connection $connection): array
+{
+    $entityConfigs = $connection->createQueryBuilder()
+        ->select('class_name', 'data')
+        ->from('oro_entity_config')
+        ->execute()
+        ->fetchAll();
+
+    $entitiesData = [];
+    foreach ($entityConfigs as $entityConfig) {
+        $formType = getFormTypeOption($entityConfig['data']);
+
+        if (isFormAlias($formType)) {
+            $entitiesData[] = [$entityConfig['class_name'], $formType];
+        }
+    }
+
+    return $entitiesData;
+}
+
+/**
+ * Shows entity fields for which [form][form_type] option needs to be replaced by FQCN in entity field's config.
+ *
+ * @param \Doctrine\DBAL\Connection $connection
+ * @return array
+ */
+function getEntityFieldsData(\Doctrine\DBAL\Connection $connection): array
+{
+    $entityFieldConfigs = $connection->createQueryBuilder()
+        ->select('entity.class_name', 'field.field_name', 'field.data')
+        ->from('oro_entity_config_field', 'field')
+        ->join('field', 'oro_entity_config', 'entity', 'field.entity_id=entity.id')
+        ->execute()
+        ->fetchAll();
+
+    $entityFieldsData = [];
+    foreach ($entityFieldConfigs as $entityFieldConfig) {
+        $formType = getFormTypeOption($entityFieldConfig['data']);
+
+        if (isFormAlias($formType)) {
+            $entityFieldsData[] = [$entityFieldConfig['class_name'], $entityFieldConfig['field_name'], $formType];
+        }
+    }
+
+    return $entityFieldsData;
+}
+
+/**
+ * Shows embedded forms for which form alis needs to be replaced by FQCN.
+ *
+ * @param \Doctrine\DBAL\Connection $connection
+ * @return array
+ */
+function getEmbeddedFormsToMigrate(\Doctrine\DBAL\Connection $connection): array
+{
+    $embeddedForms = $connection
+        ->createQueryBuilder()
+        ->select('id', 'title', 'form_type')
+        ->from('oro_embedded_form')
+        ->execute()
+        ->fetchAll();
+
+    $embeddedFormsData = [];
+    foreach ($embeddedForms as $embeddedForm) {
+        $formType = $embeddedForm['form_type'];
+
+        if (isFormAlias($formType)) {
+            $embeddedFormsData[] = [$embeddedForm['id'], $embeddedForm['title'], $embeddedForm['form_type']];
+        }
+    }
+
+    return $embeddedFormsData;
+}
+
+/**
+ * Outputs data in table format.
+ *
+ * @param array $headers
+ * @param array $rows
+ * @param string $description
+ */
+function showTable(array $headers, array $rows, string $description)
+{
+    if (empty($rows)) {
+        return;
+    }
+
+    $output = new Symfony\Component\Console\Output\ConsoleOutput();
+    $output->writeln($description);
+    $table = new \Symfony\Component\Console\Helper\Table($output);
+
+    $table->setHeaders($headers)
+        ->addRows($rows)
+        ->render();
+    $output->writeln('');
+}
+
+$connection = createConnection();
+
+$entitiesTableDescription = <<<EOL
+Form aliases found for the following entities. Please add migrations to replace them with form type FQCN.
+See Oro\Bundle\LocaleBundle\Migrations\Schema\\v1_4\UpdateLocalizationFormType as example.\n
+EOL;
+
+showTable(['Entity Class', 'Form Alias'], getEntitiesData($connection), $entitiesTableDescription);
+
+$fieldsTableDescription = <<<EOL
+Form aliases found for the following fields. Please add migrations to replace them with form type FQCN.
+See Oro\Bundle\OrganizationBundle\Migrations\Schema\\v1_7\UpdateFormTypeForExtendDescription as example.\n
+EOL;
+
+showTable(['Entity Class', 'Field Name', 'Form Alias'], getEntityFieldsData($connection), $fieldsTableDescription);
+
+$formsTableDescription = <<<EOL
+Form aliases found for the following embedded forms. Please add migrations to replace them with form type FQCN.
+See Oro\Bundle\EmbeddedFormBundle\Migrations\Data\ORM\UpdateEmbeddedFormsTypes as example.\n
+EOL;
+
+showTable(['Form Id', 'Form Title', 'Form alias'], getEmbeddedFormsToMigrate($connection), $formsTableDescription);

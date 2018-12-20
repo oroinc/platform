@@ -7,6 +7,9 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Console command to dump locale settings to the JS file for using on frontend.
+ */
 class OroLocalizationDumpCommand extends ContainerAwareCommand
 {
     /**
@@ -23,13 +26,12 @@ class OroLocalizationDumpCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $targetDir = realpath($this->getContainer()->getParameter('kernel.root_dir') . '/../web') . '/js';
+        $targetDir = realpath($this->getContainer()->getParameter('kernel.project_dir') . '/public') . '/js';
         /** @var LocaleSettings $localeSettings */
         $localeSettings = $this->getContainer()->get('oro_locale.settings');
         $addressFormats = $this->getAddressFormats($localeSettings);
         $localeSettingsData = array(
             'locale_data' => $localeSettings->getLocaleData(),
-            'currency_data' => $localeSettings->getCurrencyData(),
             'format' => array(
                 'address' => $addressFormats,
                 'name' => $localeSettings->getNameFormats()

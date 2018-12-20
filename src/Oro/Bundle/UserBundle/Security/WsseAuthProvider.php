@@ -2,23 +2,22 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
+use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Collections\Collection;
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserApi;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
- * Class WsseAuthProvider
  * This override needed to use random generated API key for WSSE auth instead regular user password.
  * In order to prevent usage of user password in third party software.
  * In case if not ORO user is used this provider fallback to native behavior.
- *
- * @package Oro\Bundle\UserBundle\Security
  */
 class WsseAuthProvider extends Provider
 {
@@ -26,6 +25,51 @@ class WsseAuthProvider extends Provider
      * @var WsseTokenFactoryInterface
      */
     protected $tokenFactory;
+
+    /**
+     * @var string
+     */
+    protected $providerKey;
+
+    /**
+     * @var string The security firewall name whose urls should process by this provider
+     */
+    private $firewallName;
+
+    /**
+     * @param UserCheckerInterface     $userChecker  A UserChecketerInterface instance
+     * @param UserProviderInterface    $userProvider An UserProviderInterface instance
+     * @param string                   $providerKey  The provider key
+     * @param PasswordEncoderInterface $encoder      A PasswordEncoderInterface instance
+     * @param Cache                    $nonceCache   The nonce cache
+     * @param int                      $lifetime     The lifetime
+     * @param string                   $dateFormat   The date format
+     */
+    public function __construct(
+        UserCheckerInterface $userChecker,
+        UserProviderInterface $userProvider,
+        $providerKey,
+        PasswordEncoderInterface $encoder,
+        Cache $nonceCache,
+        $lifetime = 300,
+        $dateFormat = '/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])'.
+        '(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)'.
+        '([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/'
+    ) {
+        $this->providerKey = $providerKey;
+
+        parent::__construct($userChecker, $userProvider, $providerKey, $encoder, $nonceCache, $lifetime, $dateFormat);
+    }
+
+    /**
+     * Sets the security firewall name whose urls should process by this provider.
+     *
+     * @param string $firewallName
+     */
+    public function setFirewallName($firewallName)
+    {
+        $this->firewallName = $firewallName;
+    }
 
     /**
      * @param WsseTokenFactoryInterface $tokenFactory
@@ -68,7 +112,6 @@ class WsseAuthProvider extends Provider
             throw new AuthenticationException('Token Factory is not set in WsseAuthProvider.');
         }
 
-        /** @var User $user */
         $user = $this->getUserProvider()->loadUserByUsername($token->getUsername());
         if ($user) {
             if ($user instanceof AdvancedUserInterface && !$user->isEnabled()) {
@@ -78,10 +121,13 @@ class WsseAuthProvider extends Provider
             if ($secret instanceof Collection) {
                 $validUserApi = $this->getValidUserApi($token, $secret, $user);
                 if ($validUserApi) {
-                    $authenticatedToken = $this->tokenFactory->create($user->getRoles());
-                    $authenticatedToken->setUser($user);
+                    $authenticatedToken = $this->tokenFactory->create(
+                        $user,
+                        $token->getCredentials(),
+                        $this->providerKey,
+                        $user->getRoles()
+                    );
                     $authenticatedToken->setOrganizationContext($validUserApi->getOrganization());
-                    $authenticatedToken->setAuthenticated(true);
 
                     return $authenticatedToken;
                 }
@@ -96,37 +142,40 @@ class WsseAuthProvider extends Provider
     /**
      * Get valid UserApi for given token
      *
-     * @param TokenInterface       $token
-     * @param Collection $secrets
-     * @param User                 $user
+     * @param TokenInterface $token
+     * @param Collection     $secrets
+     * @param UserInterface  $user
      *
-     * @return bool|UserApi
+     * @return bool|UserApiKeyInterface
      */
-    protected function getValidUserApi(TokenInterface $token, Collection $secrets, User $user)
+    protected function getValidUserApi(TokenInterface $token, Collection $secrets, UserInterface $user)
     {
         $currentIteration = 0;
         $nonce            = $token->getAttribute('nonce');
         $secretsCount     = $secrets->count();
 
-        /** @var UserApi $userApi */
+        /** @var UserApiKeyInterface $userApi */
         foreach ($secrets as $userApi) {
             $currentIteration++;
             $secret = $userApi->getApiKey();
             $isSecretValid = false;
             if ($secret) {
                 $isSecretValid = $this->validateDigest(
-                    $token->getAttribute('digest'),
+                    $token->getCredentials(),
                     $nonce,
                     $token->getAttribute('created'),
                     $secret,
                     $this->getSalt($user)
                 );
             }
-            if ($isSecretValid && !$userApi->getUser()->getOrganizations()->contains($userApi->getOrganization())) {
-                throw new BadCredentialsException('Wrong API key.');
-            }
-            if ($isSecretValid && !$userApi->getOrganization()->isEnabled()) {
-                throw new BadCredentialsException('Organization is not active.');
+
+            if ($isSecretValid) {
+                if (!$userApi->getOrganization()->isEnabled()) {
+                    throw new BadCredentialsException('Organization is not active.');
+                }
+                if (!$userApi->isEnabled()) {
+                    throw new BadCredentialsException('Wrong API key.');
+                }
             }
 
             // delete nonce from cache because user have another api keys
@@ -140,5 +189,15 @@ class WsseAuthProvider extends Provider
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(TokenInterface $token)
+    {
+        return parent::supports($token)
+            && $token->hasAttribute('firewallName')
+            && $token->getAttribute('firewallName') === $this->firewallName;
     }
 }

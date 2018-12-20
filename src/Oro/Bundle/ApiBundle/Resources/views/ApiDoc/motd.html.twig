@@ -8,6 +8,8 @@
     div.motd { padding-top: 10px; }
     div.motd div.documentation { padding: 3px 0; overflow: hidden; }
     div.motd div.documentation a { font-size: 1.2em; text-decoration: none; }
+    div.motd div.documentation p { padding: 10px 0; }
+    div.motd div.documentation ul { padding-left: 10px; list-style-type: disc; list-style-position: inside; }
     #sandbox_configuration { padding-top: 16px; padding-bottom: 5px; }
     #sandbox_configuration .account-info { position: absolute; top: 7px; right: 16px; }
     #sandbox_configuration .account-info em { padding-left: 1em; color: #2c4300; }
@@ -60,6 +62,7 @@
     $(function() {
         var userName = {{ userName|json_encode|raw }},
             apiKey = {{ apiKey|json_encode|raw }},
+            apiKeyGenerationHint = {{ apiKeyGenerationHint|default('')|json_encode|raw }},
             loginUrl = {{ loginRoute ? path(loginRoute)|json_encode|raw : 'null' }},
             logoutUrl = {{ logoutRoute ? path(logoutRoute)|json_encode|raw : 'null' }},
             sessionAllowed = {{ hasSecurityToken|json_encode|raw }},
@@ -69,10 +72,15 @@
             serverTimeOffset = Date.parse(serverTime) - clientTime,
             $motd = $('.motd').first(),
             $apiDocLink = $('#header a').first(),
+            apiActions = {{ actions|default([])|json_encode|raw }},
             apiType = window.location.pathname.substr('{{ rootPath }}'.length + 1) || '{{ defaultView }}',
             apiPrefix = '',
+            operatorMap = {'eq': '=', 'neq': '!=', 'gt': '>', 'lt': '<', 'gte': '>=', 'lte': '<='},
             escapeSelector = function (val) {
                 return val.replace(/(:|\.|\[|\]|\{|\}|,)/g, "\\$1");
+            },
+            escapeHtmlAttribute = function (val) {
+                return val.replace(/"/g,'&quot;');
             },
             addHeader = function ($headers, headerKey, headerValue) {
                 var needsHeader = true,
@@ -127,30 +135,34 @@
         $apiDocLink.after('<div id="api_type">type:' +
             {%- for name, view in views %}
             {%- if view.sandbox %}
-                {%- set viewLink = view.default ? '' : '/' ~ name %}
-                {%- set viewType = view.default ? '' : name %}
                 {%- if loop.first %}'&nbsp;' + {% else %}'&nbsp;|&nbsp;' + {% endif -%}
-                '<a href="' + '{{ rootPath ~ viewLink }}"' +
-                (apiType === '{{ viewType }}' ? ' class="active"' : '') + '>{{ view.label }}</a>' +
+                '<a href="' + '{{ rootPath ~ (view.default ? '' : '/' ~ name) }}"' +
+                (apiType === '{{ name }}' ? ' class="active"' : '') + '>{{ view.label }}</a>' +
             {%- endif %}
             {%- endfor -%}
             '</div>');
         {% endif %}
 
         /**
-         * Add the documentation link
+         * Add the documentation link and the documentation block
          */
         {% if views is defined and views -%}
-        var documentationUrl = null;
+        var documentationUrl = null, documentation = '';
         {% for name, view in views -%}
         {% if view.sandbox and view.documentation_path -%}
-            if (apiType === '{{ name }}') { documentationUrl = '{{ asset(view.documentation_path) }}'; }
+            if (apiType === '{{ name }}') {
+                documentationUrl = '{{ asset(view.documentation_path) }}';
+                {% if view.documentation is defined and view.documentation -%}
+                    documentation = {{ view.documentation|extra_markdown|json_encode|raw }};
+                {%- endif -%}
+            }
         {% endif -%}
         {%- endfor -%}
         if (documentationUrl) {
-            $motd.append('<div class="documentation">' +
-                '<a href="' + documentationUrl + '" target="_blank">The documentation</a>' +
-                '</div>');
+            documentation = '<a href="' + documentationUrl + '" target="_blank">The documentation</a>' + documentation;
+        }
+        if (documentation) {
+            $motd.append('<div class="documentation">' + documentation + '</div>');
         }
         {% endif %}
 
@@ -158,10 +170,8 @@
          * Add the authentication type selector
          */
         $('#sandbox_configuration').prepend(
-            (wsseAllowed ? '' : '<span class="authentication-warning"' +
-            ' title="To use WSSE authentication you need to generate API key for the current logged-in user.' +
-            ' To do this, go to the My User page and click Generate Key near to API Key.' +
-            ' After that reload this page."' +
+            (wsseAllowed || !apiKeyGenerationHint ? '' : '<span class="authentication-warning"' +
+            ' title="' + escapeHtmlAttribute(apiKeyGenerationHint) + '"' +
             '>{{ include('@OroApi/ApiDoc/warning.svg') }}</span>') +
             'authentication: ' +
             '<select id="authentication_type">' +
@@ -267,13 +277,26 @@
              */
             {% if views is defined and views -%}
                 var $headers = $(this).closest('.content').find('fieldset.headers'),
-                    routePath = $(this).parents('li.operation').find('div.heading span.path').text();
+                    routePath = $(this).parents('li.operation').find('div.heading span.path').text(),
+                    apiAction = apiActions[$(this).closest('.operation').attr('id')] || null,
+                    headerActions = [],
+                    headers = {};
                 {% for name, view in views -%}
                 {% if view.headers is defined and view.headers -%}
                 if (apiType === '{{ name }}' && routePath.indexOf('/api/rest/') === -1) {
-                    {%- for headerName, headerValue in view.headers -%}
-                    addHeader($headers, '{{ headerName }}', '{{ headerValue }}');
-                    {%- endfor -%}
+                    {% for headerName, headerValues in view.headers -%}
+                    {% for headerValue in headerValues -%}
+                    headerActions = {{ headerValue.actions|json_encode|raw }};
+                    if (!apiAction || headerActions.length === 0 || headerActions.indexOf(apiAction) >= 0) {
+                        headers['{{ headerName }}'] = headers['{{ headerName }}']
+                            ? headers['{{ headerName }}'] + ';{{ headerValue.value }}'
+                            : '{{ headerValue.value }}';
+                    }
+                    {% endfor -%}
+                    {% endfor -%}
+                    for (var key in headers) {
+                        addHeader($headers, key, headers[key]);
+                    }
                 }
                 {% endif %}
                 {%- endfor %}
@@ -312,6 +335,7 @@
                 var $el = $(el),
                     filterId = $el.closest('table').parent().prev().text(),
                     operators = $el.next().text(),
+                    operatorToShow,
                     options = '',
                     $operatorEl = null;
                 if (filterId) {
@@ -319,7 +343,11 @@
                     if ($operatorEl.length && $operatorEl.prop("tagName") == 'SPAN' && $operatorEl.text() == '=') {
                         operators = operators.split(',');
                         for (var i = 0; i < operators.length; i++) {
-                            options += '<option value="' + operators[i] + '">' + operators[i] + '</option>'
+                            operatorToShow = operators[i];
+                            if (operators[i] in operatorMap) {
+                                operatorToShow = operatorMap[operators[i]];
+                            }
+                            options += '<option value="' + operators[i] + '">' + operatorToShow + '</option>'
                         }
                         $operatorEl.replaceWith('<select class="operator">' + options + '</select>');
                     }
@@ -344,52 +372,37 @@
                     operator = $('.operator', $(this)).val(),
                     value = $('.value', $(this)).val(),
                     data, obj, keyPair;
-                if (value !== '' && operator !== undefined && operator !== '=' && !jQuery.isEmptyObject(options.data)) {
-                    if (options.data.lastIndexOf('{"', 0) === 0) {
-                        // json
-                        data = JSON.parse(options.data);
-                        keyPair = key.match(/^(.+)\[([^\]]+)\]$/);
-                        obj = {};
-                        if(keyPair) {
-                            if (data.hasOwnProperty(keyPair[1]) && data[keyPair[1]].hasOwnProperty(keyPair[2])) {
-                                obj[operator] = data[keyPair[1]][keyPair[2]];
-                                data[keyPair[1]][keyPair[2]] = obj;
-                            }
-                        } else if (data.hasOwnProperty(key)) {
-                            obj[operator] = data[key];
-                            data[key] = obj;
-                        }
-                        options.data = JSON.stringify(data);
-                    } else {
-                        // uri string
-                        options.data = options.data.replace(
-                            new RegExp("([\?&])?(" + encodeURIComponent(key) + ")="), "$1$2" + operator
+                if (value !== '' && operator !== undefined && operator !== '=' && operator !== 'eq') {
+                    if (options.url.indexOf('?') !== -1) {
+                        options.url = options.url.replace(
+                            new RegExp("([\?&])?(" + key.replace(/[\[\]]/g, "\\$&") + ")="), "$1$2[" + operator + ']='
                         );
+                    }
+                    if (!jQuery.isEmptyObject(options.data) && options.data !== '{}') {
+                        if (options.data.lastIndexOf('{"', 0) === 0) {
+                            // json
+                            data = JSON.parse(options.data);
+                            keyPair = key.match(/^(.+)\[([^\]]+)\]$/);
+                            obj = {};
+                            if(keyPair) {
+                                if (data.hasOwnProperty(keyPair[1]) && data[keyPair[1]].hasOwnProperty(keyPair[2])) {
+                                    obj[operator] = data[keyPair[1]][keyPair[2]];
+                                    data[keyPair[1]][keyPair[2]] = obj;
+                                }
+                            } else if (data.hasOwnProperty(key)) {
+                                obj[operator] = data[key];
+                                data[key] = obj;
+                            }
+                            options.data = JSON.stringify(data);
+                        } else {
+                            // uri string
+                            options.data = options.data.replace(
+                                new RegExp("([\?&])?(" + encodeURIComponent(key) + ")="), "$1$2[" + operator + ']='
+                            );
+                        }
                     }
                 }
             });
-
-            {% if not enableFormatParameter -%}
-            /**
-             * Remove "_format" parameter
-             */
-            options.url = options.url.replace(
-                new RegExp("([\?&])(_format=&?)"), "$1"
-            );
-            if (options.data.lastIndexOf('{"', 0) === 0) {
-                // json
-                var data = JSON.parse(options.data);
-                if (data.hasOwnProperty('_format')) {
-                    delete data['_format'];
-                    options.data = JSON.stringify(data);
-                }
-            } else {
-                // uri string
-                options.data = options.data.replace(
-                    new RegExp("([&]?)(_format=&?)"), "$1"
-                );
-            }
-            {% endif %}
 
             /**
              * Remove "Content-type" header if both "Content-type" and "Content-Type" headers exist
@@ -417,11 +430,9 @@
             /**
              * Update "Request URL" section
              */
-            if (options.type == 'GET') {
-                $('.url', $result).text(
-                    options.type + ' ' + decodeURIComponent(options.url)
-                );
-            }
+            $('.url', $result).text(
+                options.type + ' ' + decodeURIComponent(options.url)
+            );
 
             /**
              * Hide the request body and add a button to display it

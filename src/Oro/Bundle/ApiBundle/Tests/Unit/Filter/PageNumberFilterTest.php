@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
 
-class PageNumberFilterTest extends \PHPUnit_Framework_TestCase
+class PageNumberFilterTest extends \PHPUnit\Framework\TestCase
 {
     public function testApplyWithoutFilter()
     {
@@ -16,7 +16,7 @@ class PageNumberFilterTest extends \PHPUnit_Framework_TestCase
 
         $filter->apply($criteria);
 
-        $this->assertNull($criteria->getFirstResult());
+        self::assertNull($criteria->getFirstResult());
     }
 
     public function testApplyWithFilter()
@@ -31,11 +31,11 @@ class PageNumberFilterTest extends \PHPUnit_Framework_TestCase
 
         $filter->apply($criteria, $filterValue);
 
-        $this->assertNull($criteria->getFirstResult());
+        self::assertNull($criteria->getFirstResult());
 
         $criteria->setMaxResults($pageSize);
         $filter->apply($criteria, $filterValue);
 
-        $this->assertSame($expectedOffset, $criteria->getFirstResult());
+        self::assertSame($expectedOffset, $criteria->getFirstResult());
     }
 }

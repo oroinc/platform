@@ -15,13 +15,15 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
+class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RelationEntityConfigDumperExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var array */
@@ -42,10 +44,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $this->configManager->expects($this->any())
             ->method('getConfigs')
             ->with('extend')
-            ->willReturnCallback(function ($scope, $className, $withHidden) {
-                return isset($this->configs[$className])
-                    ? $this->configs[$className]
-                    : [];
+            ->willReturnCallback(function ($scope, $className) {
+                return $this->configs[$className] ?? [];
             });
         $this->configManager->expects($this->any())
             ->method('hasConfig')
@@ -82,6 +82,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testReverseRelationAlreadyCreatedForManyToOne($reverseElements)
     {
@@ -150,6 +151,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testReverseRelationAlreadyCreatedForManyToMany($reverseElements)
     {
@@ -218,6 +220,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testReverseRelationAlreadyCreatedForOneToMany($reverseElements)
     {
@@ -286,6 +289,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testNoReverseRelationForManyToOne($reverseElements)
     {
@@ -387,6 +391,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testNoReverseRelationForManyToMany($reverseElements)
     {
@@ -488,6 +493,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testNoReverseRelationForOneToMany($reverseElements)
     {
@@ -589,6 +595,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testSelfRelationShouldBeCreatedForManyToOne($reverseElements)
     {
@@ -657,6 +664,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testSelfRelationWithOptionsShouldBeCreatedForManyToOne($reverseElements)
     {
@@ -668,6 +676,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\TargetEntity',
                 'target_field_id' => $this->getFieldId('Test\TargetEntity', 'rev_rel_mto', 'oneToMany'),
                 'cascade'         => ['persist', 'remove'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'CASCADE',
                 'nullable'        => true
             ]
@@ -706,6 +715,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'relation_key'  => $relationKey,
                 'bidirectional' => true,
                 'cascade'       => ['persist', 'remove'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'CASCADE',
                 'nullable'      => true
             ],
@@ -731,6 +741,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testSelfRelationShouldBeCreatedForManyToOneAndSameOwningAndTarget($reverseElements)
     {
@@ -797,6 +808,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testSelfRelationWithOptionsShouldBeCreatedForManyToOneAndSameOwningAndTarget($reverseElements)
     {
@@ -816,6 +828,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rev_rel_mto', 'oneToMany'),
                 'cascade'         => ['persist', 'remove'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'CASCADE',
                 'nullable'        => true
             ],
@@ -842,6 +855,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'relation_key'  => $relationKey,
                 'bidirectional' => true,
                 'cascade'       => ['persist', 'remove'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'CASCADE',
                 'nullable'      => true,
             ],
@@ -869,6 +883,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testSelfRelationShouldBeCreatedForManyToMany($reverseElements)
     {
@@ -937,6 +952,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testSelfRelationWithOptionsShouldBeCreatedForManyToMany($reverseElements)
     {
@@ -948,6 +964,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\TargetEntity',
                 'target_field_id' => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_mtm', 'manyToMany'),
                 'cascade'         => ['persist', 'remove'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'CASCADE',
                 'nullable'        => true
             ]
@@ -986,6 +1003,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'relation_key'  => $relationKey,
                 'bidirectional' => true,
                 'cascade'       => ['persist', 'remove'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'CASCADE',
                 'nullable'      => true
             ],
@@ -1011,6 +1029,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testSelfRelationShouldBeCreatedForManyToManyAndSameOwningAndTarget($reverseElements)
     {
@@ -1077,6 +1096,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testSelfRelationWithOptionsShouldBeCreatedForManyToManyAndSameOwningAndTarget($reverseElements)
     {
@@ -1088,6 +1108,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_mtm', 'manyToMany'),
                 'cascade'         => ['persist', 'remove'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'CASCADE',
                 'nullable'        => true
             ],
@@ -1122,6 +1143,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'relation_key'  => $relationKey,
                 'bidirectional' => true,
                 'cascade'       => ['persist', 'remove'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'CASCADE',
                 'nullable'      => true
             ],
@@ -1149,6 +1171,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testSelfRelationShouldBeCreatedForOneToMany($reverseElements)
     {
@@ -1217,6 +1240,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testSelfRelationWithOptionsShouldBeCreatedForOneToMany($reverseElements)
     {
@@ -1228,6 +1252,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\TargetEntity',
                 'target_field_id' => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_otm', 'manyToOne'),
                 'cascade'         => ['persist', 'remove'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'CASCADE',
                 'nullable'        => true
             ]
@@ -1266,6 +1291,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'relation_key'  => $relationKey,
                 'bidirectional' => true,
                 'cascade'       => ['persist', 'remove'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'CASCADE',
                 'nullable'      => true
             ],
@@ -1291,6 +1317,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testSelfRelationShouldBeCreatedForOneToManyAndSameOwningAndTarget($reverseElements)
     {
@@ -1357,6 +1384,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testSelfRelationWithOptionsShouldBeCreatedForOneToManyAndSameOwningAndTarget($reverseElements)
     {
@@ -1368,6 +1396,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_otm', 'manyToOne'),
                 'cascade'         => ['persist', 'remove'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'CASCADE',
                 'nullable'        => true
             ],
@@ -1402,6 +1431,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'relation_key'  => $relationKey,
                 'bidirectional' => true,
                 'cascade'       => ['persist', 'remove'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'CASCADE',
                 'nullable'      => true
             ],
@@ -1587,6 +1617,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testCompleteRelationForManyToOne($reverseElements)
     {
@@ -1660,6 +1691,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testCompleteRelationWithOptionsForManyToOne($reverseElements)
     {
@@ -1671,6 +1703,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\TargetEntity',
                 'target_field_id' => $this->getFieldId('Test\TargetEntity', 'rev_rel_mto', 'oneToMany'),
                 'cascade'         => ['persist'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'CASCADE',
                 'nullable'        => true
             ]
@@ -1682,6 +1715,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
                 'cascade'         => ['remove'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'SET NULL',
                 'nullable'        => false
             ]
@@ -1725,6 +1759,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity' => 'Test\TargetEntity',
                 'relation_key'  => $relationKey,
                 'cascade'       => ['persist'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'CASCADE',
                 'nullable'      => true
             ],
@@ -1737,6 +1772,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity' => 'Test\SourceEntity',
                 'relation_key'  => $relationKey,
                 'cascade'       => ['remove'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'SET NULL',
                 'nullable'      => false
             ],
@@ -1753,6 +1789,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testCompleteRelationForManyToOneAndSameOwningAndTarget($reverseElements)
     {
@@ -1821,6 +1858,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testCompleteRelationWithOptionsForManyToOneAndSameOwningAndTarget($reverseElements)
     {
@@ -1832,6 +1870,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rev_rel_mto', 'oneToMany'),
                 'cascade'         => ['persist'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'CASCADE',
                 'nullable'        => true
             ],
@@ -1841,6 +1880,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
                 'cascade'         => ['remove'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'SET NULL',
                 'nullable'        => false
             ]
@@ -1871,6 +1911,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity' => 'Test\SourceEntity',
                 'relation_key'  => $relationKey,
                 'cascade'       => ['persist'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'CASCADE',
                 'nullable'      => true
             ],
@@ -1883,6 +1924,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity' => 'Test\SourceEntity',
                 'relation_key'  => $relationKey . '|inverse',
                 'cascade'       => ['remove'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'SET NULL',
                 'nullable'      => false
             ],
@@ -1901,6 +1943,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testCompleteRelationForManyToMany($reverseElements)
     {
@@ -1974,6 +2017,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testCompleteRelationWithOptionsForManyToMany($reverseElements)
     {
@@ -1985,6 +2029,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\TargetEntity',
                 'target_field_id' => $this->getFieldId('Test\TargetEntity', 'rev_rel_mtm', 'manyToMany'),
                 'cascade'         => ['persist'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'CASCADE',
                 'nullable'        => true
             ]
@@ -1996,6 +2041,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
                 'cascade'         => ['remove'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'SET NULL',
                 'nullable'        => false
             ]
@@ -2039,6 +2085,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity' => 'Test\TargetEntity',
                 'relation_key'  => $relationKey,
                 'cascade'       => ['persist'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'CASCADE',
                 'nullable'      => true
             ],
@@ -2051,6 +2098,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity' => 'Test\SourceEntity',
                 'relation_key'  => $relationKey,
                 'cascade'       => ['remove'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'SET NULL',
                 'nullable'      => false
             ],
@@ -2067,6 +2115,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testCompleteRelationForManyToManyAndSameOwningAndTarget($reverseElements)
     {
@@ -2135,6 +2184,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testCompleteRelationWithOptionsForManyToManyAndSameOwningAndTarget($reverseElements)
     {
@@ -2146,6 +2196,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rev_rel_mtm', 'manyToMany'),
                 'cascade'         => ['persist'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'CASCADE',
                 'nullable'        => true
             ],
@@ -2155,6 +2206,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
                 'cascade'         => ['remove'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'SET NULL',
                 'nullable'        => false
             ]
@@ -2185,6 +2237,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity' => 'Test\SourceEntity',
                 'relation_key'  => $relationKey,
                 'cascade'       => ['persist'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'CASCADE',
                 'nullable'      => true
             ],
@@ -2197,6 +2250,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity' => 'Test\SourceEntity',
                 'relation_key'  => $relationKey . '|inverse',
                 'cascade'       => ['remove'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'SET NULL',
                 'nullable'      => false
             ],
@@ -2215,6 +2269,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testCompleteRelationForOneToMany($reverseElements)
     {
@@ -2288,6 +2343,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testCompleteRelationWithOptionsForOneToMany($reverseElements)
     {
@@ -2299,6 +2355,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\TargetEntity',
                 'target_field_id' => $this->getFieldId('Test\TargetEntity', 'rev_rel_otm', 'manyToOne'),
                 'cascade'         => ['persist'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'CASCADE',
                 'nullable'        => true
             ]
@@ -2310,6 +2367,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
                 'cascade'         => ['remove'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'SET NULL',
                 'nullable'        => false
             ]
@@ -2353,6 +2411,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity' => 'Test\TargetEntity',
                 'relation_key'  => $relationKey,
                 'cascade'       => ['persist'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'CASCADE',
                 'nullable'      => true
             ],
@@ -2365,6 +2424,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity' => 'Test\SourceEntity',
                 'relation_key'  => $relationKey,
                 'cascade'       => ['remove'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'SET NULL',
                 'nullable'      => false
             ],
@@ -2381,6 +2441,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testCompleteRelationForOneToManyAndSameOwningAndTarget($reverseElements)
     {
@@ -2449,6 +2510,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @dataProvider elementsOrderProvider
+     * @param bool $reverseElements
      */
     public function testCompleteRelationWithOptionsForOneToManyAndSameOwningAndTarget($reverseElements)
     {
@@ -2460,6 +2522,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rev_rel_otm', 'manyToOne'),
                 'cascade'         => ['persist'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'CASCADE',
                 'nullable'        => true
             ],
@@ -2469,6 +2532,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
                 'cascade'         => ['remove'],
+                'fetch'           => 'extra_lazy',
                 'on_delete'       => 'SET NULL',
                 'nullable'        => false
             ]
@@ -2499,6 +2563,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity' => 'Test\SourceEntity',
                 'relation_key'  => $relationKey,
                 'cascade'       => ['persist'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'CASCADE',
                 'nullable'      => true
             ],
@@ -2511,6 +2576,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_entity' => 'Test\SourceEntity',
                 'relation_key'  => $relationKey . '|inverse',
                 'cascade'       => ['remove'],
+                'fetch'         => 'extra_lazy',
                 'on_delete'     => 'SET NULL',
                 'nullable'      => false
             ],
@@ -2536,7 +2602,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
      * @return Config
      */
     protected function addConfigNewField(
-        $values = [],
+        array $values = [],
         $type = 'string',
         $className = 'Test\SourceEntity',
         $fieldName = 'testField'
@@ -2565,7 +2631,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
      *
      * @return Config
      */
-    protected function addEntityConfig($values = [], $className = 'Test\SourceEntity')
+    protected function addEntityConfig(array $values = [], $className = 'Test\SourceEntity')
     {
         $resultValues = [
             'owner'       => ExtendScope::OWNER_CUSTOM,

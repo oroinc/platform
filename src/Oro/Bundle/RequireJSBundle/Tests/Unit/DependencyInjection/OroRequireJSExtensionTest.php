@@ -4,7 +4,7 @@ namespace Oro\Bundle\RequireJSBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\RequireJSBundle\DependencyInjection\OroRequireJSExtension;
 
-class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
+class OroRequireJSExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array
@@ -20,7 +20,6 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $config = array(
         'oro_translation' => array(
-            'js_engine' => 'node',
             'web_root' => '/path/to/web_root',
             'build_path' => 'js/app.min.js',
         )

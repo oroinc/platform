@@ -18,6 +18,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
+ * Provides methods to get/set/add tags for entities
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class TagManager
@@ -78,9 +80,13 @@ class TagManager
      */
     public function getTagsByEntityIds($entityClassName, array $ids)
     {
+        $user = $this->getUser();
+        if (!$user) {
+            return [];
+        }
         $repository = $this->getTagsRepository();
 
-        return $repository->getTagsByEntityIds($entityClassName, $ids, $this->getUser());
+        return $repository->getTagsByEntityIds($entityClassName, $ids, $user);
     }
 
     /**
@@ -173,27 +179,6 @@ class TagManager
             TaggableHelper::getEntityId($entity),
             $owner
         );
-    }
-
-    /**
-     * Remove tagging related to tags by params
-     *
-     * @param Collection|Tag[]|int[] $tagIds
-     * @param string                 $entityName
-     * @param int                    $recordId
-     * @param User                   $createdBy
-     *
-     * @return int
-     *
-     * @deprecated Use {@see deleteTagging} instead
-     */
-    public function deleteTaggingByParams($tagIds, $entityName, $recordId, $createdBy = null)
-    {
-        /** @var TagRepository $repository */
-        $repository = $this->em->getRepository($this->tagClass);
-        $tagIds     = $this->prepareTagIds($tagIds);
-
-        return $repository->deleteTaggingByParams($tagIds, $entityName, $recordId, $createdBy);
     }
 
     /**

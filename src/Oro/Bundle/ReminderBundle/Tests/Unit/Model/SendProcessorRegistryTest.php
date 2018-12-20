@@ -4,7 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
 
-class SendProcessorRegistryTest extends \PHPUnit_Framework_TestCase
+class SendProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 {
     const FOO_METHOD = 'foo';
     const FOO_LABEL  = 'foo_label';
@@ -12,7 +12,7 @@ class SendProcessorRegistryTest extends \PHPUnit_Framework_TestCase
     const BAR_LABEL  = 'bar_label';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject[]
+     * @var \PHPUnit\Framework\MockObject\MockObject[]
      */
     protected $processors;
 
@@ -51,10 +51,10 @@ class SendProcessorRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetProcessorLabels()
     {
         $this->assertEquals(
-            array(
-                self::FOO_METHOD => self::FOO_LABEL,
-                self::BAR_METHOD => self::BAR_LABEL,
-            ),
+            [
+                self::FOO_LABEL => self::FOO_METHOD,
+                self::BAR_LABEL => self::BAR_METHOD,
+            ],
             $this->registry->getProcessorLabels()
         );
     }

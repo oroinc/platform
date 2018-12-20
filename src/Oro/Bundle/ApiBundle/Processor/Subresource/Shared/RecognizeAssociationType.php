@@ -2,23 +2,25 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
+use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Makes sure that the association name exists in the Context.
+ * Makes sure that the association name exists in the context.
  * Computes the related entity class name and the relationship type
  * based on the parent class name and the association name
- * and sets them into the "class" and the "collection" attributes of the Context.
+ * and sets them into the "class" and the "collection" attributes of the context.
  */
 class RecognizeAssociationType implements ProcessorInterface
 {
     /** @var SubresourcesProvider */
-    protected $subresourcesProvider;
+    private $subresourcesProvider;
 
     /**
      * @param SubresourcesProvider $subresourcesProvider
@@ -42,22 +44,13 @@ class RecognizeAssociationType implements ProcessorInterface
         }
 
         $associationName = $context->getAssociationName();
-        if (!$associationName) {
+        if ($associationName) {
+            $this->setAssociationType($context, $associationName);
+        } else {
             $context->addError(
                 Error::createValidationError(
                     Constraint::RELATIONSHIP,
                     'The association name must be set in the context.'
-                )
-            );
-
-            return;
-        }
-
-        if (!$this->setAssociationType($context, $associationName)) {
-            $context->addError(
-                Error::createValidationError(
-                    Constraint::RELATIONSHIP,
-                    'The target entity type cannot be recognized.'
                 )
             );
         }
@@ -66,31 +59,44 @@ class RecognizeAssociationType implements ProcessorInterface
     /**
      * @param SubresourceContext $context
      * @param string             $associationName
-     *
-     * @return bool
      */
-    protected function setAssociationType(SubresourceContext $context, $associationName)
+    private function setAssociationType(SubresourceContext $context, string $associationName): void
     {
-        $entitySubresources = $this->subresourcesProvider->getSubresources(
+        $subresource = $this->subresourcesProvider->getSubresource(
             $context->getParentClassName(),
+            $associationName,
             $context->getVersion(),
             $context->getRequestType()
         );
-        if (null === $entitySubresources) {
-            return false;
-        }
-        $subresource = $entitySubresources->getSubresource($associationName);
         if (null === $subresource) {
-            return false;
+            $context->addError(
+                Error::createValidationError(
+                    Constraint::RELATIONSHIP,
+                    'Unsupported subresource.',
+                    Response::HTTP_NOT_FOUND
+                )
+            );
+
+            return;
         }
+
+        if ($subresource->isExcludedAction($context->getAction())) {
+            throw new ActionNotAllowedException();
+        }
+
         $targetClassName = $subresource->getTargetClassName();
         if (!$targetClassName) {
-            return false;
+            $context->addError(
+                Error::createValidationError(
+                    Constraint::RELATIONSHIP,
+                    'The target entity type cannot be recognized.'
+                )
+            );
+
+            return;
         }
 
         $context->setClassName($targetClassName);
         $context->setIsCollection($subresource->isCollection());
-
-        return true;
     }
 }

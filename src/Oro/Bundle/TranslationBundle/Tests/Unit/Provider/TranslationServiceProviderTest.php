@@ -3,20 +3,23 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
-use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
+use Oro\Component\Testing\TempDirExtension;
+use Symfony\Component\Translation\Reader\TranslationReader;
 
-class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
+class TranslationServiceProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    use TempDirExtension;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $adapter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $dumper;
 
     /** @var TranslationServiceProvider */
     protected $service;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $databasePersister;
 
     /** @var string */
@@ -34,45 +37,14 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->testPath = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '/oro_trans_dir';
-        $this->removeTestDir($this->testPath);
-        mkdir($this->testPath);
+        $this->testPath = $this->getTempDir('trans');
         $this->service = new TranslationServiceProvider(
             $this->adapter,
             $this->dumper,
-            new TranslationLoader(),
+            new TranslationReader(),
             $this->databasePersister,
             $this->testPath
         );
-    }
-
-    /**
-     * @param string $dir
-     */
-    protected function removeTestDir($dir)
-    {
-        if (is_dir($dir)) {
-            $files = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-                \RecursiveIteratorIterator::CHILD_FIRST
-            );
-
-            foreach ($files as $fileInfo) {
-                if ($fileInfo->isDir()) {
-                    rmdir($fileInfo->getRealPath());
-                } else {
-                    unlink($fileInfo->getRealPath());
-                }
-            }
-
-            rmdir($dir);
-        }
-    }
-
-    protected function tearDown()
-    {
-        unset($this->adapter, $this->dumper, $this->service);
-        $this->removeTestDir($this->testPath);
     }
 
     /**
@@ -99,7 +71,7 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceMock(
             ['download', 'upload', 'cleanup'],
-            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, $this->testPath]
+            [$this->adapter, $this->dumper, new TranslationReader(), $this->databasePersister, $this->testPath]
         );
 
         $dir = $this->getLangFixturesDir();
@@ -148,7 +120,7 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceMock(
             ['cleanup', 'renameFiles', 'apply', 'unzip'],
-            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, $this->testPath]
+            [$this->adapter, $this->dumper, new TranslationReader(), $this->databasePersister, $this->testPath]
         );
 
         $tempDir = $this->testPath . DIRECTORY_SEPARATOR . ltrim(uniqid(), DIRECTORY_SEPARATOR);
@@ -189,7 +161,7 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceMock(
             ['cleanup', 'renameFiles', 'apply', 'unzip'],
-            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, $this->testPath]
+            [$this->adapter, $this->dumper, new TranslationReader(), $this->databasePersister, $this->testPath]
         );
 
         $path = $this->testPath . DIRECTORY_SEPARATOR;
@@ -330,7 +302,7 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
 
         $service = $this->getServiceMock(
             ['__construct'],
-            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, $this->testPath]
+            [$this->adapter, $this->dumper, new TranslationReader(), $this->databasePersister, $this->testPath]
         );
 
         $method = new \ReflectionMethod(
@@ -359,7 +331,7 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
      * @param array $methods
      * @param array $args
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|TranslationServiceProvider
+     * @return \PHPUnit\Framework\MockObject\MockObject|TranslationServiceProvider
      */
     protected function getServiceMock($methods = [], $args = [])
     {

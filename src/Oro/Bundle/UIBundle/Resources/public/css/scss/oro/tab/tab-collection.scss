@@ -1,0 +1,17 @@
+/* @theme: admin.oro; */
+
+.tab-collection {
+    li {
+        > a:after {
+            visibility: hidden;
+            content: '*';
+            margin-left: 1px;
+        }
+
+        &.changed {
+            > a:after {
+                visibility: visible;
+            }
+        }
+    }
+}

@@ -5,9 +5,9 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Event;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
 
-class ConfigGetEventTest extends \PHPUnit_Framework_TestCase
+class ConfigGetEventTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject*/
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject*/
     protected $configManager;
 
     protected function setUp()

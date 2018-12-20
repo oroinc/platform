@@ -7,12 +7,12 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Zend\Mail\Header\HeaderInterface;
 
-class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
+class ImapEmailManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImapEmailManager */
     private $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $connector;
 
     protected function setUp()

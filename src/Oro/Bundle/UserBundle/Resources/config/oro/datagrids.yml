@@ -27,6 +27,8 @@ datagrids:
                 join:
                     left:
                         - { join: u.auth_status, alias: au }
+            hints:
+                - HINT_TRANSLATABLE
         inline_editing:
             enable: true
         columns:
@@ -45,8 +47,8 @@ datagrids:
                 inline_editing:
                     enable: false
                 choices:
-                   - Disabled
-                   - Enabled
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
             auth_status:
                 label:         oro.user.auth_status.label
                 editable:      false
@@ -122,8 +124,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Disabled
-                                1: Enabled
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1
                 auth_status:
                     type:      enum
                     data_name: au.id
@@ -360,8 +362,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Disabled
-                   - Enabled
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
         filters:
             columns:
                 firstName:
@@ -382,8 +384,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Disabled
-                                1: Enabled
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1
         sorters:
             multiple_sorting: true
             default:
@@ -424,8 +426,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Disabled
-                   - Enabled
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
         filters:
             columns:
                 has_role:
@@ -449,8 +451,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Disabled
-                                1: Enabled
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1
         sorters:
             multiple_sorting: true
             columns:
@@ -474,12 +476,12 @@ datagrids:
             type: role-permission-provider
         columns:
             label:
-                label: "Entity"
+                label: oro.user.datagrid.role_permission.columns.label
                 data_name: label
                 frontend_type: string
                 translatable: true
             permissions:
-                label: "Permissions"
+                label: oro.user.datagrid.role_permission.columns.permissions.label
                 data_name: permissions
                 frontend_type: action-permissions
             identity:
@@ -539,8 +541,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Disabled
-                   - Enabled
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
         filters:
             columns:
                 has_group:
@@ -564,8 +566,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Disabled
-                                1: Enabled
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1
         sorters:
             multiple_sorting: true
             columns:
@@ -613,8 +615,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Disabled
-                   - Enabled
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
 
         properties:
             id: ~
@@ -652,8 +654,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Disabled
-                                1: Enabled
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1
 
     owner-users-select-grid:
         extended_entity_name: '%oro_user.entity.class%'
@@ -762,8 +764,8 @@ datagrids:
                 label:         oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Disabled
-                   - Enabled
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
         sorters:
             columns:
                 firstName:
@@ -799,5 +801,5 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Disabled
-                                1: Enabled
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1

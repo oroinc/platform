@@ -40,7 +40,7 @@ class OrganizationType extends AbstractType
                 [
                     'required' => true,
                     'label'    => 'oro.organization.enabled.label',
-                    'choices'  => [1 => 'Active', 0 => 'Inactive']
+                    'choices'  => ['Active' => 1, 'Inactive' => 0]
                 ]
             )
             ->add(

@@ -6,7 +6,7 @@ use Oro\Bundle\CacheBundle\Action\DataStorage\InvalidateCacheDataStorage;
 use Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionScheduledHandler;
 use Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheScheduleArgumentsBuilder;
 
-class InvalidateCacheScheduleArgumentsBuilderTest extends \PHPUnit_Framework_TestCase
+class InvalidateCacheScheduleArgumentsBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuild()
     {

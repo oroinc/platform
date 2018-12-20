@@ -62,6 +62,7 @@ services:
             - '@router'
             - '@translator'
             - '@oro_action.operation.execution.form_provider'
+            - '@oro_ui.html_tag_helper'
 
     oro_action.helper.applications_url:
         class: '%oro_action.helper.applications_url.class%'
@@ -72,7 +73,6 @@ services:
     oro_action.resolver.destination_page_resolver:
         class: 'Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver'
         arguments:
-            - '@request_stack'
             - '@oro_entity_config.helper.entity_config'
             - '@router'
 
@@ -132,12 +132,12 @@ services:
         parent: oro_action.abstract_guesser
         calls:
             # mapping from attribute type to form parameters
-            - [addFormTypeMapping, ["string", "text"]]
-            - [addFormTypeMapping, ["int", "integer", { precision: 0 }]]
-            - [addFormTypeMapping, ["integer", "integer", { precision: 0 }]]
-            - [addFormTypeMapping, ["bool", "checkbox"]]
-            - [addFormTypeMapping, ["boolean", "checkbox"]]
-            - [addFormTypeMapping, ["float", "number"]]
+            - [addFormTypeMapping, ['string', 'Symfony\Component\Form\Extension\Core\Type\TextType']]
+            - [addFormTypeMapping, ['int', 'Symfony\Component\Form\Extension\Core\Type\IntegerType', { precision: 0 }]]
+            - [addFormTypeMapping, ['integer', 'Symfony\Component\Form\Extension\Core\Type\IntegerType', { precision: 0 }]]
+            - [addFormTypeMapping, ['bool', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
+            - [addFormTypeMapping, ['boolean', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
+            - [addFormTypeMapping, ['float', 'Symfony\Component\Form\Extension\Core\Type\NumberType']]
 
     oro_action.options_assembler:
         class: '%oro_action.options_assembler.class%'
@@ -254,3 +254,10 @@ services:
         arguments:
             - '@form.factory'
             - Oro\Bundle\ActionBundle\Form\Type\OperationExecutionType
+
+    oro_action.provider.original_url_provider:
+        class: 'Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider'
+        arguments:
+            - '@request_stack'
+            - '@router'
+            - '@oro_datagrid.converter.url_converter'

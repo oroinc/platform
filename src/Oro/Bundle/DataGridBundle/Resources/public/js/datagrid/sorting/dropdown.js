@@ -8,8 +8,9 @@ define(function(require) {
     var module = require('module');
     var config = _.defaults(module.config(), {
         hasSortingOrderButton: true,
+        inlineSortingLabel: false, // Draws inline label for sorter if soring order button (previous option) is not enabled
         disableNotSelectedOption: false,
-        className: 'sorting-select-control',
+        className: 'sorting-select sorting-select-control',
         dropdownClassName: 'sorting-select-control'
     });
 
@@ -46,6 +47,8 @@ define(function(require) {
         enabled: true,
 
         hasSortingOrderButton: config.hasSortingOrderButton,
+
+        inlineSortingLabel: config.inlineSortingLabel,
 
         disableNotSelectedOption: config.disableNotSelectedOption,
 
@@ -188,7 +191,7 @@ define(function(require) {
         },
 
         _updateDisplayDirection: function() {
-            this.$('[data-name=order-toggle]')
+            this.$('[data-name=order-toggle-icon]')
                 .toggleClass('fa-sort-amount-asc', this.currentDirection === this.DIRECTIONS[0])
                 .toggleClass('fa-sort-amount-desc', this.currentDirection === this.DIRECTIONS[1]);
         },
@@ -244,7 +247,8 @@ define(function(require) {
                 selectedValue: this._getCurrentValue(),
                 currentDirection: this.currentDirection,
                 hasSortingOrderButton: this.hasSortingOrderButton,
-                disableNotSelectedOption: this.disableNotSelectedOption
+                disableNotSelectedOption: this.disableNotSelectedOption,
+                inlineSortingLabel: this.inlineSortingLabel
             });
             return data;
         },

@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\SyncBundle;
 
-use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\ClankClientPingConfigurationPass;
-use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\ClankSessionHandlerConfigurationPass;
+use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\OriginProviderPass;
 use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\SkipTagTrackingPass;
 use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\TagGeneratorPass;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\WebsocketRouterConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * Sync/WebSocket functionality
+ */
 class OroSyncBundle extends Bundle
 {
     /**
@@ -17,11 +19,9 @@ class OroSyncBundle extends Bundle
      */
     public function build(ContainerBuilder $container)
     {
-        // register this compiler pass on "before removing" stage because parameters are resolved on "optimize" stage
-        $container->addCompilerPass(new ClankSessionHandlerConfigurationPass(), PassConfig::TYPE_BEFORE_REMOVING);
-
-        $container->addCompilerPass(new ClankClientPingConfigurationPass());
         $container->addCompilerPass(new TagGeneratorPass());
         $container->addCompilerPass(new SkipTagTrackingPass());
+        $container->addCompilerPass(new WebsocketRouterConfigurationPass());
+        $container->addCompilerPass(new OriginProviderPass());
     }
 }

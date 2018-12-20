@@ -39,6 +39,7 @@ services:
         public: false
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_override_provider_registry'
             - '@oro_api.entity_id_helper'
             - '@oro_api.complete_definition_helper.association'
             - '@oro_api.complete_definition_helper.custom_association'
@@ -66,7 +67,7 @@ services:
             - '@oro_entity_extend.association_manager'
 
     #
-    # get_config
+    # get_config and get_relation_config actions
     #
 
     oro_api.get_config.load_from_config_bag:
@@ -83,34 +84,117 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition, priority: 20 }
 
+    oro_api.get_relation_config.load_from_config_bag:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\LoadFromConfigBag
+        arguments:
+            - '@oro_api.config_extension_registry'
+            - '@oro_api.config_loader_factory'
+            - '@oro_api.config_bag_registry'
+            - '@oro_api.config_merger.relation'
+        tags:
+            - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: 20 }
+
+    oro_api.get_config.ensure_initialized:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\EnsureInitialized
+        arguments:
+            - '@oro_api.config_loader_factory'
+        tags:
+            - { name: oro.api.processor, action: get_config, priority: -5 }
+            - { name: oro.api.processor, action: get_relation_config, priority: -5 }
+
+    oro_api.get_config.complete_definition.expand_related_entities:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.config_provider'
+            - '@oro_api.entity_override_provider_registry'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&expand_related_entities&definition', priority: -20 }
+            - { name: oro.api.processor, action: get_relation_config, extra: '!identifier_fields_only&expand_related_entities&definition', priority: -20 }
+
+    oro_api.get_relation_config.load_from_metadata:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\LoadFromMetadata
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -25 }
+
     oro_api.get_config.complete_definition.associations.by_config:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinitionOfAssociationsByConfig
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.relation_config_provider'
+            - '@oro_api.entity_override_provider_registry'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, requestType: rest&!json_api, priority: -28 }
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&definition', requestType: rest&!json_api, priority: -28 }
+
+    oro_api.get_config.exclude_custom_fields:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExcludeCustomFields
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&definition', priority: -29 }
+
+    oro_api.get_config.complete_definition:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.complete_definition_helper.entity'
+            - '@oro_api.complete_definition_helper.object'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: definition, priority: -30 }
+            - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -30 }
+
+    oro_api.get_config.exclude_not_accessible_relations:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExcludeNotAccessibleRelations
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.resources_provider'
+            - '@oro_api.entity_override_provider_registry'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&definition', priority: -40 }
+            - { name: oro.api.processor, action: get_relation_config, extra: '!identifier_fields_only&definition', priority: -40 }
+
+    oro_api.get_config.add_meta_properties:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddMetaProperties
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&meta_properties&definition', priority: -40 }
 
     oro_api.get_config.add_association_validators:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddAssociationValidators
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, targetAction: update|create, priority: -45 }
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&definition', targetAction: update|create|update_relationship|add_relationship|delete_relationship|update_subresource|add_subresource|delete_subresource, priority: -45 }
 
-    oro_api.get_config.add_owner_validator:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddOwnerValidator
+    oro_api.get_config.complete_filters:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteFilters
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_security.owner.ownership_metadata_provider'
-            - '@oro_api.validation_helper'
+            - ['string', 'boolean', 'datetime', 'date', 'time']
+            - ['string', 'boolean', 'guid', 'currency']
         tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, targetAction: update|create, priority: -50 }
+            - { name: oro.api.processor, action: get_config, extra: filters&definition, priority: -80 }
+            - { name: oro.api.processor, action: get_relation_config, extra: filters&definition, priority: -80 }
+
+    oro_api.get_config.complete_sorters:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteSorters
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: sorters&definition, priority: -80 }
+            - { name: oro.api.processor, action: get_relation_config, extra: sorters&definition, priority: -80 }
 
     oro_api.get_config.json_api.fix_field_naming:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\JsonApi\FixFieldNaming
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition, requestType: json_api, priority: -100 }
+
+    oro_api.get_config.complete_disable_inclusion:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\CompleteDisableInclusion
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&definition', priority: -105 }
 
     oro_api.get_config.filter_fields_by_extra:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\FilterFieldsByExtra
@@ -118,14 +202,35 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&filter_fields&definition, priority: -110 }
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&filter_fields&definition', priority: -110 }
+
+    oro_api.get_config.normalize_filters:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\NormalizeFilters
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: filters&definition, priority: -130 }
+            - { name: oro.api.processor, action: get_relation_config, extra: filters&definition, priority: -130 }
+
+    oro_api.get_config.normalize_sorters:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\NormalizeSorters
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: sorters&definition, priority: -130 }
+            - { name: oro.api.processor, action: get_relation_config, extra: sorters&definition, priority: -130 }
+
+    oro_api.get_config.complete_composite_identifier_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteCompositeIdentifierFilter
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: filters&definition, priority: -140 }
 
     oro_api.get_config.set_max_related_entities:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetMaxRelatedEntities
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&max_related_entities&definition, priority: -160 }
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&max_related_entities&definition', priority: -160 }
 
     oro_api.get_config.set_data_transformers:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDataTransformers
@@ -133,14 +238,14 @@ services:
             - '@oro_api.data_transformer_registry'
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&data_transformers&definition, priority: -160 }
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&data_transformers&definition', priority: -160 }
 
     oro_api.get_config.set_data_customization_handler:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDataCustomizationHandler
         arguments:
             - '@oro_api.customize_loaded_data.processor'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&customize_loaded_data&definition, priority: -160 }
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&customize_loaded_data&definition', priority: -160 }
 
     oro_api.get_config.complete_status_codes:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteStatusCodes
@@ -165,108 +270,3 @@ services:
             - '@oro_api.request_depended_text_processor'
         tags:
             - { name: oro.api.processor, action: get_config, extra: descriptions&definition, priority: -210 }
-
-    #
-    # get_relation_config
-    #
-
-    oro_api.get_relation_config.load_from_config_bag:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\LoadFromConfigBag
-        arguments:
-            - '@oro_api.config_extension_registry'
-            - '@oro_api.config_loader_factory'
-            - '@oro_api.config_bag_registry'
-            - '@oro_api.config_merger.relation'
-        tags:
-            - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: 20 }
-
-    oro_api.get_relation_config.load_from_metadata:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\LoadFromMetadata
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -25 }
-
-    #
-    # get_config and get_relation_config
-    #
-
-    oro_api.get_config.ensure_initialized:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\EnsureInitialized
-        arguments:
-            - '@oro_api.config_loader_factory'
-        tags:
-            - { name: oro.api.processor, action: get_config, priority: -5 }
-            - { name: oro.api.processor, action: get_relation_config, priority: -5 }
-
-    oro_api.get_config.complete_definition.expand_related_entities:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_api.config_provider'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&expand_related_entities&definition, priority: -20 }
-            - { name: oro.api.processor, action: get_relation_config, extra: !identifier_fields_only&expand_related_entities&definition, priority: -20 }
-
-    oro_api.get_config.complete_definition:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_api.complete_definition_helper.entity'
-            - '@oro_api.complete_definition_helper.object'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: definition, priority: -30 }
-            - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -30 }
-
-    oro_api.get_config.exclude_not_accessible_relations:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExcludeNotAccessibleRelations
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_api.resources_provider'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, priority: -40 }
-            - { name: oro.api.processor, action: get_relation_config, extra: !identifier_fields_only&definition, priority: -40 }
-
-    oro_api.get_config.add_meta_properties:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddMetaProperties
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&meta_properties&definition, priority: -40 }
-
-    oro_api.get_config.complete_filters:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteFilters
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - ['string', 'boolean', 'datetime', 'date', 'time']
-            - ['string', 'boolean', 'guid', 'currency']
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: filters&definition, priority: -80 }
-            - { name: oro.api.processor, action: get_relation_config, extra: filters&definition, priority: -80 }
-
-    oro_api.get_config.complete_sorters:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteSorters
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: sorters&definition, priority: -80 }
-            - { name: oro.api.processor, action: get_relation_config, extra: sorters&definition, priority: -80 }
-
-    oro_api.get_config.complete_composite_identifier_filter:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteCompositeIdentifierFilter
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: filters&definition, priority: -85 }
-
-    oro_api.get_config.normalize_filters:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\NormalizeFilters
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: filters&definition, priority: -130 }
-            - { name: oro.api.processor, action: get_relation_config, extra: filters&definition, priority: -130 }
-
-    oro_api.get_config.normalize_sorters:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\NormalizeSorters
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: sorters&definition, priority: -130 }
-            - { name: oro.api.processor, action: get_relation_config, extra: sorters&definition, priority: -130 }

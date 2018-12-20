@@ -1,0 +1,6 @@
+services:
+    Oro\Bundle\LayoutBundle\Command\DebugCommand:
+        public: false
+        class: Oro\Bundle\LayoutBundle\Command\DebugCommand
+        tags:
+            - { name: console.command }

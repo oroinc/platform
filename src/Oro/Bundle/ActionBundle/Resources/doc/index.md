@@ -6,7 +6,7 @@
  - [Console commands](#console-commands)
  - [The Dependency Injection Tags](./dependency_injection_tags.md)
 
-  On top of common [Action Component](/src/Oro/Component/Action/Resources/doc/actions.md) and Oro Platform in general, **ActionBundle** provides a way to bring more complex solutions in ORO based projects with reusable components of configuration. 
+  On top of common [Action Component](/src/Oro/Component/Action/Resources/doc/actions.md) and OroPlatform in general, **ActionBundle** provides a way to bring more complex solutions in ORO based projects with reusable components of configuration. 
   
   Those components are:
   
@@ -28,7 +28,7 @@ The operation can be enabled or disabled. Other fields of the operation contain 
      
   * [**ActionGroup**](./action-groups.md) - another main component in ActionBundle. A named group of actions with entry `parameters` (required or optional, typed or not) and conditions. 
   
-  *Action groups* can be used not only from an operation but within the workflow processes and in any part of the ORO Platform configuration nodes that understand [Actions](/src/Oro/Component/Action/Resources/doc/actions.md).
+  *Action groups* can be used not only from an operation but within the workflow processes and in any part of the OroPlatform configuration nodes that understand [Actions](/src/Oro/Component/Action/Resources/doc/actions.md).
 A special `@run_action_group` action is designed to run a group of actions as a single one. (For more information please refer to [*ActionGroup* configuration](./action-groups.md#actiongroup-configuration) and [`@run_action_group` action](./actions.md#run_action_group)).
 
   * [**Condition**](./conditions.md) - defines whether *Operation* or *ActionGroup* is allowed. Conditions use [ConfigExpression](/src/Oro/Component/ConfigExpression/README.md) syntax and can be nested within each other. For more information regarding ActionBundle Conditions, how to create and use them, please refer to [this page](./conditions.md).
@@ -60,8 +60,8 @@ Arguments:
 
 ##### Usage
 
-- Displays a list of current actions `php app/console oro:debug:action`;
-- Shows a full description `php app/console oro:debug:action [<name>]`.
+- Displays a list of current actions `php bin/console oro:debug:action`;
+- Shows a full description `php bin/console oro:debug:action [<name>]`.
 
 #### oro:debug:condition
 
@@ -76,5 +76,5 @@ Arguments:
 
 ##### Usage
 
-- Displays list of all conditions `php app/console oro:debug:condition`;
-- Shows a full description `php app/console oro:debug:condition [<name>]`.
+- Displays list of all conditions `php bin/console oro:debug:condition`;
+- Shows a full description `php bin/console oro:debug:condition [<name>]`.

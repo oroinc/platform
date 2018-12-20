@@ -10,7 +10,7 @@ use Oro\Bundle\BatchBundle\Step\ItemStep;
  * Tests related to the ItemStep class
  *
  */
-class ItemStepTest extends \PHPUnit_Framework_TestCase
+class ItemStepTest extends \PHPUnit\Framework\TestCase
 {
     const STEP_NAME = 'test_step_name';
 
@@ -20,12 +20,12 @@ class ItemStepTest extends \PHPUnit_Framework_TestCase
     protected $itemStep = null;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $eventDispatcher = null;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $jobRepository = null;
 

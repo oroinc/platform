@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -44,17 +43,10 @@ class EmailAddressRecipientsTypeTest extends TypeTestCase
             ->getMock();
 
         $emailAddressRecipients = new EmailAddressRecipientsType($configManager);
-        $select2Hidden = new Select2Type(
-            'Symfony\Component\Form\Extension\Core\Type\HiddenType',
-            'oro_select2_hidden'
-        );
 
         return [
             new PreloadedExtension(
-                [
-                    $emailAddressRecipients->getName() => $emailAddressRecipients,
-                    $select2Hidden->getName()          => $select2Hidden,
-                ],
+                [$emailAddressRecipients],
                 []
             ),
         ];

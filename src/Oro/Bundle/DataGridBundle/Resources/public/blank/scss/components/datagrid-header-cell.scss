@@ -1,4 +1,4 @@
-// @theme: blank;
+/* @theme: blank; */
 
 .grid-header-cell {
     font-weight: $datagrid-header-cell-font-weight;
@@ -30,6 +30,12 @@
             border-left: $datagrid-header-cell-caret-size solid transparent;
             vertical-align: middle;
 
+            position: $datagrid-header-cell-caret-position;
+            top: $datagrid-header-cell-caret-top;
+            right: $datagrid-header-cell-caret-right;
+
+            transform: translateY(-50%);
+
             transition: all .2s;
         }
     }
@@ -43,7 +49,7 @@
     
     &.descending {
         .caret {
-            transform: rotate(180deg);
+            transform: translateY(-50%) rotate(180deg);
         }
     }
 
@@ -73,6 +79,7 @@
         line-height: $datagrid-header-cell-link-line-height;
         font-weight: $datagrid-header-cell-link-font-weight;
         color: $datagrid-header-cell-link-color;
+        position: $datagrid-header-cell-link-position;
         
         &:hover,
         &:focus,

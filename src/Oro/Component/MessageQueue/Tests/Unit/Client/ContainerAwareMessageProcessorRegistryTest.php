@@ -4,13 +4,14 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Oro\Component\MessageQueue\Client\ContainerAwareMessageProcessorRegistry;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Exception\MessageProcessorNotFoundException;
 use Symfony\Component\DependencyInjection\Container;
 
-class ContainerAwareMessageProcessorRegistryTest extends \PHPUnit_Framework_TestCase
+class ContainerAwareMessageProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldThrowExceptionIfProcessorIsNotSet()
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(MessageProcessorNotFoundException::class);
         $this->expectExceptionMessage('MessageProcessor was not found. processorName: "processor-name"');
         $registry = new ContainerAwareMessageProcessorRegistry([], new Container());
         $registry->get('processor-name');

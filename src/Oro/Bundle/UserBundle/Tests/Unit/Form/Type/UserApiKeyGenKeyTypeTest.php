@@ -6,7 +6,7 @@ use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenKeyType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class UserApiKeyGenKeyTypeTest extends \PHPUnit_Framework_TestCase
+class UserApiKeyGenKeyTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var UserApiKeyGenKeyType */
     protected $type;
@@ -25,11 +25,6 @@ class UserApiKeyGenKeyTypeTest extends \PHPUnit_Framework_TestCase
         $optionsResolver = new OptionsResolver();
         $this->type->configureOptions($optionsResolver);
         $this->assertEquals($options, $optionsResolver->getDefinedOptions());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(UserApiKeyGenKeyType::NAME, $this->type->getName());
     }
 
     public function testGetBlockPrefix()

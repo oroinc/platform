@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -11,9 +10,9 @@ use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
-class RelationConfigProviderTest extends \PHPUnit_Framework_TestCase
+class RelationConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionProcessorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorInterface */
     private $processor;
 
     /** @var RelationConfigProvider */
@@ -93,7 +92,6 @@ class RelationConfigProviderTest extends \PHPUnit_Framework_TestCase
             $requestType,
             [$extra, $sectionExtra]
         );
-        self::assertInstanceOf(Config::class, $result);
         self::assertEquals('relation|Test\Class|test_extra_key', $result->getDefinition()->getKey());
         self::assertTrue($definition->hasField('test_field'));
         self::assertEquals(['test_section_key' => 'value'], $result->get('test_section_extra'));

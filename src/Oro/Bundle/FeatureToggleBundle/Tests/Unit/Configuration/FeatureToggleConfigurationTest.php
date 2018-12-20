@@ -6,7 +6,7 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
 use Symfony\Component\Config\Definition\Processor;
 
-class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
+class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FeatureToggleConfiguration

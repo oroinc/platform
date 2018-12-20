@@ -8,12 +8,12 @@ use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 
-class ExtendColumnTest extends \PHPUnit_Framework_TestCase
+class ExtendColumnTest extends \PHPUnit\Framework\TestCase
 {
     const TABLE_NAME = 'test_table';
     const COLUMN_NAME = 'test_name';
 
-    /** @var ExtendOptionsManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExtendOptionsManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendOptionsManager;
 
     /** @var ExtendColumn */
@@ -94,28 +94,28 @@ class ExtendColumnTest extends \PHPUnit_Framework_TestCase
             'length' => [
                 'name' => '_length',
                 'method' => 'setLength',
-                'options' => ['extend' => ['length' => 100]],
+                'options' => ['extend' => ['length' => 100], ExtendOptionsManager::TYPE_OPTION => 'string'],
                 'initial' => null,
                 'expected' => 100
             ],
             'precision' => [
                 'name' => '_precision',
                 'method' => 'setPrecision',
-                'options' => ['extend' => ['precision' => 8]],
+                'options' => ['extend' => ['precision' => 8], ExtendOptionsManager::TYPE_OPTION => 'string'],
                 'initial' => 10,
                 'expected' => 8
             ],
             'scale' => [
                 'name' => '_scale',
                 'method' => 'setScale',
-                'options' => ['extend' => ['scale' => 5]],
+                'options' => ['extend' => ['scale' => 5], ExtendOptionsManager::TYPE_OPTION => 'string'],
                 'initial' => 0,
                 'expected' => 5
             ],
             'default' => [
                 'name' => '_default',
                 'method' => 'setDefault',
-                'options' => ['extend' => ['default' => true]],
+                'options' => ['extend' => ['default' => true], ExtendOptionsManager::TYPE_OPTION => 'string'],
                 'initial' => null,
                 'expected' => true
             ],

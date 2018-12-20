@@ -7,12 +7,12 @@ use Oro\Component\ConfigExpression\ContextAccessorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
-class ServiceExistsTest extends \PHPUnit_Framework_TestCase
+class ServiceExistsTest extends \PHPUnit\Framework\TestCase
 {
     const PROPERTY_PATH_NAME = 'testPropertyPath';
 
     /**
-     * @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $container;
 
@@ -68,7 +68,7 @@ class ServiceExistsTest extends \PHPUnit_Framework_TestCase
 
     public function testSetContextAccessor()
     {
-        /** @var ContextAccessorInterface|\PHPUnit_Framework_MockObject_MockObject $contextAccessor **/
+        /** @var ContextAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $contextAccessor **/
         $contextAccessor = $this->getMockBuilder(ContextAccessorInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -94,7 +94,7 @@ class ServiceExistsTest extends \PHPUnit_Framework_TestCase
             ->method('has')
             ->willReturn($hasService);
 
-        /** @var ContextAccessorInterface|\PHPUnit_Framework_MockObject_MockObject $contextAccessor **/
+        /** @var ContextAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $contextAccessor **/
         $contextAccessor = $this->getMockBuilder(ContextAccessorInterface::class)
             ->disableOriginalConstructor()
             ->getMock();

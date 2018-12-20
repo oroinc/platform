@@ -1,0 +1,52 @@
+/* @theme: admin.oro; */
+
+.reminders-collection,
+.ui-dialog .form-horizontal .control-group .controls .reminders-collection {
+    .inline-field {
+        float: #{$start};
+
+        &:not(:last-child) {
+            margin-#{$end}: $content-padding-small / 2;
+        }
+    }
+
+    .inline-field {
+        float: #{$start};
+        margin-#{$end}: $content-padding-small / 2;
+
+        &:last-of-type {
+            margin-#{$end}: 0;
+        }
+    }
+
+    .validation-failed {
+        margin-#{$start}: -139px;
+        font-size: .8em;
+    }
+
+    .inline-field .selector {
+        margin-#{$start}: 0;
+    }
+
+    input.number {
+        width: 50px;
+    }
+
+    select.unit {
+        width: 80px;
+    }
+
+    select.method {
+        width: 124px;
+    }
+
+    .oro-multiselect-holder {
+        padding-#{$end}: 32px;
+    }
+
+    .removeRow {
+        position: absolute;
+        top: 0;
+        #{$end}: 0;
+    }
+}

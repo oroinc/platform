@@ -1,0 +1,329 @@
+/* @theme: admin.oro; */
+
+/* mixins */
+@mixin workflow-hover-block {
+    border: 1px solid $hover-border-color;
+    background: linear-gradient($hover-gradient-start-color, $hover-gradient-middle-color 3%, $hover-gradient-end-color);
+}
+
+/* styles */
+._jsPlumb_drag_select *,
+.workflow-step,
+.workflow-transition-overlay,
+.workflow-flowchart {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.workflow-step-editor,
+.workflow-step-viewer {
+    border-top: 1px solid #f1f1f1;
+
+    .workflow-table-container {
+        padding-top: 20px;
+    }
+
+    .workflow-flowchart-container {
+        background-color: #fafafa;
+        border: 1px solid #f1f1f1;
+        border-top-width: 0;
+    }
+}
+
+.workflow-flowchart-controls {
+    padding: 10px 10px 0;
+    min-height: 32px;
+    position: absolute;
+    z-index: 600;
+
+    .checkbox-group {
+        background: rgba(251, 251, 251, .7);
+        padding: 5px 7px 2px 7px;
+
+        input[type='checkbox'] {
+            margin-top: -2px;
+            margin-right: 6px;
+        }
+    }
+}
+
+.workflow-flowchart-wrapper {
+    overflow: hidden;
+    height: 700px;
+}
+
+.workflow-flowchart {
+    position: relative;
+    min-height: 610px;
+    margin: 0;
+
+    ._jsPlumb_endpoint {
+        z-index: 100;
+    }
+}
+
+.workflow-flowchart {
+    .workflow-step {
+        z-index: 100;
+        position: absolute;
+        border-radius: 3px;
+        padding: 8px 18px;
+        height: 38px;
+        color: #fff;
+        border: 1px solid $step-border-color;
+        max-width: 180px;
+        background: linear-gradient($step-gradient-start-color, $step-gradient-end-color);
+        box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, .3);
+        text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
+
+        .step-label {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            width: 100%;
+            cursor: default;
+
+            > .dropdown-menu {
+                text-align: left;
+            }
+        }
+
+        .jsplumb-source {
+            width: $jsplumb-source-radius * 2;
+            height: $jsplumb-source-radius * 2;
+            border-radius: $jsplumb-source-radius;
+            border: $jsplumb-source-radius / 2 solid $source-border-color;
+            position: absolute;
+            visibility: hidden;
+            background: linear-gradient($source-gradient-start-color, $source-gradient-middle-color 3%, $source-gradient-end-color);
+
+            &:hover {
+                background: linear-gradient(darken($source-gradient-start-color, 5%), darken($source-gradient-middle-color, 5%) 3%, darken($source-gradient-end-color, 5%));
+                cursor: pointer;
+            }
+
+            &.jsplumb-source-top-left {
+                top: -$jsplumb-source-radius;
+                left: -$jsplumb-source-radius;
+            }
+
+            &.jsplumb-source-top-right {
+                top: -$jsplumb-source-radius;
+                right: -$jsplumb-source-radius;
+            }
+
+            &.jsplumb-source-bottom-right {
+                bottom: -$jsplumb-source-radius;
+                right: -$jsplumb-source-radius;
+            }
+
+            &.jsplumb-source-bottom-left {
+                bottom: -$jsplumb-source-radius;
+                left: -$jsplumb-source-radius;
+            }
+        }
+
+        &:hover {
+            .jsplumb-source {
+                visibility: visible;
+            }
+        }
+
+        &.dropdown {
+            .dropdown-toggle {
+                position: absolute;
+            }
+        }
+    }
+
+    .workflow-step.start-step {
+        border-radius: 42.5px;
+        height: 85px;
+        width: 85px;
+        border: 1px solid $start-step-border-color;
+        background: linear-gradient($start-step-gradient-start-color, $start-step-gradient-end-color);
+
+        .jsplumb-source-top-left {
+            top: 2px;
+            left: 2px;
+        }
+
+        .jsplumb-source-top-right {
+            top: 2px;
+            right: 2px;
+        }
+
+        .jsplumb-source-bottom-right {
+            bottom: 2px;
+            right: 2px;
+        }
+
+        .jsplumb-source-bottom-left {
+            bottom: 2px;
+            left: 2px;
+        }
+
+        .step-label {
+            margin-top: 22.5px;
+            width: 100%;
+        }
+    }
+
+    .workflow-step.final-step {
+        border: 1px solid $final-step-border-color;
+        background: linear-gradient($final-step-gradient-start-color, $final-step-gradient-end-color);
+    }
+
+    /* transition */
+    .workflow-transition-overlay {
+        padding: 3px 11px;
+        border-radius: 3px;
+        height: 28px;
+        border: 1px solid $transition-overlay-border-color;
+        background: linear-gradient($transition-overlay-gradient-start-color, $transition-overlay-gradient-end-color);
+        box-shadow: 0 3px 7px 0 #e8e8e8;
+
+        &:hover,
+        &._jsPlumb_hover {
+            z-index: 200;
+        }
+
+        .transition-label {
+            max-width: $transition-label-max-width;
+            margin-top: 1px;
+            cursor: default;
+        }
+    }
+
+    /* common style for step and transition */
+    &.workflow-drag-connection {
+        .jsplumb-source {
+            visibility: visible;
+        }
+
+        .workflow-step.start-step {
+            .jsplumb-source {
+                visibility: hidden;
+            }
+        }
+
+        .workflow-step.connection-source {
+            @include workflow-hover-block();
+        }
+    }
+
+    .workflow-step {
+        &._jsPlumb_hover,
+        &._jsPlumb_source_hover,
+        &._jsPlumb_target_hover,
+        &:not(.start-step).jsplumb-drag-hover,
+        &:hover {
+            color: #fff;
+
+            @include workflow-hover-block();
+        }
+
+        &.dropdown {
+            .dropdown-toggle {
+                margin-left: 2px;
+            }
+
+            &:hover {
+                .dropdown-toggle {
+                    position: absolute;
+                    right: 4px;
+                }
+            }
+        }
+    }
+
+    .workflow-transition-overlay {
+        opacity: .7;
+
+        &._jsPlumb_hover,
+        &._jsPlumb_source_hover,
+        &._jsPlumb_target_hover,
+        &:not(.start-step).jsplumb-drag-hover,
+        &:hover {
+            border: 1px solid #b68e65;
+            background: #fff3e6;
+            color: #7c6248;
+            opacity: 1;
+            display: block !important;
+        }
+
+        &.dropdown .dropdown-toggle {
+            margin: 0 -5px;
+        }
+    }
+
+    .workflow-step,
+    .workflow-transition-overlay {
+        white-space: nowrap;
+
+        .step-label,
+        .transition-label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+        }
+
+        &.dropdown {
+            .dropdown-menu {
+                min-width: 100%;
+                text-shadow: none;
+            }
+
+            &:hover {
+                .dropdown-toggle {
+                    display: inline-block;
+                }
+            }
+
+            .dropdown-toggle {
+                vertical-align: top;
+                display: none;
+                cursor: pointer;
+            }
+        }
+
+        &.dropdown.show {
+            z-index: 101;
+
+            .dropdown-toggle {
+                display: inline-block;
+            }
+        }
+    }
+
+    .workflow-transition-endpoint {
+        opacity: 0;
+    }
+
+    .workflow-transition-endpoint-hover {
+        opacity: 1;
+    }
+
+    &.workflow-flowchart-editor {
+        .workflow-step {
+            cursor: move;
+        }
+
+        .step-label {
+            cursor: move;
+        }
+
+        .workflow-transition-overlay {
+            padding-right: 16px;
+
+            &:hover,
+            &.show {
+                padding-right: 11px;
+            }
+        }
+    }
+}

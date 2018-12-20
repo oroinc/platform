@@ -1,0 +1,163 @@
+/* @theme: admin.oro; */
+
+// Override default bootstrap styles
+.navbar {
+    .nav {
+        > li {
+            a {
+                padding-top: 7px;
+                padding-bottom: 7px;
+            }
+
+            > a {
+                color: $navbar-li-a-color;
+                text-shadow: $navbar-li-a-text-shadow;
+
+                &:hover,
+                &:focus {
+                    color: $navbar-li-a-hover-color;
+                }
+            }
+        }
+
+        > .active {
+            > a {
+                font-weight: $navbar-active-a-font-weight;
+                color: $navbar-active-a-color;
+
+                &:hover,
+                &:focus {
+                    color: $navbar-active-a-hover-color;
+                }
+            }
+        }
+
+        li {
+            &.dropdown {
+                &.show,
+                &.active {
+                    > .dropdown-toggle {
+                        background: none;
+                    }
+                }
+            }
+        }
+    }
+
+    .btn,
+    .btn-group {
+        margin-top: 0;
+    }
+
+    .small-divider {
+        background: url(../../img/vertical-divider-general.gif) repeat-y;
+        height: 22px;
+        margin: 10px 7px 0 0;
+        border: 0;
+        width: 2px;
+    }
+
+    &-extra {
+        padding: 0;
+        margin-bottom: $content-padding-small;
+
+        > .row > div {
+            margin-bottom: $content-padding-small;
+        }
+    }
+
+    &-extra-right {
+        padding-#{$end}: $content-padding;
+    }
+}
+
+.nav-tabs {
+    > li > a,
+    > .active > a {
+        &,
+        &:hover,
+        &:focus {
+            border-width: $nav-tabs-border-width;
+            border-color: $nav-tabs-border-color;
+        }
+    }
+
+    .dropdown.show .dropdown-toggle {
+        color: $nav-link-color;
+        background: $nav-link-background;
+        border-color: $nav-tabs-border-color;
+
+        .caret,
+        &:hover .caret,
+        &:focus .caret,
+        &:active .caret {
+            border-top-color: $nav-tabs-dropdown-toggle-caret-color;
+            border-bottom-color: $nav-tabs-dropdown-toggle-caret-color;
+        }
+    }
+}
+
+.nav-tabs {
+    padding-left: $nav-tabs-inner-offset-left;
+    margin-bottom: $nav-tabs-offset-bottom;
+    border-bottom: $nav-tabs-border-bottom;
+    display: $nav-tabs-display;
+    flex-wrap: $nav-tabs-flex-wrap;
+
+    &.flex-column {
+        flex-direction: column;
+
+        .nav-item.active .nav-link,
+        .nav-item.show .nav-link,
+        .nav-item .nav-link.active {
+            border-top-color: $nav-link-column-active-border-top-color;
+            border-left-color: $nav-link-column-active-border-left-color;
+            border-right-color: $nav-link-column-active-border-right-color;
+            border-bottom-color: $nav-link-column-active-border-bottom-color;
+        }
+    }
+
+    .nav-link {
+        background: $nav-link-background;
+        font-weight: $nav-link-font-weight;
+        color: $nav-link-color;
+        border: $nav-link-border;
+        border-radius: $nav-link-border-radius;
+        margin: $nav-link-offset;
+
+        &:hover,
+        &:active,
+        &:focus {
+            background: $nav-link-hover-background;
+            color: $nav-link-hover-color;
+            outline: $nav-link-hover-outline;
+        }
+    }
+
+    .nav-item {
+        float: $nav-item-float;
+        margin-bottom: $nav-item-offset-bottom;
+    }
+
+    .nav-item.active .nav-link,
+    .nav-item.show .nav-link,
+    .nav-item .nav-link.active {
+        background: $nav-link-active-background;
+        color: $nav-link-active-color;
+        border-top-color: $nav-link-active-border-top-color;
+        border-bottom-color: $nav-link-active-border-bottom-color;
+
+        &:hover,
+        &:active,
+        &:focus {
+            background: $nav-link-active-background;
+        }
+    }
+
+    .dropdown-toggle {
+        .caret {
+            border-top-color: $nav-tabs-dropdown-toggle-caret-color;
+            border-bottom-color: $nav-tabs-dropdown-toggle-caret-color;
+        }
+    }
+}

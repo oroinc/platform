@@ -1,0 +1,13 @@
+services:
+    _defaults:
+        public: false
+
+    Oro\Bundle\RequireJSBundle\Command\OroBuildCommand:
+        arguments:
+            - '@oro_asset.node_process_factory'
+            - '@oro_requirejs.config_provider.manager'
+            - '@filesystem'
+            - '%oro_require_js.web_root%'
+            - '%oro_require_js.building_timeout'
+        tags:
+            - { name: console.command, command: oro:requirejs:build }

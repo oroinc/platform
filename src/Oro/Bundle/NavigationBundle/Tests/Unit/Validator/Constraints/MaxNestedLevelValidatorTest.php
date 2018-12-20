@@ -11,17 +11,17 @@ use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
+class MaxNestedLevelValidatorTest extends \PHPUnit\Framework\TestCase
 {
     use MenuItemTestTrait;
 
     /** @var MaxNestedLevelValidator */
     protected $validator;
 
-    /** @var BuilderChainProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BuilderChainProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $builderChainProvider;
 
-    /** @var ExecutionContextInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $context;
 
     /**
@@ -33,7 +33,7 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->builderChainProvider = $this->createMock(BuilderChainProvider::class);
 
-        /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
+        /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject $localizationHelper */
         $localizationHelper = $this->createMock(LocalizationHelper::class);
 
         $this->validator = new MaxNestedLevelValidator($this->builderChainProvider, $localizationHelper);

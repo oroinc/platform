@@ -7,7 +7,7 @@ use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestService;
 use Oro\Component\Config\Resolver\SystemAwareResolver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class SettingsProviderTest extends \PHPUnit_Framework_TestCase
+class SettingsProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider configProvider

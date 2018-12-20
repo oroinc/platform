@@ -6,15 +6,15 @@ use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\Form\FormEvents;
 
-class DefaultValuesListenerTest extends \PHPUnit_Framework_TestCase
+class DefaultValuesListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContextAccessor
+     * @var \PHPUnit\Framework\MockObject\MockObject|ContextAccessor
      */
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $workflowItem;
 

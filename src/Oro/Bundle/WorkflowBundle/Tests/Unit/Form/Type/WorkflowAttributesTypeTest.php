@@ -13,17 +13,17 @@ use Symfony\Component\Translation\TranslatorInterface;
 class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $defaultValuesListener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $formInitListener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $requiredAttributesListener;
 
@@ -33,27 +33,27 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     protected $type;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $workflowRegistry;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $attributeGuesser;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $dispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $propertyPathSecurityHelper;
 
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 
@@ -94,6 +94,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 []
             ),
         ];
+        parent::setUp();
     }
 
     /**
@@ -128,7 +129,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 }
             );
 
-        /* @var $builder FormBuilderInterface|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $builder FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->at(1))
             ->method('add')
@@ -444,8 +445,10 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 'childrenOptions' => array(
                     'first'  => array(
                         'label' => 'Guessed Label',
-                        'max_length' => 50,
-                        'required' => false
+                        'required' => false,
+                        'attr' => [
+                            'maxlength' => 50
+                        ]
                     ),
                 ),
                 'guessedData' => array(
@@ -454,7 +457,9 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                         'form_type' => TextType::class,
                         'form_options' => array(
                             'label' => 'Guessed Label',
-                            'max_length' => 50,
+                            'attr' => [
+                                'maxlength' => 50
+                            ]
                         )
                     )
                 ),

@@ -17,7 +17,7 @@ class UserRoleForm extends Form
         $entityRow = $this->getEntityRow($entity);
         $actionRow = $this->getActionRow($entityRow, $action);
         $this->getDriver()->waitForAjax();
-        $levels = $actionRow->findAll('css', 'ul.dropdown-menu-collection__list li a');
+        $levels = $actionRow->findAll('css', '.dropdown-menu li a');
         $availableLevels = [];
 
         /** @var NodeElement $level */
@@ -69,7 +69,7 @@ class UserRoleForm extends Form
             if (preg_match(sprintf('/%s/i', $action), $label->getText())) {
                 $label->click();
 
-                $dropDown = $this->getPage()->findVisible('css', 'div.dropdown-menu');
+                $dropDown = $this->getPage()->findVisible('css', '.dropdown-menu__permissions-item.show');
                 self::assertNotNull($dropDown, "Visible permission list dropdown not found for $action");
 
                 return $dropDown;

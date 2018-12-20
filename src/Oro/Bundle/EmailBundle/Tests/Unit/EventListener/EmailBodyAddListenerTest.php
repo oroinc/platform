@@ -12,7 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
+class EmailBodyAddListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailBodyAddListener */
     protected $listener;
@@ -26,10 +26,10 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
     /** @var EmailActivityListProvider */
     protected $activityListProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenStorage;
 
     /** @var ActivityListChainProvider */

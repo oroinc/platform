@@ -1,0 +1,36 @@
+id: sync_selected_origin_with_email_that_have_extra_chars_should_not_break_the_sync
+description: Sync selected origin with one folder and one simple email that have extra chars should not break the sync.
+params:
+    --id: origin_two
+log_info:
+    - 'Finding an email origin (id:'
+    - 'Found " ()" email origin. Id: '
+    - 'Get folders enabled for sync...'
+    - 'Got 1 folder(s)'
+    - 'The folder "Folder 1" is selected.'
+    - 'Previous max email UID "0"'
+    - 'Found 1 email(s).'
+    - 'Error occurred while trying to process email "test" (UID: 123). Unable to parse the header "To". Reason: "Invalid header value detected".'
+total: 1
+data:
+    id: 91
+    UID: 123
+    INTERNALDATE: 121212
+    FLAGS: []
+    BODY[HEADER]: |
+        Return-path: <azmllyaec@test.com>
+        Envelope-to: info@test.com
+        Delivery-date: Sat, 16 Jun 2018 10:42:29 +0300
+        Received: from [203.91.116.120] (helo=188.40.135.18)
+        	by srv.test.com with smtp (Exim 4.76)
+        	(envelope-from <azmllyaec@test.com>)
+        	id 1fU5qu-0005sh-9M
+        	for info@test.com; Sat, 16 Jun 2018 10:42:29 +0300
+        From: "Ira Miers" <Miers_Ira@test.com>
+        Subject: test
+        To: =?Windows-1251?B?0fJw7ujy5ev88fLi7g==?= <uirchi�k.richof@test.com>
+        Date: Sat, 16 Jun 2018 06:40:28 -0200
+        Mime-Version: 1.0
+        Content-Type: text/html; charset=utf-8
+expectedEmailData:
+    recipients: ~

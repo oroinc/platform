@@ -8,9 +8,9 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\TransitionHandleProcessor;
 
-class TransitionHandleProcessorTest extends \PHPUnit_Framework_TestCase
+class TransitionHandleProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowManager;
 
     /** @var TransitionHandleProcessor */
@@ -24,11 +24,11 @@ class TransitionHandleProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testHandle()
     {
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
 
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
 
         $context = new TransitionContext();
@@ -43,11 +43,11 @@ class TransitionHandleProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleFailures()
     {
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
 
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
 
         $context = new TransitionContext();

@@ -9,8 +9,8 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 
 class EmailQueryFactoryTest extends OrmTestCase
@@ -28,7 +28,7 @@ class EmailQueryFactoryTest extends OrmTestCase
     /** @var EmailQueryFactory */
     protected $factory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
     /** @var MailboxManager */

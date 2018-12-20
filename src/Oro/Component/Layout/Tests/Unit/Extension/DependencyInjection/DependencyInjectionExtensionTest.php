@@ -5,9 +5,9 @@ namespace Oro\Component\Layout\Tests\Unit\Extension\DependencyInjection;
 use Oro\Component\Layout\Extension\DependencyInjection\DependencyInjectionExtension;
 use Oro\Component\Layout\LayoutItemInterface;
 
-class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
+class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     /** @var DependencyInjectionExtension */
@@ -201,7 +201,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $id
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|LayoutItemInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LayoutItemInterface
      */
     protected function getLayoutItem($id)
     {

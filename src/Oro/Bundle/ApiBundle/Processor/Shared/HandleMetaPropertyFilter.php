@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\MetaPropertiesConfigExtra;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -11,19 +12,24 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Checks whether the "meta" filter exists and if so,
- * adds the corresponding configuration extra into the Context.
- * This filter can be used to specify which entity meta properties should be returned.
+ * adds the corresponding configuration extra into the context.
+ * This filter is used to specify which entity meta properties should be returned.
  */
 class HandleMetaPropertyFilter implements ProcessorInterface
 {
+    /** @var FilterNamesRegistry */
+    private $filterNamesRegistry;
+
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /**
-     * @param ValueNormalizer $valueNormalizer
+     * @param FilterNamesRegistry $filterNamesRegistry
+     * @param ValueNormalizer     $valueNormalizer
      */
-    public function __construct(ValueNormalizer $valueNormalizer)
+    public function __construct(FilterNamesRegistry $filterNamesRegistry, ValueNormalizer $valueNormalizer)
     {
+        $this->filterNamesRegistry = $filterNamesRegistry;
         $this->valueNormalizer = $valueNormalizer;
     }
 
@@ -34,12 +40,15 @@ class HandleMetaPropertyFilter implements ProcessorInterface
     {
         /** @var Context $context */
 
-        $filterValue = $context->getFilterValues()->get(AddMetaPropertyFilter::FILTER_KEY);
+        $filterName = $this->filterNamesRegistry
+            ->getFilterNames($context->getRequestType())
+            ->getMetaPropertyFilterName();
+        $filterValue = $context->getFilterValues()->get($filterName);
         if (null === $filterValue) {
             // meta properties were not requested
             return;
         }
-        $names = (array)$this->valueNormalizer->normalizeValue(
+        $names = $this->valueNormalizer->normalizeValue(
             $filterValue->getValue(),
             DataType::STRING,
             $context->getRequestType(),
@@ -50,6 +59,7 @@ class HandleMetaPropertyFilter implements ProcessorInterface
             return;
         }
 
+        $names = (array)$names;
         $configExtra = $context->getConfigExtra(MetaPropertiesConfigExtra::NAME);
         if (null === $configExtra) {
             $configExtra = new MetaPropertiesConfigExtra();

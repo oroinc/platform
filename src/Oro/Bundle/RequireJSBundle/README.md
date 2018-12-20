@@ -9,7 +9,7 @@ For details of the RequireJS build options, see [example.build.js].
 
 ## Require.js config generation
 ### Configuration
-Common options for require.js config are placed in ```app/config.yml```:
+Common options for require.js config are placed in ```config.yml```:
 
     oro_require_js:
         config: # common options which will eventually get into require.js config file
@@ -99,12 +99,11 @@ See ```@OroRequireJSBundle::scripts.html.twig```
 
 ## Build project
 ### Configuration
-Build configuration starts in ```app/config.yml```
+Build configuration starts in ```config.yml```
 
     oro_require_js:
         build_path: "js/oro.min.js"     # relative path from document root folder to project built
         building_timeout: 3600
-        js_engine: "node"               # can be configured to use other engine, e.g. Rhino
         build_logger: false             # show in browser console not optimized RequireJS modules 
         build:                          # build.js's common options
             optimize: "uglify2"
@@ -125,11 +124,11 @@ This directive will prevent module from getting concatenated into build file.
 ### Building
 To make a build for JS-resources, just execute a command in console:
 
-    php app/console oro:requirejs:build
+    php bin/console oro:requirejs:build
 
 It will:
 
-1. take initial configuration from ```oro_require_js.build``` (```app/config.yml```);
+1. take initial configuration from ```oro_require_js.build``` (```config.yml```);
 1. extend it with configuration found in bundles (```%BundleName%\Resources\config\requirejs.yml```);
 1. generate ```build.js``` - a config for builder;
 1. run builder (time consuming process, especially for Rhino JS-engine);

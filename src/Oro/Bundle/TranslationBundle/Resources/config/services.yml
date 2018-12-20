@@ -44,7 +44,7 @@ services:
         arguments:
             - '@oro_translation.uploader.default_adapter'
             - '@oro_translation.js_dumper'
-            - '@translation.loader'
+            - '@translation.reader'
             - '@oro_translation.database_translation.persister'
             - '%kernel.cache_dir%'
         lazy: true
@@ -126,6 +126,12 @@ services:
     oro_translation.empty_array.loader:
         class: '%oro_translation.empty_array.loader.class%'
 
+    oro_translation.selector:
+        class: Oro\Bundle\TranslationBundle\Translation\MessageSelector
+        decorates: translator.selector
+        arguments:
+            - '@logger'
+
     oro_translation.cache:
         parent: oro.cache.abstract
         calls:
@@ -150,7 +156,7 @@ services:
             - '@oro_translation.controller'
             - '@router'
             - '%oro_translation.js_translation.domains%'
-            - '%kernel.root_dir%'
+            - '%kernel.project_dir%'
             - '@oro_translation.provider.language'
         lazy: true
 
@@ -165,14 +171,34 @@ services:
     oro_translation.packages_provider:
         class: '%oro_translation.packages_provider.class%'
         arguments:
-            - '@oro_distribution.package_manager'
             - '%kernel.bundles%'
-            - '%kernel.root_dir%'
-            - '%oro_distribution.composer_cache_home%'
+            - '%kernel.project_dir%'
             - ['@oro_translation.packages_provider.translation']
 
     oro_translation.packages_provider.translation:
         class: 'Oro\Bundle\TranslationBundle\Provider\TranslationPackageProvider'
+
+    # this instance of the composer does not require the full initialization
+    # and can work without Phar and Zip PHP extensions
+    oro_translation.composer:
+        class: Composer\Composer
+        public: false
+        factory: ['@oro_translation.composer.factory', createComposer]
+        arguments:
+            - '@oro_translation.composer.io'
+            - '%kernel.project_dir%/composer.json'
+            - false
+            - ~
+            - false
+        lazy: true
+
+    oro_translation.composer.factory:
+        class: Composer\Factory
+        public: false
+
+    oro_translation.composer.io:
+        class: Composer\IO\BufferIO
+        public: false
 
     oro_translation.extension.transtation_packages_provider.abstract:
         class: 'Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtension'
@@ -180,7 +206,7 @@ services:
         public: false
         arguments:
             - '@oro_platform.composer.local_repo_factory'
-            - '@oro_distribution.composer'
+            - '@oro_translation.composer'
 
     oro_translation.extension.transtation_packages_provider:
         parent: oro_translation.extension.transtation_packages_provider.abstract
@@ -246,6 +272,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-translations-grid, method: onBuildBefore }
 
+    oro_translation.listener.datagrid.translatable:
+        class: 'Oro\Bundle\TranslationBundle\EventListener\Datagrid\TranslatableListener'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.before, method: onResultBefore }
+
     oro_translation.repository.language:
         class: 'Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository'
         parent: oro_entity.abstract_repository
@@ -284,6 +315,7 @@ services:
             - '@doctrine'
             - '@oro_translation.provider.translation_domain'
             - '@oro_translation.database_translation.metadata.cache'
+            - '@event_dispatcher'
 
     oro_translation.cache.provider.domains:
         parent: oro.cache.abstract
@@ -339,3 +371,7 @@ services:
            - '@oro_translation.service_provider'
            - '@oro_translation.helper.language'
            - '@oro_entity.doctrine_helper'
+
+    oro_translation.strategy.provider_link:
+        tags:
+            - { name: oro_service_link, service: oro_translation.strategy.provider }

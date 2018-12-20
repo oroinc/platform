@@ -8,7 +8,7 @@ use CG\Generator\PhpMethod;
 use Oro\Component\Layout\Loader\Generator\Extension\ImportsAwareLayoutUpdateVisitor;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 
-class ImportsAwareLayoutUpdateVisitorTest extends \PHPUnit_Framework_TestCase
+class ImportsAwareLayoutUpdateVisitorTest extends \PHPUnit\Framework\TestCase
 {
     // @codingStandardsIgnoreStart
     public function testVisit()

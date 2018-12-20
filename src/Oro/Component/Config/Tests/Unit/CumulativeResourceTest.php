@@ -10,7 +10,7 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle2\TestBundle2;
 
-class CumulativeResourceTest extends \PHPUnit_Framework_TestCase
+class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
 {
     public function testResource()
     {

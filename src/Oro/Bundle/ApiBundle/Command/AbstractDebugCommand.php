@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * A base class for CLI commands that shows a different kind of debug information about Data API configuration.
+ * The base class for CLI commands that shows a different kind of debug information about Data API configuration.
  */
 abstract class AbstractDebugCommand extends ContainerAwareCommand
 {

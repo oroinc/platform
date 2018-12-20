@@ -28,6 +28,6 @@ class CurrencyNameHelperStub extends CurrencyNameHelper
 
     public function getCurrencyChoices($nameViewStyle = null)
     {
-        return ['USD', 'EUR'];
+        return ['$' => 'USD', '€' => 'EUR'];
     }
 }

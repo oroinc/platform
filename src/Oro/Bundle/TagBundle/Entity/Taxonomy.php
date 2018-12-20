@@ -65,7 +65,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *              "immutable"=true
  *          },
  *          "form"={
- *              "form_type"="oro_taxonomy_select",
+ *              "form_type"="Oro\Bundle\TagBundle\Form\Type\TaxonomySelectType",
  *              "grid_name"="taxonomy-select-grid",
  *          },
  *      }

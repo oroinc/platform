@@ -14,26 +14,30 @@
     <div class="note-attachments">
         <div class="control-group">
             <label class="control-label">
-                Attachment
+                {{ 'Attachment'|trans }}
             </label>
-            <div class="attachment-item">
+            <div class="attachment-item attachment-item--note">
                 <div class="thumbnail">
                     {% if attachment.attachmentThumbnail  %}
                         <a href="{{ attachment.attachmentURL }}" data-gallery="note-view-{{ entity.id }}" class="no-hash" title="{{ attachment.attachmentFileName }}">
                             <span class="thumbnail" style="background: url('{{ attachment.attachmentThumbnail  }}') 50% 50% no-repeat;"></span>
                         </a>
                     {% else  %}
-                        <i class="fa {{ attachment.attachmentIcon }} fa-3x"></i>
+                        <span class="fa {{ attachment.attachmentIcon }} fa-3x" aria-hidden="true"></span>
                     {% endif  %}
                 </div>
                 <div class="dropdown link-to-record">
-                    <a class="no-hash dropdown-toggle file-menu" href="javascript: void(0);" data-toggle="dropdown">
-                        <i class="fa {{ attachment.attachmentIcon }}"></i> {{ attachment.attachmentFileName }}
+                    {% set togglerId = 'dropdown-'|uniqid %}
+                    <a id="{{ togglerId }}" class="no-hash attachment-item__filename dropdown-toggle dropdown-toggle--no-caret file-menu" href="#" role="button" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        <span class="fa {{ attachment.attachmentIcon }}" aria-hidden="true"></span> {{ attachment.attachmentFileName }}
                     </a>
-                    <ul class="dropdown-menu file-menu" role="menu" aria-labelledby="dropdownMenu">
-                        <a class="no-hash" tabindex="-1" href="{{ attachment.attachmentURL }}">
-                            {{ 'oro.translation.action.download'|trans }} <span>{{ attachment.attachmentSize }}</span>
-                        </a>
+                    <ul class="dropdown-menu file-menu" role="menu" aria-labelledby="{{ togglerId }}">
+                        <li>
+                            <a class="dropdown-item no-hash" tabindex="-1" href="{{ attachment.attachmentURL }}">
+                                {{ 'oro.translation.action.download'|trans }} <span>{{ attachment.attachmentSize }}</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

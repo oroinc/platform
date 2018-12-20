@@ -7,7 +7,7 @@ use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 
-class OroElementFactoryTest extends \PHPUnit_Framework_TestCase
+class OroElementFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \InvalidArgumentException
@@ -33,7 +33,7 @@ class OroElementFactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $configuration
-     * @return \PHPUnit_Framework_MockObject_MockObject|OroElementFactory
+     * @return \PHPUnit\Framework\MockObject\MockObject|OroElementFactory
      */
     protected function getElementFactory(array $configuration = [])
     {

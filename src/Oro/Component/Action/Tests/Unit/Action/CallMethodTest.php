@@ -7,7 +7,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CallMethodTest extends \PHPUnit_Framework_TestCase
+class CallMethodTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CallMethod
@@ -66,7 +66,7 @@ class CallMethodTest extends \PHPUnit_Framework_TestCase
         $context = new ItemStub(array('key' => 'value'));
         $options = array(
             'method' => function ($a) {
-                \PHPUnit_Framework_Assert::assertEquals('value', $a);
+                \PHPUnit\Framework\Assert::assertEquals('value', $a);
                 return 'bar';
             },
             'method_parameters' => array(new PropertyPath('key')),

@@ -4,7 +4,7 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UIBundle\Provider\UserAgent;
 
-class UserAgentTest extends \PHPUnit_Framework_TestCase
+class UserAgentTest extends \PHPUnit\Framework\TestCase
 {
     public function testWithoutUserAgentString()
     {

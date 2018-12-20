@@ -8,6 +8,7 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
+    var tinyMCE = require('tinymce/tinymce');
     require('jquery-ui');
 
     /**
@@ -105,7 +106,10 @@ define(function(require) {
          */
         clear: function() {
             _.each(this.fields, function(el) {
-                if (el.value) {
+                var editor = tinyMCE.get(el.id);
+                if (editor) {
+                    editor.setContent('');
+                } else if (el.value) {
                     el.value = '';
                 }
             });

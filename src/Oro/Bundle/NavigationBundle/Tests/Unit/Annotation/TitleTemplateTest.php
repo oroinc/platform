@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Annotation;
 
 use Oro\Bundle\NavigationBundle\Annotation\TitleTemplate;
 
-class TitleTemplateTest extends \PHPUnit_Framework_TestCase
+class TitleTemplateTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_VALUE = 'test annotation value';
 

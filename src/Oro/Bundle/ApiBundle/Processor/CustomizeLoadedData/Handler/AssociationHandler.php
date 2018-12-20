@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 /**
@@ -26,6 +27,7 @@ class AssociationHandler extends EntityHandler
      * @param string                   $propertyPath
      * @param string                   $entityClass
      * @param EntityDefinitionConfig   $config
+     * @param bool                     $collection
      * @param callable|null            $previousHandler
      */
     public function __construct(
@@ -36,6 +38,7 @@ class AssociationHandler extends EntityHandler
         string $propertyPath,
         string $entityClass,
         EntityDefinitionConfig $config,
+        bool $collection,
         ?callable $previousHandler = null
     ) {
         $this->rootEntityClass = $rootEntityClass;
@@ -46,6 +49,7 @@ class AssociationHandler extends EntityHandler
             $requestType,
             $entityClass,
             $config,
+            $collection,
             $previousHandler
         );
     }
@@ -58,6 +62,11 @@ class AssociationHandler extends EntityHandler
         $customizationContext = parent::createCustomizationContext();
         $customizationContext->setRootClassName($this->rootEntityClass);
         $customizationContext->setPropertyPath($this->propertyPath);
+
+        /** @var EntityDefinitionConfig $config */
+        $config = $customizationContext->getConfig();
+        $customizationContext->setRootConfig($config);
+        $customizationContext->setConfig($this->getAssociationConfig($config, $this->propertyPath));
 
         return $customizationContext;
     }
@@ -72,5 +81,31 @@ class AssociationHandler extends EntityHandler
             && $this->propertyPath === $handler->propertyPath
             && \is_a($this->rootEntityClass, $handler->rootEntityClass, true)
             && parent::isRedundantHandler($handler);
+    }
+
+    /**
+     * @param EntityDefinitionConfig $config
+     * @param string                 $propertyPath
+     *
+     * @return EntityDefinitionConfig|null
+     */
+    private function getAssociationConfig(
+        EntityDefinitionConfig $config,
+        string $propertyPath
+    ): ?EntityDefinitionConfig {
+        $currentConfig = $config;
+        $path = ConfigUtil::explodePropertyPath($propertyPath);
+        foreach ($path as $fieldName) {
+            $fieldConfig = $currentConfig->getField($fieldName);
+            $currentConfig = null;
+            if (null !== $fieldConfig) {
+                $currentConfig = $fieldConfig->getTargetEntity();
+            }
+            if (null === $currentConfig) {
+                break;
+            }
+        }
+
+        return $currentConfig;
     }
 }

@@ -5,10 +5,9 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Oro\Component\ChainProcessor\AbstractMatcher;
 use Oro\Component\ChainProcessor\ExpressionParser;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
  * Registers resource documentation parsers for all supported Data API request types.
@@ -28,16 +27,11 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
         $resourceDocParsers = [];
         $taggedServices = $container->findTaggedServiceIds(self::RESOURCE_DOC_PARSER_TAG);
         foreach ($taggedServices as $id => $attributes) {
-            $definition = DependencyInjectionUtil::findDefinition($container, $id);
-            if (!$definition->isPublic()) {
-                throw new LogicException(
-                    sprintf('The resource documentation parser service "%s" should be public.', $id)
-                );
-            }
+            $container->getDefinition($id)->setPublic(true);
             foreach ($attributes as $tagAttributes) {
                 $resourceDocParsers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     $id,
-                    DependencyInjectionUtil::getAttribute($tagAttributes, 'requestType', null)
+                    DependencyInjectionUtil::getRequestType($tagAttributes)
                 ];
             }
         }
@@ -63,7 +57,7 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
                     $existingRequestType[$expr] = true;
                     $id = self::DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID . '.' . $name;
                     $container
-                        ->setDefinition($id, new DefinitionDecorator(self::DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID))
+                        ->setDefinition($id, new ChildDefinition(self::DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID))
                         ->setPublic(true);
                     $defaultResourceDocParsers[] = [$id, \implode('&', $view['request_type'])];
                 }

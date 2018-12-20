@@ -22,7 +22,11 @@ define(function(require) {
                 dropdownToggleLabel: ['dropdownToggle', 'span'],
                 visibleTabs: ['tabsContainer', '>li.tab'],
                 hiddenTabs: ['dropdownMenu', '>li.tab']
-            }
+            },
+            tabClass: 'nav-item',
+            tabLinkClass: 'nav-link',
+            dropdownItemClass: '',
+            dropdownItemLinkClass: 'dropdown-item'
         },
 
         /**
@@ -107,7 +111,7 @@ define(function(require) {
 
                 $tab.on('shown.bs.tab', function(e) {
                     // fix bug, 'active' class doesn't removed from dropdown tabs
-                    $(e.relatedTarget).closest('li').removeClass('active');
+                    $(e.relatedTarget).removeClass('active');
                     self.dropdownUpdateLabel();
                 });
             });
@@ -136,6 +140,9 @@ define(function(require) {
                     var $tab = $(this);
                     visibleWidth -= $tab.data('dropdownOuterWidth');
                     $tab.prependTo(self.getElement('dropdownMenu'));
+
+                    self.turnToDropdownItem($tab);
+
                     updated = true;
                     if (dropdownContainerWidth >= visibleWidth) {
                         return false;
@@ -158,6 +165,8 @@ define(function(require) {
                         }
                     }
                     $tab.insertBefore(self.getElement('dropdown'));
+
+                    self.turnToNavItem($tab);
                     updated = true;
                 });
             }
@@ -171,6 +180,22 @@ define(function(require) {
                 }
                 this.dropdownUpdateLabel();
             }
+        },
+
+        turnToDropdownItem: function($item) {
+            $item.removeClass(this.options.tabClass)
+                .addClass(this.options.dropdownItemClass)
+                .find('a')
+                .removeClass(this.options.tabLinkClass)
+                .addClass(this.options.dropdownItemLinkClass);
+        },
+
+        turnToNavItem: function($item) {
+            $item.removeClass(this.options.dropdownItemClass)
+                .addClass(this.options.tabClass)
+                .find('a')
+                .removeClass(this.options.dropdownItemLinkClass)
+                .addClass(this.options.tabLinkClass);
         },
 
         dropdownUpdateLabel: function() {

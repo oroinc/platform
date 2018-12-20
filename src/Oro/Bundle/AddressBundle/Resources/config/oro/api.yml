@@ -2,12 +2,40 @@ api:
     entities:
         Oro\Bundle\AddressBundle\Entity\Address:
             documentation_resource: '@OroAddressBundle/Resources/doc/api/address.md'
+            fields:
+                createdAt:
+                    property_path: created
+                updatedAt:
+                    property_path: updated
+                customRegion:
+                    exclude: false # set manually because this field is marked as excluded in entity.yml
+                    property_path: regionText
+
         Oro\Bundle\AddressBundle\Entity\AddressType:
             documentation_resource: '@OroAddressBundle/Resources/doc/api/address.md'
+            filters:
+                fields:
+                    name:
+                        allow_array: true
+
         Oro\Bundle\AddressBundle\Entity\Region:
             documentation_resource: '@OroAddressBundle/Resources/doc/api/region.md'
+            filters:
+                fields:
+                    combinedCode:
+                        allow_array: true
+                    country:
+                        allow_array: true
+
         Oro\Bundle\AddressBundle\Entity\Country:
             documentation_resource: '@OroAddressBundle/Resources/doc/api/country.md'
+            fields:
+                regions:
+                    max_results: -1
+            filters:
+                fields:
+                    iso2Code:
+                        allow_array: true
 
     relations:
         Oro\Bundle\AddressBundle\Entity\AbstractAddress:

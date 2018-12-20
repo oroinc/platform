@@ -8,7 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormView;
 
-class AddressTypeTest extends \PHPUnit_Framework_TestCase
+class AddressTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AddressType
@@ -125,10 +125,5 @@ class AddressTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayHasKey('region_route', $view->vars);
         $this->assertEquals('test', $view->vars['region_route']);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_address', $this->type->getName());
     }
 }

@@ -52,32 +52,7 @@ processes, but this approach causes performance degradation. In general, a memor
 Cache chaining
 ==============
 
-Solution to the issue mentioned above is to keep a healthy balance between the fast and shared cache. It is implemented in the `ChainCache` class.
-
-```php
-<?php
-
-namespace Oro\Bundle\CacheBundle\Provider;
-
-use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\ChainCache;
-
-class MemoryCacheChain extends ChainCache
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct($cacheProviders = [])
-    {
-        if (PHP_SAPI !== 'cli') {
-            array_unshift($cacheProviders, new ArrayCache());
-        }
-
-        parent::__construct($cacheProviders);
-    }
-}
-
-```
+Solution to the issue mentioned above is to keep a healthy balance between the fast and shared cache. It is implemented in the [MemoryCacheChain](../../Provider/MemoryCacheChain.php) class.
 
 This class checks whether a request comes from the CLI. If not, the memory `ArrayCache` is added to the top
 of the cache providers which are being used for caching. With these priorities set, all HTTP requests gain performance when dealing with caches in memory and the CLI processes have no issues with the outdated data as they use the persistent cache.
@@ -86,7 +61,11 @@ of the cache providers which are being used for caching. With these priorities s
 Default cache implementation
 ============================
 
-As you may read in [Readme](../../readme.md#abstract-cache-services) there are two abstract services you can use as a 
-parent for your cache services. Default implementations are following:
+As you may read in [Readme](../../readme.md#abstract-cache-services) there are three abstract services you can use as a
+parent for your cache services. The default implementation for services based on
+`oro.file_cache.abstract` and `oro.cache.abstract` is following:
+
  - for CLI requests: `MemoryCacheChain` with only `Oro\Bundle\CacheBundle\Provider\FilesystemCache` as a cache provider
  - for other requests: `MemoryCacheChain` with `ArrayCache` on the top of `FilesystemCache`
+
+For services based on `oro.cache.abstract.without_memory_cache` the `MemoryCacheChain` is not used.

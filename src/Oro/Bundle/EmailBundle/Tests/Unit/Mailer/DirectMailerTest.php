@@ -5,28 +5,25 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
+use Oro\Bundle\EmailBundle\Provider\SmtpSettingsAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DirectMailerTest extends \PHPUnit_Framework_TestCase
+class DirectMailerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|\Swift_Mailer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\Swift_Mailer */
     protected $baseMailer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     protected $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EmailOrigin */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailOrigin */
     protected $emailOrigin;
 
     protected function setUp()
     {
         $this->baseMailer = $this->getMailerMock();
-        $this->container  = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-
-        $this->emailOrigin =
-            $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailOrigin')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->container  = $this->createMock(ContainerInterface::class);
+        $this->emailOrigin = $this->createMock(EmailOrigin::class);
 
         $managerClass = 'Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager';
         $this->imapEmailGoogleOauth2Manager = $this->getMockBuilder($managerClass)
@@ -46,6 +43,15 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($transport));
         $this->container->expects($this->never())
             ->method('getParameter');
+
+        $smtpSettingsProvider = $this->createMock(SmtpSettingsAwareInterface::class);
+        $smtpSettingsProvider->expects($this->any())
+            ->method('getSmtpSettings')
+            ->willReturn(new SmtpSettings());
+
+        $this->container->expects($this->any())
+            ->method('get')
+            ->willReturn($smtpSettingsProvider);
 
         $transport->expects($this->at(0))
             ->method('isStarted')
@@ -83,6 +89,12 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
             ->method('getParameter')
             ->with('swiftmailer.mailers')
             ->will($this->returnValue(['test1' => null, 'test2' => null]));
+
+        $smtpSettingsProvider = $this->createMock(SmtpSettingsAwareInterface::class);
+        $smtpSettingsProvider->expects($this->any())
+            ->method('getSmtpSettings')
+            ->willReturn(new SmtpSettings());
+
         $this->container->expects($this->any())
             ->method('get')
             ->will(
@@ -92,6 +104,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
                         ['swiftmailer.mailer.test1', 1, $this->getMailerMock()],
                         ['swiftmailer.mailer.test2', 1, $this->baseMailer],
                         ['swiftmailer.mailer.test2.transport.real', 1, $realTransport],
+                        ['oro_email.provider.smtp_settings', 1, $smtpSettingsProvider],
                     ]
                 )
             );
@@ -111,10 +124,114 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $realTransport->expects($this->once())
             ->method('stop');
 
+        $this->container
+            ->expects($this->any())
+            ->method('initialized')
+            ->willReturnMap([
+                ['swiftmailer.mailer.test1', true],
+                ['swiftmailer.mailer.test2', true]
+            ]);
+
         $mailer = new DirectMailer($this->baseMailer, $this->container);
         $this->assertEquals(1, $mailer->send($message, $failedRecipients));
     }
 
+    public function testSendSpooledWithSmtpSettings()
+    {
+        $message = new \Swift_Message();
+        $failedRecipients = [];
+
+        $this->baseMailer->expects($this->once())
+            ->method('getTransport')
+            ->willReturn($this->createMock(\Swift_Transport_SpoolTransport::class));
+
+        $this->container->expects($this->once())
+            ->method('getParameter')
+            ->with('swiftmailer.mailers')
+            ->willReturn(['test1' => null, 'test2' => null]);
+
+        $smtpSettingsProvider = $this->createMock(SmtpSettingsAwareInterface::class);
+        $smtpSettingsProvider->expects($this->any())
+            ->method('getSmtpSettings')
+            ->willReturn(new SmtpSettings('127.0.0.1', 1025, ''));
+
+        $realTransport = $this->createMock(\Swift_Transport_EsmtpTransport::class);
+        $realTransport->expects($this->at(0))
+            ->method('isStarted')
+            ->willReturn(false);
+
+        $realTransport->expects($this->once())
+            ->method('setHost')
+            ->with('127.0.0.1')
+            ->willReturnSelf();
+        $realTransport->expects($this->once())
+            ->method('setPort')
+            ->with(1025)
+            ->willReturnSelf();
+        $realTransport->expects($this->once())
+            ->method('setEncryption')
+            ->with('')
+            ->willReturnSelf();
+        // to process auth settings Swift will use AuthHandler which will called by __call() method
+        $realTransport->expects($this->at(3))
+            ->method('__call')
+            ->with('setUsername', [''])
+            ->willReturnSelf();
+        $realTransport->expects($this->at(4))
+            ->method('__call')
+            ->with('setPassword', [''])
+            ->willReturnSelf();
+
+        $realTransport->expects($this->once())
+            ->method('start');
+        $realTransport->expects($this->at(2))
+            ->method('isStarted')
+            ->willReturn(true);
+        $realTransport->expects($this->once())
+            ->method('send')
+            ->with($this->identicalTo($message), $this->identicalTo($failedRecipients))
+            ->willReturn(1);
+        $realTransport->expects($this->once())
+            ->method('stop');
+
+        $this->container->expects($this->any())
+            ->method('get')
+            ->willReturnMap(
+                [
+                    [
+                        'swiftmailer.mailer.test1',
+                        ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                        $this->getMailerMock()
+                    ],
+                    [
+                        'swiftmailer.mailer.test2',
+                        ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                        $this->baseMailer
+                    ],
+                    [
+                        'swiftmailer.mailer.test2.transport.real',
+                        ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                        $realTransport
+                    ],
+                    [
+                        'oro_email.provider.smtp_settings',
+                        ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                        $smtpSettingsProvider
+                    ],
+                ]
+            );
+
+        $this->container
+            ->expects($this->any())
+            ->method('initialized')
+            ->willReturnMap([
+                ['swiftmailer.mailer.test1', true],
+                ['swiftmailer.mailer.test2', true]
+            ]);
+
+        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $this->assertEquals(1, $mailer->send($message, $failedRecipients));
+    }
 
     /**
      * @expectedException \Exception
@@ -130,6 +247,15 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($transport));
         $this->container->expects($this->never())
             ->method('getParameter');
+
+        $smtpSettingsProvider = $this->createMock(SmtpSettingsAwareInterface::class);
+        $smtpSettingsProvider->expects($this->any())
+            ->method('getSmtpSettings')
+            ->willReturn(new SmtpSettings());
+
+        $this->container->expects($this->any())
+            ->method('get')
+            ->willReturn($smtpSettingsProvider);
 
         $transport->expects($this->at(0))
             ->method('isStarted')
@@ -174,9 +300,23 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
             ->method('getTransport')
             ->will($this->returnValue($transportMock));
 
-        $this->container->expects($this->once())
+        $smtpSettingsProvider = $this->createMock(SmtpSettingsAwareInterface::class);
+        $smtpSettingsProvider->expects($this->any())
+            ->method('getSmtpSettings')
+            ->willReturn(new SmtpSettings());
+
+        $this->container->expects($this->any())
             ->method('get')
-            ->willReturn($dispatcher);
+            ->willReturnMap(
+                [
+                    ['event_dispatcher', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $dispatcher],
+                    [
+                        'oro_email.provider.smtp_settings',
+                        ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                        $smtpSettingsProvider
+                    ],
+                ]
+            );
 
         $mailer = new DirectMailer($this->baseMailer, $this->container);
         $mailer->prepareEmailOriginSmtpTransport($this->emailOrigin);
@@ -196,13 +336,11 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMailerMock()
     {
-        return $this->getMockBuilder('\Swift_Mailer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->createMock('\Swift_Mailer');
     }
 
     /**
@@ -210,7 +348,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAfterPrepareSmtpTransportForEsmtpTransport()
     {
-        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit_Framework_MockObject_MockObject $smtpTransportMock */
+        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransportMock */
         $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
             ->disableOriginalConstructor()
             ->setMethods(['setHost', 'setPort', 'setEncryption', 'setUsername', 'setPassword'])
@@ -221,6 +359,16 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $this->baseMailer->expects($this->once())
             ->method('getTransport')
             ->willReturn($smtpTransportMock);
+
+        $smtpSettingsProvider = $this->createMock(SmtpSettingsAwareInterface::class);
+        $smtpSettingsProvider->expects($this->any())
+            ->method('getSmtpSettings')
+            ->willReturn(new SmtpSettings());
+
+        $this->container->expects($this->any())
+            ->method('get')
+            ->with('oro_email.provider.smtp_settings', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
+            ->willReturn($smtpSettingsProvider);
 
         $settings = new SmtpSettings();
         $settings->setHost('test.host');
@@ -261,7 +409,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAfterPrepareSmtpTransportForNonEsmtpTransport()
     {
-        /** @var \Swift_Transport_AbstractSmtpTransport|\PHPUnit_Framework_MockObject_MockObject $smtpTransportMock */
+        /** @var \Swift_Transport_AbstractSmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransportMock */
         $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_AbstractSmtpTransport::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
@@ -269,6 +417,16 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $this->baseMailer->expects($this->once())
             ->method('getTransport')
             ->willReturn($smtpTransportMock);
+
+        $smtpSettingsProvider = $this->createMock(SmtpSettingsAwareInterface::class);
+        $smtpSettingsProvider->expects($this->any())
+            ->method('getSmtpSettings')
+            ->willReturn(new SmtpSettings());
+
+        $this->container->expects($this->any())
+            ->method('get')
+            ->with('oro_email.provider.smtp_settings', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
+            ->willReturn($smtpSettingsProvider);
 
         $settings = new SmtpSettings();
         $settings->setHost('test.host');

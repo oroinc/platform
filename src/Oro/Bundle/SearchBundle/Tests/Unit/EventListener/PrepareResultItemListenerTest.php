@@ -2,10 +2,23 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener;
+use Oro\Bundle\SearchBundle\Query\Result\Item;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Router;
 
-class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
+class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PrepareResultItemListener
@@ -13,78 +26,80 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var Router|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $router;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectMapper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $mapper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var PrepareResultItemEvent|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $event;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $item;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entity;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityNameResolver;
+
+    /**
+     * @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected $configManager;
+
+    /**
+     * @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected $translator;
 
     /**
      * Set up test environment
      */
     protected function setUp()
     {
-        $this->router = $this->getMockBuilder('Symfony\Component\Routing\Router')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->router = $this->createMock(Router::class);
 
-        $this->mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mapper = $this->createMock(ObjectMapper::class);
 
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->em = $this->createMock(EntityManager::class);
 
-        $this->item = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result\Item')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->item = $this->createMock(Item::class);
 
-        $this->event = $this->getMockBuilder('Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->event = $this->createMock(PrepareResultItemEvent::class);
 
-        $this->entity = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entity = $this->createMock(User::class);
 
-        $this->entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
+
+        $this->configManager = $this->createMock(ConfigManager::class);
+
+        $this->translator = $this->createMock(Translator::class);
 
         $this->listener = new PrepareResultItemListener(
             $this->router,
             $this->mapper,
             $this->em,
-            $this->entityNameResolver
+            $this->entityNameResolver,
+            $this->configManager,
+            $this->translator
         );
     }
 
@@ -107,6 +122,13 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
         $this->item->expects($this->once())
             ->method('getRecordTitle')
             ->will($this->returnValue('title'));
+
+        $config = new Config(new EntityConfigId('entity', User::class));
+        $config->set('label', 'testLabel');
+
+        $this->configManager->expects($this->once())
+            ->method('getEntityConfig')
+            ->willReturn($config);
 
         $this->em->expects($this->never())
             ->method('getRepository');
@@ -135,13 +157,11 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRecordTitle')
             ->will($this->returnValue('title'));
 
-        $this->item->expects($this->once())
+        $this->item->expects($this->exactly(2))
             ->method('getEntityName')
             ->will($this->returnValue(get_class($this->entity)));
 
-        $metadataMock = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadataMock = $this->createMock(ClassMetadata::class);
 
         $this->em->expects($this->once())
             ->method('getClassMetadata')
@@ -151,7 +171,7 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
         $this->mapper->expects($this->exactly(2))
             ->method('getEntityMapParameter')
             ->with(get_class($this->entity), 'route')
-            ->will($this->returnValue(array('parameters' => array('parameter' => 'field'), 'name' => 'test_route')));
+            ->will($this->returnValue(['parameters' => ['parameter' => 'field'], 'name' => 'test_route']));
 
         $this->mapper->expects($this->once())
             ->method('getFieldValue')
@@ -160,8 +180,15 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->router->expects($this->once())
             ->method('generate')
-            ->with('test_route', array('parameter' => 'test_data'), true)
+            ->with('test_route', ['parameter' => 'test_data'], UrlGeneratorInterface::ABSOLUTE_URL)
             ->will($this->returnValue('test_url'));
+
+        $config = new Config(new EntityConfigId('entity', User::class));
+        $config->set('label', 'testLabel');
+
+        $this->configManager->expects($this->once())
+            ->method('getEntityConfig')
+            ->willReturn($config);
 
         $this->listener->process($this->event);
     }
@@ -187,13 +214,11 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRecordTitle')
             ->will($this->returnValue('title'));
 
-        $this->item->expects($this->once())
+        $this->item->expects($this->exactly(2))
             ->method('getEntityName')
             ->will($this->returnValue(get_class($this->entity)));
 
-        $metadataMock = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadataMock = $this->createMock(ClassMetadata::class);
 
         $this->em->expects($this->once())
             ->method('getClassMetadata')
@@ -208,6 +233,13 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
         $this->item->expects($this->once())
             ->method('setRecordUrl')
             ->with('');
+
+        $config = new Config(new EntityConfigId('entity', User::class));
+        $config->set('label', 'testLabel');
+
+        $this->configManager->expects($this->once())
+            ->method('getEntityConfig')
+            ->willReturn($config);
 
         $this->listener->process($this->event);
     }
@@ -233,22 +265,18 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRecordTitle')
             ->will($this->returnValue('title'));
 
-        $this->item->expects($this->once())
+        $this->item->expects($this->exactly(2))
             ->method('getEntityName')
             ->will($this->returnValue(get_class($this->entity)));
 
-        $metadataMock = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadataMock = $this->createMock(ClassMetadata::class);
 
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with(get_class($this->entity))
             ->will($this->returnValue($metadataMock));
 
-        $repositoryMock = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repositoryMock = $this->createMock(EntityRepository::class);
 
         $repositoryMock->expects($this->once())
             ->method('find')
@@ -265,11 +293,18 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
         $this->mapper->expects($this->atLeastOnce())
             ->method('getEntityMapParameter')
             ->with(get_class($this->entity), 'route')
-            ->will($this->returnValue(array('parameters' => array('parameter' => 'field'), 'name' => 'test_route')));
+            ->will($this->returnValue(['parameters' => ['parameter' => 'field'], 'name' => 'test_route']));
+
+        $config = new Config(new EntityConfigId('entity', User::class));
+        $config->set('label', 'testLabel');
+
+        $this->configManager->expects($this->once())
+            ->method('getEntityConfig')
+            ->willReturn($config);
 
         $this->router->expects($this->once())
             ->method('generate')
-            ->with('test_route', array('parameter' => '1'), true)
+            ->with('test_route', ['parameter' => '1'], UrlGeneratorInterface::ABSOLUTE_URL)
             ->will($this->returnValue('test_url'));
 
         $this->listener->process($this->event);
@@ -296,13 +331,11 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRecordTitle')
             ->will($this->returnValue(false));
 
-        $this->item->expects($this->once())
+        $this->item->expects($this->exactly(2))
             ->method('getEntityName')
             ->will($this->returnValue(get_class($this->entity)));
 
-        $repositoryMock = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repositoryMock = $this->createMock(EntityRepository::class);
 
         $repositoryMock->expects($this->once())
             ->method('find')
@@ -320,6 +353,13 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
         $this->item->expects($this->once())
             ->method('setRecordTitle')
             ->with('testTitle');
+
+        $config = new Config(new EntityConfigId('entity', User::class));
+        $config->set('label', 'testLabel');
+
+        $this->configManager->expects($this->once())
+            ->method('getEntityConfig')
+            ->willReturn($config);
 
         $this->listener->process($this->event);
     }

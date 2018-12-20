@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * EntityConfig controller.
  * @Route("/entity/config")
- * TODO: Discuss ACL impl., currently management of configurable entities can be on or off only
+ * BAP-17635 Discuss ACL impl., currently management of configurable entities can be on or off only
  * @Acl(
  *      id="oro_entityconfig_manage",
  *      label="oro.entity_config.action.manage",
@@ -106,7 +106,7 @@ class ConfigController extends Controller
         if ($request->getMethod() == 'POST') {
             $form->handleRequest($request);
 
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 //persist data inside the form
                 $this->get('session')->getFlashBag()->add(
                     'success',
@@ -168,7 +168,6 @@ class ConfigController extends Controller
     }
 
     /**
-     * TODO: Check if this method ever used
      * Lists Entity fields
      * @Route("/fields/{id}", name="oro_entityconfig_fields", requirements={"id"="\d+"}, defaults={"id"=0})
      * @Template()

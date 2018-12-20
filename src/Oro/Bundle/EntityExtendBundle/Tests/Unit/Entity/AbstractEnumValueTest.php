@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
-class AbstractEnumValueTest extends \PHPUnit_Framework_TestCase
+class AbstractEnumValueTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {

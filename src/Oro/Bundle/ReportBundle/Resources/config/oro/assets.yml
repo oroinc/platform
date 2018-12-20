@@ -1,5 +1,4 @@
 assets:
     css:
-        'ororeport':
-            - 'bundles/ororeport/css/report.css'
-            - 'bundles/ororeport/css/view-sql-query.css'
+        inputs:
+            - 'bundles/ororeport/css/scss/main.scss'

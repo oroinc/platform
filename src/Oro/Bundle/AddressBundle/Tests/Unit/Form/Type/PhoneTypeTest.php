@@ -6,7 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class PhoneTypeTest extends \PHPUnit_Framework_TestCase
+class PhoneTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PhoneType
@@ -44,10 +44,5 @@ class PhoneTypeTest extends \PHPUnit_Framework_TestCase
             ->with('primary', RadioType::class);
 
         $this->type->buildForm($builder, array());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_phone', $this->type->getName());
     }
 }

@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\DeleteMassAction
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension;
 use Symfony\Component\HttpFoundation\Request;
 
-class DeleteMassActionTest extends \PHPUnit_Framework_TestCase
+class DeleteMassActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DeleteMassAction */
     protected $action;

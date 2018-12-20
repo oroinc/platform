@@ -8,15 +8,15 @@ use Oro\Bundle\UIBundle\View\ScrollData;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class AttributeFamilyFormViewListenerTest extends \PHPUnit_Framework_TestCase
+class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 
     /**
-     * @var \Twig_Environment|\PHPUnit_Framework_MockObject_MockObject
+     * @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $environment;
 

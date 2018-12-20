@@ -6,17 +6,17 @@ use Oro\Bundle\PlatformBundle\Twig\SerializerExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class SerializerExtensionTest extends \PHPUnit_Framework_TestCase
+class SerializerExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var SerializerExtension */
     protected $extension;
 
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $serializer;
 
     protected function setUp()

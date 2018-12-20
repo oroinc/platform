@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger\Stub\AbstractTransitionTriggerAssemblerStub;
 
-class AbstractTransitionTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
+class AbstractTransitionTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     public function testCommonSetters()
     {

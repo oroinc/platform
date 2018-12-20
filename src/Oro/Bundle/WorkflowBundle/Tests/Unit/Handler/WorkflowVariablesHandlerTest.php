@@ -10,21 +10,21 @@ use Oro\Bundle\WorkflowBundle\Handler\WorkflowVariablesHandler;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class WorkflowVariablesHandlerTest extends \PHPUnit_Framework_TestCase
+class WorkflowVariablesHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowVariablesHandler */
     protected $handler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     protected $entityManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry $managerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry $managerRegistry */
     protected $managerRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
     protected $entityRepository;
 
     /**
@@ -35,7 +35,7 @@ class WorkflowVariablesHandlerTest extends \PHPUnit_Framework_TestCase
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->entityManager->expects($this->any())

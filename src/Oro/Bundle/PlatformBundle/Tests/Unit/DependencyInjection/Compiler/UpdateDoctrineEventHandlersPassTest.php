@@ -6,12 +6,12 @@ use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineEventHa
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class UpdateDoctrineEventHandlersPassTest extends \PHPUnit_Framework_TestCase
+class UpdateDoctrineEventHandlersPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var UpdateDoctrineEventHandlersPass */
     protected $compiler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder */
     protected $container;
 
     protected function setUp()

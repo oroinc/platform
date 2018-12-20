@@ -18,9 +18,11 @@ entity_config:
                         filterable:         true
                         show_filter:        true
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          datagrid
                             label:          "Show in Datagrid"
@@ -57,9 +59,11 @@ entity_config:
                         filterable:         true
                         show_filter:        true
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          datagrid
                             label:          "Show in Datagrid"
@@ -76,9 +80,11 @@ entity_config:
                         filterable:         true
                         show_filter:        true
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          datagrid
                             label:          "Datagrid search"
@@ -95,9 +101,11 @@ entity_config:
                         filterable:         true
                         show_filter:        true
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          datagrid
                             label:          "Datagrid filter"

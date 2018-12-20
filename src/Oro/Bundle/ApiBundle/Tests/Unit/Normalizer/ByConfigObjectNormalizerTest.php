@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
+use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
@@ -25,17 +26,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
+class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ObjectNormalizer */
-    protected $objectNormalizer;
+    private $objectNormalizer;
 
     protected function setUp()
     {
-        $doctrine = $this->getMockBuilder(ManagerRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrine->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->willReturn(null);
 
@@ -75,7 +74,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'   => 123,
                 'name' => 'test_name'
@@ -105,7 +104,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'    => 123,
                 'name1' => 'test_name'
@@ -140,7 +139,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             ['key' => 'context value']
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'   => 123,
                 'name' => 'test_name (Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group::name)[context value]'
@@ -175,7 +174,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             ['key' => 'context value']
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'      => 123,
                 'name'    => 'test_name_additional[context value]',
@@ -221,7 +220,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'        => 123,
                 'category1' => 'category_label',
@@ -269,7 +268,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'        => 123,
                 'category1' => null,
@@ -305,7 +304,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'    => 123,
                 'owner' => [
@@ -347,7 +346,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'    => 123,
                 'owner' => [
@@ -398,7 +397,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'        => 123,
                 'category1' => null,
@@ -454,7 +453,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             ['key' => 'context value']
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'        => 123,
                 'category1' => 'category_label',
@@ -513,7 +512,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'       => 123,
                 'category' => null,
@@ -575,19 +574,19 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'       => 123,
                 'category' => [
                     'name'      => 'category_name',
-                    '__class__' => Entity\Category::class,
+                    '__class__' => Entity\Category::class
                 ],
                 'owner'    => [
                     'name'   => 'user_name',
                     'groups' => [
                         [
                             'id'        => 789,
-                            '__class__' => Entity\Group::class,
+                            '__class__' => Entity\Group::class
                         ]
                     ]
                 ]
@@ -639,7 +638,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'       => 123,
                 'category' => null,
@@ -699,19 +698,19 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'       => 123,
                 'category' => [
                     'name'      => 'category_name',
-                    '__class__' => Entity\Category::class,
+                    '__class__' => Entity\Category::class
                 ],
                 'owner'    => [
                     'name'   => 'user_name',
                     'groups' => [
                         [
                             'id'        => 789,
-                            '__class__' => Entity\Group::class,
+                            '__class__' => Entity\Group::class
                         ]
                     ]
                 ]
@@ -739,7 +738,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $srcConfig = $configObject->toArray();
         $this->objectNormalizer->normalizeObject($object, $configObject);
 
-        $this->assertEquals($srcConfig, $configObject->toArray());
+        self::assertEquals($srcConfig, $configObject->toArray());
     }
 
     public function testNormalizeWithIgnoredField()
@@ -763,9 +762,9 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
-                'id' => 123,
+                'id' => 123
             ],
             $result
         );
@@ -791,10 +790,10 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'   => 123,
-                'name' => 'test_name',
+                'name' => 'test_name'
             ],
             $result
         );
@@ -823,9 +822,9 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
-                'name' => 'test_name',
+                'name' => 'test_name'
             ],
             $result
         );
@@ -865,7 +864,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'        => 123,
                 'ownerName' => 'user_name (computed)'
@@ -893,7 +892,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                             'property_path' => 'computedName',
                             'fields'        => [
                                 'renamedValue' => [
-                                    'property_path' => 'value',
+                                    'property_path' => 'value'
                                 ]
                             ]
                         ]
@@ -912,7 +911,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'        => 123,
                 'ownerName' => 'user_name (computed)'
@@ -949,7 +948,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->createConfigObject($config)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id'       => 123,
                 'category' => [
@@ -964,7 +963,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "exclusion_policy" must be "all". Object type: "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category".
+     * @expectedExceptionMessage The exclusion policy must be "all". Object type: "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category".
      */
     // @codingStandardsIgnoreEnd
     public function testNormalizeObjectForInvalidExclusionPolicyInRelationConfig()
@@ -988,7 +987,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return Entity\Product
      */
-    protected function createProductObject()
+    private function createProductObject()
     {
         $product = new Entity\Product();
         $product->setId(123);
@@ -1023,10 +1022,10 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
      *
      * @return EntityDefinitionConfig
      */
-    protected function createConfigObject(array $config)
+    private function createConfigObject(array $config)
     {
         $configExtensionRegistry = new ConfigExtensionRegistry();
-        $configExtensionRegistry->addExtension(new FiltersConfigExtension());
+        $configExtensionRegistry->addExtension(new FiltersConfigExtension(new FilterOperatorRegistry([])));
         $configExtensionRegistry->addExtension(new SortersConfigExtension());
 
         $loaderFactory = new ConfigLoaderFactory($configExtensionRegistry);

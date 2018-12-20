@@ -46,7 +46,7 @@ class OroAccountBundle implements Migration
     }
 }
 ```
-Please pay attention on `owner` attribute in `extend` scope. In this example we use `ExtendScope::OWNER_CUSTOM`, it means that Oro platform is fully responsible for render this field on edit and view pages, as well as grids. The default value of `owner` attribute is `ExtendScope::OWNER_SYSTEM`, and in this case you have to add such field in forms, views and grids manually.
+Please pay attention on `owner` attribute in `extend` scope. In this example we use `ExtendScope::OWNER_CUSTOM`, it means that OroPlatform is fully responsible for render this field on edit and view pages, as well as grids. The default value of `owner` attribute is `ExtendScope::OWNER_SYSTEM`, and in this case you have to add such field in forms, views and grids manually.
 
 Also you can use [OroOptions](Migration/OroOptions.php) class to build `oro_options`. It can be helpful in same cases, for example if you work with arrays. The following example shows how to use this class:
 
@@ -96,7 +96,7 @@ Extend fields can be also marked as unique:
 
 ## Add relation
 
-Creating relations is more complex task than creation of regular field. Oro Platform provides a special extension for [Migration bundle](../MigrationBundle/README.md#extensions-for-database-structure-migrations) named [ExtendExtension](Migration/Extension/ExtendExtension.php) to help you. To use this extension your migration should implement [ExtendExtensionAwareInterface](Migration/Extension/ExtendExtensionAwareInterface.php). The following example shows how to create many-to-one relation:
+Creating relations is more complex task than creation of regular field. OroPlatform provides a special extension for [Migration bundle](../MigrationBundle/README.md#extensions-for-database-structure-migrations) named [ExtendExtension](Migration/Extension/ExtendExtension.php) to help you. To use this extension your migration should implement [ExtendExtensionAwareInterface](Migration/Extension/ExtendExtensionAwareInterface.php). The following example shows how to create many-to-one relation:
 
 ``` php
 <?php
@@ -140,7 +140,7 @@ More examples you can find in [relations chapter](./Resources/doc/relations.md).
 
 ## Add option set field
 
-The option set is a special type of a field which allows to choose one or more options from a predefined set of options. Oro Platform provides two different data types for these purposes:
+The option set is a special type of a field which allows to choose one or more options from a predefined set of options. OroPlatform provides two different data types for these purposes:
 
  - `enum` (named `Select` on UI) - only one option can be selected
  - `multiEnum` (named `Multi-Select` on UI) - several options can be selected
@@ -230,7 +230,7 @@ class LoadLeadSourceData extends AbstractFixture
 }
 ```
 
-As you can see in this example we use `buildEnumValueClassName` function to convert the option set code to the class name of an entity responsible to store all options of this option set. It is important because such entities are generated automatically by Oro Platform and you should not use the class name directly.
+As you can see in this example we use `buildEnumValueClassName` function to convert the option set code to the class name of an entity responsible to store all options of this option set. It is important because such entities are generated automatically by OroPlatform and you should not use the class name directly.
 Also there are other functions in [ExtendHelper](Tools/ExtendHelper.php) class which can be helpful when you work with option sets:
 
  - `buildEnumCode` - builds an option set code based on its name.
@@ -305,7 +305,7 @@ class AcmeTestBundle implements Migration, ExtendExtensionAwareInterface
 The following command prepares extended entities configuration:
 
 ```bash
-php app/console oro:entity-extend:update-config
+php bin/console oro:entity-extend:update-config
 ```
 
 ## Updating database schema for extended entities
@@ -313,7 +313,7 @@ php app/console oro:entity-extend:update-config
 The following command updates a database schema for extended entities:
 
 ```bash
-php app/console oro:entity-extend:update-schema
+php bin/console oro:entity-extend:update-schema
 ```
 
 ## Warming up the cache
@@ -321,7 +321,7 @@ php app/console oro:entity-extend:update-schema
 To save entity extend configuration stored in the database to the application cache, the following command can be used:
 
 ```bash
-php app/console oro:entity-extend:cache:warmup
+php bin/console oro:entity-extend:cache:warmup
 ```
 
 ## Clearing up the cache
@@ -329,7 +329,7 @@ php app/console oro:entity-extend:cache:warmup
 The following command removes all data related to entity extend functionality from the application cache:
 
 ```bash
-php app/console oro:entity-extend:cache:clear --no-warmup
+php bin/console oro:entity-extend:cache:clear --no-warmup
 ```
 To reload all cached data just run this command without `--no-warmup` option.
 

@@ -9,20 +9,21 @@ use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class AuthorizationCheckerTest extends \PHPUnit_Framework_TestCase
+class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $innerAuthorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $objectIdentityFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $annotationProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
     /** @var AuthorizationChecker */
@@ -199,6 +200,26 @@ class AuthorizationCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('isGranted')
             ->with($this->equalTo('PERMISSION'), $this->equalTo($obj))
             ->will($this->returnValue(true));
+
+        $result = $this->authorizationChecker->isGranted('PERMISSION', $obj);
+        $this->assertTrue($result);
+    }
+
+    public function testIsGrantedForNotAclProtectedClass()
+    {
+        $obj = 'Test\Class';
+        $this->annotationProvider->expects($this->once())
+            ->method('findAnnotationById')
+            ->with('PERMISSION')
+            ->willReturn(false);
+        $this->objectIdentityFactory->expects($this->once())
+            ->method('get')
+            ->with($obj)
+            ->willThrowException(new InvalidDomainObjectException());
+        $this->innerAuthorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with('PERMISSION', $obj)
+            ->willReturn(true);
 
         $result = $this->authorizationChecker->isGranted('PERMISSION', $obj);
         $this->assertTrue($result);

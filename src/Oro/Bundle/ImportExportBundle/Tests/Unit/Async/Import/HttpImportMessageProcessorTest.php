@@ -22,7 +22,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class HttpImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testImportProcessCanBeConstructedWithRequiredAttributes()
     {
@@ -204,7 +204,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|HttpImportHandler
+     * @return \PHPUnit\Framework\MockObject\MockObject|HttpImportHandler
      */
     protected function createHttpImportHandlerMock()
     {
@@ -212,7 +212,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
      */
     protected function createJobRunnerMock()
     {
@@ -220,7 +220,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
      */
     protected function createMessageProducerInterfaceMock()
     {
@@ -228,7 +228,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|RegistryInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|RegistryInterface
      */
     protected function createDoctrineMock()
     {
@@ -237,7 +237,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
     /**
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     protected function createLoggerMock()
     {
@@ -245,7 +245,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobStorage
+     * @return \PHPUnit\Framework\MockObject\MockObject|JobStorage
      */
     protected function createJobStorageMock()
     {
@@ -253,7 +253,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageInterface
      */
     private function createMessageMock()
     {
@@ -261,7 +261,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionMock()
     {
@@ -269,7 +269,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ImportExportResultSummarizer
+     * @return \PHPUnit\Framework\MockObject\MockObject|ImportExportResultSummarizer
      */
     private function createImportExportResultSummarizerMock()
     {
@@ -277,7 +277,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FileManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|FileManager
      */
     private function createFileManagerMock()
     {

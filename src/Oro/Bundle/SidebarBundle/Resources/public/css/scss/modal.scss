@@ -1,0 +1,19 @@
+/* @theme: admin.oro; */
+
+.oro-modal-normal.widget-setup {
+    width: auto;
+    height: auto;
+    text-align: center;
+
+   .modal-dialog {
+       display: inline-block;
+       text-align: $start;
+       margin-top: $sidebar-widget-setup-modal-margin-top;
+   }
+}
+
+.sidebar-widget-setup .control-group:last-child,
+.sidebar-widget-setup .control-group:last-child textarea,
+.sidebar-widget-setup .control-group:last-child input[type='text'] {
+    margin-bottom: 0;
+}

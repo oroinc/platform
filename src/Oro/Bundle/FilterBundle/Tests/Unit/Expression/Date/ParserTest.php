@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Oro\Bundle\FilterBundle\Expression\Date\Parser;
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
 
-class ParserTest extends \PHPUnit_Framework_TestCase
+class ParserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Parser */
     protected $parser;

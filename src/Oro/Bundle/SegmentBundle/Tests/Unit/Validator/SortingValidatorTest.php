@@ -5,18 +5,18 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Util;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Validator\Constraints\Sorting as SortingConstraint;
 use Oro\Bundle\SegmentBundle\Validator\SortingValidator;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class SortingValidatorTest extends AbstractConstraintValidatorTest
+class SortingValidatorTest extends ConstraintValidatorTestCase
 {
     /** @var SortingConstraint */
     protected $sortingConstraint;
 
-    /** @var Segment|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Segment|\PHPUnit\Framework\MockObject\MockObject */
     protected $segment;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     /**

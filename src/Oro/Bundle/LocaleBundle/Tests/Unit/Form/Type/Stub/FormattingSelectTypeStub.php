@@ -13,7 +13,7 @@ class FormattingSelectTypeStub extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return FormattingSelectType::NAME;
     }
@@ -24,7 +24,7 @@ class FormattingSelectTypeStub extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'choices' => Intl::getLocaleBundle()->getLocaleNames(),
+            'choices' => array_flip(Intl::getLocaleBundle()->getLocaleNames())
         ]);
     }
 

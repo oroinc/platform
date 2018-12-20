@@ -5,9 +5,9 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 
-class ButtonSearchContextProviderTest extends \PHPUnit_Framework_TestCase
+class ButtonSearchContextProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContextHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextHelper;
 
     /** @var ButtonSearchContextProvider */

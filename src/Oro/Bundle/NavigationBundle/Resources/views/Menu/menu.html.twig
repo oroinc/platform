@@ -111,7 +111,7 @@
         {%- endif %}
     {%- endset -%}
     {# render the list of children#}
-    {%- set childrenClasses = childrenClasses|merge(['menu_level_' ~ item.level]) %}
+    {%- set childrenClasses = childrenClasses|merge(['menu', 'menu-level-' ~ item.level]) %}
     {%- set listAttributes = childrenAttributes|merge({'class': childrenClasses|join(' ') }) %}
     {%- set wrapperContent = block('list_wrapper') -%}
     {% if item.uri != '#' or wrapperContent %}
@@ -147,7 +147,7 @@
 
 {% block label %}
     {%- if item.getExtra('icon') %}
-        <i class="{{- item.getExtra('icon') -}}"></i>
+        <span class="{{- item.getExtra('icon') ~ ' menu-icon' -}}" aria-hidden="true"></span>
     {% endif -%}
     {% if options.allow_safe_labels and item.getExtra('safe_label', false) %}
         {{- item.label|trans|raw -}}

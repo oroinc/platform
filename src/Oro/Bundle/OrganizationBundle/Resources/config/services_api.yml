@@ -1,0 +1,9 @@
+services:
+    oro_organization.api.config.add_owner_validator:
+        class: Oro\Bundle\OrganizationBundle\Api\Processor\Config\AddOwnerValidator
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.owner.ownership_metadata_provider'
+            - '@oro_api.validation_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&definition', targetAction: update|create|update_relationship|add_relationship|delete_relationship|update_subresource|add_subresource|delete_subresource, priority: -50 }

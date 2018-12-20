@@ -1,0 +1,263 @@
+/* @theme: admin.oro; */
+
+.activity-list-widget {
+    position: relative;
+
+    .title {
+        display: none;
+    }
+
+    .actions-panel {
+        width: $activity-filter-box-width;
+        flex-grow: 1;
+        display: flex;
+        justify-content: flex-end;
+        margin: 0;
+    }
+
+    .activity-list {
+        position: relative;
+
+        .grid-toolbar {
+            align-items: flex-start;
+        }
+
+        .filter-box {
+            width: $activity-filter-box-width;
+            margin-bottom: $activity-filter-box-offset;
+            flex-grow: 1;
+        }
+
+        .filter-item {
+            margin-bottom: $activity-filter-item-offset;
+
+            // should keep nesting
+            > .btn {
+                height: $activity-filter-item-size;
+
+                line-height: $activity-filter-item-size;
+            }
+
+            &:last-child {
+                margin-#{$end}: 0;
+            }
+        }
+
+        .info.responsive-cell {
+            .box-content {
+                padding: 0;
+            }
+        }
+    }
+
+    .list-box {
+        &:empty {
+            display: none;
+        }
+    }
+
+    .actions {
+        position: static;
+    }
+
+    .user {
+        font-style: normal;
+    }
+
+    .date {
+        font-size: $activity-date-font-size;
+    }
+
+    .icon {
+        width: $activity-icon-size;
+
+        font-size: $activity-icon-font-size;
+        line-height: 1;
+        text-align: center;
+
+        color: $activity-icon-color;
+    }
+
+    .activity-actions {
+        .dropdown-toggle {
+            font-size: $activity-icon-font-size;
+
+            text-align: $end;
+
+            width: $activity-dropdown-toggle-size;
+
+            @include fa-icon($activity-dropdown-toggle-icon, before, true) {
+                font-weight: normal;
+            }
+        }
+    }
+
+    .comment-count {
+        margin: $activity-count-offset;
+
+        color: $activity-count-color;
+
+        .count {
+            margin-#{$start}: $activity-actions-offset;
+        }
+    }
+
+    .accordion {
+        padding: 0;
+        margin: 0;
+    }
+
+    .accordion-heading {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        min-height: $activity-heading-min-height;
+        padding: $activity-heading-offset;
+
+        cursor: pointer;
+
+        @include clearfix();
+
+        .details,
+        .message-subject,
+        .message-description,
+        .actions {
+            @include text-line-truncate(null);
+        }
+
+        .accordion-icon {
+            width: auto;
+            font-size: $activity-icon-font-size;
+            font-weight: normal;
+
+            padding: $activity-accordion-icon-offset;
+            margin: 0;
+
+            &:hover {
+                color: $activity-accordion-icon-color-hover;
+            }
+
+            @include fa-icon($activity-accordion-icon-expanded);
+
+            &.collapsed {
+                @include fa-icon($activity-accordion-icon-collapsed);
+            }
+        }
+
+        .actions {
+            margin-#{$start}: auto;
+
+            overflow: visible;
+        }
+
+        .details {
+            max-width: $activity-details-width;
+            min-width: $activity-details-width;
+
+            margin: $activity-details-offset;
+
+            &:hover {
+                width: auto;
+                z-index: 1;
+            }
+        }
+
+        .extra-info {
+            width: $activity-info-width;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .created-at {
+            color: $activity-icon-color;
+        }
+
+        .message-item {
+            display: flex;
+            align-items: center;
+            padding-#{$end}: $activity-message-item-offset;
+
+            color: $activity-icon-color;
+
+            @include text-line-truncate();
+        }
+
+        .message-subject {
+            color: $activity-message-subject-color;
+        }
+    }
+
+    .accordion-body {
+        padding-top: $activity-accordion-body-offset;
+
+        .user-fieldset {
+            margin: $activity-user-fieldset-offset;
+        }
+    }
+
+    .activity-item-email-content {
+        padding: $activity-item-email-content-padding;
+
+        .info {
+            width: 100%;
+        }
+    }
+
+    .activity-item-content {
+        padding: $activity-item-content-padding;
+        margin-bottom: $activity-item-content-margin;
+    }
+
+    .list-item:last-child {
+        border-bottom: 0;
+
+        .activity-item-email-content,
+        .activity-item-content {
+             margin-bottom: 0;
+        }
+    }
+}
+
+.condition-item.condition-activity {
+    .btn.filter-select {
+        border: none;
+        background: none transparent;
+        font-weight: normal;
+        padding-#{$start}: 0;
+        padding-#{$end}: 0;
+        color: $activity-filter-select-color;
+        box-shadow: none;
+    }
+
+    .filter-item {
+        margin-#{$end}: 0;
+
+        .fa-close {
+            margin-#{$end}: 0;
+        }
+    }
+
+    .dropdown-toggle:after {
+        display: none;
+    }
+}
+
+.responsive-section:not(.responsive-small) {
+    .email-content,
+    .activity-item-content {
+        display: flex;
+
+        > .responsive-cell {
+            &:first-child {
+                padding-#{$end}: $activity-item-content-offset;
+
+                border-#{$end}: 1px solid $activity-item-content-border-color;
+            }
+
+            &:last-child {
+                padding-#{$start}: $activity-item-content-offset;
+            }
+        }
+    }
+}

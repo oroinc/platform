@@ -5,17 +5,19 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Symfony\Component\HttpFoundation\Response;
 
-class RestPlainApiTestCase extends ApiTestCase
+/**
+ * The base class for plain REST API functional tests.
+ */
+abstract class RestPlainApiTestCase extends RestApiTestCase
 {
-    const JSON_CONTENT_TYPE = 'application/json';
+    protected const JSON_CONTENT_TYPE = 'application/json';
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
-
+        $this->initClient();
         parent::setUp();
     }
 
@@ -28,21 +30,27 @@ class RestPlainApiTestCase extends ApiTestCase
     }
 
     /**
-     * @param string $method
-     * @param string $uri
-     * @param array  $parameters
-     *
-     * @return Response
+     * {@inheritdoc}
      */
-    protected function request($method, $uri, array $parameters = [])
+    protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
-        $this->client->request($method, $uri, $parameters);
+        $this->checkHateoasHeader($server);
+        $this->checkWsseAuthHeader($server);
+
+        $this->client->request(
+            $method,
+            $uri,
+            $parameters,
+            [],
+            $server,
+            $content
+        );
 
         return $this->client->getResponse();
     }
 
     /**
-     * Asserts the response content contains the the given data.
+     * Asserts the response content contains the given data.
      *
      * @param array|string $expectedContent The file name or full file path to YAML template file or array
      * @param Response     $response
@@ -54,14 +62,14 @@ class RestPlainApiTestCase extends ApiTestCase
             $this->getReferenceRepository()->addReference('entity', $entity);
         }
 
-        $content = json_decode($response->getContent(), true);
+        $content = self::jsonToArray($response->getContent());
         $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
 
         self::assertArrayContains($expectedContent, $content);
     }
 
     /**
-     * Asserts the response content contains the the given validation error.
+     * Asserts the response content contains the given validation error.
      *
      * @param array    $expectedError
      * @param Response $response
@@ -72,7 +80,7 @@ class RestPlainApiTestCase extends ApiTestCase
     }
 
     /**
-     * Asserts the response content contains the the given validation errors.
+     * Asserts the response content contains the given validation errors.
      *
      * @param array    $expectedErrors
      * @param Response $response
@@ -81,7 +89,7 @@ class RestPlainApiTestCase extends ApiTestCase
     {
         static::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
 
-        $content = json_decode($response->getContent(), true);
+        $content = self::jsonToArray($response->getContent());
         try {
             $this->assertResponseContains($expectedErrors, $response);
             self::assertCount(
@@ -89,8 +97,8 @@ class RestPlainApiTestCase extends ApiTestCase
                 $content,
                 'Unexpected number of validation errors'
             );
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            throw new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     "%s\nResponse:\n%s",
                     $e->getMessage(),

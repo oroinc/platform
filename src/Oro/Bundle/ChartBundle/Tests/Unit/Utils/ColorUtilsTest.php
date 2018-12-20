@@ -4,7 +4,7 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\ChartBundle\Utils\ColorUtils;
 
-class ColorUtilsTest extends \PHPUnit_Framework_TestCase
+class ColorUtilsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider shadeColorProvider

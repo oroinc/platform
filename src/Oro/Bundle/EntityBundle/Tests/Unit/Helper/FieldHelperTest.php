@@ -8,7 +8,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\ImportEntity;
 use Oro\Bundle\WorkflowBundle\Field\FieldProvider;
 
-class FieldHelperTest extends \PHPUnit_Framework_TestCase
+class FieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array
@@ -27,12 +27,12 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
     ];
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $fieldProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configProvider;
 
@@ -50,7 +50,7 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FieldProvider
+     * @return \PHPUnit\Framework\MockObject\MockObject|FieldProvider
      */
     protected function prepareFieldProvider()
     {
@@ -60,7 +60,7 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConfigProvider
+     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigProvider
      */
     protected function prepareConfigProvider()
     {

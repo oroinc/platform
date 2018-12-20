@@ -44,9 +44,9 @@ class AclAccessLevelSelectorType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
-            'choices' => AccessLevel::getAccessLevelNames(),
-        ));
+        $resolver->setDefaults([
+            'choices' => array_flip(AccessLevel::getAccessLevelNames()),
+        ]);
     }
 
     /**

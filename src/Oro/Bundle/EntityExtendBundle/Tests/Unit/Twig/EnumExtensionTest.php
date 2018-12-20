@@ -11,11 +11,11 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Twig\EnumExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class EnumExtensionTest extends \PHPUnit_Framework_TestCase
+class EnumExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var EnumValueProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EnumValueProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $enumValueProvider;
 
     /** @var EnumExtension */
@@ -33,7 +33,7 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
         $enumValueEntityClass = 'Test\EnumValue';
 
         $values = [
-            'val1' => 'Value 1'
+            'Value 1' => 'val1'
         ];
 
         $this->enumValueProvider->expects($this->any())
@@ -56,7 +56,7 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
         $enumValueEntityClass = 'Test\EnumValue';
 
         $values = [
-            'val1' => '0'
+            '0' => 'val1'
         ];
 
         $this->enumValueProvider->expects($this->any())
@@ -75,7 +75,7 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
         $enumValueEntityClass = 'Test\EnumValue';
 
         $values = [
-            '0' => 'Value 1'
+           'Value 1' => '0',
         ];
 
         $this->enumValueProvider->expects($this->any())
@@ -94,10 +94,10 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
         $enumValueEntityClass = 'Test\EnumValue';
 
         $values = [
-            'val3' => 'Value 3',
-            'val1' => 'Value 1',
-            'val4' => 'Value 4',
-            'val2' => 'Value 2',
+            'Value 3' => 'val3',
+            'Value 1' => 'val1',
+            'Value 4' => 'val4',
+            'Value 2' => 'val2',
         ];
 
         $this->enumValueProvider->expects($this->any())

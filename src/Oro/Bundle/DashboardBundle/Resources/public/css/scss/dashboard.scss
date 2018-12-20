@@ -1,0 +1,484 @@
+/* @theme: admin.oro; */
+
+.dashboard-selector-container {
+    text-align: $start !important;
+
+    label {
+        padding-top: 6px;
+        padding-#{$end}: 10px;
+        margin-bottom: 0;
+    }
+
+    select {
+        width: auto;
+    }
+
+    label,
+    select,
+    .selector {
+        float: #{$start};
+    }
+
+    @include selector-width();
+}
+
+.ui-dialog .form-horizontal {
+    .widget-sort-by {
+        .control-group .controls {
+            margin-#{$start}: 0;
+
+            select {
+                max-width: 280px;
+            }
+        }
+    }
+}
+
+.dashboard-container-wrapper {
+    background-color: $dashboard-wrapper-bg;
+
+    .page-title {
+        background-color: $dashboard-container-title-background-color;
+        border-bottom: $dashboard-container-border;
+    }
+
+    .responsive-section:not(.responsive-small) {
+        .dashboard-column {
+            &:first-child {
+                padding-#{$end}: $content-padding-small;
+            }
+
+            &:last-child {
+                padding-#{$start}: $content-padding-small;
+            }
+        }
+    }
+
+    .responsive-section {
+        padding-top: $content-padding;
+
+        background: $dashboard-wrapper-bg;
+
+        .responsive-cell > div {
+            padding-bottom: $content-padding-medium;
+        }
+    }
+
+    .scrollable-container {
+        background: $dashboard-wrapper-bg;
+
+        @include safe-area-property-left(padding-left, $content-padding, false);
+        @include safe-area-property-right(padding-right, $content-padding, false);
+    }
+
+    .dashboard-widget.editable {
+        .sortable {
+            cursor: move;
+        }
+
+        .default-actions-container {
+            display: block;
+        }
+    }
+
+    .dashboard-widget {
+        position: relative;
+
+        border-radius: 1px;
+        box-shadow: $dashboard-widget-box-shadow;
+
+        .widget-header {
+            min-height: 44px;
+            padding: $dashboard-widget-header-padding;
+
+            display: flex;
+            align-items: center;
+
+            .dropdown-menu {
+                min-width: 100px;
+            }
+        }
+
+        .actions-container {
+            .collapse-action {
+                .collapse-action-icon {
+                    @include fa-icon($dashboard-action-icon);
+                }
+
+                &.collapsed .collapse-action-icon {
+                    @include fa-icon($dashboard-action-icon-collapsed);
+                }
+            }
+        }
+
+        .default-actions-container {
+            display: none;
+        }
+
+        .widget-actions-container,
+        .default-actions-container {
+            white-space: nowrap;
+        }
+
+        .default-actions-container {
+            .action-wrapper {
+                padding: 0 6px;
+
+                > a {
+                    padding: 10px 8px;
+                }
+            }
+        }
+
+        .widget-actions-container {
+            margin: side-values(10px 0 8px 0);
+
+            .action-wrapper {
+                padding: $dashboard-action-padding;
+                margin-#{$start}: 14px;
+            }
+        }
+
+        .move-action {
+            cursor: move;
+        }
+
+        .default-actions-container {
+            .action-wrapper:last-child {
+                border-#{$end}: none;
+            }
+        }
+
+        .widget-title {
+            padding: 0;
+
+            color: $dashboard-widget-title-color;
+            font-size: 18px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            flex: 1;
+            overflow: hidden;
+
+            align-self: center;
+
+            &:before {
+                min-height: 40px;
+
+                content: '';
+                display: inline;
+            }
+        }
+
+        .row-fluid {
+            padding: $dashboard-widget-content-padding;
+
+            border-top: $dashboard-container-border;
+        }
+
+        .dashboard-widget-content {
+            margin-top: 0;
+
+            .other-scroll-container {
+                margin-bottom: $dashboard-container-other-scroll-container-offset;
+            }
+        }
+
+        .widget-config-data {
+            margin-#{$end}: 10px;
+            position: relative;
+            top: $dashboard-widget-config-data-shift;
+
+            font-size: $dashboard-widget-config-data-font-size;
+            line-height: $dashboard-widget-config-data-line-height;
+
+            color: $dashboard-widget-config-data-color;
+        }
+    }
+
+    .hidden-empty-text {
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+
+        overflow: hidden !important;
+        visibility: hidden;
+    }
+
+    .widget-placeholder {
+        min-height: 200px;
+        padding: 20px;
+
+        background: $dashboard-widget-placeholder-background;
+        border: $dashboard-widget-placeholder-border;
+        color: $dashboard-widget-placeholder-color;
+        font-size: 24px;
+        text-align: center;
+
+        border-radius: 3px;
+    }
+
+    .dashboard-widget.collapsed {
+        .row-fluid {
+            border-top: none;
+        }
+    }
+
+    .collapse-expand-action-container {
+        padding: $dashboard-action-padding;
+    }
+}
+
+.dashboard-link {
+    font-weight: normal;
+}
+
+.chart-container {
+    position: relative;
+
+    margin-top: 5px;
+
+    overflow-x: visible;
+
+    &.wrapped-chart-legend {
+        margin: 0 auto;
+    }
+
+    & > .clearfix {
+        margin: 0 auto;
+
+        .chart-legend {
+            position: relative;
+
+            height: auto !important;
+            min-width: 250px; // to wrap legend event if it's empty yet
+            padding-bottom: 20px;
+
+            table {
+                position: relative;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+
+                margin: side-values(auto 0 auto 30px);
+                width: 90%;
+                height: auto;
+
+                td {
+                    padding-bottom: 7px;
+                }
+
+                .flotr-legend-color-box {
+                    width: 30px;
+                }
+            }
+        }
+
+        .funnel-label {
+            position: absolute;
+
+            padding-bottom: .5em;
+        }
+
+        .flotr-grid-label-x {
+            line-height: 14px;
+            text-overflow: ellipsis;
+
+            overflow-x: hidden;
+        }
+    }
+}
+
+.chart-legend table {
+    font-size: 13px !important;
+
+    .flotr-legend-color-box > div {
+        border: 0 !important;
+
+        & > div {
+            border: 0 !important;
+        }
+    }
+
+    .flotr-legend-label {
+        padding-#{$start}: 10px;
+    }
+}
+
+.flotr-mouse-value {
+    z-index: 1;
+
+    cursor: default;
+}
+
+.funnel-data {
+    h5 {
+        margin-bottom: 5px;
+        margin-#{$start}: 25px;
+
+        &:first-letter {
+            text-transform: uppercase;
+        }
+    }
+
+    ul {
+        list-style: none;
+    }
+}
+
+.dashboard-widgets-add {
+    margin-left: 10px;
+}
+
+.widget-configuration {
+    .items-selector-widget {
+        margin-#{$end}: $content-padding;
+    }
+
+    .widget-title-container {
+        display: flex;
+
+        .control-group {
+            &.control-group-checkbox {
+                > .control-label {
+                    width: $dashboard-widget-title-widget-control-label-width;
+                    min-width: $dashboard-widget-title-widget-control-label-min-width;
+                }
+
+                > .controls {
+                    margin-#{$start}: $dashboard-widget-title-widget-controls-offset-start;
+                }
+            }
+        }
+    }
+
+    .widget-title-widget {
+        width: $dashboard-widget-title-widget-width;
+        margin-#{$end}: $content-padding;
+        flex-grow: 1;
+        flex-shrink: 1;
+    }
+
+    .widget-title-input {
+        width: $dashboard-widget-title-input-width;
+    }
+
+    .date-range-filter {
+        & > div > .control-group {
+            margin-bottom: 0;
+        }
+
+        .filter-separator {
+            top: 2px;
+        }
+
+        .filter-select-oro {
+            height: 20px;
+            width: 120px;
+
+            line-height: 20px;
+        }
+
+        .control-group .horizontal:last-of-type .selector {
+            margin-bottom: 10px;
+        }
+
+        .control-group .horizontal:nth-of-type(2) .selector {
+            margin-top: 10px;
+        }
+    }
+
+    .controls .horizontal {
+        padding: 0;
+    }
+
+    table {
+        .action-column,
+        .action-cell {
+            width: 86px;
+        }
+
+        &.scrollable {
+            tbody {
+                height: 120px;
+
+                border-#{$start}: $dashboard-widget-configuration-border;
+
+                display: block;
+            }
+
+            thead,
+            tbody tr {
+                width: 100%;
+
+                display: table;
+                table-layout: fixed;
+            }
+
+            &.table-bordered td:first-child {
+                border-#{$start}: none;
+            }
+        }
+    }
+
+    .widget-date-widget {
+        margin: side-values(4px 0 10px);
+    }
+
+    .widget-date-input-widget {
+        input[type="text"] {
+            max-width: 110px;
+        }
+    }
+
+    .query-filter-row {
+        .collapse-toggler.collapsed .expanded-text,
+        .collapse-toggler:not(.collapsed) .collapsed-text {
+            display: none;
+        }
+
+        .collapse, .collapsing {
+            margin-top: $dashboard-widget-configuration-collapsed-margin-top;
+        }
+    }
+}
+
+.widget-content.widget-configuration {
+    .table input[type="checkbox"] {
+        margin: side-values(0 0 1px 0);
+    }
+}
+
+.dashboard-widget-items {
+    flex-wrap: wrap;
+
+    .controls.items-table-container {
+        margin-#{$start}: $dashboard-configuration-items-table-margin-start;
+        margin-top: $dashboard-configuration-items-table-margin-top;
+        flex-basis: 100%;
+    }
+
+    .btn-group + .btn-group {
+        margin-#{$start}: $dashboard-widget-configuration-buttons-space;
+    }
+
+    .widget-items-item-row .action-cell {
+        @include clearfix();
+
+        .btn-icon:not(.btn) {
+            display: block;
+            color: $dashboard-configuration-items-btn-color;
+            float: $start;
+
+            &:active,
+            &:hover {
+                color: $dashboard-configuration-items-btn-active-color;
+            }
+        }
+    }
+}
+
+.ui-dialog .form-horizontal .control-group .conditions-group .controls {
+    margin-#{$start}: 0;
+}

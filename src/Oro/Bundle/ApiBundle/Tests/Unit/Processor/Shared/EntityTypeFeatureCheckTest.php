@@ -8,19 +8,17 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class EntityTypeFeatureCheckTest extends GetListProcessorTestCase
 {
-    /** @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject */
-    protected $featureChecker;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FeatureChecker */
+    private $featureChecker;
 
     /** @var EntityTypeFeatureCheck */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->processor = new EntityTypeFeatureCheck($this->featureChecker);
     }
@@ -32,7 +30,7 @@ class EntityTypeFeatureCheckTest extends GetListProcessorTestCase
     {
         $className = 'Test\Class';
 
-        $this->featureChecker->expects($this->once())
+        $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with($className, 'api_resources')
             ->willReturn(false);
@@ -45,7 +43,7 @@ class EntityTypeFeatureCheckTest extends GetListProcessorTestCase
     {
         $className = 'Test\Class';
 
-        $this->featureChecker->expects($this->once())
+        $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with($className, 'api_resources')
             ->willReturn(true);

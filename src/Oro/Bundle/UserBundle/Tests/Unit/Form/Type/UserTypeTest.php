@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class UserTypeTest extends \PHPUnit_Framework_TestCase
+class UserTypeTest extends \PHPUnit\Framework\TestCase
 {
     const MY_PROFILE_ROUTE    = 'oro_user_profile_update';
     const OTHER_PROFILE_ROUTE = 'oro_user_update';
@@ -29,13 +29,13 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
     const RULE_GROUP          = 'oro_user_group_view';
     const RULE_ROLE           = 'oro_user_role_view';
 
-    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
-    /** @var PasswordFieldOptionsProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var PasswordFieldOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $optionsProvider;
 
     protected function setUp()
@@ -94,6 +94,12 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 ->with('roles', EntityType::class)
                 ->will($this->returnValue($builder));
         }
+        $attr = [];
+
+        if ($isMyProfile) {
+            $attr['readonly'] = true;
+        }
+
         if ($permissions[self::RULE_GROUP]) {
             $arr = array(
                 'label'     => 'oro.user.groups.label',
@@ -102,9 +108,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'multiple'  => true,
                 'expanded'  => true,
                 'required'  => false,
-                'attr'      => [
-                    'readonly' => $isMyProfile,
-                ],
+                'attr'      => $attr,
                 'disabled'  => $isMyProfile,
                 'translatable_options' => false
             );
@@ -206,7 +210,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $builder \PHPUnit_Framework_MockObject_MockObject
+     * @param $builder \PHPUnit\Framework\MockObject\MockObject
      * @param $order
      */
     protected function mockSetDefaultUserFields($builder, &$order = -1)

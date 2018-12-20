@@ -1,0 +1,364 @@
+/* @theme: admin.oro; */
+
+%header-button {
+    text-align: center;
+    border: 0 none;
+    background-color: transparent;
+    line-height: $app-header-height;
+    font-size: $app-header-icon-font-size;
+    color: $app-header-text-color;
+    padding: $mobile-app-header-button-padding;
+    text-shadow: none;
+}
+
+.app-header {
+    background-color: $app-header-bg-color;
+    color: $app-header-text-color;
+    position: fixed;
+    z-index: $mobile-app-header-z-index;
+    width: 100%;
+    height: $app-header-height;
+    max-height: $app-header-height;
+    top: 0;
+    #{$start}: 0;
+
+    .navbar .nav {
+        position: static;
+    }
+
+    &__container {
+        position: relative;
+        line-height: $app-header-height;
+        height: $app-header-height;
+    }
+
+    &__inner {
+        border-bottom: none;
+
+        @include safe-area-offset(padding, 0);
+
+        .dropdown-menu {
+            #{$start}: 0;
+
+            color: $app-header-dropdown-menu-color;
+
+            .nav-header {
+                margin-#{$end}: $mobile-app-header-header-margin-end;
+                margin-bottom: $mobile-app-header-header-margin-bottom;
+
+                font-size: $mobile-app-header-header-font-size;
+                line-height: 1;
+                text-transform: none;
+
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .nav-header-title {
+                @include fa-icon($app-header-dropdown-close-icon);
+
+                &:before {
+                    position: absolute;
+                    top: 0;
+                    #{$start}: auto;
+                    #{$end}: 0;
+                    z-index: $zindex-dropdown + 1;
+
+                    margin: $app-header-dropdown-close-icon-margin;
+                    padding: 0;
+
+                    font-size: $app-header-dropdown-close-icon-font-size;
+                    line-height: $app-header-dropdown-close-icon-font-size;
+                    color: $app-header-dropdown-close-icon-color;
+
+                    background-color: transparent;
+                    background-image: none;
+                    border: 0 none;
+
+                    display: block;
+                    box-shadow: none;
+                }
+            }
+
+            .divider {
+                margin: $mobile-app-header-dropdown-divider-margin;
+            }
+        }
+    }
+
+    .main-menu-toggler {
+        @extend %header-button;
+
+        float: #{$start};
+        padding: 0 $mobile-app-header-main-menu-toggler-h-padding;
+        color: $app-header-logo-text-color;
+    }
+
+    .organization-logo-wrapper {
+        margin-#{$start}: $mobile-app-header-organization-logo-wrapper-margin-start;
+        margin-#{$end}: $mobile-app-header-organization-logo-wrapper-margin-end;
+
+        .organization-switcher,
+        .organization-switcher > * {
+            max-width: 100%;
+        }
+
+        .organization-switcher {
+            margin: 0;
+            float: $start;
+        }
+
+        .logo {
+            font-size: $mobile-app-header-organization-logo-font-size;
+            color: $app-header-logo-text-color;
+            font-weight: bold;
+            margin: 0;
+            float: $start;
+            line-height: $app-header-height;
+            height: $app-header-height;
+            white-space: nowrap;
+            max-width: 100%;
+
+            .organization-name {
+                color: inherit;
+                text-transform: uppercase;
+                display: inline-block;
+                max-width: $app-header-max-width;
+                @include text-line-truncate($app-header-max-width, true);
+            }
+
+            &.dropdown-toggle {
+                padding-#{$end}: 12px;
+
+                &:after {
+                    vertical-align: initial;
+                    height: 54%;
+                    position: relative;
+                }
+            }
+        }
+
+        li > a {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        li.dropdown.show > .logo {
+            color: $app-header-logo-text-color;
+        }
+    }
+
+    .dropdown-menu {
+        #{$start}: 0;
+        max-width: $mobile-app-header-dropdown-menu-max-width;
+    }
+
+    &__search-and-shortcuts {
+        position: relative;
+        float: #{$end};
+        margin: 0;
+        height: $app-header-height;
+
+        .dropdown {
+            > .dropdown-toggle {
+                @extend %header-button;
+            }
+
+            .dropdown-menu {
+                padding: $mobile-app-header-dropdown-menu-padding;
+
+                .nav-header {
+                    font-size: $mobile-app-header-title-font-size;
+                    margin-bottom: $mobile-app-header-header-margin-bottom;
+                }
+            }
+        }
+
+        .header-dropdown-shortcut {
+            .dropdown-menu {
+                #{$start}: auto;
+                #{$end}: 0;
+
+                &:before {
+                    #{$start}: auto;
+                    #{$end}: $tablet-app-header-shortcuts-arrow-end;
+                }
+            }
+
+            .nav-content form {
+                padding: 0 0 18px;
+            }
+
+            .dropdown-item {
+                padding: $mobile-app-header-dropdown-item-padding;
+                > a {
+                    font-size: $mobile-app-header-dropdown-link-font-size;
+                }
+            }
+        }
+
+        .header-dropdown-search {
+            .dropdown-menu {
+                #{$start}: auto;
+                #{$end}: 0;
+                max-width: none;
+
+                .nav-content {
+                    margin-bottom: $mobile-app-header-search-form-row-margin-bottom;
+                }
+
+                .dropdown-menu {
+                    #{$start}: 0;
+                    #{$end}: auto;
+                    max-height: $mobile-app-header-search-dropdown-menu-max-height;
+                    overflow-y: auto;
+                    overflow-x: visible;
+                }
+
+                &:before {
+                    #{$start}: auto;
+                    #{$end}: $tablet-app-header-search-arrow-end;
+                }
+
+                .search-suggestion-list {
+                    top: $input-size - $input-border-width;
+
+                    font-size: $mobile-app-header-suggestion-item-font-size;
+
+                    .description {
+                        font-size: $mobile-app-header-suggestion-item-description-font-size;
+                    }
+                }
+
+                .no-data {
+                    top: $input-size - $input-border-width;
+                }
+
+                .header-search {
+                    flex-wrap: wrap;
+
+                    .select2-container {
+                        width: 100%;
+                        margin-bottom: $mobile-app-header-search-form-row-margin-bottom;
+                    }
+
+                    .search-field-container {
+                        margin-right: 12px;
+                    }
+                }
+            }
+
+            input.search {
+                width: 100%;
+            }
+        }
+    }
+
+    .user-menu {
+        float: $end;
+        margin: 0;
+
+        .dropdown {
+            > .dropdown-toggle {
+                @extend %header-button;
+                padding-#{$end}: $mobile-app-header-user-menu-toggler-padding-end;
+            }
+
+            .dropdown-menu {
+                padding: $mobile-app-header-dropdown-menu-padding;
+                #{$start}: auto;
+                #{$end}: $tablet-app-header-user-menu-offset;
+
+                .nav-header {
+                    margin-#{$end}: $mobile-app-header-header-margin-end;
+                    margin-bottom: $mobile-app-header-title-margin-bottom;
+                }
+
+                .divider {
+                    border-bottom: $mobile-app-header-user-menu-divider-border-bottom;
+                }
+
+                li:not(.nav-header):not(.divider) {
+                    padding: $mobile-app-header-dropdown-item-padding;
+                    > a {
+                        font-size: $mobile-app-header-dropdown-link-font-size;
+                        padding: 0;
+                    }
+                }
+
+                &:before {
+                    #{$start}: auto;
+                    #{$end}: $tablet-app-header-user-menu-arrow-end;
+                }
+            }
+        }
+    }
+
+
+    @media only screen and (max-width: $small-devices-media-breakpoint) {
+        &__search-and-shortcuts,
+        .user-menu,
+        .organization-logo-wrapper {
+            > .dropdown > .dropdown-menu {
+                position: fixed;
+                #{$start}: 0;
+                #{$end}: 0;
+                top: $app-header-height;
+                bottom: 0;
+                margin-top: 0;
+
+                max-width: none;
+                min-width: 0;
+                width: auto;
+
+                &:after {
+                    position: fixed;
+                    top: $app-header-height;
+                }
+            }
+        }
+
+        .organization-logo-wrapper .dropdown .dropdown-menu:before {
+            #{$start}: $mobile-app-header-organization-logo-wrapper-margin-start;
+        }
+
+        .user-menu .dropdown .dropdown-menu:before {
+            #{$end}: $phone-app-header-user-menu-arrow-end;
+        }
+
+        &__search-and-shortcuts {
+            .header-dropdown-search .dropdown-menu:before {
+                #{$end}: $phone-app-header-search-arrow-end;
+            }
+
+            .header-dropdown-shortcut .dropdown-menu {
+                &:before {
+                    #{$end}: $phone-app-header-shortcuts-arrow-end;
+                }
+
+                .shortcut-search-input {
+                    width: 100%;
+
+                    box-sizing: border-box;
+                }
+            }
+        }
+    }
+
+    li {
+        .help {
+            display: none;
+        }
+    }
+
+    .dropup,
+    .dropdown {
+        position: static;
+    }
+
+    input,
+    textarea,
+    .uneditable-input {
+        width: $app-header-input-width;
+    }
+}

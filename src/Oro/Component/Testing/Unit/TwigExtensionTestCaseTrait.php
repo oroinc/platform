@@ -2,10 +2,13 @@
 
 namespace Oro\Component\Testing\Unit;
 
+/**
+ * This trait can be used in unit tests to simplify testing of TWIG extensions.
+ */
 trait TwigExtensionTestCaseTrait
 {
     /**
-     * Rerurns an object that helps to build the dependency injection container for tests.
+     * Returns an object that helps to build the dependency injection container for tests.
      *
      * @return TestContainerBuilder
      */
@@ -42,7 +45,7 @@ trait TwigExtensionTestCaseTrait
         }
 
         if (null === $callable) {
-            \PHPUnit_Framework_TestCase::fail(sprintf('The "%s" function was not found.', $name));
+            \PHPUnit\Framework\TestCase::fail(sprintf('The "%s" function was not found.', $name));
         }
 
         return call_user_func_array($callable, $params);
@@ -76,7 +79,7 @@ trait TwigExtensionTestCaseTrait
         }
 
         if (null === $callable) {
-            \PHPUnit_Framework_TestCase::fail(sprintf('The "%s" filter was not found.', $name));
+            \PHPUnit\Framework\TestCase::fail(sprintf('The "%s" filter was not found.', $name));
         }
 
         return call_user_func_array($callable, $params);

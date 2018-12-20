@@ -1,0 +1,184 @@
+/* @theme: admin.oro; */
+
+.number-cell,
+.integer-cell,
+.align-right,
+.editable {
+    padding-#{$end}: $oro-datagrid-editable-cell-offset;
+}
+
+.view-mode {
+    &:hover {
+        position: relative;
+
+        background: $cell-selected-background;
+
+        .inline-editor-edit-action {
+            position: absolute;
+            top: 0;
+            #{$end}: $oro-datagrid-editable-action-offset-end;
+
+            display: block;
+
+            .inline-actions-btn {
+                padding-top: $oro-datagrid-body-cell-inner-top;
+                padding-bottom: $oro-datagrid-body-cell-inner-bottom;
+                line-height: $oro-datagrid-action-edit-btn-line-height;
+            }
+        }
+    }
+
+    &.has-error {
+        position: relative;
+
+        background: $cell-error-background;
+
+        &:before {
+            position: absolute;
+            top: 0;
+            #{$start}: 0;
+
+            display: inline-block;
+
+            border-#{$end}: 10px solid transparent;
+            border-top: 10px solid $oro-datagrid-editable-error;
+
+            content: '';
+        }
+
+        &:hover {
+            background: $cell-error-background;
+        }
+    }
+}
+
+.save-success {
+    position: relative;
+
+    background: $cell-success-background;
+
+    &:hover:before {
+        display: none;
+    }
+}
+
+.save-fail {
+    background: $cell-error-background;
+}
+
+.edit-mode {
+    position: relative;
+
+    &:before {
+        position: absolute;
+        top: 0;
+        #{$end}: 0;
+        bottom: 0;
+        #{$start}: 0;
+
+        background-color: $inline-action-background;
+
+        content: '';
+    }
+
+    .inline-editor-edit-action {
+        display: none;
+    }
+}
+
+.grid-body-cell.loading {
+    background: $cell-loading-background;
+
+    .inline-editor-edit-action {
+        display: none;
+    }
+
+    &:before {
+        position: absolute;
+        top: $oro-datagrid-editable-loader-top;
+        #{$end}: $oro-datagrid-editable-loader-end;
+
+        display: block;
+
+        content: '';
+
+        @include loader($oro-datagrid-editable-loader-size, $oro-datagrid-editable-loader-width);
+    }
+
+    &:hover {
+        .inline-editor-edit-action {
+            display: none;
+        }
+    }
+}
+
+.inline-editor {
+    &__actions {
+        display: flex;
+        padding: $oro-datagrid-editable-action-offset;
+
+        bottom: auto;
+    }
+
+    &__fields {
+        input[type="text"] {
+            height: $oro-datagrid-editable-action-item-size;
+            line-height: $oro-datagrid-editable-action-item-line-height;
+            padding: $oro-datagrid-editable-action-input-offset;
+
+            &:last-child {
+                padding-#{$end}: $oro-datagrid-editable-action-input-last-offset;
+            }
+        }
+    }
+
+    &-edit-action {
+        display: none;
+    }
+
+    &-wrapper {
+        &:not(.tags-select-editor) {
+            .inline-editor__action-item {
+                padding: $oro-datagrid-editable-action-item-offset;
+                font-size: $oro-datagrid-action-font-size;
+                line-height: 1;
+            }
+
+            .select2-container {
+                min-height: $oro-datagrid-editable-action-item-size;
+                padding: $oro-datagrid-select-container-offset;
+                height: $oro-datagrid-select-container-height;
+                border-radius: $oro-datagrid-select-container-border-radius;
+            }
+
+            .select2-arrow {
+                #{$end}: $oro-datagrid-select-icon-arrow-offset;
+            }
+
+            .select2-search-choice-close {
+                #{$end}: $oro-datagrid-select-icon-close-offset;
+            }
+        }
+
+        &.select-editor {
+            min-width: $oro-datagrid-select-width;
+        }
+
+        .select2-chosen {
+            min-height: $oro-datagrid-editable-action-item-size;
+            line-height: $oro-datagrid-editable-action-item-line-height;
+            padding: $oro-datagrid-select-offset;
+            height: $oro-datagrid-select-chosen-height;
+        }
+
+        .select2-choice {
+            width: calc(100% - #{$oro-datagrid-editable-action-input-last-offset});
+            height: $oro-datagrid-editable-action-item-size;
+        }
+
+        .select2-search-choice-close,
+        .select2-arrow {
+            top: $oro-datagrid-select-icon-top;
+        }
+    }
+}

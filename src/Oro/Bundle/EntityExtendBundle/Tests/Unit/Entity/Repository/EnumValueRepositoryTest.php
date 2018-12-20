@@ -6,11 +6,11 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class EnumValueRepositoryTest extends \PHPUnit_Framework_TestCase
+class EnumValueRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     const ENUM_VALUE_CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
     /** @var EnumValueRepository */

@@ -7,9 +7,14 @@ use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Provides utility methods for building forms that contain enums and multi-enums fields.
+ */
 class EnumTypeHelper extends ConfigTypeHelper
 {
     const MULTI_ENUM = 'multiEnum';
+    const TYPE_ENUM = 'enum';
+
     /**
      * Checks if the given entity/field has an enum code
      *
@@ -45,7 +50,7 @@ class EnumTypeHelper extends ConfigTypeHelper
     }
 
     /**
-     * Checks if there are any other fields except the given field which use the the given enum
+     * Checks if there are any other fields except the given field which use the given enum.
      *
      * @param string $enumCode
      * @param string $className
@@ -67,7 +72,7 @@ class EnumTypeHelper extends ConfigTypeHelper
             foreach ($enumFieldConfigs as $enumFieldConfig) {
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $enumFieldConfig->getId();
-                if (!in_array($fieldConfigId->getFieldType(), ['enum', 'multiEnum'])) {
+                if (!in_array($fieldConfigId->getFieldType(), [self::TYPE_ENUM, self::MULTI_ENUM])) {
                     // skip not enum fields
                     continue;
                 }
@@ -132,7 +137,7 @@ class EnumTypeHelper extends ConfigTypeHelper
             }
 
             $enumCode          = $enumConfig->get('code');
-            $result[$enumCode] = ($enumConfig->is('multiple') ? 'multiEnum' : 'enum') . '||' . $enumCode;
+            $result[$enumCode] = ($enumConfig->is('multiple') ? self::MULTI_ENUM : self::TYPE_ENUM) . '||' . $enumCode;
         }
 
         return $result;

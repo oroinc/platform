@@ -8,7 +8,6 @@ styles:
         - 'bundles/oroui/blank/scss/variables/scrollbar-config.scss'
         - 'bundles/oroui/blank/scss/variables/animation-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-container-config.scss'
-        - 'bundles/oroui/blank/scss/variables/page-area-container-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-header-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-main-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-content-config.scss'
@@ -29,10 +28,10 @@ styles:
         - 'bundles/oroui/blank/scss/variables/primary-menu-config.scss'
         - 'bundles/oroui/blank/scss/variables/loader-mask-config.scss'
         - 'bundles/oroui/blank/scss/variables/loading-bar-config.scss'
+        - 'bundles/oroui/blank/scss/variables/line-clamp-config.scss'
         - 'bundles/oroui/blank/scss/reset.scss'
         - 'bundles/oroui/blank/vendors/font-awesome/font-awesome.scss'
         - 'bundles/oroui/blank/scss/styles.scss'
-    filters: ['cssrewrite', 'cssmin']
     output: 'css/layout/blank/styles.css'
 
 stylebook_styles:

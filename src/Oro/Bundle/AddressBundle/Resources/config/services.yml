@@ -1,11 +1,11 @@
 parameters:
     oro_address.address.entity.class:       Oro\Bundle\AddressBundle\Entity\Address
     oro_address.country.entity.class:       Oro\Bundle\AddressBundle\Entity\Country
+    oro_address.region.entity.class:        Oro\Bundle\AddressBundle\Entity\Region
     oro_address.address.type.entity.class:  Oro\Bundle\AddressBundle\Entity\AddressType
     oro_address.address.manager.class:      Oro\Bundle\AddressBundle\Entity\Manager\AddressManager
     oro_address.provider.address.class:     Oro\Bundle\AddressBundle\Provider\AddressProvider
     oro_address.provider.phone.class:       Oro\Bundle\AddressBundle\Provider\PhoneProvider
-    oro_address.validator.valid_region.class: Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator
     oro_address.extension.action.type.map.class: Oro\Bundle\AddressBundle\Extension\Action\Actions\MapAction
 
 services:
@@ -37,21 +37,17 @@ services:
         arguments:
             - '%oro_address.country.entity.class%'
 
-    oro_address.validator.valid_region:
-        class: '%oro_address.validator.valid_region.class%'
-        tags:
-            - { name: validator.constraint_validator, alias: oro_address_valid_region }
-
-    oro_address.validator.name_or_organization:
-        class: 'Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganizationValidator'
-        tags:
-            - { name: validator.constraint_validator, alias: oro_address.validator.name_or_organization }
-
     oro_address.extension.action.type.map:
         class: '%oro_address.extension.action.type.map.class%'
         shared: false
         tags:
             - { name: oro_datagrid.extension.action.type, type: map }
+
+    oro_address.extension.js_valdation.constraints_provider_decorator:
+        class: Oro\Bundle\AddressBundle\Extension\JsValidation\ConstraintsProviderDecorator
+        decorates: oro_form.extension.js_validation.constraints_provider
+        arguments:
+            - '@oro_address.extension.js_valdation.constraints_provider_decorator.inner'
 
     oro_address.twig.extension.phone:
         class: Oro\Bundle\AddressBundle\Twig\PhoneExtension
@@ -60,3 +56,11 @@ services:
             - '@service_container'
         tags:
             - { name: twig.extension }
+
+    oro_address.listener.translator_catalogue:
+        class: 'Oro\Bundle\AddressBundle\EventListener\TranslatorCatalogueListener'
+        lazy: true
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro_translation.after_catalogue_dump, method: onAfterCatalogueDump }

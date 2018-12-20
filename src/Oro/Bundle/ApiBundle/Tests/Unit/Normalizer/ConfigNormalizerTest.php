@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
+class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider normalizeConfigProvider
@@ -25,7 +25,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
         $normalizedConfig = $configLoader->load($config);
         $normalizer->normalizeConfig($normalizedConfig);
 
-        $this->assertEquals($expectedConfig, $normalizedConfig->toArray());
+        self::assertEquals($expectedConfig, $normalizedConfig->toArray());
     }
 
     /**
@@ -53,9 +53,9 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                                         ],
                                         'field112' => null
                                     ]
-                                ],
+                                ]
                             ]
-                        ],
+                        ]
                     ]
                 ],
                 'expectedConfig' => [
@@ -71,9 +71,9 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                                     'fields' => [
                                         'field112' => null
                                     ]
-                                ],
+                                ]
                             ]
-                        ],
+                        ]
                     ]
                 ]
             ],
@@ -138,7 +138,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                     '_excluded_fields' => ['field1', 'field2'],
                     'fields'           => [
                         'field1' => [
-                            'exclude' => true,
+                            'exclude' => true
                         ],
                         'field2' => [
                             'exclude'    => true,
@@ -184,7 +184,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                         'field' => [
                             'fields' => [
                                 'field1' => [
-                                    'exclude' => true,
+                                    'exclude' => true
                                 ],
                                 'field2' => [
                                     'depends_on' => ['field1']
@@ -366,9 +366,9 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                                             'exclude' => true
                                         ]
                                     ]
-                                ],
+                                ]
                             ]
-                        ],
+                        ]
                     ]
                 ],
                 'expectedConfig' => [
@@ -386,9 +386,9 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                                     'fields'           => [
                                         'field111' => null
                                     ]
-                                ],
+                                ]
                             ]
-                        ],
+                        ]
                     ]
                 ]
             ],
@@ -509,13 +509,13 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                     'fields'           => [
                         'association1' => [
                             'data_type' => 'association:manyToOne'
-                        ],
+                        ]
                     ]
                 ],
                 'expectedConfig' => [
-                    'exclusion_policy' => 'all',
+                    'exclusion_policy' => 'all'
                 ]
-            ],
+            ]
         ];
     }
 }

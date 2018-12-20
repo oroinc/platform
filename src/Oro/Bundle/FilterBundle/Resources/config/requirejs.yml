@@ -15,6 +15,7 @@ config:
         'oro/filter/text-filter': 'bundles/orofilter/js/filter/text-filter.js'
         'oro/filter/many-to-many-filter': 'bundles/orofilter/js/filter/many-to-many-filter.js'
         'oro/filter/dictionary-filter': 'bundles/orofilter/js/filter/dictionary-filter.js'
+        'oro/filter/boolean-filter': 'bundles/orofilter/js/filter/boolean-filter.js'
         'orofilter/js/formatter/abstract-formatter': 'bundles/orofilter/js/formatter/abstract-formatter.js'
         'orofilter/js/formatter/number-formatter': 'bundles/orofilter/js/formatter/number-formatter.js'
         'orofilter/js/filters-manager': 'bundles/orofilter/js/filters-manager.js'

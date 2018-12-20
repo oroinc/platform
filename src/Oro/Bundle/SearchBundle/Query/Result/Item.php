@@ -4,6 +4,9 @@ namespace Oro\Bundle\SearchBundle\Query\Result;
 
 use JMS\Serializer\Annotation\Type;
 
+/**
+ * Represents item of search results
+ */
 class Item
 {
     /**
@@ -11,6 +14,12 @@ class Item
      * @Type("string")
      */
     protected $entityName;
+
+    /**
+     * @var string
+     * @Type("string")
+     */
+    protected $entityLabel;
 
     /**
      * @var int
@@ -55,6 +64,7 @@ class Item
         array $entityConfig = []
     ) {
         $this->entityName   = $entityName;
+        $this->entityLabel  = '';
         $this->recordId     = empty($recordId) ? 0 : $recordId;
         $this->recordTitle  = $recordTitle;
         $this->recordUrl    = $recordUrl;
@@ -71,6 +81,19 @@ class Item
     public function setEntityName($entityName)
     {
         $this->entityName = $entityName;
+
+        return $this;
+    }
+
+    /**
+     * Set entity label
+     *
+     * @param string $entityLabel
+     * @return Item
+     */
+    public function setEntityLabel($entityLabel)
+    {
+        $this->entityLabel = $entityLabel;
 
         return $this;
     }
@@ -96,6 +119,16 @@ class Item
     public function getEntityName()
     {
         return $this->entityName;
+    }
+
+    /**
+     * Get entity label
+     *
+     * @return string
+     */
+    public function getEntityLabel()
+    {
+        return $this->entityLabel;
     }
 
     /**
@@ -202,6 +235,7 @@ class Item
     {
         $result = [
             'entity_name'   => $this->entityName,
+            'entity_label'   => $this->entityLabel,
             'record_id'     => $this->recordId,
             'record_string' => $this->recordTitle,
             'record_url'    => $this->recordUrl,

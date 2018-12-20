@@ -13,7 +13,7 @@ use Symfony\Component\Yaml\Yaml;
  * Example:
  *    layout:
  *        actions:
- *            - @add:
+ *            - `@add`:
  *              id:        test
  *              parent:    root
  *              blockType: block

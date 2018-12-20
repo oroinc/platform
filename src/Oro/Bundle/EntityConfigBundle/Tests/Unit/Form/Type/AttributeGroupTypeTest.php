@@ -30,13 +30,13 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
 
     use EntityTrait;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var AttributeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $attributeManager;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     protected function setUp()

@@ -25,11 +25,17 @@ define(function(require) {
         defaults: {
             enabled: true,
             plugins: ['textcolor', 'code', 'bdesk_photo', 'paste', 'lists', 'advlist'],
+            pluginsMap: {
+                bdesk_photo: '/bundles/oroform/lib/bdeskphoto/plugin.min.js'
+            },
             menubar: false,
             toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | bdesk_photo'],
             statusbar: false,
             browser_spellcheck: true,
-            paste_data_images: true // to avoid of a paste plugin restriction
+            images_dataimg_filter: function() {
+                return false;
+            },
+            paste_data_images: false
         },
 
         events: {
@@ -109,6 +115,13 @@ define(function(require) {
             if ($(this.$el).prop('disabled') || $(this.$el).prop('readonly')) {
                 options.readonly = true;
             }
+
+            _.each(this.options.pluginsMap, function(url, name) {
+                if (this.options.plugins.indexOf(name) !== -1) {
+                    tinyMCE.PluginManager.load(name, url);
+                }
+            }, this);
+
             tinyMCE.init(_.extend({
                 target: this.el,
                 setup: function(editor) {

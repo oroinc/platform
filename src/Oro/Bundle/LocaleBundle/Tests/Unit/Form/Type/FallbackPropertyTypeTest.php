@@ -14,7 +14,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class FallbackPropertyTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
      */
     protected $translator;
 
@@ -90,7 +90,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
                     'required' => false,
                     'placeholder' => false,
                     'choices' => [
-                        FallbackType::SYSTEM => 'oro.locale.fallback.type.default',
+                        'oro.locale.fallback.type.default' => FallbackType::SYSTEM,
                     ],
                 ],
                 'submittedData' => FallbackType::SYSTEM,
@@ -103,8 +103,8 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
                     'required' => false,
                     'placeholder' => false,
                     'choices' => [
-                        FallbackType::PARENT_LOCALIZATION => 'oro.locale.fallback.type.parent_localization',
-                        FallbackType::SYSTEM => 'oro.locale.fallback.type.default',
+                        'oro.locale.fallback.type.parent_localization' => FallbackType::PARENT_LOCALIZATION,
+                        'oro.locale.fallback.type.default' => FallbackType::SYSTEM,
                     ],
                 ],
                 'submittedData' => FallbackType::PARENT_LOCALIZATION,
@@ -119,8 +119,8 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
                     'required' => false,
                     'placeholder' => false,
                     'choices' => [
-                        FallbackType::PARENT_LOCALIZATION => 'en [Parent Localization]',
-                        FallbackType::SYSTEM => 'oro.locale.fallback.type.default',
+                        'en [Parent Localization]' => FallbackType::PARENT_LOCALIZATION,
+                        'oro.locale.fallback.type.default' => FallbackType::SYSTEM,
                     ],
                 ],
                 'submittedData' => FallbackType::PARENT_LOCALIZATION,
@@ -142,7 +142,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
         $localizationCode = 'en_US';
         $parentCode = 'en';
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FormInterface $form */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $form */
         $form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $formView = new FormView();
@@ -156,11 +156,6 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
         $this->assertArrayHasKey('data-parent-localization', $formView->vars['attr']);
         $this->assertEquals($localizationCode, $formView->vars['attr']['data-localization']);
         $this->assertEquals($parentCode, $formView->vars['attr']['data-parent-localization']);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(FallbackPropertyType::NAME, $this->formType->getName());
     }
 
     public function testGetParent()

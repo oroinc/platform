@@ -5,9 +5,9 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\DataProvider;
 use Oro\Bundle\LayoutBundle\Layout\DataProvider\AssetProvider;
 use Symfony\Component\Asset\Packages;
 
-class AssetProviderTest extends \PHPUnit_Framework_TestCase
+class AssetProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Packages|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Packages|\PHPUnit\Framework\MockObject\MockObject */
     protected $packages;
 
     /** @var AssetProvider */

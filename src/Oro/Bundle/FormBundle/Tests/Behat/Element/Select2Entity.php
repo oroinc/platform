@@ -168,7 +168,14 @@ class Select2Entity extends Element implements ClearableInterface
                     return $element->isVisible();
                 });
                 if ($openArrow->isVisible()) {
-                    $openArrow->click();
+                    try {
+                        $openArrow->click();
+                    } catch (\Exception $e) {
+                        // Some elements on the page may be covered by sticky panel.
+                        // We should scroll up to the page logo. I will allow to click on the element.
+                        $this->getPage()->find('css', '.logo')->mouseOver();
+                        $openArrow->click();
+                    }
                 }
             }
         }
@@ -215,7 +222,11 @@ class Select2Entity extends Element implements ClearableInterface
      */
     public function openSelectEntityPopup($force = false)
     {
-        $entitySelectButton = $this->getParent()->getParent()->find('css', '.entity-select-btn');
+        $entitySelect = $this->getParent()->getParent();
+        $entitySelectButton = $entitySelect->find('css', '.entity-select-btn');
+        $this->spin(function () use ($entitySelect) {
+            return $entitySelect->find('css', '.select2-container');
+        }, 10);
         $entitySelectButton->focus();
         if ($entitySelectButton->isVisible()) {
             if ($force) {
@@ -239,7 +250,7 @@ class Select2Entity extends Element implements ClearableInterface
     /**
      * @return string|null
      */
-    public function getChosenValue()
+    public function getValue()
     {
         $span = $this->getParent()->find('css', 'span.select2-chosen');
 

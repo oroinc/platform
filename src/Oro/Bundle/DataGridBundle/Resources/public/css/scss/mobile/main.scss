@@ -1,0 +1,12 @@
+/* @theme: admin.oro; */
+
+.mobile-version {
+    @import "oroui/css/scss/mobile/variables/layout";
+
+    @import "oro-grid";
+    @import "datagrid-settings";
+    @import "grid-toolbar";
+    @import "toolbar-mass-actions";
+    @import "actions-panel";
+    @import "grid-views";
+}

@@ -12,7 +12,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\DuplicateConfigurati
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\EmptyConfiguration\EmptyConfigurationBundle;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\IncorrectConfiguration\IncorrectConfigurationBundle;
 
-class ProcessConfigurationProviderTest extends \PHPUnit_Framework_TestCase
+class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ProcessDefinitionListConfiguration

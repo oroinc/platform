@@ -17,10 +17,10 @@ class LanguageTypeTest extends FormIntegrationTestCase
     /** @var LanguageType */
     protected $formType;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $cmMock;
 
-    /** @var LanguageProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $languageProvider;
 
     /** @var string */
@@ -44,11 +44,6 @@ class LanguageTypeTest extends FormIntegrationTestCase
         \Locale::setDefault($this->locale);
         parent::tearDown();
         unset($this->cmMock, $this->languageProvider, $this->formType);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_language', $this->formType->getName());
     }
 
     public function testGetParent()

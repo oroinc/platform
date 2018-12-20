@@ -7,10 +7,10 @@ use Oro\Component\Action\Action\AssignValue;
 use Oro\Component\Action\Action\UnsetValue;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class UnsetValueTest extends \PHPUnit_Framework_TestCase
+class UnsetValueTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|AssignValue
+     * @var \PHPUnit\Framework\MockObject\MockObject|AssignValue
      */
     protected $assignValue;
 

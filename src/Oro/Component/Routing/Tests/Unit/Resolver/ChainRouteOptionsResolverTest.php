@@ -4,7 +4,7 @@ namespace Oro\Component\Routing\Tests\Unit\Resolver;
 
 use Oro\Component\Routing\Resolver\ChainRouteOptionsResolver;
 
-class ChainRouteOptionsResolverTest extends \PHPUnit_Framework_TestCase
+class ChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
     public function testEmptyChainResolver()
     {

@@ -4,7 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Model;
 
 use Oro\Bundle\LocaleBundle\Model\CalendarFactory;
 
-class CalendarFactoryTest extends \PHPUnit_Framework_TestCase
+class CalendarFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CalendarFactory
@@ -12,7 +12,7 @@ class CalendarFactoryTest extends \PHPUnit_Framework_TestCase
     protected $factory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $container;
 

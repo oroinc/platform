@@ -36,7 +36,7 @@ class ImportType extends AbstractType
         $builder->add('file', FileType::class);
 
         $processorChoices = $this->getImportProcessorsChoices($options['entityName']);
-        $processorNames = array_keys($processorChoices);
+        $processorNames = array_values($processorChoices);
 
         $builder->add(
             'processorAlias',
@@ -66,7 +66,7 @@ class ImportType extends AbstractType
 
         $result = [];
         foreach ($aliases as $alias) {
-            $result[$alias] = $this->generateProcessorLabel($alias);
+            $result[$this->generateProcessorLabel($alias)] = $alias;
         }
 
         return $result;

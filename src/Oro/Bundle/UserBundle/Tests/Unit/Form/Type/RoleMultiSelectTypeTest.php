@@ -9,8 +9,6 @@ use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
-use Oro\Bundle\FormBundle\Form\Type\Select2HiddenType;
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Form\Type\RoleMultiSelectType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
@@ -20,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RoleMultiSelectTypeTest extends FormIntegrationTestCase
 {
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
     /** @var RoleMultiSelectType */
@@ -56,7 +54,7 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
+        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
@@ -77,7 +75,7 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
 
     public function testBuildView()
     {
-        /** @var FormBuilder|\PHPUnit_Framework_MockObject_MockObject $builder */
+        /** @var FormBuilder|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->once())
             ->method('addModelTransformer')
@@ -128,22 +126,21 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
             ->method('getProperties')
             ->willReturn(['label']);
 
-        /** @var SearchRegistry|\PHPUnit_Framework_MockObject_MockObject $searchRegistry */
+        /** @var SearchRegistry|\PHPUnit\Framework\MockObject\MockObject $searchRegistry */
         $searchRegistry = $this->createMock(SearchRegistry::class);
         $searchRegistry->expects($this->any())
             ->method('getSearchHandler')
             ->with('roles')
             ->willReturn($searchHandler);
 
-        /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject $configProvider */
+        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider */
         $configProvider = $this->createMock(ConfigProvider::class);
 
         return [
             new PreloadedExtension(
                 [
                     $this->formType,
-                    Select2HiddenType::class => new Select2Type('hidden', 'oro_select2_hidden'),
-                    'oro_jqueryselect2_hidden' => new OroJquerySelect2HiddenType(
+                    OroJquerySelect2HiddenType::class => new OroJquerySelect2HiddenType(
                         $this->em,
                         $searchRegistry,
                         $configProvider

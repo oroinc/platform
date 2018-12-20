@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
+class SetPasswordTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SetPasswordType */
     protected $formType;
@@ -57,11 +57,6 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
                 ]
             ]);
         $this->formType->buildForm($builder, []);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_set_password', $this->formType->getName());
     }
 
     public function testGetParent()

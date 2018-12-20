@@ -10,7 +10,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CountTest extends \PHPUnit_Framework_TestCase
+class CountTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Count */
     protected $action;

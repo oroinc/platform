@@ -1,7 +1,9 @@
+#!/usr/bin/env php
 <?php
 
 $finder = PhpCsFixer\Finder::create()
     ->in([__DIR__.'/../..'])
+    ->notPath('doctrine-extensions')
     ->files()
     ->name('*.php')
     ->notName('*.php.twig')
@@ -20,6 +22,8 @@ return PhpCsFixer\Config::create()
             // imports
             'ordered_imports' => true,
             'no_extra_consecutive_blank_lines' => ['use'],
+            'php_unit_namespaced' => ['target' => '6.0'],
+            'php_unit_expectation' => true,
 
             // Symfony, but exclude Oro cases
 //            '@Symfony' => true,

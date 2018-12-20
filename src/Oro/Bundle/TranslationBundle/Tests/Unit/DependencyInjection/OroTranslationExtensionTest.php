@@ -5,7 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\TranslationBundle\DependencyInjection\OroTranslationExtension;
 use Symfony\Component\DependencyInjection\Definition;
 
-class OroTranslationExtensionTest extends \PHPUnit_Framework_TestCase
+class OroTranslationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array
@@ -35,7 +35,11 @@ class OroTranslationExtensionTest extends \PHPUnit_Framework_TestCase
             'js_translation' => array(
                 'domains' => array('validators'),
                 'debug' => false,
-            )
+            ),
+            'locales' => ['en'],
+            'default_required' => true,
+            'manager_registry' => 'doctrine',
+            'templating' => 'foo.html.twig'
         )
     );
 

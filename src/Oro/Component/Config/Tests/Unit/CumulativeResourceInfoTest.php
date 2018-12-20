@@ -4,7 +4,7 @@ namespace Oro\Component\Config\Tests\Unit;
 
 use Oro\Component\Config\CumulativeResourceInfo;
 
-class CumulativeResourceInfoTest extends \PHPUnit_Framework_TestCase
+class CumulativeResourceInfoTest extends \PHPUnit\Framework\TestCase
 {
     public function testConfig()
     {

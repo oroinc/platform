@@ -2,9 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\SkippedEntitiesProvider;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @group regression
+ */
 class GetAndDeleteTest extends RestJsonApiTestCase
 {
     /**
@@ -15,7 +20,7 @@ class GetAndDeleteTest extends RestJsonApiTestCase
      */
     public function testRestRequests($entityClass, $excludedActions)
     {
-        if (in_array('get_list', $excludedActions, true)) {
+        if (in_array(ApiActions::GET_LIST, $excludedActions, true)) {
             return;
         }
 
@@ -28,14 +33,14 @@ class GetAndDeleteTest extends RestJsonApiTestCase
         // test "get list" request
         $response = $this->cget(['entity' => $entityType, 'page[size]' => 1]);
 
-        $id = $this->getGetEntityId(self::jsonToArray($response->getContent()));
+        $id = $this->getFirstEntityId(self::jsonToArray($response->getContent()));
         if (null !== $id) {
             // test "get" request
-            if (!in_array('get', $excludedActions, true)) {
-                $this->checkGetRequest($entityType, $id, 200);
+            if (!in_array(ApiActions::GET, $excludedActions, true)) {
+                $this->checkGetRequest($entityType, $id, Response::HTTP_OK);
             }
             // test "delete" request
-            if (!in_array('delete', $excludedActions, true)) {
+            if (!in_array(ApiActions::DELETE, $excludedActions, true)) {
                 $this->checkDeleteRequest($entityType, $id, $excludedActions);
             }
         }
@@ -49,29 +54,33 @@ class GetAndDeleteTest extends RestJsonApiTestCase
      */
     public function testDeleteList($entityClass, $excludedActions)
     {
-        if (in_array('delete_list', $excludedActions, true)) {
+        if (in_array(ApiActions::DELETE_LIST, $excludedActions, true)
+            || in_array(ApiActions::GET_LIST, $excludedActions, true)
+        ) {
+            return;
+        }
+
+        if (in_array($entityClass, SkippedEntitiesProvider::getForGetListAction(), true)) {
             return;
         }
 
         $entityType = $this->getEntityType($entityClass);
+        $response = $this->cget(['entity' => $entityType], ['page[size]' => 1]);
 
-        $response = $this->cget(['entity' => $entityType], ['page[size]' => 1], [], false);
-        if ($response->getStatusCode() === 200) {
-            $id = [];
-            $content = self::jsonToArray($response->getContent());
-            if (!empty($content['data'])) {
-                foreach ($content['data'] as $item) {
-                    $id[] = $item['id'];
-                }
-                $response = $this->cdelete(
-                    ['entity' => $entityType],
-                    ['filter' => ['id' => implode(',', $id)]],
-                    [],
-                    false
-                );
-                // @todo: remove 400 and 403 status coded here
-                self::assertApiResponseStatusCodeEquals($response, [204, 400, 403], $entityType, 'delete_list');
-            }
+        $content = self::jsonToArray($response->getContent());
+        if (!empty($content['data'])) {
+            $response = $this->cdelete(
+                ['entity' => $entityType],
+                ['filter' => ['id' => $content['data'][0]['id']]],
+                [],
+                false
+            );
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                [Response::HTTP_NO_CONTENT, Response::HTTP_FORBIDDEN],
+                $entityType,
+                'delete_list'
+            );
         }
     }
 
@@ -80,15 +89,15 @@ class GetAndDeleteTest extends RestJsonApiTestCase
      * @param mixed    $id
      * @param string[] $excludedActions
      */
-    protected function checkDeleteRequest($entityType, $id, $excludedActions)
+    private function checkDeleteRequest($entityType, $id, $excludedActions)
     {
         $response = $this->delete(['entity' => $entityType, 'id' => $id], [], [], false);
-        if ($response->getStatusCode() !== 204) {
+        if ($response->getStatusCode() !== Response::HTTP_NO_CONTENT) {
             // process delete errors
-            self::assertEquals(403, $response->getStatusCode());
-        } elseif (!in_array('get', $excludedActions, true)) {
+            self::assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+        } elseif (!in_array(ApiActions::GET, $excludedActions, true)) {
             // check if entity was really deleted
-            $this->checkGetRequest($entityType, $id, 404);
+            $this->checkGetRequest($entityType, $id, Response::HTTP_NOT_FOUND);
         }
     }
 
@@ -97,7 +106,7 @@ class GetAndDeleteTest extends RestJsonApiTestCase
      * @param mixed   $id
      * @param integer $expectedStatus
      */
-    protected function checkGetRequest($entityType, $id, $expectedStatus)
+    private function checkGetRequest($entityType, $id, $expectedStatus)
     {
         $response = $this->get(['entity' => $entityType, 'id' => $id], [], [], false);
         self::assertApiResponseStatusCodeEquals($response, $expectedStatus, $entityType, 'get');
@@ -108,7 +117,7 @@ class GetAndDeleteTest extends RestJsonApiTestCase
      *
      * @return mixed
      */
-    protected function getGetEntityId($content)
+    private function getFirstEntityId($content)
     {
         return array_key_exists('data', $content) && count($content['data']) === 1
             ? $content['data'][0]['id']

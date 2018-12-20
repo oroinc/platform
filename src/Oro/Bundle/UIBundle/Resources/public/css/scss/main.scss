@@ -1,0 +1,22 @@
+/* @theme: admin.oro; */
+
+// add all lib
+@import "variables";
+@import "mixins";
+@import "font-awesome";
+@import "layout";
+@import "uniform";
+@import "oro";
+
+@import "utilites";
+
+@import "oro/main";
+
+// desktop resolution
+@import "desktop/main";
+
+// mobile resolution
+@import "mobile/main";
+
+// printing rules
+@import "print/main";

@@ -5,7 +5,7 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class SegmentTest extends \PHPUnit_Framework_TestCase
+class SegmentTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 

@@ -3,9 +3,10 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
-class QueryTest extends \PHPUnit_Framework_TestCase
+class QueryTest extends \PHPUnit\Framework\TestCase
 {
     private $config = array(
         'Oro\Bundle\DataBundle\Entity\Product' => array(
@@ -327,5 +328,16 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ['test_name' => ['field' => 'test_field', 'function' => 'test_function']],
             $query->getAggregations()
         );
+    }
+
+    public function testClone()
+    {
+        $criteria = new Criteria();
+        $query = new Query();
+        $query->setCriteria($criteria);
+
+        $cloneQuery = clone $query;
+
+        self::assertNotSame($criteria, $cloneQuery->getCriteria());
     }
 }

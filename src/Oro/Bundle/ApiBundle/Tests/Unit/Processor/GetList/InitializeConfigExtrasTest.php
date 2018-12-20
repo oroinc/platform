@@ -13,7 +13,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 class InitializeConfigExtrasTest extends GetListProcessorTestCase
 {
     /** @var InitializeConfigExtras */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -30,7 +30,7 @@ class InitializeConfigExtrasTest extends GetListProcessorTestCase
         $this->context->setAction('test_action');
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [new EntityDefinitionConfigExtra()],
             $this->context->getConfigExtras()
         );
@@ -46,7 +46,7 @@ class InitializeConfigExtrasTest extends GetListProcessorTestCase
         $this->context->setAction('test_action');
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 new TestConfigExtra('test'),
                 new EntityDefinitionConfigExtra($this->context->getAction(), true),

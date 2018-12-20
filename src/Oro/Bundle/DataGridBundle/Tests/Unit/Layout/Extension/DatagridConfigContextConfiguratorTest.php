@@ -7,12 +7,12 @@ use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Layout\Extension\DatagridConfigContextConfigurator;
 use Oro\Component\Layout\LayoutContext;
 
-class DatagridConfigContextConfiguratorTest extends \PHPUnit_Framework_TestCase
+class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DatagridConfigContextConfigurator */
     protected $contextConfigurator;
 
-    /** @var Manager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
     protected $dataGridManager;
 
     /**
@@ -29,7 +29,7 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $context = new LayoutContext();
         $context['grid_config'] = ['grid_name'];
 
-        /** @var DatagridConfiguration|\PHPUnit_Framework_MockObject_MockObject $config */
+        /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $config */
         $config = $this->getMockBuilder(DatagridConfiguration::class)->disableOriginalConstructor()->getMock();
         $config->expects($this->once())
             ->method('toArray')

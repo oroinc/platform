@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
-class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
+class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ConfigManager

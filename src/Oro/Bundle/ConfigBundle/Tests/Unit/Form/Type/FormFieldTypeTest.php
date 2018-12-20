@@ -3,9 +3,8 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
-use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
-use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -13,19 +12,6 @@ use Symfony\Component\Form\Test\TypeTestCase;
 class FormFieldTypeTest extends TypeTestCase
 {
     const TEST_LABEL = 'label';
-
-    protected function getExtensions()
-    {
-        $useParentScope = new ParentScopeCheckbox();
-        return [
-            new PreloadedExtension(
-                array(
-                    $useParentScope->getName() => $useParentScope
-                ),
-                array()
-            )
-        ];
-    }
 
     /**
      * @dataProvider buildFormOptionsProvider
@@ -41,7 +27,7 @@ class FormFieldTypeTest extends TypeTestCase
         $this->assertTrue($form->has('value'));
         $this->assertTrue($form->has('use_parent_scope_value'));
 
-        $this->assertEquals($expectedType, $form->get('value')->getConfig()->getType()->getName());
+        $this->assertEquals($expectedType, get_class($form->get('value')->getConfig()->getType()->getInnerType()));
 
         foreach ($expectedOptions as $option => $value) {
             $this->assertEquals($value, $form->get('value')->getConfig()->getOption($option));
@@ -56,7 +42,7 @@ class FormFieldTypeTest extends TypeTestCase
         return array(
             'target field options empty'                => array(
                 'options'         => array(),
-                'expectedType'    => 'text',
+                'expectedType'    => TextType::class,
                 'expectedOptions' => array()
             ),
             'target field options from array'           => array(
@@ -64,7 +50,7 @@ class FormFieldTypeTest extends TypeTestCase
                     'target_field_type'    => ChoiceType::class,
                     'target_field_options' => array('label' => self::TEST_LABEL)
                 ),
-                'expectedType'    => 'choice',
+                'expectedType'    => ChoiceType::class,
                 'expectedOptions' => array('label' => self::TEST_LABEL)
             ),
         );
@@ -92,7 +78,7 @@ class FormFieldTypeTest extends TypeTestCase
      */
     public function testListeners($resettable, $expectedCount)
     {
-        /* @var FormBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
+        /* @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $fieldBuilder = $this->createMock(FormBuilderInterface::class);
 

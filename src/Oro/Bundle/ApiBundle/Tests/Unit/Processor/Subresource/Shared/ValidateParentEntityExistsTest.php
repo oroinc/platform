@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcesso
 class ValidateParentEntityExistsTest extends GetSubresourceProcessorTestCase
 {
     /** @var ValidateParentEntityExists */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

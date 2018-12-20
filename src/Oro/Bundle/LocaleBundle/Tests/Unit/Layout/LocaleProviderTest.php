@@ -7,9 +7,9 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Layout\LocaleProvider;
 
-class LocaleProviderTest extends \PHPUnit_Framework_TestCase
+class LocaleProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $localizationHelper;
 
     /** @var LocaleProvider */

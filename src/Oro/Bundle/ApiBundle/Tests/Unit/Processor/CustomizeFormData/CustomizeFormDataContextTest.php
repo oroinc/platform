@@ -2,116 +2,141 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
+use Symfony\Component\Form\Test\FormInterface;
 
-class CustomizeFormDataContextTest extends \PHPUnit_Framework_TestCase
+class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomizeFormDataContext */
-    protected $context;
+    private $context;
 
     protected function setUp()
     {
         $this->context = new CustomizeFormDataContext();
     }
 
+    public function testIsInitialized()
+    {
+        self::assertFalse($this->context->isInitialized());
+
+        $this->context->setForm($this->createMock(FormInterface::class));
+        self::assertTrue($this->context->isInitialized());
+    }
+
     public function testRootClassName()
     {
-        $this->assertNull($this->context->getRootClassName());
+        self::assertNull($this->context->getRootClassName());
 
-        $this->context->setRootClassName('Test\Class');
-        $this->assertEquals('Test\Class', $this->context->getRootClassName());
+        $className = 'Test\Class';
+        $this->context->setRootClassName($className);
+        self::assertEquals($className, $this->context->getRootClassName());
     }
 
     public function testClassName()
     {
-        $this->assertNull($this->context->getClassName());
+        self::assertNull($this->context->getClassName());
 
-        $this->context->setClassName('Test\Class');
-        $this->assertEquals('Test\Class', $this->context->getClassName());
+        $className = 'Test\Class';
+        $this->context->setClassName($className);
+        self::assertEquals($className, $this->context->getClassName());
     }
 
     public function testPropertyPath()
     {
-        $this->assertNull($this->context->getPropertyPath());
+        self::assertNull($this->context->getPropertyPath());
 
-        $this->context->setPropertyPath('field1.field11');
-        $this->assertEquals('field1.field11', $this->context->getPropertyPath());
+        $propertyPath = 'field1.field11';
+        $this->context->setPropertyPath($propertyPath);
+        self::assertEquals($propertyPath, $this->context->getPropertyPath());
     }
 
     public function testRootConfig()
     {
-        $this->assertNull($this->context->getRootConfig());
+        self::assertNull($this->context->getRootConfig());
 
         $config = new EntityDefinitionConfig();
-        $this->context->setConfig($config);
-        $this->assertNull($this->context->getRootConfig());
+        $this->context->setRootConfig($config);
+        self::assertSame($config, $this->context->getRootConfig());
 
-        $this->context->setPropertyPath('test');
-        $this->assertSame($config, $this->context->getRootConfig());
+        $this->context->setRootConfig(null);
+        self::assertNull($this->context->getRootConfig());
     }
 
-    public function testConfigForKnownField()
+    public function testConfig()
     {
-        $this->assertNull($this->context->getConfig());
+        self::assertNull($this->context->getConfig());
 
         $config = new EntityDefinitionConfig();
-        $config
-            ->addField('field1')
-            ->createAndSetTargetEntity()
-            ->addField('field11')
-            ->createAndSetTargetEntity();
-
         $this->context->setConfig($config);
-        $this->assertSame($config, $this->context->getConfig());
+        self::assertSame($config, $this->context->getConfig());
 
-        $this->context->setPropertyPath('field1.field11');
-        $this->assertSame(
-            $config->getField('field1')->getTargetEntity()->getField('field11')->getTargetEntity(),
-            $this->context->getConfig()
-        );
+        $this->context->setConfig(null);
+        self::assertNull($this->context->getConfig());
     }
 
-    public function testConfigForUnknownField()
+    public function testIncludedEntities()
     {
-        $this->assertNull($this->context->getConfig());
+        self::assertNull($this->context->getIncludedEntities());
 
-        $config = new EntityDefinitionConfig();
-        $config->addField('field1');
-
-        $this->context->setConfig($config);
-        $this->assertSame($config, $this->context->getConfig());
-
-        $this->context->setPropertyPath('unknownField.field11');
-        $this->assertNull($this->context->getConfig());
+        $includedEntities = $this->createMock(IncludedEntityCollection::class);
+        $this->context->setIncludedEntities($includedEntities);
+        self::assertSame($includedEntities, $this->context->getIncludedEntities());
     }
 
-    public function testConfigForExcludedField()
+    public function testEvent()
     {
-        $this->assertNull($this->context->getConfig());
+        self::assertNull($this->context->getPropertyPath());
 
-        $config = new EntityDefinitionConfig();
-        $config
-            ->addField('field1')
-            ->createAndSetTargetEntity()
-            ->addField('field11')
-            ->createAndSetTargetEntity();
-        $config->getField('field1')->setExcluded();
+        $eventName = 'test_event';
+        $this->context->setEvent($eventName);
+        self::assertEquals($eventName, $this->context->getEvent());
+    }
 
-        $this->context->setConfig($config);
-        $this->assertSame($config, $this->context->getConfig());
+    public function testParentAction()
+    {
+        self::assertNull($this->context->getPropertyPath());
 
-        $this->context->setPropertyPath('field1.field11');
-        $this->assertSame(
-            $config->getField('field1')->getTargetEntity()->getField('field11')->getTargetEntity(),
-            $this->context->getConfig()
-        );
+        $actionName = 'test_action';
+        $this->context->setParentAction($actionName);
+        self::assertEquals($actionName, $this->context->getParentAction());
+
+        $this->context->setParentAction(null);
+        self::assertNull($this->context->getPropertyPath());
     }
 
     public function testForm()
     {
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $this->context->setForm($form);
-        $this->assertSame($form, $this->context->getForm());
+        self::assertSame($form, $this->context->getForm());
+    }
+
+    public function testDataAndResult()
+    {
+        self::assertNull($this->context->getData());
+        self::assertNull($this->context->getResult());
+        self::assertTrue($this->context->hasResult());
+
+        $data = ['key' => 'value'];
+        $this->context->setData($data);
+        self::assertSame($data, $this->context->getData());
+        self::assertSame($data, $this->context->getResult());
+        self::assertTrue($this->context->hasResult());
+
+        $data = ['key1' => 'value1'];
+        $this->context->setResult($data);
+        self::assertSame($data, $this->context->getResult());
+        self::assertSame($data, $this->context->getData());
+        self::assertTrue($this->context->hasResult());
+    }
+
+    /**
+     * @expectedException \BadMethodCallException
+     */
+    public function testRemoveResult()
+    {
+        $this->context->removeResult();
     }
 }

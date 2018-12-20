@@ -14,6 +14,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Abstract form type for date filter forms.
+ */
 abstract class AbstractDateFilterType extends AbstractType
 {
     const TYPE_BETWEEN     = 1;
@@ -30,6 +33,9 @@ abstract class AbstractDateFilterType extends AbstractType
     const TYPE_THIS_YEAR    = 11;
     const TYPE_ALL_TIME     = 12;
 
+    /**
+     * @var array
+     */
     public static $valueTypes = [
         self::TYPE_TODAY,
         self::TYPE_THIS_WEEK,
@@ -90,12 +96,12 @@ abstract class AbstractDateFilterType extends AbstractType
     public function getOperatorChoices()
     {
         return [
-            self::TYPE_BETWEEN     => $this->translator->trans('oro.filter.form.label_date_type_between'),
-            self::TYPE_NOT_BETWEEN => $this->translator->trans('oro.filter.form.label_date_type_not_between'),
-            self::TYPE_MORE_THAN   => $this->translator->trans('oro.filter.form.label_date_type_more_than'),
-            self::TYPE_LESS_THAN   => $this->translator->trans('oro.filter.form.label_date_type_less_than'),
-            self::TYPE_EQUAL       => $this->translator->trans('oro.filter.form.label_date_type_equals'),
-            self::TYPE_NOT_EQUAL   => $this->translator->trans('oro.filter.form.label_date_type_not_equals')
+            $this->translator->trans('oro.filter.form.label_date_type_between') => self::TYPE_BETWEEN,
+            $this->translator->trans('oro.filter.form.label_date_type_not_between') => self::TYPE_NOT_BETWEEN,
+            $this->translator->trans('oro.filter.form.label_date_type_more_than') => self::TYPE_MORE_THAN,
+            $this->translator->trans('oro.filter.form.label_date_type_less_than') => self::TYPE_LESS_THAN,
+            $this->translator->trans('oro.filter.form.label_date_type_equals') => self::TYPE_EQUAL,
+            $this->translator->trans('oro.filter.form.label_date_type_not_equals') => self::TYPE_NOT_EQUAL
         ];
     }
 
@@ -161,8 +167,7 @@ abstract class AbstractDateFilterType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $widgetOptions                = ['firstDay' => 0];
-        $view->vars['widget_options'] = array_merge($widgetOptions, $options['widget_options']);
+        $view->vars['widget_options'] = $options['widget_options'];
         $view->vars['date_parts']     = $options['date_parts'];
         $view->vars['date_vars']      = $options['date_vars'];
     }
@@ -176,7 +181,14 @@ abstract class AbstractDateFilterType extends AbstractType
             $options['date_parts'] = [];
         }
 
-        $builder->add('part', ChoiceType::class, ['choices' => $options['date_parts']]);
+        $builder->add(
+            'part',
+            ChoiceType::class,
+            [
+                'choices' => array_flip($options['date_parts']),
+            ]
+        );
+
         if ($options['compile_date']) {
             $builder->addEventSubscriber($this->subscriber);
         }

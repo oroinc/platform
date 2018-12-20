@@ -23,6 +23,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraints\Valid;
 
+/**
+ * Form type to represent email
+ */
 class EmailType extends AbstractType
 {
     /** @var AuthorizationCheckerInterface */
@@ -96,12 +99,12 @@ class EmailType extends AbstractType
             ->add(
                 'cc',
                 EmailAddressRecipientsType::class,
-                ['required' => false, 'attr' => ['class' => 'taggable-field']]
+                ['required' => false, 'attr' => ['class' => 'taggable-field'], 'label' => 'oro.email.cc.label']
             )
             ->add(
                 'bcc',
                 EmailAddressRecipientsType::class,
-                ['required' => false, 'attr' => ['class' => 'taggable-field']]
+                ['required' => false, 'attr' => ['class' => 'taggable-field'], 'label' => 'oro.email.bcc.label']
             )
             ->add('subject', TextType::class, ['required' => true, 'label' => 'oro.email.subject.label'])
             ->add(
@@ -133,8 +136,8 @@ class EmailType extends AbstractType
                     'required'   => true,
                     'data'       => 'html',
                     'choices'  => [
-                        'html' => 'oro.email.datagrid.emailtemplate.filter.type.html',
-                        'txt'  => 'oro.email.datagrid.emailtemplate.filter.type.txt'
+                        'oro.email.datagrid.emailtemplate.filter.type.html' => 'html',
+                        'oro.email.datagrid.emailtemplate.filter.type.txt' => 'txt',
                     ],
                     'expanded'   => true
                 ]
@@ -158,6 +161,7 @@ class EmailType extends AbstractType
                 'contexts',
                 ContextsSelectType::class,
                 [
+                    'label' => "oro.email.contexts.label",
                     'collectionModel' => true,
                     'error_bubbling'  => false,
                     'tooltip'   => 'oro.email.contexts.tooltip',
@@ -205,9 +209,12 @@ class EmailType extends AbstractType
             $event->setData($data);
         }
 
-        $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
         $form = $event->getForm();
+        if (!$form->has('template')) {
+            return;
+        }
 
+        $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
         FormUtils::replaceField(
             $form,
             'template',
@@ -222,7 +229,7 @@ class EmailType extends AbstractType
                         );
                     },
             ],
-            ['choice_list', 'choices']
+            ['choices']
         );
     }
 

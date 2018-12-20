@@ -5,12 +5,12 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\DashboardBundle\DependencyInjection\Compiler\ValueConvertersPass;
 use Symfony\Component\DependencyInjection\Definition;
 
-class ValueConvertersPassTest extends \PHPUnit_Framework_TestCase
+class ValueConvertersPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ValueConvertersPass */
     protected $compiler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     public function setUp()
@@ -49,10 +49,10 @@ class ValueConvertersPassTest extends \PHPUnit_Framework_TestCase
             ->with('oro_dashboard.widget_config_value.provider')
             ->willReturn($definition);
 
-        $convertersIds = array(
-            'converter1' => array(array('alias' => 'form_type_1')),
-            'converter2' => array(array('alias' => 'form_type_2')),
-        );
+        $convertersIds = [
+            'converter1' => [['form_type' => 'form_type_1']],
+            'converter2' => [['form_type' => 'form_type_2']],
+        ];
 
         $this->container->expects($this->once())
             ->method('findTaggedServiceIds')
@@ -67,7 +67,7 @@ class ValueConvertersPassTest extends \PHPUnit_Framework_TestCase
         foreach ($convertersIds as $id => $attributes) {
             $this->assertEquals('addConverter', $calls[$i][0]);
             $this->assertEquals($id, (string)$calls[$i][1][1]);
-            $this->assertEquals($attributes[0]['alias'], $calls[$i][1][0]);
+            $this->assertEquals($attributes[0]['form_type'], $calls[$i][1][0]);
             $i++;
         }
     }

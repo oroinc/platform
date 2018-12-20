@@ -11,28 +11,34 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeRequestData;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class NormalizeRequestDataTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
     private $entityIdTransformer;
 
     /** @var NormalizeRequestData */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
         $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
+        $entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
+        $entityIdTransformerRegistry->expects(self::any())
+            ->method('getEntityIdTransformer')
+            ->with($this->context->getRequestType())
+            ->willReturn($this->entityIdTransformer);
 
-        $this->processor = new NormalizeRequestData($this->valueNormalizer, $this->entityIdTransformer);
+        $this->processor = new NormalizeRequestData($this->valueNormalizer, $entityIdTransformerRegistry);
     }
 
     /**
@@ -214,7 +220,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ->method('normalizeValue')
             ->willReturnMap(
                 [
-                    ['users', 'entityClass', $requestType, false, false, 'Test\User'],
+                    ['users', 'entityClass', $requestType, false, false, 'Test\User']
                 ]
             );
         $this->entityIdTransformer->expects(self::any())
@@ -304,7 +310,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
                 Error::createValidationError('entity type constraint')
                     ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/0/type')),
                 Error::createValidationError('entity type constraint')
-                    ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/1/type')),
+                    ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/1/type'))
             ],
             $this->context->getErrors()
         );
@@ -386,7 +392,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
                 Error::createValidationError('entity type constraint', 'Not acceptable entity type.')
                     ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/0/type')),
                 Error::createValidationError('entity type constraint', 'Not acceptable entity type.')
-                    ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/1/type')),
+                    ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/1/type'))
             ],
             $this->context->getErrors()
         );
@@ -556,7 +562,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
                 Error::createValidationError('entity type constraint', 'Not acceptable entity type.')
                     ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/0/type')),
                 Error::createValidationError('entity type constraint', 'Not acceptable entity type.')
-                    ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/1/type')),
+                    ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/1/type'))
             ],
             $this->context->getErrors()
         );
@@ -642,7 +648,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
                     ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/0/id')),
                 Error::createValidationError('entity identifier constraint')
                     ->setInnerException(new \Exception('cannot normalize id'))
-                    ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/1/id')),
+                    ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/1/id'))
             ],
             $this->context->getErrors()
         );
@@ -688,7 +694,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             'association' => [
                 'id'    => 'INCLUDED1',
                 'class' => 'Test\User'
-            ],
+            ]
         ];
 
         self::assertEquals($expectedData, $this->context->getRequestData());
@@ -734,7 +740,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             'association' => [
                 'id'    => 'PRIMARY1',
                 'class' => 'Test\User'
-            ],
+            ]
         ];
 
         self::assertEquals($expectedData, $this->context->getRequestData());

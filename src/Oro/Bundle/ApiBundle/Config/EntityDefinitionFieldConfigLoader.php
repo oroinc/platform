@@ -4,24 +4,26 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * The loader for fields of "entities" configuration section.
+ */
 class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements ConfigLoaderFactoryAwareInterface
 {
-    /** @var array */
-    protected $methodMap = [
-        EntityDefinitionFieldConfig::EXCLUDE          => 'setExcluded',
-        EntityDefinitionFieldConfig::COLLAPSE         => 'setCollapsed',
-        EntityDefinitionFieldConfig::DATA_TRANSFORMER => 'setDataTransformers',
+    private const METHOD_MAP = [
+        ConfigUtil::EXCLUDE          => 'setExcluded',
+        ConfigUtil::COLLAPSE         => 'setCollapsed',
+        ConfigUtil::DATA_TRANSFORMER => 'setDataTransformers'
     ];
 
-    /** @var array */
-    protected $targetEntityMethodMap = [
-        EntityDefinitionConfig::EXCLUSION_POLICY       => 'setExclusionPolicy',
-        EntityDefinitionConfig::ORDER_BY               => 'setOrderBy',
-        EntityDefinitionConfig::MAX_RESULTS            => 'setMaxResults',
-        EntityDefinitionConfig::HINTS                  => 'setHints',
-        EntityDefinitionConfig::POST_SERIALIZE         => 'setPostSerializeHandler',
-        EntityDefinitionConfig::IDENTIFIER_FIELD_NAMES => 'setIdentifierFieldNames',
-        EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER  => 'setFormEventSubscribers',
+    private const TARGET_ENTITY_METHOD_MAP = [
+        ConfigUtil::EXCLUSION_POLICY          => 'setExclusionPolicy',
+        ConfigUtil::IDENTIFIER_FIELD_NAMES    => 'setIdentifierFieldNames',
+        ConfigUtil::ORDER_BY                  => 'setOrderBy',
+        ConfigUtil::MAX_RESULTS               => 'setMaxResults',
+        ConfigUtil::HINTS                     => 'setHints',
+        ConfigUtil::POST_SERIALIZE            => 'setPostSerializeHandler',
+        ConfigUtil::POST_SERIALIZE_COLLECTION => 'setPostSerializeCollectionHandler',
+        ConfigUtil::FORM_EVENT_SUBSCRIBER     => 'setFormEventSubscribers'
     ];
 
     /** @var ConfigLoaderFactory */
@@ -57,14 +59,14 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements 
         }
 
         foreach ($config as $key => $value) {
-            if (isset($this->targetEntityMethodMap[$key])) {
-                $this->callSetter($field->getOrCreateTargetEntity(), $this->targetEntityMethodMap[$key], $value);
+            if (isset(self::TARGET_ENTITY_METHOD_MAP[$key])) {
+                $this->callSetter($field->getOrCreateTargetEntity(), self::TARGET_ENTITY_METHOD_MAP[$key], $value);
             } elseif (ConfigUtil::FIELDS === $key) {
                 $this->loadTargetFields($field, $value);
             } elseif ($this->factory->hasLoader($key)) {
                 $this->loadTargetSection($field, $this->factory->getLoader($key), $key, $value);
             } else {
-                $this->loadConfigValue($field, $key, $value, $this->methodMap);
+                $this->loadConfigValue($field, $key, $value, self::METHOD_MAP);
             }
         }
     }
@@ -77,14 +79,14 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements 
     {
         if (!empty($fields)) {
             $targetEntity = $field->getOrCreateTargetEntity();
-            if (is_string($fields)) {
+            if (\is_string($fields)) {
                 $field->setCollapsed();
                 $targetEntity->addField($fields);
             } else {
                 foreach ($fields as $name => $config) {
                     $targetEntity->addField(
                         $name,
-                        $this->factory->getLoader(ConfigUtil::FIELDS)->load(null !== $config ? $config : [])
+                        $this->factory->getLoader(ConfigUtil::FIELDS)->load($config ?? [])
                     );
                 }
             }
@@ -106,8 +108,8 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements 
         if (!empty($config)) {
             $section = $loader->load($config);
             $isEmpty = false;
-            if (is_object($section)) {
-                if (method_exists($section, 'isEmpty') && $section->isEmpty()) {
+            if (\is_object($section)) {
+                if (\method_exists($section, 'isEmpty') && $section->isEmpty()) {
                     $isEmpty = true;
                 }
             } elseif (empty($section)) {

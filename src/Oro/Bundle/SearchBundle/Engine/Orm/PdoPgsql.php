@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -8,6 +9,9 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
+/**
+ * PostgreSQL DB driver used to run search queries for ORM search engine
+ */
 class PdoPgsql extends BaseDriver
 {
     /** @var array */
@@ -267,7 +271,9 @@ class PdoPgsql extends BaseDriver
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
 
-        $qb->addSelect(sprintf('TsRank(%s.value, :quotedValue%s) as rankField%s', $joinAlias, $index, $index))
+        $qb->addSelect(
+            sprintf('TsRank(%s.value, :quotedValue%s) * search.weight as rankField%s', $joinAlias, $index, $index)
+        )
            ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
 
         $parameter = $qb->getParameter(sprintf('value%s', $index));

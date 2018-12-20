@@ -3,14 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 /**
- * Implements empty collection of the FilterValue objects.
+ * Implements empty not changeable collection of the FilterValue objects.
  */
 class NullFilterValueAccessor implements FilterValueAccessorInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return false;
     }
@@ -18,7 +18,7 @@ class NullFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function get($key)
+    public function get(string $key): ?FilterValue
     {
         return null;
     }
@@ -26,14 +26,7 @@ class NullFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function remove($key)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getGroup($group)
+    public function getGroup(string $group): array
     {
         return [];
     }
@@ -41,7 +34,22 @@ class NullFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getAll()
+    public function getDefaultGroupName(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultGroupName(?string $group): void
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAll(): array
     {
         return [];
     }
@@ -49,7 +57,22 @@ class NullFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function set($key, FilterValue $value = null)
+    public function set(string $key, ?FilterValue $value): void
     {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove(string $key): void
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getQueryString(): string
+    {
+        return '';
     }
 }

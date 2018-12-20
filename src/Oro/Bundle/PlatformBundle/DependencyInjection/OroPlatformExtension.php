@@ -71,6 +71,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
             $this->mergeConfigIntoOne($container, 'security', reset($securityConfig));
         }
 
+        DbalConfigurationLoader::load($container);
         $this->preparePostgreSql($container);
     }
 
@@ -79,7 +80,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
      *
      * @param ContainerBuilder $container
      */
-    public function preparePostgreSql(ContainerBuilder $container)
+    private function preparePostgreSql(ContainerBuilder $container)
     {
         $dbDriver = $container->getParameter('database_driver');
         if ($dbDriver === DatabaseDriverInterface::DRIVER_POSTGRESQL) {
@@ -145,5 +146,6 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         $loader->load('services.yml');
         $loader->load('doctrine.yml');
         $loader->load('session.yml');
+        $loader->load('commands.yml');
     }
 }

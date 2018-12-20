@@ -1,0 +1,319 @@
+/* @theme: admin.oro; */
+
+body {
+    min-width: $width-body-page-mobile;
+}
+
+& {
+    min-height: 100vh;
+}
+
+.app-page {
+    &__central-panel {
+        padding-top: $app-header-height;
+    }
+}
+
+.page-toolbar {
+    min-height: 0;
+    justify-content: center;
+    background-color: $mobile-page-toolbar-background-color;
+}
+
+.mobile-hide {
+    display: none;
+    width: 0;
+    height: 0;
+    visibility: hidden;
+    position: absolute;
+    top: -9999px;
+    #{$start}: -9999px;
+}
+
+/**
+ * Fixes issue when header with position fixed loses its place after blur event on some input
+ * $see fixStickyHeader() in oroui/js/mobile/layout.js
+ */
+&.input-focused .app-header {
+    position: absolute;
+}
+
+.scrollspy.container-fluid,
+.page-title + [data-bound-component*="datagrid"],
+.page-title + .product-container {
+    .content-with-sidebar--container {
+        padding: 0;
+    }
+
+    > .no-data-visible {
+        padding-top: 1px;
+    }
+}
+
+.product-container {
+    .jstree-wrapper {
+        margin-top: 10px;
+    }
+}
+
+.page-title + [data-bound-component*="datagrid"] {
+    @include safe-area-property-left(padding-left, $content-padding, false);
+    @include safe-area-property-right(padding-right, $content-padding, false);
+}
+
+.layout-content .responsive-section {
+    &:only-child {
+        padding: 0;
+    }
+}
+
+.container-fluid {
+    > .responsive-section {
+        .responsive-cell,
+        .responsive-cell:only-child {
+            padding: 0 $content-padding;
+        }
+
+        &:not(.responsive-small) {
+            .responsive-cell {
+                margin-bottom: 0;
+
+                &:not(:only-child) {
+                    float: #{$start};
+                    width: 50%;
+                }
+
+                &:first-child {
+                    padding-#{$start}: $content-padding;
+                    padding-#{$end}: 24px;
+                }
+
+                &:last-child {
+                    padding-#{$start}: 24px;
+                    padding-#{$end}: 0;
+                }
+
+                &:only-child {
+                    padding-#{$start}: $content-padding;
+                }
+
+                .inner-grid {
+                    margin-#{$start}: -$content-padding;
+
+                    .grid-views {
+                        margin-#{$start}: $content-padding;
+                    }
+                }
+            }
+        }
+
+        &.responsive-small {
+            .responsive-cell {
+                &,
+                &:only-child {
+                    padding: 0;
+                }
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+}
+
+.responsive-cell .box-type1 {
+    .filter-box {
+        .btn-group {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.box-type1 {
+    margin: 0 $content-padding $content-padding;
+    border-radius: 3px;
+
+    .title {
+        padding-bottom: 10px;
+    }
+
+    .calendar-container {
+        padding: 0;
+    }
+}
+
+.responsive-cell {
+    margin-bottom: $content-padding;
+
+    .tab-content {
+        .box-type1 {
+            margin-bottom: 0;
+
+            .container-fluid {
+                padding-#{$start}: $content-padding;
+                padding-#{$end}: $content-padding;
+            }
+        }
+    }
+
+    .box-type1 {
+        margin-#{$end}: 0;
+        margin-#{$start}: 0;
+
+        .filter-box {
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .container-fluid {
+            padding-#{$start}: 0;
+            padding-#{$end}: 0;
+        }
+    }
+}
+
+.layout-content {
+    > .scrollable-container {
+        @include safe-area-property-left(padding-left, $content-padding, false);
+        @include safe-area-property-right(padding-right, $content-padding, false);
+    }
+
+    // Update offset on pages with sidebar
+    > .sidebar-container .category-data {
+        padding-#{$start}: $content-padding;
+    }
+
+    //  Update offset on view pages
+    .layout-content .scrollspy-main-container > .scrollable-container {
+        margin-#{$start}: -$content-padding;
+        margin-#{$end}: -$content-padding;
+        padding-#{$start}: $content-padding;
+        padding-#{$end}: $content-padding;
+    }
+}
+
+//  Update offset on create / update pages
+form > .layout-content {
+    padding-#{$start}: $content-padding;
+    padding-#{$end}: $content-padding;
+
+    .scrollspy-main-container > .scrollable-container {
+        margin-#{$start}: -$content-padding;
+        margin-#{$end}: -$content-padding;
+        padding-#{$start}: $content-padding;
+        padding-#{$end}: $content-padding;
+    }
+}
+
+.page-title + [data-bound-component*="datagrid"] {
+    padding-#{$start}: $content-padding;
+    padding-#{$end}: $content-padding;
+}
+
+.oro-page {
+    &.collapsible-sidebar {
+        @media only screen and (min-width: 820px) {
+            .oro-page-sidebar {
+                > .dropdown-menu {
+                    display: block !important;
+                    z-index: inherit;
+                }
+            }
+        }
+
+        @media only screen and (max-width: 820px) {
+            overflow: visible;
+
+            .oro-page-sidebar {
+                overflow: visible;
+                clear: both;
+                width: 100%;
+
+                > .dropdown-toggle:focus {
+                    font-weight: normal;
+                }
+
+                > .dropdown-toggle {
+                    display: block;
+                    background: $primary-inverse;
+                    line-height: 30px;
+                    margin: 0 10px;
+                }
+
+                > .dropdown-menu {
+                    z-index: 900;
+                    position: absolute;
+                    padding: 5px 0;
+                    margin: 2px 0 0;
+                    background-color: $primary-inverse;
+                    border: 1px solid rgba(0, 0, 0, .2);
+                    border-radius: 6px;
+                    box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+
+                    > li {
+                        width: auto;
+                    }
+                }
+            }
+
+            .oro-page-body {
+                width: 100%;
+                overflow: hidden;
+            }
+        }
+    }
+}
+
+.collection-fields-list-bg.oro-item-collection {
+    & > div {
+        margin: 21px 0 20px;
+        padding: 16px 24px;
+    }
+}
+
+@media screen and (min-width: $tablet-devices-media-breakpoint) {
+    .container-fluid {
+        > .responsive-section {
+            &.responsive-small {
+                .responsive-cell {
+                    margin-bottom: 0;
+
+                    &:not(:only-child) {
+                        float: #{$start};
+                        width: 50%;
+                    }
+
+                    &:first-child {
+                        padding-left: $content-padding;
+                        padding-right: 24px;
+                    }
+
+                    &:last-child {
+                        padding-left: 24px;
+                        padding-right: 0;
+                    }
+
+                    &:only-child {
+                        padding-left: $content-padding;
+                    }
+
+                    .inner-grid {
+                        margin-#{$start}: -$content-padding;
+
+                        .grid-views {
+                            margin-#{$start}: $content-padding;
+                        }
+                    }
+                }
+
+                .row-fluid {
+                    &.row-fluid-divider {
+                        background: linear-gradient($additional-ultra-light, $additional-ultra-light) repeat-y 50% 0;
+                        background-size: 1px 100%;
+                    }
+                }
+            }
+        }
+    }
+}

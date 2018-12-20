@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Checks if there are any errors in the Context,
+ * Checks if there are any errors in the context,
  * and if so, completes missing properties of all Error objects.
  * E.g. if an error is created due to an exception occurs,
  * such error does not have "statusCode", "title", "details" and other properties,
@@ -18,7 +18,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class CompleteErrors implements ProcessorInterface
 {
     /** @var ErrorCompleterRegistry */
-    protected $errorCompleterRegistry;
+    private $errorCompleterRegistry;
 
     /**
      * @param ErrorCompleterRegistry $errorCompleterRegistry
@@ -40,11 +40,12 @@ class CompleteErrors implements ProcessorInterface
             return;
         }
 
-        $errorCompleter = $this->errorCompleterRegistry->getErrorCompleter($context->getRequestType());
+        $requestType = $context->getRequestType();
+        $errorCompleter = $this->errorCompleterRegistry->getErrorCompleter($requestType);
         $metadata = $this->getMetadata($context);
         $errors = $context->getErrors();
         foreach ($errors as $error) {
-            $errorCompleter->complete($error, $context->getRequestType(), $metadata);
+            $errorCompleter->complete($error, $requestType, $metadata);
         }
     }
 
@@ -53,7 +54,7 @@ class CompleteErrors implements ProcessorInterface
      *
      * @return EntityMetadata|null
      */
-    protected function getMetadata(Context $context)
+    private function getMetadata(Context $context)
     {
         $entityClass = $context->getClassName();
         if (!$entityClass || false === strpos($entityClass, '\\')) {

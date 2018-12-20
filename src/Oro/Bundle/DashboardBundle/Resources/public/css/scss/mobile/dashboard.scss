@@ -1,0 +1,107 @@
+/* @theme: admin.oro; */
+
+.dashboard-selector-container {
+    label {
+        display: none;
+    }
+}
+.dashboard-container-wrapper {
+    min-height: calc(100vh - #{$app-header-height} - 1px);
+
+    .responsive-section {
+        .responsive-cell > div {
+            padding: 0;
+        }
+    }
+
+    .scrollable-container {
+        padding-top: $dashboard-wrapper-mobile-offset;
+    }
+
+    .dashboard-widget {
+        .action-wrapper.sortable {
+            display: none;
+        }
+    }
+}
+
+.chart-container {
+    & > .clearfix {
+        max-width: 100%;
+
+        .chart-legend {
+            padding-bottom: 8px;
+        }
+    }
+}
+
+.widget-configuration {
+    .date-range-filter {
+        max-width: 300px;
+
+        .control-group .filter-select-oro {
+            height: 32px;
+            max-width: initial;
+
+            line-height: 32px;
+        }
+
+        .filter-start-date,
+        .filter-end-date {
+            max-width: calc(50% - 10px);
+
+            input {
+                line-height: 32px;
+            }
+        }
+    }
+
+    .control-label.wrap {
+        width: auto;
+    }
+}
+
+.dashboard-widgets-add {
+    margin-left: 0;
+}
+
+.dashboard-widget-items {
+    .controls {
+        width: auto;
+
+        @include clearfix();
+    }
+
+    .action-column {
+        width: $dashboard-mobile-action-column-width;
+
+        text-align: center;
+    }
+
+    .action-cell {
+        font-size: 0;
+
+        .btn-icon {
+            width: $dashboard-mobile-items-btn-size;
+            height: $dashboard-mobile-items-btn-size;
+
+            & + .btn-icon {
+                margin-#{$start}: $dashboard-mobile-items-btn-space;
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: $small-devices-media-breakpoint) {
+    .dashboard-widget-items {
+        .items-selector-widget {
+            width: 100%;
+            margin-#{$end}: 0;
+            margin-bottom: $content-padding-medium;
+
+            & + .btn-group + .btn-group {
+                float: $end;
+            }
+        }
+    }
+}

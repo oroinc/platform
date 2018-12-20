@@ -15,14 +15,14 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
             contentContainer: '.layout-content',
             template: _.template('<div>' +
                 '<div class="container-fluid page-title">' +
-                    '<div class="navigation clearfix navbar-extra navbar-extra-right">' +
+                    '<div class="navigation navbar-extra navbar-extra-right">' +
                         '<div class="row">' +
-                            '<div class="pull-left pull-left-extra">' +
-                                '<div class="clearfix customer-info well-small customer-simple">' +
-                                    '<div class="customer-content pull-left">' +
+                            '<div class="pull-left">' +
+                                '<div class="clearfix">' +
+                                    '<div class="page-title__path pull-left">' +
                                         '<div class="clearfix">' +
                                             '<div class="pull-left">' +
-                                                '<h1 class="user-name widget-title"><%- title %></h1>' +
+                                                '<h1 class="page-title__entity-title widget-title"><%- title %></h1>' +
                                             '</div>' +
                                         '</div>' +
                                     '</div>' +

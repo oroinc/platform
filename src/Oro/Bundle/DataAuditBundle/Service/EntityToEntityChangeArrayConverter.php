@@ -3,8 +3,12 @@ namespace Oro\Bundle\DataAuditBundle\Service;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMInvalidArgumentException;
 use Oro\Bundle\DataAuditBundle\Entity\AuditAdditionalFieldsInterface;
 
+/**
+ * This converter is intended to build an array contains changes made in of entity objects.
+ */
 class EntityToEntityChangeArrayConverter
 {
     /**
@@ -16,20 +20,25 @@ class EntityToEntityChangeArrayConverter
      */
     public function convertEntityToArray(EntityManagerInterface $em, $entity, array $changeSet)
     {
-        $entityClass = ClassUtils::getClass($entity);
-
-        $additionalFields = [];
-
-        if ($entity instanceof AuditAdditionalFieldsInterface && $entity->getAdditionalFields()) {
-            $additionalFields = $this->sanitizeAdditionalFields($em, $entity->getAdditionalFields());
+        $result = [
+            'entity_class' => ClassUtils::getClass($entity),
+            'entity_id' => $this->getEntityId($em, $entity)
+        ];
+        $sanitizedChangeSet = $this->sanitizeChangeSet($em, $changeSet);
+        if (!empty($sanitizedChangeSet)) {
+            $result['change_set'] = $sanitizedChangeSet;
+        }
+        if ($entity instanceof AuditAdditionalFieldsInterface) {
+            $additionalFields = $entity->getAdditionalFields();
+            if (!empty($additionalFields)) {
+                $additionalFields = $this->sanitizeAdditionalFields($em, $additionalFields);
+                if (!empty($additionalFields)) {
+                    $result['additional_fields'] = $additionalFields;
+                }
+            }
         }
 
-        return [
-            'entity_class' => $entityClass,
-            'entity_id' => $this->getEntityId($em, $entity),
-            'change_set' => $this->sanitizeChangeSet($em, $changeSet),
-            'additional_fields' => $additionalFields
-        ];
+        return $result;
     }
 
     /**
@@ -88,7 +97,7 @@ class EntityToEntityChangeArrayConverter
             foreach ($value as $key => $item) {
                 $sanitized[$key] = $this->convertFieldValue($em, $item);
             }
-        } elseif (is_object($value)) {
+        } elseif (!is_scalar($value)) {
             $sanitized = null;
         }
 
@@ -99,12 +108,17 @@ class EntityToEntityChangeArrayConverter
      * @param EntityManagerInterface $em
      * @param object $entity
      *
-     * @return int|string
+     * @return int|string|null
      */
     private function getEntityId(EntityManagerInterface $em, $entity)
     {
-        return $em->getClassMetadata(ClassUtils::getClass($entity))
-            ->getSingleIdReflectionProperty()
-            ->getValue($entity);
+        try {
+            return $em->getUnitOfWork()->getSingleIdentifierValue($entity);
+        } catch (ORMInvalidArgumentException $e) {
+            throw new \LogicException(sprintf(
+                'The entity "%s" has a composite identifier. The data audit does not support such identifiers.',
+                ClassUtils::getClass($entity)
+            ));
+        }
     }
 }

@@ -127,7 +127,7 @@ class TargetType extends AbstractType
         foreach ($entityIds as $entityId) {
             $className = $entityId->getClassName();
             $entityConfig = $this->configManager->getProvider('entity')->getConfig($className);
-            $choices[$className] = $entityConfig->get('label');
+            $choices[$entityConfig->get('label')] = $className;
         }
 
         return $choices;

@@ -163,6 +163,7 @@ class Loader
                 $fixture = $this->fixtures[$fixtureId];
                 if (0 === count($this->getUnsequencedFixtures($sequences, $fixture->getDependencies()))) {
                     $sequences[$fixtureId] = $sequence++;
+                    break;
                 }
             }
 
@@ -224,7 +225,7 @@ class Loader
      *
      * @return array
      */
-    private function getUnsequencedFixtures(array $sequences, $dependencies = null)
+    protected function getUnsequencedFixtures(array $sequences, $dependencies = null)
     {
         $unsequencedFixtures = [];
         if (null === $dependencies) {

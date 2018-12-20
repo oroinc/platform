@@ -1,0 +1,59 @@
+/* @theme: admin.oro; */
+
+$input-size: 40px;
+$input-width: 100%;
+$input-font-size: 16px;
+$input-inner-offset: 11px 12px 10px 12px;
+$input-appearance: none;
+
+$selector-min-width: 100%;
+$selector-inner-offset: 0;
+$selector-span-inner-offset: side-values(11px 24px 10px 12px);
+$selector-span-min-width: 100%;
+$selector-span-line-height: 1;
+$selector-span-height: $input-size;
+$selector-span-icon-top: 4px;
+$selector-span-icon-font-size: $base-font-size--l;
+
+$input-append-add-on-height: 40px;
+$input-append-add-on-width: 40px;
+$input-append-add-on-font-size: $base-font-size;
+$input-append-add-on-line-height: 36px;
+
+$controls-fields-row-input-small-width: calc(50% - 5px);
+
+$form-horizontal-max-width: 100%;
+$form-horizontal-control-group-max-width: none;
+$form-horizontal-control-group-display: block;
+
+$form-horizontal-control-label-width: auto;
+$form-horizontal-control-label-inner-offset-top: 0;
+$form-horizontal-control-label-inner-offset-bottom: 4px;
+$form-horizontal-control-label-inner-line-height: 1.25;
+
+$form-horizontal-controls-offset-left: 0;
+$form-horizontal-control-subgroup-offset-right: 8px;
+
+$form-horizontal-controls-control-group-checkbox-offset-top: 12px;
+$form-horizontal-controls-control-group-checkbox-label-inner-offset-bottom: 0;
+
+$control-group-checkbox-position: relative;
+$control-group-checkbox-display: inline-block;
+$control-group-checkbox-inner-offset-right: 16px;
+
+$control-group-checkbox-label-width: auto;
+$control-group-checkbox-label-offset-right: $content-padding-medium;
+$control-group-checkbox-label-line-height: 18px;
+
+$control-group-checkbox-controls-padding-top: 0;
+$control-group-checkbox-controls-position: absolute;
+$control-group-checkbox-controls-top: -3px;
+$control-group-checkbox-controls-right: 0;
+
+$control-select2-container-width: 100%;
+$control-select2-container-max-width: 100%;
+
+$user-fieldset-offset: 0 0 10px;
+$user-fieldset-line-height: .9;
+$well-offset-bottom: 7px;
+$well-tags-overlay-offset-bottom: 0;

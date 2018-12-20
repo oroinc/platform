@@ -126,10 +126,10 @@ class LocalizationSelectionType extends AbstractType
      */
     protected function checkLocalizations(array $localizations)
     {
-        foreach ($localizations as $id => $label) {
+        foreach ($localizations as $label => $id) {
             $localization = $this->localizationManager->getLocalization($id);
             if (!($localization instanceof Localization)) {
-                unset($localizations[$id]);
+                unset($localizations[$label]);
             }
         }
 

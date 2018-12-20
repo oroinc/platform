@@ -7,7 +7,7 @@ use Oro\Bundle\ImportExportBundle\Formatter\DateTimeTypeFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Translation\Translator;
 
-class DateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
+class DateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DateTimeTypeFormatter
@@ -16,11 +16,11 @@ class DateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject $localeSettings */
+        /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $localeSettings */
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->getMock();
-        /** @var Translator|\PHPUnit_Framework_MockObject_MockObject $translator */
+        /** @var Translator|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator      = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
@@ -28,7 +28,7 @@ class DateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testFormatTypeProvider
+     * @dataProvider formatTypeProvider
      * @param string          $value
      * @param string          $type
      * @param \Exception|null $exception
@@ -45,7 +45,7 @@ class DateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function testFormatTypeProvider()
+    public function formatTypeProvider()
     {
         $value = (new \DateTime())->format('d/m/Y H:i:s');
 

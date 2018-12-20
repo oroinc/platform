@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -14,6 +15,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Form type for number filters
+ */
 class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
 {
     const NAME = 'oro_type_number_filter';
@@ -25,11 +29,18 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
     protected $translator;
 
     /**
-     * @param TranslatorInterface $translator
+     * @var LocaleSettings
      */
-    public function __construct(TranslatorInterface $translator)
+    private $localeSettings;
+
+    /**
+     * @param TranslatorInterface $translator
+     * @param LocaleSettings $localeSettings
+     */
+    public function __construct(TranslatorInterface $translator, LocaleSettings $localeSettings)
     {
         $this->translator = $translator;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -83,18 +94,18 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $operatorChoices = array(
-            self::TYPE_EQUAL              => $this->translator->trans('oro.filter.form.label_type_equal'),
-            self::TYPE_NOT_EQUAL          => $this->translator->trans('oro.filter.form.label_type_not_equal'),
-            self::TYPE_GREATER_EQUAL      => $this->translator->trans('oro.filter.form.label_type_greater_equal'),
-            self::TYPE_GREATER_THAN       => $this->translator->trans('oro.filter.form.label_type_greater_than'),
-            self::TYPE_LESS_EQUAL         => $this->translator->trans('oro.filter.form.label_type_less_equal'),
-            self::TYPE_LESS_THAN          => $this->translator->trans('oro.filter.form.label_type_less_than'),
-            self::TYPE_IN                 => $this->translator->trans('oro.filter.form.label_type_in'),
-            self::TYPE_NOT_IN             => $this->translator->trans('oro.filter.form.label_type_not_in'),
-            FilterUtility::TYPE_EMPTY     => $this->translator->trans('oro.filter.form.label_type_empty'),
-            FilterUtility::TYPE_NOT_EMPTY => $this->translator->trans('oro.filter.form.label_type_not_empty'),
-        );
+        $operatorChoices = [
+            $this->translator->trans('oro.filter.form.label_type_equal') => self::TYPE_EQUAL,
+            $this->translator->trans('oro.filter.form.label_type_not_equal') => self::TYPE_NOT_EQUAL,
+            $this->translator->trans('oro.filter.form.label_type_greater_equal') => self::TYPE_GREATER_EQUAL,
+            $this->translator->trans('oro.filter.form.label_type_greater_than') => self::TYPE_GREATER_THAN,
+            $this->translator->trans('oro.filter.form.label_type_less_equal') => self::TYPE_LESS_EQUAL,
+            $this->translator->trans('oro.filter.form.label_type_less_than') => self::TYPE_LESS_THAN,
+            $this->translator->trans('oro.filter.form.label_type_in') => self::TYPE_IN,
+            $this->translator->trans('oro.filter.form.label_type_not_in') => self::TYPE_NOT_IN,
+            $this->translator->trans('oro.filter.form.label_type_empty') => FilterUtility::TYPE_EMPTY,
+            $this->translator->trans('oro.filter.form.label_type_not_empty') => FilterUtility::TYPE_NOT_EMPTY,
+        ];
 
         $resolver->setDefaults(
             array(
@@ -136,7 +147,7 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
                 $formatterOptions['grouping'] = false;
         }
 
-        $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
+        $formatter = new \NumberFormatter($this->localeSettings->getLocale(), \NumberFormatter::DECIMAL);
 
         $formatterOptions['orderSeparator'] = $formatterOptions['grouping']
             ? $formatter->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL)

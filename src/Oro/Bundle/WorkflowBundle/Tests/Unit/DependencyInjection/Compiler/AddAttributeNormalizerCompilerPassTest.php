@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\AddAttributeNormalizerCompilerPass;
 use Symfony\Component\DependencyInjection\Reference;
 
-class AddAttributeNormalizerCompilerPassTest extends \PHPUnit_Framework_TestCase
+class AddAttributeNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcess()
     {

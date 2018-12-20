@@ -18,14 +18,14 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $processorBag;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
+    private $processorBag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $errorCompleter;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ErrorCompleterInterface */
+    private $errorCompleter;
 
     /** @var ProcessIncludedEntities */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -40,7 +40,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
             ->with($this->context->getRequestType())
             ->willReturn($this->errorCompleter);
 
-        $this->processor = new ProcessIncludedEntitiesStub(
+        $this->processor = new ProcessIncludedEntities(
             $this->processorBag,
             $errorCompleterRegistry
         );
@@ -77,12 +77,15 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext = new CreateContext($this->configProvider, $this->metadataProvider);
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
+        $expectedContext->setMasterRequest(false);
+        $expectedContext->setCorsRequest(false);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedContext->setIncludedEntities($includedEntities);
         $expectedContext->setClassName('Test\Class');
         $expectedContext->setId('id');
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
+        $expectedContext->skipFormValidation(true);
         $expectedContext->setLastGroup('transform_data');
         $expectedContext->setSoftErrorsHandling(true);
 
@@ -111,6 +114,8 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
+        $this->context->setMasterRequest(true);
+        $this->context->setCorsRequest(true);
         $this->context->getRequestHeaders()->set('header1', 'value1');
         $this->processor->process($this->context);
         self::assertFalse($actionContext->hasErrors());
@@ -139,6 +144,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setId('id');
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
+        $expectedContext->skipFormValidation(true);
         $expectedContext->setLastGroup('transform_data');
         $expectedContext->setSoftErrorsHandling(true);
 
@@ -193,12 +199,15 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext = new UpdateContext($this->configProvider, $this->metadataProvider);
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
+        $expectedContext->setMasterRequest(false);
+        $expectedContext->setCorsRequest(false);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedContext->setIncludedEntities($includedEntities);
         $expectedContext->setClassName('Test\Class');
         $expectedContext->setId('id');
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
+        $expectedContext->skipFormValidation(true);
         $expectedContext->setLastGroup('transform_data');
         $expectedContext->setSoftErrorsHandling(true);
 
@@ -227,6 +236,8 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
+        $this->context->setMasterRequest(true);
+        $this->context->setCorsRequest(true);
         $this->context->getRequestHeaders()->set('header1', 'value1');
         $this->processor->process($this->context);
         self::assertFalse($actionContext->hasErrors());
@@ -255,6 +266,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setId('id');
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
+        $expectedContext->skipFormValidation(true);
         $expectedContext->setLastGroup('transform_data');
         $expectedContext->setSoftErrorsHandling(true);
 

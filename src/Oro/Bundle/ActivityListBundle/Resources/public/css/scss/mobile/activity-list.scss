@@ -1,0 +1,125 @@
+/* @theme: admin.oro; */
+
+.activity-list-widget {
+    .grid-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .filter-box {
+        padding: 0;
+        width: 100%;
+        flex-grow: 1;
+    }
+
+    .filter-item {
+        margin-bottom: $activity-mobile-toolbar-item-offset;
+    }
+
+    .pagination {
+        margin: 0;
+    }
+
+    .accordion-group {
+        margin-bottom: 0;
+    }
+
+    .accordion-body {
+        padding-top: $activity-mobile-accordion-body-offset;
+    }
+
+    .actions-panel {
+        width: auto;
+    }
+
+    .activity-actions {
+        margin-#{$start}: 0;
+
+        .dropdown-toggle {
+            height: $activity-mobile-icon-size;
+            width: $activity-dropdown-toggle-size;
+
+            line-height: $activity-mobile-icon-size;
+        }
+    }
+
+    .accordion-heading {
+        flex-wrap: wrap;
+
+        padding-top: $activity-mobile-accordion-heading-offset;
+        padding-bottom: $activity-mobile-accordion-heading-offset;
+
+        .details {
+            margin: $activity-mobile-details-offset;
+        }
+
+        .extra-info {
+            order: 1;
+            width: 100%;
+        }
+
+        .message-item {
+            padding-#{$end}: 0;
+        }
+    }
+
+    .accordion-toggle {
+        background: transparent;
+
+        &:before {
+            margin: 0;
+        }
+    }
+
+    .accordion-icon {
+        padding-#{$start}: 0;
+        height: $activity-mobile-icon-size;
+
+        line-height: $activity-mobile-icon-size;
+    }
+
+    .comment {
+        .user {
+            display: block;
+        }
+    }
+
+    .activity-list {
+        .info {
+            padding: 0;
+        }
+    }
+}
+
+@include media-breakpoint-down(sm) {
+    .activity-list-widget {
+        .accordion-heading {
+            padding-#{$start}: 0;
+            padding-#{$end}: 0;
+
+            .details {
+                max-width: $activity-mobile-details-small-width;
+                min-width: $activity-mobile-details-small-width;
+            }
+        }
+    }
+
+    .activity-item-content {
+        padding: $activity-mobile-item-content-padding;
+    }
+
+    .activity-item-email-content {
+        padding: $activity-mobile-item-email-content-padding;
+    }
+}
+
+@include media-breakpoint-down(xs) {
+    .activity-list-widget {
+        .accordion-heading {
+            .details {
+                max-width: $activity-mobile-details-xs-width;
+                min-width: $activity-mobile-details-xs-width;
+            }
+        }
+    }
+}

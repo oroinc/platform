@@ -10,7 +10,6 @@ use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -70,11 +69,11 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
                 ->setOriginalUrl('example.com')
                 ->setDatagridName($datagrid);
 
-            $this->destinationPageResolver->expects($this->once())->method('getOriginalUrl')->willReturn('example.com');
+            $this->originalUrlProvider->expects($this->once())->method('getOriginalUrl')->willReturn('example.com');
 
             $buttons = [new StartTransitionButton($transition, $workflow, $buttonContext)];
         } else {
-            $this->destinationPageResolver->expects($this->never())->method('getOriginalUrl');
+            $this->originalUrlProvider->expects($this->never())->method('getOriginalUrl');
         }
 
         $this->assertEquals(
@@ -227,31 +226,31 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
         // for notstart transition
         $this->assertFalse($this->extension->supports($this->createTransitionButton(false, false)));
 
-        /** @var ButtonInterface|\PHPUnit_Framework_MockObject_MockObject $notTransitionButton */
+        /** @var ButtonInterface|\PHPUnit\Framework\MockObject\MockObject $notTransitionButton */
         $notTransitionButton = $this->createMock(ButtonInterface::class);
         // for not supported button
         $this->assertFalse($this->extension->supports($notTransitionButton));
     }
 
     /**
-     * @param TransitionManager|\PHPUnit_Framework_MockObject_MockObject $transitionManager
+     * @param TransitionManager|\PHPUnit\Framework\MockObject\MockObject $transitionManager
      * @param array $configuration
      * @param array $exclusiveRecordGroups
      *
-     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getWorkflow(
         TransitionManager $transitionManager,
         array $configuration = [],
         array $exclusiveRecordGroups = []
     ) {
-        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
         $workflow = $this->getMockBuilder(Workflow::class)
             ->setMethods(['getTransitionManager', 'getVariables'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject $definition */
+        /** @var WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject $definition */
         $definition = $this->createMock(WorkflowDefinition::class);
         $definition->expects($this->any())->method('getRelatedEntity')->willReturn(self::ENTITY_CLASS);
         $definition->expects($this->any())->method('getConfiguration')->willReturn($configuration);
@@ -272,7 +271,7 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
      */
     private function createTransitionButton($isAvailable = false, $isStart = true)
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->any())->method('isAvailable')->willReturn($isAvailable);
         $transition->expects($this->any())->method('isStart')->willReturn($isStart);

@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Model;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 
-class AclPermissionTest extends \PHPUnit_Framework_TestCase
+class AclPermissionTest extends \PHPUnit\Framework\TestCase
 {
     public function testAclPermission()
     {

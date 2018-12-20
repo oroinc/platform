@@ -7,7 +7,7 @@ use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType;
 use Oro\Component\Config\Common\ConfigObject;
 
-class ConfigObjectTest extends \PHPUnit_Framework_TestCase
+class ConfigObjectTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ConfigObjectType

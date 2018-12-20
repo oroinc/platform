@@ -108,11 +108,12 @@ define(function(require) {
             NumberRangeFilter.__super__._updateValueField.apply(this, arguments);
 
             var type = this.$(this.criteriaValueSelectors.type).val();
+            var filterEnd = this.$('.filter-separator, .filter-end');
 
             if (this.isApplicable(type)) {
-                this.$('.filter-separator, .filter-end').show();
+                filterEnd.show();
             } else {
-                this.$('.filter-separator, .filter-end').hide();
+                filterEnd.hide();
 
                 this.value.value_end = this.emptyValue.value_end;
                 this._setInputValue(this.criteriaValueSelectors.value_end, this.value.value_end);
@@ -236,15 +237,16 @@ define(function(require) {
          * @inheritDoc
          */
         _writeDOMValue: function(data) {
-            var valueEnd = _.isString(data.value_end) ? this.formatter.toRaw(data.value_end) : data.value_end;
-            this._setInputValue(this.criteriaValueSelectors.value_end, valueEnd);
+            NumberRangeFilter.__super__._writeDOMValue.apply(this, arguments);
+
+            this._setInputValue(this.criteriaValueSelectors.value_end, data.value_end);
             var $typeInput = this.$(this.criteriaValueSelectors.type);
             if ($typeInput.length && data.type !== $typeInput.val()) {
                 this._setInputValue(this.criteriaValueSelectors.type, data.type);
                 this._updateTypeDropdown(data.type);
             }
 
-            return NumberRangeFilter.__super__._writeDOMValue.apply(this, arguments);
+            return this;
         },
 
         /**
@@ -265,7 +267,7 @@ define(function(require) {
             var parentDiv = a.parent().parent().parent();
             var choiceName = a.html();
             choiceName += this.caret;
-            parentDiv.find('.dropdown-toggle').html(choiceName);
+            parentDiv.find('[data-toggle="dropdown"]').html(choiceName);
         },
 
         /**

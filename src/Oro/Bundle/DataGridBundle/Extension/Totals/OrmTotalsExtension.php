@@ -15,7 +15,6 @@ use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -286,8 +285,7 @@ class OrmTotalsExtension extends AbstractExtension
      */
     protected function getData(ResultsObject $pageData, $columnsConfig, $perPage = false, $skipAclWalkerCheck = false)
     {
-        // todo: Need refactor this method. If query has not order by part and doesn't have id's in select, result
-        //       can be unexpected
+        // this method requires refactoring, see BAP-17427 for details
         $totalQueries = [];
         foreach ($columnsConfig as $field => $totalData) {
             if (isset($totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY])
@@ -342,7 +340,7 @@ class OrmTotalsExtension extends AbstractExtension
             $data = $pageData->getData();
         }
         foreach ($rootIdentifiers as $identifier) {
-            $ids = ArrayUtil::arrayColumn($data, $identifier['alias']);
+            $ids = \array_column($data, $identifier['alias']);
 
             $field = isset($identifier['entityAlias'])
                 ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']

@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Form\Type\EntityType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -21,10 +22,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * Class ConfigEntityGridController
+ * ConfigEntityGrid controller
  * @package Oro\Bundle\EntityExtendBundle\Controller
  * @Route("/entity/extend/entity")
- * TODO: Discuss ACL impl., currently acl is disabled
+ * BAP-17635 Discuss ACL impl., currently acl is disabled
  * @AclAncestor("oro_entityconfig_manage")
  */
 class ConfigEntityGridController extends Controller
@@ -65,7 +66,7 @@ class ConfigEntityGridController extends Controller
         if ($request->getMethod() == 'POST') {
             $form->handleRequest($request);
 
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $entityConfig->set('unique_key', $form->getData());
                 $configManager = $entityProvider->getConfigManager();
                 $configManager->persist($entityConfig);
@@ -136,7 +137,7 @@ class ConfigEntityGridController extends Controller
         $cloneEntityModel->setClassName('');
         $form->add(
             'model',
-            'oro_entity_extend_entity_type',
+            EntityType::class,
             array(
                 'data' => $cloneEntityModel,
             )
@@ -145,7 +146,7 @@ class ConfigEntityGridController extends Controller
         if ($request->getMethod() == 'POST') {
             $form->handleRequest($request);
 
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 //persist data inside the form
                 $this->get('session')->getFlashBag()->add(
                     'success',

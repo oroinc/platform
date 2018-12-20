@@ -1,0 +1,227 @@
+/* @theme: admin.oro; */
+
+.grid-main-container {
+    display: table;
+    width: 100%;
+    max-width: 100%;
+
+    font-size: $oro-datagrid-font-size;
+
+    border-collapse: collapse;
+    border-spacing: 0;
+
+    overflow: hidden;
+}
+
+.grid-scrollable-container {
+    margin: 0;
+    padding: 0;
+
+    overflow: auto;
+}
+
+.grid-header,
+.grid-footer {
+    text-transform: uppercase;
+    font-size: $oro-datagrid-header-font-size;
+
+    .caret {
+        position: relative;
+
+        display: none;
+        height: $oro-datagrid-caret-size * 2;
+        margin-#{$start}: $oro-datagrid-caret-size;
+
+        border: none;
+        border-right: $oro-datagrid-caret-size solid transparent;
+        border-left: $oro-datagrid-caret-size solid transparent;
+    }
+
+    .ascending {
+        .caret {
+            display: inline-block;
+            top: $oro-datagrid-caret-ascending-offset;
+
+            border-top: $oro-datagrid-caret-size solid transparent;
+            border-bottom: $oro-datagrid-caret-size solid transparent;
+            border-bottom-color: inherit;
+        }
+    }
+
+    .descending {
+        .caret {
+            display: inline-block;
+            top: $oro-datagrid-caret-descending-offset;
+
+            border-bottom: $oro-datagrid-caret-size solid transparent;
+            border-top: $oro-datagrid-caret-size solid transparent;
+            border-top-color: inherit;
+        }
+    }
+}
+
+.grid-header.thead-sizing {
+    display: none;
+}
+
+.grid-body {
+    color: $oro-datagrid-body-color;
+}
+
+.grid-cell {
+    display: table-cell;
+
+    text-align: #{$start};
+}
+
+.grid-header-cell {
+    padding: $oro-datagrid-header-cell-inner-offset;
+
+    white-space: nowrap;
+
+    &__label,
+    &__link {
+        line-height: $oro-datagrid-label-line-height;
+
+        color: $oro-datagrid-label-color;
+
+        vertical-align: $oro-datagrid-label-align;
+    }
+
+    &:first-child {
+        border-top-#{$start}-radius: $oro-datagrid-header-cell-radius;
+        border-bottom-#{$start}-radius: $oro-datagrid-header-cell-radius;
+    }
+
+    &:last-child {
+        border-top-#{$end}-radius: $oro-datagrid-header-cell-radius;
+        border-bottom-#{$end}-radius: $oro-datagrid-header-cell-radius;
+    }
+}
+
+.grid-body-cell {
+    padding: $oro-datagrid-body-cell-inner-offset;
+
+    line-height: $oro-datagrid-body-cell-line-height;
+
+    border-bottom: $oro-datagrid-body-cell-border;
+
+    vertical-align: top;
+}
+
+.grid-body-cell-contexts {
+    padding: $oro-datagrid-body-cell-wide-inner-offset;
+}
+
+.grid-footer-cell {
+    padding: $oro-datagrid-footer-cell-inner-offset;
+
+    font-weight: $oro-datagrid-footer-cell-font-weight;
+
+    background-color: $oro-datagrid-footer-cell-background-color;
+    color: $oro-datagrid-footer-cell-color;
+
+    @at-root tr:first-child .grid-footer-cell {
+        padding-top: $oro-datagrid-footer-cell-outer-inner-offset;
+    }
+
+    @at-root tr:last-child .grid-footer-cell {
+        padding-bottom: $oro-datagrid-footer-cell-outer-inner-offset;
+    }
+
+    &.number-cell,
+    &.integer-cell {
+        font-size: $oro-datagrid-footer-cell-numeric-font-size;
+    }
+}
+
+.grid-header-cell {
+    background-color: $oro-datagrid-header-background;
+}
+
+.grid-header-cell,
+.grid-body-cell,
+.grid-footer-cell {
+    &:first-of-type {
+        padding-#{$start}: $oro-grid-first-cell-offset;
+    }
+}
+
+.grid-row {
+    &.row-selected {
+        background-color: $oro-datagrid-row-selected;
+
+        &:hover {
+            background-color: $oro-datagrid-row-selected;
+        }
+    }
+
+    &.row-edit-mode,
+    &:hover {
+        background-color: $oro-datagrid-cell-background-hover;
+    }
+}
+
+.header-cell-highlight {
+    background: $oro-datagrid-header-cell-highlight;
+}
+
+.string-cell,
+.uri-cell,
+.email-cell,
+.select-cell,
+.date-cell,
+.time-cell,
+.datetime-cell,
+.boolean-cell {
+    text-align: #{$start};
+}
+
+.number-cell,
+.integer-cell {
+    text-align: #{$end};
+
+    &:first-child {
+        text-align: #{$start};
+    }
+
+    &:not(:first-child) {
+        .grid-header-cell__label {
+            margin-#{$start}: auto;
+        }
+    }
+}
+
+.date-cell {
+    white-space: nowrap;
+}
+
+.multi-select-cell,
+.multi-relation-cell {
+    .value-item {
+        &:after {
+            content: ', ';
+        }
+
+        &:last-child:after {
+            content: '';
+        }
+    }
+}
+
+.ascending,
+.descending {
+    .grid-header-cell__link,
+    .grid-header-cell__label {
+        color: $oro-datagrid-label-active-color;
+    }
+}
+
+@media print {
+    .select-all-header-cell,
+    .select-row-cell,
+    .action-column,
+    .action-cell {
+        display: none;
+    }
+}

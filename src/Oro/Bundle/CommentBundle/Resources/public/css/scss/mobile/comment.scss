@@ -1,0 +1,28 @@
+/* @theme: admin.oro; */
+
+.comments-block {
+    .comment-content {
+        max-width: calc(100% - 50px);
+    }
+
+    .comment-attachments {
+        @media only screen and (max-width: 500px) {
+            display: none; // hide thumbnails on mobile
+        }
+
+        .link-to-record {
+            .dropdown-menu {
+                @media only screen and (max-width: 500px) {
+                    .view-image {
+                        display: block;
+                    }
+                }
+            }
+        }
+    }
+
+    .comment-actions__trigger {
+        height: $comments-comment-action-height;
+        width: $comments-comment-action-size;
+    }
+}

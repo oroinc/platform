@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Form\Extension;
 
-use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
@@ -11,23 +11,35 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Initializes the form builder by adding all options required to handle
+ * all types of form related events dispatched in "customize_form_data" action,
+ * and registers handlers for all the events, except "pre_validate" and "post_validate".
+ * The "pre_validate" and "post_validate" events are processed by FormValidationHandler,
+ * because the deferred validation is used in Data API.
+ * @see \Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
+ * @see \Oro\Bundle\ApiBundle\Form\FormValidationHandler
+ */
 class CustomizeFormDataExtension extends AbstractTypeExtension
 {
-    const API_CONTEXT       = 'api_context';
-    const API_EVENT_CONTEXT = 'api_event_context';
-
     /** @var ActionProcessorInterface */
-    protected $customizationProcessor;
+    private $customizationProcessor;
+
+    /** @var CustomizeFormDataHandler */
+    private $customizationHandler;
 
     /**
      * @param ActionProcessorInterface $customizationProcessor
+     * @param CustomizeFormDataHandler $customizationHandler
      */
-    public function __construct(ActionProcessorInterface $customizationProcessor)
-    {
+    public function __construct(
+        ActionProcessorInterface $customizationProcessor,
+        CustomizeFormDataHandler $customizationHandler
+    ) {
         $this->customizationProcessor = $customizationProcessor;
+        $this->customizationHandler = $customizationHandler;
     }
 
     /**
@@ -39,8 +51,11 @@ class CustomizeFormDataExtension extends AbstractTypeExtension
             return;
         }
 
-        if (array_key_exists(self::API_CONTEXT, $options)) {
-            $builder->setAttribute(self::API_CONTEXT, $options[self::API_CONTEXT]);
+        if (\array_key_exists(CustomizeFormDataHandler::API_CONTEXT, $options)) {
+            $builder->setAttribute(
+                CustomizeFormDataHandler::API_CONTEXT,
+                $options[CustomizeFormDataHandler::API_CONTEXT]
+            );
         }
 
         $this->addEventListeners($builder);
@@ -52,8 +67,8 @@ class CustomizeFormDataExtension extends AbstractTypeExtension
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setDefined([self::API_CONTEXT])
-            ->setAllowedTypes(self::API_CONTEXT, ['null', FormContext::class]);
+            ->setDefined([CustomizeFormDataHandler::API_CONTEXT])
+            ->setAllowedTypes(CustomizeFormDataHandler::API_CONTEXT, ['null', FormContext::class]);
     }
 
     /**
@@ -67,10 +82,10 @@ class CustomizeFormDataExtension extends AbstractTypeExtension
     /**
      * @param FormBuilderInterface $builder
      */
-    protected function addEventListeners(FormBuilderInterface $builder)
+    private function addEventListeners(FormBuilderInterface $builder): void
     {
         // the same context object is used for all listeners to allow sharing the data between them
-        $builder->setAttribute(self::API_EVENT_CONTEXT, $this->customizationProcessor->createContext());
+        $builder->setAttribute(CustomizeFormDataHandler::API_EVENT_CONTEXT, $this->createContext());
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
@@ -99,13 +114,14 @@ class CustomizeFormDataExtension extends AbstractTypeExtension
             },
             255 // this listener should be executed before all other listeners, including the validation one
         );
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            function (FormEvent $event) {
-                $this->handleFormEvent(CustomizeFormDataContext::EVENT_FINISH_SUBMIT, $event);
-            },
-            -255 // this listener should be executed after all other listeners, including the validation one
-        );
+    }
+
+    /**
+     * @return CustomizeFormDataContext
+     */
+    private function createContext(): CustomizeFormDataContext
+    {
+        return $this->customizationProcessor->createContext();
     }
 
     /**
@@ -114,72 +130,8 @@ class CustomizeFormDataExtension extends AbstractTypeExtension
      *
      * @return CustomizeFormDataContext|null
      */
-    protected function handleFormEvent($eventName, FormEvent $event)
+    private function handleFormEvent(string $eventName, FormEvent $event): ?CustomizeFormDataContext
     {
-        $context = $this->getInitializedContext($event->getForm());
-        if (null !== $context) {
-            $context->setEvent($eventName);
-            $context->setData($event->getData());
-            $this->customizationProcessor->process($context);
-        }
-
-        return $context;
-    }
-
-    /**
-     * @param FormInterface $form
-     *
-     * @return CustomizeFormDataContext|null
-     */
-    protected function getInitializedContext(FormInterface $form)
-    {
-        /** @var CustomizeFormDataContext $context */
-        $context = $form->getConfig()->getAttribute(self::API_EVENT_CONTEXT);
-        if ($context->has(CustomizeFormDataContext::CLASS_NAME)) {
-            // already initialized
-            return $context;
-        }
-
-        $rootFormConfig = $form->getRoot()->getConfig();
-        if (!$rootFormConfig->hasAttribute(self::API_CONTEXT)) {
-            // by some reasons the root form does not have the context of API action
-            return null;
-        }
-
-        /** @var FormContext $formContext */
-        $formContext = $rootFormConfig->getAttribute(self::API_CONTEXT);
-        $context->setVersion($formContext->getVersion());
-        $context->getRequestType()->set($formContext->getRequestType());
-        $context->setConfig($formContext->getConfig());
-        $context->setClassName($form->getConfig()->getDataClass());
-        $context->setForm($form);
-        if (null !== $form->getParent()) {
-            $context->setRootClassName($rootFormConfig->getDataClass());
-            $context->setPropertyPath($this->getPropertyPath($form));
-        }
-
-        return $context;
-    }
-
-    /**
-     * @param FormInterface $form
-     *
-     * @return string
-     */
-    protected function getPropertyPath(FormInterface $form)
-    {
-        $path = [];
-        while (null !== $form->getParent()->getParent()) {
-            if (!$form->getData() instanceof Collection) {
-                if ($form->getParent()->getData() instanceof Collection) {
-                    $path[] = $form->getParent()->getName();
-                } else {
-                    $path[] = $form->getName();
-                }
-            }
-            $form = $form->getParent();
-        }
-
-        return implode('.', array_reverse($path));
+        return $this->customizationHandler->handleFormEvent($eventName, $event);
     }
 }

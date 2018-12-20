@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -13,11 +14,20 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Sets default sorting for different kind of requests.
- * The sort filter name is "sort", the default sorting expression is "identifier field ASC".
+ * The default sorting expression is "identifier field ASC".
  */
 class SetDefaultSorting implements ProcessorInterface
 {
-    private const SORT_FILTER_KEY = 'sort';
+    /** @var FilterNamesRegistry */
+    private $filterNamesRegistry;
+
+    /**
+     * @param FilterNamesRegistry $filterNamesRegistry
+     */
+    public function __construct(FilterNamesRegistry $filterNamesRegistry)
+    {
+        $this->filterNamesRegistry = $filterNamesRegistry;
+    }
 
     /**
      * {@inheritdoc}
@@ -32,21 +42,28 @@ class SetDefaultSorting implements ProcessorInterface
         }
 
         $config = $context->getConfig();
-        if ($config->isSortingEnabled()) {
-            $this->addSortFilter($context->getFilters(), $config);
+        if (null !== $config && $config->isSortingEnabled()) {
+            $this->addSortFilter(
+                $this->filterNamesRegistry->getFilterNames($context->getRequestType())->getSortFilterName(),
+                $context->getFilters(),
+                $config
+            );
         }
     }
 
     /**
+     * @param string                 $filterName
      * @param FilterCollection       $filters
      * @param EntityDefinitionConfig $config
      */
-    protected function addSortFilter(FilterCollection $filters, EntityDefinitionConfig $config): void
-    {
-        $sortFilterKey = $this->getSortFilterKey();
-        if (!$filters->has($sortFilterKey)) {
+    protected function addSortFilter(
+        string $filterName,
+        FilterCollection $filters,
+        EntityDefinitionConfig $config
+    ): void {
+        if (!$filters->has($filterName)) {
             $filters->add(
-                $sortFilterKey,
+                $filterName,
                 new SortFilter(
                     DataType::ORDER_BY,
                     $this->getSortFilterDescription(),
@@ -64,14 +81,6 @@ class SetDefaultSorting implements ProcessorInterface
     /**
      * @return string
      */
-    protected function getSortFilterKey(): string
-    {
-        return self::SORT_FILTER_KEY;
-    }
-
-    /**
-     * @return string
-     */
     protected function getSortFilterDescription(): string
     {
         return 'Result sorting. Comma-separated fields, e.g. \'field1,-field2\'.';
@@ -84,18 +93,18 @@ class SetDefaultSorting implements ProcessorInterface
      */
     protected function getDefaultValue(EntityDefinitionConfig $config): array
     {
-        $idFieldNames = $config->getIdentifierFieldNames();
-        if (empty($idFieldNames)) {
-            return [];
-        }
-
-        $orderBy = [];
-        foreach ($idFieldNames as $fieldName) {
-            $field = $config->getField($fieldName);
-            if (null !== $field) {
-                $fieldName = $field->getPropertyPath($fieldName);
+        $orderBy = $config->getOrderBy();
+        if (empty($orderBy)) {
+            $idFieldNames = $config->getIdentifierFieldNames();
+            if (!empty($idFieldNames)) {
+                foreach ($idFieldNames as $fieldName) {
+                    $field = $config->getField($fieldName);
+                    if (null !== $field) {
+                        $fieldName = $field->getPropertyPath($fieldName);
+                    }
+                    $orderBy[$fieldName] = Criteria::ASC;
+                }
             }
-            $orderBy[$fieldName] = Criteria::ASC;
         }
 
         return $orderBy;

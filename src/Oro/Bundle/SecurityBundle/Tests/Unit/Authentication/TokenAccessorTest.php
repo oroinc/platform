@@ -9,9 +9,9 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class TokenAccessorTest extends \PHPUnit_Framework_TestCase
+class TokenAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
     /** @var TokenAccessor */

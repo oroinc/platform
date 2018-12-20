@@ -5,7 +5,7 @@ use Oro\Bundle\AddressBundle\Form\Type\CountryType;
 use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CountryTypeTest extends \PHPUnit_Framework_TestCase
+class CountryTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CountryType

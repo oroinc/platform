@@ -9,12 +9,12 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-class WorkflowDeactivationHelperTest extends \PHPUnit_Framework_TestCase
+class WorkflowDeactivationHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowRegistry;
 
-    /** @var WorkflowTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $translationHelper;
 
     /** @var WorkflowDeactivationHelper */
@@ -102,7 +102,7 @@ class WorkflowDeactivationHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $name
      * @param array $exclusiveActiveGroups
-     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getWorkflow($name, array $exclusiveActiveGroups = [])
     {

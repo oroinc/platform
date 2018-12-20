@@ -6,7 +6,7 @@ use Oro\Bundle\ActionBundle\Helper\DocCommentParser;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2;
 
-class DocCommentParserTest extends \PHPUnit_Framework_TestCase
+class DocCommentParserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DocCommentParser */
     protected $parser;

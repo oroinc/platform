@@ -37,8 +37,8 @@ class WidgetSortByType extends AbstractType
             ->add('order', ChoiceType::class, [
                 'label' => false,
                 'choices' => [
-                    'ASC' => 'oro.dashboard.widget.sort_by.order.asc.label',
-                    'DESC' => 'oro.dashboard.widget.sort_by.order.desc.label',
+                    'oro.dashboard.widget.sort_by.order.asc.label' => 'ASC',
+                    'oro.dashboard.widget.sort_by.order.desc.label' => 'DESC',
                 ],
             ])
             ->add('className', HiddenType::class, ['data' => $options['class_name']]);
@@ -87,7 +87,7 @@ class WidgetSortByType extends AbstractType
         //@TODO change logic of grabbing choices. They should grab from datagrid config
         $fields = $this->fieldProvider->getFields($className);
         foreach ($fields as $field) {
-            $choices[$field['name']] = $field['label'];
+            $choices[$field['label']] = $field['name'];
         }
 
         return $choices;

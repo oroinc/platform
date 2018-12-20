@@ -5,7 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Layout\DataProvider;
 use Oro\Bundle\NavigationBundle\Layout\DataProvider\BreadcrumbProvider;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 
-class BreadcrumbProviderTest extends \PHPUnit_Framework_TestCase
+class BreadcrumbProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var BreadcrumbProvider
@@ -13,7 +13,7 @@ class BreadcrumbProviderTest extends \PHPUnit_Framework_TestCase
     private $provider;
 
     /**
-     * @var BreadcrumbManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var BreadcrumbManagerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $breadcrumbManager;
 

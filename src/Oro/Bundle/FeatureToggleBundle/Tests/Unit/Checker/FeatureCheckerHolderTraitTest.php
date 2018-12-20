@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Cache;
+namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Checker;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 
-class FeatureCheckerHolderTraitTest extends \PHPUnit_Framework_TestCase
+class FeatureCheckerHolderTraitTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider isFeatureEnabledDataProvider
@@ -13,7 +13,7 @@ class FeatureCheckerHolderTraitTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsFeatureEnabled($expectedStatus)
     {
-        /** @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject $checkerMock */
+        /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject $checkerMock */
         $checkerMock = $this->getMockBuilder(FeatureChecker::class)
             ->disableOriginalConstructor()
             ->getMock();

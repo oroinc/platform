@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * An instance of this class can be added to the config extras of the Context
+ * An instance of this class can be added to the config extras of the context
  * to request a general entity information including information about fields.
  */
 class EntityDefinitionConfigExtra implements ConfigExtraInterface
@@ -27,8 +27,8 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
 
     /**
      * @param string|null $action          The name of the action for which the configuration is requested
-     * @param bool        $collection      A flag indicates Whether a configuration is requested
-     *                                     for a list of entities resource or a single entity  resource
+     * @param bool        $collection      A flag indicates whether a configuration is requested
+     *                                     for a list of entities resource or a single entity resource
      * @param string|null $parentClassName The class name of the parent entity
      *                                     for which the configuration is requested
      * @param string|null $associationName The association name of a sub-resource

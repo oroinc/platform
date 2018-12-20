@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerAssemblerInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler;
 
-class WorkflowTransitionTriggersAssemblerTest extends \PHPUnit_Framework_TestCase
+class WorkflowTransitionTriggersAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     public function testAssembler()
     {

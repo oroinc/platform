@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 
-class EmailAttachmentsTypeTest extends \PHPUnit_Framework_TestCase
+class EmailAttachmentsTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailAttachmentsType
@@ -19,11 +19,6 @@ class EmailAttachmentsTypeTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->emailAttachmentsType = new EmailAttachmentsType();
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_email_attachments', $this->emailAttachmentsType->getName());
     }
 
     public function testGetParent()

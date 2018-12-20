@@ -20,7 +20,7 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
     /** @var AttributeMultiSelectType */
     private $formType;
 
-    /** @var AttributeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $managerMock;
 
     protected function setUp()
@@ -105,11 +105,6 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
 
         $locked = call_user_func($result['choice_attr'], 777);
         $this->assertEquals(['locked' => 'locked'], $locked);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(AttributeMultiSelectType::NAME, $this->formType->getName());
     }
 
     public function testGetParent()

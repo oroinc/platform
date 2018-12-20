@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ProcessorRegistryCompilerPass;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ProcessorRegistryCompilerPassTest extends \PHPUnit_Framework_TestCase
+class ProcessorRegistryCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ProcessorRegistryCompilerPass

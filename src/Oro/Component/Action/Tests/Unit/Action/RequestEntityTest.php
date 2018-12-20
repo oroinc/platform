@@ -9,7 +9,7 @@ use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class RequestEntityTest extends \PHPUnit_Framework_TestCase
+class RequestEntityTest extends \PHPUnit\Framework\TestCase
 {
     const PROPERTY_PATH_VALUE = 'property_path_value';
 
@@ -24,7 +24,7 @@ class RequestEntityTest extends \PHPUnit_Framework_TestCase
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
      */
     protected $registry;
 

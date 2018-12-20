@@ -1,0 +1,41 @@
+/* @theme: admin.demo; */
+
+.app-header {
+    &__search-and-shortcuts {
+        .dropdown {
+            &.header-dropdown-search {
+                .dropdown-menu {
+                    background-color: $header-search-dropdown-menu-background;
+                }
+
+                .search-form {
+                    .header-search {
+                        .search-suggestion-list {
+                            background-color: $header-search-dropdown-menu-background;
+
+                            li {
+                                border-top-color: $header-search-suggestion-list-separator-color;
+                            }
+
+                            .description {
+                                color: $header-search-suggestion-item-description-color;
+                            }
+
+                            .entity-label {
+                                color: $header-search-suggestion-item-entity-color;
+                            }
+
+                            li.selected {
+                                background-color: $header-search-selected-suggestion-item-bg;
+
+                                .description, .entity-label {
+                                    color: $header-search-selected-suggestion-item-color;
+                                }
+                            }
+                        }
+                    } // Ends .header-search
+                } // Ends .search-form
+            } // Ends &:.header-dropdown-search
+        } // Ends .dropdown
+    } // Ends .top-search
+}

@@ -74,7 +74,6 @@ class OroDurationType extends AbstractType
         $resolver->setDefaults(
             [
                 'tooltip' => 'oro.form.oro_duration.tooltip',
-                'type' => 'text',
                 'validation_groups' => false, // disable frontend validators, we validate before submit
             ]
         );

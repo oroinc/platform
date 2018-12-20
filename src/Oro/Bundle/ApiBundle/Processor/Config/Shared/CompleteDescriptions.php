@@ -146,7 +146,11 @@ class CompleteDescriptions implements ProcessorInterface
         $associationName,
         $parentEntityClass
     ) {
-        $entityDescription = false;
+        if (!$definition->hasIdentifierDescription()) {
+            $definition->setIdentifierDescription(self::ID_DESCRIPTION);
+        }
+
+        $entityDescription = null;
         if ($definition->hasDescription()) {
             $description = $definition->getDescription();
             if ($description instanceof Label) {
@@ -180,7 +184,7 @@ class CompleteDescriptions implements ProcessorInterface
      * @param bool                   $isCollection
      * @param string                 $associationName
      * @param string                 $parentEntityClass
-     * @param string|bool|null       $entityDescription
+     * @param string|null            $entityDescription
      */
     private function setDocumentationForEntity(
         EntityDefinitionConfig $definition,
@@ -204,18 +208,16 @@ class CompleteDescriptions implements ProcessorInterface
         $processInheritDoc = !$associationName;
         if (!$definition->hasDocumentation()) {
             if ($associationName) {
-                if (false === $entityDescription) {
+                if (!$entityDescription) {
                     $entityDescription = $this->getAssociationDescription($associationName);
                 }
                 $this->setDocumentationForSubresource($definition, $entityDescription, $targetAction, $isCollection);
             } else {
                 $processInheritDoc = false;
-                if (false === $entityDescription) {
+                if (!$entityDescription) {
                     $entityDescription = $this->getEntityDescription($entityClass, $isCollection);
                 }
-                if ($entityDescription) {
-                    $this->setDocumentationForResource($definition, $targetAction, $entityDescription);
-                }
+                $this->setDocumentationForResource($definition, $targetAction, $entityDescription);
             }
         }
         if ($processInheritDoc) {
@@ -292,18 +294,16 @@ class CompleteDescriptions implements ProcessorInterface
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $targetAction
-     * @param string|null            $entityDescription
+     * @param string            $entityDescription
      */
     private function setDescriptionForResource(
         EntityDefinitionConfig $definition,
         $targetAction,
         $entityDescription
     ) {
-        if ($entityDescription) {
-            $description = $this->resourceDocProvider->getResourceDescription($targetAction, $entityDescription);
-            if ($description) {
-                $definition->setDescription($description);
-            }
+        $description = $this->resourceDocProvider->getResourceDescription($targetAction, $entityDescription);
+        if ($description) {
+            $definition->setDescription($description);
         }
     }
 
@@ -540,14 +540,17 @@ class CompleteDescriptions implements ProcessorInterface
             if (!$field->hasDescription()) {
                 $description = $resourceDocParser->getFilterDocumentation($entityClass, $fieldName);
                 if ($description) {
+                    if (InheritDocUtil::hasInheritDoc($description)) {
+                        $description = InheritDocUtil::replaceInheritDoc(
+                            $description,
+                            $this->getFilterDefaultDescription($fieldName, $definition->getField($fieldName))
+                        );
+                    }
                     $field->setDescription($description);
                 } else {
-                    $fieldConfig = $definition->getField($fieldName);
-                    if (null !== $fieldConfig && $fieldConfig->hasTargetEntity()) {
-                        $field->setDescription(\sprintf(self::ASSOCIATION_FILTER_DESCRIPTION, $fieldName));
-                    } else {
-                        $field->setDescription(\sprintf(self::FIELD_FILTER_DESCRIPTION, $fieldName));
-                    }
+                    $field->setDescription(
+                        $this->getFilterDefaultDescription($fieldName, $definition->getField($fieldName))
+                    );
                 }
             } else {
                 $description = $field->getDescription();
@@ -564,18 +567,39 @@ class CompleteDescriptions implements ProcessorInterface
     }
 
     /**
+     * @param string                           $fieldName
+     * @param EntityDefinitionFieldConfig|null $fieldConfig
+     *
+     * @return string
+     */
+    private function getFilterDefaultDescription(string $fieldName, ?EntityDefinitionFieldConfig $fieldConfig): string
+    {
+        if (null !== $fieldConfig && $fieldConfig->hasTargetEntity()) {
+            return \sprintf(self::ASSOCIATION_FILTER_DESCRIPTION, $fieldName);
+        }
+
+        return \sprintf(self::FIELD_FILTER_DESCRIPTION, $fieldName);
+    }
+
+    /**
      * @param string $entityClass
      * @param bool   $isCollection
      *
-     * @return string|null
+     * @return string
      */
     private function getEntityDescription($entityClass, $isCollection)
     {
-        if ($isCollection) {
-            return $this->entityDocProvider->getEntityPluralDescription($entityClass);
+        $entityDescription = $isCollection
+            ? $this->entityDocProvider->getEntityPluralDescription($entityClass)
+            : $this->entityDocProvider->getEntityDescription($entityClass);
+        if (!$entityDescription) {
+            $lastDelimiter = \strrpos($entityClass, '\\');
+            $entityDescription = false === $lastDelimiter
+                ? $entityClass
+                : \substr($entityClass, $lastDelimiter + 1);
         }
 
-        return $this->entityDocProvider->getEntityDescription($entityClass);
+        return $entityDescription;
     }
 
     /**

@@ -6,17 +6,17 @@ namespace Oro\Component\EntitySerializer;
  * This class is used by EntitySerializer instead of EntityConfig
  * and allows caching intermediate data related to an entity.
  */
-class InternalEntityConfig extends EntityConfig
+final class InternalEntityConfig extends EntityConfig
 {
     /** @var array */
-    protected $cache = [];
+    private $cache = [];
 
     /**
      * {@inheritdoc}
      */
     public function toArray()
     {
-        return array_merge(parent::toArray(), $this->cache);
+        return \array_merge(parent::toArray(), $this->cache);
     }
 
     /**
@@ -24,19 +24,19 @@ class InternalEntityConfig extends EntityConfig
      */
     public function has($key)
     {
-        return array_key_exists($key, $this->cache) || parent::has($key);
+        return \array_key_exists($key, $this->cache) || parent::has($key);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get($key)
+    public function get($key, $defaultValue = null)
     {
-        if (array_key_exists($key, $this->cache)) {
+        if (\array_key_exists($key, $this->cache)) {
             return $this->cache[$key];
         }
 
-        return parent::get($key);
+        return parent::get($key, $defaultValue);
     }
 
     /**

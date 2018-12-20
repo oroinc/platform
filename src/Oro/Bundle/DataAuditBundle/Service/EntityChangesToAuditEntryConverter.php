@@ -12,6 +12,11 @@ use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
 
+/**
+ * This converter is intended to add the data audit records to the database
+ * based on a list of entity changes.
+ * @see \Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener
+ */
 class EntityChangesToAuditEntryConverter
 {
     /** @var ManagerRegistry */
@@ -29,7 +34,10 @@ class EntityChangesToAuditEntryConverter
     /** @var SetNewAuditVersionService */
     private $setNewAuditVersionService;
 
-    /** @var ChangeSetToAuditFieldsConverter */
+    /** @var AuditRecordValidator */
+    private $auditRecordValidator;
+
+    /** @var ChangeSetToAuditFieldsConverterInterface */
     private $changeSetToAuditFieldsConverter;
 
     /**
@@ -41,12 +49,13 @@ class EntityChangesToAuditEntryConverter
     private $entityMetadataCache = [];
 
     /**
-     * @param ManagerRegistry                 $doctrine
-     * @param AuditEntityMapper               $auditEntityMapper
-     * @param AuditConfigProvider             $configProvider
-     * @param EntityNameProvider              $entityNameProvider
-     * @param SetNewAuditVersionService       $setNewAuditVersionService
-     * @param ChangeSetToAuditFieldsConverter $changeSetToAuditFieldsConverter
+     * @param ManagerRegistry                          $doctrine
+     * @param AuditEntityMapper                        $auditEntityMapper
+     * @param AuditConfigProvider                      $configProvider
+     * @param EntityNameProvider                       $entityNameProvider
+     * @param SetNewAuditVersionService                $setNewAuditVersionService
+     * @param AuditRecordValidator                     $auditRecordValidator
+     * @param ChangeSetToAuditFieldsConverterInterface $changeSetToAuditFieldsConverter
      */
     public function __construct(
         ManagerRegistry $doctrine,
@@ -54,13 +63,15 @@ class EntityChangesToAuditEntryConverter
         AuditConfigProvider $configProvider,
         EntityNameProvider $entityNameProvider,
         SetNewAuditVersionService $setNewAuditVersionService,
-        ChangeSetToAuditFieldsConverter $changeSetToAuditFieldsConverter
+        AuditRecordValidator $auditRecordValidator,
+        ChangeSetToAuditFieldsConverterInterface $changeSetToAuditFieldsConverter
     ) {
         $this->doctrine = $doctrine;
         $this->auditEntityMapper = $auditEntityMapper;
         $this->configProvider = $configProvider;
         $this->entityNameProvider = $entityNameProvider;
         $this->setNewAuditVersionService = $setNewAuditVersionService;
+        $this->auditRecordValidator = $auditRecordValidator;
         $this->changeSetToAuditFieldsConverter = $changeSetToAuditFieldsConverter;
     }
 
@@ -88,12 +99,16 @@ class EntityChangesToAuditEntryConverter
     ) {
         $needFlush = false;
         $auditEntryClass = $this->auditEntityMapper->getAuditEntryClass($this->getEntityByReference($user));
+        $auditFieldClass = $this->auditEntityMapper->getAuditEntryFieldClassForAuditEntry($auditEntryClass);
         /** @var EntityManagerInterface $auditEntityManager */
         $auditEntityManager = $this->doctrine->getManagerForClass($auditEntryClass);
         foreach ($entityChanges as $entityChange) {
+            if (!$this->auditRecordValidator->validateAuditRecord($entityChange, $auditDefaultAction)) {
+                continue;
+            }
+
             $entityClass = $entityChange['entity_class'];
             $entityId = $entityChange['entity_id'];
-
             if (!$this->configProvider->isAuditableEntity($entityClass)) {
                 continue;
             }
@@ -101,8 +116,9 @@ class EntityChangesToAuditEntryConverter
             $entityMetadata = $this->getEntityMetadata($entityClass);
             $fields = $this->changeSetToAuditFieldsConverter->convert(
                 $auditEntryClass,
+                $auditFieldClass,
                 $entityMetadata,
-                $entityChange['change_set']
+                $entityChange['change_set'] ?? []
             );
 
             if (empty($fields)) {
@@ -142,7 +158,7 @@ class EntityChangesToAuditEntryConverter
                 $needFlush = true;
             }
 
-            if (isset($entityChange['additional_fields']) && !empty($entityChange['additional_fields'])) {
+            if (!empty($entityChange['additional_fields'])) {
                 $auditEntry->setAdditionalFields($entityChange['additional_fields']);
                 $needFlush = true;
             }
@@ -179,6 +195,10 @@ class EntityChangesToAuditEntryConverter
         $auditEntityManager = $this->doctrine->getManagerForClass($auditEntryClass);
 
         foreach ($entityChanges as $entityChange) {
+            if (!$this->auditRecordValidator->validateAuditRecord($entityChange, $auditDefaultAction)) {
+                continue;
+            }
+
             $entityClass = $entityChange['entity_class'];
             $entityId = $entityChange['entity_id'];
             if (!$this->configProvider->isAuditableEntity($entityClass)) {
@@ -198,7 +218,7 @@ class EntityChangesToAuditEntryConverter
                 $auditDefaultAction
             );
 
-            if (isset($entityChange['additional_fields']) && !empty($entityChange['additional_fields'])) {
+            if (!empty($entityChange['additional_fields'])) {
                 $audit->setAdditionalFields($entityChange['additional_fields']);
             }
 

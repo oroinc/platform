@@ -84,7 +84,11 @@ class Config implements ConfigInterface
      */
     public function is($code, $value = true)
     {
-        $existingValue = $this->get($code);
+        if (!array_key_exists($code, $this->values)) {
+            return false;
+        }
+
+        $existingValue = $this->values[$code];
 
         return $existingValue === null
             ? false

@@ -25,15 +25,6 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
         );
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_enum_select',
-            $this->type->getName()
-        );
-    }
-
-
     public function testBuildForm()
     {
         $this->doTestBuildForm($this->type);

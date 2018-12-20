@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\PreBuild;
 use Oro\Bundle\NavigationBundle\EventListener\MenuGridListener;
 
-class MenuGridListenerTest extends \PHPUnit_Framework_TestCase
+class MenuGridListenerTest extends \PHPUnit\Framework\TestCase
 {
     public function testOnPreBuild()
     {

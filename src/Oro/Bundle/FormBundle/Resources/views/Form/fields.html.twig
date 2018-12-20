@@ -184,19 +184,19 @@
             {% endif %}
         {% endif %}
         {% set isRadioLabel = form.parent.vars.expanded|default(false) and checked is defined %}
-        {% if tooltip is defined and tooltip %}
-            {% import 'OroUIBundle::macros.html.twig' as ui %}
-            {{ ui.tooltip(
-                tooltip,
-                tooltip_parameters|default({}),
-                tooltip_placement|default(null),
-                tooltip_details_enabled|default(false),
-                tooltip_details_link|default(null),
-                tooltip_details_anchor|default(null)
-            ) }}
-        {%- endif -%}
 
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {%- if tooltip is defined and tooltip -%}
+                {% import 'OroUIBundle::macros.html.twig' as ui %}
+                {{ ui.tooltip(
+                    tooltip,
+                    tooltip_parameters|default({}),
+                    tooltip_placement|default(null),
+                    tooltip_details_enabled|default(false),
+                    tooltip_details_link|default(null),
+                    tooltip_details_anchor|default(null)
+                ) }}
+            {%- endif -%}
             {%- if translatable_label is defined and not translatable_label -%}
                 {{ label }}
             {%- elseif raw_label is defined and raw_label -%}
@@ -342,18 +342,24 @@
     {% endif %}
     <div
         data-content="{{ name }}"
-        data-validation-optional-group
-        {% if form.vars.attr['data-validation-optional-group-handler'] is defined %}
-            data-validation-optional-group-handler="{{ form.vars.attr['data-validation-optional-group-handler'] }}"
+        {% if widget.parent.vars.skip_optional_validation_group is not defined %}
+            data-validation-optional-group
+            {% if form.vars.attr['data-validation-optional-group-handler'] is defined %}
+                data-validation-optional-group-handler="{{ form.vars.attr['data-validation-optional-group-handler'] }}"
+            {% endif %}
         {% endif %}
     >
         <div class="row-oro oro-multiselect-holder{% if not allow_delete %} not-removable{% endif %}">
             {{ form_widget(form, {disabled: disabled}) }}
             {% if allow_delete %}
-            <button class="removeRow btn btn-action btn-link" type="button" data-related="{{ name }}">×</button>
+            <button class="removeRow btn btn-icon btn-square-light" type="button" data-related="{{ name }}">
+                <span class="fa-close"></span>
+            </button>
             {% endif %}
             {% if allow_add_after %}
-            <button class="addAfterRow btn btn-action btn-link" type="button" data-related="{{ name }}">+</button>
+            <button class="addAfterRow btn btn-icon btn-square-light" type="button" data-related="{{ name }}">
+                <span class="fa-plus"></span>
+            </button>
             {% endif %}
         </div>
     </div>
@@ -381,7 +387,7 @@
                 {% endif %}
             </div>
             {% if allow_add %}
-            <a class="btn add-list-item" href="javascript: void(0);"><i class="fa-plus"></i>{{ form.vars.add_label|default('oro.form.collection.add')|trans }}</a>
+            <a class="btn add-list-item" href="javascript: void(0);">{{ form.vars.add_label|default('oro.form.collection.add')|trans }}</a>
             {% endif %}
         </div>
         {% if handle_primary and (prototype is not defined or prototype.primary is defined) %}
@@ -610,10 +616,14 @@
             {{ form_widget(form) }}
 
             {% if isButtonsEnabled %}
-                <button class="add-on btn entity-select-btn"><i class="fa-bars"></i></button>
+                <button class="add-on btn btn-icon btn-square-default entity-select-btn">
+                    <span class="fa-bars"></span>
+                </button>
 
                 {% if form.vars.create_enabled %}
-                    <button class="btn entity-create-btn"><i class="fa-plus"></i></button>
+                    <button class="btn btn-icon btn-square-default entity-create-btn">
+                        <span class="fa-plus"></span>
+                    </button>
                 {% endif %}
             {% endif %}
         </div>
@@ -727,4 +737,10 @@
 
     {{ form_widget(form) }}
     {{ form_errors(form) }}
+{% endblock %}
+
+{% block button_row %}
+    <div class="control-group-container control-group-button">
+        {{ form_widget(form) }}
+    </div>
 {% endblock %}

@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Encoder;
 
 use Oro\Bundle\ImportExportBundle\Serializer\Encoder\DummyEncoder;
 
-class DummyEncoderTest extends \PHPUnit_Framework_TestCase
+class DummyEncoderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DummyEncoder

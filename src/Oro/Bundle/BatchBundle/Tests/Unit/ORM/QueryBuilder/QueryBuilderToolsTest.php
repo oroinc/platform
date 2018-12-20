@@ -7,7 +7,7 @@ use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
+class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
 {
     public function testPrepareFieldAliases()
     {
@@ -323,6 +323,36 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetFieldsWithoutAggregateFunctionsForSeveralNestedFunctions()
+    {
+        $tools = new QueryBuilderTools();
+
+        $condition = 'DATE(CONVERT_TZ(l.createdAt, \'+00:00\', \'+03:00\')) >= :param1 ' .
+            'AND MIN(l.updatedAt) <= :param2';
+
+        $this->assertEquals(
+            [
+                'DATE(CONVERT_TZ(l.createdAt, \'+00:00\', \'+03:00\'))'
+            ],
+            array_values($tools->getFieldsWithoutAggregateFunctions($condition))
+        );
+    }
+
+    public function testGetFieldsWithoutAggregateFunctionsForFunctionInMiddleOfMatchedExpression()
+    {
+        $tools = new QueryBuilderTools();
+
+        $condition = 'DATE_ADD(CURRENT_TIME(), INTERVAL 4 MONTH) >= :param1 ' .
+            'AND MIN(l.updatedAt) <= :param2';
+
+        $this->assertEquals(
+            [
+                'DATE_ADD(CURRENT_TIME(), INTERVAL 4 MONTH)'
+            ],
+            array_values($tools->getFieldsWithoutAggregateFunctions($condition))
+        );
+    }
+
     /**
      * @dataProvider fieldsDataProvider
      * @param string $condition
@@ -355,7 +385,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
      * @param string $join
      * @param string $condition
      * @param string $alias
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getJoinMock($join, $condition, $alias)
     {
@@ -377,7 +407,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $name
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getParameterMock($name)
     {
@@ -396,7 +426,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $parts
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getSelectMock($parts)
     {

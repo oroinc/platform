@@ -26,12 +26,12 @@ class EntityCollectionTypeTest extends TypeTestCase
 
     public function testShouldClearCollectionWhenRemoveAllItems()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ArrayCollection $groups */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ArrayCollection $groups */
         $groups = $this->getMockBuilder(ArrayCollection::class)
             ->setMethods(['clear'])
             ->getMock();
 
-        $groups->expects($this->once())
+        $groups->expects(self::once())
             ->method('clear');
 
         $entity = new User();
@@ -60,12 +60,6 @@ class EntityCollectionTypeTest extends TypeTestCase
 
         $form->submit(['groups' => []]);
         self::assertTrue($form->isSynchronized());
-    }
-
-    public function testGetName()
-    {
-        $type = new EntityCollectionType();
-        self::assertEquals('oro_api_entity_collection', $type->getName());
     }
 
     public function testGetParent()

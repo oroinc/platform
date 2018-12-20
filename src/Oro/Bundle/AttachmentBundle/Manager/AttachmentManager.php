@@ -2,17 +2,19 @@
 
 namespace Oro\Bundle\AttachmentBundle\Manager;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
+use Oro\Bundle\AttachmentBundle\Exception\InvalidAttachmentEncodedParametersException;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Symfony\Component\Filesystem\Filesystem as SymfonyFileSystem;
-use Symfony\Component\HttpFoundation\File\File as ComponentFile;
+use Oro\Component\PhpUtils\Formatter\BytesFormatter;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+/**
+ * General methods of working with attachments
+ */
 class AttachmentManager
 {
     /**
@@ -80,84 +82,6 @@ class AttachmentManager
     }
 
     /**
-     * Copy file by $fileUrl (local path or remote file), copy it to temp dir and return File entity record
-     *
-     * @param string $fileUrl
-     * @return File|null
-     * @deprecated since 1.10. See Oro\Bundle\AttachmentBundle\Manager\FileManager::createFileEntity
-     */
-    public function prepareRemoteFile($fileUrl)
-    {
-        try {
-            $fileName = pathinfo($fileUrl, PATHINFO_BASENAME);
-            $parametersPosition = strpos($fileName, '?');
-            if ($parametersPosition) {
-                $fileName = substr($fileName, 0, $parametersPosition);
-            }
-
-            $tmpFile = $this->fileManager->getTemporaryFileName($fileName);
-            $filesystem = new SymfonyFileSystem();
-            $filesystem->copy($fileUrl, $tmpFile, true);
-
-            $entity = new File();
-            $entity->setFile(new ComponentFile($tmpFile));
-            $this->fileManager->preUpload($entity);
-            $entity->setOriginalFilename($fileName);
-
-            return $entity;
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
-
-    /**
-     * Update attachment entity before upload
-     *
-     * @param File $entity
-     * @deprecated since 1.10. Use Oro\Bundle\AttachmentBundle\Manager\FileManager::preUpload instead
-     */
-    public function preUpload(File $entity)
-    {
-        $this->fileManager->preUpload($entity);
-    }
-
-    /**
-     * Upload attachment file
-     *
-     * @param File $entity
-     * @deprecated since 1.10. Use Oro\Bundle\AttachmentBundle\Manager\FileManager::upload instead
-     */
-    public function upload(File $entity)
-    {
-        $this->fileManager->upload($entity);
-    }
-
-    /**
-     * Copy file from local filesystem to attachment storage with new name
-     *
-     * @param string $localFilePath
-     * @param string $destinationFileName
-     * @deprecated since 1.10. Use Oro\Bundle\AttachmentBundle\Manager\FileManager::writeFileToStorage instead
-     */
-    public function copyLocalFileToStorage($localFilePath, $destinationFileName)
-    {
-        $this->fileManager->writeFileToStorage($localFilePath, $destinationFileName);
-    }
-
-    /**
-     * Get file content
-     *
-     * @param File|string $file The File object or file name
-     *
-     * @return string
-     * @deprecated since 1.10. Use Oro\Bundle\AttachmentBundle\Manager\FileManager::getContent instead
-     */
-    public function getContent($file)
-    {
-        return $this->fileManager->getContent($file);
-    }
-
-    /**
      * Get attachment url
      *
      * @param object $parentEntity
@@ -207,11 +131,7 @@ class AttachmentManager
      */
     public function getFileSize($bytes)
     {
-        $sz = ['B', 'KB', 'MB', 'GB'];
-        $factor = floor((strlen($bytes) - 1) / 3);
-        $key = (int)$factor;
-
-        return isset($sz[$key]) ? sprintf("%.2f", $bytes / pow(1000, $factor)) . ' ' . $sz[$key] : $bytes;
+        return BytesFormatter::format($bytes);
     }
 
     /**
@@ -255,7 +175,7 @@ class AttachmentManager
                 'codedString' => $urlString,
                 'extension'   => $entity->getExtension()
             ],
-            $absolute
+            $absolute ? RouterInterface::ABSOLUTE_URL : RouterInterface::ABSOLUTE_PATH
         );
     }
 
@@ -269,14 +189,16 @@ class AttachmentManager
      *   - entity id
      *   - download type
      *   - original filename
-     * @throws \LogicException
+     * @throws InvalidAttachmentEncodedParametersException
      */
     public function decodeAttachmentUrl($urlString)
     {
         if (!($decodedString = base64_decode(str_replace('_', '/', $urlString)))
             || count($result = explode('|', $decodedString)) < 5
         ) {
-            throw new \LogicException('Input string is not correct attachment encoded parameters');
+            throw new InvalidAttachmentEncodedParametersException(
+                'Attachment parameters cannot be decoded'
+            );
         }
 
         return $result;
@@ -343,7 +265,7 @@ class AttachmentManager
     }
 
     /**
-     * Generate url for prod env (without prefix "/app_dev.php")
+     * Generate url for prod env (without prefix "/index_dev.php")
      *
      * @param string $name
      * @param array $parameters
@@ -365,20 +287,6 @@ class AttachmentManager
         $routerContext->setBaseUrl($prevBaseUrl);
 
         return $url;
-    }
-
-    /**
-     * if in form was clicked delete button and file has not file name - then delete this file record from the db
-     *
-     * @param File          $entity
-     * @param EntityManager $em
-     * @deprecated since 1.10. This method is never used and will be removed
-     */
-    public function checkOnDelete(File $entity, EntityManager $em)
-    {
-        if ($entity->isEmptyFile() && $entity->getFilename() === null) {
-            $em->remove($entity);
-        }
     }
 
     /**
@@ -410,13 +318,15 @@ class AttachmentManager
      */
     public function parseFileKey($key)
     {
-        if (!($decoded = base64_decode(str_replace('_', '/', $key)))
-            || count($result = @unserialize($decoded)) !== 3
-        ) {
-            throw new \InvalidArgumentException(sprintf('Invalid file key: "%s".', $key));
+        $decoded = base64_decode(str_replace('_', '/', $key));
+        if ($decoded) {
+            $result = @unserialize($decoded);
+            if (!empty($result) && count($result) === 3) {
+                return $result;
+            }
         }
 
-        return $result;
+        throw new \InvalidArgumentException(sprintf('Invalid file key: "%s".', $key));
     }
 
     /**
@@ -433,19 +343,6 @@ class AttachmentManager
         );
     }
 
-    /**
-     * Copy attachment file object
-     *
-     * @param File $file
-     *
-     * @return File
-     * @deprecated since 1.10. Use Oro\Bundle\AttachmentBundle\Manager\FileManager::cloneFileEntity instead
-     */
-    public function copyAttachmentFile(File $file)
-    {
-        return $this->fileManager->cloneFileEntity($file);
-    }
-    
     /**
      * Check if content type is an image
      *

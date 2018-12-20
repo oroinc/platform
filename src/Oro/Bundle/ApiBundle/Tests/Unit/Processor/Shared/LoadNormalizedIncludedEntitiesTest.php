@@ -17,13 +17,13 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $processorBag;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
+    private $processorBag;
 
     /** @var LoadNormalizedIncludedEntities */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -77,6 +77,9 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
+        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setCorsRequest(false);
+        $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedGetContext->setClassName($includedEntityClass);
         $expectedGetContext->setId($includedRealEntityId);
@@ -90,7 +93,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
             ->method('process')
             ->with(self::identicalTo($getContext))
             ->willReturnCallback(
-                function (GetContext $context) use ($expectedGetContext, $getResult, $getMetadata) {
+                function (GetContext $context) use ($expectedGetContext, $getResult) {
                     self::assertEquals($expectedGetContext, $context);
 
                     $context->setResult($getResult);
@@ -101,6 +104,9 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $this->context->setIncludedEntities($includedEntities);
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
+        $this->context->setMasterRequest(true);
+        $this->context->setCorsRequest(true);
+        $this->context->setHateoas(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
         $this->processor->process($this->context);
 
@@ -151,6 +157,9 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
+        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setCorsRequest(false);
+        $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedGetContext->setClassName($includedEntityClass);
         $expectedGetContext->setId($includedRealEntityId);
@@ -163,7 +172,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
             ->method('process')
             ->with(self::identicalTo($getContext))
             ->willReturnCallback(
-                function (GetContext $context) use ($expectedGetContext, $getResult, $getMetadata) {
+                function (GetContext $context) use ($expectedGetContext, $getResult) {
                     self::assertEquals($expectedGetContext, $context);
 
                     $context->setResult($getResult);
@@ -174,6 +183,9 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $this->context->setIncludedEntities($includedEntities);
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
+        $this->context->setMasterRequest(true);
+        $this->context->setCorsRequest(true);
+        $this->context->setHateoas(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
         $this->processor->process($this->context);
 

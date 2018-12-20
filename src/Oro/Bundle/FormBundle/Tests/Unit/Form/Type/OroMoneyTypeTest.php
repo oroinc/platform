@@ -15,12 +15,12 @@ class OroMoneyTypeTest extends FormIntegrationTestCase
     protected $formType;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $localeSettings;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $numberFormatter;
 
@@ -56,7 +56,7 @@ class OroMoneyTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    OroMoneyType::class => $this->formType
+                    $this->formType
                 ],
                 []
             ),

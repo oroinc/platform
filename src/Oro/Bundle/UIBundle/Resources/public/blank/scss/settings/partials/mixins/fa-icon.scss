@@ -1,0 +1,21 @@
+/* @theme: blank; */
+
+// Mixin for include font-awesome icons to custom elements
+// List of icons https://github.com/FortAwesome/Font-Awesome/blob/master/scss/_variables.scss
+// @param $icon-name (Font Awesome icon)
+// @param $state {CSS pseudo-element}
+// Use:  @include fa-icon($view-product-gallery-icon, before, true) {
+//  extra rules
+// }
+@mixin fa-icon($icon: null, $state: before, $extra-rules: false) {
+    @if ($icon) {
+        &:#{$state} {
+            content: '#{$icon}';
+            font-family: $icon-font;
+
+            @if ($extra-rules) {
+                @content;
+            }
+        }
+    }
+}

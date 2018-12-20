@@ -1,0 +1,26 @@
+/* @theme: admin.oro; */
+
+.search-header .search-form {
+    input[type="text"] {
+        width: 218px;
+    }
+}
+
+.search-grid {
+    .pagination-container {
+        .pull-right {
+            margin-left: 5px;
+        }
+
+        .separator {
+            display: none;
+        }
+    }
+}
+
+@media only screen and (max-width: 512px) {
+    .search-header .search-form {
+        clear: both;
+        width: 100%;
+    }
+}

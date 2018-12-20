@@ -10,6 +10,7 @@ use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
 use Oro\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class WidgetControllerTest extends WebTestCase
 {
@@ -553,11 +554,11 @@ class WidgetControllerTest extends WebTestCase
                 'form_options' => [
                     'attribute_fields' => [
                         'message_attr' => [
-                            'form_type' => 'text',
+                            'form_type' => TextType::class,
                             'options' => ['required' => true, 'constraints' => [['NotBlank' => []]]]
                         ],
                         'descr_attr' => [
-                            'form_type' => 'text'
+                            'form_type' => TextType::class
                         ]
                     ],
                     'attribute_default_values' => ['message_attr' => '$message']

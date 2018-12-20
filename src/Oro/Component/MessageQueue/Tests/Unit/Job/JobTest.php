@@ -4,7 +4,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Oro\Component\MessageQueue\Job\Job;
 
-class JobTest extends \PHPUnit_Framework_TestCase
+class JobTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldConstructWithNullId()
     {
@@ -58,7 +58,7 @@ class JobTest extends \PHPUnit_Framework_TestCase
     public function testShouldConstructWithNullChildJobs()
     {
         $job = new Job();
-        self::assertNull($job->getChildJobs());
+        self::assertEmpty($job->getChildJobs());
     }
 
     public function testShouldConstructWithNullCreatedAt()

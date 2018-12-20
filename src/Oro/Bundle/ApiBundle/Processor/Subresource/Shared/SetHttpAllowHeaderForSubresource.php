@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Processor\Shared\SetHttpAllowHeader;
-use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Sets "Allow" HTTP header if the response status code is 405 (Method Not Allowed).
- * In case if there are no any allowed HTTP methods, the response status code is changed to 404.
+ * If there are no any allowed HTTP methods, the response status code is changed to 404.
  */
 class SetHttpAllowHeaderForSubresource extends SetHttpAllowHeader
 {
@@ -19,21 +17,11 @@ class SetHttpAllowHeaderForSubresource extends SetHttpAllowHeader
     protected function getHttpMethodToActionsMap()
     {
         return [
-            self::METHOD_GET => ApiActions::GET_SUBRESOURCE
+            Request::METHOD_OPTIONS => ApiActions::OPTIONS,
+            Request::METHOD_GET     => ApiActions::GET_SUBRESOURCE,
+            Request::METHOD_PATCH   => ApiActions::UPDATE_SUBRESOURCE,
+            Request::METHOD_POST    => ApiActions::ADD_SUBRESOURCE,
+            Request::METHOD_DELETE  => ApiActions::DELETE_SUBRESOURCE
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getExcludeActions(Context $context)
-    {
-        /** @var SubresourceContext $context */
-
-        return $this->getExcludeActionsForClass(
-            $context->getParentClassName(),
-            $context->getVersion(),
-            $context->getRequestType()
-        );
     }
 }

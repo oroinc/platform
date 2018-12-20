@@ -8,12 +8,12 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 
-class RelationBuilderTest extends \PHPUnit_Framework_TestCase
+class RelationBuilderTest extends \PHPUnit\Framework\TestCase
 {
     const SOURCE_CLASS = 'Test\SourceEntity';
     const TARGET_CLASS = 'Test\TargetEntity';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var RelationBuilder */
@@ -21,9 +21,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigManager');
         $this->builder       = new RelationBuilder($this->configManager);
     }
 
@@ -263,7 +261,8 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
                     'owner'           => true,
                     'target_entity'   => self::TARGET_CLASS,
                     'target_field_id' => false,
-                    'cascade'         => ['persist', 'remove']
+                    'cascade'         => ['persist', 'remove'],
+                    'fetch'           => 'extra_lazy',
                 ]
             ]
         );
@@ -277,7 +276,8 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
                 'relation_key'  => $relationKey,
                 'target_entity' => self::TARGET_CLASS,
                 'target_field'  => $targetFieldName,
-                'cascade'       => ['persist', 'remove']
+                'cascade'       => ['persist', 'remove'],
+                'fetch'         => 'extra_lazy',
             ]
         );
 
@@ -335,7 +335,8 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             [
                 'extend' => [
                     'owner'   => ExtendScope::OWNER_CUSTOM,
-                    'cascade' => ['persist', 'remove']
+                    'cascade' => ['persist', 'remove'],
+                    'fetch'   => 'extra_lazy',
                 ],
                 'test'   => [
                     'test_attr' => 123
@@ -372,7 +373,8 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
                     'owner'           => true,
                     'target_entity'   => self::TARGET_CLASS,
                     'target_field_id' => false,
-                    'cascade'         => ['persist', 'remove']
+                    'cascade'         => ['persist', 'remove'],
+                    'fetch'           => 'extra_lazy',
                 ]
             ]
         );
@@ -388,7 +390,8 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
                 'target_title'    => [$targetTitleFieldName],
                 'target_detailed' => [$targetDetailedFieldName],
                 'target_grid'     => [$targetGridFieldName],
-                'cascade'         => ['persist', 'remove']
+                'cascade'         => ['persist', 'remove'],
+                'fetch'           => 'extra_lazy',
             ]
         );
 
@@ -448,7 +451,8 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             [
                 'extend' => [
                     'owner'   => ExtendScope::OWNER_CUSTOM,
-                    'cascade' => ['persist', 'remove']
+                    'cascade' => ['persist', 'remove'],
+                    'fetch'   => 'extra_lazy',
                 ],
                 'test'   => [
                     'test_attr' => 123
@@ -893,7 +897,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProviderMock()
     {

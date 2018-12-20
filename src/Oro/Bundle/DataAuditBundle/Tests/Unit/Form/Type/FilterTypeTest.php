@@ -11,7 +11,7 @@ use Symfony\Component\Form\Forms;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class FilterTypeTest extends \PHPUnit_Framework_TestCase
+class FilterTypeTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {

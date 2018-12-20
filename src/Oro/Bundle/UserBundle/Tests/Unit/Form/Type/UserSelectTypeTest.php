@@ -5,7 +5,7 @@ use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
 use Oro\Bundle\UserBundle\Form\Type\UserSelectType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class UserSelectTypeTest extends \PHPUnit_Framework_TestCase
+class UserSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var UserSelectType

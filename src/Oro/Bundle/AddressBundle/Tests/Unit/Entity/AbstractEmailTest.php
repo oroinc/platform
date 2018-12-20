@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Entity;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractEmail;
 
-class AbstractEmailTest extends \PHPUnit_Framework_TestCase
+class AbstractEmailTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AbstractEmail
@@ -95,7 +95,7 @@ class AbstractEmailTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string|null $email
      * @param int $id
-     * @return AbstractEmail|\PHPUnit_Framework_MockObject_MockObject
+     * @return AbstractEmail|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createEmail($email = null, $id = null)
     {

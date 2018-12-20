@@ -15,18 +15,22 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type\Stub\ApplicableEntitiesTypeSt
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type\Stub\OroIconTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
 {
+    /** @var WorkflowDefinitionChoicesGroupProvider|\PHPUnit\Framework\MockObject\MockObject */
+    protected $choicesProvider;
+
     /** @var WorkflowDefinitionType */
     protected $formType;
 
     protected function setUp()
     {
-        $choicesProvider = $this->createMock(WorkflowDefinitionChoicesGroupProvider::class);
-        $this->formType = new WorkflowDefinitionType($choicesProvider);
+        $this->choicesProvider = $this->createMock(WorkflowDefinitionChoicesGroupProvider::class);
+        $this->formType = new WorkflowDefinitionType($this->choicesProvider);
         parent::setUp();
     }
 
@@ -46,6 +50,13 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit(array $fields, array $submittedData, array $expectedData)
     {
+        $this->choicesProvider->expects($this->any())
+            ->method('getActiveGroupsChoices')
+            ->willReturn([]);
+        $this->choicesProvider->expects($this->any())
+            ->method('getRecordGroupsChoices')
+            ->willReturn([]);
+
         $form = $this->factory->create(WorkflowDefinitionType::class);
 
         foreach ($fields as $field => $options) {
@@ -103,16 +114,11 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /* @var $resolver \PHPUnit_Framework_MockObject_MockObject|OptionsResolver */
+        /* @var $resolver \PHPUnit\Framework\MockObject\MockObject|OptionsResolver */
         $resolver = $this->getMockBuilder(OptionsResolver::class)->disableOriginalConstructor()->getMock();
         $resolver->expects($this->once())->method('setDefaults')->with(['data_class' => WorkflowDefinition::class]);
 
         $this->formType->configureOptions($resolver);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(WorkflowDefinitionType::NAME, $this->formType->getName());
     }
 
     public function testGetBlockPrefix()
@@ -125,17 +131,17 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider $configProvider */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider $configProvider */
         $configProvider = $this->getMockBuilder(ConfigProvider::class)->disableOriginalConstructor()->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Translator $translator */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Translator $translator */
         $translator = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
 
         $choiceType = $this->getMockBuilder(OroChoiceType::class)
             ->setMethods(['configureOptions', 'getParent'])
             ->disableOriginalConstructor()
             ->getMock();
-        $choiceType->expects($this->any())->method('getParent')->willReturn('choice');
+        $choiceType->expects($this->any())->method('getParent')->willReturn(ChoiceType::class);
 
         return array_merge(
             parent::getExtensions(),

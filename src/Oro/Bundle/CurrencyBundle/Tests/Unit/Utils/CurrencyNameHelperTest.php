@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\CurrencyBundle\Tests\Units\Utils;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Provider\CurrencyListProviderStub;
 use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
+use Oro\Bundle\LocaleBundle\Model\CalendarFactory;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
-class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements ViewTypeProviderInterface
+class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements ViewTypeProviderInterface
 {
     /**
      * @var string
@@ -15,7 +18,7 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
     private $viewType;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\LocaleBundle\Formatter\NumberFormatter
+     * @var \PHPUnit\Framework\MockObject\MockObject|\Oro\Bundle\LocaleBundle\Formatter\NumberFormatter
      */
     protected $formatter;
 
@@ -29,7 +32,7 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
     public function testGetCurrencyName()
     {
         $currencyNameHelper = new CurrencyNameHelper(
-            $this->getLocaleStub('en'),
+            $this->getLocaleSettings('en'),
             $this->formatter,
             $this,
             new CurrencyListProviderStub()
@@ -45,7 +48,7 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
     public function testGetCurrencyNameWithFullName()
     {
         $currencyNameHelper = new CurrencyNameHelper(
-            $this->getLocaleStub('en'),
+            $this->getLocaleSettings('en'),
             $this->formatter,
             $this,
             new CurrencyListProviderStub()
@@ -61,7 +64,7 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
     public function testGetCurrencyNameForFrenchLocale()
     {
         $currencyNameHelper = new CurrencyNameHelper(
-            $this->getLocaleStub('fr'),
+            $this->getLocaleSettings('fr'),
             $this->formatter,
             $this,
             new CurrencyListProviderStub()
@@ -77,30 +80,28 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
     public function testGetCurrencyNameForLocalCurrencies()
     {
         $currencyNameHelper = new CurrencyNameHelper(
-            $this->getLocaleStub('en'),
+            $this->getLocaleSettings('en'),
             $this->formatter,
             $this,
             new CurrencyListProviderStub()
         );
 
         $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_SYMBOL;
-        $this->assertEquals('₴', $currencyNameHelper->getCurrencyName('UAH'));
+        $this->assertEquals('UAH', $currencyNameHelper->getCurrencyName('UAH'));
     }
 
     public function testGetCurrencyChoices()
     {
         $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_SYMBOL;
-        $currencyProvider = new CurrencyListProviderStub();
-        $currencyProvider->setCurrencyList(['USD', 'EUR']);
 
         $currencyNameHelper = new CurrencyNameHelper(
-            $this->getLocaleStub('en'),
+            $this->getLocaleSettings('en'),
             $this->formatter,
             $this,
             new CurrencyListProviderStub()
         );
 
-        $this->assertEquals(['USD' => '$', 'EUR' => '€'], $currencyNameHelper->getCurrencyChoices());
+        $this->assertEquals(['$' => 'USD', '€' => 'EUR'], $currencyNameHelper->getCurrencyChoices());
     }
 
     /**
@@ -113,29 +114,21 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
 
     /**
      * @param string $localeCode
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return LocaleSettings
      */
-    private function getLocaleStub($localeCode)
+    private function getLocaleSettings(string $localeCode): LocaleSettings
     {
-        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->setMethods(['getLocale', 'getCurrencySymbolByCurrency'])
-            ->getMock();
-
-        $localeSettings
-            ->expects($this->any())
-            ->method('getLocale')
+        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
+        $configManager = $this->createMock(ConfigManager::class);
+        $configManager->expects($this->any())
+            ->method('get')
+            ->with('oro_locale.locale')
             ->willReturn($localeCode);
 
-        $localeSettings
-            ->expects($this->any())
-            ->method('getCurrencySymbolByCurrency')
-            ->will($this->returnValueMap([
-                ['USD', '$'],
-                ['UAH', '₴'],
-            ]));
+        /** @var CalendarFactory $calendarFactory */
+        $calendarFactory = $this->createMock(CalendarFactory::class);
 
-        return $localeSettings;
+        return new LocaleSettings($configManager, $calendarFactory);
     }
 
     /**
@@ -147,7 +140,7 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
     public function testFormatCurrency(Price $price, array $options, $expected)
     {
         $currencyNameHelper = new CurrencyNameHelper(
-            $this->getLocaleStub('en'),
+            $this->getLocaleSettings('en'),
             $this->formatter,
             $this,
             new CurrencyListProviderStub()

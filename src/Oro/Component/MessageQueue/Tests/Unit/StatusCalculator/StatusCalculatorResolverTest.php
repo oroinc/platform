@@ -11,7 +11,7 @@ use Oro\Component\MessageQueue\StatusCalculator\CollectionCalculator;
 use Oro\Component\MessageQueue\StatusCalculator\QueryCalculator;
 use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
 
-class StatusCalculatorResolverTest extends \PHPUnit_Framework_TestCase
+class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var StatusCalculatorResolver
@@ -19,12 +19,12 @@ class StatusCalculatorResolverTest extends \PHPUnit_Framework_TestCase
     private $statusCalculatorResolver;
 
     /**
-     * @var QueryCalculator | \PHPUnit_Framework_MockObject_MockObject
+     * @var QueryCalculator | \PHPUnit\Framework\MockObject\MockObject
      */
     private $queryCalculator;
 
     /**
-     * @var CollectionCalculator | \PHPUnit_Framework_MockObject_MockObject
+     * @var CollectionCalculator | \PHPUnit\Framework\MockObject\MockObject
      */
     private $collectionCalculator;
 

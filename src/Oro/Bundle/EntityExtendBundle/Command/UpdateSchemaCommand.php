@@ -12,6 +12,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * The CLI command to update schema according to data stored in entity config caches
+ */
 class UpdateSchemaCommand extends ContainerAwareCommand
 {
     use SchemaTrait;
@@ -31,12 +34,6 @@ class UpdateSchemaCommand extends ContainerAwareCommand
                         null,
                         InputOption::VALUE_NONE,
                         'Dumps the generated SQL statements to the screen (does not execute them).'
-                    ),
-                    new InputOption(
-                        'attributes-only',
-                        null,
-                        InputOption::VALUE_NONE,
-                        'Executes update schema only for entities which has attributes.'
                     )
                 ]
             );
@@ -60,7 +57,7 @@ class UpdateSchemaCommand extends ContainerAwareCommand
         /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
 
-        $metadata = $this->getClassesMetadata($input, $em);
+        $metadata = $this->getClassesMetadata($em);
 
         $schemaTool = new SaveSchemaTool($em);
         $sqls       = $schemaTool->getUpdateSchemaSql($metadata, true);
@@ -89,19 +86,14 @@ class UpdateSchemaCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param InputInterface $input
      * @param EntityManager $em
      *
      * @return array
      */
-    protected function getClassesMetadata(InputInterface $input, EntityManager $em)
+    protected function getClassesMetadata(EntityManager $em)
     {
         $extendEntityConfigProvider = $this->getContainer()
             ->get('oro_entity_config.provider.extend_entity_config_provider');
-
-        if ($input->getOption('attributes-only')) {
-            $extendEntityConfigProvider->enableAttributesOnly();
-        }
 
         $extendConfigs = $extendEntityConfigProvider->getExtendEntityConfigs();
         $metadata = [];

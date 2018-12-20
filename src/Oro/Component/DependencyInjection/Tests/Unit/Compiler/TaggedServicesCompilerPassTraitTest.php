@@ -7,10 +7,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class TaggedServicesCompilerPassTraitTest extends \PHPUnit_Framework_TestCase
+class TaggedServicesCompilerPassTraitTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var TaggedServicesCompilerPassTrait|\PHPUnit_Framework_MockObject_MockObject
+     * @var TaggedServicesCompilerPassTrait|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $trait;
 
@@ -36,7 +36,7 @@ class TaggedServicesCompilerPassTraitTest extends \PHPUnit_Framework_TestCase
     {
         $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
         $container->expects($this->once())->method('hasDefinition')->willReturn(true);
-        $container->expects($this->once())->method('findTaggedServiceIds')->with('tag1')->willReturn(null);
+        $container->expects($this->once())->method('findTaggedServiceIds')->with('tag1')->willReturn([]);
         $container->expects($this->never())->method('getDefinition');
 
         $this->trait->registerTaggedServices($container, 'service1', 'tag1', 'addExtension');

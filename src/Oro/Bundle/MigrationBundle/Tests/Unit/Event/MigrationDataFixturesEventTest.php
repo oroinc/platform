@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
 
-class MigrationDataFixturesEventTest extends \PHPUnit_Framework_TestCase
+class MigrationDataFixturesEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEventWithoutLogger()
     {

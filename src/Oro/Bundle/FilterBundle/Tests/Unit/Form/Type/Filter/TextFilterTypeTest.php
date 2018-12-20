@@ -35,34 +35,29 @@ class TextFilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(TextFilterType::NAME, $this->type->getName());
-    }
-
     /**
      * {@inheritDoc}
      */
     public function configureOptionsDataProvider()
     {
-        return array(
-            array(
-                'defaultOptions' => array(
-                    'field_type'       => TextType::class,
-                    'operator_choices' => array(
-                        TextFilterType::TYPE_CONTAINS     => 'oro.filter.form.label_type_contains',
-                        TextFilterType::TYPE_NOT_CONTAINS => 'oro.filter.form.label_type_not_contains',
-                        TextFilterType::TYPE_EQUAL        => 'oro.filter.form.label_type_equals',
-                        TextFilterType::TYPE_STARTS_WITH  => 'oro.filter.form.label_type_start_with',
-                        TextFilterType::TYPE_ENDS_WITH    => 'oro.filter.form.label_type_end_with',
-                        TextFilterType::TYPE_IN           => 'oro.filter.form.label_type_in',
-                        TextFilterType::TYPE_NOT_IN       => 'oro.filter.form.label_type_not_in',
-                        FilterUtility::TYPE_EMPTY         => 'oro.filter.form.label_type_empty',
-                        FilterUtility::TYPE_NOT_EMPTY     => 'oro.filter.form.label_type_not_empty',
-                    )
-                )
-            )
-        );
+        return [
+            [
+                'defaultOptions' => [
+                    'field_type' => TextType::class,
+                    'operator_choices' => [
+                        'oro.filter.form.label_type_contains' => TextFilterType::TYPE_CONTAINS,
+                        'oro.filter.form.label_type_not_contains' => TextFilterType::TYPE_NOT_CONTAINS,
+                        'oro.filter.form.label_type_equals' => TextFilterType::TYPE_EQUAL,
+                        'oro.filter.form.label_type_start_with' => TextFilterType::TYPE_STARTS_WITH,
+                        'oro.filter.form.label_type_end_with' => TextFilterType::TYPE_ENDS_WITH,
+                        'oro.filter.form.label_type_in' => TextFilterType::TYPE_IN,
+                        'oro.filter.form.label_type_not_in' => TextFilterType::TYPE_NOT_IN,
+                        'oro.filter.form.label_type_empty' => FilterUtility::TYPE_EMPTY,
+                        'oro.filter.form.label_type_not_empty' => FilterUtility::TYPE_NOT_EMPTY,
+                    ]
+                ]
+            ]
+        ];
     }
 
     /**

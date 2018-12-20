@@ -6,15 +6,15 @@ use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\AddNormalizerComp
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
-class AddNormalizerCompilerPassTest extends \PHPUnit_Framework_TestCase
+class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $serializerDefinition;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $containerBuilder;
 

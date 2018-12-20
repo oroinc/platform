@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChangePasswordTypeTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ChangePasswordSubscriber */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ChangePasswordSubscriber */
     protected $subscriber;
 
     /** @var ChangePasswordType */
@@ -44,7 +44,7 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
      */
     public function testBuildForm()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FormBuilderInterface $builder */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|FormBuilderInterface $builder */
         $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
         $options = [
             'current_password_label' => 'label',
@@ -70,7 +70,7 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
      */
     public function testConfigureOptions()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OptionsResolver $resolver */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|OptionsResolver $resolver */
         $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')

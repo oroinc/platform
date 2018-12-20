@@ -8,9 +8,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 class AssertNotHasResultTest extends GetProcessorTestCase
 {
     /** @var AssertNotHasResult */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

@@ -243,20 +243,6 @@ $localeSettings = $this->get('oro_locale.settings');
 $symbol = $localeSettings->getCurrencySymbolByCurrency('USD');
 ```
 
-Data about currency code and currency symbols are loaded from bundle's file ./Resources/config/oro/currency_data.yml. Other bundles could provide their files
-to extend this data.
-
-Example of currency_data.yml file:
-
-```yml
-UAH:
-    symbol: ₴
-UGX:
-    symbol: UGX
-USD:
-    symbol: $
-```
-
 
 Names formats
 -------------
@@ -326,9 +312,9 @@ is dumped to container parameters (on backend) and to file oro.locale_data.js (o
 If user wants to regenerate these dumped information, he have to execute two commands -
 cache:clear and oro:localization:dump:
 ```
-> php app/console cache:clear
+> php bin/console cache:clear
 Clearing the cache for the dev environment with debug true
-> php app/console oro:localization:dump
+> php bin/console oro:localization:dump
 17:28:34 [file+] oro.locale_data.js
 ```
 

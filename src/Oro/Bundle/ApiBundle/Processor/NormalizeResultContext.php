@@ -4,6 +4,11 @@ namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Bundle\ApiBundle\Model\Error;
 
+/**
+ * The base execution context for processors for actions with "normalize_result" group.
+ * Processors from this group are intended to prepare a valid response
+ * and they are executed regardless whether an error occurred or not.
+ */
 class NormalizeResultContext extends ApiContext
 {
     /**

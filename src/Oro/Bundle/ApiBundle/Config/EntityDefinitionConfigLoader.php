@@ -4,13 +4,16 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * The loader for "entities" configuration section.
+ */
 class EntityDefinitionConfigLoader extends AbstractConfigLoader implements ConfigLoaderFactoryAwareInterface
 {
-    /** @var array */
-    protected $methodMap = [
-        EntityDefinitionConfig::DOCUMENTATION_RESOURCE => 'setDocumentationResources',
-        EntityDefinitionConfig::POST_SERIALIZE         => 'setPostSerializeHandler',
-        EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER  => 'setFormEventSubscribers',
+    private const METHOD_MAP = [
+        ConfigUtil::DOCUMENTATION_RESOURCE    => 'setDocumentationResources',
+        ConfigUtil::POST_SERIALIZE            => 'setPostSerializeHandler',
+        ConfigUtil::POST_SERIALIZE_COLLECTION => 'setPostSerializeCollectionHandler',
+        ConfigUtil::FORM_EVENT_SUBSCRIBER     => 'setFormEventSubscribers'
     ];
 
     /** @var ConfigLoaderFactory */
@@ -51,7 +54,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
             } elseif ($this->factory->hasLoader($key)) {
                 $this->loadSection($definition, $this->factory->getLoader($key), $key, $value);
             } else {
-                $this->loadConfigValue($definition, $key, $value, $this->methodMap);
+                $this->loadConfigValue($definition, $key, $value, self::METHOD_MAP);
             }
         }
     }
@@ -66,7 +69,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
             foreach ($fields as $name => $config) {
                 $definition->addField(
                     $name,
-                    $this->factory->getLoader(ConfigUtil::FIELDS)->load(null !== $config ? $config : [])
+                    $this->factory->getLoader(ConfigUtil::FIELDS)->load($config ?? [])
                 );
             }
         }
@@ -87,8 +90,8 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
         if (!empty($config)) {
             $section = $loader->load($config);
             $isEmpty = false;
-            if (is_object($section)) {
-                if (method_exists($section, 'isEmpty') && $section->isEmpty()) {
+            if (\is_object($section)) {
+                if (\method_exists($section, 'isEmpty') && $section->isEmpty()) {
                     $isEmpty = true;
                 }
             } elseif (empty($section)) {

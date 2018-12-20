@@ -9,11 +9,11 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
 class EntityTitleProviderTest extends OrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityNameResolver */
-    protected $entityNameResolver;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityNameResolver */
+    private $entityNameResolver;
 
     /** @var EntityTitleProvider */
-    protected $entityTitleProvider;
+    private $entityTitleProvider;
 
     protected function setUp()
     {
@@ -169,7 +169,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
     {
         $targets = [
             Entity\Product::class => ['id', [123]],
-            Entity\User::class    => ['id', [456]],
+            Entity\User::class    => ['id', [456]]
         ];
 
         $this->entityNameResolver->expects(self::exactly(2))
@@ -177,7 +177,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
             ->willReturnMap(
                 [
                     [Entity\Product::class, 'e', null, null, 'e.name'],
-                    [Entity\User::class, 'e', null, null, 'COALESCE(e.name, \'\')'],
+                    [Entity\User::class, 'e', null, null, 'COALESCE(e.name, \'\')']
                 ]
             );
 
@@ -218,7 +218,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
                     'id'     => 456,
                     'entity' => Entity\User::class,
                     'title'  => 'user title 1'
-                ],
+                ]
             ],
             $this->entityTitleProvider->getTitles($targets)
         );
@@ -229,7 +229,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
         $targets = [
             Entity\Product::class  => ['id', [123]],
             Entity\User::class     => ['id', [456]],
-            Entity\Category::class => ['name', ['category1']],
+            Entity\Category::class => ['name', ['category1']]
         ];
 
         $this->entityNameResolver->expects(self::exactly(3))
@@ -238,7 +238,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
                 [
                     [Entity\Product::class, 'e', null, null, 'e.name'],
                     [Entity\User::class, 'e', null, null, 'COALESCE(e.name, \'\')'],
-                    [Entity\Category::class, 'e', null, null, 'e.label'],
+                    [Entity\Category::class, 'e', null, null, 'e.label']
                 ]
             );
 
@@ -300,7 +300,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
                     'id'     => 'category1',
                     'entity' => Entity\Category::class,
                     'title'  => 'category title 1'
-                ],
+                ]
             ],
             $this->entityTitleProvider->getTitles($targets)
         );

@@ -10,6 +10,11 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+/**
+ * Preparing storable index data from entities.
+ *
+ * @package Oro\Bundle\SearchBundle\Engine
+ */
 class ObjectMapper extends AbstractMapper
 {
     /**
@@ -186,6 +191,14 @@ class ObjectMapper extends AbstractMapper
                 $value = array_shift($value);
             }
 
+            if (is_numeric($value)) {
+                if ($type === Query::TYPE_INTEGER) {
+                    $value = (int)$value;
+                } elseif ($type === Query::TYPE_DECIMAL) {
+                    $value = (float)$value;
+                }
+            }
+
             $result[$dataField] = $value;
         }
 
@@ -304,6 +317,7 @@ class ObjectMapper extends AbstractMapper
     {
         if (strpos($fieldName, Indexer::TEXT_ALL_DATA_FIELD) === 0) {
             $value = $this->htmlTagHelper->stripTags((string)$value);
+            $value = $this->htmlTagHelper->stripLongWords($value);
         }
 
         return $value;

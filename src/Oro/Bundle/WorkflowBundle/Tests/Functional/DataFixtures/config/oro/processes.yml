@@ -1,0 +1,19 @@
+processes:
+    definitions:
+        entity_manager_cleanup:
+            label: 'Entity Manager Cleanup'
+            enabled: true
+            entity: Oro\Bundle\UserBundle\Entity\User
+            order: 20
+            exclude_definitions: [entity_manager_cleanup]
+            actions_configuration:
+                - '@call_service_method':
+                    service: oro_workflow.entity_manager_clearer_stub
+                    method: clear
+    triggers:
+        entity_manager_cleanup:
+            -
+                event: update
+                field: firstName
+                priority: 10
+                queued: true

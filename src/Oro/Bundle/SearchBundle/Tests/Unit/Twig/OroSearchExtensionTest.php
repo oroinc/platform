@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\SearchBundle\Twig\OroSearchExtension;
 
-class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
+class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
 {
     private $extension;
 

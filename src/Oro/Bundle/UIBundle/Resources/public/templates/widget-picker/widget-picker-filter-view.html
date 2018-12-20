@@ -1,4 +1,2 @@
-<label>
-    <i class="fa-search"></i>
-    <input type="text" data-role="widget-picker-search" value="<%=search %>" placeholder="Enter keyword" />
-</label>
+<input type="text" class="widget-picker__filter-search" data-role="filter-search" value="<%- search %>"
+    data-clearable data-placeholder-icon="fa-search" placeholder="<%- _.__('oro.ui.widget_picker.filter.search_placeholder') %>" />

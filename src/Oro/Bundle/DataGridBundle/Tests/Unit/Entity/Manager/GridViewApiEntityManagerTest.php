@@ -8,13 +8,13 @@ use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 
-class GridViewApiEntityManagerTest extends \PHPUnit_Framework_TestCase
+class GridViewApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = "Oro\\Bundle\\DataGridBundle\\Entity\\GridView";
     /** @var   */
     protected $gridViewManager;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $om;
 
     /** @var  GridViewApiEntityManager */

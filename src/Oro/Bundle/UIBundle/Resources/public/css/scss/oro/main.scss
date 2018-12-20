@@ -1,0 +1,57 @@
+/* @theme: admin.oro; */
+
+@import "variables";
+
+@import "app-page";
+@import "application-menu";
+@import "attribute-item";
+@import "drag-and-drop-support";
+@import "create-select-entity";
+@import "entity";
+@import "ui-sortable";
+@import "form/form";
+@import "loading/loading-mask";
+@import "loading/loading-dots";
+@import "loading/loading-bar";
+@import "dropdown/dropdown-mask";
+@import "zoomable-area";
+@import "select2";
+@import "datepicker";
+@import "simplecolorpicker";
+@import "dialog";
+@import "label";
+
+@import "page-header";
+@import "page-toolbar";
+@import "app-header";
+
+@import "form/form-description";
+@import "form/form-signin";
+@import "form/forms";
+
+@import "progressbar";
+@import "footer";
+@import "fs-toolbar";
+@import "flash-messages";
+@import "inline-actions";
+@import "error-page";
+@import "nav";
+@import "no-data";
+
+@import "tab/tabs";
+@import "tab/oro-tabs";
+@import "tab/tab-collection";
+
+@import "checkbox";
+
+@import "jstree/jstree-actions";
+@import "jstree/jstree-wrapper";
+@import "jstree/jstree";
+
+@import "content-sidebar";
+@import "highlight-text";
+@import "scrollspy";
+@import "widget-picker";
+@import "tables";
+@import "other-scroll-container";
+@import "load-more";

@@ -15,7 +15,7 @@
  - Routes
  - Datagrids
 
-Every active *operation* shows a button or a link on the corresponding page. The button is displayed only if all the described preconditions are met. The *operation* is performed by clicking the button if all the described preconditions and conditions are met. Also, if the operation has a form dialog configuration, then a a modal dialog with fields appears when clicking the button. 
+Every active *operation* shows a button or a link on the corresponding page. The button is displayed only if all the described preconditions are met. For the *operation* button or link to be displayed the `preconditions` section should evaluate to `true`.  After a user clicks on the button or link the *operation* will be performed only if the `conditions` section evaluates to `true`. Also, if the operation has a form dialog configuration, then a a modal dialog with fields appears when clicking the button. 
 
 ## How does it work?
 
@@ -138,7 +138,7 @@ operations:
 Execute a command to validate all operations configuration:
 
 ```
-php app/console oro:action:configuration:validate
+php bin/console oro:action:configuration:validate
 ```
 
 **Note:** All configurations apply automatically after their changes made in developer environment.
@@ -149,11 +149,11 @@ php app/console oro:action:configuration:validate
 **Oro Action Bundle** defines several system wide default operations for a common purpose. Those are basic CRUD-called operations for entities:
  
  - `UPDATE` - operation for an entity editing that uses a route from the `routeUpdate` option of the entity configuration.
- - `DELETE` - operation for an entity deletion that uses a route from the `routeDelete` option of the entity configuration.
+ - `DELETE` - operation for an entity deletion that uses a route from the `routeName` option of the entity configuration.
 
   If the default operations are used in the nondefault applications, as in `commerce`, for example, the routes are retrieved from the `routeCommerceUpdate` and `routeCommerceDelete` options.
 
-  Configurations for the default operations are allocated in the `Resources/config/oro/action.yml` file under the **Oro Action Bundle** directory.
+  Configurations for the default operations are allocated in the `Resources/config/oro/actions.yml` file under the **Oro Action Bundle** directory.
 
 ### Questions and Answers
 
@@ -187,7 +187,7 @@ datagrids:
 However, action_configuration can accept callable as value, so sometimes the options are occupied by service callback.
 If it is so, we can use another approach.
 
- The **second way** is to disable the operation for custom datagrid using the `exclude_datagrids` option in operation definition.So you can specify the name of the datagrid that should be excluded from the *operation* matching. If your operation is defined by another bundle, you can use the *merge* behavior of operation configuration and just add anadditional property value under your bundle configuration. For example, the operation that should not be displayed for the `product_view` datagrid is the default `DELETE` operation from `OroActionBundle`. You can exclude your grid from matching with the next addition to `<YourBundle>/Resources/config/oro/action.yml`
+ The **second way** is to disable the operation for custom datagrid using the `exclude_datagrids` option in operation definition.So you can specify the name of the datagrid that should be excluded from the *operation* matching. If your operation is defined by another bundle, you can use the *merge* behavior of operation configuration and just add anadditional property value under your bundle configuration. For example, the operation that should not be displayed for the `product_view` datagrid is the default `DELETE` operation from `OroActionBundle`. You can exclude your grid from matching with the next addition to `<YourBundle>/Resources/config/oro/actions.yml`
 
 ```
 operations:

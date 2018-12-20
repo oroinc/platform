@@ -10,11 +10,13 @@ use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessage
 use Oro\Component\MessageQueue\Test\DbalSchemaExtensionTrait;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
+use Oro\Component\Testing\TempDirExtension;
 use Psr\Log\NullLogger;
 
 class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
 {
     use DbalSchemaExtensionTrait;
+    use TempDirExtension;
 
     protected function setUp()
     {
@@ -34,9 +36,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
         $connection = $this->createConnection();
         $dbal = $connection->getDBALConnection();
 
-        $pidDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'oro-message-queue';
-        @unlink($pidDir);
-        @mkdir($pidDir);
+        $pidDir = $this->getTempDir('message-queue');
         file_put_contents($pidDir.'/consumer-id.pid', '123456');
 
         $dbal->insert('message_queue', [
@@ -88,7 +88,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalMessageConsumer
+     * @return \PHPUnit\Framework\MockObject\MockObject|DbalMessageConsumer
      */
     private function createMessageConsumerMock()
     {

@@ -51,7 +51,7 @@ define([
         },
         noDataMessage: __('Empty Address Book'),
         attributes: {
-            'class': 'list-box map-box'
+            'class': 'map-box'
         },
 
         /**
@@ -117,7 +117,7 @@ define([
         },
 
         _initMainContainers: function() {
-            this.$noDataContainer = $('<div class="no-data"><span>' + this.noDataMessage + '</span></div>');
+            this.$noDataContainer = $('<div class="no-data">' + this.noDataMessage + '</div>');
             this.$addressesContainer = $('<div class="map-address-list"/>');
 
             if (!this.$el.find('.map-address-list').length) {
@@ -234,7 +234,7 @@ define([
                     dialogOptions: {
                         modal: true,
                         resizable: false,
-                        width: 475,
+                        width: 585,
                         autoResize: true,
                         close: _.bind(function() {
                             delete this.addressEditDialog;

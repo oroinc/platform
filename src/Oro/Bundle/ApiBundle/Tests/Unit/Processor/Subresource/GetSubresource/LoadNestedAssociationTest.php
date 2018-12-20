@@ -16,25 +16,21 @@ use Oro\Component\EntitySerializer\EntitySerializer;
 
 class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entitySerializer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntitySerializer */
+    private $entitySerializer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityTitleProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityTitleProvider */
+    private $entityTitleProvider;
 
     /** @var LoadNestedAssociation */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->entitySerializer = $this->getMockBuilder(EntitySerializer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityTitleProvider = $this->getMockBuilder(EntityTitleProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entitySerializer = $this->createMock(EntitySerializer::class);
+        $this->entityTitleProvider = $this->createMock(EntityTitleProvider::class);
 
         $this->processor = new LoadNestedAssociation(
             $this->entitySerializer,
@@ -117,12 +113,12 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         self::assertEquals(
             [
                 'id'                   => 1,
-                ConfigUtil::CLASS_NAME => Entity\User::class,
+                ConfigUtil::CLASS_NAME => Entity\User::class
             ],
             $this->context->getResult()
         );
         self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
-        self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForNestedAssociationWithTitle()
@@ -310,7 +306,7 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         $this->processor->process($this->context);
         self::assertNull($this->context->getResult());
         self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
-        self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForNestedAssociationWhenParentEntityWasNotFound()
@@ -343,6 +339,6 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         $this->processor->process($this->context);
         self::assertNull($this->context->getResult());
         self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
-        self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 }

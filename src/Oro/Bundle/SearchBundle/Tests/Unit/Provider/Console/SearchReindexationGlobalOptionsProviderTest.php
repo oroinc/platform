@@ -10,9 +10,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
-class SearchReindexationGlobalOptionsProviderTest extends \PHPUnit_Framework_TestCase
+class SearchReindexationGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Command|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Command|\PHPUnit\Framework\MockObject\MockObject */
     protected $command;
 
     /** @var SearchReindexationGlobalOptionsProvider */
@@ -78,7 +78,7 @@ class SearchReindexationGlobalOptionsProviderTest extends \PHPUnit_Framework_Tes
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|InputDefinition
+     * @return \PHPUnit\Framework\MockObject\MockObject|InputDefinition
      */
     protected function prepareDefinition()
     {
@@ -95,7 +95,7 @@ class SearchReindexationGlobalOptionsProviderTest extends \PHPUnit_Framework_Tes
             'Determines whether search data reindexation need to be scheduled or not'
         );
 
-        /** @var InputDefinition|\PHPUnit_Framework_MockObject_MockObject $definition */
+        /** @var InputDefinition|\PHPUnit\Framework\MockObject\MockObject $definition */
         $definition = $this->createMock(InputDefinition::class);
         $definition->expects($this->exactly(4))
             ->method('addOption')
@@ -111,11 +111,11 @@ class SearchReindexationGlobalOptionsProviderTest extends \PHPUnit_Framework_Tes
 
     /**
      * @param $definition
-     * @return \PHPUnit_Framework_MockObject_MockObject|Application
+     * @return \PHPUnit\Framework\MockObject\MockObject|Application
      */
     protected function prepareApplication($definition)
     {
-        /** @var Application|\PHPUnit_Framework_MockObject_MockObject $application */
+        /** @var Application|\PHPUnit\Framework\MockObject\MockObject $application */
         $application = $this->createMock(Application::class);
         $application->expects($this->once())
             ->method('getDefinition')

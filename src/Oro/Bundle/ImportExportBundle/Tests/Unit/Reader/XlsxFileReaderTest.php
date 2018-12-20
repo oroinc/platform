@@ -7,35 +7,35 @@ use Liuggio\ExcelBundle\Factory;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\XlsxFileReader;
 
-class XlsxFileReaderTest extends \PHPUnit_Framework_TestCase
+class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
 {
     const MOCK_FILE_NAME = 'mock_file_for_initialize.xlsx';
 
     /** @var XlsxFileReader */
     protected $reader;
 
-    /** @var ContextRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextRegistry;
 
-    /** @var  Factory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  Factory|\PHPUnit\Framework\MockObject\MockObject */
     protected $phpExcelFactory;
 
-    /** @var \PHPExcel|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPExcel|\PHPUnit\Framework\MockObject\MockObject */
     protected $phpExcel;
 
-    /** @var  \PHPExcel_Worksheet|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPExcel_Worksheet|\PHPUnit\Framework\MockObject\MockObject */
     protected $phpExcelWorksheet;
 
-    /** @var \PHPExcel_Worksheet_RowIterator|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPExcel_Worksheet_RowIterator|\PHPUnit\Framework\MockObject\MockObject */
     protected $phpExcelWorksheetRowIterator;
 
-    /** @var \PHPExcel_Worksheet_Row|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPExcel_Worksheet_Row|\PHPUnit\Framework\MockObject\MockObject */
     protected $phpExcelWorksheetRow;
 
-    /** @var \PHPExcel_Worksheet_RowCellIterator|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPExcel_Worksheet_RowCellIterator|\PHPUnit\Framework\MockObject\MockObject */
     protected $phpExcelWorksheetRowCellIterator;
 
-    /** @var \PHPExcel_Cell|\PHPUnit_Framework_MockObject_MockObject  */
+    /** @var \PHPExcel_Cell|\PHPUnit\Framework\MockObject\MockObject  */
     protected $phpExcelCell;
 
     /** @var int */
@@ -329,8 +329,8 @@ class XlsxFileReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $context
-     * @return \PHPUnit_Framework_MockObject_MockObject|StepExecution
+     * @param \PHPUnit\Framework\MockObject\MockObject $context
+     * @return \PHPUnit\Framework\MockObject\MockObject|StepExecution
      */
     protected function getMockStepExecution($context)
     {

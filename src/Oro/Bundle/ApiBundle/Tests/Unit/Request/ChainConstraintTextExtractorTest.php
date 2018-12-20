@@ -3,22 +3,23 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\ChainConstraintTextExtractor;
+use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted;
 
-class ChainConstraintTextExtractorTest extends \PHPUnit_Framework_TestCase
+class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainConstraintTextExtractor */
-    protected $extractor;
+    private $extractor;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject[] */
-    protected $extractors = [];
+    /** @var \PHPUnit\Framework\MockObject\MockObject[] */
+    private $extractors = [];
 
     protected function setUp()
     {
         $this->extractor = new ChainConstraintTextExtractor();
 
-        $firstExtractor = $this->createMock('Oro\Bundle\ApiBundle\Request\ConstraintTextExtractorInterface');
-        $secondExtractor = $this->createMock('Oro\Bundle\ApiBundle\Request\ConstraintTextExtractorInterface');
+        $firstExtractor = $this->createMock(ConstraintTextExtractorInterface::class);
+        $secondExtractor = $this->createMock(ConstraintTextExtractorInterface::class);
 
         $this->extractor->addExtractor($firstExtractor);
         $this->extractor->addExtractor($secondExtractor);
@@ -30,137 +31,137 @@ class ChainConstraintTextExtractorTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = new AccessGranted();
 
-        $this->extractors[0]->expects($this->once())
+        $this->extractors[0]->expects(self::once())
             ->method('getConstraintStatusCode')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn(400);
-        $this->extractors[1]->expects($this->never())
+        $this->extractors[1]->expects(self::never())
             ->method('getConstraintStatusCode');
 
-        $this->assertEquals(400, $this->extractor->getConstraintStatusCode($constraint));
+        self::assertEquals(400, $this->extractor->getConstraintStatusCode($constraint));
     }
 
     public function testGetConstraintStatusCodeBySecondExtractor()
     {
         $constraint = new AccessGranted();
 
-        $this->extractors[0]->expects($this->once())
+        $this->extractors[0]->expects(self::once())
             ->method('getConstraintStatusCode')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn(null);
-        $this->extractors[1]->expects($this->once())
+        $this->extractors[1]->expects(self::once())
             ->method('getConstraintStatusCode')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn(401);
 
-        $this->assertEquals(401, $this->extractor->getConstraintStatusCode($constraint));
+        self::assertEquals(401, $this->extractor->getConstraintStatusCode($constraint));
     }
 
     public function testGetConstraintStatusCodeWithNullResult()
     {
         $constraint = new AccessGranted();
 
-        $this->extractors[0]->expects($this->once())
+        $this->extractors[0]->expects(self::once())
             ->method('getConstraintStatusCode')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn(null);
-        $this->extractors[1]->expects($this->once())
+        $this->extractors[1]->expects(self::once())
             ->method('getConstraintStatusCode')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn(null);
 
-        $this->assertNull($this->extractor->getConstraintStatusCode($constraint));
+        self::assertNull($this->extractor->getConstraintStatusCode($constraint));
     }
 
     public function testGetConstraintCodeByFirstExtractor()
     {
         $constraint = new AccessGranted();
 
-        $this->extractors[0]->expects($this->once())
+        $this->extractors[0]->expects(self::once())
             ->method('getConstraintCode')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn(645);
-        $this->extractors[1]->expects($this->never())
+        $this->extractors[1]->expects(self::never())
             ->method('getConstraintCode');
 
-        $this->assertEquals(645, $this->extractor->getConstraintCode($constraint));
+        self::assertEquals(645, $this->extractor->getConstraintCode($constraint));
     }
 
     public function testGetConstraintCodeBySecondExtractor()
     {
         $constraint = new AccessGranted();
 
-        $this->extractors[0]->expects($this->once())
+        $this->extractors[0]->expects(self::once())
             ->method('getConstraintCode')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn(null);
-        $this->extractors[1]->expects($this->once())
+        $this->extractors[1]->expects(self::once())
             ->method('getConstraintCode')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn(8456);
 
-        $this->assertEquals(8456, $this->extractor->getConstraintCode($constraint));
+        self::assertEquals(8456, $this->extractor->getConstraintCode($constraint));
     }
 
     public function testGetConstraintCodeWithNullResult()
     {
         $constraint = new AccessGranted();
 
-        $this->extractors[0]->expects($this->once())
+        $this->extractors[0]->expects(self::once())
             ->method('getConstraintCode')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn(null);
-        $this->extractors[1]->expects($this->once())
+        $this->extractors[1]->expects(self::once())
             ->method('getConstraintCode')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn(null);
 
-        $this->assertNull($this->extractor->getConstraintCode($constraint));
+        self::assertNull($this->extractor->getConstraintCode($constraint));
     }
 
     public function testGetConstraintTypeByFirstExtractor()
     {
         $constraint = new AccessGranted();
 
-        $this->extractors[0]->expects($this->once())
+        $this->extractors[0]->expects(self::once())
             ->method('getConstraintType')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn('first extractor type');
-        $this->extractors[1]->expects($this->never())
+        $this->extractors[1]->expects(self::never())
             ->method('getConstraintType');
 
-        $this->assertEquals('first extractor type', $this->extractor->getConstraintType($constraint));
+        self::assertEquals('first extractor type', $this->extractor->getConstraintType($constraint));
     }
 
     public function testGetConstraintTypeBySecondExtractor()
     {
         $constraint = new AccessGranted();
 
-        $this->extractors[0]->expects($this->once())
+        $this->extractors[0]->expects(self::once())
             ->method('getConstraintType')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn(null);
-        $this->extractors[1]->expects($this->once())
+        $this->extractors[1]->expects(self::once())
             ->method('getConstraintType')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn('second extractor type');
 
-        $this->assertEquals('second extractor type', $this->extractor->getConstraintType($constraint));
+        self::assertEquals('second extractor type', $this->extractor->getConstraintType($constraint));
     }
 
     public function testGetConstraintTypWithNullResult()
     {
         $constraint = new AccessGranted();
 
-        $this->extractors[0]->expects($this->once())
+        $this->extractors[0]->expects(self::once())
             ->method('getConstraintType')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn(null);
-        $this->extractors[1]->expects($this->once())
+        $this->extractors[1]->expects(self::once())
             ->method('getConstraintType')
-            ->with($this->identicalTo($constraint))
+            ->with(self::identicalTo($constraint))
             ->willReturn(null);
 
-        $this->assertNull($this->extractor->getConstraintType($constraint));
+        self::assertNull($this->extractor->getConstraintType($constraint));
     }
 }

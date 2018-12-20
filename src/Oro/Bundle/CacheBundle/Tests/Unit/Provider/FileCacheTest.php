@@ -3,10 +3,12 @@
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\CacheBundle\Provider\SyncCacheInterface;
-use Symfony\Component\Filesystem\Filesystem;
+use Oro\Component\Testing\TempDirExtension;
 
-class FileCacheTest extends \PHPUnit_Framework_TestCase
+class FileCacheTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /**
      * @param string $cacheClass
      * @param string $id
@@ -17,8 +19,7 @@ class FileCacheTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetFilename($cacheClass, $id, $namespace, $expectedFileName)
     {
-        $fs = new Filesystem();
-        $directory = 'dir' . uniqid();
+        $directory = $this->getTempDir('file_cache');
 
         $cache = $this->getMockBuilder($cacheClass)
             ->setConstructorArgs([$directory, '.ext'])
@@ -34,9 +35,6 @@ class FileCacheTest extends \PHPUnit_Framework_TestCase
             $directory . DIRECTORY_SEPARATOR . $expectedFileName,
             str_replace(realpath($directory), $directory, $result)
         );
-
-        $this->assertTrue($fs->exists($directory));
-        $fs->remove($directory);
     }
 
     /**
@@ -48,7 +46,7 @@ class FileCacheTest extends \PHPUnit_Framework_TestCase
     {
         $namespace = '123';
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|SyncCacheInterface $cache */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|SyncCacheInterface $cache */
         $cache = $this->getMockBuilder($cacheClass)
             ->disableOriginalConstructor()
             ->setMethods(['setNamespace', 'getNamespace'])

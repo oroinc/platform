@@ -6,7 +6,7 @@ use Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class WidgetTitleTypeTest extends \PHPUnit_Framework_TestCase
+class WidgetTitleTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetTitleType */
     protected $formType;
@@ -14,11 +14,6 @@ class WidgetTitleTypeTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->formType = new WidgetTitleType();
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_type_widget_title', $this->formType->getName());
     }
 
     public function testBuildForm()

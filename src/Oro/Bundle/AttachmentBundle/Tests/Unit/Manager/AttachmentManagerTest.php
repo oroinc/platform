@@ -2,22 +2,22 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
+use Oro\Bundle\AttachmentBundle\Exception\InvalidAttachmentEncodedParametersException;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
-use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
+class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AttachmentManager  */
     protected $attachmentManager;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject|RouterInterface */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject|RouterInterface */
     protected $router;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject|AssociationManager */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
     protected $associationManager;
 
     /** @var TestAttachment */
@@ -73,7 +73,7 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
                     'codedString' => $expectsString,
                     'extension' => 'txt'
                 ],
-                true
+                RouterInterface::ABSOLUTE_URL
             );
         $this->attachmentManager->getFileUrl($parentEntity, $fieldName, $this->attachment, 'download', true);
     }
@@ -92,6 +92,14 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
                 'T3JvXFRlc3RcVGVzdENsYXNzfHRlc3RGaWVsZHwxfGRvd25sb2FkfHRlc3RGaWxlLndpdGhGb3J3YXJkU2xhc2g/LnR4dA=='
             )
         );
+    }
+
+    public function testDecodeAttachmentUrlException()
+    {
+        $this->expectException(InvalidAttachmentEncodedParametersException::class);
+        $this->expectExceptionMessage('Attachment parameters cannot be decoded');
+
+        $this->attachmentManager->decodeAttachmentUrl('some_string');
     }
 
     public function testWrongAttachmentUrl()

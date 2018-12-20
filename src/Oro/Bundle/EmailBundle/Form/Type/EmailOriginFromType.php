@@ -85,7 +85,7 @@ class EmailOriginFromType extends AbstractType
     {
         $choices = $this->createChoices();
         $resolver->setDefaults([
-            'choices'   => $choices,
+            'choices' => $choices,
             'attr' => [],
         ]);
 
@@ -154,7 +154,7 @@ class EmailOriginFromType extends AbstractType
                     $owner = $origin->getOwner();
                     $email = $origin->getOwner()->getEmail();
                     $this->helper->preciseFullEmailAddress($email, ClassUtils::getClass($owner), $owner->getId());
-                    $origins[$origin->getId() . '|' . $origin->getOwner()->getEmail()] = $email;
+                    $origins[$email] = $origin->getId() . '|' . $origin->getOwner()->getEmail();
                 }
             }
         }
@@ -196,7 +196,7 @@ class EmailOriginFromType extends AbstractType
             } else {
                 $this->helper->preciseFullEmailAddress($email);
             }
-            $origins[$key] = $email;
+            $origins[$email] = $key;
         }
 
         return $origins;
@@ -220,7 +220,7 @@ class EmailOriginFromType extends AbstractType
                 $email = $mailbox->getEmail();
                 $this->helper->preciseFullEmailAddress($email);
                 $email .= ' (Mailbox)';
-                $origins[$origin->getId() . '|' . $mailbox->getEmail()] = $email;
+                $origins[$email] = $origin->getId() . '|' . $mailbox->getEmail();
             }
         }
 

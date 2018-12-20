@@ -8,7 +8,7 @@ use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\FormView;
 
-class FormUtilsTest extends \PHPUnit_Framework_TestCase
+class FormUtilsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider optionsProvider
@@ -230,10 +230,10 @@ class FormUtilsTest extends \PHPUnit_Framework_TestCase
                 [],
                 ['required' => true, 'attr' => ['readonly' => true]]
             ],
-            'readonly option is merged and replaces existing option' => [
-                ['attr' => ['readonly' => true]],
-                ['attr' => ['readonly' => false]],
-                ['attr' => ['readonly' => false]]
+            'disabled option is merged and replaces existing option' => [
+                ['attr' => ['disabled' => true]],
+                ['attr' => ['disabled' => false]],
+                ['attr' => ['disabled' => false]]
             ],
             'string option is replaced' => [
                 ['required' => true],

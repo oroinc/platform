@@ -6,22 +6,21 @@ use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\LoadCustomEntities;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
-class LoadCustomEntitiesTest extends \PHPUnit_Framework_TestCase
+class LoadCustomEntitiesTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configManager;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
+    private $configManager;
 
     /** @var LoadCustomEntities */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->processor = new LoadCustomEntities($this->configManager);
     }
@@ -30,7 +29,7 @@ class LoadCustomEntitiesTest extends \PHPUnit_Framework_TestCase
     {
         $context = new CollectResourcesContext();
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getConfigs')
             ->with('extend', null, true)
             ->willReturn(
@@ -47,15 +46,15 @@ class LoadCustomEntitiesTest extends \PHPUnit_Framework_TestCase
                     $this->getEntityConfig(
                         'Test\Entity4',
                         ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM, 'is_deleted' => true]
-                    ),
+                    )
                 ]
             );
 
         $this->processor->process($context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
-                'Test\Entity1' => new ApiResource('Test\Entity1'),
+                'Test\Entity1' => new ApiResource('Test\Entity1')
             ],
             $context->getResult()->toArray()
         );
@@ -67,10 +66,10 @@ class LoadCustomEntitiesTest extends \PHPUnit_Framework_TestCase
      *
      * @return Config
      */
-    protected function getEntityConfig($className, $values = [])
+    private function getEntityConfig($className, array $values = [])
     {
         $configId = new EntityConfigId('extend', $className);
-        $config   = new Config($configId);
+        $config = new Config($configId);
         $config->setValues($values);
 
         return $config;

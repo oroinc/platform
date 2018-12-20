@@ -1,0 +1,74 @@
+/* @theme: admin.oro; */
+
+// Main menu
+$menu-animation: all 200ms linear !default;
+$menu-background-color: $primary-300 !default;
+$menu-font-size: $base-font-size + 1 !default;
+$menu-background-color-active: $extra-200 !default;
+$menu-header-height: 48px !default;
+
+$menu-icon-left: $fa-var-angle-left !default;
+$menu-icon-right: $fa-var-angle-right !default;
+$menu-icon-up: $fa-var-angle-up !default;
+$menu-icon-down: $fa-var-angle-down !default;
+$menu-icon-toggler: $fa-var-arrow-left !default;
+$menu-placeholder-size: 17px !default;
+
+$menu-top-icon-start: if-ltr($menu-icon-left, $menu-icon-right) !default;
+$menu-top-icon-end: if-ltr($menu-icon-right, $menu-icon-left) !default;
+
+$menu-close-botton-background-color: rgba($primary, .55) !default;
+$menu-close-button-color: $primary-inverse !default;
+
+// Main menu full screen view
+$menu-full-screen-button-color: $primary-750 !default;
+$menu-full-screen-title-color: $primary-200 !default;
+
+// Main menu side view
+$menu-side-width: 230px !default;
+$menu-side-width-minimized: 80px !default;
+
+// Main menu dropdown
+$menu-header-background-color: $primary !default;
+$menu-dropdown-background-color: $primary-860 !default;
+$menu-dropdown-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
+$menu-dropdown-background-color-active: $primary-500 !default;
+$menu-dropdown-background-color-light-active: $primary-700 !default;
+
+// Mobile main menu
+$menu-mobile-box-shadow: if-ltr(0 2px 10px 0 rgba(0, 0, 0, .19), -2px 0 10px 0 rgba(0, 0, 0, .19)) !default;
+
+// Main menu items
+$menu-accordion-icon-color: $primary-550 !default;
+
+$menu-item-first-level-text-color: $primary-800 !default;
+$menu-item-first-level-text-color-active: $primary-inverse !default;
+$menu-item-text-color: $primary-300 !default;
+$menu-item-text-highlight-color: $extra-200 !default;
+$menu-item-offset: 9px 18px 9px 16px !default;
+$menu-item-divider-color: $primary-800 !default;
+
+$menu-minimized-item-first-level-text-color-active: $primary-400 !default;
+
+// Main menu toggler
+$menu-toggler-font-size: 16px !default;
+$menu-toggler-color: $additional-lighten !default;
+$menu-icon-toggler-transform: if-ltr(0, 180deg) !default;
+$menu-icon-toggler-transform-active: if-ltr(180deg, 0) !default;
+
+
+// Main menu overlay
+$side-menu-fill-blur-width: 36px !default;
+
+$side-menu-overlay-header-height: 108px !default;
+$side-menu-overlay-title-font-size: 21px !default;
+$side-menu-overlay-button-font-size: 18px !default;
+$side-menu-overlay-button-offset: if-ltr(null, -$side-menu-fill-blur-width) !default;
+
+$side-menu-overlay-ui-helper-direction: if-ltr(inherit, ltr) !default;
+$side-menu-overlay-ui-helper-text-align: if-ltr(right, left) !default;
+$side-menu-overlay-ui-fill-transform: if-ltr(translate(-100%), null) !default;
+$side-menu-overlay-ui-fill-width: if-ltr(300%, 100%) !default;
+$side-menu-overlay-ui-fill-blur-box-shadow: if-ltr(2px 2px 2px 0 rgba(0, 0, 0, .19), -2px 0px 2px 0 rgba(0, 0, 0, .19)) !default;
+$side-menu-overlay-ui-fill-blur-inner-transform: if-ltr(null, translate(-100%)) !default;
+$side-menu-overlay-ui-fill-blur-offset: if-ltr(null, -$side-menu-fill-blur-width) !default;

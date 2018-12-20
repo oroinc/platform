@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\DataProviderDecorator;
 
-class DataProviderDecoratorTest extends \PHPUnit_Framework_TestCase
+class DataProviderDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \ArrayObject

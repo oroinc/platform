@@ -9,7 +9,7 @@ Client Side Architecture
 
 ## Chaplin
 
-Client Side Architecture of Oro Platform is built over [Chaplin](http://chaplinjs.org/) (an architecture for JavaScript web applications based on the [Backbone.js](http://backbonejs.org/) library).
+Client Side Architecture of OroPlatform is built over [Chaplin](http://chaplinjs.org/) (an architecture for JavaScript web applications based on the [Backbone.js](http://backbonejs.org/) library).
 
 Backbone provides little structure above simple routing, individual models, views and their binding. Chaplin addresses these limitations by providing a light-weight but flexible structure which leverages well-proven design patterns and best practises.
 
@@ -70,8 +70,8 @@ It's placed in a twig-template in order to get access to backend variables in ru
 ## App Modules
 App modules are atomic parts of general application, responsible for:
 
- * defining global view (which live beside active controller);
  * register handlers in `mediator` (see [Chaplin.mediator](http://docs.chaplinjs.org/chaplin.mediator.html));
+ * subscribe to `mediator` events;
  * and do all actions which precede creating an instance of application.
 
 App modules export nothing, they are just callback functions that are executed right before the application is started.
@@ -81,45 +81,20 @@ App modules are declared in `requirejs.yml` configuration file, in custom sectio
 ```
 config:
     appmodules:
-        - oroui/js/app/modules/views-module
         - oroui/js/app/modules/messenger-module
 ```
 
 This approach allows to define in each bundle code which should be executed on the application start.
 
-### Example 1
-`oroui/js/app/modules/views-module` - declares global views which will be instantiated right before an action point of controller gains control
-
-```javascript
-define([
-    'oroui/js/app/controllers/base/controller'
-], function (BaseController) {
-    'use strict';
-    /* ... */
-
-    /**
-     * Init PageContentView
-     */
-    BaseController.loadBeforeAction([
-        'oroui/js/app/views/page/content-view'
-    ], function (PageContentView) {
-        BaseController.addToReuse('content', PageContentView, {
-            el: 'mainContainer'
-        });
-    });
-    /* ... */
-});
-```
-
-### Example 2
+### Example
 `oroui/js/app/modules/messenger-module` - registers messenger's public methods as handlers in `mediator`
 
 ```javascript
-define([
-    'oroui/js/mediator',
-    'oroui/js/messenger'
-], function (mediator, messenger) {
+define(function(require) {
     'use strict';
+    
+    var mediator = require('oroui/js/mediator');
+    var messenger = require('oroui/js/messenger');
 
     /**
      * Init messenger's handlers
@@ -131,9 +106,17 @@ define([
     /* ... */
 });
 ```
+## Page Layout View
+
+ChaplinJS has introduced [`Chaplin.Layout`](http://docs.chaplinjs.org/chaplin.layout.html) which the top-level application view. 
+The view is initialized for the `body` element and stays in memory, even when the active controller is changed. 
+We have extended this approach and created `PageLayoutView`. In addition to handling clicks on application-internal links, it collects form data and prepares navigation options for the AJAX POST request.
+Also it implements the `ComponentContainer` interface and initializes the top level [`Page Component`](#page-component) defined in the page's HTML. 
+That allows to create the so called global views. These views stay in the memory, as well as `PageLayoutView`, when the active controller is changed.
 
 ## Page Controller
-Page Controller is a central part of platform's architecture. After [Chaplin.Dispatcher](http://docs.chaplinjs.org/chaplin.dispatcher.html) call the target method (which is `page#index`), Page Controller executes whole stack of page loading and triggers proper events on each stage. Page Model (`oroui/js/app/models/page-model`) is used as container for page's data and performs interactions with server (loads data on navigation, posts data on form submit). Page Controller also works with pages cache component and declares some [navigation handlers](./mediator-handlers.md#page-controller).
+
+The Page Controller is the central part of platform's architecture. After [Chaplin.Dispatcher](http://docs.chaplinjs.org/chaplin.dispatcher.html) calls the target method (which is `page#index`), the Page Controller executes the whole stack of page loading and triggers proper events at each stage. The Page Model (`oroui/js/app/models/page-model`) is used as a  container for page's data and performs interactions with the server (loads data on navigation, posts data on form submit). Page Controller also works with pages cache component and declares some [navigation handlers](./mediator-handlers.md#page-controller).
 
 ![Page loading flow](./page-controller.png)
 

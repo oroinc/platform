@@ -1,0 +1,19 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/variables";
+@import "oroui/css/scss/mixins";
+
+@import "variables";
+
+@import "app-header";
+@import "dashboard";
+@import "email-notification-menu";
+@import "short-emails-list";
+@import "sidebar-widget";
+@import "email-detailed-info-table";
+@import "email-detail-info";
+@import "icon-email-thread";
+@import "style";
+
+// mobile
+@import "mobile/main";

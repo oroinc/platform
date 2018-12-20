@@ -10,10 +10,10 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class GlobalOptionsListenerTest extends \PHPUnit_Framework_TestCase
+class GlobalOptionsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var GlobalOptionsProviderRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var GlobalOptionsProviderRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     private $registry;
 
@@ -30,9 +30,9 @@ class GlobalOptionsListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnConsoleCommand()
     {
-        /** @var Command|\PHPUnit_Framework_MockObject_MockObject $command */
+        /** @var Command|\PHPUnit\Framework\MockObject\MockObject $command */
         $command = $this->createMock(Command::class);
-        /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject $input */
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         /** @var OutputInterface $output */
         $output = $this->createMock(OutputInterface::class);

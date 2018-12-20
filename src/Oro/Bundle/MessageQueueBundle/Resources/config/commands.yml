@@ -1,0 +1,24 @@
+services:
+    Oro\Bundle\MessageQueueBundle\Command\CleanupCommand:
+        public: false
+        class: Oro\Bundle\MessageQueueBundle\Command\CleanupCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\MessageQueueBundle\Command\ClientConsumeMessagesCommand:
+        public: false
+        class: Oro\Bundle\MessageQueueBundle\Command\ClientConsumeMessagesCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\MessageQueueBundle\Command\ConsumerHeartbeatCommand:
+        public: false
+        class: Oro\Bundle\MessageQueueBundle\Command\ConsumerHeartbeatCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\MessageQueueBundle\Command\TransportConsumeMessagesCommand:
+        public: false
+        class: Oro\Bundle\MessageQueueBundle\Command\TransportConsumeMessagesCommand
+        tags:
+            - { name: console.command }

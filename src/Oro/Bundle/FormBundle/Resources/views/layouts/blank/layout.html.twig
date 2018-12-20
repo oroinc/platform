@@ -37,7 +37,7 @@
     {% if style is not defined %}
         {% set add_class = '' %}
     {% else %}
-        {% set add_class = 'btn ' ~ style %}
+        {% set add_class = ' btn ' ~ style %}
     {% endif %}
     {% set attr = attr|merge({
         class: attr.class|default('') ~ add_class

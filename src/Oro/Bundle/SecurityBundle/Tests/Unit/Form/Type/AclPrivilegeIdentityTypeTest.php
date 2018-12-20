@@ -6,7 +6,7 @@ use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeIdentityType;
 use Oro\Bundle\SecurityBundle\Form\Type\ObjectLabelType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
-class AclPrivilegeIdentityTypeTest extends \PHPUnit_Framework_TestCase
+class AclPrivilegeIdentityTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclPrivilegeIdentityType */
     protected $formType;
@@ -25,11 +25,6 @@ class AclPrivilegeIdentityTypeTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->at(1))->method('add')
             ->with('name', ObjectLabelType::class, array('required' => false));
         $this->formType->buildForm($builder, array());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_acl_privilege_identity', $this->formType->getName());
     }
 
     public function testConfigureOptions()

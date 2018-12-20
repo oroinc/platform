@@ -42,12 +42,12 @@ class ChartType extends ConfigProviderAwareType
                 ChoiceType::class,
                 [
                     'label' => 'oro.chart.form.name.label',
-                    'choices' => array_map(
+                    'choices' => array_flip(array_map(
                         function (array $chartConfig) {
                             return $chartConfig['label'];
                         },
                         $chartConfigs
-                    ),
+                    )),
                     'placeholder' => 'oro.chart.form.chart_empty_value'
                 ]
             )

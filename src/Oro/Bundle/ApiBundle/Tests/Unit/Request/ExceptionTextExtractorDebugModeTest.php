@@ -10,17 +10,34 @@ use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Exception\DisabledException;
+use Symfony\Component\Security\Core\Exception\LockedException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class ExceptionTextExtractorDebugModeTest extends \PHPUnit_Framework_TestCase
+class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExceptionTextExtractor */
-    protected $exceptionTextExtractor;
+    private $exceptionTextExtractor;
 
     protected function setUp()
     {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::any())
+            ->method('trans')
+            ->willReturnCallback(function ($label, $parameters) {
+                $result = 'translated: ' . $label;
+                if (!empty($parameters)) {
+                    $result .= sprintf(' (%s)', implode(',', array_keys($parameters)));
+                }
+
+                return $result;
+            });
+
         $this->exceptionTextExtractor = new ExceptionTextExtractor(
             true,
-            ['\UnexpectedValueException']
+            $translator,
+            [\UnexpectedValueException::class]
         );
     }
 
@@ -30,7 +47,7 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit_Framework_TestCase
      *
      * @return ExecutionFailedException
      */
-    protected function createExecutionFailedException(\Exception $innerException = null, $processorId = 'processor1')
+    private function createExecutionFailedException(\Exception $innerException = null, $processorId = 'processor1')
     {
         return new ExecutionFailedException(
             $processorId,
@@ -45,7 +62,7 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetExceptionStatusCode(\Exception $exception, $expectedStatusCode)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expectedStatusCode,
             $this->exceptionTextExtractor->getExceptionStatusCode($exception)
         );
@@ -59,17 +76,20 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit_Framework_TestCase
             [$this->createExecutionFailedException(new BadRequestHttpException()), 400],
             [new AccessDeniedException(), 403],
             [new ForbiddenException('test'), 403],
+            [new LockedException('Reason.'), 403],
+            [new DisabledException('Reason.'), 403],
+            [new UsernameNotFoundException('Reason.'), 403],
             [new \InvalidArgumentException(), 500],
             [new RuntimeException(), 500],
             [new ActionNotAllowedException(), 405],
             [new ForbiddenException('Reason.'), 403],
-            [new ResourceNotAccessibleException(), 404],
+            [new ResourceNotAccessibleException(), 404]
         ];
     }
 
     public function testGetExceptionCode()
     {
-        $this->assertNull($this->exceptionTextExtractor->getExceptionCode(new \Exception()));
+        self::assertNull($this->exceptionTextExtractor->getExceptionCode(new \Exception()));
     }
 
     /**
@@ -77,7 +97,7 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit_Framework_TestCase
      */
     public function testExceptionType(\Exception $exception, $expectedType)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expectedType,
             $this->exceptionTextExtractor->getExceptionType($exception)
         );
@@ -95,7 +115,10 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit_Framework_TestCase
             [new RuntimeException('Some error.'), 'runtime exception'],
             [new ActionNotAllowedException(), 'action not allowed exception'],
             [new ForbiddenException('Reason.'), 'forbidden exception'],
-            [new ResourceNotAccessibleException(), 'resource not accessible exception'],
+            [new LockedException('Reason.'), 'authentication exception'],
+            [new DisabledException('Reason.'), 'authentication exception'],
+            [new UsernameNotFoundException('Reason.'), 'authentication exception'],
+            [new ResourceNotAccessibleException(), 'resource not accessible exception']
         ];
     }
 
@@ -104,7 +127,7 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit_Framework_TestCase
      */
     public function testExceptionText(\Exception $exception, $expectedType)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expectedType,
             $this->exceptionTextExtractor->getExceptionText($exception)
         );
@@ -179,9 +202,21 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit_Framework_TestCase
                 'Reason.'
             ],
             [
+                new LockedException('Reason.'),
+                'translated: Account is locked.'
+            ],
+            [
+                new DisabledException('Reason.'),
+                'translated: Account is disabled.'
+            ],
+            [
+                new UsernameNotFoundException('Reason.'),
+                'translated: Username could not be found. ({{ username }}).'
+            ],
+            [
                 new ResourceNotAccessibleException(),
                 'The resource is not accessible.'
-            ],
+            ]
         ];
     }
 }

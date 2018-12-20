@@ -6,12 +6,12 @@ use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
 use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
-class OptionsResolverTest extends \PHPUnit_Framework_TestCase
+class OptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContextAccessor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextAccessor;
 
-    /** @var OptionsAssembler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OptionsAssembler|\PHPUnit\Framework\MockObject\MockObject */
     protected $optionsAssembler;
 
     /** @var OptionsResolver */

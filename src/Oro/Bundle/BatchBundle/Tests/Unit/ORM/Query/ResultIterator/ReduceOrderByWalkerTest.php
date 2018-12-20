@@ -11,22 +11,22 @@ use Doctrine\ORM\Query\AST\PathExpression;
 use Oro\Bundle\BatchBundle\ORM\Query\ResultIterator\ReduceOrderByWalker;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\ORM\Query\ResultIterator\SqlWalkerHelperTrait;
 
-class ReduceOrderByWalkerTest extends \PHPUnit_Framework_TestCase
+class ReduceOrderByWalkerTest extends \PHPUnit\Framework\TestCase
 {
     use SqlWalkerHelperTrait;
 
     /**
-     * @var AbstractQuery|\PHPUnit_Framework_MockObject_MockObject
+     * @var AbstractQuery|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $query;
 
     /**
-     * @var |\PHPUnit_Framework_MockObject_MockObject
+     * @var |\PHPUnit\Framework\MockObject\MockObject
      */
     protected $parserResult;
 
     /**
-     * @var |\PHPUnit_Framework_MockObject_MockObject
+     * @var |\PHPUnit\Framework\MockObject\MockObject
      */
     protected $queryComponents = [];
 
@@ -36,12 +36,12 @@ class ReduceOrderByWalkerTest extends \PHPUnit_Framework_TestCase
     protected $reduceOrderByWalker;
 
     /**
-     * @var Connection|\PHPUnit_Framework_MockObject_MockObject
+     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $connection;
 
     /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 

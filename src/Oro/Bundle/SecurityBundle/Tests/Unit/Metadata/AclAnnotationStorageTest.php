@@ -6,7 +6,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor as AclAnnotationAncestor;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
 
-class AclAnnotationStorageTest extends \PHPUnit_Framework_TestCase
+class AclAnnotationStorageTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)

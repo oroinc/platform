@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\AddApiDocViewAnnotationHandler;
 use Symfony\Component\Routing\Route;
 
-class AddApiDocViewAnnotationHandlerTest extends \PHPUnit_Framework_TestCase
+class AddApiDocViewAnnotationHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AddApiDocViewAnnotationHandler */
     private $handler;

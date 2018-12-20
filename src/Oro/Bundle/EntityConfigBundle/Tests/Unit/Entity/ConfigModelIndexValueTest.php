@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class ConfigModelIndexValueTest extends \PHPUnit_Framework_TestCase
+class ConfigModelIndexValueTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {

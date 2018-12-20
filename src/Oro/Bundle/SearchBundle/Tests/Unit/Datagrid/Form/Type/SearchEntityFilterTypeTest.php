@@ -18,10 +18,10 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class SearchEntityFilterTypeTest extends FormIntegrationTestCase
 {
-    /** @var EntityNameResolver|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityNameResolver;
 
-    /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $localizationHelper;
 
     /** @var SearchEntityFilterType */
@@ -105,11 +105,6 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
             'resolved-label',
             $formOptions['field_options']['choice_label']($entity)
         );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(SearchEntityFilterType::NAME, $this->type->getName());
     }
 
     public function testGetBlockPrefix()

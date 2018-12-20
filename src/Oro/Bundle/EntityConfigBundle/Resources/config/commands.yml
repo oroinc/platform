@@ -1,0 +1,24 @@
+services:
+    Oro\Bundle\EntityConfigBundle\Command\CacheClearCommand:
+        public: false
+        class: Oro\Bundle\EntityConfigBundle\Command\CacheClearCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EntityConfigBundle\Command\CacheWarmupCommand:
+        public: false
+        class: Oro\Bundle\EntityConfigBundle\Command\CacheWarmupCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EntityConfigBundle\Command\DebugCommand:
+        public: false
+        class: Oro\Bundle\EntityConfigBundle\Command\DebugCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EntityConfigBundle\Command\UpdateCommand:
+        public: false
+        class: Oro\Bundle\EntityConfigBundle\Command\UpdateCommand
+        tags:
+            - { name: console.command }

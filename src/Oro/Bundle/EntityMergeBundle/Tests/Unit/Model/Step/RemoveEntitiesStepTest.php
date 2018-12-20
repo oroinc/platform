@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Step;
 use Oro\Bundle\EntityMergeBundle\Model\Step\RemoveEntitiesStep;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
-class RemoveEntitiesStepTest extends \PHPUnit_Framework_TestCase
+class RemoveEntitiesStepTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var RemoveEntitiesStep
@@ -13,12 +13,12 @@ class RemoveEntitiesStepTest extends \PHPUnit_Framework_TestCase
     protected $step;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 

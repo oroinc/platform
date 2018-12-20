@@ -37,13 +37,18 @@ services:
             - [addNameFormats, ['%oro_locale.format.name%']]
             - [addAddressFormats, ['%oro_locale.format.address%']]
             - [addLocaleData, ['%oro_locale.locale_data%']]
-            - [addCurrencyData, ['%oro_locale.currency_data%']]
 
     oro_locale.helper.localization:
         class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationHelper'
         arguments:
             - '@oro_locale.manager.localization'
             - '@oro_locale.provider.current_localization'
+
+    oro_locale.helper.default_locale_localization:
+        class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationHelper'
+        arguments:
+           - '@oro_locale.manager.localization'
+           - '@oro_locale.provider.config_default_localization'
 
     oro_locale.helper.localization.link:
         tags:
@@ -317,6 +322,11 @@ services:
     oro_locale.provider.current_localization:
         class: 'Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider'
 
+    oro_locale.provider.config_default_localization:
+        class: 'Oro\Bundle\LocaleBundle\Provider\ConfigDefaultLocalizationProvider'
+        arguments:
+            - '@oro_locale.manager.localization'
+
     oro_locale.entity_generator.extension:
         class: '%oro_locale.entity_generator.extension.class%'
         tags:
@@ -344,3 +354,14 @@ services:
             - "@oro_locale.provider.current_localization"
         tags:
             - {name: oro_scope.provider, scopeType: web_content, priority: 1}
+
+    oro_locale.provider.chain_preferred_language_provider:
+        class: Oro\Bundle\LocaleBundle\Provider\ChainPreferredLanguageProvider
+
+    oro_locale.provider.default_preferred_language_provider:
+        class: Oro\Bundle\LocaleBundle\Provider\DefaultPreferredLanguageProvider
+        public: false
+        arguments:
+            - '@oro_locale.settings'
+        tags:
+            - { name: oro_locale.preferred_language_provider, priority: 255 }

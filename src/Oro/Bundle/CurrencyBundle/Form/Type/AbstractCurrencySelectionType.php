@@ -19,6 +19,9 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Base class for form types that work with currencies.
+ */
 abstract class AbstractCurrencySelectionType extends AbstractType
 {
     /**
@@ -66,11 +69,11 @@ abstract class AbstractCurrencySelectionType extends AbstractType
                 $this->checkOptions($options);
 
                 if ($options['full_currency_list']) {
-                    return $this->currencyNameHelper->getCurrencyFilteredList();
+                    return array_flip($this->currencyNameHelper->getCurrencyFilteredList());
                 }
 
                 $currencies = $options['currencies_list'];
-                if (!count($currencies)) {
+                if (empty($currencies)) {
                     $currencies = $this->getCurrencies();
                 }
 
@@ -78,7 +81,7 @@ abstract class AbstractCurrencySelectionType extends AbstractType
 
                 $this->checkCurrencies($currencies);
 
-                return array_flip($currencies);
+                return array_unique($currencies);
             },
             'compact' => false,
             'currencies_list' => null,
@@ -139,7 +142,7 @@ abstract class AbstractCurrencySelectionType extends AbstractType
                     $event->getForm()->getParent(),
                     $event->getForm()->getName(),
                     ['additional_currencies' => [$formData]],
-                    ['choice_list', 'choices']
+                    ['choices']
                 );
             }
         });
@@ -223,6 +226,6 @@ abstract class AbstractCurrencySelectionType extends AbstractType
      */
     private function isMissedCurrency($currencyCode, array $options)
     {
-        return (empty($options['choices']) || !isset($options['choices'][$currencyCode]));
+        return empty($options['choices']) || !in_array($currencyCode, $options['choices'], true);
     }
 }

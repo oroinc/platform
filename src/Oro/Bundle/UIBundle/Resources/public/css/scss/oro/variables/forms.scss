@@ -1,0 +1,17 @@
+/* @theme: admin.oro; */
+
+$form-pass-reset-background: linear-gradient(color('white'), darken(color('white'), 5%));
+$form-pass-reset-border: 1px solid darken(color('white'), 17%);
+$form-horizontal-control-label-width: 182px !default;
+$form-horizontal-control-label-offset: 6px !default;
+$form-horizontal-control-label-line-height: 20px !default;
+$form-horizontal-widget-control-label-width: auto !default;
+
+$form-horizontal-control-margin-start: 24px !default;
+$form-container-control-row-space: 16px !default;
+
+$form-container-column-max-width: 480px !default;
+$form-container-column-offset-right: 20px !default;
+
+$modal-form-horizontal-control-label-width: 140px !default;
+$modal-form-horizontal-controls-input-width: 100% !default;

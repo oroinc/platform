@@ -1,0 +1,26 @@
+/* @theme: admin.oro; */
+
+.mobile-version {
+    @import "variables";
+    @import "app-header";
+    @import "attribute-item";
+    @import "clearfix";
+    @import "content-sidebar";
+    @import "dialog";
+    @import "form";
+    @import "layout";
+    @import "form-description";
+    @import "login";
+    @import "main-menu";
+    @import "modal";
+    @import "page-header";
+    @import "accordion";
+    @import "flash-messages";
+    @import "inline-actions";
+    @import "select2";
+    @import "jstree";
+    @import "tables";
+    @import "scrollspy";
+    @import "popover";
+    @import "widget-picker";
+}

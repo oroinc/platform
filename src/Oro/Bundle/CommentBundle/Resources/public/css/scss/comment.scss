@@ -1,0 +1,179 @@
+/* @theme: admin.oro; */
+
+.comments-view-header {
+    padding: $comment-view-header-offset;
+
+    @include clearfix();
+}
+
+.comments-header-view-title {
+    margin: 0;
+
+    font-size: $comment-view-title-font-size;
+    font-weight: $comment-view-title-font-weight;
+}
+
+.comments-view-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.comment-form-container {
+    .comment-form {
+        padding-bottom: $comment-view-content-offset;
+
+        .comment-text-field {
+            width: 100%;
+        }
+
+        .attachment-item {
+            margin-top: $comment-view-attachment-item-offset;
+        }
+
+        .pull-left,
+        .pull-right {
+            max-width: 100%;
+        }
+
+        .control-group {
+            .controls:first-child {
+                margin-#{$start}: 0;
+            }
+        }
+    }
+}
+
+.comments-block {
+    margin-bottom: $comments-block-offset;
+    min-width: inherit;
+
+    color: $comments-block-color;
+
+    .comment-item {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .comment-item:last-child {
+        .comment-content {
+            padding-bottom: 0;
+        }
+    }
+
+    .comment-title {
+        width: $comments-block-title-size;
+        position: relative;
+    }
+
+    .comment-author-info {
+        margin-bottom: $comments-block-author-info-offset;
+    }
+
+    .comment-content {
+        flex-grow: 1;
+        padding: $comments-block-content-offset;
+
+        p {
+            margin: $comments-block-paragraph-offset;
+
+            &:last-child {
+                margin: $comments-block-paragraph-last-offset;
+            }
+        }
+    }
+
+    .comment-title {
+        .comment-title-avatar {
+            width: $comments-block-title-size;
+            height: $comments-block-title-size;
+
+            border-radius: $comments-block-avatar-radius;
+        }
+
+        .no-avatar {
+            line-height: 1;
+
+            @include fa-icon($comments-avatar-placeholder-icon, before, true) {
+                font-size: $comments-block-title-size;
+                color: $comments-avatar-placeholder-color;
+            }
+        }
+    }
+
+    .comment-body {
+        color: $comments-block-body-color;
+
+        word-break: break-all;
+
+        .scrollspy-title {
+            display: none;
+        }
+    }
+
+    .comment-actions {
+        &__trigger {
+            width: $comments-comment-action-size;
+
+            font-size: $comments-comment-action-font-size;
+            text-align: $end;
+
+            @include fa-icon($comments-comment-actions-icon, before, true) {
+                font-weight: normal;
+            }
+        }
+    }
+
+    .comment-attachments {
+        .thumbnail {
+            display: block;
+            width: $comments-thumbnail-width;
+            height: $comments-thumbnail-height;
+
+            text-align: center;
+
+            background:  $comments-thumbnail-background;
+            border-radius: $comments-thumbnail-border-radius;
+
+            .fa {
+                padding-top: $comments-thumbnail-icon-offset;
+                color: $comments-thumbnail-icon-color;
+            }
+        }
+
+        .link-to-record {
+            padding-top: $comment-view-base-offset;
+
+            .dropdown-toggle {
+                display: inline-block;
+            }
+
+            .dropdown-menu {
+                .view-image {
+                    display: none;
+                }
+            }
+
+            .fa {
+                color: $comments-thumbnail-icon-record-color;
+                font-size: $comments-thumbnail-icon-record-font-size;
+            }
+        }
+    }
+
+    .attachment-icon.accordion-toggle {
+        display: none;
+
+        &.collapsed {
+            display: inline-block;
+        }
+    }
+}
+
+.ui-dialog {
+    .comment-form {
+        textarea,
+        .mce-tinymce {
+            max-width: 100%;
+        }
+    }
+}

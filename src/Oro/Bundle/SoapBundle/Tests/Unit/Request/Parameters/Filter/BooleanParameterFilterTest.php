@@ -4,7 +4,7 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\Request\Parameters\Filter;
 
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\BooleanParameterFilter;
 
-class BooleanParameterFilterTest extends \PHPUnit_Framework_TestCase
+class BooleanParameterFilterTest extends \PHPUnit\Framework\TestCase
 {
 
     /**

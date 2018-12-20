@@ -1,0 +1,18 @@
+/* @theme: admin.oro; */
+
+.thread-view {
+    .email-actions-items {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+
+        .btn-group {
+            margin-#{$start}: $email-actions-btn-group-mobile-offset;
+            margin-bottom: $email-actions-btn-group-mobile-offset;
+
+            &:first-child {
+                margin-#{$start}:  $email-actions-btn-group-first-mobile-offset;;
+            }
+        }
+    }
+}
