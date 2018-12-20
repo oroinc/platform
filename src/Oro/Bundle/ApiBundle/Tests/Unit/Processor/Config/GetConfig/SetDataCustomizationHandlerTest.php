@@ -110,7 +110,10 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 ->getPostSerializeHandler()
         );
 
-        self::assertNull($configObject->getPostSerializeCollectionHandler());
+        self::assertInstanceOf(
+            EntityHandler::class,
+            $configObject->getPostSerializeCollectionHandler()
+        );
 
         $assert = $this->getRootHandlerAssertion($configObject);
         $assert();
@@ -200,7 +203,8 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 ->getTargetEntity()
                 ->getPostSerializeHandler()
         );
-        self::assertNull(
+        self::assertInstanceOf(
+            AssociationHandler::class,
             $configObject
                 ->getField('field2')
                 ->getTargetEntity()
@@ -222,7 +226,8 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 ->getTargetEntity()
                 ->getPostSerializeHandler()
         );
-        self::assertNull(
+        self::assertInstanceOf(
+            AssociationHandler::class,
             $configObject
                 ->getField('field2')
                 ->getTargetEntity()

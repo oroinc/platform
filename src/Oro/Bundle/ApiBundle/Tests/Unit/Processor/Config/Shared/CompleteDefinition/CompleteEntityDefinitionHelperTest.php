@@ -1361,6 +1361,48 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
+    public function testCompleteDefinitionForIdentifierFieldsOnlyWithReplacedField()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'id'     => null,
+                'field1' => [
+                    'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
+                ],
+                '_field1' => [
+                    'property_path' => 'field1'
+                ]
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+        $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id' => null
+                ]
+            ],
+            $config
+        );
+    }
+
     public function testCompleteDefinitionForIdentifierFieldsOnlyWhenNoIdFieldInConfig()
     {
         $config = $this->createConfigObject([

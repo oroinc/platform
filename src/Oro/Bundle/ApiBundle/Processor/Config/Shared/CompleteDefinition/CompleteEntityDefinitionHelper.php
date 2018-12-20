@@ -83,13 +83,13 @@ class CompleteEntityDefinitionHelper
         EntityDefinitionConfig $definition,
         ConfigContext $context
     ) {
-        $existingFields = $this->getExistingFields($definition);
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($context->getClassName());
         if ($context->hasExtra(FilterIdentifierFieldsConfigExtra::NAME)) {
-            $this->completeIdentifierFields($definition, $metadata, $existingFields);
+            $this->completeIdentifierFields($definition, $metadata);
         } else {
             $version = $context->getVersion();
             $requestType = $context->getRequestType();
+            $existingFields = $this->getExistingFields($definition);
             $expandedEntities = $this->getExpandedEntities(
                 $definition,
                 $context->get(ExpandRelatedEntitiesConfigExtra::NAME)
@@ -212,12 +212,10 @@ class CompleteEntityDefinitionHelper
     /**
      * @param EntityDefinitionConfig $definition
      * @param ClassMetadata          $metadata
-     * @param array                  $existingFields [property path => field name, ...]
      */
     private function completeIdentifierFields(
         EntityDefinitionConfig $definition,
-        ClassMetadata $metadata,
-        array $existingFields
+        ClassMetadata $metadata
     ) {
         // get identifier fields
         $configuredIdFieldNames = $definition->getIdentifierFieldNames();
@@ -237,16 +235,15 @@ class CompleteEntityDefinitionHelper
             }
         }
         // remove all not identifier fields
-        foreach ($existingFields as $propertyPath => $fieldName) {
-            if (!\in_array($propertyPath, $idFieldNames, true)
-                && !$definition->getField($fieldName)->isMetaProperty()
-            ) {
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if (!$field->isMetaProperty() && !\in_array($field->getPropertyPath($fieldName), $idFieldNames, true)) {
                 $definition->removeField($fieldName);
             }
         }
         // make sure all identifier fields are added
         foreach ($idFieldNames as $propertyPath) {
-            if (!isset($existingFields[$propertyPath])) {
+            if (null === $definition->findField($propertyPath, true)) {
                 $definition->addField($propertyPath);
             }
         }

@@ -82,6 +82,37 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The "data_class" form option should be specified for the nested object. Field: Test\Class::testField.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testAddNestedObjectAssociationShouldThrowExceptionWhenNoDataClassFormOption()
+    {
+        $config = new EntityDefinitionConfig();
+
+        $entityMetadata = new EntityMetadata();
+        $entityClass = 'Test\Class';
+        $fieldName = 'testField';
+        $field = new EntityDefinitionFieldConfig();
+        $targetAction = 'testAction';
+
+        $this->objectMetadataFactory->expects(self::never())
+            ->method('createAndAddAssociationMetadata');
+        $this->objectMetadataFactory->expects(self::never())
+            ->method('createObjectMetadata');
+
+        $this->nestedObjectMetadataHelper->addNestedObjectAssociation(
+            $entityMetadata,
+            $entityClass,
+            $config,
+            $fieldName,
+            $field,
+            $targetAction
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage The "association.field1" property path is not supported for the nested object. Parent Field: Test\ParentClass::parentField. Target Field: targetField.
      */
     // @codingStandardsIgnoreEnd
