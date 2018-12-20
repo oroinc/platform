@@ -4,3 +4,6 @@ trusted_data:
         Oro\Bundle\TranslationBundle\Translation\DatabasePersister:
             executeBatchTranslationInsert:
                 sqlData: true
+        Oro\Bundle\TranslationBundle\Entity\Repository\AbstractTranslationRepository:
+            doUpdateTranslations:
+                sql: true

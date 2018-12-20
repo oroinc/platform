@@ -8,7 +8,6 @@ trusted_data:
         Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper:
             getTableName: true
         Oro\Bundle\EntityBundle\ORM\DoctrineHelper:
-            getSingleRootAlias: true
             getSingleEntityIdentifier: true
             getEntityIdentifierFieldNames: true
             getEntityIdentifierFieldNamesForClass: true
