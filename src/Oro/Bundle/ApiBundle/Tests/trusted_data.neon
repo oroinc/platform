@@ -10,8 +10,6 @@ trusted_data:
             addJoinToParentEntity:
                 parentClassName: true
                 joinAlias: true
-
-        # TODO: CHECK THIS! Looks like safe method must be used instead
         Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor:
             createQueryBuilder:
                 entityClass: true
@@ -23,146 +21,18 @@ trusted_data:
                 parentJoinAlias: true
                 associationName: true
 
-        # $expression, $parameterName and $value are checked by
-        # Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor::walkComparison
-        # as all expressions are called only from this method, we do not need to check these arguments in each expression
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EqComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NeqComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NeqOrNullComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-            walkRangeExpression:
-                field: true
-                parameterName: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NeqOrEmptyComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\GtComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\GteComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\LtComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\LteComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ExistsComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EmptyComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\InComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NinComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\MemberOfComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-            walkRangeExpression:
-                field: true
-                parameterName: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AllMemberOfComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ContainsComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NotContainsComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\StartsWithComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NotStartsWithComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EndsWithComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
-        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NotEndsWithComparisonExpression:
-            walkComparisonExpression:
-                field: true
-                expression: true
-                parameterName: true
-                value: true
+    safe_methods:
+        Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery:
+            getJoinFieldName: true
+        Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig:
+            findFieldNameByPropertyPath: true
+            getIdentifierFieldNames: true
 
-        safe_methods:
-            Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery:
-                getJoinFieldName: true
-            Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig:
-                findFieldNameByPropertyPath: true
-                getIdentifierFieldNames: true
-        check_methods:
-            Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionInterface:
-                __all__: true
-                walkComparisonExpression: [1, 2, 3]
-        check_methods_safety:
-            Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor:
-                buildPlaceholder: true
+    check_methods:
+        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionInterface:
+            __all__: true
+            walkComparisonExpression: [1, 2, 3]
+
+    check_methods_safety:
+        Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor:
+            buildPlaceholder: true
