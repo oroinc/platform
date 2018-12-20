@@ -590,7 +590,18 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     {
         /** @var Form $form */
         $form = $this->createElement($formName);
-        $field = $form->findField($fieldName);
+        $mapping = $form->getOption('mapping');
+        if ($mapping && isset($mapping[$fieldName])) {
+            $field = $form->findField($mapping[$fieldName]);
+            if (isset($mapping[$fieldName]['element'])) {
+                $field = $this->elementFactory->wrapElement(
+                    $mapping[$fieldName]['element'],
+                    $field
+                );
+            }
+        } else {
+            $field = $form->findField($fieldName);
+        }
 
         if (null === $field) {
             $driver = $this->getSession()->getDriver();
