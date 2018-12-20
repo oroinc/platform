@@ -74,12 +74,12 @@ class Element extends NodeElement
 
     /**
      * @param string $key
-     * @return string|array
+     * @return string|array|null
      */
     public function getOption($key)
     {
         if (!isset($this->options[$key])) {
-            self::fail("Option with '$key' key not found'");
+            return null;
         }
 
         return $this->options[$key];
