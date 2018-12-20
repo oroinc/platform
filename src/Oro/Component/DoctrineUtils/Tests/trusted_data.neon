@@ -49,3 +49,4 @@ trusted_data:
             checkIdentifier: true
             checkParameter: true
             checkField: true
+            checkPath: true
