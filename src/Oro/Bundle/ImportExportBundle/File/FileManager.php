@@ -242,14 +242,13 @@ class FileManager
             $file = $file->getKey();
         }
 
-	if ($file && $this->filesystem->has($file)) {
-	    try {
+        if ($file && $this->filesystem->has($file)) {
+            try {
                 return $this->filesystem->mimeType($file);
-	    } catch (\LogicException $e) {
-		// The underlying adapter does support mimetype.
-		return null;
-	    }
-
+            } catch (\LogicException $e) {
+                // The underlying adapter does support mimetype.
+                return null;
+            }
         }
 
         return null;
