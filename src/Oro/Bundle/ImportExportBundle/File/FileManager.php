@@ -5,7 +5,6 @@ namespace Oro\Bundle\ImportExportBundle\File;
 use Gaufrette\Adapter;
 use Gaufrette\File;
 use Gaufrette\Filesystem;
-use Gaufrette\Stream;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
