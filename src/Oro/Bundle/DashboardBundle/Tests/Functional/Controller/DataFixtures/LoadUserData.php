@@ -3,17 +3,15 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
+use Oro\Bundle\UserBundle\Entity\UserApi;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\UserBundle\Entity\UserManager;
-use Oro\Bundle\UserBundle\Entity\UserApi;
-
-use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
-
-class LoadUserData extends AbstractFixture implements ContainerAwareInterface
+class LoadUserData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     const USER_NAME     = 'user_wo_permissions';
     const USER_PASSWORD = 'user_api_key';
@@ -32,6 +30,14 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return [LoadOrganization::class];
+    }
+
+    /**
      * @param ObjectManager $manager
      */
     public function load(ObjectManager $manager)
@@ -45,16 +51,13 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->findBy(array('role' => 'IS_AUTHENTICATED_ANONYMOUSLY'));
 
         $user = $userManager->createUser();
-
-        /** @var OrganizationManager $organizationManager */
-        $organizationManager = $this->container->get('oro_organization.organization_manager');
-        $org = $organizationManager->getOrganizationRepo()->getFirst();
+        $organization = $this->getReference('organization');
 
         $apiKey = new UserApi();
         $apiKey
             ->setApiKey('user_api_key')
             ->setUser($user)
-            ->setOrganization($org);
+            ->setOrganization($organization);
 
         $user
             ->setUsername(self::USER_NAME)
@@ -64,8 +67,8 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->addRole($role[0])
             ->setEmail('simple@example.com')
             ->addApiKey($apiKey)
-            ->setOrganization($org)
-            ->addOrganization($org)
+            ->setOrganization($organization)
+            ->addOrganization($organization)
             ->setSalt('');
 
         $userManager->updateUser($user);
