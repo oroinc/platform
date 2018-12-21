@@ -7,7 +7,6 @@ use Gaufrette\Exception\FileNotFound;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
@@ -42,7 +41,7 @@ class ExportHandler extends AbstractHandler
      * @var WriterChain
      */
     protected $writerChain;
-
+    
     /**
      * @param FileManager $fileManager
      */
@@ -144,9 +143,9 @@ class ExportHandler extends AbstractHandler
         if ($errorsCount > 0) {
             $errors = array_merge($errors, $jobResult->getFailureExceptions());
         }
-
+        
         $errors = array_slice($errors, 0, 100);
-
+        
         if (($writer = $this->writerChain->getWriter($outputFormat)) && $writer instanceof ClosableInterface) {
             $writer->close();
         }
@@ -288,20 +287,13 @@ class ExportHandler extends AbstractHandler
         } catch (FileNotFound $exception) {
             throw new NotFoundHttpException();
         }
-        $response = new Response($content);
-
-        $disposition = $response->headers->makeDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $fileName
-        );
-        $response->headers->set('Content-Disposition', $disposition);
-
-        $contentType = $this->fileManager->getMimeType($fileName);
+        $headers     = [];
+        $contentType = $this->getFileContentType($fileName);
         if ($contentType !== null) {
-            $response->headers->set('Content-Type', $contentType);
+            $headers['Content-Type'] = $contentType;
         }
 
-        return $response;
+        return new Response($content, 200, $headers);
     }
 
     /**
