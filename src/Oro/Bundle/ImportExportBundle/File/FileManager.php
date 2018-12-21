@@ -5,7 +5,6 @@ namespace Oro\Bundle\ImportExportBundle\File;
 use Gaufrette\Adapter;
 use Gaufrette\File;
 use Gaufrette\Filesystem;
-use Gaufrette\Stream;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -231,5 +230,26 @@ class FileManager
     public function isFileExist($fileName)
     {
         return $this->filesystem->has($fileName);
+    }
+
+    /**
+     * @param string|File $file
+     */
+    public function getMimeType($file)
+    {
+        if ($file instanceof File) {
+            $file = $file->getKey();
+        }
+
+        if ($file && $this->filesystem->has($file)) {
+            try {
+                return $this->filesystem->mimeType($file);
+            } catch (\LogicException $e) {
+                // The underlying adapter does support mimetype.
+                return null;
+            }
+        }
+
+        return null;
     }
 }
