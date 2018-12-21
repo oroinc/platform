@@ -52,6 +52,7 @@ body:not(.login-page) {
     &:last-child {
         padding-#{$start}: $content-padding-small;
     }
+
     &:only-child {
         padding: 0;
     }

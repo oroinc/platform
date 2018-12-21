@@ -285,6 +285,14 @@
     margin-top: $section-content-offset-top;
     padding-top: $section-content-inner-offset-top;
     padding-bottom: $section-content-inner-offset-bottom;
+
+    .row-fluid {
+        margin: $row-fluid-inner-offset;
+
+        .row-fluid {
+            margin: 0;
+        }
+    }
 }
 
 .responsive-form-inner {

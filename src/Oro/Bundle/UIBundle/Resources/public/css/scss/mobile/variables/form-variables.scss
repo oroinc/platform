@@ -55,5 +55,6 @@ $control-select2-container-max-width: 100%;
 
 $user-fieldset-offset: 0 0 10px;
 $user-fieldset-line-height: .9;
-$well-offset-bottom: 7px;
+$user-fieldset-inner-offset: 0;
+$well-offset-bottom: $content-padding-medium;
 $well-tags-overlay-offset-bottom: 0;
