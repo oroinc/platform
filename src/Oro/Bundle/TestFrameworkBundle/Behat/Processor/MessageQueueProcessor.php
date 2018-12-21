@@ -94,14 +94,12 @@ class MessageQueueProcessor implements MessageQueueProcessorInterface
         $isRunning = $this->isRunning();
         if (!$isRunning) {
             $cacheChangeDate = $cacheState->getChangeDate();
-            if (null === $cacheChangeDate) {
-                $this->stopMessageQueue();
-                $this->startMessageQueue();
-            }
-            if ($cacheChangeDate > $this->lastCacheStateChangeDate) {
+            if (null === $cacheChangeDate || $cacheChangeDate > $this->lastCacheStateChangeDate) {
                 $this->lastCacheStateChangeDate = $cacheChangeDate;
                 $this->stopMessageQueue();
                 $this->startMessageQueue();
+            } else {
+                throw new \RuntimeException('Message Queue is not running');
             }
         }
     }

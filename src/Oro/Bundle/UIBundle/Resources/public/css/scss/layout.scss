@@ -23,6 +23,16 @@
             display: none;
         }
 
+        ol,
+        ul,
+        dl {
+            &:not(.extra-list) {
+                margin: side-values(0 0 $content-padding-medium $content-padding);
+
+                word-break: break-word;
+            }
+        }
+
         @include responsive-inline-position();
     }
 

@@ -414,6 +414,16 @@ select[multiple] {
         &--column {
             flex-direction: column;
         }
+
+        .add-list-item {
+            margin-top: $content-padding-small;
+        }
+
+        .reminders-collection {
+            + .add-list-item {
+                margin-top: 0;
+            }
+        }
     }
 }
 
@@ -434,6 +444,16 @@ select[multiple] {
         &--column:not(:last-of-type) {
             margin: 0;
         }
+
+        &.control-group-checkbox {
+            &:not(:last-of-type) {
+                margin-top: -$content-padding-small;
+            }
+        }
+    }
+
+    div[data-name="field__default-product-options"] {
+        margin: 0 0 $form-container-control-row-space;
     }
 
     + .form-horizontal,
