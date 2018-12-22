@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 @import "oroui/css/scss/variables";
 @import "oroui/css/scss/mixins";
 @import "oroui/css/scss/oro/variables/select2-variables";
@@ -9,8 +11,8 @@ $tag-selector-item-font-size: $base-font-size--s !default;
 $tag-selector-item-line-height: $select2-search-field-line-height !default;
 $tag-selector-item-min-width: 180px !default;
 $tag-selector-item-max-height: 40vh !default;
-$tag-selector-item-padding-horizontal: 8px !default;
-$tag-selector-item-padding-vertical: 4px !default;
+$tag-selector-item-padding-horizontal: $content-padding-small !default;
+$tag-selector-item-padding-vertical: $content-padding-small / 2 !default;
 $tag-selector-item-offset-horizontal: 3px !default;
 $tag-selector-item-offset-vertical: 3px !default;
 $tag-selector-item-border-radius: 2px !default;
@@ -27,11 +29,15 @@ $tag-item-edit-hover-alt-background:    $secondary-dark;
 $tag-item-editable-hover-color:         $primary-inverse;
 $tag-item-height:                       24px !default;
 $tag-item-font-size:                    12px !default;
-$tag-item-offset-vertical:              1px !default;
-$tag-item-offset-horizontal:            2px !default;
-$tag-item-offset:                       side-values(0 $tag-item-offset-horizontal $tag-item-offset-vertical 0) !default;
+$tag-item-offset-vertical:              $content-padding-small / 2 !default;
+$tag-item-offset-horizontal:            $content-padding-small / 2 !default;
+$tag-item-offset:                       side-values($tag-item-offset-vertical $tag-item-offset-horizontal 0 0) !default;
 $tag-item-line-height:                  absolute-line-height($oro-datagrid-font-size, $oro-datagrid-body-cell-line-height);
 $tag-item-inner-offset-horizontal:      12px !default;
 $tag-item-inner-offset-vertical:        ($tag-item-height - $tag-item-line-height)/2 !default;
 $tag-item-inner-offset:                 side-values($tag-item-inner-offset-vertical $tag-item-inner-offset-horizontal) !default;
 $tag-item-border-radius:                ($tag-item-height / 2) !default;
+
+$tag-item-icon-offset-end:              $content-padding-small !default;
+
+$tag-item-na-inner-offset:              2px 0 !default;

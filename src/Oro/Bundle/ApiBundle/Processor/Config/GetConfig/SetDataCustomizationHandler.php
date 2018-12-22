@@ -7,7 +7,6 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\AssociationHandler;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\EntityHandler;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
@@ -67,35 +66,19 @@ class SetDataCustomizationHandler implements ProcessorInterface
                 $definition->getPostSerializeHandler()
             )
         );
-        if ($this->isCollectionValuedAction($context)) {
-            $definition->setPostSerializeCollectionHandler(
-                new EntityHandler(
-                    $this->customizationProcessor,
-                    $version,
-                    $requestType,
-                    $entityClass,
-                    $definition,
-                    true,
-                    $definition->getPostSerializeCollectionHandler()
-                )
-            );
-        }
+        $definition->setPostSerializeCollectionHandler(
+            new EntityHandler(
+                $this->customizationProcessor,
+                $version,
+                $requestType,
+                $entityClass,
+                $definition,
+                true,
+                $definition->getPostSerializeCollectionHandler()
+            )
+        );
 
         $this->processAssociations($context, $definition, $entityClass);
-    }
-
-    /**
-     * @param ConfigContext $context
-     *
-     * @return bool
-     */
-    private function isCollectionValuedAction(ConfigContext $context): bool
-    {
-        $action = $context->getTargetAction();
-
-        return
-            ApiActions::GET_LIST === $action
-            || (ApiActions::GET_SUBRESOURCE === $action && $context->isCollection());
     }
 
     /**
@@ -167,21 +150,19 @@ class SetDataCustomizationHandler implements ProcessorInterface
                 $targetEntity->getPostSerializeHandler()
             )
         );
-        if ($field->isCollectionValuedAssociation()) {
-            $targetEntity->setPostSerializeCollectionHandler(
-                new AssociationHandler(
-                    $this->customizationProcessor,
-                    $version,
-                    $requestType,
-                    $rootEntityClass,
-                    $fieldPath,
-                    $targetEntityClass,
-                    $definition,
-                    true,
-                    $targetEntity->getPostSerializeCollectionHandler()
-                )
-            );
-        }
+        $targetEntity->setPostSerializeCollectionHandler(
+            new AssociationHandler(
+                $this->customizationProcessor,
+                $version,
+                $requestType,
+                $rootEntityClass,
+                $fieldPath,
+                $targetEntityClass,
+                $definition,
+                true,
+                $targetEntity->getPostSerializeCollectionHandler()
+            )
+        );
         $this->processAssociations($context, $targetEntity, $rootEntityClass, $fieldPath);
     }
 

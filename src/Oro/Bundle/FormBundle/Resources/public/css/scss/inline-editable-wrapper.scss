@@ -59,10 +59,11 @@
     }
 
     &--size-s {
+        line-height: $inline-actions-btn-s-line-height;
         padding: $inline-actions-btn-s-offset;
     }
 
-    @at-root .has-error .inline-actions-btn  {
+    @at-root .has-error .inline-actions-btn {
         color: $inline-actions-btn-color-error;
 
         &:hover {

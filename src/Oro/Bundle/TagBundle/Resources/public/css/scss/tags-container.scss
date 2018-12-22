@@ -1,11 +1,12 @@
 /* @theme: admin.oro; */
 
 .tags-container {
-    display: inline-block;
+    display: inline-flex;
+    flex-wrap: wrap;
+    margin-top: -$tag-item-offset-vertical;
 
-    .tags-cell & {
-        display: block;
-        margin: side-values(-$tag-item-inner-offset-vertical 0);
+    &__icon {
+        margin-#{$end}: $tag-item-icon-offset-end;
     }
 
     &__tag-entry {
@@ -15,7 +16,8 @@
         font-size: $tag-item-font-size;
         padding: $tag-item-inner-offset;
         margin: $tag-item-offset;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
         vertical-align: top;
         line-height: $tag-item-line-height;
         transition: $hover-transition;
@@ -41,6 +43,11 @@
 
     &__tag-entry_is-my {
         background-color: $tag-item-background;
+    }
+
+    &__na {
+        display: inline-block;
+        padding: $tag-item-na-inner-offset;
     }
 }
 

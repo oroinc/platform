@@ -1,12 +1,16 @@
 <span class="tags-container">
-    <% if (tags.length > 0) { _.each(tags , function(tag) { %><a href="<%= tag.url %>"
-           class="tags-container__tag-entry<% if(tag.owner) { %> tags-container__tag-entry_is-my<% } %>"
-        <% if (tag.backgroundColor && tag.backgroundColor.length > 0) { %>
-            style="background-color:<%= tag.backgroundColor %>;"
+    <% if (tags.length > 0) { _.each(tags , function(tag) { %>
+    <a href="<%= tag.url %>"
+       title="<%- tag.name %><% if(tag.ownerFirstName && tag.ownerLastName) { %><%- _.__('oro.tag.added_by', {first_name: tag.ownerFirstName, last_name: tag.ownerLastName}) %><% } %>"
+       class="tags-container__tag-entry<% if(tag.owner == true) { %> tags-container__tag-entry_is-my<% } %>"
+       <% if (tag.backgroundColor && tag.backgroundColor.length > 0) { %>style="background-color:<%= tag.backgroundColor %>;"<% } %>
+    >
+        <% if(tag.owner == true) { %>
+            <span class="fa-user tags-container__icon"></span>
         <% } %>
-        >
-            <%- tag.name %>
-    </a><% }) } else if (showDefault){ %>
-        <%= _.__('N/A') %>
+        <span><%- tag.name %></span>
+    </a>
+    <% }) } else if (showDefault){ %>
+        <span class="tags-container__na"><%= _.__('N/A') %></span>
     <% } %>
 </span>

@@ -25,10 +25,7 @@ class UpdateLoadedCollection implements ProcessorInterface
             return;
         }
 
-        $ids = [];
-        foreach ($data as $item) {
-            $ids[] = $item['id'];
-        }
+        $ids = $context->getIdentifierValues($data, 'id');
         sort($ids);
         $computedIds = sprintf('[%s] (%s)', implode(',', $ids), $context->getClassName());
 
