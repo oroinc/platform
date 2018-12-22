@@ -39,16 +39,6 @@ class OroCurrencyExtensionTest extends ExtensionTestCase
     /**
      * {@inheritDoc}
      */
-    protected function buildContainerMock()
-    {
-        return $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(['setDefinition', 'setParameter', 'prependExtensionConfig'])
-            ->getMock();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     protected function getContainerMock()
     {
         $container = parent::getContainerMock();

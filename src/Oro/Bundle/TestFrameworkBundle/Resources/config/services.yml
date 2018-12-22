@@ -49,18 +49,20 @@ services:
 
     oro_test.alice_reference_processor:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceReferenceProcessor
+        public: false
         arguments:
             - '@doctrine'
+        tags: ['oro_test.alice_processor']
 
     oro_test.alice_to_string_processor:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceToStringProcessor
+        public: false
+        tags: ['oro_test.alice_processor']
 
     oro_test.alice_fixture_loader:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader
         calls:
             - [setFileLocator, ['@file_locator']]
-            - [addProcessor, ['@oro_test.alice_reference_processor']]
-            - [addProcessor, ['@oro_test.alice_to_string_processor']]
 
     oro_config.cache:
         parent: doctrine_cache.abstract.array

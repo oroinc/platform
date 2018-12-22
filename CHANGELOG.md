@@ -10,6 +10,10 @@
 #### AsseticBundle
 * Bundle was removed, use AssetBundle instead
 
+### Changed
+#### ApiBundle
+* Fixed `depends_on` configuration option of `entities.fields` section of `Resources/config/oro/api.yml`. From now only entity property names (or paths contains entity property names) can be used in it. Also the exception handling of invalid values for this option was improved to return more useful exception messages.
+
 
 ## 3.1.0-rc (2018-11-30)
 [Show detailed list of changes](incompatibilities-3-1-rc.md)

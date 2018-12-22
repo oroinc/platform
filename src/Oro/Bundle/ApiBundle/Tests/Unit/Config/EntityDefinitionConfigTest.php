@@ -215,6 +215,10 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         $realSwapField->setPropertyPath('swapField');
         $ignoredField = $config->addField('ignoredField');
         $ignoredField->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $replacedField = $config->addField('replacedField');
+        $replacedField->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $realReplacedField = $config->addField('realReplacedField');
+        $realReplacedField->setPropertyPath('replacedField');
 
         self::assertNull($config->findField('unknown'));
         self::assertNull($config->findField('unknown', true));
@@ -266,6 +270,18 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNull($config->findFieldByPath('ignoredField', true));
         self::assertNull($config->findFieldByPath(ConfigUtil::IGNORE_PROPERTY_PATH));
         self::assertNull($config->findFieldByPath(ConfigUtil::IGNORE_PROPERTY_PATH, true));
+
+        self::assertSame($replacedField, $config->findField('replacedField'));
+        self::assertSame($realReplacedField, $config->findField('replacedField', true));
+        self::assertSame('realReplacedField', $config->findFieldNameByPropertyPath('replacedField'));
+        self::assertSame($replacedField, $config->findFieldByPath('replacedField'));
+        self::assertSame($realReplacedField, $config->findFieldByPath('replacedField', true));
+
+        self::assertSame($realReplacedField, $config->findField('realReplacedField'));
+        self::assertNull($config->findField('realReplacedField', true));
+        self::assertNull($config->findFieldNameByPropertyPath('realReplacedField'));
+        self::assertSame($realReplacedField, $config->findFieldByPath('realReplacedField'));
+        self::assertNull($config->findFieldByPath('realReplacedField', true));
     }
 
     public function testFindFieldByPathForChildFields()
