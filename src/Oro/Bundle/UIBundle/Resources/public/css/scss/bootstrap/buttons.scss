@@ -17,6 +17,7 @@ button {
     vertical-align: middle;
     user-select: none;
     border: $btn-border-width solid transparent;
+    flex-shrink: 0;
 
     @if ($btn-theme) {
         @include button-custom-variant($btn-theme...);
@@ -140,6 +141,21 @@ fieldset:disabled a.btn {
 
     &.gold-icon {
         color: $btn-icon-gold-color;
+    }
+
+    &%btn-square {
+        &.dropdown-toggle:not(.dropdown-toggle--no-caret) {
+            width: $btn-square-icon-dropdown-toggle-width;
+
+            [class^="fa-"],
+            [class*=" fa-"] {
+                #{$start}: $btn-square-icon-dropdown-toggle-fa-left;
+            }
+
+            &:after {
+                #{$end}: $btn-square-icon-dropdown-toggle-after-right;
+            }
+        }
     }
 }
 

@@ -22,13 +22,6 @@
 }
 
 .fallback-container {
-    .fallback-status {
-        width: $fallback-container-status-width;
-        text-align: $fallback-container-status-text-align;
-        line-height: $fallback-container-status-line-height;
-        height: $fallback-container-status-height;
-    }
-
     input {
         &[type="radio"],
         &[type="checkbox"] {
