@@ -10,6 +10,7 @@ button {
 .btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     font-weight: $btn-font-weight;
     text-align: center;
     text-transform: $btn-text-transform;

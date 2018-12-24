@@ -33,12 +33,12 @@ $font-family-sans-serif: Arial, Helvetica, sans-serif;
 $font-size-base: 14px;
 $line-height-base: 1.57;
 $link-hover-decoration: none;
-$btn-font-weight: bold;
-$btn-font-size: 12px;
-$btn-text-transform: uppercase;
+$btn-font-weight: null;
+$btn-font-size: $base-font-size;
+$btn-text-transform: null;
 
-$btn-link-font-weight: bold;
-$btn-link-text-transform: uppercase;
+$btn-link-font-weight: null;
+$btn-link-text-transform: null;
 
 $btn-padding-y-sm: 0;
 $btn-padding-x-sm: 12px;
@@ -49,7 +49,7 @@ $btn-line-height-sm: 24px;
 $btn-icon-line-height-sm: $btn-line-height-sm - 1px;
 $btn-border-radius-sm: 16px;
 
-$btn-mobile-font-size: 14px;
+$btn-mobile-font-size: $base-font-size--m;
 $btn-mobile-border-radius: 20px;
 $btn-square-mobile-border-radius: 2px;
 $btn-icon-mobile-fa-icon-font-size: 18px;
