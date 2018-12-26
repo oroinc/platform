@@ -456,13 +456,65 @@ define(function(require) {
             return false;
         }
 
-        var resizeSearch = prototype.resizeSearch;
+        /* original private Select2 methods */
+        /* eslint-disable */
+        var sizer;
 
+        function measureTextWidth(e) {
+            if (!sizer){
+                var style = e[0].currentStyle || window.getComputedStyle(e[0], null);
+                sizer = $(document.createElement("div")).css({
+                    position: "absolute",
+                    left: "-10000px",
+                    top: "-10000px",
+                    display: "none",
+                    fontSize: style.fontSize,
+                    fontFamily: style.fontFamily,
+                    fontStyle: style.fontStyle,
+                    fontWeight: style.fontWeight,
+                    letterSpacing: style.letterSpacing,
+                    textTransform: style.textTransform,
+                    whiteSpace: "nowrap"
+                });
+                sizer.attr("class","select2-sizer");
+                $("body").append(sizer);
+            }
+            sizer.text(e.val());
+            return sizer.width();
+        }
+        /* eslint-enable */
+        /* original private Select2 methods:end */
+
+        /**
+         * Overrides select2 resizeSearch method.
+         * Resizes search input to fill available width.
+         * Returns rounded value.
+         */
         prototype.resizeSearch = function() {
-            this.selection.addClass('select2-search-resize');
-            resizeSearch.apply(this, arguments);
-            this.selection.removeClass('select2-search-resize');
-            this.search.width(Math.floor($(this.search).width()) - 1);
+            //  Determines if search input item is on first row and sets correspondent css class.
+            //  This class is needed for additional styling to prevent visual intersection with action buttons
+            var isFirstRow = (
+                this.selection.children(':first-child').position().top ===
+                this.searchContainer.position().top
+            );
+            var sideBorderPadding = this.search.outerWidth(false) - this.search.width();
+            var minimumWidth = measureTextWidth(this.search) + 10;
+            var left = this.search.offset().left;
+            var maxWidth = this.selection.width();
+            var containerLeft = this.selection.offset().left;
+
+            var searchWidth = maxWidth - (left - containerLeft) - sideBorderPadding;
+
+            if (searchWidth < minimumWidth) {
+                searchWidth = maxWidth - sideBorderPadding;
+            }
+
+            if (searchWidth <= 0) {
+                searchWidth = minimumWidth;
+            }
+
+            this.search.width(Math.floor(searchWidth) - 1);
+            this.selection.toggleClass('select2-first-row', isFirstRow);
         };
 
         prototype.updateSelection = function(data) {

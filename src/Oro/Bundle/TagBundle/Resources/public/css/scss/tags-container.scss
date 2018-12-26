@@ -9,6 +9,14 @@
         margin-#{$end}: $tag-item-icon-offset-end;
     }
 
+    &.tags-cell {
+        padding: $tag-cell-container-inner-offset;
+    }
+
+    .tags-cell & {
+        display: block;
+    }
+
     &__tag-entry {
         color: $tag-item-color;
         background-color: $tag-item-background;

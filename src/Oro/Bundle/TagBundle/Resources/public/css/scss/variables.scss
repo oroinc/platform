@@ -6,7 +6,7 @@
 @import "orodatagrid/css/scss/variables/grid-variables";
 
 $tag-selector-min-width: 100px !default;
-$tag-selector-actions-width: 74px !default;
+$tag-selector-items-width: 100% !important;
 $tag-selector-item-font-size: $base-font-size--s !default;
 $tag-selector-item-line-height: $select2-search-field-line-height !default;
 $tag-selector-item-min-width: 180px !default;
@@ -20,6 +20,8 @@ $tag-selector-item-close-icon-width: 24px;
 $tag-selector-item-color: $primary-400;
 $tag-selector-item-background: $primary-830;
 $tag-selector-item-input-inner-offset: 0 !default;
+$tag-selector-actions-width: 65px !default;
+$tag-selector-actions-font-size: $base-font-size--m !default;
 
 $tag-item-color:                        $secondary;
 $tag-item-background:                   $secondary-300;
@@ -41,3 +43,19 @@ $tag-item-border-radius:                ($tag-item-height / 2) !default;
 $tag-item-icon-offset-end:              $content-padding-small !default;
 
 $tag-item-na-inner-offset:              2px 0 !default;
+
+$tag-selector-action-height: $select2-search-field-line-height + ($tag-selector-item-offset-vertical * 2) !default;
+$tag-selector-action-width: $tag-selector-action-height !default;
+
+$tag-cell-container-height-delta: $tag-item-height - $oro-datagrid-editable-cell-line-height;
+$tag-cell-container-inner-offset-top: $oro-datagrid-body-cell-inner-top -
+    $tag-cell-container-height-delta !default;
+$tag-cell-container-inner-offset-bottom: $oro-datagrid-body-cell-inner-bottom -
+    $tag-item-offset-vertical -
+    $tag-cell-container-height-delta !default;
+$tag-cell-container-inner-offset: side-values(
+        $tag-cell-container-inner-offset-top
+        $oro-datagrid-editable-cell-offset
+        $tag-cell-container-inner-offset-bottom
+        $oro-datagrid-body-cell-inner-horizontal
+) !default;
