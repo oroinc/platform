@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\AttachmentBundle\Manager;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
+use Oro\Bundle\AttachmentBundle\Exception\InvalidAttachmentEncodedParametersException;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Component\PhpUtils\Formatter\BytesFormatter;
-use Symfony\Component\Filesystem\Filesystem as SymfonyFileSystem;
-use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
@@ -191,14 +189,16 @@ class AttachmentManager
      *   - entity id
      *   - download type
      *   - original filename
-     * @throws \LogicException
+     * @throws InvalidAttachmentEncodedParametersException
      */
     public function decodeAttachmentUrl($urlString)
     {
         if (!($decodedString = base64_decode(str_replace('_', '/', $urlString)))
             || count($result = explode('|', $decodedString)) < 5
         ) {
-            throw new \LogicException('Input string is not correct attachment encoded parameters');
+            throw new InvalidAttachmentEncodedParametersException(
+                'Attachment parameters cannot be decoded'
+            );
         }
 
         return $result;

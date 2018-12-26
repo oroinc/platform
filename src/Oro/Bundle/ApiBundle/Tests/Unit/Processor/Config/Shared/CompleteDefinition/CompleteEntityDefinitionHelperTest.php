@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared\CompleteDefini
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteAssociationHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomAssociationHelper;
@@ -1361,6 +1362,48 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
+    public function testCompleteDefinitionForIdentifierFieldsOnlyWithReplacedField()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'id'     => null,
+                'field1' => [
+                    'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
+                ],
+                '_field1' => [
+                    'property_path' => 'field1'
+                ]
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+        $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id' => null
+                ]
+            ],
+            $config
+        );
+    }
+
     public function testCompleteDefinitionForIdentifierFieldsOnlyWhenNoIdFieldInConfig()
     {
         $config = $this->createConfigObject([
@@ -1877,5 +1920,111 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             ]
         ];
+    }
+
+    public function testShouldThrowCorrectExceptionWhenDependsOnNameOfUndefinedPropertyAndGetConfigThrowException()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'field' => [
+                    'depends_on' => ['undefinedField']
+                ]
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(self::TEST_CLASS_NAME, $context->getVersion(), $context->getRequestType())
+            ->willThrowException(new RuntimeException('circular dependency detected'));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Cannot resolve dependency to "undefinedField" specified for "Test\Class::field".'
+            . ' Check "depends_on" option for this field.'
+        );
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+    }
+
+    public function testShouldThrowCorrectExceptionWhenDependsOnNotFullyConfiguredFieldReplacement()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'field' => [
+                    'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH,
+                    'depends_on'    => ['field']
+                ]
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(self::TEST_CLASS_NAME, $context->getVersion(), $context->getRequestType())
+            ->willThrowException(new RuntimeException('circular dependency detected'));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Cannot resolve dependency to "field" specified for "Test\Class::field".'
+            . ' Check "depends_on" option for this field.'
+            . ' If the value of this option is correct you can declare an excluded field with "field" property path.'
+            . ' For example:' . "\n"
+            . '_field:' . "\n"
+            . '    property_path: field' . "\n"
+            . '    exclude: true'
+        );
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
     }
 }

@@ -52,6 +52,7 @@ class StubScope extends Scope
 
             return $this->attributes[$name];
         }
+
         if (strpos($name, 'set') === 0) {
             $name = lcfirst(substr($name, 3));
 
@@ -59,6 +60,7 @@ class StubScope extends Scope
 
             return $this;
         }
+
         throw new \InvalidArgumentException();
     }
 }

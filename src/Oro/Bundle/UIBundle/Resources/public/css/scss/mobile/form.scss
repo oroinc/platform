@@ -135,13 +135,15 @@
     }
 }
 
-h5.user-fieldset {
+.user-fieldset {
     line-height: $user-fieldset-line-height;
     margin: $user-fieldset-offset;
+    padding-bottom: $user-fieldset-inner-offset;
 }
 
 .widget-title {
     line-height: $user-fieldset-line-height;
+    padding-bottom: $user-fieldset-inner-offset;
 }
 
 .well {

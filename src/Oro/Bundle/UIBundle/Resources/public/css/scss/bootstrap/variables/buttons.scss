@@ -34,6 +34,10 @@ $btn-icon-dropdown-toggle-after-transform: translate(0, -50%) !default;
 $btn-icon-dropdown-toggle-fa-left: $content-padding-medium !default;
 $btn-icon-dropdown-toggle-fa-transform: translate(0, -50%) !default;
 
+$btn-square-icon-dropdown-toggle-width: 46px !default;
+$btn-square-icon-dropdown-toggle-after-right: $content-padding-small !default;
+$btn-square-icon-dropdown-toggle-fa-left: $content-padding-small !default;
+
 /* Style for button without theme modificator */
 $btn-theme: (
     'background': $primary-830,
