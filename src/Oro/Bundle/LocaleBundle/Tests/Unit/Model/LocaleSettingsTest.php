@@ -104,27 +104,6 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddCurrencyData()
-    {
-        $usData = array(LocaleSettings::CURRENCY_SYMBOL_KEY => '$');
-        $usDataModified = array(LocaleSettings::CURRENCY_SYMBOL_KEY => 'AU$');
-        $ruData = array(LocaleSettings::CURRENCY_SYMBOL_KEY => 'руб.');
-
-        $this->assertEmpty($this->localeSettings->getCurrencyData());
-
-        $this->localeSettings->addCurrencyData(array('USD' => $usData));
-        $this->assertEquals(
-            array('USD' => $usData),
-            $this->localeSettings->getCurrencyData()
-        );
-
-        $this->localeSettings->addCurrencyData(array('USD' => $usDataModified, 'RUR' => $ruData));
-        $this->assertEquals(
-            array('USD' => $usDataModified, 'RUR' => $ruData),
-            $this->localeSettings->getCurrencyData()
-        );
-    }
-
     /**
      * @dataProvider getValidLocaleDataProvider
      */
@@ -429,11 +408,6 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         $existingCurrencyCode = 'USD';
         $existingCurrencySymbol = '$';
         $notExistingCurrencyCode = 'UAK';
-
-        $currencyData = array(
-            $existingCurrencyCode => array('symbol' => $existingCurrencySymbol)
-        );
-        $this->localeSettings->addCurrencyData($currencyData);
 
         $this->assertEquals(
             $existingCurrencySymbol,

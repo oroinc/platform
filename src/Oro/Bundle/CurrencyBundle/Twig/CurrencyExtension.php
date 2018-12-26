@@ -9,6 +9,9 @@ use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Intl\Intl;
 
+/**
+ * Provides TWIG filters and functions for working with prices and currencies.
+ */
 class CurrencyExtension extends \Twig_Extension
 {
     /** @var ContainerInterface */
@@ -125,7 +128,7 @@ class CurrencyExtension extends \Twig_Extension
     /**
      * Returns symbols for active currencies
      *
-     * @return string json object with active currency symbols
+     * @return array Collection of active currency codes and symbols
      */
     public function getSymbolCollection()
     {
@@ -136,10 +139,10 @@ class CurrencyExtension extends \Twig_Extension
             function ($symbol) {
                 return ['symbol' => $symbol];
             },
-            array_keys($currencySymbolCollection)
+            array_flip($currencySymbolCollection)
         );
 
-        return json_encode($currencySymbolCollection);
+        return $currencySymbolCollection;
     }
 
     /**

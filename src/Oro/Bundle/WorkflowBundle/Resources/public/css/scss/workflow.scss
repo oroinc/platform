@@ -22,24 +22,8 @@ a.disabled.workflow-transition-buttons {
     text-align: center;
 }
 
-li.processed {
-    color: $workflow-li-processed-color;
-}
-
-li.current {
-    color: $workflow-li-current-color;
-}
-
-li.current:before {
-    background-position: 50% -24px;
-}
-
 .workflow-history-container {
     margin-#{$end}: 10px;
-
-    .btn {
-        padding-#{$start}: 6px;
-    }
 }
 
 table.grid {

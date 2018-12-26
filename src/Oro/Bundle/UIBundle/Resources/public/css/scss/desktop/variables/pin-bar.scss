@@ -10,4 +10,4 @@ $pin-item-show-more-menu-width:      20px !default;
 $pin-item-show-more-menu-offset:     -8px !default;
 $pin-item-show-more-menu-arrow-end:  12px !default;
 
-$pin-show-more-gradient:             linear-gradient(to if-ltr(left, right), $primary-900, transparent) !default;
+$pin-show-more-gradient: linear-gradient(to if-ltr(left, right), $primary-900, rgba($primary-900, 0)) !default;

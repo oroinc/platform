@@ -115,6 +115,6 @@ services:
     oro_api.validator.access_granted:
         class: Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator
         arguments:
-            - '@security.authorization_checker'
+            - '@oro_api.security.authorization_checker'
         tags:
             - { name: validator.constraint_validator, alias: oro_api.validator.access_granted }

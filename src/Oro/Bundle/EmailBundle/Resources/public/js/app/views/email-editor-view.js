@@ -186,14 +186,14 @@ define(function(require) {
                 );
             }
             if (!this.model.get('email').get('cc').length) {
-                this.hideField('Cc');
+                this.hideField('Cc', __('oro.email.cc.label'));
             }
             if (!this.model.get('email').get('bcc').length) {
-                this.hideField('Bcc');
+                this.hideField('Bcc', __('oro.email.bcc.label'));
             }
         },
 
-        showField: function(fieldName) {
+        showField: function(fieldName, fieldValue) {
             var field = fieldName.toLowerCase();
             var $field = this.$('[data-ftid$="_email_' + field + '"]');
             $field.parents('.control-group.taggable-field').show();
@@ -202,7 +202,7 @@ define(function(require) {
                 .on('focusout', _.bind(function(e) {
                     setTimeout(_.bind(function() {
                         if (!$field.val()) {
-                            this.hideField(fieldName);
+                            this.hideField(fieldName, fieldValue);
                         }
                     }, this), 200);
                 }, this))
@@ -210,11 +210,11 @@ define(function(require) {
 
             this.$('[data-ftid$="_email_to"]')
                 .parents('.control-group.taggable-field')
-                .find('label').html(__('oro.email.to'));
+                .find('label').html(__('oro.email.to.label'));
             this.addForgedAsterisk();
         },
 
-        hideField: function(fieldName) {
+        hideField: function(fieldName, fieldValue) {
             var field = fieldName.toLowerCase();
             var $field = this.$('[data-ftid$="_email_' + field + '"]');
             $field.parents('.control-group.taggable-field').hide();
@@ -222,12 +222,12 @@ define(function(require) {
             if (this.$('span.show' + fieldName).length > 0) {
                 return;
             }
-            this.$('.cc-bcc-holder').append('<span class="show' + fieldName + '">' + fieldName + '</span>');
+            this.$('.cc-bcc-holder').append('<span class="show' + fieldName + '">' + fieldValue + '</span>');
             this.$('.show' + fieldName).on('click', _.bind(function(e) {
                 e.stopPropagation();
                 var target = e.target;
                 $(target).remove();
-                this.showField(fieldName);
+                this.showField(fieldName, fieldValue);
             }, this));
         },
 

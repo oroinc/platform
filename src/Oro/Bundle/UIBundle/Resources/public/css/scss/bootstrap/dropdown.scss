@@ -121,6 +121,12 @@
 .dropdown-toggle {
     &:after {
         vertical-align: $caret-width / 2;
+
+        margin-#{$start}: $content-padding-small;
+
+        border-top-width: 5px;
+        border-right-width: 5px;
+        border-left-width: 5px;
     }
 
     &--no-caret {

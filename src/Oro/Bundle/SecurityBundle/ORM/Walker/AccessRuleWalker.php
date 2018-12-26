@@ -92,6 +92,23 @@ class AccessRuleWalker extends TreeWalkerAdapter
                 $factors = $conditionalExpression->conditionalTerms;
             }
             foreach ($factors as $factorId => $expression) {
+                if ($expression instanceof ConditionalPrimary) {
+                    $conditionalExpression = $expression->conditionalExpression;
+                    if (isset($conditionalExpression->simpleConditionalExpression->subselect)
+                        && $conditionalExpression->simpleConditionalExpression->subselect instanceof Subselect
+                    ) {
+                        $this->processSelect(
+                            $conditionalExpression->simpleConditionalExpression->subselect,
+                            $context,
+                            $em
+                        );
+                        $this->processJoins(
+                            $conditionalExpression->simpleConditionalExpression->subselect,
+                            $context,
+                            $em
+                        );
+                    }
+                }
                 if (isset($expression->simpleConditionalExpression->subselect)
                     && $expression->simpleConditionalExpression->subselect instanceof Subselect
                 ) {

@@ -1,56 +1,56 @@
 /* @theme: admin.demo; */
 
 .list-bar-wrapper {
-  .pin-holder {
-    &.outdated a {
-      color: $pin-item-outdated-color;
+    .pin-holder {
+        &.outdated a {
+            color: $pin-item-outdated-color;
 
-      &:hover,
-      &:active,
-      &:focus {
-        color: $pin-item-outdated-hover-color;
-      }
-    }
-  }
-
-  .btn-close {
-    &:before {
-      color: $pin-item-close-color;
+            &:hover,
+            &:active,
+            &:focus {
+                color: $pin-item-outdated-hover-color;
+            }
+        }
     }
 
-    &:hover:before {
-      color: $pin-item-close-hover-color;
+    .btn-close {
+        &:before {
+            color: $pin-item-close-color;
+        }
+
+        &:hover:before {
+            color: $pin-item-close-hover-color;
+        }
     }
-  }
 }
 
 .show-more {
-  &:before {
-    background-image: linear-gradient(to left, $app-header-bg-color, transparent);
-  }
-
-  .dropdown-toggle {
-    background-color: $app-header-bg-color;
-    color: $pin-item-close-color;
-
-    &:hover {
-      color: $pin-item-close-hover-color;
+    &:before {
+        background-image: $pin-show-more-gradient;
     }
-  }
+
+    .dropdown-toggle {
+        background-color: $app-header-bg-color;
+        color: $pin-item-close-color;
+
+        &:hover {
+            color: $pin-item-close-hover-color;
+        }
+    }
 }
 
 .list-bar {
-  .pin-holder {
-    &.active {
-      background-color: $pin-item-active-bg-color;
-    }
+    .pin-holder {
+        &.active {
+            background-color: $pin-item-active-bg-color;
+        }
 
-    a {
-      &:hover,
-      &:active,
-      &:focus {
-        color: $app-header-text-hover-color;
-      }
+        a {
+            &:hover,
+            &:active,
+            &:focus {
+                color: $app-header-text-hover-color;
+            }
+        }
     }
-  }
 }

@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 /**
+ * Provides data for building workflow widget
+ *
  * @Route("/workflowwidget")
  */
 class WidgetController extends Controller
@@ -76,7 +78,7 @@ class WidgetController extends Controller
                 },
                 $applicableWorkflows
             ),
-            'originalUrl' => $this->get('oro_action.resolver.destination_page_resolver')->getOriginalUrl(),
+            'originalUrl' => $this->get('oro_action.provider.original_url_provider')->getOriginalUrl(),
         ];
     }
 

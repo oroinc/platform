@@ -1,14 +1,6 @@
 /* @theme: admin.oro; */
 
 .entity-create-or-select-container {
-    .entity-create-btn,
-    .entity-create-btn[disabled],
-    .entity-create-btn[disabled]:active {
-        padding: 0 6px;
-        margin-left: 3px;
-        height: 30px;
-    }
-
     &.entity-create-multi-enabled {
         .dropdown-menu {
             li button {

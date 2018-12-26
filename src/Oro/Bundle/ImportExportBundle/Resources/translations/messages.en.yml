@@ -8,7 +8,9 @@ oro:
             label: Export
             processor: Processor
             popup:
-                options.label: Exported data
+                options:
+                    label: Exported data
+                button.label: Export
 
         export_template:
             label: Export template

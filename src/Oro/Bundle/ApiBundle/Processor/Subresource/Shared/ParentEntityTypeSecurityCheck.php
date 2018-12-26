@@ -3,9 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
-use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
@@ -19,38 +16,26 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class ParentEntityTypeSecurityCheck implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
-
-    /** @var AclGroupProviderInterface */
-    protected $aclGroupProvider;
+    private $authorizationChecker;
 
     /** @var string */
-    protected $permission;
+    private $permission;
 
     /** @var bool */
-    protected $forcePermissionUsage;
+    private $forcePermissionUsage;
 
     /**
-     * @param DoctrineHelper                $doctrineHelper
      * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param AclGroupProviderInterface     $aclGroupProvider
      * @param string                        $permission
      * @param bool                          $forcePermissionUsage
      */
     public function __construct(
-        DoctrineHelper $doctrineHelper,
         AuthorizationCheckerInterface $authorizationChecker,
-        AclGroupProviderInterface $aclGroupProvider,
         $permission,
         $forcePermissionUsage = false
     ) {
-        $this->doctrineHelper = $doctrineHelper;
         $this->authorizationChecker = $authorizationChecker;
-        $this->aclGroupProvider = $aclGroupProvider;
         $this->permission = $permission;
         $this->forcePermissionUsage = $forcePermissionUsage;
     }
@@ -69,37 +54,23 @@ class ParentEntityTypeSecurityCheck implements ProcessorInterface
             $aclResource = $parentConfig->getAclResource();
             if ($aclResource) {
                 if ($this->forcePermissionUsage) {
-                    $isGranted = $this->isPermissionGranted($context->getParentClassName());
+                    $isGranted = $this->authorizationChecker->isGranted(
+                        $this->permission,
+                        $context->getParentClassName()
+                    );
                 } else {
                     $isGranted = $this->authorizationChecker->isGranted($aclResource);
                 }
             }
         } else {
-            $isGranted = $this->isPermissionGranted($context->getParentClassName());
+            $isGranted = $this->authorizationChecker->isGranted(
+                $this->permission,
+                $context->getParentClassName()
+            );
         }
 
         if (!$isGranted) {
             throw new AccessDeniedException();
         }
-    }
-
-    /**
-     * @param string $entityClass
-     *
-     * @return bool
-     */
-    protected function isPermissionGranted($entityClass)
-    {
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            return true;
-        }
-
-        return $this->authorizationChecker->isGranted(
-            $this->permission,
-            new ObjectIdentity(
-                'entity',
-                ObjectIdentityHelper::buildType($entityClass, $this->aclGroupProvider->getGroup())
-            )
-        );
     }
 }

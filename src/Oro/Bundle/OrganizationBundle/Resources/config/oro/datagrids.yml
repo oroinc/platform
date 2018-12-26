@@ -151,8 +151,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   Disabled: 0
-                   Enabled: 1
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
         filters:
             columns:
                 hasCurrentBusinessUnit:
@@ -176,8 +176,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                Disabled: 2
-                                Enabled: 1
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1
         sorters:
             columns:
                 hasCurrentBusinessUnit:
@@ -218,8 +218,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   Disabled: 0
-                   Enabled: 1
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
         sorters:
             default:
                 lastName: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
@@ -244,5 +244,5 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                Disabled: 2
-                                Enabled: 1
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1

@@ -10,7 +10,6 @@ use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -70,11 +69,11 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
                 ->setOriginalUrl('example.com')
                 ->setDatagridName($datagrid);
 
-            $this->destinationPageResolver->expects($this->once())->method('getOriginalUrl')->willReturn('example.com');
+            $this->originalUrlProvider->expects($this->once())->method('getOriginalUrl')->willReturn('example.com');
 
             $buttons = [new StartTransitionButton($transition, $workflow, $buttonContext)];
         } else {
-            $this->destinationPageResolver->expects($this->never())->method('getOriginalUrl');
+            $this->originalUrlProvider->expects($this->never())->method('getOriginalUrl');
         }
 
         $this->assertEquals(

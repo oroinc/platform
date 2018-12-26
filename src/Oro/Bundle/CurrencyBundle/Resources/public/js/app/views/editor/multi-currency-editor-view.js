@@ -67,7 +67,6 @@ define(function(require) {
     var _ = require('underscore');
     var $ = require('jquery');
     var localeSettings = require('orolocale/js/locale-settings');
-    var configuration = require('oroconfig/js/configuration');
     var numberFormatter = require('orolocale/js/formatter/number');
     var multiCurrencyFormatter = require('orocurrency/js/formatter/multi-currency');
     require('jquery.select2');
@@ -188,7 +187,7 @@ define(function(require) {
          * @returns {Array}
          */
         getCurrencyData: function() {
-            var useSymbol = configuration.get('currency-view-type') === 'symbol';
+            var useSymbol = localeSettings.getCurrencyViewType() === 'symbol';
             var availableCurrencies = this.availableCurrencies;
             var modelCurrency = _.result(this.getModelValue(), 'currency');
             if (modelCurrency && _.indexOf(availableCurrencies, modelCurrency) === -1) {
@@ -255,7 +254,7 @@ define(function(require) {
         getTemplateData: function() {
             var data = MultiCurrencyEditorView.__super__.getTemplateData.apply(this, arguments);
             data.singleCurrency = this.isSingleCurrency();
-            data.currentCurrencyLabel = configuration.get('currency-view-type') === 'symbol'
+            data.currentCurrencyLabel = localeSettings.getCurrencyViewType() === 'symbol'
                 ? localeSettings.getCurrencySymbol(data.value.currency)
                 : data.value.currency;
             return data;

@@ -15,7 +15,6 @@ class OroLocaleExtension extends Extension
     const PARAMETER_NAME_FORMATS = 'oro_locale.format.name';
     const PARAMETER_ADDRESS_FORMATS = 'oro_locale.format.address';
     const PARAMETER_LOCALE_DATA = 'oro_locale.locale_data';
-    const PARAMETER_CURRENCY_DATA = 'oro_locale.currency_data';
     const PARAMETER_FORMATTING_CODE = 'oro_locale.formatting_code';
     const PARAMETER_LANGUAGE = 'oro_locale.language';
 
@@ -41,10 +40,6 @@ class OroLocaleExtension extends Extension
         $container->setParameter(
             self::PARAMETER_LOCALE_DATA,
             $this->escapePercentSymbols($config['locale_data'])
-        );
-        $container->setParameter(
-            self::PARAMETER_CURRENCY_DATA,
-            $this->escapePercentSymbols($config['currency_data'])
         );
 
         $container->setParameter(self::PARAMETER_FORMATTING_CODE, $config['formatting_code']);
@@ -128,7 +123,6 @@ class OroLocaleExtension extends Extension
             'name_format'    => [],
             'address_format' => [],
             'locale_data'    => [],
-            'currency_data'  => [],
         ];
 
         $configLoader = new CumulativeConfigLoader(
@@ -137,7 +131,6 @@ class OroLocaleExtension extends Extension
                 new YamlCumulativeFileLoader('Resources/config/oro/name_format.yml'),
                 new YamlCumulativeFileLoader('Resources/config/oro/address_format.yml'),
                 new YamlCumulativeFileLoader('Resources/config/oro/locale_data.yml'),
-                new YamlCumulativeFileLoader('Resources/config/oro/currency_data.yml')
             ]
         );
         $resources    = $configLoader->load($container);
@@ -164,7 +157,7 @@ class OroLocaleExtension extends Extension
         }
 
         // merge formats
-        foreach (['name_format', 'address_format', 'locale_data', 'currency_data'] as $configKey) {
+        foreach (['name_format', 'address_format', 'locale_data'] as $configKey) {
             if (!empty($configData[$configKey])) {
                 $configData[$configKey] = array_merge($externalData[$configKey], $configData[$configKey]);
             } else {

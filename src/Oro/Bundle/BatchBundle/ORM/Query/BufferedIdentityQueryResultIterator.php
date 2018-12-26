@@ -232,7 +232,7 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
     }
 
     /**
-     * Makes sure the the list of identifiers is loaded.
+     * Makes sure the list of identifiers is loaded.
      */
     protected function ensureIdentifiersLoaded()
     {

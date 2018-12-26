@@ -10,9 +10,12 @@ use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Provides a set of methods to manage business units.
+ */
 class BusinessUnitManager
 {
     /** @var EntityManager */
@@ -89,7 +92,7 @@ class BusinessUnitManager
      *
      * @return BusinessUnit
      */
-    public function getBusinessUnit(array $criteria = array(), array $orderBy = null)
+    public function getBusinessUnit(array $criteria = [], array $orderBy = null)
     {
         return $this->getBusinessUnitRepo()->findOneBy($criteria, $orderBy);
     }
@@ -97,11 +100,11 @@ class BusinessUnitManager
     /**
      * Checks if user can be set as owner by given user
      *
-     * @param User              $currentUser
-     * @param User              $newUser
-     * @param string            $accessLevel
-     * @param OwnerTreeProvider $treeProvider
-     * @param Organization      $organization
+     * @param User                       $currentUser
+     * @param User                       $newUser
+     * @param string                     $accessLevel
+     * @param OwnerTreeProviderInterface $treeProvider
+     * @param Organization               $organization
      *
      * @return bool
      */
@@ -109,51 +112,43 @@ class BusinessUnitManager
         User $currentUser,
         User $newUser,
         $accessLevel,
-        OwnerTreeProvider $treeProvider,
+        OwnerTreeProviderInterface $treeProvider,
         Organization $organization
     ) {
-        $userId = $newUser->getId();
-        if ($accessLevel == AccessLevel::SYSTEM_LEVEL) {
+        if (AccessLevel::SYSTEM_LEVEL === $accessLevel) {
             return true;
-        } elseif ($accessLevel == AccessLevel::BASIC_LEVEL && $userId == $currentUser->getId()) {
-            return true;
-        } elseif ($accessLevel == AccessLevel::GLOBAL_LEVEL && $newUser->getOrganizations()->contains($organization)) {
-            return true;
-        } else {
-            $resultBuIds = [];
-            if ($accessLevel == AccessLevel::LOCAL_LEVEL) {
-                $resultBuIds = $treeProvider->getTree()->getUserBusinessUnitIds(
-                    $currentUser->getId(),
-                    $organization->getId()
-                );
-            } elseif ($accessLevel == AccessLevel::DEEP_LEVEL) {
-                $resultBuIds = $treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
-                    $currentUser->getId(),
-                    $organization->getId()
-                );
-            }
-
-            if (!empty($resultBuIds)) {
-                $newUserBuIds = $treeProvider->getTree()->getUserBusinessUnitIds(
-                    $userId,
-                    $organization->getId()
-                );
-                $intersectBUIds = array_intersect($resultBuIds, $newUserBuIds);
-                return !empty($intersectBUIds);
-            }
         }
 
-        return false;
+        if (AccessLevel::BASIC_LEVEL === $accessLevel) {
+            return $newUser->getId() == $currentUser->getId();
+        }
+
+        if (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
+            return $newUser->getOrganizations()->contains($organization);
+        }
+
+        $allowedBuIds = $this->getAllowedBusinessUnitIds($currentUser, $accessLevel, $treeProvider, $organization);
+        if (empty($allowedBuIds)) {
+            return false;
+        }
+
+        $newUserBuIds = $treeProvider->getTree()->getUserBusinessUnitIds(
+            $newUser->getId(),
+            $organization->getId()
+        );
+        $intersectIds = array_intersect($allowedBuIds, $newUserBuIds);
+
+        return !empty($intersectIds);
     }
 
     /**
      * Checks if Business Unit can be set as owner by given user
      *
-     * @param User              $currentUser
-     * @param BusinessUnit      $entityOwner
-     * @param string            $accessLevel
-     * @param OwnerTreeProvider $treeProvider
-     * @param Organization      $organization
+     * @param User                       $currentUser
+     * @param BusinessUnit               $entityOwner
+     * @param string                     $accessLevel
+     * @param OwnerTreeProviderInterface $treeProvider
+     * @param Organization               $organization
      *
      * @return bool
      */
@@ -161,27 +156,18 @@ class BusinessUnitManager
         User $currentUser,
         BusinessUnit $entityOwner,
         $accessLevel,
-        OwnerTreeProvider $treeProvider,
+        OwnerTreeProviderInterface $treeProvider,
         Organization $organization
     ) {
-        $businessUnits = [];
         if (AccessLevel::SYSTEM_LEVEL === $accessLevel) {
             return true;
-        } elseif (AccessLevel::LOCAL_LEVEL === $accessLevel) {
-            $businessUnits = $treeProvider->getTree()->getUserBusinessUnitIds(
-                $currentUser->getId(),
-                $organization->getId()
-            );
-        } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
-            $businessUnits = $treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
-                $currentUser->getId(),
-                $organization->getId()
-            );
-        } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
-            $businessUnits = $this->getBusinessUnitIds($this->tokenAccessor->getOrganizationId());
         }
 
-        return in_array($entityOwner->getId(), $businessUnits, true);
+        $allowedBuIds = AccessLevel::GLOBAL_LEVEL === $accessLevel
+            ? $this->getBusinessUnitIds($this->tokenAccessor->getOrganizationId())
+            : $this->getAllowedBusinessUnitIds($currentUser, $accessLevel, $treeProvider, $organization);
+
+        return in_array($entityOwner->getId(), $allowedBuIds, true);
     }
 
     /**
@@ -309,5 +295,36 @@ class BusinessUnitManager
                 return $result;
             }
         }
+    }
+
+    /**
+     * @param User                       $currentUser
+     * @param int                        $accessLevel
+     * @param OwnerTreeProviderInterface $treeProvider
+     * @param Organization               $organization
+     *
+     * @return array
+     */
+    private function getAllowedBusinessUnitIds(
+        User $currentUser,
+        $accessLevel,
+        OwnerTreeProviderInterface $treeProvider,
+        Organization $organization
+    ) {
+        if (AccessLevel::LOCAL_LEVEL === $accessLevel) {
+            return $treeProvider->getTree()->getUserBusinessUnitIds(
+                $currentUser->getId(),
+                $organization->getId()
+            );
+        }
+
+        if (AccessLevel::DEEP_LEVEL === $accessLevel) {
+            return $treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
+                $currentUser->getId(),
+                $organization->getId()
+            );
+        }
+
+        return [];
     }
 }

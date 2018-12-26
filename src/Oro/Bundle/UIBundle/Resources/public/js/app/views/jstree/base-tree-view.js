@@ -27,8 +27,7 @@ define(function(require) {
 
         optionNames: BaseView.prototype.optionNames.concat([
             'onSelectRoute', 'onSelectRouteParameters', 'onRootSelectRoute',
-            'autoSelectFoundNode',
-            'viewGroup'
+            'autoSelectFoundNode', 'viewGroup', 'autohideNeighbors'
         ]),
 
         /**
@@ -135,6 +134,8 @@ define(function(require) {
          */
         _foundNodes: false,
 
+        autohideNeighbors: false,
+
         /**
          * @inheritDoc
          */
@@ -174,6 +175,7 @@ define(function(require) {
             };
 
             this.nodeId = options.nodeId;
+
             this.jsTreeConfig = this.customizeTreeConfig(options, config);
 
             this.subview('highlight', new HighlightTextView({
@@ -260,10 +262,10 @@ define(function(require) {
                 };
             }
 
-            if (_.isUndefined(options.autohideNeighbors)) {
+            if (_.isUndefined(this.autohideNeighbors)) {
                 config.autohideNeighbors = tools.isMobile();
             } else {
-                config.autohideNeighbors = options.autohideNeighbors;
+                config.autohideNeighbors = this.autohideNeighbors;
             }
 
             return config;
@@ -457,7 +459,7 @@ define(function(require) {
         },
 
         onSelect: function(event, data) {
-            if (!tools.isMobile()) {
+            if (!tools.isMobile() || !this.jsTreeInstance.settings.autohideNeighbors) {
                 return;
             }
             var selectedNode = data.node;

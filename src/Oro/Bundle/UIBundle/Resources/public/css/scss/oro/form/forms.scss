@@ -68,6 +68,15 @@
                 margin-top: 10px;
             }
 
+            &.messages {
+                margin: 0;
+
+                .alert {
+                    margin: side-values($content-padding-small 0 0);
+                    max-width: $field-width;
+                }
+            }
+
             .control-label {
                 &.html-property {
                     overflow: auto;
@@ -92,6 +101,11 @@
             &-description {
                 margin-top: $content-padding-small;
             }
+
+            &.html-content {
+                padding-top: $form-horizontal-control-label-offset;
+                max-width: $field-width;
+            }
         }
 
         &.control-group-datetime {
@@ -105,7 +119,6 @@
                 }
             }
         }
-
         &.control-group-checkbox {
             .controls {
                 padding-top: 5px;
@@ -115,6 +128,12 @@
         &.control-group-choice {
             .choice-widget-expanded {
                 padding-top: 6px;
+            }
+
+            .select2 {
+                + input {
+                    margin-top: $input-outer-offset-bottom;
+                }
             }
         }
 
@@ -146,8 +165,15 @@
         .control-group {
             &.attribute-row label.control-label {
                 cursor: default;
-                color: $primary-550;
             }
+        }
+    }
+
+    .control-group-button {
+        .btn {
+            display: block;
+            width: 100%;
+            max-width: $field-width;
         }
     }
 }

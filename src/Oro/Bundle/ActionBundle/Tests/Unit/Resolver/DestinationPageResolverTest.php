@@ -5,15 +5,10 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Resolver;
 use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
 class DestinationPageResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    protected $requestStack;
-
     /** @var EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigHelper;
 
@@ -28,11 +23,10 @@ class DestinationPageResolverTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $this->requestStack = $this->createMock(RequestStack::class);
         $this->router = $this->createMock(RouterInterface::class);
         $this->entityConfigHelper = $this->createMock(EntityConfigHelper::class);
 
-        $this->resolver = new DestinationPageResolver($this->requestStack, $this->entityConfigHelper, $this->router);
+        $this->resolver = new DestinationPageResolver($this->entityConfigHelper, $this->router);
     }
 
     public function testGetAvailableDestinationsForEntity()
@@ -53,17 +47,6 @@ class DestinationPageResolverTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['custom' => 'custom_route']);
 
         $this->assertEquals([null, 'custom'], $this->resolver->getAvailableDestinationsForEntity('TestClass'));
-    }
-
-    public function testGetOriginalUrl()
-    {
-        $this->requestStack->expects($this->once())
-            ->method('getMasterRequest')
-            ->willReturn(
-                new Request([], [], [], [], [], ['REQUEST_URI' => 'example.com'])
-            );
-
-        $this->assertEquals('example.com', $this->resolver->getOriginalUrl());
     }
 
     public function testResolveDestinationUrl()

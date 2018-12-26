@@ -184,19 +184,19 @@
             {% endif %}
         {% endif %}
         {% set isRadioLabel = form.parent.vars.expanded|default(false) and checked is defined %}
-        {% if tooltip is defined and tooltip %}
-            {% import 'OroUIBundle::macros.html.twig' as ui %}
-            {{ ui.tooltip(
-                tooltip,
-                tooltip_parameters|default({}),
-                tooltip_placement|default(null),
-                tooltip_details_enabled|default(false),
-                tooltip_details_link|default(null),
-                tooltip_details_anchor|default(null)
-            ) }}
-        {%- endif -%}
 
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {%- if tooltip is defined and tooltip -%}
+                {% import 'OroUIBundle::macros.html.twig' as ui %}
+                {{ ui.tooltip(
+                    tooltip,
+                    tooltip_parameters|default({}),
+                    tooltip_placement|default(null),
+                    tooltip_details_enabled|default(false),
+                    tooltip_details_link|default(null),
+                    tooltip_details_anchor|default(null)
+                ) }}
+            {%- endif -%}
             {%- if translatable_label is defined and not translatable_label -%}
                 {{ label }}
             {%- elseif raw_label is defined and raw_label -%}
@@ -737,4 +737,10 @@
 
     {{ form_widget(form) }}
     {{ form_errors(form) }}
+{% endblock %}
+
+{% block button_row %}
+    <div class="control-group-container control-group-button">
+        {{ form_widget(form) }}
+    </div>
 {% endblock %}

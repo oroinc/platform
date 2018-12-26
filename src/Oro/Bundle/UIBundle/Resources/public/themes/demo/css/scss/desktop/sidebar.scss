@@ -4,59 +4,59 @@
 
 // sidebar
 .sidebar {
-  background-color: $sidebar-bg-color;
+    background-color: $sidebar-bg-color;
 
-  &__add-widget,
-  &__toggle {
-    &:hover {
-      background-color: $sidebar-active-color;
+    &__add-widget,
+    &__toggle {
+        &:hover {
+            background-color: $sidebar-active-color;
+        }
     }
-  }
 
-  .mCSB_scrollTools {
-    .mCSB_dragger {
-      .mCSB_dragger_bar {
-        background-color: rgba($primary-400, 0.2) !important;
-      }
+    .mCSB_scrollTools {
+        .mCSB_dragger {
+            .mCSB_dragger_bar {
+                background-color: rgba($primary-400, 0.2) !important;
+            }
 
-      &:hover .mCSB_dragger_bar {
-        background-color: rgba($primary-400, 0.7) !important;
-      }
+            &:hover .mCSB_dragger_bar {
+                background-color: rgba($primary-400, 0.7) !important;
+            }
+        }
     }
-  }
 }
 
 // sidebar-widget
 .sidebar-widget {
-  .sidebar.minimized &.poppedup &__popup {
-    &:before {
-      border-color: $sidebar-widget-header-active-bg-color;
-      border-bottom-color: transparent;
-      border-right-color: transparent;
+    .sidebar.minimized &.poppedup &__popup {
+        &:before {
+            border-color: $sidebar-widget-header-active-bg-color;
+            border-bottom-color: transparent;
+            border-right-color: transparent;
+        }
     }
-  }
 
-  &__icon,
-  &__header {
-    background-color: $sidebar-widget-header-bg-color;
-    &:hover {
-      background-color: $sidebar-widget-header-active-bg-color;
+    &__icon,
+    &__header {
+        background-color: $sidebar-widget-header-bg-color;
+        &:hover {
+            background-color: $sidebar-widget-header-active-bg-color;
+        }
     }
-  }
-  &.poppedup &__icon,
-  &.expanded &__header {
-    background-color: $sidebar-widget-header-active-bg-color;
-  }
+    &.poppedup &__icon,
+    &.expanded &__header {
+        background-color: $sidebar-widget-header-active-bg-color;
+    }
 
-  &__header-title {
-    color: $sidebar-widget-title-color;
-  }
+    &__header-title {
+        color: $sidebar-widget-title-color;
+    }
 
-  &__header-actions {
-    color: $sidebar-widget-actions-color;
-  }
+    &__header-actions {
+        color: $sidebar-widget-actions-color;
+    }
 
-  &__popup {
-    background-color: $sidebar-widget-content-bg-color;
-  }
+    &__popup {
+        background-color: $sidebar-widget-content-bg-color;
+    }
 }

@@ -73,8 +73,17 @@ class AddOwnerValidator implements ProcessorInterface
         }
 
         // add owner validator
-        if (!$this->validationHelper->hasValidationConstraintForClass($entityClass, Owner::class)) {
-            $definition->addFormConstraint(new Owner(['groups' => ['api']]));
+        $ownerConstraintClass = $this->getOwnerConstraintClass();
+        if (!$this->validationHelper->hasValidationConstraintForClass($entityClass, $ownerConstraintClass)) {
+            $definition->addFormConstraint(new $ownerConstraintClass(['groups' => ['api']]));
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getOwnerConstraintClass()
+    {
+        return Owner::class;
     }
 }

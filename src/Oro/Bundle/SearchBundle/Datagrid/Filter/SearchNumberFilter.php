@@ -7,8 +7,12 @@ use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
+use Oro\Bundle\SearchBundle\Exception\LogicException;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
+/**
+ * Basic number filter which supports multiple operators, for "search" datasource.
+ */
 class SearchNumberFilter extends AbstractFilter
 {
     /**

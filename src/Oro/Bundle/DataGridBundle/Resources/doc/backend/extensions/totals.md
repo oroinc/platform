@@ -13,36 +13,37 @@ Totals setting should be placed under `totals` tree node.
 datagrids:
   demo:
     source:
-      totals:
-        page_total:
-            extends: grand_total
-            per_page: true
-            hide_if_one_page: true
-            columns:
-              name:
-                  label: 'page total'
-        grand_total:          
-            columns:
-              name:
-                  label: 'grand total'
-              contactName:
-                  expr: 'COUNT(o.name)'
-                  formatter: integer
-              closeDate:
-                  label: 'Oldest'
-                  expr: 'MIN(o.closeDate)'
-                  formatter: date
-              probability:
-                  label: 'Summary'
-                  expr: 'SUM(o.probability)'
-                  formatter: percent
-              budget:
-                  label: 'Budget Amount'
-                  expr: 'SUM(o.budget)'
-                  formatter: currency
-                  divisor: 100
-              statusLabel:
-                  label: oro.sales.opportunity.status.label
+       [...]
+    totals:
+      page_total:
+          extends: grand_total
+          per_page: true
+          hide_if_one_page: true
+          columns:
+            name:
+                label: 'page total'
+      grand_total:          
+          columns:
+            name:
+                label: 'grand total'
+            contactName:
+                expr: 'COUNT(o.name)'
+                formatter: integer
+            closeDate:
+                label: 'Oldest'
+                expr: 'MIN(o.closeDate)'
+                formatter: date
+            probability:
+                label: 'Summary'
+                expr: 'SUM(o.probability)'
+                formatter: percent
+            budget:
+                label: 'Budget Amount'
+                expr: 'SUM(o.budget)'
+                formatter: currency
+                divisor: 100
+            statusLabel:
+                label: oro.sales.opportunity.status.label
 ```
 
 **Notes:**

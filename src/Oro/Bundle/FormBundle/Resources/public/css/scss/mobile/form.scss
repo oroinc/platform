@@ -2,12 +2,20 @@
 
 .section-content {
     margin-top: $section-content-mobile-offset-top;
-    padding-top: $section-content-mobile-inner-offset-top;
+    padding: $section-content-mobile-inner-offset;
+
+    .row-fluid {
+        margin: $row-fluid-mobile-inner-offset;
+    }
 }
 
 .entities.list-group {
     .list-group-item {
         width: calc(#{$entities-list-mobile-group-item-width} - #{$entities-list-group-item-offset-start});
+
+        &__header {
+            padding-#{$end}: $entities-list-group-item-header-mobile-inner-offset-end;
+        }
     }
 }
 

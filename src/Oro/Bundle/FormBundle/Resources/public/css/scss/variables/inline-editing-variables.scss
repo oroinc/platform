@@ -1,18 +1,17 @@
 /* @theme: admin.oro; */
 
-$inline-editor-actions-offset: 0 4px !default;
+$inline-editor-actions-inner-offset: $input-border-width !default;
 
-$inline-editor-action-item-offset: 6px 4px !default;
 $inline-editor-action-item-color: $primary-200 !default;
 $inline-editor-action-item-color-hover: $additional-dark !default;
 $inline-editor-action-item-color-disabled: $primary-700 !default; //    closest to #68686a 0.5 opacity
 
-$inline-editor-action-item-input-offset: 6px !default;
-$inline-editor-action-item-fields-last-offset: 54px !default;
+$inline-editor-action-item-fields-last-offset: 66px !default;
+$inline-editor-inner-offset: -$inline-editor-action-item-fields-last-offset !default;
 
 $inline-editor-wrapper-width: 150px !default;
 
-$inline-editor-number-editor-width: 189px !default;
+$inline-editor-number-editor-width: 100% !default;
 
 $inline-editor-datetime-editor-width: 225px !default;
 

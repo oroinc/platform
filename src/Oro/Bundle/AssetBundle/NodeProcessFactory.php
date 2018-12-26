@@ -14,10 +14,14 @@ class NodeProcessFactory
      */
     private $jsEngine;
 
+    /**
+     * @param string $jsEnginePath
+     */
     public function __construct(string $jsEnginePath)
     {
         $this->jsEngine = $jsEnginePath;
     }
+
     /**
      * @param string         $command The command line to run
      * @param string         $cwd The working directory or null to use the working dir of the current PHP process

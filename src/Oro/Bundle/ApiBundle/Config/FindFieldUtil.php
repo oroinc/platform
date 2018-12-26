@@ -35,14 +35,9 @@ class FindFieldUtil
             }
         }
         if ($findByPropertyPath) {
-            foreach ($fields as $field) {
-                $fieldPropertyPath = $field->getPropertyPath();
-                if ($fieldPropertyPath
-                    && $fieldPropertyPath === $fieldName
-                    && ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldPropertyPath
-                ) {
-                    return $field;
-                }
+            $foundFieldName = self::findFieldNameByPropertyPath($fields, $fieldName);
+            if ($foundFieldName) {
+                return $fields[$foundFieldName];
             }
         }
 
@@ -61,13 +56,25 @@ class FindFieldUtil
     {
         if (isset($fields[$propertyPath])) {
             $fieldPropertyPath = $fields[$propertyPath]->getPropertyPath();
-            if (!$fieldPropertyPath
-                || $fieldPropertyPath === $propertyPath
-                || ConfigUtil::IGNORE_PROPERTY_PATH === $fieldPropertyPath
-            ) {
+            if (!$fieldPropertyPath || $fieldPropertyPath === $propertyPath) {
                 return $propertyPath;
             }
+            if (ConfigUtil::IGNORE_PROPERTY_PATH === $fieldPropertyPath) {
+                return self::findFieldNameByPropertyPath($fields, $propertyPath) ?? $propertyPath;
+            }
         }
+
+        return self::findFieldNameByPropertyPath($fields, $propertyPath);
+    }
+
+    /**
+     * @param FieldConfigInterface[] $fields
+     * @param string                 $propertyPath
+     *
+     * @return string|null
+     */
+    private static function findFieldNameByPropertyPath(array $fields, $propertyPath)
+    {
         foreach ($fields as $fieldName => $field) {
             $fieldPropertyPath = $field->getPropertyPath();
             if ($fieldPropertyPath

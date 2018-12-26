@@ -1,6 +1,10 @@
 /* @theme: admin.oro; */
 
 $section-content-mobile-offset-top: 0 !default;
-$section-content-mobile-inner-offset-top: 16px !default;
+$section-content-mobile-inner-offset: $content-padding-medium 0 !default;
 
 $entities-list-mobile-group-item-width: 100% !default;
+
+$row-fluid-mobile-inner-offset: 0 !default;
+
+$entities-list-group-item-header-mobile-inner-offset-end: $content-padding + $content-padding-medium !default;

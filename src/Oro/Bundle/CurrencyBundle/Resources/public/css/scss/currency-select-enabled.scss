@@ -16,11 +16,7 @@
             font-size: $currency-select-enabled-base-currency-selector-font-size;
             flex-shrink: 0;
 
-            @if $start == 'left' {
-                @include border-left-radius(0);
-            } @else {
-                @include border-right-radius(0);
-            }
+            @include border-start-radius(0);
 
             &.active {
                 outline: $currency-select-enabled-base-currency-selector-active-outline;
@@ -32,6 +28,10 @@
         margin-top: $currency-select-enabled-default-currency-equivalent-offset-top;
 
         color: $currency-select-enabled-default-currency-equivalent-color;
+
+        &:empty {
+            margin-top: 0;
+        }
     }
 
     .base-currency-field {
