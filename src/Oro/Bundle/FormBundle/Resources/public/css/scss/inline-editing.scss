@@ -1,35 +1,39 @@
 /* @theme: admin.oro; */
 
+.inline-editor__inner {
+    position: relative;
+    margin-#{$end}: $inline-editor-inner-offset;
+}
+
 .inline-editor__actions {
     position: absolute;
     top: 0;
     #{$end}: 0;
     z-index: 2;
 
-    padding: $inline-editor-actions-offset;
+    padding: $inline-editor-actions-inner-offset;
 
     &--over-multiselect {
         z-index: 10004; // to show over .ui-multiselect-menu
     }
-}
 
-.inline-editor__action-item {
-    padding: $inline-editor-action-item-offset;
-    background: none;
-    border: none;
-    color: $inline-editor-action-item-color;
+    .btn {
+        background: none;
+        border: none;
+        color: $inline-editor-action-item-color;
 
-    &:hover {
-        color: $inline-editor-action-item-color-hover;
-    }
+        &:hover {
+            color: $inline-editor-action-item-color-hover;
+        }
 
-    &[disabled] {
-        cursor: auto;
-        color: $inline-editor-action-item-color-disabled;
-    }
+        &[disabled] {
+            cursor: auto;
+            color: $inline-editor-action-item-color-disabled;
+        }
 
-    [class^="fa-"] {
-        margin: 0;
+        [class^="fa-"] {
+            margin: 0;
+        }
     }
 }
 
@@ -40,10 +44,6 @@
 
         line-height: 1;
 
-        &:first-child {
-            padding-#{$start}: $inline-editor-action-item-input-offset;
-        }
-
         &:last-child {
             padding-#{$end}: $inline-editor-action-item-fields-last-offset;
         }
@@ -51,7 +51,8 @@
 }
 
 .inline-editor-wrapper {
-        position: absolute;
+    position: absolute;
+    padding-#{$end}: $inline-editor-action-item-fields-last-offset;
 
     min-width: $inline-editor-wrapper-width;
 
@@ -60,17 +61,10 @@
     }
 
     &.number-editor {
-        // about 10+2 digits
         min-width: $inline-editor-number-editor-width;
 
         input[name='value'] {
             text-align: #{$end};
-        }
-    }
-
-    &.date-editor {
-        .hasDatepicker {
-            padding-#{$start}: $inline-editor-action-item-input-offset;
         }
     }
 
@@ -101,18 +95,11 @@
         }
     }
 
-    .select2-container {
-        border-color: $inline-editor-select2-border-color;
-        box-shadow: $inline-editor-select2-box-shadow;
-    }
-
     &.select-editor {
         min-width: $inline-editor-select-editor-width;
     }
 
     .select2-choice {
-        width: $inline-editor-select2-choice-width;
-
         &:after {
             position: absolute;
             #{$end}: 0;
@@ -126,6 +113,10 @@
 
             content: '';
         }
+    }
+
+    .inline-editor__fields .select2-choice {
+        width: $inline-editor-select2-choice-width;
     }
 
     &.multi-select-editor,
@@ -148,29 +139,6 @@
 }
 
 .inline-editor__select2-drop {
-    box-shadow: $inline-editor-select2-drop-box-shadow;
-
-    &:before {
-        position: absolute;
-        bottom: 100%;
-        #{$end}: 0;
-        #{$start}: 0;
-
-        height: $inline-editor-select2-drop-placeholder-height;
-        background-color: $inline-editor-select2-drop-placeholder-color;
-
-        content: '';
-    }
-
-    &.select2-drop-above {
-        box-shadow: $inline-editor-select2-drop-above-box-shadow;
-
-        &:before {
-            top: 100%;
-            bottom: auto;
-        }
-    }
-
     .select2-input {
         margin: 0;
         height: $inline-editor-select2-drop-height;

@@ -11,6 +11,7 @@ Table of Contents
  - [Create Entity](#create-entity)
  - [Remove Entity](#remove-entity)
  - [Find Entity](#find-entity)
+ - [Flush Entity](#flush-entity)
  - [Format String](#format-string)
  - [Call Method](#call-method)
  - [Create DateTime](#create-date-time)
@@ -261,6 +262,32 @@ OR
     order_by:
         date_created: desc
     case_insensitive: true
+```
+
+Flush Entity
+-----------
+
+**Class:** Oro\Component\Action\Action\FlushEntity
+
+**Alias:** flush_entity
+
+**Description:** Flush entity with specified class instance.
+
+**Parameters:**
+ - entity - data will contain entity instance;
+
+**Configuration Example**
+```
+- @flush_entity:
+     entity: $.someEntity #flush entity stored in some attribute
+
+OR
+
+- @flush_entity: $.someEntity
+
+OR
+
+- @flush_entity: ~ #flush context entity
 ```
 
 Format String

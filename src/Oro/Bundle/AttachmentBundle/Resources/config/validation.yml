@@ -1,4 +1,4 @@
 Oro\Bundle\AttachmentBundle\Entity\Attachment:
-    properies:
+    properties:
         file:
             - Valid: ~

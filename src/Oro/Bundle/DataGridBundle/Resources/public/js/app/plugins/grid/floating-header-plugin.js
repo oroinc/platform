@@ -8,7 +8,6 @@ define(function(require) {
     var Backbone = require('backbone');
     var mediator = require('oroui/js/mediator');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
-    var scrollBarWidth = mediator.execute('layout:scrollbarWidth');
 
     FloatingHeaderPlugin = BasePlugin.extend({
         initialize: function(grid) {
@@ -129,11 +128,11 @@ define(function(require) {
             this.setupCache();
             var headerCells = this.domCache.headerCells;
             var firstRowCells = this.domCache.firstRowCells;
+            var scrollLeft = this.domCache.gridScrollableContainer[0].scrollLeft;
             var totalWidth;
             var sumWidth;
             var widthDecrement = 0;
             var widths = [];
-            var self = this;
             // remove style
             headerCells.attr('style', '');
             firstRowCells.attr('style', '');
@@ -141,13 +140,7 @@ define(function(require) {
             this.domCache.gridContainer.css({width: ''});
             this.$el.removeClass('floatThead');
 
-            // compensate scroll bar
-            if (this.scrollVisible) {
-                this.$grid.css({borderRight: scrollBarWidth + 'px solid transparent'});
-                totalWidth = this.$grid[0].scrollWidth - scrollBarWidth;
-            } else {
-                totalWidth = this.$grid[0].scrollWidth;
-            }
+            totalWidth = this.$grid[0].scrollWidth;
 
             // save widths
             headerCells.each(function(i, headerCell) {
@@ -160,13 +153,7 @@ define(function(require) {
             });
 
             if (sumWidth > totalWidth) {
-                widthDecrement = (sumWidth - totalWidth) / widths.length + 0.001;
-            }
-
-            // add scroll bar width to last cell if scroll is visible
-            if (self.scrollVisible) {
-                widths[widths.length - 1] += scrollBarWidth;
-                totalWidth += scrollBarWidth;
+                widthDecrement = (sumWidth - totalWidth) / widths.length;
             }
 
             // set exact sizes to header cells and cells in first row
@@ -184,8 +171,6 @@ define(function(require) {
                 }
             });
 
-            this.$grid.css({borderRight: 'none'});
-
             if (this.currentFloatTheadMode !== 'default') {
                 this.$el.addClass('floatThead');
             }
@@ -195,6 +180,7 @@ define(function(require) {
             this.domCache.gridContainer.css({
                 width: totalWidth
             });
+            this.domCache.gridScrollableContainer[0].scrollLeft = scrollLeft;
 
             mediator.trigger('gridHeaderCellWidth:updated');
 

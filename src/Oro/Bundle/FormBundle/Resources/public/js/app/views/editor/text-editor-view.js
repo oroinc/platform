@@ -71,6 +71,7 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var $ = require('jquery');
+    var scrollHelper = require('oroui/js/tools/scroll-helper');
     var BaseView = require('oroui/js/app/views/base/view');
 
     TextEditorView = BaseView.extend(/** @lends TextEditorView.prototype */{
@@ -188,6 +189,13 @@ define(function(require) {
                 this.setFormState(this.options.value);
             }
             this.onChange();
+        },
+
+        /**
+         * Scrolls parent container to make editor completely visible
+         */
+        scrollIntoView: function() {
+            scrollHelper.scrollIntoView(this.$('.inline-editor__inner')[0], void 0, 20, 20);
         },
 
         /**
