@@ -7,7 +7,6 @@ datagrids:
             type: orm
             query:
                 select:
-                    audit: a
                     id: a.id
                     section: a.action
                     version: a.version
@@ -15,31 +14,15 @@ datagrids:
                     objectName: a.objectName
                     objectId: a.objectId
                     loggedAt: a.loggedAt
-                    author:  CONCAT(u.firstName, ' ', u.lastName, ' - ', u.email) as author
-                    organization: o.name as organization
+                    author:  a.ownerDescription as author
+                    organization: IDENTITY(a.organization) as organization
+                    impersonation: IDENTITY(a.impersonation) as impersonation
                 from:
                     - { table: OroDataAuditBundle:AbstractAudit, alias: a }
-                join:
-                    left:
-                        organization:
-                            join: a.organization
-                            alias: o
-                        fields:
-                            join: a.fields
-                            alias: f
-                        audit:
-                            join: OroDataAuditBundle:Audit
-                            alias: ua
-                            conditionType: WITH
-                            condition: ua.id = a.id
-                        user:
-                            join: ua.user
-                            alias: u
-                        impersonation:
-                            join: ua.impersonation
-                            alias: i
-                groupBy: a.id, o.name, author
+            hints:
+                - HINT_FORCE_PARTIAL_LOAD
         columns:
+            id: {renderable: false, manageable: false}
             action:
                 label: oro.dataaudit.datagrid.action
                 type: twig
@@ -51,11 +34,11 @@ datagrids:
                 label: oro.dataaudit.datagrid.entity_type
                 type: callback
                 callable: "@oro_dataaudit.datagrid.entity_type_provider->getEntityType"
-            objectName:
-                label: oro.dataaudit.datagrid.entity_name
             objectId:
                 label: oro.dataaudit.datagrid.entity_id
                 frontend_type: integer
+            objectName:
+                label: oro.dataaudit.datagrid.entity_name
             data:
                 label: oro.dataaudit.datagrid.data
                 type: twig
@@ -73,6 +56,8 @@ datagrids:
         properties: ~
         sorters:
             columns:
+                id:
+                    data_name: a.id
                 action:
                     data_name: a.action
                 version:
@@ -84,11 +69,11 @@ datagrids:
                 objectId:
                     data_name: a.objectId
                 author:
-                    data_name: ua.user
+                    data_name: a.ownerDescription
                 loggedAt:
                     data_name: a.loggedAt
             default:
-                loggedAt: DESC
+                id: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
         filters:
             columns:
                 action:
@@ -110,19 +95,25 @@ datagrids:
                     options:
                           field_options:
                               choices: "@oro_dataaudit.datagrid.entity_type_provider->getEntityTypes"
-                objectName:
-                    type: string
-                    data_name: a.objectName
                 objectId:
                     type: number-range
                     data_name: a.objectId
+                objectName:
+                    type: string
+                    data_name: a.objectName
                 author:
                     type: string
                     data_name: author
+                impersonation:
+                    label: oro.dataaudit.datagrid.impersonation
+                    type: choice-tree
+                    data_name: a.impersonation
+                    className: 'Oro\Bundle\UserBundle\Entity\Impersonation'
+                    autocomplete_alias: impersonations
+                    renderedPropertyName: ipAddressToken
                 loggedAt:
                     type: datetime
                     data_name: a.loggedAt
-                    enabled: false
 
     audit-history-grid:
         acl_resource: oro_dataaudit_view
@@ -130,36 +121,20 @@ datagrids:
             type: orm
             query:
                 select:
-                    audit: a
                     id: a.id
+                    author: a.ownerDescription as author
                     loggedAt: a.loggedAt
                 from:
                     - { table: OroDataAuditBundle:AbstractAudit, alias: a }
-                join:
-                    left:
-                        fields:
-                            join: a.fields
-                            alias: f
-                        audit:
-                            join: OroDataAuditBundle:Audit
-                            alias: ua
-                            conditionType: WITH
-                            condition: ua.id = a.id
-                        user:
-                            join: ua.user
-                            alias: u
-                        impersonation:
-                            join: ua.impersonation
-                            alias: i
                 where:
                     and:
                         - a.objectClass = :objectClass AND a.objectId = :objectId
-                groupBy: a.id
+            hints:
+                - HINT_FORCE_PARTIAL_LOAD
         columns:
+            id: {renderable: false, manageable: false}
             author:
                 label: oro.dataaudit.datagrid.author
-                type: callback
-                callable: "@oro_dataaudit.datagrid.author_provider->getAuthor"
             loggedAt:
                 label: oro.dataaudit.datagrid.logged_at
                 type: field
@@ -179,11 +154,12 @@ datagrids:
         properties: ~
         sorters:
             columns:
+                id:
+                    data_name: a.id
                 author:
-                    data_name: ua.user
+                    data_name: a.ownerDescription
                 loggedAt:
                     data_name: a.loggedAt
             default:
-                loggedAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
-
+                id: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
         filters: ~
