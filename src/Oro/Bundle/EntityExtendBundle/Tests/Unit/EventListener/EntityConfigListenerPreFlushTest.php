@@ -5,12 +5,28 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
-use Oro\Bundle\EntityExtendBundle\EventListener\EntityConfigListener;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityConfigBundle\Event\Events;
+use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\PreSetRequireUpdateEvent;
+use Oro\Bundle\EntityExtendBundle\EventListener\EntityConfigListener;
 
 class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
 {
+    //@codingStandardsIgnoreStart
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage No event dispatcher set for Oro\Bundle\EntityExtendBundle\EventListener\EntityConfigListener
+     */
+    //@codingStandardsIgnoreEnd
+    public function testPreFlushMissingEventDispatcher()
+    {
+        $event = new PreFlushConfigEvent([], $this->configManager);
+
+        $listener = new EntityConfigListener();
+        $listener->preFlush($event);
+    }
+
     /**
      *  Test create new field (entity state is 'NEW', owner - Custom)
      *  Nothing should be persisted
@@ -38,6 +54,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
         $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
 
         $listener = new EntityConfigListener();
+        $listener->setEventDispatcher($this->eventDispatcher);
         $listener->preFlush($event);
 
         $this->assertEquals(
@@ -50,7 +67,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
      *  Test create new field (entity state is 'Active')
      *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
      */
-    public function testNewFieldActiveEntity()
+    public function testNewFieldActiveEntityUpdateRequired()
     {
         $entityConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
         $fieldConfig = $this->getEventConfigNewField();
@@ -72,13 +89,66 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
 
         $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
 
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                Events::PRE_SET_REQUIRE_UPDATE,
+                new PreSetRequireUpdateEvent($event->getConfigs(), $this->configManager)
+            )
+            ->willReturnCallback(function (string $eventName, PreSetRequireUpdateEvent $event) {
+                $event->setUpdateRequired(true);
+            });
+
         $listener = new EntityConfigListener();
+        $listener->setEventDispatcher($this->eventDispatcher);
         $listener->preFlush($event);
 
         $this->configManager->calculateConfigChangeSet($entityConfig);
 
         $this->assertEquals(
             ['state' => [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]],
+            $this->configManager->getConfigChangeSet($entityConfig)
+        );
+    }
+
+    public function testNewFieldActiveEntityUpdateNotRequired()
+    {
+        $entityConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
+        $fieldConfig = $this->getEventConfigNewField();
+
+        $this->configCache->expects($this->once())
+            ->method('getEntityConfig')
+            ->willReturnOnConsecutiveCalls($entityConfig);
+        $this->configManager->getEntityConfig(
+            $entityConfig->getId()->getScope(),
+            $entityConfig->getId()->getClassName()
+        );
+
+        $this->configManager->persist($entityConfig);
+        $this->configManager->persist($fieldConfig);
+        $this->configManager->calculateConfigChangeSet($entityConfig);
+        $this->configManager->calculateConfigChangeSet($fieldConfig);
+
+        $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                Events::PRE_SET_REQUIRE_UPDATE,
+                new PreSetRequireUpdateEvent($event->getConfigs(), $this->configManager)
+            )
+            ->willReturnCallback(function (string $eventName, PreSetRequireUpdateEvent $event) {
+                $event->setUpdateRequired(false);
+            });
+
+        $listener = new EntityConfigListener();
+        $listener->setEventDispatcher($this->eventDispatcher);
+        $listener->preFlush($event);
+
+        $this->configManager->calculateConfigChangeSet($entityConfig);
+
+        $this->assertEquals(
+            [],
             $this->configManager->getConfigChangeSet($entityConfig)
         );
     }
@@ -111,6 +181,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
         $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
 
         $listener = new EntityConfigListener();
+        $listener->setEventDispatcher($this->eventDispatcher);
         $listener->preFlush($event);
 
         $this->assertEquals(

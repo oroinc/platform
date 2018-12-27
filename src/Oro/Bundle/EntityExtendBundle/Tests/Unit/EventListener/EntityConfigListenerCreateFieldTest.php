@@ -31,6 +31,7 @@ class EntityConfigListenerCreateFieldTest extends EntityConfigListenerTestCase
         $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $this->configManager);
 
         $listener = new EntityConfigListener();
+        $listener->setEventDispatcher($this->eventDispatcher);
         $listener->createField($event);
 
         $this->assertEquals(
@@ -60,6 +61,7 @@ class EntityConfigListenerCreateFieldTest extends EntityConfigListenerTestCase
         $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $this->configManager);
 
         $listener = new EntityConfigListener();
+        $listener->setEventDispatcher($this->eventDispatcher);
         $listener->createField($event);
 
         $this->assertEquals(
@@ -95,6 +97,7 @@ class EntityConfigListenerCreateFieldTest extends EntityConfigListenerTestCase
         $event = new RenameFieldEvent(self::ENTITY_CLASS_NAME, 'testField', 'newName', $this->configManager);
 
         $listener = new EntityConfigListener();
+        $listener->setEventDispatcher($this->eventDispatcher);
         $listener->renameField($event);
 
         $this->assertEquals(
