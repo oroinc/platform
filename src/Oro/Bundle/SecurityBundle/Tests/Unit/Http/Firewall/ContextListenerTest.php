@@ -11,6 +11,7 @@ use Oro\Bundle\SecurityBundle\Exception\OrganizationAccessDeniedException;
 use Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -24,14 +25,19 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
     use EntityTrait;
 
     /**
-     * @var TokenStorageInterface
+     * @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $tokenStorage;
 
     /**
-     * @var OrganizationManager
+     * @var OrganizationManager|\PHPUnit_Framework_MockObject_MockObject
      */
     private $organizationManager;
+
+    /**
+     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $logger;
 
     /**
      * @var ContextListener
@@ -44,6 +50,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
         $container = $this->createMock(ContainerInterface::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->organizationManager = $this->createMock(OrganizationManager::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $container->expects($this->any())
             ->method('get')
@@ -54,6 +61,11 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
                     ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
                     $this->organizationManager
                 ],
+                [
+                    'logger',
+                    ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                    $this->logger
+                ]
             ]);
 
         $this->listener = new ContextListener($container);
@@ -68,6 +80,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
         $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn($token);
+        /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->createMock(GetResponseEvent::class);
         $event->expects($this->never())
             ->method($this->anything());
@@ -100,21 +113,40 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
         $token->expects($this->any())
             ->method('getUser')
             ->willReturn($user);
-        $token->expects($this->once())
-            ->method('setAuthenticated')
-            ->with(false);
 
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects($this->atLeastOnce())
             ->method('getToken')
             ->willReturn($token);
         $event = $this->createMock(GetResponseEvent::class);
         $event->expects($this->never())
             ->method($this->anything());
 
+        $noResultException = new NoResultException();
         $this->organizationManager->expects($this->once())
             ->method('getOrganizationById')
-            ->willThrowException(new NoResultException());
+            ->willThrowException($noResultException);
 
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects($this->once())
+            ->method('set')
+            ->with(Security::AUTHENTICATION_ERROR, $this->isInstanceOf(OrganizationAccessDeniedException::class));
+
+        $request = $this->createMock(Request::class);
+        $request->expects($this->any())
+            ->method('getSession')
+            ->willReturn($session);
+        /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        $event = $this->createMock(GetResponseEvent::class);
+        $event->expects($this->any())
+            ->method('getRequest')
+            ->willReturn($request);
+
+        $this->logger
+            ->expects($this->once())
+            ->method('error')
+            ->with('Could not find organization by id 1', ['exception' => $noResultException]);
+
+        $this->expectException(OrganizationAccessDeniedException::class);
         $this->listener->onKernelRequest($event);
     }
 
@@ -137,6 +169,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
         $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn($token);
+        /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->createMock(GetResponseEvent::class);
         $event->expects($this->never())
             ->method($this->anything());
@@ -202,7 +235,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
         $token->expects($this->never())
             ->method('setOrganizationContext');
 
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects($this->atLeastOnce())
             ->method('getToken')
             ->willReturn($token);
         $this->tokenStorage->expects($this->once())
@@ -218,6 +251,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
         $request->expects($this->any())
             ->method('getSession')
             ->willReturn($session);
+        /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->createMock(GetResponseEvent::class);
         $event->expects($this->any())
             ->method('getRequest')
