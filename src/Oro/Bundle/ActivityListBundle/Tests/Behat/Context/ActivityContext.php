@@ -257,14 +257,36 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
      * Example: Then I should see Ask how his mood text in activity
      *
      * @Then /^(?:|I )should see (?P<text>.+) text in activity$/
+     *
+     * @param string $text
      */
-    public function iShouldSeeTextInCollapsedActivityItem($text)
+    public function iShouldSeeTextInCollapsedActivityItem(string $text)
     {
         /** @var ActivityList $activityList */
         $activityList = $this->createElement('Activity List');
         $collapsedItem = $activityList->getCollapsedItem();
 
         self::assertNotFalse(
+            stripos($collapsedItem->getText(), $text),
+            sprintf('Can\'t find "%s" in collapsed activity item', $text)
+        );
+    }
+
+    /**
+     * Search text in current collapsed activity
+     * Example: Then I should not see Ask how his mood text in activity
+     *
+     * @Then /^(?:|I )should not see (?P<text>.+) text in activity$/
+     *
+     * @param string $text
+     */
+    public function iShouldNotSeeTextInCollapsedActivityItem(string $text)
+    {
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('Activity List');
+        $collapsedItem = $activityList->getCollapsedItem();
+
+        self::assertFalse(
             stripos($collapsedItem->getText(), $text),
             sprintf('Can\'t find "%s" in collapsed activity item', $text)
         );
