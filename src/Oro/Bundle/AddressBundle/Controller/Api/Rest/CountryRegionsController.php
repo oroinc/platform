@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
  * CountryRegions controller
  * @RouteResource("country/regions")
  * @NamePrefix("oro_api_country_")
- * BAP-17635 Discuss ACL impl.
  */
 class CountryRegionsController extends FOSRestController
 {
