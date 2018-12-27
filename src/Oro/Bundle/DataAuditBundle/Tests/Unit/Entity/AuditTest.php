@@ -124,4 +124,13 @@ class AuditTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($loggedAt, $audit->getLoggedAt());
     }
+
+    public function testLimitOwnerDescription()
+    {
+        $descr = str_pad('a', 300);
+        $audit = new Audit();
+        $audit->setOwnerDescription($descr);
+
+        $this->assertSame(255, mb_strlen($audit->getOwnerDescription()));
+    }
 }

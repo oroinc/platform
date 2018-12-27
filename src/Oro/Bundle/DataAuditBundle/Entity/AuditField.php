@@ -8,7 +8,7 @@ use Oro\Bundle\DataAuditBundle\Model\ExtendAuditField;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\DataAuditBundle\Entity\Repository\AuditFieldRepository")
  * @ORM\Table(name="oro_audit_field")
  * @Config(mode="hidden")
  */

@@ -175,7 +175,7 @@ class AuditController extends RestGetController implements ClassResourceInterfac
         $result['username']     = $entity->getUser() ? $entity->getUser()->getUsername() : null;
 
         unset($result['fields']);
-        $result['data'] = $entity->getData();
+        $result['data'] = $this->get('oro_dataaudit.model.fields_transformer')->getCollectionData($entity->getFields());
 
         return $result;
     }
