@@ -315,15 +315,10 @@ textarea {
     vertical-align: top;
 }
 
-.oro-clearfix-width:after,
 .oro-clearfix:after {
     content: '';
     display: block;
     clear: both;
-}
-
-.oro-clearfix-width {
-    height: 1%;
 }
 
 .oro-clearfix {
