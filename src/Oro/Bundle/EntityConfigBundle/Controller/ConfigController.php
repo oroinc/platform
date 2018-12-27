@@ -28,7 +28,6 @@ use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
 /**
  * EntityConfig controller.
  * @Route("/entity/config")
- * TODO: Discuss ACL impl., currently management of configurable entities can be on or off only
  * @Acl(
  *      id="oro_entityconfig_manage",
  *      label="oro.entity_config.action.manage",
@@ -47,12 +46,6 @@ class ConfigController extends Controller
     /**
      * Lists all configurable entities.
      * @Route("/", name="oro_entityconfig_index")
-     * Acl(
-     *      id="oro_entityconfig",
-     *      label="oro.entity_config.action.view_entities",
-     *      type="action",
-     *      group_name=""
-     * )
      * @Template()
      */
     public function indexAction()
@@ -80,12 +73,6 @@ class ConfigController extends Controller
 
     /**
      * @Route("/update/{id}", name="oro_entityconfig_update")
-     * Acl(
-     *      id="oro_entityconfig_update",
-     *      label="oro.entity_config.action.update_entity",
-     *      type="action",
-     *      group_name=""
-     * )
      * @Template()
      *
      * @param string $id
@@ -135,12 +122,6 @@ class ConfigController extends Controller
     /**
      * View Entity
      * @Route("/view/{id}", name="oro_entityconfig_view")
-     * Acl(
-     *      id="oro_entityconfig_view",
-     *      label="oro.entity_config.action.view_entity",
-     *      type="action",
-     *      group_name=""
-     * )
      * @Template()
      *
      * @param EntityConfigModel $entity
@@ -199,12 +180,6 @@ class ConfigController extends Controller
 
     /**
      * @Route("/field/update/{id}", name="oro_entityconfig_field_update")
-     * Acl(
-     *      id="oro_entityconfig_field_update",
-     *      label="oro.entity_config.action.update_entity_field",
-     *      type="action",
-     *      group_name=""
-     * )
      * @Template()
      * @param FieldConfigModel $fieldConfigModel
      * @return array|RedirectResponse
@@ -221,12 +196,6 @@ class ConfigController extends Controller
 
     /**
      * @Route("/field/search/{id}", name="oro_entityconfig_field_search", defaults={"id"=0})
-     * Acl(
-     *      id="oro_entityconfig_field_search",
-     *      label="oro.entity_config.action.field_search",
-     *      type="action",
-     *      group_name=""
-     * )
      * @param string $id
      * @return Response
      */

@@ -62,12 +62,6 @@ class BusinessUnitController extends Controller
      *      name="oro_business_unit_search",
      *      requirements={"organizationId"="\d+"}
      * )
-     * Acl(
-     *      id="oro_business_unit_view",
-     *      type="action",
-     *      class="OroOrganizationBundle:BusinessUnit",
-     *      permission="VIEW"
-     * )
      */
     public function searchAction($organizationId)
     {
