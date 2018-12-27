@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * Serve data audit api calls
+ *
  * @NamePrefix("oro_api_")
  */
 class AuditController extends RestGetController implements ClassResourceInterface
@@ -176,7 +178,7 @@ class AuditController extends RestGetController implements ClassResourceInterfac
         $result['username']     = $entity->getUser() ? $entity->getUser()->getUsername() : null;
 
         unset($result['fields']);
-        $result['data'] = $entity->getData();
+        $result['data'] = $this->get('oro_dataaudit.model.fields_transformer')->getCollectionData($entity->getFields());
 
         return $result;
     }

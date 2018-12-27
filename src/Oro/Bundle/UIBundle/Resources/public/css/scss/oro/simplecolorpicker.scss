@@ -1,147 +1,145 @@
 /* @theme: admin.oro; */
 
-.simplecolorpicker {
-    &.icon {
-        &[data-color=''],
-        &[data-color='#FFFFFF'],
-        &[data-color='#ffffff'] {
-            border: 1px solid rgba(0, 0, 0, .2);
-        }
-
-        &[data-color='']:hover,
-        &[data-color='#FFFFFF']:hover,
-        &[data-color='#ffffff']:hover {
-            border: 1px solid rgba(0, 0, 0, .2) !important;
-        }
+.simplecolorpicker span.color {
+    &[data-selected] {
+        border: 1px solid transparent;
     }
 
-    span.color {
-        &[data-color=''],
-        &[data-color='#FFFFFF'],
-        &[data-color='#ffffff'] {
-            border: 1px solid rgba(0, 0, 0, .2);
-        }
+    &:hover,
+    &[data-selected]:hover {
+        border: 1px solid transparent;
+        box-shadow: 0 0 $checkbox-icon-border-shadow-size $checkbox-icon-border-color;
+    }
+}
 
-        &[data-color='']:hover,
-        &[data-color='#FFFFFF']:hover,
-        &[data-color='#ffffff']:hover {
-            border: 1px solid rgba(0, 0, 0, .2) !important;
+.simplecolorpicker.icon,
+.simplecolorpicker span.color {
+    width: $checkbox-icon-width;
+    height: $checkbox-icon-height;
+    margin: 4px;
+
+    line-height: 1;
+
+    border-radius: $checkbox-icon-border-radius;
+
+    &[data-color=''],
+    &[data-color='#FFFFFF'],
+    &[data-color='#ffffff'] {
+        border-color: $checkbox-icon-border-color-default;
+
+        &:hover {
+            border-color: $checkbox-icon-border-color-default;
         }
+    }
+}
+
+.simplecolorpicker.fontawesome {
+    span.color {
+        position: relative;
 
         &[data-selected]:after {
-            color: inherit !important;
-        }
-    }
-}
-
-i.color {
-    display: block;
-    border: 1px solid rgba(0, 0, 0, .2);
-    width: 18px;
-    height: 18px;
-    margin-top: -3px;
-}
-
-.context-menu,
-.controls {
-    .simplecolorpicker.icon,
-    .simplecolorpicker span.color {
-        width: 18px;
-        height: 18px;
-        margin: 0 3px 3px 0;
-    }
-
-    .simplecolorpicker.icon {
-        margin-top: 3px;
-    }
-
-    .simplecolorpicker span.vr {
-        margin: 0 5px 0 2px;
-        padding: 3px 0 0 0;
-    }
-
-    .simplecolorpicker.fontawesome {
-        span.color {
-            position: relative;
-            margin: 0 3px -3px 0;
-        }
-
-        span.color[data-selected]:after {
             margin: 0;
-            display: block;
-            position: absolute;
-            top: -2px;
-            left: 2px;
-        }
-    }
 
-    .simplecolorpicker.inline {
-        padding-top: 3px;
-        padding-bottom: 0;
-        margin-bottom: -3px;
-        max-width: 263px;
-    }
+            line-height: 1;
 
-    .simplecolorpicker.inline.with-empty-color,
-    .simplecolorpicker.inline.with-custom-color {
-        max-width: 294px;
-    }
-
-    .simplecolorpicker {
-        .minicolors-swatch {
-            position: relative;
-            vertical-align: top;
-            background-position: -62px -1px;
-        }
-    }
-
-    .minicolors {
-        .minicolors-panel {
-            padding: 5px;
-            border: 1px solid rgba(0, 0, 0, .2);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
-
-            .minicolors-grid {
-                top: 6px;
-                left: 6px;
-            }
-
-            .minicolors-slider {
-                top: 6px;
-                left: 157px;
-            }
-        }
-
-        .form-actions {
-            position: absolute;
-            top: 162px;
-            left: 0;
-            width: 183px;
-            padding: 5px;
-            margin: 0;
-            background-color: #fff;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
-
-            .btn {
-                margin-left: 5px;
-            }
         }
     }
 }
+.simplecolorpicker.inline {
+    padding: 8px 12px;
+}
 
-.context-menu {
+.simplecolorpicker.inline.with-empty-color,
+.simplecolorpicker.inline.with-custom-color {
+    max-width: 294px;
+}
+
+.simplecolorpicker {
     .minicolors-swatch {
-        cursor: pointer;
         position: relative;
         vertical-align: top;
         background-position: -62px -1px;
-        width: 18px;
-        height: 18px;
-        margin-right: 5px;
-        border: 1px solid rgba(0, 0, 0, .2);
+    }
+}
+
+.minicolors {
+    $position: 12px;
+
+    .minicolors-panel {
+        height: 222px;
+        width: 196px;
+        padding: 8px;
+
+        border: $dropdown-border-width solid $dropdown-border-color;
+
+        box-sizing: border-box;
+
+        @include border-radius($dropdown-border-radius);
+        @include box-shadow($dropdown-box-shadow);
+
+        .minicolors-grid {
+            top: $position;
+            #{$start}: $position;
+        }
+
+        .minicolors-slider {
+            top: $position;
+            #{$start}: auto;
+            #{$end}: $position;
+        }
     }
 
-    .minicolors-swatch:hover {
-        border: 1px solid #222; /* $gray-dark */
+    .form-actions {
+        position: absolute;
+        top: auto;
+        #{$end}: $position;
+        bottom: $position;
+
+        width: 100%;
+
+        box-sizing: border-box;
+
+        .btn {
+            margin-#{$start}: 6px;
+        }
     }
+}
+
+.minicolors-swatch {
+    position: relative;
+
+    width: $checkbox-icon-width;
+    height: $checkbox-icon-height;
+    margin: 0;
+
+    border-radius: $checkbox-icon-border-radius;
+    background-position: -62px -1px;
+
+    border-color: transparent;
+    cursor: pointer;
+}
+
+.with-empty-color > .minicolors-swatch {
+    border-color: inherit;
+}
+
+.custom-color {
+    line-height: 1;
+
+    @include fa-icon($checkbox-checked-icon, before, true) {
+        color: $primary-inverse;
+    };
+}
+
+.custom-color-wrapper {
+    display: inline-block;
+    min-width: $dropdown-item-icon-fa-size;
+    margin-#{$end}: $dropdown-item-icon-fa-offset;
+    vertical-align: middle;
+
+    line-height: 1;
+}
+
+.custom-color-name {
+    vertical-align: middle;
 }

@@ -30,6 +30,18 @@ entity_config:
                         sortable:           true
                         filterable:         true
                         show_filter:        true
+
+                # this attribute is used to store an alias that was generated for an entity
+                # and helps to resolve duplicated aliases
+                entity_alias: # string
+                    options:
+                        auditable: false
+
+                # this attribute is used to store a plural alias that was generated for an entity
+                # and helps to resolve duplicated aliases
+                entity_plural_alias: # string
+                    options:
+                        auditable: false
     attribute:
         entity:
             items:

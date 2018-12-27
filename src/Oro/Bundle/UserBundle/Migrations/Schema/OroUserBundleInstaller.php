@@ -60,7 +60,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v2_3';
+        return 'v2_4';
     }
 
     /**
@@ -142,6 +142,9 @@ class OroUserBundleInstaller implements
         AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
         AddImpersonationTable::createOroUserImpersonationTable($schema);
         AddImpersonationIpColumn::addColumn($schema);
+        $table = $schema->getTable('oro_user_impersonation');
+        $table->addIndex(['ip_address'], 'oro_user_imp_ip');
+
         AddAuthStatusColumn::addAuthStatusFieldAndValues($schema, $queries, $this->extendExtension);
         OroUserBundle20::addEmailUserIndexes($schema);
 

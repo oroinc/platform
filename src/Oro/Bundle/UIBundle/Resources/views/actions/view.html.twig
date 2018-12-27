@@ -109,9 +109,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="pull-right title-buttons-container">
-                        {{ titleButtonsBlock }}
-                    </div>
+                    {% spaceless %}
+                        <div class="pull-right title-buttons-container">
+                            {{ titleButtonsBlock }}
+                        </div>
+                    {% endspaceless %}
                 </div>
                 <div class="row inline-info">
                     <div class="pull-left-extra">

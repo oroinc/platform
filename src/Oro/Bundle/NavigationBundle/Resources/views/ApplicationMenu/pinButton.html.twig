@@ -4,7 +4,7 @@
     <div class="navigation clearfix">
         <div class="top-action-box">
             {% spaceless %}
-            <button class="btn btn-icon btn-light favorite-button" {% if contentProviderContent['favoriteButton'] == false %}style="display: none"{% endif %}
+            <button class="btn btn-icon btn-light-custom favorite-button" {% if contentProviderContent['favoriteButton'] == false %}style="display: none"{% endif %}
                     data-title="{{ oro_title_render_serialized() }}"
                     data-title-rendered="{{ oro_title_render() }}"
                     data-title-rendered-short="{{ oro_title_render_short() }}"
@@ -23,9 +23,10 @@
                             }
                         }
                     }) }}>
-                        <i class="fa-star-o hide-text">{{ 'oro.navigation.favorites.button'|trans }}</i>
+                        <span class="fa-star-o"></span>
+                        {{- 'oro.navigation.favorites.button'|trans -}}
             </button>
-            <button class="btn btn-icon btn-light minimize-button" {% if contentProviderContent['pinButton'] == false %}style="display: none"{% endif %}
+            <button class="btn btn-icon btn-light-custom minimize-button" {% if contentProviderContent['pinButton'] == false %}style="display: none"{% endif %}
                     data-title="{{ oro_title_render_serialized() }}"
                     data-title-rendered="{{ oro_title_render() }}"
                     data-title-rendered-short="{{ oro_title_render_short() }}"
@@ -52,7 +53,8 @@
                             }
                         }
                     }) }}>
-                        <i class="fa-thumb-tack hide-text">{{ 'oro.navigation.pins.button'|trans }}</i>
+                        <span class="fa-thumb-tack"></span>
+                        {{- 'oro.navigation.pins.button'|trans -}}
             </button>
             {% endspaceless %}
         </div>

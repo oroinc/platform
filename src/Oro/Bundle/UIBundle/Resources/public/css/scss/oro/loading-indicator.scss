@@ -1,0 +1,17 @@
+/* @theme: admin.oro; */
+
+.loading-indicator {
+    display: block;
+
+    line-height: 1;
+    text-align: center;
+    text-indent: 0;
+
+    &:before {
+        display: inline-block;
+
+        content: '';
+
+        @include loader(16px, 2px);
+    }
+}

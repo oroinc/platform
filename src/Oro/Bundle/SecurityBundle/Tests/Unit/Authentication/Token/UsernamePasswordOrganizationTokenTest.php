@@ -8,6 +8,8 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 
 class UsernamePasswordOrganizationTokenTest extends OrganizationTokenTestAbstract
 {
+    use OrganizationContextTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -16,5 +18,12 @@ class UsernamePasswordOrganizationTokenTest extends OrganizationTokenTestAbstrac
         $user = new User(2);
         $organization = new Organization(3);
         return new UsernamePasswordOrganizationToken($user, ['test'], 'key', $organization);
+    }
+
+    public function testOrganizationContextSerialization(): void
+    {
+        $token = $this->getToken();
+
+        $this->assertOrganizationContextSerialization($token);
     }
 }
