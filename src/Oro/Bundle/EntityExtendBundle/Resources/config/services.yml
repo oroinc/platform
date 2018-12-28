@@ -421,6 +421,28 @@ services:
                         - Regex:
                             pattern: '/^[\d+]*$/'
                             message: "This value should contain only numbers."
+            -
+                - addConstraints
+                -
+                    - smallint
+                    -
+                        - Regex:
+                              pattern: '/^[\d+]*$/'
+                              message: "This value should contain only numbers."
+            -
+                - addConstraints
+                -
+                    - bigint
+                    -
+                        - Regex:
+                              pattern: '/^[\d+]*$/'
+                              message: "This value should contain only numbers."
+            - [addConstraints, ['float', [{ Type: {type: 'numeric'} }]]]
+            - [addConstraints, ['decimal', [{ Type: {type: 'numeric'} }]]]
+            - [addConstraints, ['money', [{ Type: {type: 'numeric'} }]]]
+            - [addConstraints, ['percent', [{ Type: {type: 'numeric'} }]]]
+            - [addConstraints, ['date', [{ Date: ~ }]]]
+            - [addConstraints, ['datetime', [{ DateTime: ~ }]]]
 
     oro_entity_extend.listener.extend_field_value_render:
         class: '%oro_entity_extend.listener.extend_field_value_render.class%'
