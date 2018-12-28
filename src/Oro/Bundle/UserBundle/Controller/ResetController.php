@@ -49,9 +49,7 @@ class ResetController extends Controller
             }
         }
 
-        if (null === $user->getConfirmationToken()) {
-            $user->setConfirmationToken($user->generateToken());
-        }
+        $user->setConfirmationToken($user->generateToken());
 
         $this->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user));
         try {
