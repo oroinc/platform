@@ -4,12 +4,15 @@ namespace Oro\Bundle\DataAuditBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\DataAuditBundle\Model\FieldsTransformer;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
 
 /**
+ * Abstract class for audit entities
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository")
  * @ORM\Table(
  *     name="oro_audit",
@@ -17,7 +20,8 @@ use Oro\Bundle\UserBundle\Entity\Impersonation;
  *         @ORM\Index(name="idx_oro_audit_logged_at", columns={"logged_at"}),
  *         @ORM\Index(name="idx_oro_audit_type", columns={"type"}),
  *         @ORM\Index(name="idx_oro_audit_object_class", columns={"object_class"}),
- *         @ORM\Index(name="idx_oro_audit_obj_by_type", columns={"object_id", "object_class", "type"})
+ *         @ORM\Index(name="idx_oro_audit_obj_by_type", columns={"object_id", "object_class", "type"}),
+ *         @ORM\Index(name="idx_oro_audit_owner_descr", columns={"owner_description"})
  *     },
  *     uniqueConstraints={
  *         @ORM\UniqueConstraint(name="idx_oro_audit_version", columns={"object_id", "object_class", "version"})
@@ -214,16 +218,6 @@ abstract class AbstractAudit
     }
 
     /**
-     * @return AbstractAuditField[]|Collection
-     */
-    protected function getVisibleFields()
-    {
-        return $this->getFields()->filter(function (AbstractAuditField $field) {
-            return $field->isVisible();
-        });
-    }
-
-    /**
      * Get field
      *
      * @param string $field
@@ -415,37 +409,6 @@ abstract class AbstractAudit
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getData()
-    {
-        $data = [];
-        foreach ($this->getVisibleFields() as $field) {
-            $newValue = $field->getNewValue();
-            $oldValue = $field->getOldValue();
-            if (in_array($field->getDataType(), ['date', 'datetime', 'array', 'jsonarray'], true)) {
-                $newValue = [
-                    'value' => $newValue,
-                    'type'  => $field->getDataType(),
-                ];
-                $oldValue = [
-                    'value' => $oldValue,
-                    'type'  => $field->getDataType(),
-                ];
-            }
-            $data[$field->getField()] = [
-                'old' => $oldValue,
-                'new' => $newValue,
-            ];
-
-            if ($field->getTranslationDomain()) {
-                $data[$field->getField()]['translationDomain'] = $field->getTranslationDomain();
-            }
-        }
-        return $data;
-    }
-
-    /**
      * @return string
      */
     public function getOwnerDescription()
@@ -458,7 +421,7 @@ abstract class AbstractAudit
      */
     public function setOwnerDescription($ownerDescription)
     {
-        $this->ownerDescription = $ownerDescription;
+        $this->ownerDescription = mb_substr($ownerDescription, 0, 255, mb_detect_encoding($ownerDescription));
     }
 
     /**

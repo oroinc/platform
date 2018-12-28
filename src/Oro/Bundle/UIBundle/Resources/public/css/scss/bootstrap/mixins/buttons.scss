@@ -11,7 +11,9 @@
     $active-border: darken($border, 8%),
     $active-color: color-yiq($active-background),
     $active-box-shadow: null,
+    $focus-background: null,
     $focus-border: null,
+    $focus-color: null,
     $focus-box-shadow: null,
     $disabled-color: $color,
     $disabled-background-color: $background,
@@ -36,6 +38,8 @@
 
     &:focus,
     &.focus {
+        color: $focus-color;
+        background-color: $focus-background;
         border-color: $focus-border;
 
         // Avoid using mixin so we can pass custom focus shadow properly

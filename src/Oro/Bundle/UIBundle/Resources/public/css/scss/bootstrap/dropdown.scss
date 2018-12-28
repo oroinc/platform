@@ -147,19 +147,14 @@
 
     [class^="fa-"],
     [class*=" fa-"] {
+        position: relative;
+
         min-width: $dropdown-item-icon-fa-size;
         height: $dropdown-item-icon-fa-size;
         margin-#{$end}: $dropdown-item-icon-fa-offset;
 
         text-align: center;
-        line-height: 0;
-
-        vertical-align: middle;
-
-        &:before {
-            font-size: $dropdown-item-icon-fa-font-size;
-
-            vertical-align: text-bottom;
-        }
+        font-size: $dropdown-item-icon-fa-font-size;
+        line-height: 1;
     }
 }

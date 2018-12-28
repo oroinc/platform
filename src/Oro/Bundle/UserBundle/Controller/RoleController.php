@@ -13,6 +13,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
+ * This controller covers CRUD functionality for Role entity.
  * @Route("/role")
  */
 class RoleController extends Controller
@@ -58,8 +59,6 @@ class RoleController extends Controller
                 'tabIds' => $this->getRolePrivilegeCategoryProvider()->getTabList(),
                 'readonly' => true
             ],
-            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
-            // completely delete a role and un-assign it from all users or reassign users to another role before
             'allow_delete' =>
                 $role->getId() &&
                 !$this->get('doctrine.orm.entity_manager')
@@ -148,8 +147,6 @@ class RoleController extends Controller
             'capabilitySetOptions' =>
                 $this->get('oro_user.provider.role_privilege_capability_provider')->getCapabilitySetOptions($role),
             'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
-            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
-            // completely delete a role and un-assign it from all users or reassign users to another role before
             'allow_delete' =>
                 $role->getId() &&
                 !$this->get('doctrine.orm.entity_manager')

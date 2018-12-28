@@ -50,10 +50,12 @@ oro:
             version: Version
             entity_type: Entity type
             entity_name: Entity name
-            entity_id: Entity id
+            entity_id: Entity identifier
             data: Data
             organization: Organization
-            author_impersonation: " (impersonated from %ipAddress%)"
+            author_impersonation: " (impersonated from %ipAddress% using %token%)"
+            author_impersonation_filter: "Impersonated from %ipAddress% using %token%"
+            impersonation: Impersonation
 
         entity_config:
             entity:

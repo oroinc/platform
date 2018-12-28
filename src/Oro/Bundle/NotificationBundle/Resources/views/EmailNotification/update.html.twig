@@ -92,7 +92,8 @@
         ]
     } %}
 
-    <div data-page-component-module="oronotification/js/app/components/email-notification-form-component"
+    <div class="responsive-form-inner"
+         data-page-component-module="oronotification/js/app/components/email-notification-form-component"
          data-page-component-options="{{ {
              'selectors': {
                  'form': '#' ~ form.vars.id,
@@ -105,8 +106,9 @@
 {% endblock content_data %}
 
 {% block content %}
-    <div data-page-component-module="oroui/js/app/components/view-component"
-          data-page-component-options="{{ {
+    <div class="scrollable-container"
+         data-page-component-module="oroui/js/app/components/view-component"
+         data-page-component-options="{{ {
               view: 'oronotification/js/app/views/email-notification-form-view'
           }|json_encode }}">
         {{ parent() }}

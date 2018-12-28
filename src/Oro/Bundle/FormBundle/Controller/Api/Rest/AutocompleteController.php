@@ -11,11 +11,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\ConstraintViolation;
 
+/**
+ * Autocomplete search API resource.
+ */
 class AutocompleteController extends FOSRestController
 {
     /**
      * @param Request $request
-     * AclAncestor("oro_search")
      * @ApiDoc(
      *  description="Get autocomplete search result",
      *  resource=true,
