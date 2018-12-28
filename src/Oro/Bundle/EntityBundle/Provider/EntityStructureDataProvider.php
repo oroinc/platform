@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Provides detailed information about entities
@@ -22,6 +24,12 @@ class EntityStructureDataProvider
 
     /** @var EntityClassNameHelper */
     protected $classNameHelper;
+
+    /** @var TranslatorInterface */
+    private $translator;
+
+    /** @var Cache */
+    private $cache;
 
     /** @var array */
     protected $entityPropertyMappings = [
@@ -57,16 +65,50 @@ class EntityStructureDataProvider
     }
 
     /**
+     * @param TranslatorInterface $translator
+     */
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
+     * @param Cache $cache
+     */
+    public function setCache(Cache $cache)
+    {
+        $this->cache = $cache;
+    }
+
+    /**
      * @return EntityStructure[]
      */
     public function getData()
     {
-        $entityStructures = $this->processEntities();
+        $cacheKey = null;
+        if (null !== $this->cache && null !== $this->translator) {
+            $cacheKey = sprintf('data.%s', $this->translator->getLocale());
+            $entityStructures = $this->cache->fetch($cacheKey);
+            if (false === $entityStructures) {
+                $entityStructures = $this->processEntities();
 
-        $event = new EntityStructureOptionsEvent();
-        $event->setData($entityStructures);
+                $event = new EntityStructureOptionsEvent();
+                $event->setData($entityStructures);
+                $this->eventDispatcher->dispatch(EntityStructureOptionsEvent::EVENT_NAME, $event);
+                $entityStructures = $event->getData();
 
-        return $this->eventDispatcher->dispatch(EntityStructureOptionsEvent::EVENT_NAME, $event)->getData();
+                $this->cache->save($cacheKey, $entityStructures);
+            }
+        } else {
+            $entityStructures = $this->processEntities();
+
+            $event = new EntityStructureOptionsEvent();
+            $event->setData($entityStructures);
+            $this->eventDispatcher->dispatch(EntityStructureOptionsEvent::EVENT_NAME, $event);
+            $entityStructures = $event->getData();
+        }
+
+        return $entityStructures;
     }
 
     /**

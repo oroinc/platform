@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Model;
 
-class EntityStructure
+/**
+ * Represents detailed information about an entity type.
+ */
+class EntityStructure implements \Serializable
 {
     /**
      * This field required for JSON API
@@ -273,5 +276,43 @@ class EntityStructure
         $this->routes = $routes;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize([
+            $this->id,
+            $this->className,
+            $this->label,
+            $this->pluralLabel,
+            $this->alias,
+            $this->pluralAlias,
+            $this->icon,
+            $this->routes,
+            $this->options,
+            $this->fields
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        list(
+            $this->id,
+            $this->className,
+            $this->label,
+            $this->pluralLabel,
+            $this->alias,
+            $this->pluralAlias,
+            $this->icon,
+            $this->routes,
+            $this->options,
+            $this->fields
+            ) = unserialize($serialized);
     }
 }
