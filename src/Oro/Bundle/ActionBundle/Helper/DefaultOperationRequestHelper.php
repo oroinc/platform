@@ -12,6 +12,8 @@ class DefaultOperationRequestHelper
     const MASS_ACTION_ROUTE = 'oro_datagrid_mass_action';
     const DATAGRID_WIDGET_ROUTE = 'oro_datagrid_widget';
 
+    const ORIGINAL_ROUTE_PARAMETER_KEY = 'originalRoute';
+
     /** @var RequestStack */
     protected $requestStack;
 
@@ -42,8 +44,8 @@ class DefaultOperationRequestHelper
         if (in_array($route, [self::DATAGRID_ROUTE, self::MASS_ACTION_ROUTE, self::DATAGRID_WIDGET_ROUTE], true)) {
             $params = $request->query->get($request->get('gridName'));
 
-            if (isset($params['originalRoute'])) {
-                $route = $params['originalRoute'];
+            if (isset($params[self::ORIGINAL_ROUTE_PARAMETER_KEY])) {
+                $route = $params[self::ORIGINAL_ROUTE_PARAMETER_KEY];
             }
         }
 

@@ -289,8 +289,9 @@ operations:
                 service: translator.default
                 method: rebuildCache
             - '@call_service_method':
-                service: oro_translation.js_dumper
-                method: dumpTranslations
+                service: oro_platform.command_executor
+                method: runCommand
+                method_parameters: ['oro:translation:dump']
             - '@call_service_method':
                 service: oro_ui.dynamic_asset_version_manager
                 method: updateAssetVersion

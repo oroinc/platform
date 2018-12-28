@@ -4,20 +4,22 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Functional\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener;
+use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
+use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
-use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
-use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Tests\Functional\Helper\AdminUserTrait;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @dbIsolationPerTest
@@ -28,6 +30,7 @@ use Oro\Component\MessageQueue\Client\MessagePriority;
 class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 {
     use MessageQueueExtension;
+    use AdminUserTrait;
 
     protected function setUp()
     {
@@ -1016,5 +1019,53 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
             'entities_updated'    => [],
             'collections_updated' => []
         ]);
+    }
+
+    public function testShouldSendOwnerDescriptionOverridesAuthorName()
+    {
+        $user = $this->getAdminUser();
+        $organization = $user->getOrganization();
+        $token = new UsernamePasswordOrganizationToken($user, $user->getUsername(), 'main', $organization);
+        $token->setAttribute('owner_description', 'Integration: #1');
+
+        $tokenStorage = $this->getTokenStorage();
+        $tokenStorage->setToken($token);
+
+        $em = $this->getEntityManager();
+
+        $entity = new TestAuditDataOwner();
+        $entity->setStringProperty('aString');
+        $em->persist($entity);
+        $em->flush();
+
+        /** @var Message $message */
+        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $body = $message->getBody();
+
+        self::assertArrayHasKey('owner_description', $body);
+        self::assertSame('Integration: #1', $body['owner_description']);
+    }
+
+    public function testShouldSendOwnerDescriptionUsingAuthorName()
+    {
+        $user = $this->getAdminUser();
+        $token = new UsernamePasswordToken($user, $user->getUsername(), 'main');
+
+        $tokenStorage = $this->getTokenStorage();
+        $tokenStorage->setToken($token);
+
+        $em = $this->getEntityManager();
+
+        $entity = new TestAuditDataOwner();
+        $entity->setStringProperty('aString');
+        $em->persist($entity);
+        $em->flush();
+
+        /** @var Message $message */
+        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $body = $message->getBody();
+
+        self::assertArrayHasKey('owner_description', $body);
+        self::assertSame('John Doe - admin@example.com', $body['owner_description']);
     }
 }

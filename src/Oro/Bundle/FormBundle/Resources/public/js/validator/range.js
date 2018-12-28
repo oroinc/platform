@@ -22,25 +22,27 @@ define(function(require) {
             value = numberFormatter.unformatStrict(value);
             return this.optional(element) ||
                 !(isNaN(value) ||
-                    (param.min !== null && value < Number(param.min)) ||
-                    (param.max !== null && value > Number(param.max)));
+                    (param.min !== null && value < numberFormatter.unformatStrict(param.min)) ||
+                    (param.max !== null && value > numberFormatter.unformatStrict(param.max)));
         },
         function(param, element) {
             var message;
             var placeholders = {};
             var value = this.elementValue(element);
             var normalizedValue = numberFormatter.unformatStrict(value);
+            var normalizedMin = numberFormatter.unformatStrict(param.min);
+            var normalizedMax = numberFormatter.unformatStrict(param.max);
             param = _.extend({}, defaultParam, param);
             if (isNaN(normalizedValue)) {
                 message = param.invalidMessage;
-            } else if (param.min !== null && normalizedValue < Number(param.min)) {
+            } else if (param.min !== null && normalizedValue < normalizedMin) {
                 message = param.minMessage;
-                placeholders.limit = param.min;
-            } else if (param.max !== null && normalizedValue > Number(param.max)) {
+                placeholders.limit = numberFormatter.formatDecimal(param.min);
+            } else if (param.max !== null && normalizedValue > normalizedMax) {
                 message = param.maxMessage;
-                placeholders.limit = param.max;
+                placeholders.limit = numberFormatter.formatDecimal(param.max);
             }
-            placeholders.value = value;
+            placeholders.value = numberFormatter.formatDecimal(value);
             return __(message, placeholders);
         }
     ];

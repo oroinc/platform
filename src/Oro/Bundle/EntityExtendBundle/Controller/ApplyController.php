@@ -14,7 +14,6 @@ use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
 /**
  * EntityExtendBundle controller.
  * @Route("/entity/extend")
- * TODO: Discuss ACL impl., currently acl is disabled
  */
 class ApplyController extends Controller
 {
@@ -48,12 +47,6 @@ class ApplyController extends Controller
      *      "/update_attribute_schema",
      *      name="oro_entityextend_attribute_schema_update",
      *      defaults={"id"=0}
-     * )
-     * Acl(
-     *      id="oro_entityextend_attribute_schema_update",
-     *      label="oro.entity_extend.action.apply_changes",
-     *      type="action",
-     *      group_name=""
      * )
      */
     public function updateAttributeSchemaAction()

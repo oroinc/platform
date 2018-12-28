@@ -81,9 +81,10 @@ services:
 
     oro_entity_config.tools.command_executor:
         class: %oro_entity_config.tools.command_executor.class%
+        decorates: oro_platform.command_executor
         arguments:
-            - %kernel.root_dir%/console
-            - %kernel.environment%
+            - '%kernel.root_dir%/console'
+            - '%kernel.environment%'
             - '@oro_cache.oro_data_cache_manager'
 
     oro_entity_config.config_loader:

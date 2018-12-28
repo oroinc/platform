@@ -8,7 +8,7 @@ use Symfony\Component\PropertyAccess\Exception\ExceptionInterface;
 
 use Doctrine\Common\Inflector\Inflector;
 
-class ResultRecord implements ResultRecordInterface
+class ResultRecord implements ResultRecordInterface, ResultRecordWritableInterface
 {
     /** @var array */
     private $valueContainers = [];
@@ -47,10 +47,7 @@ class ResultRecord implements ResultRecordInterface
     }
 
     /**
-     * Set value of property by name
-     *
-     * @param string $name
-     * @param mixed $value
+     * {@inheritdoc}
      */
     public function setValue($name, $value)
     {
@@ -74,11 +71,7 @@ class ResultRecord implements ResultRecordInterface
     }
 
     /**
-     * Get value of property by name
-     *
-     * @param  string $name
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getValue($name)
     {

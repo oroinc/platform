@@ -17,6 +17,7 @@ use Oro\Bundle\ActionBundle\Button\OperationButton;
 
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 
@@ -229,7 +230,10 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         $context = $this->contextHelper->getContext();
 
         if (!empty($context['route'])) {
-            $config->offsetSetByPath('[options][urlParams][originalRoute]', $context['route']);
+            $config->offsetSetByPath(
+                '[options][urlParams]['. DefaultOperationRequestHelper::ORIGINAL_ROUTE_PARAMETER_KEY .']',
+                $context['route']
+            );
         }
     }
 

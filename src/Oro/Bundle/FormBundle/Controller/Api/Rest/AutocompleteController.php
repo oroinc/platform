@@ -18,7 +18,6 @@ class AutocompleteController extends FOSRestController
 {
     /**
      * @param Request $request
-     * AclAncestor("oro_search")
      * @ApiDoc(
      *  description="Get autocomplete search result",
      *  resource=true,

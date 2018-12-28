@@ -7,9 +7,12 @@ use Symfony\Component\Security\Core\Role\RoleInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
+/**
+ * Organization aware token.
+ */
 class OrganizationToken extends AbstractToken implements OrganizationContextTokenInterface
 {
-    use OrganizationContextTokenTrait;
+    use OrganizationContextTokenSerializerTrait;
     /**
      * @param Organization             $organization The organization
      * @param RoleInterface[]|string[] $roles        An array of roles

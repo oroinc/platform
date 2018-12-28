@@ -15,6 +15,7 @@ use Oro\Bundle\ActionBundle\Provider\ApplicationProviderAwareTrait;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 
+use Oro\Bundle\WorkflowBundle\Fixer\OriginalUrlFixer;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
@@ -24,6 +25,9 @@ abstract class AbstractButtonProviderExtension implements
     ApplicationProviderAwareInterface
 {
     use ApplicationProviderAwareTrait;
+
+    /** @var OriginalUrlFixer */
+    private $originalUrlFixer;
 
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
@@ -53,6 +57,14 @@ abstract class AbstractButtonProviderExtension implements
     }
 
     /**
+     * @param OriginalUrlFixer $originalUrlFixer
+     */
+    public function setOriginalUrlFixer(OriginalUrlFixer $originalUrlFixer)
+    {
+        $this->originalUrlFixer = $originalUrlFixer;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function find(ButtonSearchContext $buttonSearchContext)
@@ -78,6 +90,14 @@ abstract class AbstractButtonProviderExtension implements
 
             foreach ($transitions as $transition) {
                 $buttonContext = $this->generateButtonContext($transition, $buttonSearchContext);
+                /**
+                 * We got grid ajax url instead of page when do filtering or another work
+                 * on the grid that force to reload grid with ajax. For this case we must
+                 * rewrite this url on url that will goes to the page where this grid locates
+                 */
+                if ($this->originalUrlFixer) {
+                    $this->originalUrlFixer->fixGridAjaxUrl($buttonContext);
+                }
                 $buttons[] = $this->createTransitionButton($transition, $workflow, $buttonContext);
             }
         }

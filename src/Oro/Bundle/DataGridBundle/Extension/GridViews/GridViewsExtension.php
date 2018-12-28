@@ -3,24 +3,24 @@
 namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-
 use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Adds grid views functionality to datagrids.
+ * Adds to parameters filters and sorters taken from actual grid view.
+ */
 class GridViewsExtension extends AbstractExtension
 {
     const GRID_VIEW_ROOT_PARAM = '_grid_view';
@@ -114,9 +114,13 @@ class GridViewsExtension extends AbstractExtension
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $currentViewId = $this->getCurrentViewId($config->getName());
+        $stateGridView = $data->offsetGetByPath('[state][gridView]', self::DEFAULT_VIEW_ID);
+        $filtersState = [];
+        if ($stateGridView === self::DEFAULT_VIEW_ID) {
+            $filtersState = $data->offsetGetByPath('[state][filters]', []);
+        }
         // need to set [initialState][filters] from [state][filters]
         // before [state][filters] will be set from default grid view
-        $filtersState = $data->offsetGetByPath('[state][filters]', []);
         $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID, 'filters' => $filtersState]);
         $this->setDefaultParams($config->getName(), $data);
         $data->offsetAddToArray('state', ['gridView' => $currentViewId]);

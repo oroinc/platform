@@ -498,9 +498,17 @@ class ConfigManager
      */
     public function flushAllCaches()
     {
-        //$this->cache->flushAllConfigurable();
-        //$this->cache->flushAllConfigs();
-        // @todo temporary solution. 'flush' methods should be used. should be fixed in BAP-9151
+        /**
+         * The Doctrine cache provider has two methods to clear the cache:
+         *  deleteAll - Deletes all cache entries in the current cache namespace.
+         *  flushAll - Flushes all cache entries, globally.
+         * Actually deleteAll method does not remove cached entries, it just increase cache version. The flushAll
+         * deletes all cached entries, but it does it for all namespaces.
+         * The problem is that we use the same cache, but for different caches we use different namespaces.
+         * E.g. we use oro_entity_aliases namespace for entity alias cache and oro_entity_config namespace for
+         * entity config cache. But if a developer call flushAll method for any of these cache all cached entries
+         * from all caches will be removed
+         */
         $this->cache->deleteAllConfigurable();
         $this->cache->deleteAllConfigs();
     }
@@ -558,7 +566,6 @@ class ConfigManager
             $this->auditManager->save($logEntry);
         }
 
-        // @todo: Should be removed together with deprecated events
         if ($this->hasListeners(Events::POST_FLUSH_CONFIG)) {
             $this->eventDispatcher->dispatch(
                 Events::POST_FLUSH_CONFIG,
@@ -586,10 +593,11 @@ class ConfigManager
     protected function prepareFlush(&$models)
     {
         $groupedConfigs = [];
+        $persistConfigsCount = count($this->persistConfigs);
+
         foreach ($this->persistConfigs as $config) {
             $this->calculateConfigChangeSet($config);
 
-            // @todo: Should be removed together with deprecated events
             if ($this->hasListeners(Events::PRE_PERSIST_CONFIG)) {
                 $this->eventDispatcher->dispatch(
                     Events::PRE_PERSIST_CONFIG,
@@ -640,7 +648,13 @@ class ConfigManager
             }
         }
 
-        if (count($this->persistConfigs) !== count($this->configChangeSets)) {
+        // First we are comparing persistConfigs size to configChangeSets size in case one of them was changed.
+        // Then we are comparing persistConfigs size to stored persistConfigs size in case new persistConfigs
+        // were added and configChangeSets were recalculated. In this case persistConfigs and configChangeSets sizes
+        // will be equal, but we still need to rerun the logic with updated persistConfigs.
+        if (count($this->persistConfigs) !== count($this->configChangeSets)
+            || count($this->persistConfigs) !== $persistConfigsCount
+        ) {
             $this->prepareFlush($models);
         }
     }
@@ -787,7 +801,6 @@ class ConfigManager
                     $this->cache->saveEntities($entities, true);
                 }
 
-                // @todo: Should be removed together with deprecated events
                 if ($this->hasListeners(Events::NEW_ENTITY_CONFIG)) {
                     $this->eventDispatcher->dispatch(
                         Events::NEW_ENTITY_CONFIG,
@@ -852,7 +865,6 @@ class ConfigManager
                 $this->cache->saveFields($className, $fields, true);
             }
 
-            // @todo: Should be removed together with deprecated events
             if ($this->hasListeners(Events::NEW_FIELD_CONFIG)) {
                 $this->eventDispatcher->dispatch(
                     Events::NEW_FIELD_CONFIG,
@@ -871,8 +883,6 @@ class ConfigManager
     /**
      * @param string $className
      * @param bool   $force - if TRUE overwrite existing value from annotation
-     *
-     * @TODO: need handling for removed values
      */
     public function updateConfigEntityModel($className, $force = false)
     {
@@ -896,7 +906,6 @@ class ConfigManager
             }
         }
 
-        // @todo: Should be removed together with deprecated events
         if ($this->hasListeners(Events::UPDATE_ENTITY_CONFIG)) {
             $this->eventDispatcher->dispatch(
                 Events::UPDATE_ENTITY_CONFIG,
@@ -913,8 +922,6 @@ class ConfigManager
      * @param string $className
      * @param string $fieldName
      * @param bool   $force - if TRUE overwrite existing value from annotation
-     *
-     * @TODO: need handling for removed values
      */
     public function updateConfigFieldModel($className, $fieldName, $force = false)
     {
@@ -944,7 +951,6 @@ class ConfigManager
             }
         }
 
-        // @todo: Should be removed together with deprecated events
         if ($this->hasListeners(Events::UPDATE_FIELD_CONFIG)) {
             $this->eventDispatcher->dispatch(
                 Events::UPDATE_FIELD_CONFIG,
@@ -970,7 +976,6 @@ class ConfigManager
     {
         $result = $this->modelManager->changeFieldName($className, $fieldName, $newFieldName);
         if ($result) {
-            // @todo: Should be removed together with deprecated events
             if ($this->hasListeners(Events::RENAME_FIELD_OLD)) {
                 $this->eventDispatcher->dispatch(
                     Events::RENAME_FIELD_OLD,

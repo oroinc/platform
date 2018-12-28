@@ -11,7 +11,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Entity()
  * @ORM\Table(name="oro_user_impersonation")
  * @ORM\Table(name="oro_user_impersonation", indexes = {
- *      @ORM\Index("token_idx", columns = {"token"})
+ *      @ORM\Index("token_idx", columns = {"token"}),
+ *      @ORM\Index("oro_user_imp_ip", columns = {"ip_address"}),
  * })
  */
 class Impersonation

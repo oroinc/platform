@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
+/**
+ * Provides the list of all events related to entity configuration.
+ */
 final class Events
 {
     /**
@@ -62,4 +65,9 @@ final class Events
     const PRE_PERSIST_CONFIG = 'entity_config.persist.config';
     /** @deprecated since 1.9. Use POST_FLUSH instead */
     const POST_FLUSH_CONFIG = 'entity_config.flush.config';
+
+    /**
+     * Occurs before setting config state to Require update
+     */
+    const PRE_SET_REQUIRE_UPDATE = 'oro.entity_config.pre_set_require_update';
 }

@@ -92,12 +92,20 @@ class EmailType extends AbstractType
             ->add(
                 'cc',
                 'oro_email_email_address_recipients',
-                ['required' => false, 'attr' => ['class' => 'taggable-field']]
+                [
+                    'label' => 'oro.email.cc.label',
+                    'required' => false,
+                    'attr' => ['class' => 'taggable-field']
+                ]
             )
             ->add(
                 'bcc',
                 'oro_email_email_address_recipients',
-                ['required' => false, 'attr' => ['class' => 'taggable-field']]
+                [
+                    'label' => 'oro.email.bcc.label',
+                    'required' => false,
+                    'attr' => ['class' => 'taggable-field']
+                ]
             )
             ->add('subject', 'text', ['required' => true, 'label' => 'oro.email.subject.label'])
             ->add(
@@ -154,6 +162,7 @@ class EmailType extends AbstractType
                 'contexts',
                 'oro_activity_contexts_select',
                 [
+                    'label' => "oro.email.contexts.label",
                     'collectionModel' => true,
                     'error_bubbling'  => false,
                     'tooltip'   => 'oro.email.contexts.tooltip',

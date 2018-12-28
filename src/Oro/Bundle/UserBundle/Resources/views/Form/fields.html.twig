@@ -56,7 +56,7 @@
 {% endblock %}
 
 {% block oro_user_apikey_gen_key_row %}
-    <span class="api-key" id="{{ apiKeyElementId }}">{{ value|escape|default('N/A') }}</span>
+    <span class="api-key" id="{{ apiKeyElementId }}">{{ value|escape|default('N/A'|trans) }}</span>
 {% endblock %}
 
 {% block _user_settings_oro_user___case_insensitive_email_addresses_enabled_value_errors %}

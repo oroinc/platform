@@ -101,3 +101,9 @@ services:
             - '@oro_platform.provider.console.global_options_provider_registry'
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 250 }
+
+    oro_platform.command_executor:
+        class: Oro\Component\PhpUtils\Tools\CommandExecutor\CommandExecutor
+        arguments:
+            - %kernel.root_dir%/console
+            - %kernel.environment%

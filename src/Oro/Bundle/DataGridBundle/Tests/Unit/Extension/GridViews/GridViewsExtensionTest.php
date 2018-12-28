@@ -4,24 +4,22 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\GridViews;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
-use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
+use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -151,6 +149,63 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
 
         // check local cache of grid view
         $this->assertGridStateView($grid2, 'view2');
+    }
+
+    /**
+     * @dataProvider visitMetadataInitialStateDataProvider
+     *
+     * @param array $state
+     * @param array $expectedInitialState
+     */
+    public function testVisitMetadataInitialState(array $state, array $expectedInitialState)
+    {
+        $user = new User();
+
+        $this->tokenAccessor->expects($this->any())->method('getUser')->willReturn($user);
+
+        /** @var GridViewManager|\PHPUnit_Framework_MockObject_MockObject $gridViewManager */
+        $gridViewManager = $this->createMock(GridViewManager::class);
+        $gridViewManager->expects($this->once())
+            ->method('getAllGridViews')
+            ->willReturn([]);
+
+        $this->serviceLink->expects($this->any())->method('getService')->willReturn($gridViewManager);
+
+        $data = MetadataObject::create(['state' => $state]);
+        $config = DatagridConfiguration::create([DatagridConfiguration::NAME_KEY => 'grid1']);
+
+        $this->assertFalse($data->offsetExists('initialState'));
+        $this->gridViewsExtension->setParameters(new ParameterBag());
+        $this->gridViewsExtension->visitMetadata($config, $data);
+        $this->assertTrue($data->offsetExists('initialState'));
+        $this->assertEquals($expectedInitialState, $data->offsetGet('initialState'));
+    }
+
+    /**
+     * @return array
+     */
+    public function visitMetadataInitialStateDataProvider(): array
+    {
+        return [
+            'state for default grid view' => [
+                'state' => [
+                    'filters' => ['sampleFilter' => 'sampleValue'],
+                ],
+                'initialState' => [
+                    'gridView' => GridViewsExtension::DEFAULT_VIEW_ID,
+                    'filters' => ['sampleFilter' => 'sampleValue'],
+                ],
+            ],
+            'state for custom grid view' => [
+                'state' => [
+                    ['gridView' => 'customGridView', 'filters' => ['sampleFilter' => 'sampleValue']],
+                ],
+                'initialState' => [
+                    'gridView' => GridViewsExtension::DEFAULT_VIEW_ID,
+                    'filters' => [],
+                ],
+            ],
+        ];
     }
 
     /**

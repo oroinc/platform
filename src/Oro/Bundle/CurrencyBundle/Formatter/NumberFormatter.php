@@ -29,55 +29,20 @@ class NumberFormatter extends BaseFormatter
      */
     public function formatCurrency(
         $value,
-        $currency = null,
+        $currencyCode = null,
         array $attributes = [],
         array $textAttributes = [],
         array $symbols = [],
         $locale = null
     ) {
-        if (!$currency) {
-            $currency = $this->localeSettings->getCurrency();
-        }
-
-        if (!$locale) {
-            $locale = $this->localeSettings->getLocaleWithRegion();
-        }
-
-        $formatter = $this->getFormatter($locale, \NumberFormatter::CURRENCY, $attributes, $textAttributes, $symbols);
-
-        $currencyCode = $formatter->getTextAttribute(\NumberFormatter::CURRENCY_CODE);
-        $currencySymbol = $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
-        $currencyIntlSymbol = $formatter->getSymbol(\NumberFormatter::INTL_CURRENCY_SYMBOL);
-        $localizedCurrencySymbol = $this->localeSettings->getCurrencySymbolByCurrency($currency);
-
-        $replaceSymbols = array_filter(
-            [$currency, $currencySymbol, $currencyIntlSymbol],
-            function ($symbol) use ($localizedCurrencySymbol) {
-                return $symbol !== $localizedCurrencySymbol;
-            }
-        );
+        $result = parent::formatCurrency($value, $currencyCode, $attributes, $textAttributes, $symbols, $locale);
 
         if ($this->viewTypeProvider->getViewType() === ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE) {
-            $localizedCurrencySymbol =
-                $this->isCurrencySymbolPrepend($currencyCode, $locale) ?
-                    sprintf('%s ', $localizedCurrencySymbol) : $localizedCurrencySymbol;
+            $toCurrencySymbol = $this->localeSettings->getCurrencySymbolByCurrency($currencyCode);
+            // Adds a space before currency ISO code, excludes case with duplication when space is already there.
+            $result = trim(str_replace([$toCurrencySymbol, '  '], [$toCurrencySymbol . ' ', ' '], $result), ' ');
         }
 
-        $formattedString = $formatter->formatCurrency(
-            $value,
-            $currencyCode
-        );
-
-        if (!empty($replaceSymbols)) {
-            $localizedFormattedString = str_replace(
-                $replaceSymbols,
-                $localizedCurrencySymbol,
-                $formattedString
-            );
-
-            return $localizedFormattedString;
-        }
-
-        return $formattedString;
+        return $result;
     }
 }
