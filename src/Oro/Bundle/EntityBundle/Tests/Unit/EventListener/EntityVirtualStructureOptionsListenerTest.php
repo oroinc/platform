@@ -47,10 +47,7 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
             ->willReturn(true);
 
         $event = $this->getEntity(EntityStructureOptionsEvent::class, ['data' => [$entityStructure]]);
-        $expectedFieldStructure = (clone $fieldStructure)->addOption(
-            EntityVirtualStructureOptionsListener::OPTION_NAME,
-            true
-        );
+        $expectedFieldStructure = (clone $fieldStructure)->addOption('virtual', true);
         $expectedEntityStructure = $this->getEntity(
             EntityStructure::class,
             [
@@ -81,10 +78,7 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
             ->willReturn(true);
 
         $event = $this->getEntity(EntityStructureOptionsEvent::class, ['data' => [$entityStructure]]);
-        $expectedFieldStructure = (clone $fieldStructure)->addOption(
-            EntityVirtualStructureOptionsListener::OPTION_NAME,
-            true
-        );
+        $expectedFieldStructure = (clone $fieldStructure)->addOption('virtual', true);
         $expectedEntityStructure = $this->getEntity(
             EntityStructure::class,
             [

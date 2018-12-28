@@ -5,14 +5,16 @@ namespace Oro\Bundle\EntityBundle\EventListener;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
-use Oro\Bundle\EntityBundle\Model\EntityStructure;
 
+/**
+ * Adds "identifier" option for identifier fields.
+ */
 class EntityIdentifierStructureOptionsListener
 {
-    const OPTION_NAME = 'identifier';
+    private const OPTION_NAME = 'identifier';
 
     /** @var ManagerRegistry */
-    protected $managerRegistry;
+    private $managerRegistry;
 
     /**
      * @param ManagerRegistry $managerRegistry
@@ -28,12 +30,7 @@ class EntityIdentifierStructureOptionsListener
     public function onOptionsRequest(EntityStructureOptionsEvent $event)
     {
         $data = $event->getData();
-
         foreach ($data as $entityStructure) {
-            if (!$entityStructure instanceof EntityStructure) {
-                continue;
-            }
-
             $className = $entityStructure->getClassName();
 
             $metadata = $this->getMetadataFor($className);
@@ -48,7 +45,6 @@ class EntityIdentifierStructureOptionsListener
                 }
             }
         }
-
         $event->setData($data);
     }
 
@@ -57,7 +53,7 @@ class EntityIdentifierStructureOptionsListener
      *
      * @return ClassMetadata
      */
-    protected function getMetadataFor($className)
+    private function getMetadataFor($className)
     {
         $manager = $this->managerRegistry->getManagerForClass($className);
 

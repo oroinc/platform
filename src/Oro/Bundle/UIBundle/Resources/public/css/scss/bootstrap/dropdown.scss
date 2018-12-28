@@ -10,8 +10,8 @@
     }
 
     &[x-displayed-arrow] {
-        $arrow-offset: -5px;
-        $placeholder: 8px;
+        $arrow-offset: -4px;
+        $placeholder: 6px;
 
         &:before {
             position: absolute;
