@@ -81,6 +81,7 @@
     }
 
     .icon {
+        height: $oro-datagrid-action-font-size;
         margin-#{$start}: $oro-datagrid-all-header-cell-icon-offset;
 
         vertical-align: middle;
