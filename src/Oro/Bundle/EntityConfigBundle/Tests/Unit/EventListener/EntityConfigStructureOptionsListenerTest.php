@@ -50,10 +50,7 @@ class EntityConfigStructureOptionsListenerTest extends \PHPUnit\Framework\TestCa
             ->willReturn(true);
 
         $event = $this->getEntity(EntityStructureOptionsEvent::class, ['data' => [$entityStructure]]);
-        $expectedFieldStructure = (clone $fieldStructure)->addOption(
-            EntityConfigStructureOptionsListener::OPTION_NAME,
-            true
-        );
+        $expectedFieldStructure = (clone $fieldStructure)->addOption('configurable', true);
         $expectedEntityStructure = $this->getEntity(
             EntityStructure::class,
             [
@@ -85,10 +82,7 @@ class EntityConfigStructureOptionsListenerTest extends \PHPUnit\Framework\TestCa
             ->willReturn(true);
 
         $event = $this->getEntity(EntityStructureOptionsEvent::class, ['data' => [$entityStructure]]);
-        $expectedFieldStructure = (clone $fieldStructure)->addOption(
-            EntityConfigStructureOptionsListener::OPTION_NAME,
-            true
-        );
+        $expectedFieldStructure = (clone $fieldStructure)->addOption('configurable', true);
         $expectedEntityStructure = $this->getEntity(
             EntityStructure::class,
             [

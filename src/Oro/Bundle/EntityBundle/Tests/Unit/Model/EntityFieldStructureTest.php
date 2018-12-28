@@ -27,4 +27,19 @@ class EntityFieldStructureTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($item->hasOption('unknown'));
         $this->assertNull($item->getOption('unknown'));
     }
+
+    public function testSerialization()
+    {
+        $field = new EntityFieldStructure();
+        $field->setName('field1');
+        $field->setType('integer');
+        $field->setLabel('Field 1');
+        $field->setRelationType('manyToOne');
+        $field->setRelatedEntityName('Test\TargetEntity');
+        $field->addOption('option1', 'value1');
+
+        $unserialized = unserialize(serialize($field));
+        $this->assertEquals($field, $unserialized);
+        $this->assertNotSame($field, $unserialized);
+    }
 }
