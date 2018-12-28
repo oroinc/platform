@@ -2,6 +2,14 @@
 
 .reminders-collection,
 .ui-dialog .form-horizontal .control-group .controls .reminders-collection {
+    .number {
+        width: $reminders-collection-mobile-number-width;
+    }
+
+    .validation-failed {
+        margin-#{$start}: $reminders-collection-mobile-validation-failed-offset-start;
+    }
+
     .float-holder {
         float: none;
 

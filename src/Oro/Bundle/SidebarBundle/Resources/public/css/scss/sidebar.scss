@@ -28,12 +28,12 @@
         max-height: 100%;
         padding-bottom: 44px;
         overflow: auto;
-        background-color: inherit;
+        background-color: transparent;
 
         &:after {
             content: '';
             position: absolute;
-            background-color: inherit;
+            background-color: transparent;
             width: 100%;
             height: 44px;
             bottom: 44px;
@@ -42,7 +42,7 @@
 
     &__content {
         box-sizing: border-box;
-        background-color: inherit;
+        background-color: transparent;
     }
 
     &__toggle,
@@ -51,7 +51,7 @@
         outline: none;
         border: 0;
         padding: 0;
-        background-color: inherit;
+        background-color: transparent;
     }
 
     // resize element
@@ -332,8 +332,9 @@
 
     &__header-icon {
         color: $sidebar-widget-title-color;
-        background-color: inherit;
+        background-color: transparent;
         padding-#{$end}: 8px;
+        padding-#{$start}: 2px;
     }
 
     &__header-toggle {
@@ -342,7 +343,7 @@
 
         @include fa-icon($sidebar-icon-toggle);
 
-        background-color: inherit;
+        background-color: transparent;
     }
 
     &.expanded &__header-toggle {
@@ -362,7 +363,7 @@
 
         @include fa-icon($sidebar-icon-actions-widget);
 
-        background-color: inherit;
+        background-color: transparent;
         color: $sidebar-widget-actions-color;
     }
 
@@ -393,11 +394,11 @@
 
 // sidebar widget icon
 .sidebar-widget-icon {
-    background-color: inherit;
+    background-color: transparent;
     position: relative;
     font-size: 16px;
     line-height: 14px;
-    vertical-align: text-top;
+    vertical-align: middle;
 
     &.highlight,
     &.highlight:before {
@@ -423,7 +424,7 @@
             margin: 0;
             padding: 0;
             border-radius: 8px;
-            background-color: inherit;
+            background-color: transparent;
             font-size: 11px;
             line-height: 15px;
             height: 15px;

@@ -74,6 +74,11 @@ Show Transition Labels: Show Transition Labels
 
 oro:
     workflow:
+        datagrid:
+            workflow_permission:
+                columns:
+                    label: 'Workflow name'
+                    permissions: 'Permissions'
         permission:
             update_configuration:
                 label: Configure

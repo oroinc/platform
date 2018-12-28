@@ -92,6 +92,7 @@
             padding: $dashboard-widget-header-padding;
 
             display: flex;
+            align-items: center;
 
             .dropdown-menu {
                 min-width: 100px;
@@ -99,8 +100,6 @@
         }
 
         .actions-container {
-            margin-top: 4px;
-
             .collapse-action {
                 .collapse-action-icon {
                     @include fa-icon($dashboard-action-icon);
@@ -118,12 +117,13 @@
 
         .widget-actions-container,
         .default-actions-container {
+            line-height: 1;
             white-space: nowrap;
         }
 
         .default-actions-container {
             .action-wrapper {
-                padding: 0 3px;
+                padding: 0 6px;
 
                 > a {
                     padding: 10px 8px;
@@ -132,8 +132,6 @@
         }
 
         .widget-actions-container {
-            margin: side-values(10px 0 8px 0);
-
             .action-wrapper {
                 padding: $dashboard-action-padding;
                 margin-#{$start}: 14px;
@@ -155,6 +153,7 @@
 
             color: $dashboard-widget-title-color;
             font-size: 18px;
+            line-height: 1;
             text-overflow: ellipsis;
             white-space: nowrap;
 

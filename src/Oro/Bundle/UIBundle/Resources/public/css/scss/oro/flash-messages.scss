@@ -13,9 +13,7 @@
         z-index: $flash-messages-frame-z-index;
 
         .alert {
-            &.show {
-                margin-top: $flash-messages-alert-show-offset-top;
-            }
+            margin-top: $flash-messages-alert-offset-top;
         }
     }
 

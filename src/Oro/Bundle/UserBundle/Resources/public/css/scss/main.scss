@@ -52,14 +52,15 @@ form.change-password-form {
     }
 }
 
-.form-horizontal .control-group-oro_user_emailsettings > .controls,
-.form-horizontal .control-group-oro_user_emailsettings > .controls > div > .control-group > .controls {
-    margin-left: 0;
-}
-
-.form-horizontal .control-group-oro_user_emailsettings .controls .control-label.wrap {
-    width: 230px;
-    text-align: #{$end};
+.form-horizontal {
+    .control-group {
+        &.control-group-oro_user_emailsettings,
+        &.control-group-oro_imap_configuration {
+            > .controls {
+                margin-#{$start}: 0;
+            }
+        }
+    }
 }
 
 .form-horizontal .control-group-oro_organizations_select .select2-choices {

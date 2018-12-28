@@ -8,7 +8,9 @@ button {
 }
 
 .btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-weight: $btn-font-weight;
     text-align: center;
     text-transform: $btn-text-transform;
@@ -16,6 +18,7 @@ button {
     vertical-align: middle;
     user-select: none;
     border: $btn-border-width solid transparent;
+    flex-shrink: 0;
 
     @if ($btn-theme) {
         @include button-custom-variant($btn-theme...);
@@ -104,6 +107,7 @@ fieldset:disabled a.btn {
 .btn-icon {
     width: $btn-icon-width;
     height: $btn-icon-height;
+    display: inline-block;
     padding: $btn-icon-inner-offset;
     position: $btn-icon-position;
     text-indent: $btn-icon-text-indent;
@@ -139,6 +143,21 @@ fieldset:disabled a.btn {
     &.gold-icon {
         color: $btn-icon-gold-color;
     }
+
+    &%btn-square {
+        &.dropdown-toggle:not(.dropdown-toggle--no-caret) {
+            width: $btn-square-icon-dropdown-toggle-width;
+
+            [class^="fa-"],
+            [class*=" fa-"] {
+                #{$start}: $btn-square-icon-dropdown-toggle-fa-left;
+            }
+
+            &:after {
+                #{$end}: $btn-square-icon-dropdown-toggle-after-right;
+            }
+        }
+    }
 }
 
 //
@@ -146,12 +165,11 @@ fieldset:disabled a.btn {
 //
 // Make a button look and behave like a link
 .btn-link {
-    font-weight: $font-weight-normal;
+    font-weight: $btn-link-font-weight;
     color: $link-color;
     background-color: transparent;
     border-color: transparent;
-    text-transform: none;
-    padding: 0;
+    text-transform: $btn-link-text-transform;
 
     @include hover {
         color: $link-hover-color;

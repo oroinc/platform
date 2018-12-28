@@ -92,6 +92,16 @@
     > .navigation {
         @include clearfix();
     }
+
+    .title-buttons-container {
+        .btn-group {
+            margin-#{$start}: $content-padding-small;
+
+            .btn-group {
+                margin-#{$start}: 0;
+            }
+        }
+    }
 }
 
 .customer-info-actions {

@@ -10,9 +10,31 @@ use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapte
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchNumberFilter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var string
+     */
+    private $filterName = 'filter-name';
+
+    /**
+     * @var string
+     */
+    private $dataName = 'field-name';
+
+    /**
+     * @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $formFactory;
+
+    /**
+     * @var FilterUtility|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $filterUtility;
+
     /**
      * @var SearchNumberFilter
      */
@@ -23,12 +45,13 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        /* @var $formFactory FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-        $formFactory = $this->createMock(FormFactoryInterface::class);
-        /* @var $filterUtility FilterUtility|\PHPUnit\Framework\MockObject\MockObject */
-        $filterUtility = $this->createMock(FilterUtility::class);
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->filterUtility = $this->createMock(FilterUtility::class);
 
-        $this->filter = new SearchNumberFilter($formFactory, $filterUtility);
+        $this->filter = new SearchNumberFilter($this->formFactory, $this->filterUtility);
+        $this->filter->init($this->filterName, [
+            FilterUtility::DATA_NAME_KEY => $this->dataName,
+        ]);
     }
 
     /**
@@ -129,5 +152,46 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
 
         $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => $fieldName]);
         $this->assertTrue($this->filter->apply($ds, ['type' => FilterUtility::TYPE_NOT_EMPTY, 'value' => null]));
+    }
+
+    public function testGetMetadata()
+    {
+        $form = $this->createMock(FormInterface::class);
+        $view = $this->createMock(FormView::class);
+
+        $typeView = $this->createMock(FormView::class);
+        $typeView->vars['choices'] = [];
+        $view->vars['formatter_options'] = ['decimals' => 0, 'grouping' => false];
+        $view->vars['array_separator'] = ',';
+        $view->vars['array_operators'] = [9, 10];
+        $view->vars['data_type'] = 'data_integer';
+        $view->children['type'] = $typeView;
+
+        $this->formFactory->expects($this->any())
+            ->method('create')
+            ->willReturn($form);
+        $form->expects($this->any())
+            ->method('createView')
+            ->willReturn($view);
+        $this->filterUtility->expects($this->any())
+            ->method('getExcludeParams')
+            ->willReturn([]);
+
+        $expected = [
+            'name' => 'filter-name',
+            'label' => 'Filter-name',
+            'choices' => [],
+            'data_name' => 'field-name',
+            'options' => [],
+            'lazy' => false,
+            'formatterOptions' => [
+                'decimals' => 0,
+                'grouping' => false,
+            ],
+            'arraySeparator' => ',',
+            'arrayOperators' => [9, 10],
+            'dataType' => 'data_integer',
+        ];
+        $this->assertEquals($expected, $this->filter->getMetadata());
     }
 }

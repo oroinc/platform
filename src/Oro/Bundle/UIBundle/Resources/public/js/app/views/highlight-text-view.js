@@ -333,14 +333,14 @@ define(function(require) {
             var popover = $el.data(Popover.DATA_KEY);
 
             if (popover !== void 0) {
-                content = popover.getContent();
+                content = $('<div/>').html(popover.getContent());
             } else if (this._isField($el) && !this._isFieldChoice($el)) {
-                content = $el.val();
+                content = $('<div/>').html($el.val());
             } else {
-                content = $el.html();
+                content = $el;
             }
 
-            return $('<div/>').html(content);
+            return content;
         },
 
         /**
@@ -360,7 +360,7 @@ define(function(require) {
             } else if (this._isField($el)) {
                 $el.toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($content, false));
             } else {
-                $el.html($content.html());
+                $el.get(0).normalize();
                 $el.toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($el));
             }
         },
@@ -380,7 +380,11 @@ define(function(require) {
                         $children.replaceWith(text);
                     }
                 } else {
-                    this.highlightElementContent($children);
+                    if (!$children.is(this.highlightSelectors.join(', '))) {
+                        this.highlightElement({
+                            $el: $children
+                        });
+                    }
                 }
             }, this);
         },

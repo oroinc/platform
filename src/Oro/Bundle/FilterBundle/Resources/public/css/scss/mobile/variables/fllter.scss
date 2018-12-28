@@ -1,11 +1,15 @@
 /* @theme: admin.oro; */
 
+$mobile-filter-offset-y: $content-padding !default;
+
 $mobile-filter-box-background-color: inherit !default;
 $mobile-filter-box-border-bottom-width: 0 !default;
 
 $mobile-filter-box-ui-dialog-inner-offset: 0 !default;
 
 $mobile-filter-box-criteria-offset-left: auto !default;
+
+$mobile-filter-box-criteria-empty-width: 100% !default;
 
 $mobile-filter-box-dropdown-offset-left: auto !default;
 $mobile-filter-box-dropdown-offset-right: auto !default;
@@ -26,7 +30,7 @@ $mobile-filter-box-dropdown-toggle-before-display: inline-block !default;
 $mobile-filter-box-reset-all-filter-icon: $fa-var-times !default;
 $mobile-filter-box-reset-all-filter-display: none !default;
 $mobile-filter-box-reset-all-filter-position: absolute !default;
-$mobile-filter-box-reset-all-filter-top: 2px !default;
+$mobile-filter-box-reset-all-filter-top: 0 !default;
 $mobile-filter-box-reset-all-filter-end: 16px !default;
 
 $mobile-filter-box-reset-all-icon-font-size: $base-font-size--m !default;
@@ -61,7 +65,7 @@ $mobile-filter-box-dropdown-menu-after-position: absolute !default;
 $mobile-filter-box-dropdown-menu-after-top: -7px !default;
 
 $mobile-filter-item-display: block !default;
-$mobile-filter-item-offset: 0 0 16px !default;
+$mobile-filter-item-offset: 0 0 $mobile-filter-offset-y !default;
 
 $mobile-filter-box-dropdown-menu-breakpoint-left: 50% !default;
 $mobile-filter-box-dropdown-menu-breakpoint-offset-left: -253px !default;
@@ -69,23 +73,17 @@ $mobile-filter-box-dropdown-menu-breakpoint-offset-left: -253px !default;
 $mobile-filter-box-width: 100% !default;
 $mobile-filter-box-height: 40px !default;
 $mobile-filter-box-text-transform: none !default;
-$mobile-filter-box-text-text-align: left !default;
 $mobile-filter-box-font-size: $base-font-size--m !default;
-$mobile-filter-box-line-height: 36px !default;
 
 $mobile-filter-box-product-price-filter-display: block !default;
 $mobile-filter-box-choice-filter-float: none !default;
 
-$mobile-choice-filter-inner-offset-bottom: 48px !default;
+$mobile-choice-filter-inner-offset-bottom: 40px + $mobile-filter-offset-y !default;
 $mobile-choice-filter-value-inner-offset-bottom: $mobile-choice-filter-inner-offset-bottom !default;
 
 $mobile-filter-update-display: block !default;
 $mobile-filter-update-width: 100% !default;
-$mobile-filter-update-max-width: 256px !default;
-$mobile-filter-update-offset: 8px auto 0 !default;
-$mobile-filter-update-height: 40px !default;
-$mobile-filter-update-border-radius: 20px !default;
-$mobile-filter-update-font-size: 14px !default;
+$mobile-filter-update-offset: $mobile-filter-offset-y auto 0 !default;
 
 $mobile-filter-box-ui-dialog-content-inner-offset: 60px 16px !default;
 $mobile-filter-box-ui-dialog-content-height: 100vh !default;

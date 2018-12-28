@@ -29,13 +29,16 @@ $btn-border-radius: 16px;
 $btn-border-width: 0;
 $btn-square-border-radius: 2px;
 $btn-square-border-width: 2px;
-$font-family-sans-serif: Helvetica, Arial, sans-serif;
+$font-family-sans-serif: Arial, Helvetica, sans-serif;
 $font-size-base: 14px;
 $line-height-base: 1.57;
 $link-hover-decoration: none;
-$btn-font-weight: bold;
-$btn-font-size: 12px;
-$btn-text-transform: uppercase;
+$btn-font-weight: null;
+$btn-font-size: $base-font-size;
+$btn-text-transform: null;
+
+$btn-link-font-weight: null;
+$btn-link-text-transform: null;
 
 $btn-padding-y-sm: 0;
 $btn-padding-x-sm: 12px;
@@ -46,14 +49,15 @@ $btn-line-height-sm: 24px;
 $btn-icon-line-height-sm: $btn-line-height-sm - 1px;
 $btn-border-radius-sm: 16px;
 
-$btn-mobile-font-size: 14px;
+$btn-mobile-font-size: $base-font-size--m;
 $btn-mobile-border-radius: 20px;
 $btn-square-mobile-border-radius: 2px;
 $btn-icon-mobile-fa-icon-font-size: 18px;
 
 $content-title-font-size: 20px;
 $content-title-font-weight: bold;
-$content-title-line-height: 1.5;
+$content-title-line-height: 1.2;
+$content-title-inner-offset-bottom: 6px;
 
 $label-margin-bottom: 0;
 
@@ -62,6 +66,7 @@ $label-margin-bottom: 0;
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
 $border-width: 2px;
 
+$input-color: $primary-200;
 $input-border-width: 2px;
 $input-border-color: $primary-750;
 
@@ -84,15 +89,13 @@ $btn-square-mobile-line-height: 36px;
 $btn-mobile-padding-y: $input-btn-mobile-padding-y;
 $btn-mobile-padding-x: $input-btn-mobile-padding-x;
 
-$btn-group-divider-width: 1px;
-$btn-group-divider-color: rgba($primary-inverse, .4);
-
 // Navbar
 $nav-tabs-link-hover-border-color: $primary-750;
 $nav-divider-margin-y: 4px;
-$nav-link-padding-y: 0;
+$nav-link-padding-y: 8px;
+$nav-link-padding-x: 16px;
 
-//Alert
+// Alert
 $alert-border-radius: 2px;
 $alert-border-width: 1px;
 $alert-padding-y: $content-padding-small / 2;
@@ -323,4 +326,5 @@ $large-screen:                          1920px;
 
 @import "variables/alert";
 @import "variables/buttons";
+@import "variables/button-group";
 @import "variables/badge";

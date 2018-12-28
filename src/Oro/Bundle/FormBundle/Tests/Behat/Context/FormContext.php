@@ -520,6 +520,25 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Then /^I should see that option "([^"]*)" is selected in "([^"]*)" select$/
+     * @param string $label
+     * @param string $field
+     */
+    public function iShouldSeeThatOptionIsSelected($label, $field)
+    {
+        $selectedOptionText = $this->getSelectedOptionText($field);
+        self::assertContains(
+            $label,
+            $selectedOptionText,
+            sprintf(
+                'Selected option with label "%s" doesn\'t contain text "%s" !',
+                $selectedOptionText,
+                $label
+            )
+        );
+    }
+
+    /**
      * @Then /^I should not see "([^"]*)" for "([^"]*)" select$/
      * @param string $label
      * @param string $field
@@ -572,6 +591,31 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         }, $options);
     }
 
+    /**
+     * @param $selectField
+     * @return string
+     * @throws ElementNotFoundException
+     */
+    protected function getSelectedOptionText($selectField)
+    {
+        /** @var Select $element */
+        $element = $this->createElement($selectField);
+        /** @var NodeElement[] $options */
+        $option = $element->find('css', 'option[selected]');
+
+        if (null === $option) {
+            $driver = $this->getSession()->getDriver();
+            throw new ElementNotFoundException(
+                $driver,
+                'select option',
+                'css',
+                'option[selected]'
+            );
+        }
+
+        return $option->getText();
+    }
+
     /**.
      * @return OroForm
      */
@@ -590,7 +634,18 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     {
         /** @var Form $form */
         $form = $this->createElement($formName);
-        $field = $form->findField($fieldName);
+        $mapping = $form->getOption('mapping');
+        if ($mapping && isset($mapping[$fieldName])) {
+            $field = $form->findField($mapping[$fieldName]);
+            if (isset($mapping[$fieldName]['element'])) {
+                $field = $this->elementFactory->wrapElement(
+                    $mapping[$fieldName]['element'],
+                    $field
+                );
+            }
+        } else {
+            $field = $form->findField($fieldName);
+        }
 
         if (null === $field) {
             $driver = $this->getSession()->getDriver();

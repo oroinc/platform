@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Async;
 
 use Doctrine\DBAL\Driver\AbstractDriverException;
+use Doctrine\DBAL\Exception\DeadlockException;
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\EntityBundle\ORM\DatabaseExceptionHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Async\DeletedAttributeRelationProcessor;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
@@ -31,11 +31,6 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
     protected $logger;
 
     /**
-     * @var DatabaseExceptionHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $databaseExceptionHelper;
-
-    /**
      * @var DeletedAttributeProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $deletedAttributeProvider;
@@ -51,15 +46,11 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->databaseExceptionHelper = $this->getMockBuilder(DatabaseExceptionHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->deletedAttributeProvider = $this->createMock(DeletedAttributeProviderInterface::class);
 
         $this->processor = new DeletedAttributeRelationProcessor(
             $this->doctrineHelper,
             $this->logger,
-            $this->databaseExceptionHelper,
             $this->deletedAttributeProvider
         );
     }
@@ -105,20 +96,8 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
         $entityManager->expects($this->once())
             ->method('rollback');
 
-        /** @var \Exception $exception */
-        $exception = $this->getMockBuilder(AbstractDriverException::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $driverException = $this->createMock(AbstractDriverException::class);
-        $this->databaseExceptionHelper->expects($this->once())
-            ->method('getDriverException')
-            ->with($exception)
-            ->willReturn($driverException);
-        $this->databaseExceptionHelper->expects($this->once())
-            ->method('isDeadlock')
-            ->with($driverException)
-            ->willReturn(true);
+        /** @var DeadlockException $exception */
+        $exception = $this->createMock(DeadlockException::class);
 
         $this->deletedAttributeProvider->expects($this->once())
             ->method('removeAttributeValues')

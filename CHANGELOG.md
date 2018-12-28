@@ -3,10 +3,16 @@
 ### Added
 #### AssetBundle
 * bundle replace AsseticBundle to build assets
+#### ApiBundle
+* Added `custom_fields` as a possible value for `exclusion_policy` option of `entities` section of `Resources/config/oro/api.yml`. This value can be used if it is required to exclude all custom fields (fields with `is_extend` = `true` and `owner` = `Custom` in `extend` scope in entity configuration) that are not configured explicitly.
 
 ### Removed
 #### AsseticBundle
 * Bundle was removed, use AssetBundle instead
+
+### Changed
+#### ApiBundle
+* Fixed `depends_on` configuration option of `entities.fields` section of `Resources/config/oro/api.yml`. From now only entity property names (or paths contains entity property names) can be used in it. Also the exception handling of invalid values for this option was improved to return more useful exception messages.
 
 
 ## 3.1.0-rc (2018-11-30)

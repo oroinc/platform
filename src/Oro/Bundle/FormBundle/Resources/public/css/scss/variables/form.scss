@@ -57,7 +57,7 @@ $entities-list-flex-direction: row !default;
 $entities-list-flex-wrap: wrap !default;
 $entities-list-offset-top: 16px !default;
 
-$entities-list-group-item-inner-offset: 14px 16px !default;
+$entities-list-group-item-inner-offset: 12px $content-padding-medium !default;
 $entities-list-group-item-offset-bottom: 8px !default;
 $entities-list-group-item-offset-start: 8px !default;
 $entities-list-group-item-offset-end: 0 !default;
@@ -68,21 +68,33 @@ $entities-list-group-item-position: relative !default;
 $entities-list-group-item-border-radius: 4px !default;
 $entities-list-group-item-close-button-size: 16px !default;
 
+$entities-list-group-item-header-offset-bottom: $content-padding-small !default;
+$entities-list-group-item-header-inner-offset-end: $content-padding-medium !default;
 
-$entities-list-group-item-h-offset: 3px 0 6px !default;
-$entities-list-group-default-selector-offset-end: 10px !default;
+$entities-list-group-item-title-offset: 0 !default;
+$entities-list-group-item-title-font-size: $base-font-size !default;
+$entities-list-group-item-title-font-weight: bold !default;
+$entities-list-group-item-title-align-self: center !default;
+$entities-list-group-item-title-overflow: hidden !default;
 
-$entities-list-group-checkbox-view-offset-end: 3px !default;
+$entities-list-group-item-link-overflow: hidden !default;
+$entities-list-group-item-link-text-overflow: ellipsis !default;
 
-$entities-list-group-item-remove-btn-color: $primary-700 !default;
+$entities-list-group-default-offset-end: $content-padding-small !default;
+
+$entities-list-item-extra-info-line-height: 1.4 !default;
+
+$entities-list-group-checkbox-view-offset-end: $content-padding-small !default;
+
 $entities-list-group-item-remove-btn-position: absolute !default;
-$entities-list-group-item-remove-btn-top: 7px !default;
-$entities-list-group-item-remove-btn-end: 7px !default;
+$entities-list-group-item-remove-btn-top: 0 !default;
+$entities-list-group-item-remove-btn-end: 0 !default;
 
 $controls-list-group-width: 297px !default;
 $controls-list-group-inner-offset-top: 0 !default;
 $controls-list-group-inner-offset-bottom: 0 !default;
-$controls-list-group-vertical-align: middle !default;
+
+$controls-list-group-float-holder-label-inner-offset: 0 $content-padding-small !default;
 
 $controls-list-group-label-bottom-offset: 0 !default;
 
@@ -92,7 +104,7 @@ $control-group-collapsible-display: inline-block !default;
 
 $control-group-collapsible-collapse-action-color: #727272 !default;
 $control-group-collapsible-collapse-action-font-size: 13px !default;
-$control-group-collapsible-collapse-action-font-family: Helvetica !default;
+$control-group-collapsible-collapse-action-font-family: $font-family-sans-serif !default;
 $control-group-collapsible-collapse-action-font-weight: bold !default;
 
 $control-group-collapsible-collapse-action-icon-content: '−' !default;
@@ -139,5 +151,7 @@ $multi-checkbox-control-item-offset: 0 4px 0 0 !default;
 $multi-checkbox-control-input-offset-top: -2px !default;
 
 $section-content-offset-top: -20px !default;
-$section-content-inner-offset-top: 26px !default;
-$section-content-inner-offset-bottom: 32px !default;
+$section-content-inner-offset-top: 28px !default;
+$section-content-inner-offset-bottom: 20px !default;
+
+$row-fluid-inner-offset: 4px 0 12px !default;

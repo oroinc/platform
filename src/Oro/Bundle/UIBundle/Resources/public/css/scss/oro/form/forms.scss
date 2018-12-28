@@ -46,9 +46,7 @@
             }
 
             label {
-                display: inline;
                 position: relative;
-                margin-bottom: 0;
             }
         }
 
@@ -68,6 +66,15 @@
             &.autocomplete-box {
                 margin-bottom: 10px;
                 margin-top: 10px;
+            }
+
+            &.messages {
+                margin: 0;
+
+                .alert {
+                    margin: side-values($content-padding-small 0 0);
+                    max-width: $field-width;
+                }
             }
 
             .control-label {
@@ -94,6 +101,11 @@
             &-description {
                 margin-top: $content-padding-small;
             }
+
+            &.html-content {
+                padding-top: $form-horizontal-control-label-offset;
+                max-width: $field-width;
+            }
         }
 
         &.control-group-datetime {
@@ -101,21 +113,27 @@
                 &.datepicker-input {
                     width: 189px;
                 }
+
                 &.timepicker-input {
                     width: 100px;
                 }
             }
         }
-
         &.control-group-checkbox {
             .controls {
-                padding-top: 6px;
+                padding-top: 5px;
             }
         }
 
         &.control-group-choice {
             .choice-widget-expanded {
                 padding-top: 6px;
+            }
+
+            .select2 {
+                + input {
+                    margin-top: $input-outer-offset-bottom;
+                }
             }
         }
 
@@ -126,6 +144,12 @@
                         margin-bottom: 0;
                     }
                 }
+            }
+        }
+
+        &.control-group-oro_entity_relation_type {
+            > .controls {
+                margin-#{$start}: 0;
             }
         }
     }
@@ -141,8 +165,15 @@
         .control-group {
             &.attribute-row label.control-label {
                 cursor: default;
-                color: $primary-550;
             }
+        }
+    }
+
+    .control-group-button {
+        .btn {
+            display: block;
+            width: 100%;
+            max-width: $field-width;
         }
     }
 }
@@ -150,7 +181,7 @@
 .choice-widget-expanded {
     &__item {
         &:not(:last-child) {
-            margin-bottom: 4px;
+            margin-bottom: $content-padding-small / 2;
         }
     }
 }
@@ -193,6 +224,8 @@ input[type='checkbox'] + label {
 
 label {
     &.required {
+        position: relative;
+
         em {
             color: $danger-dark;
             font-size: 21px;

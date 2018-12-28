@@ -32,8 +32,6 @@
 
         touch-action: manipulation;
 
-        user-select: none;
-
         box-sizing: border-box;
 
         @if ($appearance) {

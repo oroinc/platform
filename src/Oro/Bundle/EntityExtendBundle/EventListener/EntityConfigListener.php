@@ -3,14 +3,31 @@
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\PreSetRequireUpdateEvent;
 use Oro\Bundle\EntityConfigBundle\Event\RenameFieldEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Updates entity config state on actions with entities and fields
+ */
 class EntityConfigListener
 {
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
     /**
      * @param PreFlushConfigEvent $event
      */
@@ -23,10 +40,18 @@ class EntityConfigListener
 
         $configManager = $event->getConfigManager();
         $changeSet     = $configManager->getConfigChangeSet($config);
+
+        $preSetRequireUpdateEvent = new PreSetRequireUpdateEvent($event->getConfigs(), $configManager);
+        $this->eventDispatcher->dispatch(
+            Events::PRE_SET_REQUIRE_UPDATE,
+            $preSetRequireUpdateEvent
+        );
+
         // synchronize field state with entity state, when custom field state changed
         if (isset($changeSet['state'])
             && $changeSet['state'][1] !== ExtendScope::STATE_ACTIVE
             && $config->is('owner', ExtendScope::OWNER_CUSTOM)
+            && $preSetRequireUpdateEvent->isUpdateRequired()
         ) {
             $entityConfig = $configManager->getEntityConfig('extend', $config->getId()->getClassName());
             if ($entityConfig->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_DELETE])) {

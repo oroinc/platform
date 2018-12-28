@@ -76,9 +76,9 @@ services:
 
     oro_entity_config.tools.command_executor:
         class: '%oro_entity_config.tools.command_executor.class%'
+        decorates: oro_platform.command_executor
         arguments:
-            - '%kernel.project_dir%/bin/console'
-            - '%kernel.environment%'
+            - '@oro_entity_config.tools.command_executor.inner'
             - '@oro_cache.oro_data_cache_manager'
 
     oro_entity_config.config_loader:
@@ -402,7 +402,6 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@logger'
-            - '@oro_entity.database_exception_helper'
             - '@oro_entity_config.provider.deleted_attribute'
         tags:
             - { name: oro_message_queue.client.message_processor, topicName: 'oro_entity_config.attribute_was_removed_from_family' }

@@ -6,32 +6,35 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
-use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
+/**
+ * Helps to prepare buttons that applicable for datagrid start transition context
+ */
 class DatagridStartTransitionButtonProviderExtension extends AbstractStartTransitionButtonProviderExtension
 {
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
     /**
-     * @param DoctrineHelper $doctrineHelper
      * @param WorkflowRegistry $workflowRegistry
      * @param RouteProviderInterface $routeProvider
-     * @param DestinationPageResolver $destinationPageResolver
+     * @param OriginalUrlProvider    $originalUrlProvider
+     * @param DoctrineHelper         $doctrineHelper
      */
     public function __construct(
-        DoctrineHelper $doctrineHelper,
         WorkflowRegistry $workflowRegistry,
         RouteProviderInterface $routeProvider,
-        DestinationPageResolver $destinationPageResolver
+        OriginalUrlProvider $originalUrlProvider,
+        DoctrineHelper $doctrineHelper
     ) {
-        parent::__construct($workflowRegistry, $routeProvider, $destinationPageResolver);
+        parent::__construct($workflowRegistry, $routeProvider, $originalUrlProvider);
 
         $this->doctrineHelper = $doctrineHelper;
     }

@@ -15,12 +15,13 @@ use Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\OwnerValidator;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
-use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -42,11 +43,14 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
     private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnerTreeProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnerTreeProviderInterface */
     private $ownerTreeProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|AclVoter */
     private $aclVoter;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
+    private $aclGroupProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|BusinessUnitManager */
     private $businessUnitManager;
@@ -66,8 +70,9 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->ownerTreeProvider = $this->createMock(OwnerTreeProvider::class);
+        $this->ownerTreeProvider = $this->createMock(OwnerTreeProviderInterface::class);
         $this->aclVoter = $this->createMock(AclVoter::class);
+        $this->aclGroupProvider = $this->createMock(AclGroupProviderInterface::class);
         $this->businessUnitManager = $this->createMock(BusinessUnitManager::class);
 
         $this->testEntity = new Entity();
@@ -101,8 +106,19 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             $this->tokenAccessor,
             $this->ownerTreeProvider,
             $this->aclVoter,
+            $this->aclGroupProvider,
             $this->businessUnitManager
         );
+    }
+
+    /**
+     * @param string $ownerType
+     *
+     * @return OwnershipMetadata
+     */
+    private function createOwnershipMetadata($ownerType)
+    {
+        return new OwnershipMetadata($ownerType, 'owner', 'owner', 'organization', 'organization');
     }
 
     /**
@@ -156,6 +172,59 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @param \PHPUnit\Framework\MockObject\MockObject|ClassMetadata $entityMetadata
+     * @param array                                                  $originalEntityData
+     *
+     * @return \PHPUnit\Framework\MockObject\MockObject|UnitOfWork
+     */
+    private function expectManageableEntity(ClassMetadata $entityMetadata, array $originalEntityData)
+    {
+        $em = $this->createMock(EntityManagerInterface::class);
+        $uow = $this->createMock(UnitOfWork::class);
+
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(Entity::class)
+            ->willReturn($em);
+        $em->expects(self::once())
+            ->method('getClassMetadata')
+            ->willReturn($entityMetadata);
+        $em->expects(self::any())
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
+
+        $uow->expects(self::any())
+            ->method('getOriginalEntityData')
+            ->with($this->testEntity)
+            ->willReturn($originalEntityData);
+
+        return $uow;
+    }
+
+    /**
+     * @param int $accessLevel
+     */
+    private function expectAddOneShotIsGrantedObserver($accessLevel)
+    {
+        $this->aclVoter->expects(self::once())
+            ->method('addOneShotIsGrantedObserver')
+            ->willReturnCallback(function (OneShotIsGrantedObserver $observer) use ($accessLevel) {
+                $observer->setAccessLevel($accessLevel);
+            });
+    }
+
+    private function expectGetUserOrganizationIds(array $organizationIds)
+    {
+        $ownerTree = $this->createMock(OwnerTreeInterface::class);
+        $ownerTree->expects(self::once())
+            ->method('getUserOrganizationIds')
+            ->willReturn($organizationIds);
+        $this->ownerTreeProvider->expects(self::once())
+            ->method('getTree')
+            ->willReturn($ownerTree);
+    }
+
+    /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
     public function testValidateForInvalidConstraintType()
@@ -204,39 +273,30 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidWithNullOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
 
         $owner = null;
         $this->testEntity->setId(234);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::never())
-            ->method('getUnitOfWork');
+        $this->expectManageableEntity($entityMetadata, []);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::never())
+            ->method('getIdentifierValues');
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-
         $this->aclVoter->expects(self::never())
             ->method('addOneShotIsGrantedObserver');
         $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
-        $entityMetadata->expects(self::never())
-            ->method('getIdentifierValues');
         $this->businessUnitManager->expects(self::never())
             ->method('canUserBeSetAsOwner');
 
@@ -246,45 +306,30 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidWithNotChangedOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
 
         $owner = $this->createUser(123);
         $this->testEntity->setId(234);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => $owner]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::never())
+            ->method('getIdentifierValues');
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => $owner]);
-
         $this->aclVoter->expects(self::never())
             ->method('addOneShotIsGrantedObserver');
         $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
-        $entityMetadata->expects(self::never())
-            ->method('getIdentifierValues');
         $this->businessUnitManager->expects(self::never())
             ->method('canUserBeSetAsOwner');
 
@@ -294,49 +339,34 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidBecauseAccessDenied()
     {
-        $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = null;
 
         $owner = $this->createUser(123);
         $this->testEntity->setId(234);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([$this->testEntity->getId()]);
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('ASSIGN', $this->testEntity)
+            ->with('ASSIGN', 'entity:' . Entity::class)
             ->willReturn(true);
-        $entityMetadata->expects(self::once())
-            ->method('getIdentifierValues')
-            ->with($this->testEntity)
-            ->willReturn([$this->testEntity->getId()]);
         $this->businessUnitManager->expects(self::never())
             ->method('canUserBeSetAsOwner');
 
@@ -349,49 +379,34 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidExistingEntityWithUserOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = $this->createUser(123);
         $this->testEntity->setId(234);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([$this->testEntity->getId()]);
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('ASSIGN', $this->testEntity)
+            ->with('ASSIGN', 'entity:' . Entity::class)
             ->willReturn(true);
-        $entityMetadata->expects(self::once())
-            ->method('getIdentifierValues')
-            ->with($this->testEntity)
-            ->willReturn([$this->testEntity->getId()]);
         $this->businessUnitManager->expects(self::once())
             ->method('canUserBeSetAsOwner')
             ->with($this->currentUser, $owner, $accessLevel, $this->ownerTreeProvider, $this->currentOrg)
@@ -403,49 +418,34 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidExistingEntityWithBusinessUnitOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('BUSINESS_UNIT');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = $this->createBusinessUnit(123);
         $this->testEntity->setId(234);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([$this->testEntity->getId()]);
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('ASSIGN', $this->testEntity)
+            ->with('ASSIGN', 'entity:' . Entity::class)
             ->willReturn(true);
-        $entityMetadata->expects(self::once())
-            ->method('getIdentifierValues')
-            ->with($this->testEntity)
-            ->willReturn([$this->testEntity->getId()]);
         $this->businessUnitManager->expects(self::once())
             ->method('canBusinessUnitBeSetAsOwner')
             ->with($this->currentUser, $owner, $accessLevel, $this->ownerTreeProvider, $this->currentOrg)
@@ -457,50 +457,35 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidExistingEntityWithOrganizationOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('ORGANIZATION', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('ORGANIZATION');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = $this->createOrganization(123);
         $this->testEntity->setId(234);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([$this->testEntity->getId()]);
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('ASSIGN', $this->testEntity)
+            ->with('ASSIGN', 'entity:' . Entity::class)
             ->willReturn(true);
-        $entityMetadata->expects(self::once())
-            ->method('getIdentifierValues')
-            ->with($this->testEntity)
-            ->willReturn([$this->testEntity->getId()]);
-        $this->getUserOrganizationIdsExpectation([2, 3, $owner->getId()]);
+        $this->expectGetUserOrganizationIds([2, 3, $owner->getId()]);
 
         $this->validator->validate($this->testEntity, $this->constraint);
         $this->assertNoViolation();
@@ -508,49 +493,34 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidExistingEntityWithUserOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = $this->createUser(123);
         $this->testEntity->setId(234);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([$this->testEntity->getId()]);
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('ASSIGN', $this->testEntity)
+            ->with('ASSIGN', 'entity:' . Entity::class)
             ->willReturn(true);
-        $entityMetadata->expects(self::once())
-            ->method('getIdentifierValues')
-            ->with($this->testEntity)
-            ->willReturn([$this->testEntity->getId()]);
         $this->businessUnitManager->expects(self::once())
             ->method('canUserBeSetAsOwner')
             ->with($this->currentUser, $owner, $accessLevel, $this->ownerTreeProvider, $this->currentOrg)
@@ -565,49 +535,34 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidExistingEntityWithBusinessUnitOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('BUSINESS_UNIT');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = $this->createBusinessUnit(123);
         $this->testEntity->setId(234);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([$this->testEntity->getId()]);
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('ASSIGN', $this->testEntity)
+            ->with('ASSIGN', 'entity:' . Entity::class)
             ->willReturn(true);
-        $entityMetadata->expects(self::once())
-            ->method('getIdentifierValues')
-            ->with($this->testEntity)
-            ->willReturn([$this->testEntity->getId()]);
         $this->businessUnitManager->expects(self::once())
             ->method('canBusinessUnitBeSetAsOwner')
             ->with($this->currentUser, $owner, $accessLevel, $this->ownerTreeProvider, $this->currentOrg)
@@ -622,50 +577,35 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidExistingEntityWithOrganizationOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('ORGANIZATION', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('ORGANIZATION');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = $this->createOrganization(123);
         $this->testEntity->setId(234);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([$this->testEntity->getId()]);
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('ASSIGN', $this->testEntity)
+            ->with('ASSIGN', 'entity:' . Entity::class)
             ->willReturn(true);
-        $entityMetadata->expects(self::once())
-            ->method('getIdentifierValues')
-            ->with($this->testEntity)
-            ->willReturn([$this->testEntity->getId()]);
-        $this->getUserOrganizationIdsExpectation([2, 3]);
+        $this->expectGetUserOrganizationIds([2, 3]);
 
         $this->validator->validate($this->testEntity, $this->constraint);
         $this->buildViolation($this->constraint->message)
@@ -676,48 +616,33 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidNewEntityWithUserOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = $this->createUser(123);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([]);
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('CREATE', 'entity:' . Entity::class)
             ->willReturn(true);
-        $entityMetadata->expects(self::once())
-            ->method('getIdentifierValues')
-            ->with($this->testEntity)
-            ->willReturn([]);
         $this->businessUnitManager->expects(self::once())
             ->method('canUserBeSetAsOwner')
             ->with($this->currentUser, $owner, $accessLevel, $this->ownerTreeProvider, $this->currentOrg)
@@ -729,48 +654,33 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidNewEntityWithBusinessUnitOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('BUSINESS_UNIT');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = $this->createBusinessUnit(123);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([]);
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('CREATE', 'entity:' . Entity::class)
             ->willReturn(true);
-        $entityMetadata->expects(self::once())
-            ->method('getIdentifierValues')
-            ->with($this->testEntity)
-            ->willReturn([]);
         $this->businessUnitManager->expects(self::once())
             ->method('canBusinessUnitBeSetAsOwner')
             ->with($this->currentUser, $owner, $accessLevel, $this->ownerTreeProvider, $this->currentOrg)
@@ -782,49 +692,34 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidNewEntityWithOrganizationOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('ORGANIZATION', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('ORGANIZATION');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = $this->createOrganization(123);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([]);
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('CREATE', 'entity:' . Entity::class)
             ->willReturn(true);
-        $entityMetadata->expects(self::once())
-            ->method('getIdentifierValues')
-            ->with($this->testEntity)
-            ->willReturn([]);
-        $this->getUserOrganizationIdsExpectation([2, 3, $owner->getId()]);
+        $this->expectGetUserOrganizationIds([2, 3, $owner->getId()]);
 
         $this->validator->validate($this->testEntity, $this->constraint);
         $this->assertNoViolation();
@@ -832,48 +727,33 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidNewEntityWithUserOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = $this->createUser(123);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([]);
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('CREATE', 'entity:' . Entity::class)
             ->willReturn(true);
-        $entityMetadata->expects(self::once())
-            ->method('getIdentifierValues')
-            ->with($this->testEntity)
-            ->willReturn([]);
         $this->businessUnitManager->expects(self::once())
             ->method('canUserBeSetAsOwner')
             ->with($this->currentUser, $owner, $accessLevel, $this->ownerTreeProvider, $this->currentOrg)
@@ -888,48 +768,33 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidNewEntityWithBusinessUnitOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('BUSINESS_UNIT');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = $this->createBusinessUnit(123);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([]);
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('CREATE', 'entity:' . Entity::class)
             ->willReturn(true);
-        $entityMetadata->expects(self::once())
-            ->method('getIdentifierValues')
-            ->with($this->testEntity)
-            ->willReturn([]);
         $this->businessUnitManager->expects(self::once())
             ->method('canBusinessUnitBeSetAsOwner')
             ->with($this->currentUser, $owner, $accessLevel, $this->ownerTreeProvider, $this->currentOrg)
@@ -944,49 +809,34 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidNewEntityWithOrganizationOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('ORGANIZATION', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('ORGANIZATION');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = $this->createOrganization(123);
         $this->testEntity->setOwner($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([]);
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('CREATE', 'entity:' . Entity::class)
             ->willReturn(true);
-        $entityMetadata->expects(self::once())
-            ->method('getIdentifierValues')
-            ->with($this->testEntity)
-            ->willReturn([]);
-        $this->getUserOrganizationIdsExpectation([2, 3]);
+        $this->expectGetUserOrganizationIds([2, 3]);
 
         $this->validator->validate($this->testEntity, $this->constraint);
         $this->buildViolation($this->constraint->message)
@@ -997,10 +847,8 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidNewEntityWithNewUserOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = new User();
@@ -1008,21 +856,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->testEntity->setOwner($owner);
         $this->testEntity->setOrganization($this->currentOrg);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $this->ownershipMetadataProvider->expects(self::once())
-            ->method('getMetadata')
-            ->with(Entity::class)
-            ->willReturn($ownershipMetadata);
-
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
         $entityMetadata->expects(self::exactly(2))
             ->method('getFieldValue')
             ->willReturnMap([
@@ -1033,20 +867,21 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
                     $this->testEntity->getOrganization()
                 ]
             ]);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
-        $this->authorizationChecker->expects(self::once())
-            ->method('isGranted')
-            ->with('CREATE', 'entity:' . Entity::class)
-            ->willReturn(true);
         $entityMetadata->expects(self::once())
             ->method('getIdentifierValues')
             ->with($this->testEntity)
             ->willReturn([]);
+
+        $this->ownershipMetadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(Entity::class)
+            ->willReturn($ownershipMetadata);
+
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('CREATE', 'entity:' . Entity::class)
+            ->willReturn(true);
         $this->businessUnitManager->expects(self::never())
             ->method('canUserBeSetAsOwner');
 
@@ -1056,10 +891,8 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidNewEntityWithNewBusinessUnitOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('BUSINESS_UNIT');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = new BusinessUnit();
@@ -1067,21 +900,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->testEntity->setOwner($owner);
         $this->testEntity->setOrganization($this->currentOrg);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $this->ownershipMetadataProvider->expects(self::once())
-            ->method('getMetadata')
-            ->with(Entity::class)
-            ->willReturn($ownershipMetadata);
-
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
         $entityMetadata->expects(self::exactly(2))
             ->method('getFieldValue')
             ->willReturnMap([
@@ -1092,20 +911,21 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
                     $this->testEntity->getOrganization()
                 ]
             ]);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
-        $this->authorizationChecker->expects(self::once())
-            ->method('isGranted')
-            ->with('CREATE', 'entity:' . Entity::class)
-            ->willReturn(true);
         $entityMetadata->expects(self::once())
             ->method('getIdentifierValues')
             ->with($this->testEntity)
             ->willReturn([]);
+
+        $this->ownershipMetadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(Entity::class)
+            ->willReturn($ownershipMetadata);
+
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('CREATE', 'entity:' . Entity::class)
+            ->willReturn(true);
         $this->businessUnitManager->expects(self::never())
             ->method('canBusinessUnitBeSetAsOwner');
 
@@ -1115,49 +935,34 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidNewEntityWithNewOrganizationOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('ORGANIZATION', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('ORGANIZATION');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = new Organization();
         $this->testEntity->setOwner($owner);
         $this->testEntity->setOrganization($owner);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
+        $entityMetadata->expects(self::once())
+            ->method('getFieldValue')
+            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
+            ->willReturn($owner);
+        $entityMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with($this->testEntity)
+            ->willReturn([]);
+
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(Entity::class)
             ->willReturn($ownershipMetadata);
 
-        $entityMetadata->expects(self::once())
-            ->method('getFieldValue')
-            ->with($this->testEntity, $ownershipMetadata->getOwnerFieldName())
-            ->willReturn($owner);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('CREATE', 'entity:' . Entity::class)
             ->willReturn(true);
-        $entityMetadata->expects(self::once())
-            ->method('getIdentifierValues')
-            ->with($this->testEntity)
-            ->willReturn([]);
         $this->businessUnitManager->expects(self::never())
             ->method('canUserBeSetAsOwner');
 
@@ -1167,10 +972,8 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidNewEntityWithNewUserOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = new User();
@@ -1178,21 +981,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->testEntity->setOwner($owner);
         $this->testEntity->setOrganization($this->currentOrg);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $this->ownershipMetadataProvider->expects(self::once())
-            ->method('getMetadata')
-            ->with(Entity::class)
-            ->willReturn($ownershipMetadata);
-
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
         $entityMetadata->expects(self::exactly(2))
             ->method('getFieldValue')
             ->willReturnMap([
@@ -1203,20 +992,21 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
                     $this->testEntity->getOrganization()
                 ]
             ]);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
-        $this->authorizationChecker->expects(self::once())
-            ->method('isGranted')
-            ->with('CREATE', 'entity:' . Entity::class)
-            ->willReturn(true);
         $entityMetadata->expects(self::once())
             ->method('getIdentifierValues')
             ->with($this->testEntity)
             ->willReturn([]);
+
+        $this->ownershipMetadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(Entity::class)
+            ->willReturn($ownershipMetadata);
+
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('CREATE', 'entity:' . Entity::class)
+            ->willReturn(true);
         $this->businessUnitManager->expects(self::never())
             ->method('canUserBeSetAsOwner');
 
@@ -1229,10 +1019,8 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidNewEntityWithNewBusinessUnitOwner()
     {
-        $ownershipMetadata = new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner', 'organization', 'organization');
+        $ownershipMetadata = $this->createOwnershipMetadata('BUSINESS_UNIT');
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $uow = $this->createMock(UnitOfWork::class);
         $accessLevel = AccessLevel::DEEP_LEVEL;
 
         $owner = new BusinessUnit();
@@ -1240,21 +1028,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->testEntity->setOwner($owner);
         $this->testEntity->setOrganization($this->currentOrg);
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(Entity::class)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->willReturn($entityMetadata);
-        $em->expects(self::once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $this->ownershipMetadataProvider->expects(self::once())
-            ->method('getMetadata')
-            ->with(Entity::class)
-            ->willReturn($ownershipMetadata);
-
+        $this->expectManageableEntity($entityMetadata, [$ownershipMetadata->getOwnerFieldName() => null]);
         $entityMetadata->expects(self::exactly(2))
             ->method('getFieldValue')
             ->willReturnMap([
@@ -1265,20 +1039,21 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
                     $this->testEntity->getOrganization()
                 ]
             ]);
-        $uow->expects(self::once())
-            ->method('getOriginalEntityData')
-            ->with($this->testEntity)
-            ->willReturn([$ownershipMetadata->getOwnerFieldName() => null]);
-
-        $this->addOneShotIsGrantedObserverExpectation($accessLevel);
-        $this->authorizationChecker->expects(self::once())
-            ->method('isGranted')
-            ->with('CREATE', 'entity:' . Entity::class)
-            ->willReturn(true);
         $entityMetadata->expects(self::once())
             ->method('getIdentifierValues')
             ->with($this->testEntity)
             ->willReturn([]);
+
+        $this->ownershipMetadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(Entity::class)
+            ->willReturn($ownershipMetadata);
+
+        $this->expectAddOneShotIsGrantedObserver($accessLevel);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('CREATE', 'entity:' . Entity::class)
+            ->willReturn(true);
         $this->businessUnitManager->expects(self::never())
             ->method('canBusinessUnitBeSetAsOwner');
 
@@ -1287,28 +1062,5 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             ->atPath('owner')
             ->setParameters(['{{ owner }}' => 'owner'])
             ->assertRaised();
-    }
-
-    /**
-     * @param int $accessLevel
-     */
-    private function addOneShotIsGrantedObserverExpectation($accessLevel)
-    {
-        $this->aclVoter->expects(self::once())
-            ->method('addOneShotIsGrantedObserver')
-            ->willReturnCallback(function (OneShotIsGrantedObserver $observer) use ($accessLevel) {
-                $observer->setAccessLevel($accessLevel);
-            });
-    }
-
-    private function getUserOrganizationIdsExpectation(array $organizationIds)
-    {
-        $ownerTree = $this->createMock(OwnerTreeInterface::class);
-        $ownerTree->expects(self::once())
-            ->method('getUserOrganizationIds')
-            ->willReturn($organizationIds);
-        $this->ownerTreeProvider->expects(self::once())
-            ->method('getTree')
-            ->willReturn($ownerTree);
     }
 }

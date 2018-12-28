@@ -58,7 +58,7 @@
     <% if (hasActions) { %>
     <div class="more-bar-holder">
         <% var actionsTogglerId = _.uniqueId('dropdown-') %>
-        <div class="dropdown dropdown--with-arrow"><button data-toggle="dropdown" class="comment-actions__trigger btn btn-icon btn-lighter " id="<%- actionsTogglerId %>"
+        <div class="dropdown"><button data-toggle="dropdown" class="comment-actions__trigger btn btn-icon btn-lighter " id="<%- actionsTogglerId %>"
                                  data-placement="left-start" aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('oro.comment.actions_label') %>">
             </button>
             <ul class="dropdown-menu launchers-dropdown-menu" role="menu" aria-labelledby="<%- actionsTogglerId %>">

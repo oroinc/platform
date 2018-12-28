@@ -7,6 +7,10 @@ oro_behat_extension:
         mapping:
           Message: 'oro_note_form[message]'
           Attachment: 'oro_note_form[attachment][file]'
+          Context:
+            locator: '//div[contains(@id,"s2id_oro_note_form_contexts-uid")]'
+            type: xpath
+            element: Select2Choices
     Add Note Button:
       selector: '.ui-dialog .widget-actions [type="submit"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

@@ -270,12 +270,12 @@ datagrids:
             type: workflow-permission-provider
         columns:
             label:
-                label: "Workflow name"
+                label: oro.workflow.datagrid.workflow_permission.columns.label
                 data_name: label
                 frontend_type: string
                 translatable: true
             permissions:
-                label: "Permissions"
+                label: oro.workflow.datagrid.workflow_permission.columns.permissions
                 data_name: permissions
                 frontend_type: action-permissions
             identity:

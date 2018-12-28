@@ -549,6 +549,15 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $ownerTable->addColumn('id', 'integer', ['autoincrement' => true]);
         $ownerTable->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
         $ownerTable->addColumn('target_id', 'integer', ['notnull' => false]);
+        $ownerTable->addColumn(
+            'extend_description',
+            'text',
+            [
+                'oro_options' => [
+                    'extend' => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM]
+                ]
+            ]
+        );
         $ownerTable->setPrimaryKey(['id']);
         $ownerTable->addIndex(['target_id']);
 

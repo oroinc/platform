@@ -7,6 +7,8 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
 
 class ConsoleTokenTest extends \PHPUnit\Framework\TestCase
 {
+    use OrganizationContextTrait;
+
     /**
      * @var ConsoleToken
      */
@@ -32,5 +34,12 @@ class ConsoleTokenTest extends \PHPUnit\Framework\TestCase
         $this->token->setOrganizationContext($organization);
 
         $this->assertEquals($organization, $this->token->getOrganizationContext());
+    }
+
+    public function testOrganizationContextSerialization(): void
+    {
+        $token = new ConsoleToken();
+
+        $this->assertOrganizationContextSerialization($token);
     }
 }

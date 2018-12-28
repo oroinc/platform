@@ -83,13 +83,15 @@ class CompleteEntityDefinitionHelper
         EntityDefinitionConfig $definition,
         ConfigContext $context
     ) {
-        $existingFields = $this->getExistingFields($definition);
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($context->getClassName());
+        $entityClass = $context->getClassName();
+        /** @var ClassMetadata $metadata */
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         if ($context->hasExtra(FilterIdentifierFieldsConfigExtra::NAME)) {
-            $this->completeIdentifierFields($definition, $metadata, $existingFields);
+            $this->completeIdentifierFields($definition, $metadata);
         } else {
             $version = $context->getVersion();
             $requestType = $context->getRequestType();
+            $existingFields = $this->getExistingFields($definition);
             $expandedEntities = $this->getExpandedEntities(
                 $definition,
                 $context->get(ExpandRelatedEntitiesConfigExtra::NAME)
@@ -117,6 +119,7 @@ class CompleteEntityDefinitionHelper
                 $entityOverrideProvider,
                 $definition,
                 $metadata,
+                $entityClass,
                 $version,
                 $requestType
             );
@@ -212,12 +215,10 @@ class CompleteEntityDefinitionHelper
     /**
      * @param EntityDefinitionConfig $definition
      * @param ClassMetadata          $metadata
-     * @param array                  $existingFields [property path => field name, ...]
      */
     private function completeIdentifierFields(
         EntityDefinitionConfig $definition,
-        ClassMetadata $metadata,
-        array $existingFields
+        ClassMetadata $metadata
     ) {
         // get identifier fields
         $configuredIdFieldNames = $definition->getIdentifierFieldNames();
@@ -237,16 +238,15 @@ class CompleteEntityDefinitionHelper
             }
         }
         // remove all not identifier fields
-        foreach ($existingFields as $propertyPath => $fieldName) {
-            if (!\in_array($propertyPath, $idFieldNames, true)
-                && !$definition->getField($fieldName)->isMetaProperty()
-            ) {
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if (!$field->isMetaProperty() && !\in_array($field->getPropertyPath($fieldName), $idFieldNames, true)) {
                 $definition->removeField($fieldName);
             }
         }
         // make sure all identifier fields are added
         foreach ($idFieldNames as $propertyPath) {
-            if (!isset($existingFields[$propertyPath])) {
+            if (null === $definition->findField($propertyPath, true)) {
                 $definition->addField($propertyPath);
             }
         }
@@ -431,6 +431,7 @@ class CompleteEntityDefinitionHelper
      * @param EntityOverrideProviderInterface $entityOverrideProvider
      * @param EntityDefinitionConfig          $definition
      * @param ClassMetadata                   $metadata
+     * @param string                          $entityClass
      * @param string                          $version
      * @param RequestType                     $requestType
      */
@@ -438,21 +439,36 @@ class CompleteEntityDefinitionHelper
         EntityOverrideProviderInterface $entityOverrideProvider,
         EntityDefinitionConfig $definition,
         ClassMetadata $metadata,
+        $entityClass,
         $version,
         RequestType $requestType
     ) {
         $fields = $definition->getFields();
-        foreach ($fields as $field) {
+        foreach ($fields as $fieldName => $field) {
             $propertyPath = $field->getPropertyPath();
             if ($propertyPath && false !== \strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
-                $this->completeDependentAssociation(
-                    $entityOverrideProvider,
-                    $definition,
-                    $metadata,
-                    $propertyPath,
-                    $version,
-                    $requestType
-                );
+                try {
+                    $this->completeDependentAssociation(
+                        $entityOverrideProvider,
+                        $definition,
+                        $metadata,
+                        $propertyPath,
+                        $version,
+                        $requestType
+                    );
+                } catch (\Exception $e) {
+                    throw new \RuntimeException(
+                        sprintf(
+                            'Cannot resolve property path "%s" specified for "%s::%s".'
+                            . ' Check "property_path" option for this field.',
+                            $propertyPath,
+                            $entityClass,
+                            $fieldName
+                        ),
+                        0,
+                        $e
+                    );
+                }
                 $formOptions = $field->getFormOptions();
                 if (null === $formOptions || !\array_key_exists('mapped', $formOptions)) {
                     $formOptions['mapped'] = false;
@@ -461,16 +477,72 @@ class CompleteEntityDefinitionHelper
             }
             $dependsOn = $field->getDependsOn();
             if (!empty($dependsOn)) {
-                foreach ($dependsOn as $dependsOnFieldName) {
-                    $this->completeDependentAssociation(
-                        $entityOverrideProvider,
-                        $definition,
-                        $metadata,
+                $this->resolveDependsOn(
+                    $entityOverrideProvider,
+                    $definition,
+                    $metadata,
+                    $entityClass,
+                    $fieldName,
+                    $dependsOn,
+                    $version,
+                    $requestType
+                );
+            }
+        }
+    }
+
+    /**
+     * @param EntityOverrideProviderInterface $entityOverrideProvider
+     * @param EntityDefinitionConfig          $definition
+     * @param ClassMetadata                   $metadata
+     * @param string                          $entityClass
+     * @param string                          $fieldName
+     * @param string[]                        $dependsOn
+     * @param string                          $version
+     * @param RequestType                     $requestType
+     */
+    private function resolveDependsOn(
+        EntityOverrideProviderInterface $entityOverrideProvider,
+        EntityDefinitionConfig $definition,
+        ClassMetadata $metadata,
+        $entityClass,
+        $fieldName,
+        array $dependsOn,
+        $version,
+        RequestType $requestType
+    ) {
+        foreach ($dependsOn as $dependsOnFieldName) {
+            try {
+                $this->completeDependentAssociation(
+                    $entityOverrideProvider,
+                    $definition,
+                    $metadata,
+                    $dependsOnFieldName,
+                    $version,
+                    $requestType
+                );
+            } catch (\Exception $e) {
+                $hintMessage = 'Check "depends_on" option for this field.';
+                if ($dependsOnFieldName === $fieldName) {
+                    $hintMessage .= sprintf(
+                        ' If the value of this option is correct you can declare an excluded field'
+                        . ' with "%1$s" property path. For example:%2$s'
+                        . '_%1$s:%2$s    property_path: %1$s%2$s    exclude: true',
                         $dependsOnFieldName,
-                        $version,
-                        $requestType
+                        "\n"
                     );
                 }
+                throw new \RuntimeException(
+                    sprintf(
+                        'Cannot resolve dependency to "%s" specified for "%s::%s". %s',
+                        $dependsOnFieldName,
+                        $entityClass,
+                        $fieldName,
+                        $hintMessage
+                    ),
+                    0,
+                    $e
+                );
             }
         }
     }
@@ -495,42 +567,45 @@ class CompleteEntityDefinitionHelper
         $targetDefinition = $definition;
         $targetMetadata = $metadata;
         $path = ConfigUtil::explodePropertyPath($propertyPath);
+        $pathLength = \count($path);
         $i = 0;
-        foreach ($path as $targetFieldName) {
-            $targetField = $targetDefinition->getField($targetFieldName);
+        foreach ($path as $targetPropertyName) {
+            $targetField = $targetDefinition->findField($targetPropertyName, true);
             if (null === $targetField) {
-                $targetEntityDefinition = $this->associationHelper->loadDefinition(
-                    $targetClass,
-                    $version,
-                    $requestType
-                );
-
-                $targetField = $targetDefinition->addField(
-                    $targetFieldName,
-                    $targetEntityDefinition->getField($targetFieldName)
-                );
-                $targetField->setExcluded();
-
-                $dependsOn = $targetField->getDependsOn();
-                if (!empty($dependsOn)) {
-                    foreach ($dependsOn as $dependsOnFieldName) {
-                        $dependsOnField = $targetEntityDefinition->getField($dependsOnFieldName);
-                        if (null !== $dependsOnField) {
-                            $targetDefinition->addField($dependsOnFieldName, $dependsOnField);
-                            $dependsOnField->setExcluded();
-                        }
-                    }
+                $targetFullDefinition = $this->loadFullDefinition($targetClass, $version, $requestType);
+                $targetFieldName = $targetDefinition->findFieldNameByPropertyPath($targetPropertyName);
+                if ($targetFieldName) {
+                    $targetField = $targetDefinition->getField($targetFieldName);
+                } else {
+                    $targetField = $targetDefinition->addField(
+                        $targetPropertyName,
+                        $targetFullDefinition->findField($targetPropertyName, true)
+                    );
+                    $targetField->setExcluded();
+                }
+                $targetDependsOn = $targetField->getDependsOn();
+                if (!empty($targetDependsOn)) {
+                    $this->resolveDependsOn(
+                        $entityOverrideProvider,
+                        $targetDefinition,
+                        $this->doctrineHelper->getEntityMetadataForClass($targetClass),
+                        $targetClass,
+                        $targetFieldName,
+                        $targetDependsOn,
+                        $version,
+                        $requestType
+                    );
                 }
             }
 
             $i++;
-            if ($i >= \count($path)) {
+            if ($i >= $pathLength) {
                 break;
             }
 
             $targetClass = $targetField->getTargetClass();
-            if (!$targetClass && null !== $targetMetadata && $targetMetadata->hasAssociation($targetFieldName)) {
-                $targetClass = $targetMetadata->getAssociationTargetClass($targetFieldName);
+            if (!$targetClass && null !== $targetMetadata && $targetMetadata->hasAssociation($targetPropertyName)) {
+                $targetClass = $targetMetadata->getAssociationTargetClass($targetPropertyName);
                 $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass, false);
                 $targetClass = $this->resolveEntityClass($targetClass, $entityOverrideProvider);
             }
@@ -541,6 +616,31 @@ class CompleteEntityDefinitionHelper
 
             $targetDefinition = $targetField->getOrCreateTargetEntity();
         }
+    }
+
+    /**
+     * @param string      $entityClass
+     * @param string      $version
+     * @param RequestType $requestType
+     *
+     * @return EntityDefinitionConfig
+     */
+    private function loadFullDefinition($entityClass, $version, RequestType $requestType)
+    {
+        try {
+            $definition = $this->associationHelper->loadDefinition($entityClass, $version, $requestType);
+        } catch (\Exception $e) {
+            throw new \RuntimeException(
+                sprintf('The configuration for "%s" cannot be loaded.', $entityClass),
+                0,
+                $e
+            );
+        }
+        if (null === $definition) {
+            throw new \RuntimeException(sprintf('The configuration for "%s" was not found.', $entityClass));
+        }
+
+        return $definition;
     }
 
     /**

@@ -1,0 +1,16 @@
+/* @theme: admin.oro; */
+
+$reminders-collection-inline-field-offset-end: $content-padding-small / 2 !default;
+
+$reminders-collection-validation-failed-width: 205px !default;
+$reminders-collection-validation-failed-offset-start: -126px !default;
+
+$reminders-collection-number-width: 42px !default;
+$reminders-collection-number-text-align: center !default;
+
+$reminders-collection-select-unit-width: 80px !important !default;
+$reminders-collection-select-method-width: 104px !important !default;
+
+$reminders-collection-oro-multiselect-holder-width: $field-width + $content-padding-small / 2 + 32px !default;
+$reminders-collection-oro-multiselect-holder-offset-bottom: $content-padding-small !default;
+$reminders-collection-oro-multiselect-holder-position: relative !default;

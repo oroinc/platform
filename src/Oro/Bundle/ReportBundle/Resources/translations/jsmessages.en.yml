@@ -6,6 +6,6 @@ oro:
             show_sql_query: Show SQL Query
             hide_sql_query: Hide SQL Query
             messages:
-                copied: Copied to Clipoboard.
-                copy_not_successful: Copy command was not successful.
-                copy_not_supported: Your browser does not support copy command. Please press Ctrl/Cmd+C to copy.
+                copied: Copied to Clipboard.
+                copy_not_successful: Copying was not successful.
+                copy_not_supported: Your browser does not support copying. Please press Ctrl/Cmd+C to copy.

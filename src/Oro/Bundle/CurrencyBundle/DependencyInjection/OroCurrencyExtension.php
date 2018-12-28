@@ -23,6 +23,10 @@ class OroCurrencyExtension extends Extension
         $loader->load('formatters.yml');
         $loader->load('importexport.yml');
 
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
+
         $container->prependExtensionConfig($this->getAlias(), $config);
     }
 

@@ -463,7 +463,7 @@ class EntityMapper
     }
 
     /**
-     * Checks if the the given entity class is a manageable entity.
+     * Checks if the given entity class is a manageable entity.
      *
      * @param string $entityClass
      *

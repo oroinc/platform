@@ -31,7 +31,14 @@
     .btn + .btn-group,
     .btn-group + .btn,
     .btn-group + .btn-group {
-        margin-left: -$btn-group-divider-width;
+        margin-#{$start}: -$btn-group-divider-width;
+    }
+
+    @each $color, $value in $btn-group-square-divider-keys {
+        .btn + .btn-square-#{$color},
+        .btn-group + .btn-square-#{$color} {
+            margin-#{$start}: -$btn-group-square-divider-width;
+        }
     }
 
     > .btn-sm:first-child {
@@ -62,29 +69,83 @@
     // Reset rounded corners
     > .btn:not(:last-child):not(.dropdown-toggle),
     > .btn-group:not(:last-child) > .btn {
-        @include border-right-radius(0);
+        @include border-end-radius(0);
 
-        border-right-width: $btn-group-divider-width;
+        border-#{$end}-width: $btn-group-divider-width;
 
         &,
         &:hover,
         &:focus,
         &:active {
-            border-right-color: $btn-group-divider-color;
+            border-#{$end}-color: $btn-group-divider-color;
         }
     }
 
     > .btn:not(:first-child),
     > .btn-group:not(:first-child) > .btn {
-        @include border-left-radius(0);
+        @include border-start-radius(0);
 
-        border-left-width: $btn-group-divider-width;
+        border-#{$start}-width: $btn-group-divider-width;
 
         &,
         &:hover,
         &:focus,
         &:active {
-            border-left-color: $btn-group-divider-color;
+            border-#{$start}-color: $btn-group-divider-color;
+        }
+    }
+
+    @each $color, $value in $btn-group-divider-keys {
+        > .btn-#{$color}:not(:last-child):not(.dropdown-toggle),
+        > .btn-group:not(:last-child) > .btn-#{$color} {
+            &,
+            &:hover,
+            &:focus,
+            &:active {
+                border-#{$end}-color: $value;
+            }
+        }
+
+        > .btn-#{$color}:not(:first-child),
+        > .btn-group:not(:first-child) > .btn-#{$color} {
+            &,
+            &:hover,
+            &:focus,
+            &:active {
+                border-#{$start}-color: $value;
+            }
+        }
+    }
+
+    @each $color, $value in $btn-group-square-divider-keys {
+        > .btn-square-#{$color}:not(:last-child):not(.dropdown-toggle),
+        > .btn-group:not(:last-child) > .btn-square-#{$color} {
+            border-#{$end}-width: $btn-group-square-divider-width;
+
+            &,
+            &:hover,
+            &:active {
+                border-#{$end}-color: $value;
+            }
+
+            &:focus {
+                border-#{$end}-color: $secondary-100;
+            }
+        }
+
+        > .btn-square-#{$color}:not(:first-child),
+        > .btn-group:not(:first-child) > .btn-square-#{$color} {
+            border-#{$start}-width: $btn-group-square-divider-width;
+
+            &,
+            &:hover,
+            &:active {
+                border-#{$start}-color: $value;
+            }
+
+            &:focus {
+                border-#{$start}-color: $secondary-100;
+            }
         }
     }
 }

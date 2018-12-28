@@ -16,6 +16,11 @@ class DoctrineTagEventListener
     /**
      * @var bool
      */
+    private $enabled = true;
+
+    /**
+     * @var bool
+     */
     private $isApplicationInstalled;
 
     /**
@@ -59,6 +64,16 @@ class DoctrineTagEventListener
     }
 
     /**
+     * Enables or disables the listener.
+     *
+     * @param bool $enabled
+     */
+    public function setEnabled($enabled = true)
+    {
+        $this->enabled = $enabled;
+    }
+
+    /**
      * Collect changes that were done
      * Generates tags and store in protected variable
      *
@@ -66,7 +81,7 @@ class DoctrineTagEventListener
      */
     public function onFlush(OnFlushEventArgs $event)
     {
-        if (!$this->isApplicationInstalled) {
+        if (!$this->enabled || !$this->isApplicationInstalled) {
             return;
         }
 

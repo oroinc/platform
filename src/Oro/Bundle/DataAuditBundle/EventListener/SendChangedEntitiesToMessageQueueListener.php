@@ -12,6 +12,7 @@ use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\Model\AdditionalEntityChangesToAuditStorage;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Service\EntityToEntityChangeArrayConverter;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
@@ -70,12 +71,16 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     /** @var AdditionalEntityChangesToAuditStorage */
     private $additionalEntityChangesStorage;
 
+    /** @var EntityNameResolver */
+    private $entityNameResolver;
+
     /**
      * @param MessageProducerInterface              $messageProducer
      * @param TokenStorageInterface                 $tokenStorage
      * @param AdditionalEntityChangesToAuditStorage $additionalEntityChangesStorage
      * @param EntityToEntityChangeArrayConverter    $entityToArrayConverter
      * @param AuditConfigProvider                   $auditConfigProvider
+     * @param EntityNameResolver                    $entityNameResolver
      * @param LoggerInterface                       $logger
      */
     public function __construct(
@@ -84,6 +89,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         AdditionalEntityChangesToAuditStorage $additionalEntityChangesStorage,
         EntityToEntityChangeArrayConverter $entityToArrayConverter,
         AuditConfigProvider $auditConfigProvider,
+        EntityNameResolver $entityNameResolver,
         LoggerInterface $logger
     ) {
         $this->messageProducer = $messageProducer;
@@ -91,6 +97,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->additionalEntityChangesStorage = $additionalEntityChangesStorage;
         $this->entityToArrayConverter = $entityToArrayConverter;
         $this->auditConfigProvider = $auditConfigProvider;
+        $this->entityNameResolver = $entityNameResolver;
         $this->logger = $logger;
 
         $this->allInsertions = new \SplObjectStorage;
@@ -106,6 +113,20 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     public function setEnabled($enabled = true)
     {
         $this->enabled = $enabled;
+    }
+
+    /**
+     * @param AdditionalEntityChangesToAuditStorage $additionalEntityChangesStorage
+     */
+    public function setAdditionalEntityChangesStorage(
+        AdditionalEntityChangesToAuditStorage $additionalEntityChangesStorage
+    ) {
+        $this->additionalEntityChangesStorage = $additionalEntityChangesStorage;
+    }
+
+    public function setEntityNameResolver(EntityNameResolver $entityNameResolver): void
+    {
+        $this->entityNameResolver = $entityNameResolver;
     }
 
     /**
@@ -153,22 +174,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             //we need this solution as the token can be cleared by the mq extension
             $securityToken = $this->getSecurityToken($em);
             if (null !== $securityToken) {
-                $user = $securityToken->getUser();
-                if ($user instanceof AbstractUser) {
-                    $body['user_id'] = $user->getId();
-                    $body['user_class'] = ClassUtils::getClass($user);
-                }
-                if ($securityToken instanceof OrganizationContextTokenInterface) {
-                    $body['organization_id'] = $securityToken->getOrganizationContext()->getId();
-                }
-
-                if ($securityToken->hasAttribute('IMPERSONATION')) {
-                    $body['impersonation_id'] = $securityToken->getAttribute('IMPERSONATION');
-                }
-
-                if ($securityToken->hasAttribute('owner_description')) {
-                    $body['owner_description'] = $securityToken->getAttribute('owner_description');
-                }
+                $this->prepareBodyFromToken($securityToken, $body);
             }
 
             $this->messageProducer->send(
@@ -181,6 +187,33 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             $this->allDeletions->detach($em);
             $this->allCollectionUpdates->detach($em);
             $this->allTokens->detach($em);
+        }
+    }
+
+    /**
+     * @param TokenInterface $securityToken
+     * @param array $body
+     */
+    private function prepareBodyFromToken(TokenInterface $securityToken, array &$body): void
+    {
+        $user = $securityToken->getUser();
+        if ($user instanceof AbstractUser) {
+            $body['user_id'] = $user->getId();
+            $body['user_class'] = ClassUtils::getClass($user);
+            $body['owner_description'] = $this->entityNameResolver->getName($user, 'email');
+        }
+        if ($securityToken instanceof OrganizationContextTokenInterface) {
+            $body['organization_id'] = $securityToken->getOrganizationContext()->getId();
+        }
+
+        if ($securityToken->hasAttribute('IMPERSONATION')) {
+            $impersonationId = $securityToken->getAttribute('IMPERSONATION');
+
+            $body['impersonation_id'] = $impersonationId;
+        }
+
+        if ($securityToken->hasAttribute('owner_description')) {
+            $body['owner_description'] = $securityToken->getAttribute('owner_description');
         }
     }
 

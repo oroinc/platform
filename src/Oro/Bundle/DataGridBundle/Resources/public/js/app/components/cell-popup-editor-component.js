@@ -32,7 +32,7 @@ define(function(require) {
             zIndex: 1,
             position: {
                 my: 'left top',
-                at: 'left top+1',
+                at: 'left top',
                 collision: 'flipfit'
             }
         },
@@ -108,13 +108,25 @@ define(function(require) {
 
             viewInstance.$el.addClass('inline-editor-wrapper');
 
+            var position = {
+                of: cell.$el,
+                within: cell.$el.closest('tbody')
+            };
+
+            var isAlignedRight = cell.el && getComputedStyle(cell.el).textAlign === 'right';
+
+            if (isAlignedRight) {
+                $.extend(position, {
+                    at: 'right top',
+                    my: 'right top'
+                });
+            }
+
             var overlayOptions = $.extend(true, {}, this.OVERLAY_TOOL_DEFAULTS, {
                 insertInto: cell.$el,
-                position: {
-                    of: cell.$el,
-                    within: cell.$el.closest('tbody')
-                }
+                position: position
             });
+
             this.resizeToCell(viewInstance, cell);
             var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
             viewInstance.trigger('change:visibility');
@@ -181,16 +193,7 @@ define(function(require) {
          * Resizes editor to cell width
          */
         resizeToCell: function(view, cell) {
-            view.$el.width(cell.$el.outerWidth() + this.getWidthIncrement());
-        },
-
-        /**
-         * Returns cell editor width increment
-         *
-         * @returns {number}
-         */
-        getWidthIncrement: function() {
-            return 48;
+            view.$el.width(cell.$el.outerWidth());
         },
 
         /**

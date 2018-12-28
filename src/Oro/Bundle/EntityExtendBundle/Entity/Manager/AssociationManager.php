@@ -17,6 +17,9 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Provides a set of methods to manage extended associations (see "Resources/doc/associations.md").
+ */
 class AssociationManager
 {
     /** @var ConfigManager */
@@ -357,8 +360,8 @@ class AssociationManager
     }
 
     /**
-     * Returns a query builder that could be used for fetching the the list of owner side entities
-     * the specified $associationTargetClass associated with
+     * Returns a query builder that could be used for fetching the list of owner side entities
+     * the specified $associationTargetClass associated with.
      *
      * The resulting query would be something like this:
      * <code>

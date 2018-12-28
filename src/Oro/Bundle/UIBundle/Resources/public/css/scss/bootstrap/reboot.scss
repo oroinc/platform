@@ -12,15 +12,6 @@ ol {
     padding: 0;
 }
 
-button,
-input,
-optgroup,
-select,
-textarea {
-    font-size: 100%;
-    line-height: 1.15; //  Correct the line height in all browsers.
-}
-
 input {
     &::-ms-clear {
         display: none;
@@ -58,7 +49,7 @@ select {
     }
 }
 
-[type=search] {
+[type="search"] {
     -webkit-appearance: textfield;
-    outline-offset: -2px
+    outline-offset: -2px;
 }

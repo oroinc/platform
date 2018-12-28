@@ -13,7 +13,6 @@ use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -113,10 +112,10 @@ class OperationFormHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->formProcessing($request, $actionData, $operation);
 
-        $this->assertEquals(
-            new RedirectResponse('http://redirect.url/', 302),
-            $this->handler->process('operation', $request, $this->flashBag)
-        );
+        $response = $this->handler->process('operation', $request, $this->flashBag);
+
+        $this->assertEquals('http://redirect.url/', $response->getTargetUrl());
+        $this->assertEquals(302, $response->getStatusCode());
     }
 
     public function testProcessRefreshDatagrid()

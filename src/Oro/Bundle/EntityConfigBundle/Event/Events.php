@@ -45,4 +45,9 @@ final class Events
      * This event occurs after all changes of configuration data is flushed into a database.
      */
     const POST_FLUSH = 'oro.entity_config.post_flush';
+
+    /**
+     * Occurs before setting config state to Require update
+     */
+    const PRE_SET_REQUIRE_UPDATE = 'oro.entity_config.pre_set_require_update';
 }

@@ -51,9 +51,7 @@ services:
     oro_api.create.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - '@oro_api.doctrine_helper'
-            - '@security.authorization_checker'
-            - '@oro_security.acl.group_provider.chain'
+            - '@oro_api.security.authorization_checker'
             - CREATE
         tags:
             - { name: oro.api.processor, action: create, group: security_check, priority: 10 }

@@ -223,7 +223,7 @@ The `entities` section describes a configuration of entities.
   Please note that the same entity can be configured in different `Resources/config/oro/api.yml` files, e.g. when some bundle needs to add a field to an entity declared in another bundle. In this case, all configuration files for this entity can have **documentation_resource** option and all documentation files declared there are merged. Pay attention that if the same field is documented in several documentation files, they are be merged and only a documentation from one file is used.
 * **exclude** (*boolean*) - Indicates whether the entity should be excluded from the data API. By default, `false`.
 * **inherit** (*boolean*) - Indicates whether the configuration for certain entity should be merged with the configuration of a parent entity. By default, `true`. Set to `false` if a derived entity should have completely different configuration to the parent entity and merging with the parent configuration is not needed.
-* **exclusion_policy** (*string*) - Indicates the exclusion strategy to use for the entity. Possible values: `all` or `none`. By default, `none`. `none` - Exclude fields marked with the `exclude` flag. `all` - Exclude both marked and not marked fields. 
+* **exclusion_policy** (*string*) - Indicates the exclusion strategy to use for the entity. Possible values: `all`, `custom_fields` or `none`. By default, `none`. `none` - exclude fields marked with the `exclude` flag. `all` - exclude all fields that are not configured explicitly. `custom_fields` - exclude all custom fields (fields with `is_extend` = `true` and `owner` = `Custom` in `extend` scope in entity configuration) that are not configured explicitly.
 * **max_results** (*integer*) - The maximum number of entities in the result. Set `-1` (it means unlimited), zero, or positive number to define the limit. Use to set the limit for both the parent and related entities.
 * **order_by** (*array*) - The property can be used to configure the default ordering of the result. The item key is the name of a field. The value can be `ASC` or `DESC`. By default, the result is ordered by an identifier field.
 * **disable_inclusion** (*boolean*) - Indicates whether the inclusion of related entities is disabled. In JSON.API, the [**include** request parameter](http://jsonapi.org/format/#fetching-includes) is used to customize which related entities to return. By default, `false`.
@@ -275,7 +275,7 @@ This section describes configuration of entity fields.
 
 * **exclude** (*boolean*) - Indicates whether the field should be excluded. This property is described above in the [Exclude option](#exclude-option) section.
 * **description** (*string*) - A human-readable description of the field or a link to the [documentation resource](./documentation.md). Used in auto-generated documentation only.
-* **property_path** (*string*) - The property path to the field value. Can be used to rename the field or to access a field of a related entity.
+* **property_path** (*string*) - The property path to the field value. Can be used to rename the field or to access a field of a related entity. Use the "dot" notation to separate property names in the path, e.g. `user.firstName`. Each property name must be equal to the name of existing property of an entity.
 * **collapse** (*boolean*) - Indicates whether to collapse the entity. It is applicable for associations only. When `true`, the target entity is returned as a value instead of an array of entity fields values. Usually, this property is set by the [get_relation_config](./actions.md#get_relation_config-action) processors to get an identifier of the related entity.
 * **form_type** (*string*) - The form type that to use for the field in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
 * **form_options** (*array*) - The form options to use for the field in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
@@ -283,7 +283,7 @@ This section describes configuration of entity fields.
 * **meta_property** (*boolean*) - Indicates whether the field represents a meta information. For JSON.API, such fields are returned in the [meta](http://jsonapi.org/format/#document-meta) section. By default, `false`.
 * **target_class** (*string*) - The class name of a target entity if a field represents an association. If the data API resource is based on the non ORM entity, set the target class in a configuration file.
 * **target_type** (*string*) - The type of a target association. Can be *to-one* or *to-many*. Also *collection* can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default. If the data API resource is based on the non ORM entity, set the target type in a configuration file.
-* **depends_on** (*string[]*) - A list of fields that the field depends on. Use `.`to specify a path to an association field. This option is helpful for computed fields: the required fields will be loaded from the database even if they are excluded.
+* **depends_on** (*string[]*) - A list of entity properties that the field depends on. Use the "dot" notation to specify a path to a nested property, e.g. `user.firstName`. Each element in the path must be equal to the name of existing property of an entity. This option is helpful for computed fields: the specified fields will be loaded from the database even if they are excluded.
 
 Special data types:
 
@@ -353,7 +353,7 @@ api:
                 # A computed field
                 field9:
                     data_type: string
-                    depends_on: [field1, association1.field11]
+                    depends_on: [property1, association1.property11]
 ```
 
 ## filters Configuration Section
@@ -364,7 +364,7 @@ This section describes fields by which the result data can be filtered. It conta
 * **fields** - This section describes a configuration of each field that can be used to filter the result data. Each filter can have the following properties:
     * **exclude** (*boolean*) - Indicates whether to disable filtering by this field. By default, `false`.
     * **description** (*string*) - A human-readable description of the filter or a link to the [documentation resource](./documentation.md). Used in auto-generated documentation only.
-    * **property_path** *string*) - The property path to the field value. See the description of the property in the **fields** configuration section.
+    * **property_path** *string*) - The property path to the field value. See the description of the property in the [fields](#fields-configuration-section) configuration section.
     * **data_type** (*string*) - The data type of the filter value. Can be `boolean`, `integer`, `string`, etc.
     * **allow_array** (*boolean*) - Indicates whether the filter can contains several values. By default, `false` for `string`, `boolean`, `datetime`, `date`, `time` fields. and `true` for other fields.
     * **allow_range** (*boolean*) - Indicates whether the filter can contains a pair of "from" and "to" values. By default, `false` for `string`, `boolean`, `guid`, `currency` fields. and `true` for other fields.
@@ -415,7 +415,7 @@ This section describes fields by which the result data can be sorted. It contain
 * **exclusion_policy** (*string*) - Can be `all` or `none`. By default, `none`. Indicates which exclusion strategy to use. Possible values: `all` or `none`. `none` - Exclude fields marked with the `exclude` flag. `all` - Exclude both marked and not marked fields. 
 * **fields** - This section describes a configuration of each field that can be used to sort the result data. Each sorter can have the following properties:
     * **exclude** (*boolean*) - Indicates whether to disable sorting by this field. By default, `false`.
-    * **property_path** (*string*) - The property path to the field value. See the description of the property in the **fields** configuration section.
+    * **property_path** (*string*) - The property path to the field value. See the description of the property in the [fields](#fields-configuration-section) configuration section.
 
 **Example:**
 

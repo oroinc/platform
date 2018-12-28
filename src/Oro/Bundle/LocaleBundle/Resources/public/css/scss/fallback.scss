@@ -22,13 +22,6 @@
 }
 
 .fallback-container {
-    .fallback-status {
-        width: $fallback-container-status-width;
-        text-align: $fallback-container-status-text-align;
-        line-height: $fallback-container-status-line-height;
-        height: $fallback-container-status-height;
-    }
-
     input {
         &[type="radio"],
         &[type="checkbox"] {
@@ -43,7 +36,6 @@
 
             span {
                 padding-right: $fallback-container-select-span-inner-offset-right;
-                min-width: $fallback-container-select-span-min-width;
             }
         }
     }
@@ -98,14 +90,24 @@
     display: flex;
     align-items: center;
     margin: $fallback-item-fallback-line-offset;
+    max-width: $fallback-item-label-max-width;
 }
 
 .fallback-item-fallback {
     flex-grow: 1;
+    min-width: $fallback-item-fallback-min-width;
+    max-width: $fallback-item-fallback-max-width;
 }
 
 .fallback-item-use-fallback {
     min-width: $fallback-item-use-fallback-width;
+    @include text-line-truncate($max-width: $fallback-item-use-fallback-max-width);
+
+    padding-#{$end}: $content-padding-small;
+
+    .checkbox-view {
+        margin-#{$end}: $content-padding-small;
+    }
 }
 
 .fallback-item-value-input {
@@ -126,15 +128,13 @@
     .validation-failed {
         width: $fallback-item-value--first-validation-width;
         order: $fallback-item-value--first-validation-order;
+        max-width: $fallback-item-label-max-width;
     }
 
     .input-append {
         .input-group {
+            display: block;
             margin-#{$end}: $fallback-item-value--first-input-group-offset-end;
         }
-    }
-
-    input[type="text"] {
-        width: $fallback-item-value--first-input-width;
     }
 }

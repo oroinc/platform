@@ -5,6 +5,8 @@ oro:
             fail.message: 'Could not start export, please try again.'
             error_template_download.message: 'Errors occured while downloading the template.'
         import:
+            widget:
+                title: 'Import'
             starting.message: 'Starting import...'
             success.message: 'Import started successfully. You will receive email notification upon completion.'
             fail.message: 'Could not start import, please try again.'

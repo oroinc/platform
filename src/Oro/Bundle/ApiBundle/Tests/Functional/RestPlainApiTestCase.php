@@ -32,6 +32,14 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
     /**
      * {@inheritdoc}
      */
+    protected function getResponseContentType()
+    {
+        return self::JSON_CONTENT_TYPE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
         $this->checkHateoasHeader($server);
@@ -46,11 +54,14 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
             $content
         );
 
+        // make sure that REST API call does not start the session
+        self::assertSessionNotStarted($method, $uri);
+
         return $this->client->getResponse();
     }
 
     /**
-     * Asserts the response content contains the the given data.
+     * Asserts the response content contains the given data.
      *
      * @param array|string $expectedContent The file name or full file path to YAML template file or array
      * @param Response     $response
@@ -69,7 +80,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
     }
 
     /**
-     * Asserts the response content contains the the given validation error.
+     * Asserts the response content contains the given validation error.
      *
      * @param array    $expectedError
      * @param Response $response
@@ -80,7 +91,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
     }
 
     /**
-     * Asserts the response content contains the the given validation errors.
+     * Asserts the response content contains the given validation errors.
      *
      * @param array    $expectedErrors
      * @param Response $response
@@ -107,5 +118,22 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
                 $e->getComparisonFailure()
             );
         }
+    }
+
+    /**
+     * Extracts REST API resource identifier from the response.
+     *
+     * @param Response $response
+     * @param string   $identifierFieldName
+     *
+     * @return mixed
+     */
+    protected function getResourceId(Response $response, string $identifierFieldName = 'id')
+    {
+        $content = self::jsonToArray($response->getContent());
+        self::assertInternalType('array', $content);
+        self::assertArrayHasKey($identifierFieldName, $content);
+
+        return $content[$identifierFieldName];
     }
 }

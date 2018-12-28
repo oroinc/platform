@@ -413,10 +413,10 @@ services:
     oro_workflow.extension.datagrid_start_transition_button_provider:
         class: 'Oro\Bundle\WorkflowBundle\Extension\DatagridStartTransitionButtonProviderExtension'
         arguments:
-            - '@oro_entity.doctrine_helper'
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.start_transition_route'
-            - '@oro_action.resolver.destination_page_resolver'
+            - '@oro_action.provider.original_url_provider'
+            - '@oro_entity.doctrine_helper'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
@@ -427,7 +427,7 @@ services:
         arguments:
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.start_transition_route'
-            - '@oro_action.resolver.destination_page_resolver'
+            - '@oro_action.provider.original_url_provider'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
@@ -438,7 +438,7 @@ services:
         arguments:
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.transition_route'
-            - '@oro_action.resolver.destination_page_resolver'
+            - '@oro_action.provider.original_url_provider'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:

@@ -14,9 +14,18 @@ oro_behat_extension:
               element: Select2Entity
 
     Add Grouping button:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
       selector:
         locator: '//div[@id="oro_report-grouping-form"]//a[@title="Add"]'
+        type: xpath
+
+    Show SQL Query:
+      selector:
+        locator: '//div[@class="sql-query-container"]//a[text()="Show SQL Query"]'
+        type: xpath
+
+    Copy to Clipboard:
+      selector:
+        locator: '//div[@class="sql-query-container"]//a[text()="Copy to Clipboard"]'
         type: xpath
 
   suites:
@@ -27,5 +36,6 @@ oro_behat_extension:
         - OroQueryDesignerBundle::QueryDesignerContext
         - OroFilterBundle::FilterContext
         - OroFormBundle::FormContext
+        - OroConfigBundle::FeatureContext
       paths:
         - '@OroReportBundle/Tests/Behat/Features'

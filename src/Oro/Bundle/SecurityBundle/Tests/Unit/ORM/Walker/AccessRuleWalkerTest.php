@@ -476,6 +476,49 @@ class AccessRuleWalkerTest extends OrmTestCase
         );
     }
 
+    public function testWalkerQueryWithSubselectAndMultipleWhereConditions()
+    {
+        $this->rule->setRule(function (Criteria $criteria) {
+            if ($criteria->getEntityClass() === CmsAddress::class) {
+                $criteria->andExpression(new Comparison(new Path('user'), Comparison::LT, 5));
+            }
+
+            $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
+        });
+
+        $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 9);
+
+        $qb = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('u');
+        $query = $qb->select('u.id')
+            ->where('u.id > 0')
+            ->andWhere(
+                '(EXISTS(
+                    SELECT users.id FROM ' . CmsUser::class . ' users
+                    JOIN users.articles articles
+                    WHERE articles.id in (1,2,3)
+                ))'
+            )
+            ->getQuery();
+
+        $query->setHint(
+            Query::HINT_CUSTOM_TREE_WALKERS,
+            [AccessRuleWalker::class]
+        );
+        $query->setHint(AccessRuleWalker::CONTEXT, $context);
+
+        $this->assertEquals(
+            'SELECT c0_.id AS id_0'
+            . ' FROM cms_users c0_'
+            . ' WHERE c0_.id > 0'
+            . ' AND (EXISTS '
+            . '(SELECT c1_.id FROM cms_users c1_'
+            . ' INNER JOIN cms_articles c2_ ON c1_.id = c2_.user_id AND (c2_.organization = 1)'
+            . ' WHERE c2_.id IN (1, 2, 3) AND c1_.organization = 1))'
+            . ' AND c0_.organization = 1',
+            $query->getSQL()
+        );
+    }
+
     public function testWalkerQueryWithSubselectAndDisabledCheckRootEntityAndCheckRelationships()
     {
         $this->rule->setRule(function (Criteria $criteria) {

@@ -504,6 +504,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
             []
         );
 
-        $this->assertEquals($redirectResponse, $response);
+        $this->assertEquals($redirectResponse->getTargetUrl(), $response->getTargetUrl());
+        $this->assertEquals($redirectResponse->getStatusCode(), $response->getStatusCode());
     }
 }

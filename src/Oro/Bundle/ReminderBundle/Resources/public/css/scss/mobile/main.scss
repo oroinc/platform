@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
 .mobile-version {
-    @import "./reminders-collection";
+    @import "variables";
+
+    @import "reminders-collection";
 }

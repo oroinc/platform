@@ -1,6 +1,6 @@
 /* @theme: admin.oro; */
 
-$btn-fa-icon-font-size: $base-font-size--m - 1 !default;
+$btn-fa-icon-font-size: $base-font-size--m !default;
 $btn-fa-icon-line-height: $btn-line-height - 2 !default;
 $btn-fa-icon-vertical-align: middle !default;
 
@@ -24,15 +24,19 @@ $btn-icon-fa-top: 50% !default;
 $btn-icon-fa-left: 50% !default;
 $btn-icon-fa-transform: translate(-50%, -50%) !default;
 
-$btn-icon-dropdown-toggle-width: 44px !default;
+$btn-icon-dropdown-toggle-width: 62px !default;
 
 $btn-icon-dropdown-toggle-after-position: absolute !default;
 $btn-icon-dropdown-toggle-after-top: 50% !default;
-$btn-icon-dropdown-toggle-after-right: 8px !default;
+$btn-icon-dropdown-toggle-after-right: $content-padding-medium !default;
 $btn-icon-dropdown-toggle-after-transform: translate(0, -50%) !default;
 
-$btn-icon-dropdown-toggle-fa-left: 8px !default;
+$btn-icon-dropdown-toggle-fa-left: $content-padding-medium !default;
 $btn-icon-dropdown-toggle-fa-transform: translate(0, -50%) !default;
+
+$btn-square-icon-dropdown-toggle-width: 46px !default;
+$btn-square-icon-dropdown-toggle-after-right: $content-padding-small !default;
+$btn-square-icon-dropdown-toggle-fa-left: $content-padding-small !default;
 
 /* Style for button without theme modificator */
 $btn-theme: (
@@ -41,7 +45,8 @@ $btn-theme: (
     'color': $primary-400,
     'hover-color': $primary-400,
     'active-color': $primary-400,
-    'active-box-shadow': inset 0 2px 3px 2px rgba(0, 0, 0, .21)
+    'active-box-shadow': inset 0 2px 3px 2px rgba(0, 0, 0, .21),
+    'focus-box-shadow': (inset 0 0 0 2px $secondary-100, 0 0 6px 0 rgba($secondary-100, .8))
 ) !default;
 
 $btn-theme-light: (
@@ -55,6 +60,22 @@ $btn-theme-light: (
     'active-border': transparent,
     'active-color': $primary-500,
     'active-box-shadow': none,
+    'disabled-opacity': .25
+) !default;
+
+$btn-theme-light-custom: (
+    'background': transparent,
+    'border': transparent,
+    'color': $primary-400,
+    'hover-background': $primary-900,
+    'hover-border': transparent,
+    'hover-color': $primary-500,
+    'active-background': $primary-860,
+    'active-border': transparent,
+    'active-color': $primary-500,
+    'active-box-shadow': none,
+    'focus-background': $primary-900,
+    'focus-box-shadow': none,
     'disabled-opacity': .25
 ) !default;
 
@@ -78,8 +99,8 @@ $btn-theme-primary: (
 ) !default;
 
 $btn-theme-info: (
-    'background': $secondary,
-    'border': $secondary
+    'background': $info,
+    'border': $info
 ) !default;
 
 $btn-theme-success: (
@@ -89,7 +110,10 @@ $btn-theme-success: (
 
 $btn-theme-warning: (
     'background': $warning,
-    'border': $warning
+    'border': $warning,
+    'color': $primary-inverse,
+    'hover-color': $primary-inverse,
+    'active-color': $primary-inverse
 ) !default;
 
 $btn-theme-danger: (
@@ -102,10 +126,16 @@ $btn-theme-dark: (
     'border': $additional
 ) !default;
 
+$btn-theme-inverse: (
+    'background': $additional,
+    'border': $additional
+) !default;
+
 $btn-theme-keys: () !default;
 $btn-theme-keys: map-merge(
     (
         'light': $btn-theme-light,
+        'light-custom': $btn-theme-light-custom,
         'lighter': $btn-theme-lighter,
         'primary': $btn-theme-primary,
         'info': $btn-theme-info,
@@ -113,6 +143,7 @@ $btn-theme-keys: map-merge(
         'warning': $btn-theme-warning,
         'danger': $btn-theme-danger,
         'dark': $btn-theme-dark,
+        'inverse': $btn-theme-inverse
     ),
     $btn-theme-keys
 );
@@ -128,6 +159,40 @@ $btn-theme-square-default: (
     'active-border': $primary-750,
     'active-color': $primary-500,
     'active-box-shadow': inset 0 2px 3px 2px rgba(0, 0, 0, .21),
+    'focus-box-shadow': 0 0 6px 0 rgba($secondary-100, .8),
+    'focus-border': $secondary-100,
+    'disabled-opacity': .25
+) !default;
+
+$btn-theme-square-light: (
+    'background': transparent,
+    'border': transparent,
+    'color': $primary-400,
+    'hover-background': transparent,
+    'hover-border': transparent,
+    'hover-color': $primary-500,
+    'active-background': transparent,
+    'active-border': transparent,
+    'active-color': $primary-500,
+    'active-box-shadow': none,
+    'focus-box-shadow': 0 0 6px 0 rgba($secondary-100, .8),
+    'focus-border': $secondary-100,
+    'disabled-opacity': .25
+) !default;
+
+$btn-theme-square-lighter: (
+    'background': transparent,
+    'border': transparent,
+    'color': $primary-700,
+    'hover-background': transparent,
+    'hover-border': transparent,
+    'hover-color': $primary-500,
+    'active-background': transparent,
+    'active-border': transparent,
+    'active-color': $primary-500,
+    'active-box-shadow': none,
+    'focus-box-shadow': 0 0 6px 0 rgba($secondary-100, .8),
+    'focus-border': $secondary-100,
     'disabled-opacity': .25
 ) !default;
 
@@ -135,8 +200,8 @@ $btn-theme-square-keys: () !default;
 $btn-theme-square-keys: map-merge(
     (
         'default': $btn-theme-square-default,
-        'light': $btn-theme-light,
-        'lighter': $btn-theme-lighter,
+        'light': $btn-theme-square-light,
+        'lighter': $btn-theme-square-lighter
     ),
     $btn-theme-square-keys
 );

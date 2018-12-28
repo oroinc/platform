@@ -25,7 +25,6 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\AccessDenied;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Comparison;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\CompositeExpression;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Exists;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\ExpressionInterface;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\NullComparison;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Subquery;

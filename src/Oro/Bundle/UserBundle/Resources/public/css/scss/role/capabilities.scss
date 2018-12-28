@@ -7,7 +7,7 @@
     border-bottom: 1px solid $role-capability-color;
 
     &:last-child {
-        padding-bottom: 0;
+        padding-bottom: $role-capability-bottom-offset;
 
         border-bottom: none;
     }
@@ -25,10 +25,6 @@
         display: inline-block;
         width: $role-capability-item-width;
         padding: $role-capability-item-offset;
-
-        label {
-            margin-bottom: 0; // reset global styles
-        }
     }
 
     &__item-label {

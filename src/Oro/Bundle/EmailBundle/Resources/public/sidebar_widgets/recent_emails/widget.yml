@@ -1,4 +1,4 @@
-title:     "Recent emails"
+title: oro.email.recent_emails_widget.title
 iconClass: "mail-icon"
 dialogIcon: "bundles/oroemail/sidebar_widgets/recent_emails/img/recent_emails.png"
 module:    "oroemail/sidebar_widgets/recent_emails/js/widget"

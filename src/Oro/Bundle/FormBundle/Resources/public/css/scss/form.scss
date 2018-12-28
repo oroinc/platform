@@ -114,33 +114,41 @@
         width: $entities-list-group-item-width;
         flex-shrink: 0;
 
-        .remove-btn {
-            [class^="fa-"],
-            [class*=" fa-"] {
-                font-size: $entities-list-group-item-close-button-size;
-            }
+        &__header {
+            display: flex;
+            margin-bottom: $entities-list-group-item-header-offset-bottom;
+            padding-#{$end}: $entities-list-group-item-header-inner-offset-end;
         }
-    }
 
-    .list-group-item h4 {
-        margin: $entities-list-group-item-h-offset;
-        font-size: $base-font-size;
-        font-weight: 700;
-    }
+        &__title {
+            margin: $entities-list-group-item-title-offset;
+            font-size: $entities-list-group-item-title-font-size;
+            font-weight: $entities-list-group-item-title-font-weight;
+            align-self: $entities-list-group-item-title-align-self;
+            overflow: $entities-list-group-item-title-overflow;
+            flex-shrink: 1;
+        }
 
-    .default-selector {
-        margin-#{$end}: $entities-list-group-default-selector-offset-end;
-    }
+        &__link {
+            display: block;
+            overflow: $entities-list-group-item-link-overflow;
+            text-overflow: $entities-list-group-item-link-text-overflow;
+        }
 
-    .checkbox-view {
-        margin-#{$end}: $entities-list-group-checkbox-view-offset-end;
-    }
+        &__default {
+            margin-#{$end}: $entities-list-group-default-offset-end;
+            flex-shrink: 0;
+        }
 
-    .remove-btn {
-        color: $entities-list-group-item-remove-btn-color;
-        position: $entities-list-group-item-remove-btn-position;
-        top: $entities-list-group-item-remove-btn-top;
-        #{$end}: $entities-list-group-item-remove-btn-end;
+        &__extra-info {
+            line-height: $entities-list-item-extra-info-line-height;
+        }
+
+        .remove-btn {
+            position: $entities-list-group-item-remove-btn-position;
+            top: $entities-list-group-item-remove-btn-top;
+            #{$end}: $entities-list-group-item-remove-btn-end;
+        }
     }
 }
 
@@ -154,11 +162,22 @@
         td {
             padding-top: $controls-list-group-inner-offset-top;
             padding-bottom: $controls-list-group-inner-offset-bottom;
-            vertical-align: $controls-list-group-vertical-align;
 
             &:first-child,
             &.fallback-item-value {
-                padding-left: $controls-list-group-fallback-item-value-inner-offset-left;
+                padding-#{$start}: $controls-list-group-fallback-item-value-inner-offset-left;
+            }
+
+            &.float-holder-label {
+                padding: $controls-list-group-float-holder-label-inner-offset;
+
+                &:first-child {
+                    padding-#{$start}: 0;
+                }
+
+                &:last-child {
+                    padding-#{$end}: 0;
+                }
             }
 
             label {
@@ -180,7 +199,7 @@
         .collapse-action {
             color: $control-group-collapsible-collapse-action-color;
             font-size: $control-group-collapsible-collapse-action-font-size;
-            font-family: $control-group-collapsible-collapse-action-font-family, Arial, sans-serif;
+            font-family: $control-group-collapsible-collapse-action-font-family;
             font-weight: $control-group-collapsible-collapse-action-font-weight;
 
             &:before {
@@ -266,10 +285,18 @@
     margin-top: $section-content-offset-top;
     padding-top: $section-content-inner-offset-top;
     padding-bottom: $section-content-inner-offset-bottom;
+
+    .row-fluid {
+        margin: $row-fluid-inner-offset;
+
+        .row-fluid {
+            margin: 0;
+        }
+    }
 }
 
 .responsive-form-inner {
     .float-holder {
-        margin-right: 4px;
+        margin-#{$end}: ($content-padding-small / 2);
     }
 }

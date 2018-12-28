@@ -5,6 +5,8 @@
     max-width: 100%;
     padding: 0 $badge-padding-x;
     font-size: $base-font-size--s;
+    font-weight: normal;
+    line-height: 1.2;
     border-radius: $border-radius;
 
     &-large {

@@ -86,4 +86,12 @@ class CurrencyExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals('oro_currency', $this->extension->getName());
     }
+
+    public function testGetSymbolCollection()
+    {
+        $this->assertEquals(
+            ['USD' => ['symbol' => '$'], 'EUR' => ['symbol' => '€']],
+            self::callTwigFunction($this->extension, 'oro_currency_symbol_collection', [])
+        );
+    }
 }

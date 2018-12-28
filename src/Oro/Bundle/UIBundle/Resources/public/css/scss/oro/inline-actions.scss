@@ -1,9 +1,10 @@
 /* @theme: admin.oro; */
 
 .inline-actions-element {
-    display: inline-block;
-    margin: (-$content-padding-small / 2) (-$content-padding-small);
-    padding: ($content-padding-small / 2) $content-padding-small;
+    display: inline-flex;
+    align-items: flex-start;
+    margin: (-$content-padding-small / 2 - 2px) (-$content-padding-small / 2) (-$content-padding-small / 2);
+    padding: ($content-padding-small / 2) ($content-padding-small / 2);
 
     transition: $hover-transition;
 
@@ -41,7 +42,8 @@
     display: inline-flex;
     align-items: center;
     vertical-align: top;
-    margin: 0 2px;
+    min-height: 20px;
+    line-height: 1.15;
 
     .btn {
         font: 0/0 a;
@@ -79,6 +81,12 @@
             &.hide-text {
                 @include hide-text();
             }
+        }
+    }
+
+    .attribute-item & {
+        .inline-actions-btn {
+            line-height: 1;
         }
     }
 }

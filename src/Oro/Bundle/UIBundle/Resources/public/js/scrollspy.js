@@ -19,6 +19,15 @@ define(function(require) {
 
         $container.find('[data-spy="scroll"]').each(function() {
             var $spy = $(this);
+
+            if (tools.isDesktop()) {
+                $spy.find('.responsive-section:last').each(function() {
+                    var $section = $(this);
+                    var titleHeight = $section.find('.scrollspy-title:visible').outerHeight();
+                    $section.css('min-height', 'calc(100% + ' + (titleHeight || 0) + 'px)');
+                });
+            }
+
             $spy.scrollspy($spy.data());
         });
     };
@@ -120,19 +129,6 @@ define(function(require) {
 
         $('[data-spy="scroll"]').each(function() {
             var $spy = $(this);
-            var spyHeight = $spy.innerHeight();
-            var isMultipleRows = $spy.find('.responsive-section').length > 1;
-
-            $spy.find('.responsive-section:last').each(function() {
-                var $row = $(this);
-                var titleHeight = $row.find('.scrollspy-title').outerHeight();
-                var rowAdjHeight = isMultipleRows ? titleHeight + spyHeight : spyHeight;
-                var naturalHeight = $row.height('auto').height();
-
-                if (rowAdjHeight > naturalHeight) {
-                    $row.outerHeight(rowAdjHeight);
-                }
-            });
 
             if ($spy.data('bs.scrollspy')) {
                 $spy.scrollspy('refresh').scrollspy('_process');

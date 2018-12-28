@@ -201,6 +201,17 @@ oro:
             label:                   Roles
             description:             The roles assigned to the user.
         datagrid:
+            user:
+                columns:
+                    enabled: Enabled
+                    disabled: Disabled
+                filters:
+                    enabled: Enabled
+                    disabled: Disabled
+            role_permission:
+                columns:
+                    label: 'Entity'
+                    permissions.label: 'Permissions'
             views:
                 active: Active Users
                 cannot_login: Cannot login

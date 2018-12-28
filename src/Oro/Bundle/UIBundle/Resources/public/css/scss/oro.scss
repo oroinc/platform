@@ -77,12 +77,6 @@ footer {
     }
 }
 
-.extra-list .extra-list-element {
-    vertical-align: top;
-    line-height: 1.2em;
-    padding-bottom: 5px;
-}
-
 .oro_translations {
     .nav-tabs {
         > li {
@@ -306,21 +300,6 @@ footer {
     line-height: 0;
 }
 
-label.required,
-.form-horizontal label.required {
-    position: relative;
-}
-
-label.required em,
-.form-horizontal label.required em {
-    color: $danger-dark;
-    font-size: 21px;
-    font-style: normal;
-    margin-#{$start}: 3px;
-    position: absolute;
-    top: 0;
-}
-
 .mce-tinymce {
     width: $field-width;
 
@@ -336,15 +315,10 @@ textarea {
     vertical-align: top;
 }
 
-.oro-clearfix-width:after,
 .oro-clearfix:after {
     content: '';
     display: block;
     clear: both;
-}
-
-.oro-clearfix-width {
-    height: 1%;
 }
 
 .oro-clearfix {
@@ -448,22 +422,17 @@ textarea {
     @include clearfix();
 
     &.row-fluid-divider {
-        background: url(../../img/vertical-separator.png) repeat-y 50% 0;
+        background: linear-gradient($additional-ultra-light, $additional-ultra-light) repeat-y 50% 0;
+        background-size: 1px 100%;
     }
 }
 
-/* fix incorrect aligment of fluid divider line in Firefox */
-@-moz-document url-prefix() {
-    .row-fluid.row-fluid-divider {
-        background-position: calc(50% - 1px) 0;
-    }
-}
-
-h5.user-fieldset {
+.user-fieldset {
     font-weight: $content-title-font-weight;
     font-size: $content-title-font-size;
     line-height: $content-title-line-height;
-    margin: side-values(0 0 16px);
+    padding-bottom: $content-title-inner-offset-bottom;
+    margin: side-values(0 0 $content-padding-medium);
     text-align: $start;
 }
 
@@ -471,6 +440,7 @@ h5.user-fieldset {
     font-weight: $content-title-font-weight;
     font-size: $content-title-font-size;
     line-height: $content-title-line-height;
+    padding-bottom: $content-title-inner-offset-bottom;
     display: block;
 }
 
@@ -501,7 +471,7 @@ h5.user-fieldset {
 
 .oro-multiselect-holder .selector {
     display: inline-block;
-    width: auto;
+    width: 122px;
     overflow: hidden;
     vertical-align: middle;
 }
@@ -564,6 +534,12 @@ label.radio.error {
     margin-bottom: 0;
 }
 
+.grid {
+    & + .add-list-item {
+        margin-top: $content-padding-medium;
+    }
+}
+
 .add-list-item {
     i.fa-plus {
         font-size: 12px;
@@ -583,13 +559,13 @@ label.radio.error {
     }
 
     .row-oro.oro-multiselect-holder {
-        margin: 0 0 8px;
+        margin: 0 0 $content-padding-medium;
     }
 
     .enum-value-collection & {
         .row-oro {
             &.oro-multiselect-holder {
-                margin: 0 0 10px;
+                margin: 0 0 $content-padding-small;
             }
         }
 
@@ -606,11 +582,11 @@ label.radio.error {
     }
 }
 
-.oro-address-collection.oro-item-collection {
+.collection-fields-list-bg.oro-item-collection {
     & > div {
         position: relative;
-        padding: 16px 0;
-        margin: 0 0 20px;
+        padding: $content-padding-medium 0;
+        margin: 0 0 $content-padding-medium;
         border: 1px solid $primary-860;
         background: $primary-900;
         border-radius: 4px;
@@ -641,10 +617,9 @@ label.radio.error {
     }
 
     .box-content {
-        padding: 20px 15px;
-
         &.box-split-content {
-            background: url(../../img/vertical-separator.png) repeat-y center 0;
+            background: linear-gradient($additional-ultra-light, $additional-ultra-light) repeat-y 50% 0;
+            background-size: 1px 100%;
 
             .responsive-small &,
             .responsive-big & {

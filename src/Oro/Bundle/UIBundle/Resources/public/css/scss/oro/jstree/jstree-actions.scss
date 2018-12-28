@@ -4,10 +4,12 @@
     display: $jstree-actions-display;
 
     &__handle {
-        padding: $jstree-actions-handle-offset;
         color: $jstree-actions-handle-color;
 
-        width: 16px;
+        &.btn {
+            padding: $jstree-actions-handle-offset;
+            width: 16px;
+        }
 
         &:hover {
             color: $jstree-actions-handle-hover-color;
@@ -19,6 +21,7 @@
 
         &--inline {
             margin: $jstree-actions-menu-inline-margin;
+            align-items: $jstree-actions-menu-inline-li-align-items;
             list-style: $jstree-actions-menu-inline-list-style;
 
             li {

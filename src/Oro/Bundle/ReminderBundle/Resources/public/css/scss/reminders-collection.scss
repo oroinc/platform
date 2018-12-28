@@ -1,40 +1,48 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/mixins/direction";
-
 .reminders-collection,
 .ui-dialog .form-horizontal .control-group .controls .reminders-collection {
     .inline-field {
         float: #{$start};
+        margin-#{$end}: $reminders-collection-inline-field-offset-end;
 
         &:not(:last-child) {
-            margin-#{$end}: 5px;
+            margin-#{$end}: $content-padding-small / 2;
+        }
+
+        .selector {
+            margin-#{$start}: 0;
         }
     }
 
     .validation-failed {
-        margin-#{$start}: -139px;
-        font-size: .8em;
+        width: $reminders-collection-validation-failed-width;
+        margin-#{$start}: $reminders-collection-validation-failed-offset-start;
+
+        text-align: #{$start};
     }
 
-    .inline-field .selector {
-        margin-left: 0;
-    }
-
-    input.number {
-        width: 50px;
+    .number {
+        width: $reminders-collection-number-width;
+        text-align: $reminders-collection-number-text-align;
     }
 
     select.unit {
-        width: 80px;
+        width: $reminders-collection-select-unit-width;
     }
 
     select.method {
-        width: 124px;
+        width: $reminders-collection-select-method-width;
     }
 
     .oro-multiselect-holder {
         padding-#{$end}: 32px;
+
+        &.row-oro {
+            width: $reminders-collection-oro-multiselect-holder-width;
+            margin-bottom: $reminders-collection-oro-multiselect-holder-offset-bottom;
+            position: $reminders-collection-oro-multiselect-holder-position;
+        }
     }
 
     .removeRow {

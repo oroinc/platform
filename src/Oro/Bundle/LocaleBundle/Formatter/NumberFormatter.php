@@ -63,38 +63,56 @@ class NumberFormatter
      * Format currency, replace INTL currency symbol with configuration currency symbol
      *
      * @param float $value
-     * @param string $currency Currency code
+     * @param string $currencyCode Currency code
      * @param array $attributes Set of attributes of \NumberFormatter
      * @param array $textAttributes Set of text attributes of \NumberFormatter
      * @param array $symbols Set of symbols of \NumberFormatter
      * @param string|null $locale Locale of formatting
+     *
      * @return string
      */
     public function formatCurrency(
         $value,
-        $currency = null,
-        array $attributes = array(),
-        array $textAttributes = array(),
-        array $symbols = array(),
+        $currencyCode = null,
+        array $attributes = [],
+        array $textAttributes = [],
+        array $symbols = [],
         $locale = null
     ) {
-        if (!$currency) {
-            $currency = $this->localeSettings->getCurrency();
+        if (!$currencyCode) {
+            $currencyCode = $this->localeSettings->getCurrency();
         }
 
-        $formatter = $this->getFormatter($locale, \NumberFormatter::CURRENCY, $attributes, $textAttributes, $symbols);
+        if (!$locale) {
+            $locale = $this->localeSettings->getLocale();
+        }
 
-        $currencySymbol = $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
-        $currencyIntlSymbol = $formatter->getSymbol(\NumberFormatter::INTL_CURRENCY_SYMBOL);
-        $localizedCurrencySymbol = $this->localeSettings->getCurrencySymbolByCurrency($currency);
-
-        $formattedString = $formatter->formatCurrency($value, $currency);
-
-        return str_replace(
-            array($currency, $currencySymbol, $currencyIntlSymbol),
-            $localizedCurrencySymbol,
-            $formattedString
+        $formatter = $this->getFormatter(
+            $locale . '@currency=' . $currencyCode,
+            \NumberFormatter::CURRENCY,
+            $attributes,
+            $textAttributes,
+            $symbols
         );
+
+        $formattedString = $formatter->formatCurrency($value, $currencyCode);
+        $fromCurrencySymbol = $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
+        $toCurrencySymbol = $this->localeSettings->getCurrencySymbolByCurrency($currencyCode, $locale);
+
+        if ($toCurrencySymbol === $currencyCode) {
+            // Adds a space after currency if it is an ISO code.
+            $toCurrencySymbol .= ' ';
+
+            // 1) replaces currency symbol with one provided by LocaleSettings;
+            // 2) excludes the case with space duplication when space is already there.
+            $formattedString = trim(str_replace(
+                [$fromCurrencySymbol, '  '],
+                [$toCurrencySymbol, ' '],
+                $formattedString
+            ), ' ');
+        }
+
+        return $formattedString;
     }
 
     /**
