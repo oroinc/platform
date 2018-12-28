@@ -520,6 +520,25 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Then /^I should see that option "([^"]*)" is selected in "([^"]*)" select$/
+     * @param string $label
+     * @param string $field
+     */
+    public function iShouldSeeThatOptionIsSelected($label, $field)
+    {
+        $selectedOptionText = $this->getSelectedOptionText($field);
+        self::assertContains(
+            $label,
+            $selectedOptionText,
+            sprintf(
+                'Selected option with label "%s" doesn\'t contain text "%s" !',
+                $selectedOptionText,
+                $label
+            )
+        );
+    }
+
+    /**
      * @Then /^I should not see "([^"]*)" for "([^"]*)" select$/
      * @param string $label
      * @param string $field
@@ -570,6 +589,31 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         return array_map(function (NodeElement $option) {
             return $option->getText();
         }, $options);
+    }
+
+    /**
+     * @param $selectField
+     * @return string
+     * @throws ElementNotFoundException
+     */
+    protected function getSelectedOptionText($selectField)
+    {
+        /** @var Select $element */
+        $element = $this->createElement($selectField);
+        /** @var NodeElement[] $options */
+        $option = $element->find('css', 'option[selected]');
+
+        if (null === $option) {
+            $driver = $this->getSession()->getDriver();
+            throw new ElementNotFoundException(
+                $driver,
+                'select option',
+                'css',
+                'option[selected]'
+            );
+        }
+
+        return $option->getText();
     }
 
     /**.
