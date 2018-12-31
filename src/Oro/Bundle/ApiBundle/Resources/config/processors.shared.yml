@@ -726,15 +726,15 @@ services:
     oro_api.remove_info_records_for_entity:
         class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveInfoRecordsForSingleItem
         tags:
-            - { name: oro.api.processor, action: get, group: load_data, requestType: rest&json_api, hateoas: true, priority: -200 }
-            - { name: oro.api.processor, action: get_subresource, group: load_data, collection: false, requestType: rest&json_api, hateoas: true, priority: -200 }
+            - { name: oro.api.processor, action: get, group: load_data, hateoas: true, priority: -200 }
+            - { name: oro.api.processor, action: get_subresource, group: load_data, collection: false, hateoas: true, priority: -200 }
 
     oro_api.remove_info_records_for_entities:
         class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveInfoRecordsForCollection
         tags:
-            - { name: oro.api.processor, action: get_list, group: load_data, requestType: rest&json_api, hateoas: true, priority: -200 }
-            - { name: oro.api.processor, action: get_subresource, group: load_data, collection: true, requestType: rest&json_api, hateoas: true, priority: -200 }
-            - { name: oro.api.processor, action: get_relationship, group: load_data, collection: true, requestType: rest&json_api, hateoas: true, priority: -200 }
+            - { name: oro.api.processor, action: get_list, group: load_data, hateoas: true, priority: -200 }
+            - { name: oro.api.processor, action: get_subresource, group: load_data, collection: true, hateoas: true, priority: -200 }
+            - { name: oro.api.processor, action: get_relationship, group: load_data, collection: true, hateoas: true, priority: -200 }
 
     oro_api.add_page_number_to_info_record:
         class: Oro\Bundle\ApiBundle\Processor\Shared\AddPageNumberToInfoRecord

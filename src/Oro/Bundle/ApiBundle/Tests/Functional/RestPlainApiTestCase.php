@@ -76,7 +76,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
         $content = self::jsonToArray($response->getContent());
         $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
 
-        self::assertArrayContains($expectedContent, $content);
+        self::assertThat($content, new RestPlainDocContainsConstraint($expectedContent, false));
     }
 
     /**

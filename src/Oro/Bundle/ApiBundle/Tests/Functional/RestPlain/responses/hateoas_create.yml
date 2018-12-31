@@ -1,0 +1,18 @@
+id: new
+name: 'Entity 1 (1)'
+biM2O: '<(@entity2_1->id)>'
+biM2M: ['<(@entity2_1->id)>', '<(@entity2_2->id)>']
+default_biM2M: '<(@entity2_1->id)>'
+biM2MnD: ['<(@entity2_1->id)>', '<(@entity2_2->id)>']
+biO2M: ['<(@entity2_1->id)>', '<(@entity2_2->id)>']
+default_biO2M: '<(@entity2_1->id)>'
+biO2MnD: ['<(@entity2_1->id)>', '<(@entity2_2->id)>']
+uniM2O: '<(@entity2_1->id)>'
+uniM2M: ['<(@entity2_1->id)>', '<(@entity2_2->id)>']
+default_uniM2M: '<(@entity2_1->id)>'
+uniM2MnD: ['<(@entity2_1->id)>', '<(@entity2_2->id)>']
+uniO2M: ['<(@entity2_1->id)>', '<(@entity2_2->id)>']
+default_uniO2M: '<(@entity2_1->id)>'
+uniO2MnD: ['<(@entity2_1->id)>', '<(@entity2_2->id)>']
+enumField: '<(@enum1_1->id)>'
+multiEnumField: ['<(@enum2_1->id)>', '<(@enum2_2->id)>']
