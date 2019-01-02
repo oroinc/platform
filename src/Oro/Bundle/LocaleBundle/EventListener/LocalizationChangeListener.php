@@ -9,81 +9,60 @@ use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigValueRepository;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 
 /**
- * Set default (global value) localization values for users, organizations and websites on ConfigUpdateEvent
- * Remove all custom localization settings for users, organizations and websites
+ * Set default (global value) localization values for available scopes on ConfigUpdateEvent
+ * Remove all custom localization settings for available scopes
  */
 class LocalizationChangeListener
 {
-    private const SCOPE_KEY = 'scope';
-    private const MANAGER_KEY = 'manager';
+    /** @var ConfigManager */
+    private $configManager;
 
     /** @var ManagerRegistry */
     private $managerRegistry;
 
-    /** @var array */
-    private $configManagers;
-
     /**
+     * @param ConfigManager $configManager
      * @param ManagerRegistry $managerRegistry
      */
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(ConfigManager $configManager, ManagerRegistry $managerRegistry)
     {
+        $this->configManager = $configManager;
         $this->managerRegistry = $managerRegistry;
-        $this->configManagers = [];
     }
 
     /**
      * @param ConfigUpdateEvent $event
      */
-    public function onConfigUpdate(ConfigUpdateEvent $event)
+    public function onConfigUpdate(ConfigUpdateEvent $event): void
     {
-        if (!$event->isChanged('oro_locale.default_localization') || 'global' !== $event->getScope()) {
+        if (!$event->isChanged('oro_locale.enabled_localizations') || 'global' !== $event->getScope()) {
             return;
         }
 
-        /** @var ConfigValueRepository $repository */
-        $repository = $this->managerRegistry->getManagerForClass(ConfigValue::class)->getRepository(ConfigValue::class);
-
-        $configManagers = $this->getAvailableConfigManagers();
-
-        foreach ($configManagers as $configManager) {
-            $values = $repository->getConfigValues(
-                $configManager->getScopeEntityName(),
+        $values = $this->getRepository()
+            ->getConfigValues(
+                $this->configManager->getScopeEntityName(),
                 'oro_locale',
                 'default_localization'
             );
 
-            foreach ($values as $value) {
-                $configManager->reset('oro_locale.default_localization', $value->getConfig()->getRecordId());
-                $configManager->flush($value->getConfig()->getRecordId());
+        $availableLocalizations = $event->getNewValue('oro_locale.enabled_localizations');
+        foreach ($values as $value) {
+            if (!in_array($value->getValue(), $availableLocalizations, true)) {
+                $recordId = $value->getConfig()->getRecordId();
+
+                $this->configManager->reset('oro_locale.default_localization', $recordId);
+                $this->configManager->flush($recordId);
             }
         }
     }
 
     /**
-     * @param string $scope
-     * @param ConfigManager $manager
+     * @return ConfigValueRepository
      */
-    public function addConfigManager($scope, ConfigManager $manager)
+    private function getRepository(): ConfigValueRepository
     {
-        $this->configManagers[] = [self::SCOPE_KEY => $scope, self::MANAGER_KEY => $manager];
-    }
-
-    /**
-     * Return array of available config managers without duplicates and exclude global manager
-     *
-     * @return array
-     */
-    public function getAvailableConfigManagers(): array
-    {
-        $configManagers = [];
-
-        foreach ($this->configManagers as $configManager) {
-            if ($configManager[self::SCOPE_KEY] !== 'global') {
-                $configManagers[$configManager[self::SCOPE_KEY]] = $configManager[self::MANAGER_KEY];
-            }
-        }
-
-        return $configManagers;
+        return $this->managerRegistry->getManagerForClass(ConfigValue::class)
+            ->getRepository(ConfigValue::class);
     }
 }

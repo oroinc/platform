@@ -369,6 +369,7 @@ services:
     oro_locale_config.event_listener.localization_change:
         class: 'Oro\Bundle\LocaleBundle\EventListener\LocalizationChangeListener'
         arguments:
+            - '@oro_config.user'
             - '@doctrine'
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }

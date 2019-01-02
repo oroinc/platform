@@ -6,7 +6,6 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\AddDateTimeFormatConver
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\CurrentLocalizationPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\PreferredLanguageProviderPass;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\ScopeConfigurationPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\OroLocaleBundle;
@@ -18,10 +17,8 @@ class OroLocaleBundleTest extends \PHPUnit\Framework\TestCase
     {
         $container = new ContainerBuilder();
 
-        $kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
-
         $passesBeforeBuild = $container->getCompiler()->getPassConfig()->getBeforeOptimizationPasses();
-        $bundle = new OroLocaleBundle($kernel);
+        $bundle = new OroLocaleBundle();
         $bundle->build($container);
 
         $passes = $container->getCompiler()->getPassConfig()->getBeforeOptimizationPasses();
@@ -31,13 +28,12 @@ class OroLocaleBundleTest extends \PHPUnit\Framework\TestCase
         }));
 
         $this->assertInternalType('array', $passes);
-        $this->assertCount(6, $passes);
+        $this->assertCount(5, $passes);
         $this->assertInstanceOf(AddDateTimeFormatConverterCompilerPass::class, $passes[0]);
         $this->assertInstanceOf(TwigSandboxConfigurationPass::class, $passes[1]);
         $this->assertInstanceOf(CurrentLocalizationPass::class, $passes[2]);
-        $this->assertInstanceOf(ScopeConfigurationPass::class, $passes[3]);
-        $this->assertInstanceOf(DefaultFallbackExtensionPass::class, $passes[4]);
-        $this->assertInstanceOf(PreferredLanguageProviderPass::class, $passes[5]);
+        $this->assertInstanceOf(DefaultFallbackExtensionPass::class, $passes[3]);
+        $this->assertInstanceOf(PreferredLanguageProviderPass::class, $passes[4]);
         $this->assertAttributeEquals(
             [
                 Localization::class => [
@@ -45,7 +41,7 @@ class OroLocaleBundleTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             'classes',
-            $passes[4]
+            $passes[3]
         );
     }
 }
