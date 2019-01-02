@@ -85,8 +85,8 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
                         [
                             'name' => 'field1',
                             'options' => [
-                                EntityExclusionStructureOptionsListener::OPTION_NAME => true,
-                            ],
+                                'exclude' => true
+                            ]
                         ]
                     )
                 ]
@@ -149,9 +149,9 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
                         [
                             'name' => 'field1',
                             'options' => [
-                                EntityExclusionStructureOptionsListener::OPTION_NAME => true,
+                                'exclude' => true
                             ],
-                            'related_entity_name' => \stdClass::class,
+                            'related_entity_name' => \stdClass::class
                         ]
                     )
                 ]
@@ -164,24 +164,6 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
         $this->listener->onOptionsRequest($event);
 
         $this->assertEquals([$expectedEntityStructure], $event->getData());
-    }
-
-    public function testOnOptionsRequestUnsupported()
-    {
-        $this->managerRegistry
-            ->expects($this->never())
-            ->method($this->anything());
-
-        $this->exclusionProvider
-            ->expects($this->never())
-            ->method($this->anything());
-
-        $event = new EntityStructureOptionsEvent();
-        $event->setData([new \stdClass()]);
-
-        $this->listener->onOptionsRequest($event);
-
-        $this->assertEquals([new \stdClass()], $event->getData());
     }
 
     public function testOnOptionsRequestClassExcluded()
@@ -209,7 +191,7 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
             [
                 'className' => Item::class,
                 'options' => [
-                    EntityExclusionStructureOptionsListener::OPTION_NAME => true,
+                    'exclude' => true
                 ],
                 'fields' => [
                     $this->getEntity(
@@ -389,8 +371,8 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
                         [
                             'name' => $fieldName,
                             'options' => [
-                                EntityExclusionStructureOptionsListener::OPTION_NAME => true,
-                            ],
+                                'exclude' => true
+                            ]
                         ]
                     )
                 ]

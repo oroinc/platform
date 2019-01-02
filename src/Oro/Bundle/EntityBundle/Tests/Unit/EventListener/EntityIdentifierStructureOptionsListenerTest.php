@@ -70,8 +70,8 @@ class EntityIdentifierStructureOptionsListenerTest extends \PHPUnit\Framework\Te
                         [
                             'name' => 'field1',
                             'options' => [
-                                EntityIdentifierStructureOptionsListener::OPTION_NAME => true,
-                            ],
+                                'identifier' => true
+                            ]
                         ]
                     )
                 ]
@@ -84,19 +84,6 @@ class EntityIdentifierStructureOptionsListenerTest extends \PHPUnit\Framework\Te
         $this->listener->onOptionsRequest($event);
 
         $this->assertEquals([$expectedEntityStructure], $event->getData());
-    }
-
-    public function testOnOptionsRequestUnsupported()
-    {
-        $this->managerRegistry->expects($this->never())
-            ->method($this->anything());
-
-        $event = new EntityStructureOptionsEvent();
-        $event->setData([new \stdClass()]);
-
-        $this->listener->onOptionsRequest($event);
-
-        $this->assertEquals([new \stdClass()], $event->getData());
     }
 
     public function testOnOptionsRequestWithoutObjectManager()
