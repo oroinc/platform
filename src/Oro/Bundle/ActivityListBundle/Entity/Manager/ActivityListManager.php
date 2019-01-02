@@ -203,12 +203,13 @@ class ActivityListManager
     private function loadListDataIds(QueryBuilder $qb, $entityClass, $entityId, $filter, $pageFilter, $pageSize)
     {
         $orderBy = $this->config->get('oro_activity_list.sorting_field');
+        $orderByField = QueryBuilderUtil::getField('activity', $orderBy);
         $grouping = $this->config->get('oro_activity_list.grouping');
 
         $getIdsQb = clone $qb;
         $getIdsQb->setMaxResults($pageSize * self::ACTIVITY_LIST_PAGE_SIZE_MULTIPLIER);
         $getIdsQb->resetDQLParts(['select']);
-        $getIdsQb->addSelect('activity.id, activity.' . $orderBy);
+        $getIdsQb->addSelect(['activity.id', $orderByField]);
         if ($grouping) {
             $getIdsQb->addSelect('activity.relatedActivityClass, activity.relatedActivityId');
         }
@@ -236,11 +237,11 @@ class ActivityListManager
             $lastRow = $ids[$numberOfIds - 1];
             $offsetDate = $lastRow[$orderBy];
             if (null === $qb->getParameter('offsetDate')) {
-                $whereComparison = 'gt';
                 if (!$this->isAscendingOrderForListData($pageFilter)) {
-                    $whereComparison = 'lt';
+                    $qb->andWhere($qb->expr()->lt($orderByField, ':offsetDate'));
+                } else {
+                    $qb->andWhere($qb->expr()->gt($orderByField, ':offsetDate'));
                 }
-                $qb->andWhere($qb->expr()->{$whereComparison}('activity.' . $orderBy, ':offsetDate'));
             }
             $qb->setParameter('offsetDate', $offsetDate);
             $rows = $this->loadListDataIds(
@@ -368,13 +369,14 @@ class ActivityListManager
 
         if (!empty($pageFilter['date']) && !empty($pageFilter['ids'])) {
             $dateFilter = new \DateTime($pageFilter['date'], new \DateTimeZone('UTC'));
-            $whereComparison = 'gte';
             if (!$this->isAscendingOrderForListData($pageFilter)) {
-                $whereComparison = 'lte';
+                $qb->andWhere($qb->expr()->lte('activity.' . $orderBy, ':dateFilter'));
+            } else {
+                $qb->andWhere($qb->expr()->gte('activity.' . $orderBy, ':dateFilter'));
             }
 
             $qb->andWhere($qb->expr()->notIn('activity.id', implode(',', $pageFilter['ids'])));
-            $qb->andWhere($qb->expr()->{$whereComparison}('activity.' . $orderBy, ':dateFilter'));
+
             $qb->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
         }
 
@@ -583,13 +585,17 @@ class ActivityListManager
         $ids = $this->getGroupedActivityListIds($entity, $targetActivityClass, $targetActivityId);
         if (!empty($ids)) {
             $qb = $this->getRepository()->createQueryBuilder('activity');
+            $orderByField = QueryBuilderUtil::getField(
+                'activity',
+                $this->config->get('oro_activity_list.sorting_field')
+            );
+            $orderByDirection = QueryBuilderUtil::getSortOrder(
+                $this->config->get('oro_activity_list.sorting_direction')
+            );
             $qb = $qb
                 ->where($qb->expr()->in('activity.id', ':activitiesIds'))
                 ->setParameter('activitiesIds', $ids)
-                ->orderBy(
-                    'activity.' . $this->config->get('oro_activity_list.sorting_field'),
-                    $this->config->get('oro_activity_list.sorting_direction')
-                );
+                ->orderBy($orderByField, $orderByDirection);
             $activityLists = $qb->getQuery()->getResult();
         }
 

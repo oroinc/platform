@@ -21,3 +21,5 @@ trusted_data:
         Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter:
             getEntityAlias: true
             createRelatedActivityDql: true
+        Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager:
+            getActivityListAssociationName: true

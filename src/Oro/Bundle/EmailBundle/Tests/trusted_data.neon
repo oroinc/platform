@@ -40,3 +40,4 @@ trusted_data:
         Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory:
             getOwningExpression: true
             prepareSearchFilters: true
+            prepareSearchFiltersForQueryBuilder: true

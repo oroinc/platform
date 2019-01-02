@@ -157,7 +157,10 @@ class SegmentSnapshotRepository extends EntityRepository
                 ->orWhere(
                     $deleteQB->expr()->andX(
                         $deleteQB->expr()->in('snp.segment', ':segmentsIds'),
-                        $deleteQB->expr()->in('snp.' . $params['entityIdentifierField'], ':entityIds')
+                        $deleteQB->expr()->in(
+                            QueryBuilderUtil::getField('snp', $params['entityIdentifierField']),
+                            ':entityIds'
+                        )
                     )
                 )
                 ->setParameter('segmentsIds', $params['segmentIds'])

@@ -67,14 +67,12 @@ abstract class AbstractTranslationRepository extends TranslationRepository
                     $params[] = $value;
                 }
 
-                $connection->executeQuery(
-                    sprintf(
-                        'INSERT INTO %s (foreign_key, locale, object_class, field, content) VALUES %s',
-                        $tableName,
-                        implode(', ', array_fill(0, count($data), '(?, ?, ?, ?, ?)'))
-                    ),
-                    $params
+                $sql = sprintf(
+                    'INSERT INTO %s (foreign_key, locale, object_class, field, content) VALUES %s',
+                    $tableName,
+                    implode(', ', array_fill(0, count($data), '(?, ?, ?, ?, ?)'))
                 );
+                $connection->executeQuery($sql, $params);
             }
 
             $connection->commit();
