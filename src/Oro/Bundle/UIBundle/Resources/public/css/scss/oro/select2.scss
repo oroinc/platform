@@ -218,15 +218,21 @@
                     background: $select2-search-choice-background;
                     padding: side-values(
                         $select2-search-choice-inner-offset-vertical
-                        ($select2-search-choice-inner-offset-horizontal +
-                            $select2-search-multi-choice-close-width +
-                            $select2-search-multi-choice-close-right
-                        )
+                        $select2-search-choice-inner-offset-horizontal-unlocked
                         $select2-search-choice-inner-offset-vertical
                         $select2-search-choice-inner-offset-horizontal
                     );
                     border-radius: $select2-search-choice-border-radius;
                     margin: side-values(0 $select2-search-choice-offset $select2-search-choice-offset 0);
+                }
+
+                &.select2-locked {
+                    > div {
+                        padding: side-values(
+                            $select2-search-choice-inner-offset-vertical
+                            $select2-search-choice-inner-offset-horizontal
+                        );
+                    }
                 }
 
                 img {

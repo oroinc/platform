@@ -88,6 +88,7 @@ $select2-search-choice-color: $primary-400 !default;
 $select2-search-choice-border-radius: 2px !default;
 $select2-search-choice-inner-offset-vertical: 4px !default;
 $select2-search-choice-inner-offset-horizontal: 8px !default;
+$select2-search-choice-inner-offset-horizontal-unlocked: $content-padding !default;
 $select2-search-choice-offset: 3px !default;
 $select2-search-choice-position: relative !default;
 $select2-search-choice-box-sizing: border-box !default;
@@ -140,7 +141,7 @@ $select2-search-multi-choice-close-display: flex !default;
 $select2-search-multi-choice-close-align-items: center !default;
 $select2-search-multi-choice-close-width: 12px !default;
 $select2-search-multi-choice-close-height: 16px !default;
-$select2-search-multi-choice-close-right: 3px !default;
+$select2-search-multi-choice-close-right: $content-padding-small !default;
 $select2-search-multi-choice-close-top: 2px !default;
 
 $select2-search-choice-close-icon: "\f00d" !default;
