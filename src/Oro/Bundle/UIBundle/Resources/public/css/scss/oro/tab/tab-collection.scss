@@ -2,10 +2,17 @@
 
 .tab-collection {
     li {
-        > a:after {
-            visibility: hidden;
-            content: '*';
-            margin-left: 1px;
+        > a {
+            position: relative;
+
+            &:after {
+                position: absolute;
+                #{$end}: 10px;
+
+                visibility: hidden;
+
+                content: '*';
+            }
         }
 
         &.changed {
