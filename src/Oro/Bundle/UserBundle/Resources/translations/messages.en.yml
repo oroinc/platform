@@ -30,7 +30,6 @@ Login page: Login page
 "Business Unit": "Business Unit"
 "User": "User"
 "None": "None"
-"There is no active user with username or email address \"%username%\".": "There is no active user with username or email address \"%username%\"."
 "Username or Email": "Username or Email"
 "Return to Login": "Return to Login"
 "Request": "Request"
@@ -149,7 +148,12 @@ oro:
             description:                    The password that the user uses to log into the system. The password must conform to the system security policy.
             change_dialog.title:            Change password
             reset_dialog.title:             Reset password
-            reset_password.label:           Reset password
+            reset_password:
+                label: Reset password
+                title: Check Email
+                message: If there is a user account associated with %email% you will receive an email with a link to reset your password.
+                flash:
+                    success: Reset password email has been sent to user
             change_password.label:          Change password
             new_password.label:             New password
             enter_new_password.label:       New password
@@ -160,9 +164,6 @@ oro:
                 ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
                 popup.message: User {{ user }} will receive reset password by email.
                 popup.question: Are you sure you want to proceed?
-            reset_password:
-                flash:
-                    success: Reset password email has been sent to user
             force_reset:
                 popup.message: User {{ user }} will receive reset password by email and will be disabled from login.
                 popup.question: Are you sure you want to proceed?
