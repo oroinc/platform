@@ -122,7 +122,7 @@ class ConfigurationBuilder implements BuilderInterface
             $isAllowed = $isAllowed || $newMenuItem->getExtra('isAllowed');
         }
 
-        if ($menu->getExtra('isAllowed')) {
+        if ($menu->getExtra('isAllowed') && $menu->getDisplayChildren()) {
             $menu->setExtra('isAllowed', $isAllowed);
         }
     }
