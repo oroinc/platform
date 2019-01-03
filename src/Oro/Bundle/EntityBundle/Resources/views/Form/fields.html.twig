@@ -12,20 +12,20 @@
 {% endblock %}
 
 {% block oro_entity_fallback_value_widget %}
-    <table class="entity-fallback-container"
+    <div class="entity-fallback-container"
            data-page-component-module="oroui/js/app/components/view-component"
            data-page-component-options="{{ {view: 'oroentity/js/app/views/entity-field-fallback'}|json_encode }}"
     >
-        <tr>
-            <td>
-                {{ form_widget(form.scalarValue, {'attr': {'class': 'entity-field-value'}}) }}
-            </td>
-            <td nowrap="true" class="fallback-item-use-fallback">
-                {{ form_widget(form.useFallback, {'attr': {'class': 'use-fallback-checkbox'} }) }} {{ form.useFallback.vars.label|trans }}
-            </td>
-            <td class="fallback-item-fallback">
+        <div class="entity-fallback-container__value">
+            {{ form_widget(form.scalarValue, {'attr': {'class': 'entity-field-value'}}) }}
+        </div>
+        <div class="entity-fallback-container__line">
+            <div class="entity-fallback-container__use">
+                {{ form_widget(form.useFallback, {'attr': {'class': 'use-fallback-checkbox'} }) }}{{ form.useFallback.vars.label|trans }}
+            </div>
+            <div class="entity-fallback-container__fallback">
                 {{ form_widget(form.fallback, {'attr': {'class': 'fallback fallback-select'}}) }}
-            </td>
-        </tr>
-    </table>
+            </div>
+        </div>
+    </div>
 {% endblock %}

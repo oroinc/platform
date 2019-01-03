@@ -10,6 +10,8 @@
     }
 
     .accordion-toggle {
+        display: flex;
+        align-items: center;
         padding: $scrollspy-mobile-toggle-offset;
 
         border-radius: $scrollspy-mobile-border-radius;
@@ -26,7 +28,7 @@
         };
 
         &.collapsed {
-            @include fa-icon($fa-var-angle-right);
+            @include fa-icon(if-ltr($fa-var-angle-right, $fa-var-angle-left));
         }
     }
 }

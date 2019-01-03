@@ -1,0 +1,29 @@
+/* @theme: admin.oro; */
+
+@media only screen and (min-width: $small-landscape-devices-media-breakpoint) and (max-width: $tablet-devices-media-breakpoint) {
+    .entity-fallback-container {
+        display: flex;
+
+        &__value {
+            width: 100%;
+        }
+        &__line {
+            margin-top: 0;
+            margin-#{$start}: $content-padding;
+            min-width: 40%;
+        }
+
+        &__use {
+            padding-#{$end}: $content-padding;
+        }
+    }
+}
+
+@media only screen and (max-width: $small-landscape-devices-media-breakpoint) {
+    .entity-fallback-container {
+        &__line {
+            max-width: 100%;
+        }
+    }
+}
+

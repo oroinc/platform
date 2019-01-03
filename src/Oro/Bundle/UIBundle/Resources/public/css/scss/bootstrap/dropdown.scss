@@ -154,7 +154,10 @@
         margin-#{$end}: $dropdown-item-icon-fa-offset;
 
         text-align: center;
-        font-size: $dropdown-item-icon-fa-font-size;
         line-height: 1;
+
+        &:before {
+            font-size: $dropdown-item-icon-fa-font-size;
+        }
     }
 }
