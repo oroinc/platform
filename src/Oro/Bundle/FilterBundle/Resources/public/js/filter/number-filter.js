@@ -169,7 +169,6 @@ define(function(require) {
          */
         _writeDOMValue: function(data) {
             this._initInputWidget();
-            this.$el.find('select').inputWidget('refresh');
 
             return NumberFilter.__super__._writeDOMValue.apply(this, arguments);
         },
