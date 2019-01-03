@@ -30,7 +30,7 @@
             }
 
             .select2-arrow {
-                right: $mobile-select2-allowclear-right;
+                #{$end}: $mobile-select2-allowclear-right;
             }
         }
 
@@ -38,7 +38,7 @@
             height: $mobile-select2-search-choice-close-height;
             width: $mobile-select2-search-choice-close-width;
             top: $mobile-select2-search-choice-close-top;
-            right: $mobile-select2-search-choice-close-right;
+            #{$end}: $mobile-select2-search-choice-close-right;
 
             color: $mobile-select2-search-choice-close-color;
             text-align: $mobile-select2-search-choice-close-text-align;

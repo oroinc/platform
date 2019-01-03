@@ -229,10 +229,6 @@
                     margin: side-values(0 $select2-search-choice-offset $select2-search-choice-offset 0);
                 }
 
-                &.select2-locked {
-                    padding: $select2-search-choice-select2-locked-inner-offset;
-                }
-
                 img {
                     margin-top: $select2-search-choice-img-offset-top;
                     margin-bottom: $select2-search-choice-img-offset-bottom;

@@ -1,3 +1,6 @@
 /* @theme: admin.oro; */
 
-@import "./variables/entity-fallback";
+@import "oroui/css/scss/variables";
+@import "oroui/css/scss/oro/variables/form-variables";
+
+@import "variables/entity-fallback";

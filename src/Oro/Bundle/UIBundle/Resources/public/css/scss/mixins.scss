@@ -325,5 +325,9 @@ $enable-safe-area: true;
         > span {
             width: 100%;
         }
+
+        select {
+            width: $width;
+        }
     }
 }

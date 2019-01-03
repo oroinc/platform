@@ -267,13 +267,7 @@ define(function(require) {
          * @protected
          */
         _initializeSelectWidget: function() {
-            var position = {
-                my: 'left top',
-                at: 'left bottom',
-                of: this.$el,
-                collision: 'fit none',
-                within: this._findDropdownFitContainer(this.dropdownContainer) || this.dropdownContainer
-            };
+            var position = this._getSelectWidgetPosition();
 
             this.selectWidget = new this.MultiselectDecorator({
                 element: this.$(this.inputSelector),
@@ -325,6 +319,22 @@ define(function(require) {
                     this._onClickFilterArea(e);
                 }
             }, this));
+        },
+
+        /**
+         * Get position to multiselect widget
+         *
+         * @returns {{my: string, at: string, of: *, collision: string, within: (*|null)}}
+         * @private
+         */
+        _getSelectWidgetPosition: function() {
+            return {
+                my: 'left top+8',
+                at: 'left bottom',
+                of: this.$el,
+                collision: 'fit none',
+                within: this._findDropdownFitContainer(this.dropdownContainer) || this.dropdownContainer
+            };
         },
 
         /**

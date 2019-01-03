@@ -1,4 +1,3 @@
-assets:
-    css:
-        inputs:
-            - 'bundles/orocomment/css/scss/main.scss'
+css:
+    inputs:
+        - 'bundles/orocomment/css/scss/main.scss'

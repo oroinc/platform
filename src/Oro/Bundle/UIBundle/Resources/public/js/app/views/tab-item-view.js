@@ -26,9 +26,7 @@ define(function(require) {
             'data-toggle="tab" ' +
             'aria-controls="<% if(obj.controlTabPanel) { %><%- controlTabPanel %><% } else { %><%- id %><% } %>" ' +
             'aria-selected="<% if(obj.active) { %>true<% } else { %>false<% } %>"' +
-            '>' +
-            '    <%- label %>' +
-            '</a>'),
+            '><%- label %></a>'),
 
         listen: {
             'change:active model': 'updateStates',
