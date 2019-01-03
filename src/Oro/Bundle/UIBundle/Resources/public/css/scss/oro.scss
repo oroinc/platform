@@ -462,6 +462,8 @@ textarea {
 
 .alert-error > ul {
     margin-bottom: 0;
+
+    @include list-unstyled();
 }
 
 .oro-multiselect {

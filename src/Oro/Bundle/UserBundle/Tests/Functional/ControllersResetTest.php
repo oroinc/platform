@@ -67,7 +67,7 @@ class ControllersResetTest extends WebTestCase
         );
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('An email has been sent to', $result->getContent());
+        $this->assertContains('If there is a user account associated with', $result->getContent());
 
         /** @var User $user */
         $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->findOneBy(
