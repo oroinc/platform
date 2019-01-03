@@ -17,7 +17,7 @@ use Symfony\Component\Process\Process;
 /**
  * Run bin/webpack to build assets.
  */
-class OroAssetBuildCommand extends Command
+class OroAssetsBuildCommand extends Command
 {
     protected static $defaultName = 'oro:assets:build';
 
@@ -77,18 +77,28 @@ class OroAssetBuildCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Run bin/webpack to build assets')
+            ->setDescription(
+                <<<DESCRIPTION
+The command runs webpack to build assets.
+
+In <comment>dev</comment> environment command builds assets without minification and with source-maps. 
+In <comment>prod</comment> environment assets are minified and do not include source-maps.
+ 
+<info>Note:</info> When using the <comment>watch</comment> mode after changing the assets configuration at 
+<comment>assets.yml</comment> files, it is required to restart the command, otherwise it will not detect the changes. 
+DESCRIPTION
+            )
             ->addArgument(
                 'theme',
                 InputArgument::OPTIONAL,
-                'Theme name to build. When not provided - all available themes will be built.'
+                'Theme name to build. When not provided, all available themes are built.'
             )
             ->addOption(
                 'watch',
                 'w',
                 InputOption::VALUE_NONE,
                 'Turn on watch mode. This means that after the initial build, 
-                webpack will continue to watch for changes in any of the resolved files.'
+                webpack continues to watch the changes in any of the resolved files.'
             )
             ->addOption(
                 'npm-install',
@@ -96,7 +106,11 @@ class OroAssetBuildCommand extends Command
                 InputOption::VALUE_NONE,
                 'Reinstall npm dependencies to vendor/oro/platform/build folder, to be used by webpack.'.
                 'Required when "node_modules" folder is corrupted.'
-            );
+            )
+            ->addUsage('admin.oro --watch')
+            ->addUsage('blank -w')
+            ->addUsage('default')
+            ->addUsage('-i');
     }
 
     /**
