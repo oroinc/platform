@@ -62,6 +62,10 @@ class Form extends Element
         }
 
         if (null === $field) {
+            $field = $this->findFieldByLabel($label, false);
+        }
+
+        if (null === $field) {
             $field = $this->getPage()->find('named', ['field', $label]);
         }
 
@@ -232,9 +236,11 @@ class Form extends Element
 
     /**
      * @param string $locator Label text
+     * @param bool $failOnError
      * @return NodeElement|null
+     * @throws ElementNotFoundException
      */
-    protected function findFieldByLabel($locator)
+    protected function findFieldByLabel($locator, $failOnError = true)
     {
         if ($label = $this->findLabel($locator)) {
             $sndParent = $label->getParent()->getParent();
@@ -262,7 +268,7 @@ class Form extends Element
                 && $field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))
             ) {
                 return $field;
-            } else {
+            } elseif ($failOnError) {
                 self::fail(sprintf('Find label "%s", but can\'t determine field type', $locator));
             }
         }
