@@ -76,20 +76,8 @@
         text-align: center;
 
         color: $activity-icon-color;
-    }
 
-    .activity-actions {
-        .dropdown-toggle {
-            font-size: $activity-icon-font-size;
-
-            text-align: $end;
-
-            width: $activity-dropdown-toggle-size;
-
-            @include fa-icon($activity-dropdown-toggle-icon, before, true) {
-                font-weight: normal;
-            }
-        }
+        flex-shrink: 0;
     }
 
     .comment-count {
@@ -112,7 +100,6 @@
         align-items: center;
         width: 100%;
         min-height: $activity-heading-min-height;
-        padding: $activity-heading-offset;
 
         cursor: pointer;
 
@@ -126,26 +113,20 @@
         }
 
         .accordion-icon {
-            width: auto;
-            font-size: $activity-icon-font-size;
-            font-weight: normal;
-
-            padding: $activity-accordion-icon-offset;
-            margin: 0;
-
-            &:hover {
-                color: $activity-accordion-icon-color-hover;
+            .fa-icon {
+                @include fa-icon($activity-accordion-icon-expanded);
             }
 
-            @include fa-icon($activity-accordion-icon-expanded);
-
             &.collapsed {
-                @include fa-icon($activity-accordion-icon-collapsed);
+                .fa-icon {
+                    @include fa-icon($activity-accordion-icon-collapsed);
+                }
             }
         }
 
         .actions {
             margin-#{$start}: auto;
+            padding-#{$start}: $content-padding-small;
 
             overflow: visible;
         }
