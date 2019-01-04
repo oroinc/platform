@@ -44,6 +44,11 @@ oro_behat_extension:
           URI: 'menu_update[uri]'
           Icon: 'menu_update[icon]'
           Description: 'menu_update[descriptions][values][default]'
+    Tab Link:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+        selector:
+            locator: '//ul[contains(@class,"nav-tabs")]/li/a'
+            type: xpath
 
   pages:
     Shortcut Actionslist:

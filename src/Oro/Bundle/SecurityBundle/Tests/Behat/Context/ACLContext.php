@@ -221,7 +221,7 @@ class ACLContext extends OroFeatureContext implements
     /**
      * Example: And I uncheck "Access dotmailer statistics" entity permission
      *
-     * @Then /^(?:|I )uncheck "(?P<entity>(?:[^"]|\\")*)" entity permission$/
+     * @Then /^(?:|I )uncheck "(?P<name>(?:[^"]|\\")*)" entity permission$/
      */
     public function uncheckEntityPermission($name)
     {
