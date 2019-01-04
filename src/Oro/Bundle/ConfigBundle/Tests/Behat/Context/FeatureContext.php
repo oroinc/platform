@@ -261,10 +261,10 @@ class FeatureContext extends OroFeatureContext implements
      * Enables (set to true) certain config option
      * Used instead of manual walking on configuration like "System/ Configuration"
      *
-     * Example: 'some_configaration.option' should be enabled
+     * Example: I enable 'some_configaration.option' configuration option
      *
-     * @Given /^"(?P<configSettingName>[^"]+)" should be enabled$/
-     * @Given /^'(?P<configSettingName>[^']+)' should be enabled$/
+     * @Given /^I enable "(?P<configSettingName>[^"]+)" configuration option$/
+     * @Given /^I enable '(?P<configSettingName>[^']+)' configuration option$/
      * @param string $configSettingName
      */
     public function enableConfigOption(string $configSettingName): void
