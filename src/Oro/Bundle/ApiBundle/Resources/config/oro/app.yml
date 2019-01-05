@@ -158,6 +158,7 @@ oro_api:
         - Symfony\Component\Form\Extension\Core\Type\RepeatedType
         - Oro\Bundle\ApiBundle\Form\Type\BooleanType
         - Oro\Bundle\ApiBundle\Form\Type\NumberType
+        - Oro\Bundle\ApiBundle\Form\Type\ArrayType
         - Oro\Bundle\ApiBundle\Form\Type\CollectionType
         - Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType
         - Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType
@@ -230,6 +231,12 @@ oro_api:
                 scale: 4
         duration:
             form_type: Oro\Bundle\FormBundle\Form\Type\OroDurationType
+        array:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
+        simple_array:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
+        json_array:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
 
     actions:
         options:
