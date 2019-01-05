@@ -378,12 +378,8 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     /**
      * @dataProvider invalidValueDataProvider
      */
-    public function testUpdateShouldHandleInvalidValue(
-        $fieldName,
-        $value,
-        $errorDetail = 'This value is not valid.',
-        $errorTitle = 'form constraint'
-    ) {
+    public function testUpdateShouldHandleInvalidValue($fieldName, $value, $errorTitle = 'form constraint')
+    {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
         $data = [
@@ -401,7 +397,6 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => $errorTitle,
-                'detail' => $errorDetail,
                 'source' => ['pointer' => '/data/attributes/' . $fieldName]
             ],
             $response
@@ -427,6 +422,12 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
             'Decimal (not number string)'    => ['fieldDecimal', 'a'],
             'Float (empty string)'           => ['fieldFloat', ''],
             'Float (not number string)'      => ['fieldFloat', 'a'],
+            'Array (empty string)'           => ['fieldArray', ''],
+            'Array (not array)'              => ['fieldArray', 0],
+            'SimpleArray (empty string)'     => ['fieldSimpleArray', ''],
+            'SimpleArray (not array)'        => ['fieldSimpleArray', 0],
+            'JsonArray (empty string)'       => ['fieldJsonArray', ''],
+            'JsonArray (not array)'          => ['fieldJsonArray', 0],
             'DateTime (empty string)'        => ['fieldDateTime', ''],
             'DateTime (invalid string)'      => ['fieldDateTime', 'a'],
             'DateTime (not string)'          => ['fieldDateTime', 1],
@@ -440,13 +441,16 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
             'Percent (not number string)'    => ['fieldPercent', 'a'],
             'Money (empty string)'           => ['fieldMoney', ''],
             'Money (not number string)'      => ['fieldMoney', 'a'],
-            'Duration (not number string)'   => ['fieldDuration', 'a', 'Value is not in a valid duration format'],
+            'Duration (not number string)'   => ['fieldDuration', 'a'],
             'MoneyValue (empty string)'      => ['fieldMoneyValue', ''],
             'MoneyValue (not number string)' => ['fieldMoneyValue', 'a']
         ];
     }
 
-    public function testShouldAcceptZeroNumberAsFalseInBooleanField()
+    /**
+     * @dataProvider validBooleanValueDataProvider
+     */
+    public function testValidValuesForBooleanField($submittedValue, $expectedValue)
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
@@ -455,7 +459,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
                 'type'       => $entityType,
                 'id'         => '<toString(@TestItem1->id)>',
                 'attributes' => [
-                    'fieldBoolean' => 0
+                    'fieldBoolean' => $submittedValue
                 ]
             ]
         ];
@@ -463,83 +467,30 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data);
 
         $expectedResponseData = $data;
-        $expectedResponseData['data']['attributes']['fieldBoolean'] = false;
+        $expectedResponseData['data']['attributes']['fieldBoolean'] = $expectedValue;
         $this->assertResponseContains($expectedResponseData, $response);
 
         $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getResourceId($response));
-        self::assertFalse($entity->fieldBoolean);
+        self::assertSame($expectedValue, $entity->fieldBoolean);
     }
 
-    public function testShouldAcceptOneNumberAsTrueInBooleanField()
+    /**
+     * @return array
+     */
+    public function validBooleanValueDataProvider()
     {
-        $entityType = $this->getEntityType(TestAllDataTypes::class);
-
-        $data = [
-            'data' => [
-                'type'       => $entityType,
-                'id'         => '<toString(@TestItem1->id)>',
-                'attributes' => [
-                    'fieldBoolean' => 1
-                ]
-            ]
+        return [
+            'false'          => [false, false],
+            'true'           => [true, true],
+            '0'              => [0, false],
+            '1'              => [1, true],
+            '0 (string)'     => ['0', false],
+            '1 (string)'     => ['1', true],
+            'true (string)'  => ['false', false],
+            'false (string)' => ['true', true],
+            'no'             => ['no', false],
+            'yes'            => ['yes', true]
         ];
-
-        $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data);
-
-        $expectedResponseData = $data;
-        $expectedResponseData['data']['attributes']['fieldBoolean'] = true;
-        $this->assertResponseContains($expectedResponseData, $response);
-
-        $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getResourceId($response));
-        self::assertTrue($entity->fieldBoolean);
-    }
-
-    public function testShouldAcceptNoStringAsFalseInBooleanField()
-    {
-        $entityType = $this->getEntityType(TestAllDataTypes::class);
-
-        $data = [
-            'data' => [
-                'type'       => $entityType,
-                'id'         => '<toString(@TestItem1->id)>',
-                'attributes' => [
-                    'fieldBoolean' => 'no'
-                ]
-            ]
-        ];
-
-        $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data);
-
-        $expectedResponseData = $data;
-        $expectedResponseData['data']['attributes']['fieldBoolean'] = false;
-        $this->assertResponseContains($expectedResponseData, $response);
-
-        $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getResourceId($response));
-        self::assertFalse($entity->fieldBoolean);
-    }
-
-    public function testShouldAcceptYesStringAsTrueInBooleanField()
-    {
-        $entityType = $this->getEntityType(TestAllDataTypes::class);
-
-        $data = [
-            'data' => [
-                'type'       => $entityType,
-                'id'         => '<toString(@TestItem1->id)>',
-                'attributes' => [
-                    'fieldBoolean' => 'yes'
-                ]
-            ]
-        ];
-
-        $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data);
-
-        $expectedResponseData = $data;
-        $expectedResponseData['data']['attributes']['fieldBoolean'] = true;
-        $this->assertResponseContains($expectedResponseData, $response);
-
-        $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getResourceId($response));
-        self::assertTrue($entity->fieldBoolean);
     }
 
     public function testShouldAcceptTimezoneInDateTimeField()
@@ -648,9 +599,11 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         );
     }
 
-    public function testShouldAcceptNumberValueAsSecondsInDurationField()
+    /**
+     * @dataProvider validDurationValueDataProvider
+     */
+    public function testValidValuesForDurationField($submittedValue, $durationInSeconds)
     {
-        $durationInSeconds = 123;
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
         $data = [
@@ -658,7 +611,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
                 'type'       => $entityType,
                 'id'         => '<toString(@TestItem1->id)>',
                 'attributes' => [
-                    'fieldDuration' => $durationInSeconds
+                    'fieldDuration' => $submittedValue
                 ]
             ]
         ];
@@ -673,55 +626,21 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         self::assertSame($durationInSeconds, $entity->fieldDuration);
     }
 
-    public function testShouldAcceptJiraStyleValueInDurationField()
+    /**
+     * @return array
+     */
+    public function validDurationValueDataProvider()
     {
-        $inputDuration = '1h 2m 3s';
-        $durationInSeconds = 3723; // 1 hour 2 minutes 3 seconds
-        $entityType = $this->getEntityType(TestAllDataTypes::class);
-
-        $data = [
-            'data' => [
-                'type'       => $entityType,
-                'id'         => '<toString(@TestItem1->id)>',
-                'attributes' => [
-                    'fieldDuration' => $inputDuration
-                ]
-            ]
+        return [
+            'seconds'                            => [123, 123],
+            'seconds (string)'                   => ['123', 123],
+            'Jira style'                         => ['1h 2m 3s', 3723],
+            'Jira style (hours only)'            => ['1h', 3600],
+            'Jira style (minutes only)'          => ['1m', 60],
+            'Jira style (seconds only)'          => ['1s', 1],
+            'Jira style (minutes and seconds)'   => ['1m 2s', 62],
+            'Column style'                       => ['1:2:3', 3723],
+            'Column style (minutes and seconds)' => ['1:2', 62]
         ];
-
-        $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data);
-
-        $expectedResponseData = $data;
-        $expectedResponseData['data']['attributes']['fieldDuration'] = $durationInSeconds;
-        $this->assertResponseContains($expectedResponseData, $response);
-
-        $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getResourceId($response));
-        self::assertSame($durationInSeconds, $entity->fieldDuration);
-    }
-
-    public function testShouldAcceptColumnStyleValueInDurationField()
-    {
-        $inputDuration = '1:2:3';
-        $durationInSeconds = 3723; // 1 hour 2 minutes 3 seconds
-        $entityType = $this->getEntityType(TestAllDataTypes::class);
-
-        $data = [
-            'data' => [
-                'type'       => $entityType,
-                'id'         => '<toString(@TestItem1->id)>',
-                'attributes' => [
-                    'fieldDuration' => $inputDuration
-                ]
-            ]
-        ];
-
-        $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data);
-
-        $expectedResponseData = $data;
-        $expectedResponseData['data']['attributes']['fieldDuration'] = $durationInSeconds;
-        $this->assertResponseContains($expectedResponseData, $response);
-
-        $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getResourceId($response));
-        self::assertSame($durationInSeconds, $entity->fieldDuration);
     }
 }
