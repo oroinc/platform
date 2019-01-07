@@ -40,7 +40,7 @@ class JobRunner
      *
      * @return mixed
      */
-    public function runUnique($ownerId, $name, \Closure $runCallback)
+    public function runUnique($ownerId, $name, callable $runCallback)
     {
         $rootJob = $this->jobProcessor->findOrCreateRootJob($ownerId, $name, true);
         if (!$rootJob) {
@@ -82,7 +82,7 @@ class JobRunner
      *
      * @return mixed
      */
-    public function createDelayed($name, \Closure $startCallback)
+    public function createDelayed($name, callable $startCallback)
     {
         $childJob = $this->jobProcessor->findOrCreateChildJob($name, $this->rootJob);
 
@@ -115,7 +115,7 @@ class JobRunner
      *
      * @throws \Exception
      */
-    public function runDelayed($jobId, \Closure $runCallback)
+    public function runDelayed($jobId, callable $runCallback)
     {
         $job = $this->jobProcessor->findJobById($jobId);
         if (! $job) {
