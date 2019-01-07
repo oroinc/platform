@@ -36,7 +36,7 @@ class JobRunner
     /**
      * @param string $ownerId
      * @param string $name
-     * @param \Closure $runCallback
+     * @param callable $runCallback
      *
      * @return mixed
      */
@@ -78,7 +78,7 @@ class JobRunner
 
     /**
      * @param string   $name
-     * @param \Closure $startCallback
+     * @param callable $startCallback
      *
      * @return mixed
      */
@@ -109,7 +109,7 @@ class JobRunner
 
     /**
      * @param string   $jobId
-     * @param \Closure $runCallback
+     * @param callable $runCallback
      *
      * @return mixed
      *
