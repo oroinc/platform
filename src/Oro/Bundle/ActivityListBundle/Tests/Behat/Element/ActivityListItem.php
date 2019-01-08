@@ -12,7 +12,7 @@ class ActivityListItem extends Element
 {
     public function collapse()
     {
-        $this->find('css', 'a.accordion-toggle')->click();
+        $this->find('css', 'a[data-toggle="collapse"]')->click();
         $this->getDriver()->waitForAjax();
     }
 

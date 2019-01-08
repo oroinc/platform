@@ -157,13 +157,13 @@ define(function(require) {
         },
 
         showActionsDropdown: function(e) {
-            if (!this.$('.activity-actions > [data-toggle="dropdown"]').parent().hasClass('show')) {
+            if (!_.isMobile() && !this.$('.activity-actions > [data-toggle="dropdown"]').parent().hasClass('show')) {
                 this.$('.activity-actions > [data-toggle="dropdown"]').dropdown('toggle');
             }
         },
 
         hideActionsDropdown: function(e) {
-            if (this.$('.activity-actions > [data-toggle="dropdown"]').parent().hasClass('show')) {
+            if (!_.isMobile() && this.$('.activity-actions > [data-toggle="dropdown"]').parent().hasClass('show')) {
                 this.$('.activity-actions > [data-toggle="dropdown"]').dropdown('toggle');
             }
         },

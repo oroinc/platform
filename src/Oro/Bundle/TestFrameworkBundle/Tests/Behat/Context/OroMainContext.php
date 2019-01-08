@@ -1335,6 +1335,28 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Assert that select field has no options
+     * Example: Then User Address Select has no options
+     *
+     * @When /^(?P<fieldName>[\w\s]*) has no options$/
+     */
+    public function selectHasNoOptions($fieldName)
+    {
+        $field = $this->createElement($fieldName);
+        $this->assertTrue($field->isValid(), sprintf('Select "%s" not found on page', $fieldName));
+
+        $options = $field->findAll('css', 'option');
+        if (count($options) > 0) {
+            $options = array_filter($options, function (NodeElement $option) {
+                $value = $option->getValue();
+
+                return !empty($value);
+            });
+        }
+        $this->assertCount(0, $options);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function fillField($field, $value)

@@ -1,4 +1,5 @@
 /* @theme: admin.oro; */
+
 @import "oroui/css/scss/oro/variables";
 
 .widget-content > .label-info:first-child {
@@ -461,6 +462,8 @@ textarea {
 
 .alert-error > ul {
     margin-bottom: 0;
+
+    @include list-unstyled();
 }
 
 .oro-multiselect {
@@ -559,7 +562,7 @@ label.radio.error {
     }
 
     .row-oro.oro-multiselect-holder {
-        margin: 0 0 $content-padding-medium;
+        margin: 0 0 $content-padding-small;
     }
 
     .enum-value-collection & {

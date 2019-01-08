@@ -23,14 +23,6 @@
         font-size: $base-font-size--l;
     }
 
-    .jstree-open > .jstree-ocl:before {
-        content: '\f106';
-    }
-
-    .jstree-closed > .jstree-ocl:before {
-        content: '\f105';
-    }
-
     .jstree-anchor {
         font-size: $jstree-mobile-anchor-font-size;
         padding: side-values($jstree-mobile-anchor-inner-offset);
@@ -46,5 +38,11 @@
         line-height: $jstree-mobile-wholerow-height;
         height: $jstree-mobile-wholerow-height;
     }
-
 }
+
+.controls {
+    .jstree-wrapper {
+        max-width: 100%;
+    }
+}
+

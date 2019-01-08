@@ -1,5 +1,4 @@
-assets:
-    css:
-        inputs:
-          - 'bundles/orodatagrid/css/scss/main.scss'
-          # - 'bundles/orodatagrid/css/scss/inline-editing-help.scss' component temporary not in use
+css:
+    inputs:
+      - 'bundles/orodatagrid/css/scss/main.scss'
+      # - 'bundles/orodatagrid/css/scss/inline-editing-help.scss' component temporary not in use

@@ -210,7 +210,7 @@ class ACLContext extends OroFeatureContext implements
      *
      * Example: And I check "Access dotmailer statistics" entity permission
      *
-     * @Then /^(?:|I )check "(?P<name>([\w\s]+))" entity permission$/
+     * @Then /^(?:|I )check "(?P<name>(?:[^"]|\\")*)" entity permission$/
      */
     public function checkEntityPermission($name)
     {
@@ -221,7 +221,7 @@ class ACLContext extends OroFeatureContext implements
     /**
      * Example: And I uncheck "Access dotmailer statistics" entity permission
      *
-     * @Then /^(?:|I )uncheck "(?P<name>([\w\s]+))" entity permission$/
+     * @Then /^(?:|I )uncheck "(?P<name>(?:[^"]|\\")*)" entity permission$/
      */
     public function uncheckEntityPermission($name)
     {

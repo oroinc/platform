@@ -59,8 +59,6 @@
     Uploader uniform
 **/
 .uploader {
-    float: $uploader-float;
-
     color: $uploader-color;
     border-radius: $uploader-border-radius;
     background-color: $uploader-background-color;
@@ -336,6 +334,10 @@ select[multiple] {
         &:not(:first-of-type) {
             margin-#{$start}: $add-on-append-outer-offset-left;
         }
+
+        &:first-child {
+            margin-#{$start}: 0;
+        }
     }
 
     .input-prepend & {
@@ -413,10 +415,6 @@ select[multiple] {
 
         &--column {
             flex-direction: column;
-        }
-
-        .add-list-item {
-            margin-top: $content-padding-small;
         }
 
         .reminders-collection {
