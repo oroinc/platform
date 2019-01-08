@@ -111,7 +111,7 @@
                                 <div class="top-row">
                                     {% block breadcrumbs %}
                                         {% if breadcrumbs is defined %}
-                                            <div class="pull-left">
+                                            <div class="page-title__entity-title-wrapper">
                                                 <div class="sub-title">
                                                     {%- if breadcrumbs.indexPath is defined -%}
                                                         <a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumbs.indexLabel }}</a>

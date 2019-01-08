@@ -38,16 +38,17 @@
 
         h1 {
             font-size: 18px;
-            line-height: 18px;
+            line-height: 24px;
         }
 
         .sub-title {
             font-size: 13px;
             line-height: 1em;
+            vertical-align: bottom;
         }
 
         &__icon {
-            top: -4px;
+            top: 0;
             width: 28px;
 
             &:empty:before {
