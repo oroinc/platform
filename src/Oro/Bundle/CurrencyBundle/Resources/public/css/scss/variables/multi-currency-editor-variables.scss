@@ -1,16 +1,27 @@
 /* @theme: admin.oro; */
 
+@import "orodatagrid/css/scss/variables/grid-variables";
+
 $multi-currency-editor-single-width: 168px !default;
 $multi-currency-editor-single-offset: 10px !default;
-$multi-currency-editor-single-border: 2px solid $primary-750 !default;
+$multi-currency-editor-single-border-width: $input-border-width;
+$multi-currency-editor-single-border-color: $input-border-color;
+$multi-currency-editor-single-border:
+    $multi-currency-editor-single-border-width
+    solid
+    $multi-currency-editor-single-border-color !default;
 $multi-currency-editor-single-color: $primary-830 !default;
-
-$multi-currency-editor-multi-width: 240px !default;
+$multi-currency-editor-single-add-on-inner-offset: side-values(
+    $oro-datagrid-body-cell-inner-top - $multi-currency-editor-single-border-width
+    $multi-currency-editor-single-offset
+    $oro-datagrid-body-cell-inner-bottom - $multi-currency-editor-single-border-width
+) !default;
+$multi-currency-editor-multi-width: 100% !default;
 $multi-currency-editor-multi-choice-offset: 52px !default;
 $multi-currency-editor-multi-choice-active: $secondary !default;
 $multi-currency-editor-multi-choice-active-z-index: auto !default;
 
-$multi-currency-editor-multi-actions-color: $primary-inverse !default;
+$multi-currency-editor-multi-actions-color: none !default;
 $multi-currency-editor-multi-actions-border: 2px solid $primary-750 !default;
 
 $multi-currency-editor-multi-fields-offset: 6px !default;

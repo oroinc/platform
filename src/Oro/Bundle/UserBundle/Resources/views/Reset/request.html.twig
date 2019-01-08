@@ -14,11 +14,6 @@
                     <h2 class="title">{{ 'Forgot Password'|trans }}</h2>
                 </div>
                 <fieldset class="oro-forgot-password">
-                    {% if invalid_username is defined %}
-                        <div class="alert alert-error" role="alert">
-                            {{ 'There is no active user with username or email address "%username%".'|trans({ '%username%': invalid_username }) }}
-                        </div>
-                    {% endif %}
                     {{ messagesContent }}
                     <input type="text" id="prependedInput" name="username" required="required" placeholder="{{ 'Username or Email'|trans }}" autofocus/>
                     <input type="hidden" name="frontend" value="1" />

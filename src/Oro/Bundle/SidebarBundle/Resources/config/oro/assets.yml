@@ -1,5 +1,4 @@
-assets:
-    css:
-        inputs:
-          - 'bundles/orosidebar/css/scss/main.scss'
-          - 'bundles/orosidebar/sidebar_widgets/sticky_note/css/styles.css'
+css:
+    inputs:
+      - 'bundles/orosidebar/css/scss/main.scss'
+      - 'bundles/orosidebar/sidebar_widgets/sticky_note/css/styles.css'

@@ -1303,6 +1303,14 @@ services:
             - '@oro_email.manager.template_email'
             - '@oro_entity.doctrine_helper'
 
+    oro_email.entity_name_provider:
+        class: 'Oro\Bundle\EmailBundle\Provider\EmailEntityNameProvider'
+        public: false
+        arguments:
+            - '@property_accessor'
+        tags:
+            - { name: oro_entity.name_provider, priority: -80 }
+
     oro_email.provider.email_template_content_provider:
         class: 'Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider'
         public: false

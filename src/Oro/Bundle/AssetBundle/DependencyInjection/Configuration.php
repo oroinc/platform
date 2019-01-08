@@ -39,10 +39,10 @@ class Configuration implements ConfigurationInterface
                 ->always(
                     function ($value) use ($finder) {
                         if (!isset($value['nodejs_path'])) {
-                            $value['nodejs_path'] = $finder->findNodeJs();
+                            $value['nodejs_path'] = (string)$finder->findNodeJs();
                         }
                         if (!isset($value['npm_path'])) {
-                            $value['npm_path'] = $finder->findNpm();
+                            $value['npm_path'] = (string)$finder->findNpm();
                         }
 
                         return $value;

@@ -5,7 +5,7 @@ $table-unit-table-min-width: 300px !default;
 $table-unit-table-td-first-child-font-weight: bold !default;
 
 $table-td-first-child-inner-offset: $content-padding-medium !default;
-$table-td-first-child-text-align: left !default;
+$table-td-first-child-text-align: #{$start} !default;
 $table-td-expander-font-size: 30px !default;
 
 $table-td-last-child-inner-offset: $content-padding-medium !default;
@@ -67,10 +67,10 @@ $table-tbody-row-selected-hover-td-background: inherit !default;
 
 $table-tbody-td-border-top: 1px solid $primary-860 !default;
 $table-tbody-td-border-bottom: 1px solid $primary-860 !default;
-$table-tbody-td-offset: 6px 10px 6px !default;
+$table-tbody-td-offset: $content-padding-small !default;
 
 $table-tfoot-th-background: $primary-600 !default;
-$table-tfoot-th-inner-offset: 4px 10px !default;
+$table-tfoot-th-inner-offset: ($content-padding-small / 2) $content-padding-small !default;
 
 $table-dl-offset: 0 0 15px !default;
 

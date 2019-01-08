@@ -6,9 +6,12 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 
+/**
+ * Token user impersonation.
+ */
 class ImpersonationToken extends AbstractToken implements OrganizationContextTokenInterface
 {
-    use OrganizationContextTokenTrait;
+    use OrganizationContextTokenSerializerTrait;
     /**
      * @param string|object            $user         The username (like a nickname, email address, etc.),
      *                                               or a UserInterface instance

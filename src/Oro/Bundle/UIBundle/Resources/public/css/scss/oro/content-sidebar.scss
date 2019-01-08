@@ -73,6 +73,10 @@
         }
     }
 
+    &--sidebar-content {
+        flex-shrink: 1;
+    }
+
     &--header-content {
         white-space: nowrap;
     }
@@ -90,6 +94,7 @@
         align-items: $content-sidebar-align-items;
         height: $content-sidebar-height;
         padding: $content-sidebar-offset-inner;
+        flex-shrink: 0;
 
         .content-sidebar-minimized & {
             padding: $content-sidebar-minimized-offset-inner;
@@ -131,6 +136,10 @@
     &--container {
         display: $content-sidebar-container-display;
         margin-#{$start}: $content-sidebar-container-offset-left;
+
+        &:only-child {
+            height: 100%;
+        }
     }
 
     &--content {

@@ -3,9 +3,7 @@
 namespace Oro\Bundle\FormBundle\Controller;
 
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
-use Oro\Bundle\FormBundle\Autocomplete\Security;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,6 +13,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
+ * Autocomplete search controller.
+ *
  * @Route("/autocomplete")
  */
 class AutocompleteController extends Controller
@@ -26,7 +26,6 @@ class AutocompleteController extends Controller
      * @throws HttpException|AccessDeniedHttpException
      *
      * @Route("/search", name="oro_form_autocomplete_search")
-     * AclAncestor("oro_search")
      */
     public function searchAction(Request $request)
     {

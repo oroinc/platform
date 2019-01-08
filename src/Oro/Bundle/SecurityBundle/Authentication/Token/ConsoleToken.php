@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Authentication\Token;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
+/**
+ * Token represent user with organization context for usage by console commands.
+ */
 class ConsoleToken extends AbstractToken implements OrganizationContextTokenInterface
 {
-    use OrganizationContextTokenTrait;
+    use OrganizationContextTokenSerializerTrait;
 
     /**
      * {@inheritdoc}

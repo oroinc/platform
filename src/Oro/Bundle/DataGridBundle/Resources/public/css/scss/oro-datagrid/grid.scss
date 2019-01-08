@@ -7,7 +7,7 @@
 
     font-size: $oro-datagrid-font-size;
 
-    border-collapse: collapse;
+    border-collapse: separate;
     border-spacing: 0;
 
     overflow: hidden;
@@ -104,7 +104,7 @@
 
     line-height: $oro-datagrid-body-cell-line-height;
 
-    border-bottom: $oro-datagrid-body-cell-border;
+    border-bottom: $oro-datagrid-body-cell-border-bottom;
 
     vertical-align: top;
 }

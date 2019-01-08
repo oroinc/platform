@@ -14,7 +14,7 @@ services:
         tags:
             - { name: kernel.cache_warmer, priority: 0 }
 
-    Oro\Bundle\AssetBundle\Command\OroAssetBuildCommand:
+    Oro\Bundle\AssetBundle\Command\OroAssetsBuildCommand:
         arguments:
             - '@oro_asset.node_process_factory'
             - '@oro_asset_bundle.bundles_path.cache'

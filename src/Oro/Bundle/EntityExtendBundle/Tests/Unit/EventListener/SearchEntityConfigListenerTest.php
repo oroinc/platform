@@ -91,6 +91,11 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['searchable' => [false, true]]);
 
         $this->searchMappingProvider->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('Test\Class')
+            ->willReturn(['mapping_config']);
+
+        $this->searchMappingProvider->expects(self::once())
             ->method('clearCache');
         $this->searchIndexer->expects(self::once())
             ->method('reindex')
@@ -123,6 +128,11 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects(self::exactly(2))
             ->method('getConfigChangeSet')
             ->willReturn(['searchable' => [false, true]]);
+
+        $this->searchMappingProvider->expects(self::exactly(2))
+            ->method('getEntityConfig')
+            ->with('Test\Class')
+            ->willReturn(['mapping_config']);
 
         $this->searchMappingProvider->expects(self::once())
             ->method('clearCache');
@@ -160,11 +170,86 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getConfigChangeSet')
             ->willReturn(['searchable' => [false, true]]);
 
+        $this->searchMappingProvider->expects(self::exactly(2))
+            ->method('getEntityConfig')
+            ->withConsecutive(['Test\Class1'], ['Test\Class2'])
+            ->willReturnOnConsecutiveCalls(['mapping_config1'], ['mapping_config2']);
+
         $this->searchMappingProvider->expects(self::once())
             ->method('clearCache');
         $this->searchIndexer->expects(self::once())
             ->method('reindex')
             ->with(['Test\Class1', 'Test\Class2']);
+
+        $this->listener->preFlush(new PreFlushConfigEvent($configs1, $this->configManager));
+        $this->listener->preFlush(new PreFlushConfigEvent($configs2, $this->configManager));
+        $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
+        $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
+
+        self::assertAttributeEmpty('classNames', $this->listener);
+    }
+
+    public function testShouldNotReindexForEntityNotHavingSearchConfigSingleEntity()
+    {
+        $searchConfig = $this->getFieldConfig('search');
+        $configs = [
+            'search' => $searchConfig,
+            'extend' => $this->getFieldConfig('extend', ['state' => ExtendScope::STATE_ACTIVE])
+        ];
+
+        $this->configManager->expects(self::once())
+            ->method('getConfigChangeSet')
+            ->with(self::identicalTo($searchConfig))
+            ->willReturn(['searchable' => [false, true]]);
+
+        $this->searchMappingProvider->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('Test\Class')
+            ->willReturn([]);
+
+        $this->searchMappingProvider->expects(self::never())
+            ->method('clearCache');
+        $this->searchIndexer->expects(self::never())
+            ->method('reindex');
+
+        $this->listener->preFlush(new PreFlushConfigEvent($configs, $this->configManager));
+        $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
+
+        self::assertAttributeEmpty('classNames', $this->listener);
+    }
+
+    public function testShouldNotReindexForEntityNotHavingSearchConfigMultipleEntities()
+    {
+        $searchConfig1 = new Config(new FieldConfigId('search', 'Test\Class1', 'field1'));
+        $extendConfig1 = new Config(new FieldConfigId('extend', 'Test\Class1', 'field1'));
+        $extendConfig1->setValues(['state' => ExtendScope::STATE_ACTIVE]);
+        $configs1 = [
+            'search' => $searchConfig1,
+            'extend' => $extendConfig1
+        ];
+
+        $searchConfig2 = new Config(new FieldConfigId('search', 'Test\Class2', 'field1'));
+        $extendConfig2 = new Config(new FieldConfigId('extend', 'Test\Class2', 'field1'));
+        $extendConfig2->setValues(['state' => ExtendScope::STATE_ACTIVE]);
+        $configs2 = [
+            'search' => $searchConfig2,
+            'extend' => $extendConfig2
+        ];
+
+        $this->configManager->expects(self::exactly(2))
+            ->method('getConfigChangeSet')
+            ->willReturn(['searchable' => [false, true]]);
+
+        $this->searchMappingProvider->expects(self::exactly(2))
+            ->method('getEntityConfig')
+            ->withConsecutive(['Test\Class1'], ['Test\Class2'])
+            ->willReturnOnConsecutiveCalls(['mapping_config1'], []);
+
+        $this->searchMappingProvider->expects(self::once())
+            ->method('clearCache');
+        $this->searchIndexer->expects(self::once())
+            ->method('reindex')
+            ->with(['Test\Class1']);
 
         $this->listener->preFlush(new PreFlushConfigEvent($configs1, $this->configManager));
         $this->listener->preFlush(new PreFlushConfigEvent($configs2, $this->configManager));

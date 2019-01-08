@@ -10,6 +10,9 @@ use Oro\Bundle\EmailBundle\Tests\Behat\Mock\Mailer\DirectMailerDecorator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class EmailContext extends OroFeatureContext implements KernelAwareContext
 {
     use AssertTrait, KernelDictionary;
@@ -129,6 +132,76 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             self::fail(
                 sprintf(
                     'Sent emails don\'t contain expected data. The following messages has been sent: %s',
+                    print_r($messagesData, true)
+                )
+            );
+        }
+    }
+
+    /**
+     * Example: Then Email should not contains the following:
+     *            | From    | admin@example.com |
+     *            | To      | user1@example.com |
+     *            | Cc      | user2@example.com |
+     *            | Bcc     | user3@example.com |
+     *            | Subject | Test Subject      |
+     *            | Body    | Test Body         |
+     *
+     * @Given /^Email should not contains the following:/
+     * @Given /^An email does not containing the following was sent:/
+     *
+     * @param TableNode $table
+     */
+    public function emailShouldNotContainsTheFollowing(TableNode $table)
+    {
+        self::assertNotEmpty($table, 'Assertions list must contain at least one row.');
+
+        $mailer = $this->getMailer();
+        if (!$mailer instanceof DirectMailerDecorator) {
+            return;
+        }
+
+        $expectedRows = [];
+        foreach ($table->getRows() as list($field, $text)) {
+            //Keys makes possible to use multiple Body field in expected table
+            $expectedRows[] = ['field' => $field, 'pattern' => $this->getPattern($text)];
+        }
+
+        $sentMessages = $mailer->getSentMessages();
+
+        self::assertNotEmpty($sentMessages, 'There are no sent messages');
+
+        $found = false;
+        /** @var \Swift_Mime_Message $message */
+        foreach ($sentMessages as $message) {
+            foreach ($expectedRows as $expectedContent) {
+                $found = (bool) preg_match(
+                    $expectedContent['pattern'],
+                    $this->getMessageData($message, $expectedContent['field'])
+                );
+                if ($found === false) {
+                    break;
+                }
+            }
+
+            if ($found) {
+                break;
+            }
+        }
+
+        if ($found) {
+            $messagesData = [];
+            foreach ($mailer->getSentMessages() as $message) {
+                $item = [];
+                foreach ($expectedRows as $expectedContent) {
+                    $item[$expectedContent['field']] = $this->getMessageData($message, $expectedContent['field']);
+                }
+                $messagesData[] = $item;
+            }
+
+            self::fail(
+                sprintf(
+                    'Sent emails contains extra data. The following messages has been sent: %s',
                     print_r($messagesData, true)
                 )
             );

@@ -160,7 +160,7 @@
     + div,
     + label,
     &-label {
-        margin-#{$start}: $checkbox-sibling-outer-offset-start;
+        margin-#{$start}: $checkbox-sibling-outer-offset;
         vertical-align: middle;
         display: inline-block;
     }

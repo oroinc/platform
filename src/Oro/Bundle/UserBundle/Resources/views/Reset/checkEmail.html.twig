@@ -8,13 +8,13 @@
         <div class="form-wrapper__inner">
             <form action="" class="form-signin">
                 <div class="title-box">
-                    <h2 class="title">{{ 'Check Email'|trans }}</h2>
+                    <h2 class="title">{{ 'oro.user.password.reset_password.title'|trans }}</h2>
                 </div>
                 <fieldset>
                     <div class="alert alert-success" role="alert">
-                        {{ 'An email has been sent to %email%. It contains a link you must click to reset your password.'|trans({ '%email%': email }) }}
+                        {{ 'oro.user.password.reset_password.message'|trans({ '%email%': email }) }}
                     </div>
-                    <a href="{{ path('oro_default') }}">{{ 'Go to homepage'|trans }}</a>
+                    <a href="{{ path('oro_user_security_login') }}">&laquo; {{ 'Return to Login'|trans }}</a>
                 </fieldset>
             </form>
         </div>

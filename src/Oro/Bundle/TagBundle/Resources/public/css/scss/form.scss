@@ -1,13 +1,5 @@
 /* @theme: admin.oro; */
 
-.tags-column-editor {
-    width: auto !important; // ignore cell width
-
-    .select2-choices {
-        max-width: 20vw;
-    }
-}
-
 .tags-select-editor {
     min-width: $tag-selector-item-min-width; // ignore min-width
 
@@ -20,8 +12,8 @@
 
     .select2-choices {
         max-height: $tag-selector-item-max-height;
-        min-width: $tag-selector-item-min-width;
         background: $primary-inverse;
+        width: $tag-selector-items-width;
 
         &:before {
             content: ' ';
@@ -32,16 +24,22 @@
             margin: side-values(0 0 $tag-selector-item-offset-vertical 0);
         }
 
-        &.select2-search-resize {
-            padding-#{$end}: 48px;// to fill area required for actions buttons
+        .select2-search-field {
+            padding: 0;
+
+            input:last-child {
+                padding: $tag-selector-item-input-inner-offset;
+                height: auto;
+                font-size: $tag-selector-item-font-size;
+                line-height: $tag-selector-item-line-height;
+            }
         }
 
-        .select2-search-field input {
-            padding: $tag-selector-item-input-inner-offset;
-            height: auto;
-            font-size: $tag-selector-item-font-size;
-            line-height: $tag-selector-item-line-height;
-            margin-#{$end}: -$tag-selector-actions-width;
+        &.select2-first-row {
+            .select2-search-field input:last-child {
+                margin-#{$end}: -$tag-selector-actions-width;
+                padding-#{$end}: $tag-selector-actions-width;
+            }
         }
 
         .select2-search-choice {
@@ -50,8 +48,9 @@
             .select2-search-choice-close {
                 top: 0;
                 border: none;
+                bottom: $tag-selector-item-offset-vertical;
                 width: $tag-selector-item-close-icon-width;
-                height: 100%;
+                height: auto;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -68,13 +67,16 @@
         }
     }
 
-    .inline-editor__action-item {
-        line-height: $select2-container-min-height;
-        padding-top: 0;
-        padding-bottom: 0;
-    }
+    .inline-editor__actions {
+        display: flex;
 
-    &.inline-view-editor .select2-choices {
-        width: 100% !important;
+        .btn {
+            line-height: $select2-search-field-line-height;
+            padding-top: $tag-selector-item-offset-vertical;
+            padding-bottom: 0;
+            font-size: $tag-selector-actions-font-size;
+            height: $tag-selector-action-height;
+            width: $tag-selector-action-width;
+        }
     }
 }

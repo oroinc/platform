@@ -8,11 +8,11 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * This controller covers CRUD functionality for Business Unit entity.
  * @Route("/business_unit")
  */
 class BusinessUnitController extends Controller
@@ -48,8 +48,6 @@ class BusinessUnitController extends Controller
     {
         return array(
             'entity' => $entity,
-            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
-            // completely delete an owner and related entities or reassign related entities to another owner before
             'allow_delete' => !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
         );
     }
@@ -59,12 +57,6 @@ class BusinessUnitController extends Controller
      *      "/search/{organizationId}",
      *      name="oro_business_unit_search",
      *      requirements={"organizationId"="\d+"}
-     * )
-     * Acl(
-     *      id="oro_business_unit_view",
-     *      type="action",
-     *      class="OroOrganizationBundle:BusinessUnit",
-     *      permission="VIEW"
      * )
      */
     public function searchAction($organizationId)
@@ -131,8 +123,6 @@ class BusinessUnitController extends Controller
         return array(
             'entity' => $entity,
             'form' => $this->get('oro_organization.form.business_unit')->createView(),
-            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
-            // completely delete an owner and related entities or reassign related entities to another owner before
             'allow_delete' =>
                 $entity->getId() &&
                 !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)

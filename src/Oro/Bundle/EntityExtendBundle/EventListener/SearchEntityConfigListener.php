@@ -8,6 +8,10 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
+/**
+ * Listener for oro.entity_config.pre_flush and oro.entity_config.post_flush events.
+ * On pre_flush it decides which entities should be reindexed and reindexes them on post_flush.
+ */
 class SearchEntityConfigListener
 {
     /** @var SearchMappingProvider */
@@ -77,8 +81,11 @@ class SearchEntityConfigListener
 
         $extendConfig = $event->getConfig('extend');
 
+        $searchMapping = $this->searchMappingProvider->getEntityConfig($event->getClassName());
+
         return
             null !== $extendConfig
-            && $extendConfig->is('state', ExtendScope::STATE_ACTIVE);
+            && $extendConfig->is('state', ExtendScope::STATE_ACTIVE)
+            && !empty($searchMapping);
     }
 }

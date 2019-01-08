@@ -5,3 +5,6 @@ oro_entity:
         - Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent
         - Oro\Bundle\EmailBundle\Entity\EmailBody
         - Oro\Bundle\EmailBundle\Entity\EmailRecipient
+
+    entity_name_formats:
+        email: ~

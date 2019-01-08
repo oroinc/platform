@@ -1,4 +1,5 @@
 /* @theme: admin.oro; */
+
 @import "oroui/css/scss/oro/variables";
 
 .widget-content > .label-info:first-child {
@@ -315,15 +316,10 @@ textarea {
     vertical-align: top;
 }
 
-.oro-clearfix-width:after,
 .oro-clearfix:after {
     content: '';
     display: block;
     clear: both;
-}
-
-.oro-clearfix-width {
-    height: 1%;
 }
 
 .oro-clearfix {
@@ -466,6 +462,8 @@ textarea {
 
 .alert-error > ul {
     margin-bottom: 0;
+
+    @include list-unstyled();
 }
 
 .oro-multiselect {
@@ -564,7 +562,7 @@ label.radio.error {
     }
 
     .row-oro.oro-multiselect-holder {
-        margin: 0 0 $content-padding-medium;
+        margin: 0 0 $content-padding-small;
     }
 
     .enum-value-collection & {

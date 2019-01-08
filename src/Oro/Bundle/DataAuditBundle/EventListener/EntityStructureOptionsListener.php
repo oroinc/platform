@@ -5,14 +5,16 @@ namespace Oro\Bundle\DataAuditBundle\EventListener;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
 use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
-use Oro\Bundle\EntityBundle\Model\EntityStructure;
 
+/**
+ * Adds "auditable" option for auditable entities and fields.
+ */
 class EntityStructureOptionsListener
 {
-    const OPTION_NAME = 'auditable';
+    private const OPTION_NAME = 'auditable';
 
     /** @var AuditConfigProvider */
-    protected $auditConfigProvider;
+    private $auditConfigProvider;
 
     /**
      * @param AuditConfigProvider $auditConfigProvider
@@ -29,10 +31,6 @@ class EntityStructureOptionsListener
     {
         $data = $event->getData();
         foreach ($data as $entityStructure) {
-            if (!$entityStructure instanceof EntityStructure) {
-                continue;
-            }
-
             $className = $entityStructure->getClassName();
 
             if ($this->auditConfigProvider->isAuditableEntity($className)) {
@@ -54,7 +52,6 @@ class EntityStructureOptionsListener
                 }
             }
         }
-
         $event->setData($data);
     }
 }

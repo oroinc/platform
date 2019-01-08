@@ -10,8 +10,8 @@
     }
 
     &[x-displayed-arrow] {
-        $arrow-offset: -5px;
-        $placeholder: 8px;
+        $arrow-offset: -4px;
+        $placeholder: 6px;
 
         &:before {
             position: absolute;
@@ -147,19 +147,17 @@
 
     [class^="fa-"],
     [class*=" fa-"] {
+        position: relative;
+
         min-width: $dropdown-item-icon-fa-size;
         height: $dropdown-item-icon-fa-size;
         margin-#{$end}: $dropdown-item-icon-fa-offset;
 
         text-align: center;
-        line-height: 0;
-
-        vertical-align: middle;
+        line-height: 1;
 
         &:before {
             font-size: $dropdown-item-icon-fa-font-size;
-
-            vertical-align: text-bottom;
         }
     }
 }
