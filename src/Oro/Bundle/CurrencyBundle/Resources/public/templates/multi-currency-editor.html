@@ -1,17 +1,22 @@
-<div class="inline-editor__fields">
-    <!-- span wrapper for input[name=value] fixes flex box layout -->
-    <span><input name="value" type="<%= inputType %>" value="<%= value.amount %>"
-           class="form-control" placeholder="<%= placeholder %>"
-           autocomplete="off"></span><span class="add-on"><%= currentCurrencyLabel %></span>
-    <input name="currency" type="hidden" value="<%= value.currency %>">
-</div>
-<div class="inline-editor__actions">
-    <button class="inline-editor__action-item" type="submit"
-            title="<%= _.__('oro.form.inlineEditing.action.save') %>">
-        <span class="fa-check" aria-hidden="true"></span>
-    </button>
-    <button class="inline-editor__action-item" data-action="cancel"
-            title="<%= _.__('oro.form.inlineEditing.action.cancel') %>">
-        <span class="fa-ban" aria-hidden="true"></span>
-    </button>
+<div class="inline-editor__inner">
+    <span class="inline-editor__prefix">
+        <input name="currency" type="hidden" value="<%- value.currency %>">
+        <span class="add-on"><%- currentCurrencyLabel %></span>
+    </span>
+    <div class="inline-editor__fields">
+        <!-- span wrapper for input[name=value] fixes flex box layout -->
+        <span><input name="value" type="<%- inputType %>" value="<%- value.amount %>"
+               class="form-control" placeholder="<%- placeholder %>"
+               autocomplete="off"></span>
+    </div>
+    <div class="inline-editor__actions">
+        <button class="btn btn-icon btn-square-light inline-editor__action-item" type="submit"
+                title="<%- _.__('oro.form.inlineEditing.action.save') %>">
+            <span class="fa-check" aria-hidden="true"></span>
+        </button>
+        <button class="btn btn-icon btn-square-light inline-editor__action-item" data-action="cancel"
+                title="<%- _.__('oro.form.inlineEditing.action.cancel') %>">
+            <span class="fa-ban" aria-hidden="true"></span>
+        </button>
+    </div>
 </div>

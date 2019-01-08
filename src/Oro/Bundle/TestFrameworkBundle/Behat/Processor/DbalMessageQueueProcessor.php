@@ -54,10 +54,6 @@ class DbalMessageQueueProcessor implements MessageQueueProcessorInterface
         while (true) {
             $this->baseMessageQueueProcessor->waitWhileProcessingMessages();
 
-            if (!$this->isRunning()) {
-                throw new \RuntimeException('Message Queue is not running');
-            }
-
             if ($this->isEmptyTables()) {
                 return;
             }

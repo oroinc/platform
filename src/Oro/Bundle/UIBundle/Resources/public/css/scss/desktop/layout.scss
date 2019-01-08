@@ -52,6 +52,7 @@ body:not(.login-page) {
     &:last-child {
         padding-#{$start}: $content-padding-small;
     }
+
     &:only-child {
         padding: 0;
     }
@@ -72,11 +73,18 @@ body:not(.login-page) {
     &__content {
         flex-grow: 1;
         overflow: inherit;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     &__main {
         display: flex;
         width: 100%;
+        height: 100%;
+        align-items: stretch;
+        flex-grow: 1;
+        justify-content: stretch;
     }
 
     &__left-panel,
@@ -85,6 +93,10 @@ body:not(.login-page) {
     }
 
     &__central-panel {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
         flex-grow: 1;
     }
 }
@@ -98,6 +110,8 @@ body:not(.login-page) {
     // Update offset on pages with sidebar
     > .sidebar-container .category-data {
         padding-#{$start}: $content-padding;
+        padding-#{$end}: $content-padding;
+        margin-#{$end}: -$content-padding;
     }
 
     //  Update offset on view pages
@@ -107,6 +121,28 @@ body:not(.login-page) {
         padding-#{$start}: $content-padding;
         padding-#{$end}: $content-padding;
     }
+}
+
+#container,
+.scrollspy-main-container,
+.scrollable-container > form,
+.layout-content,
+.layout-content > *:only-child,
+.layout-content > .responsive-form-inner,
+.content-with-sidebar--content .category-data {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
+    flex-grow: 1;
+    height: 100%;
+}
+
+.scrollable-container {
+    overflow: auto;
+    flex-grow: 1;
+    flex-shrink: 1;
+    height: 100%;
 }
 
 .container-fluid {

@@ -1,0 +1,20 @@
+-
+    id: '<(@entity2_1->id)>'
+    name: 'Entity 2 (1)'
+    biM2OOwners: ['<(@entity1_1->id)>']
+    biM2MOwners: ['<(@entity1_1->id)>']
+    biM2MnDOwners: ['<(@entity1_1->id)>']
+    biO2MOwner: '<(@entity1_1->id)>'
+    biO2MnDOwner: '<(@entity1_1->id)>'
+    testapie1_uniO2M: '<(@entity1_1->id)>'
+    testapie1_uniO2MnD: '<(@entity1_1->id)>'
+-
+    id: '<(@entity2_2->id)>'
+    name: 'Entity 2 (2)'
+    biM2OOwners: []
+    biM2MOwners: ['<(@entity1_1->id)>']
+    biM2MnDOwners: ['<(@entity1_1->id)>']
+    biO2MOwner: '<(@entity1_1->id)>'
+    biO2MnDOwner: '<(@entity1_1->id)>'
+    testapie1_uniO2M: '<(@entity1_1->id)>'
+    testapie1_uniO2MnD: '<(@entity1_1->id)>'

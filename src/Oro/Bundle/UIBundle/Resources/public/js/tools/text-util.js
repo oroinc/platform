@@ -79,7 +79,12 @@ define(['underscore', 'orotranslation/js/translator'], function(_, __) {
             if (!_.isString(text)) {
                 return text;
             }
-            var words = _.compact(text.split(/\W+/));
+            var words = text.split(/\s+/g) // split text by whitespaces
+                .map(function(word) {
+                    // trims punctuation for each word
+                    return word.replace(/^[!-#%-*,-/:;?@\[-\]_{}"']+|[!-#%-*,-/:;?@\[-\]_{}'"]+$/g, '');
+                });
+            words = _.compact(words);
             if (words.length < minWordsCount) {
                 return text;
             }

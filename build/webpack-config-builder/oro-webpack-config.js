@@ -69,8 +69,8 @@ class ConfigBuilder {
      * @returns {Function}
      */
     getWebpackConfig() {
-        return (env, argv) => {
-            this._isProduction = argv.mode === 'production';
+        return (env, args) => {
+            this._isProduction = args.mode === 'production';
             let theme = env ? env.theme : undefined;
             this._symfonyEnv = env ? env.symfony : undefined;
 

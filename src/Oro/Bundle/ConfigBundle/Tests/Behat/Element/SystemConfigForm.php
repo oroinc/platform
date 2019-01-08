@@ -40,11 +40,12 @@ class SystemConfigForm extends Form
     /**
      * @param string $label
      * @param string $checkbox
+     * @param null|string $section
      * @throws ElementNotFoundException
      */
-    public function uncheckCheckboxByLabel($label, $checkbox)
+    public function uncheckCheckboxByLabel($label, $checkbox, $section = null)
     {
-        $this->getSettingControlByLabel($label, $checkbox)->uncheck();
+        $this->getSettingControlByLabel($label, $checkbox, $section)->uncheck();
     }
 
     /**
@@ -52,14 +53,18 @@ class SystemConfigForm extends Form
      *
      * @param string $label
      * @param null|string $inputLabel
+     * @param null|string $section
      * @return NodeElement|null
+     * @throws ElementNotFoundException
      */
-    private function getSettingControlByLabel($label, $inputLabel = null)
+    private function getSettingControlByLabel($label, $inputLabel = null, $section = null)
     {
-        $container = $this->getContainer($label);
+        $container = $this->getContainer($label, $section);
 
         if ($inputLabel != null) {
             $useDefaultLabel = $container->find('css', "label:contains('$inputLabel')");
+            self::assertNotNull($useDefaultLabel, "Use default checkbox element for $label not found");
+            $useDefaultLabel->focus();
             $input = $useDefaultLabel->getParent()->find('css', 'input');
         } else {
             $input = $container->find('css', '[data-name="field__value"]');
@@ -77,11 +82,19 @@ class SystemConfigForm extends Form
 
     /**
      * @param string $label
+     * @param null|string $section
      * @return NodeElement
      */
-    private function getContainer($label)
+    private function getContainer($label, $section = null)
     {
-        $labelElement = $this->find('css', "label:contains('$label')");
+        if ($section) {
+            $labelElement = $this->find(
+                'xpath',
+                "//h5/span[text()=\"$section\"]/../..//label[text()=\"$label\"]"
+            );
+        } else {
+            $labelElement = $this->find('css', "label:contains('$label')");
+        }
 
         self::assertNotNull($labelElement, "Label element for $label not found");
 

@@ -19,19 +19,12 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  *
  * @package Oro\Bundle\EntityExtendBundle\Controller
  * @Route("/entity/extend/field")
- * BAP-17635 Discuss ACL impl., currently acl is disabled
  * @AclAncestor("oro_entityconfig_manage")
  */
 class ConfigFieldGridController extends Controller
 {
     /**
      * @Route("/create/{id}", name="oro_entityextend_field_create", requirements={"id"="\d+"}, defaults={"id"=0})
-     * Acl(
-     *      id="oro_entityextend_field_create",
-     *      label="oro.entity_extend.action.config_field_grid.create",
-     *      type="action",
-     *      group_name=""
-     * )
      *
      * @Template
      * @param Request $request
@@ -63,12 +56,6 @@ class ConfigFieldGridController extends Controller
 
     /**
      * @Route("/update/{id}", name="oro_entityextend_field_update", requirements={"id"="\d+"}, defaults={"id"=0})
-     * Acl(
-     *      id="oro_entityextend_field_update",
-     *      label="oro.entity_extend.action.config_field_grid.update",
-     *      type="action",
-     *      group_name=""
-     * )
      * @Template("OroEntityConfigBundle:Config:fieldUpdate.html.twig")
      * @param Request $request
      * @param EntityConfigModel $entity
@@ -109,12 +96,6 @@ class ConfigFieldGridController extends Controller
      *      requirements={"id"="\d+"},
      *      defaults={"id"=0}
      * )
-     * Acl(
-     *      id="oro_entityextend_field_remove",
-     *      label="oro.entity_extend.action.config_field_grid.remove",
-     *      type="action",
-     *      group_name=""
-     * )
      * @param FieldConfigModel $field
      * @return Response
      */
@@ -136,12 +117,6 @@ class ConfigFieldGridController extends Controller
      *      name="oro_entityextend_field_unremove",
      *      requirements={"id"="\d+"},
      *      defaults={"id"=0}
-     * )
-     * Acl(
-     *      id="oro_entityextend_field_unremove",
-     *      label="oro.entity_extend.action.config_field_grid.unremove",
-     *      type="action",
-     *      group_name=""
      * )
      * @param FieldConfigModel $field
      * @return Response

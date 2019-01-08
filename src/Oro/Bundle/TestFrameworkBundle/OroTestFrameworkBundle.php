@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle;
 
+use Oro\Bundle\TestFrameworkBundle\DependencyInjection\Compiler\AliceProcessorCompilerPass;
 use Oro\Bundle\TestFrameworkBundle\DependencyInjection\Compiler\CheckReferenceCompilerPass;
 use Oro\Bundle\TestFrameworkBundle\DependencyInjection\Compiler\ClientCompilerPass;
 use Oro\Bundle\TestFrameworkBundle\DependencyInjection\Compiler\TagsInformationPass;
@@ -9,6 +10,9 @@ use Oro\Bundle\TestFrameworkBundle\DependencyInjection\Compiler\TestSessionListe
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * The TestFrameworkBundle bundle class.
+ */
 class OroTestFrameworkBundle extends Bundle
 {
     /**
@@ -20,5 +24,6 @@ class OroTestFrameworkBundle extends Bundle
         $container->addCompilerPass(new CheckReferenceCompilerPass());
         $container->addCompilerPass(new ClientCompilerPass());
         $container->addCompilerPass(new TestSessionListenerCompilerPass());
+        $container->addCompilerPass(new AliceProcessorCompilerPass());
     }
 }

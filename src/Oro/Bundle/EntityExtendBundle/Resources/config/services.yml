@@ -165,6 +165,8 @@ services:
 
     oro_entity_extend.listener.config_listener:
         class: Oro\Bundle\EntityExtendBundle\EventListener\EntityConfigListener
+        arguments:
+            - '@event_dispatcher'
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.entity.create, method: updateEntity }
             - { name: kernel.event_listener, event: oro.entity_config.entity.update, method: updateEntity }
@@ -419,6 +421,28 @@ services:
                         - Regex:
                             pattern: '/^[\d+]*$/'
                             message: "This value should contain only numbers."
+            -
+                - addConstraints
+                -
+                    - smallint
+                    -
+                        - Regex:
+                              pattern: '/^[\d+]*$/'
+                              message: "This value should contain only numbers."
+            -
+                - addConstraints
+                -
+                    - bigint
+                    -
+                        - Regex:
+                              pattern: '/^[\d+]*$/'
+                              message: "This value should contain only numbers."
+            - [addConstraints, ['float', [{ Type: {type: 'numeric'} }]]]
+            - [addConstraints, ['decimal', [{ Type: {type: 'numeric'} }]]]
+            - [addConstraints, ['money', [{ Type: {type: 'numeric'} }]]]
+            - [addConstraints, ['percent', [{ Type: {type: 'numeric'} }]]]
+            - [addConstraints, ['date', [{ Date: ~ }]]]
+            - [addConstraints, ['datetime', [{ DateTime: ~ }]]]
 
     oro_entity_extend.listener.extend_field_value_render:
         class: '%oro_entity_extend.listener.extend_field_value_render.class%'
@@ -492,6 +516,7 @@ services:
         arguments:
             - "@oro_entity.entity_alias_config_bag"
             - "@oro_entity_config.config_manager"
+            - "@oro_entity.entity_alias_duplicate_resolver"
         tags:
             - { name: oro_entity.alias_provider, priority: -90 }
 

@@ -9,18 +9,12 @@
             align-items: center;
             height: auto;
             min-width: initial;
-            padding-#{$start}: $multi-currency-editor-single-offset;
-            padding-#{$end}: $multi-currency-editor-single-offset;
-            margin-#{$start}: -$input-border-width;
+            padding: $multi-currency-editor-single-add-on-inner-offset;
+            margin-#{$start}: -$multi-currency-editor-single-border-width;
 
             border: $multi-currency-editor-single-border;
             background-color: $multi-currency-editor-single-color;
-        }
-
-        .inline-editor__actions {
-            #{$start}: 100%;
-            #{$end}: auto;
-            margin-#{$start}: -$input-border-width;
+            line-height: $oro-datagrid-body-cell-line-height;
         }
     }
 
@@ -32,7 +26,6 @@
         }
 
         .select2-choice {
-            padding-#{$end}: $multi-currency-editor-multi-choice-offset;
 
             &:after {
                 display: none;
@@ -50,24 +43,9 @@
         }
     }
 
-    .inline-editor__actions {
-        bottom: 0;
-        z-index: auto;
-
-        display: flex;
-        padding: 0;
-
-        background: $multi-currency-editor-multi-actions-color;
-        border: $multi-currency-editor-multi-actions-border;
-    }
-
     .inline-editor__fields {
-        display: flex;
-        margin: 0;
-
         input[type="text"] {
-            text-align: #{$end} !important; // Rewrite hard selectors
-            padding-#{$end}: $multi-currency-editor-multi-fields-offset !important; // Rewrite hard selectors
+            text-align: #{$end};
         }
     }
 
@@ -85,19 +63,6 @@
 
     .select2-container-active {
         z-index: $multi-currency-editor-multi-choice-active-z-index;
-
-        &:before,
-        &:after {
-            position: absolute;
-            top: -$input-border-width;
-            bottom: -$input-border-width;
-            z-index: 1;
-
-            width: $input-border-width;
-            background-color: $multi-currency-editor-multi-choice-active;
-
-            content: '';
-        }
 
         &:before {
             #{$start}: -$input-border-width;

@@ -489,9 +489,17 @@ class ConfigManager
      */
     public function flushAllCaches()
     {
-        // 'flushAllConfigurable' and 'flushAllConfigs' methods cannot be used due to them are removed
-        // entries from all caches, not only from entity config related caches
-        // for details, see BAP-9151
+        /**
+         * The Doctrine cache provider has two methods to clear the cache:
+         *  deleteAll - Deletes all cache entries in the current cache namespace.
+         *  flushAll - Flushes all cache entries, globally.
+         * Actually deleteAll method does not remove cached entries, it just increase cache version. The flushAll
+         * deletes all cached entries, but it does it for all namespaces.
+         * The problem is that we use the same cache, but for different caches we use different namespaces.
+         * E.g. we use oro_entity_aliases namespace for entity alias cache and oro_entity_config namespace for
+         * entity config cache. But if a developer call flushAll method for any of these cache all cached entries
+         * from all caches will be removed
+         */
         $this->cache->deleteAllConfigurable();
         $this->cache->deleteAllConfigs();
     }
@@ -570,6 +578,8 @@ class ConfigManager
     protected function prepareFlush(&$models)
     {
         $groupedConfigs = [];
+        $persistConfigsCount = count($this->persistConfigs);
+
         foreach ($this->persistConfigs as $config) {
             $this->calculateConfigChangeSet($config);
 
@@ -616,7 +626,13 @@ class ConfigManager
             }
         }
 
-        if (count($this->persistConfigs) !== count($this->configChangeSets)) {
+        // First we are comparing persistConfigs size to configChangeSets size in case one of them was changed.
+        // Then we are comparing persistConfigs size to stored persistConfigs size in case new persistConfigs
+        // were added and configChangeSets were recalculated. In this case persistConfigs and configChangeSets sizes
+        // will be equal, but we still need to rerun the logic with updated persistConfigs.
+        if (count($this->persistConfigs) !== count($this->configChangeSets)
+            || count($this->persistConfigs) !== $persistConfigsCount
+        ) {
             $this->prepareFlush($models);
         }
     }

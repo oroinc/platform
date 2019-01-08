@@ -1,4 +1,3 @@
-assets:
-    css:
-        inputs:
-            - 'bundles/orouser/css/scss/main.scss'
+css:
+    inputs:
+        - 'bundles/orouser/css/scss/main.scss'

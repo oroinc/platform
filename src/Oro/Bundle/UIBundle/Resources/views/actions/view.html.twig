@@ -73,7 +73,7 @@
                             <div class="top-row">
                                 {% block breadcrumbs %}
                                     {% if breadcrumbs is defined %}
-                                        <div class="pull-left">
+                                        <div class="page-title__entity-title-wrapper">
                                             {% if breadcrumbs.indexLabel is defined %}
                                                 <div class="sub-title">
                                                     {%- if breadcrumbs.indexPath is defined -%}
@@ -109,9 +109,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="pull-right title-buttons-container">
-                        {{ titleButtonsBlock }}
-                    </div>
+                    {% spaceless %}
+                        <div class="pull-right title-buttons-container">
+                            {{ titleButtonsBlock }}
+                        </div>
+                    {% endspaceless %}
                 </div>
                 <div class="row inline-info">
                     <div class="pull-left-extra">

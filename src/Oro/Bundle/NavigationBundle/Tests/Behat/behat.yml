@@ -103,7 +103,7 @@ oro_behat_extension:
     Tab Link:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
       selector:
-        locator: '//div[contains(@class,"oro-tabs__head")]/ul/li/a'
+        locator: '//ul[contains(@class,"nav-tabs")]/li/a'
         type: xpath
 
   pages:

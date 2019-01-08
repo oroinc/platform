@@ -28,6 +28,10 @@
         margin-top: $currency-select-enabled-default-currency-equivalent-offset-top;
 
         color: $currency-select-enabled-default-currency-equivalent-color;
+
+        &:empty {
+            margin-top: 0;
+        }
     }
 
     .base-currency-field {

@@ -351,6 +351,7 @@ define(function(require) {
                     this.highlightCell(cell, false);
                 }
             });
+            editorComponent.view.scrollIntoView();
             editorComponent.view.focus(!!fromPreviousCell);
         },
 

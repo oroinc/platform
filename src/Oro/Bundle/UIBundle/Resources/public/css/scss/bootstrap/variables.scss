@@ -33,12 +33,12 @@ $font-family-sans-serif: Arial, Helvetica, sans-serif;
 $font-size-base: 14px;
 $line-height-base: 1.57;
 $link-hover-decoration: none;
-$btn-font-weight: bold;
-$btn-font-size: 12px;
-$btn-text-transform: uppercase;
+$btn-font-weight: null;
+$btn-font-size: $base-font-size;
+$btn-text-transform: null;
 
-$btn-link-font-weight: bold;
-$btn-link-text-transform: uppercase;
+$btn-link-font-weight: null;
+$btn-link-text-transform: null;
 
 $btn-padding-y-sm: 0;
 $btn-padding-x-sm: 12px;
@@ -49,14 +49,15 @@ $btn-line-height-sm: 24px;
 $btn-icon-line-height-sm: $btn-line-height-sm - 1px;
 $btn-border-radius-sm: 16px;
 
-$btn-mobile-font-size: 14px;
+$btn-mobile-font-size: $base-font-size--m;
 $btn-mobile-border-radius: 20px;
 $btn-square-mobile-border-radius: 2px;
 $btn-icon-mobile-fa-icon-font-size: 18px;
 
 $content-title-font-size: 20px;
 $content-title-font-weight: bold;
-$content-title-line-height: 1.5;
+$content-title-line-height: 1.2;
+$content-title-inner-offset-bottom: 6px;
 
 $label-margin-bottom: 0;
 
@@ -91,7 +92,8 @@ $btn-mobile-padding-x: $input-btn-mobile-padding-x;
 // Navbar
 $nav-tabs-link-hover-border-color: $primary-750;
 $nav-divider-margin-y: 4px;
-$nav-link-padding-y: 0;
+$nav-link-padding-y: 8px;
+$nav-link-padding-x: 16px;
 
 // Alert
 $alert-border-radius: 2px;
@@ -232,7 +234,10 @@ $badge-font-weight: normal;
 $badge-padding-y: 4px;
 $badge-padding-x: 8px;
 $badge-pill-padding-x: 8px;
-$badge-icon-offset: 5px;
+$badge-icon-offset: 8px;
+$badge-icon-height: 12px !default;
+$badge-line-height: 16px !default;
+$badge-vertical-align: bottom;
 
 // Oro Variables
 $general-border-color:                  #ddd;

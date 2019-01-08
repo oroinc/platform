@@ -17,8 +17,6 @@ class StyleLoader {
         let commonConfigs = this._configLoader.loadConfigs('/Resources/config/oro/assets.yml');
         let themeConfigs = this._configLoader.loadConfigs('/Resources/public/themes/' + theme + '/settings.yml');
 
-        commonConfigs = commonConfigs.assets;
-
         themeConfigs = themeConfigs.styles;
         for (let key in themeConfigs) {
             if (themeConfigs.hasOwnProperty(key)) {

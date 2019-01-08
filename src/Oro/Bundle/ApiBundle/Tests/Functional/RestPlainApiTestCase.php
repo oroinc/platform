@@ -32,6 +32,14 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
     /**
      * {@inheritdoc}
      */
+    protected function getResponseContentType()
+    {
+        return self::JSON_CONTENT_TYPE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
         $this->checkHateoasHeader($server);
@@ -45,6 +53,9 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
             $server,
             $content
         );
+
+        // make sure that REST API call does not start the session
+        self::assertSessionNotStarted($method, $uri);
 
         return $this->client->getResponse();
     }
@@ -65,7 +76,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
         $content = self::jsonToArray($response->getContent());
         $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
 
-        self::assertArrayContains($expectedContent, $content);
+        self::assertThat($content, new RestPlainDocContainsConstraint($expectedContent, false));
     }
 
     /**
@@ -107,5 +118,22 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
                 $e->getComparisonFailure()
             );
         }
+    }
+
+    /**
+     * Extracts REST API resource identifier from the response.
+     *
+     * @param Response $response
+     * @param string   $identifierFieldName
+     *
+     * @return mixed
+     */
+    protected function getResourceId(Response $response, string $identifierFieldName = 'id')
+    {
+        $content = self::jsonToArray($response->getContent());
+        self::assertInternalType('array', $content);
+        self::assertArrayHasKey($identifierFieldName, $content);
+
+        return $content[$identifierFieldName];
     }
 }

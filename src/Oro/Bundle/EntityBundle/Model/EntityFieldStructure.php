@@ -2,25 +2,28 @@
 
 namespace Oro\Bundle\EntityBundle\Model;
 
-class EntityFieldStructure
+/**
+ * Represents detailed information about an entity field.
+ */
+class EntityFieldStructure implements \Serializable
 {
     /** @var string */
-    protected $name;
+    private $name;
 
     /** @var string */
-    protected $type;
+    private $type;
 
     /** @var string */
-    protected $label;
+    private $label;
 
     /** @var string */
-    protected $relationType;
+    private $relationType;
 
     /** @var string */
-    protected $relatedEntityName;
+    private $relatedEntityName;
 
     /** @var array */
-    protected $options = [];
+    private $options = [];
 
     /**
      * @return string
@@ -33,7 +36,7 @@ class EntityFieldStructure
     /**
      * @param string $name
      *
-     * @return $this
+     * @return self
      */
     public function setName($name)
     {
@@ -53,7 +56,7 @@ class EntityFieldStructure
     /**
      * @param string $type
      *
-     * @return $this
+     * @return self
      */
     public function setType($type)
     {
@@ -73,7 +76,7 @@ class EntityFieldStructure
     /**
      * @param string $label
      *
-     * @return $this
+     * @return self
      */
     public function setLabel($label)
     {
@@ -93,7 +96,7 @@ class EntityFieldStructure
     /**
      * @param string $relationType
      *
-     * @return $this
+     * @return self
      */
     public function setRelationType($relationType)
     {
@@ -113,7 +116,7 @@ class EntityFieldStructure
     /**
      * @param string $relatedEntityName
      *
-     * @return $this
+     * @return self
      */
     public function setRelatedEntityName($relatedEntityName)
     {
@@ -132,9 +135,9 @@ class EntityFieldStructure
 
     /**
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      *
-     * @return $this
+     * @return self
      */
     public function addOption($name, $value)
     {
@@ -165,5 +168,35 @@ class EntityFieldStructure
     public function hasOption($name)
     {
         return isset($this->options[$name]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize([
+            $this->name,
+            $this->type,
+            $this->label,
+            $this->relationType,
+            $this->relatedEntityName,
+            $this->options
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        list(
+            $this->name,
+            $this->type,
+            $this->label,
+            $this->relationType,
+            $this->relatedEntityName,
+            $this->options
+            ) = unserialize($serialized, ['allowed_classes' => false]);
     }
 }

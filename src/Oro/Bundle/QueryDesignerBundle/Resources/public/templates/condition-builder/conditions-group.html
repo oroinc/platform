@@ -1,7 +1,7 @@
 <button class="btn-link btn-close fa-close hide-text">close</button>
 <ul class="conditions-group<% if (criteria !== 'conditions-group') { %> <%- criteria %><% } %>" data-role="condition-content"></ul>
 <% if (!_.isEmpty(validation)) { %>
-<input class="select2-focusser select2-offscreen" type="checkbox"
+<input class="invisible" type="checkbox"
        name="<%= 'condition_item_' + Date.now() %>"
        data-validation="<%- JSON.stringify(validation) %>" <% if (!_.isEmpty(value)) { %>checked <% } %>/>
 <% } %>

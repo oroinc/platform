@@ -29,6 +29,10 @@
 
 .system-configuration-container {
     padding: 0 $content-padding;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    overflow: hidden;
 
     .control-group {
         .controls, &.controls {

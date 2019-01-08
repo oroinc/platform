@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
- * This controller covers basic CRUD functionality for User entity.
+ * This controller covers CRUD functionality for User entity.
  * Also includes user profile management functionality.
  */
 class UserController extends Controller
@@ -184,8 +184,6 @@ class UserController extends Controller
         return [
             'entity'       => $entity,
             'form'         => $this->get('oro_user.form.user')->createView(),
-            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
-            // completely delete an owner and related entities or reassign related entities to another owner before
             'allow_delete' => $this->isUserDeleteAllowed($entity)
         ];
     }
@@ -197,9 +195,6 @@ class UserController extends Controller
      */
     protected function view(User $entity, $isProfileView = false)
     {
-        // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
-        // completely delete an owner and related entities or reassign related entities to another owner before
-
         return [
             'entity' => $entity,
             'allow_delete' => $this->isUserDeleteAllowed($entity),

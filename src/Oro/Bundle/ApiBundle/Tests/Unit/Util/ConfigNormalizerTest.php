@@ -68,6 +68,60 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
+            'replaced fields'                                            => [
+                'config'         => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'field'        => [
+                            'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
+                        ],
+                        '_field'       => [
+                            'property_path' => 'field',
+                            'exclude'       => true
+                        ],
+                        'association1' => [
+                            'fields' => [
+                                'association11' => [
+                                    'fields' => [
+                                        'field111'  => [
+                                            'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
+                                        ],
+                                        '_field111' => [
+                                            'property_path' => 'field111',
+                                            'exclude'       => true
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'exclusion_policy' => 'all',
+                    '_renamed_fields'  => ['field' => '_field'],
+                    '_excluded_fields' => ['_field'],
+                    'fields'           => [
+                        '_field'       => [
+                            'property_path' => 'field',
+                            'exclude'       => true
+                        ],
+                        'association1' => [
+                            'fields' => [
+                                'association11' => [
+                                    '_renamed_fields'  => ['field111' => '_field111'],
+                                    '_excluded_fields' => ['_field111'],
+                                    'fields'           => [
+                                        '_field111' => [
+                                            'property_path' => 'field111',
+                                            'exclude'       => true
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             'field depends on another field'                             => [
                 'config'         => [
                     'exclusion_policy' => 'all',
@@ -108,6 +162,37 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                             'exclude' => false
                         ],
                         'field2' => [
+                            'depends_on' => ['field1']
+                        ]
+                    ]
+                ]
+            ],
+            'field depends on replaced field'                            => [
+                'config'         => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'field1'  => [
+                            'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
+                        ],
+                        '_field1' => [
+                            'property_path' => 'field1',
+                            'exclude'       => true
+                        ],
+                        'field2'  => [
+                            'depends_on' => ['field1']
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'exclusion_policy' => 'all',
+                    '_renamed_fields'  => ['field1' => '_field1'],
+                    '_excluded_fields' => ['_field1'],
+                    'fields'           => [
+                        '_field1' => [
+                            'property_path' => 'field1',
+                            'exclude'       => false
+                        ],
+                        'field2'  => [
                             'depends_on' => ['field1']
                         ]
                     ]
@@ -253,7 +338,6 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                     'fields'           => [
                         'association1' => [
                             'fields' => [
-                                'field11' => null,
                                 'field12' => null
                             ]
                         ],
@@ -275,12 +359,7 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                 'expectedConfig' => [
                     'exclusion_policy' => 'all',
                     'fields'           => [
-                        'association1' => [
-                            'fields' => [
-                                'field11' => null
-                            ]
-                        ],
-                        'field2'       => [
+                        'field2' => [
                             'depends_on' => ['association1.field11']
                         ]
                     ]

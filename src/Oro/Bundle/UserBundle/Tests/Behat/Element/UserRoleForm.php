@@ -48,7 +48,8 @@ class UserRoleForm extends Form
      */
     public function setCheckBoxPermission($name, $check = true)
     {
-        $element = $this->findLabel($name)->find('css', 'input');
+        $label = $this->findVisible('css', $this->selectorManipulator->addContainsSuffix('label', $name));
+        $element = $label->find('css', 'input');
 
         if ($check) {
             $element->check();

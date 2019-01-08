@@ -1,0 +1,21 @@
+/* @theme: admin.oro; */
+
+.control-group-compact-fallback {
+    .entity-fallback-container {
+        display: flex;
+        max-width: 294px;
+
+        &__value {
+            min-width: 25%;
+            max-width: 35%;
+
+            @include selector-width(100%);
+            padding-#{$end}: $content-padding-small;
+        }
+
+        &__line {
+            width: 100%;
+            margin-top: 0;
+        }
+    }
+}
