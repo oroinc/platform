@@ -15,7 +15,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 class LocalizationRepository extends EntityRepository implements BatchIteratorInterface
 {
     use BatchIteratorTrait;
-    
+
     /**
      * @return array
      */
