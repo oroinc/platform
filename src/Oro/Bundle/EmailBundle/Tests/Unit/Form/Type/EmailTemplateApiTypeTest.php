@@ -63,7 +63,7 @@ class EmailTemplateApiTypeTest extends \PHPUnit\Framework\TestCase
                 ['oro_email.sanitize_html', false, false, null, true]
             ]));
 
-        $this->localeSettings->expects($this->exactly(2))
+        $this->localeSettings->expects($this->exactly(1))
             ->method('getLanguage')
             ->will($this->returnValue('ru_UA'));
 
@@ -71,6 +71,6 @@ class EmailTemplateApiTypeTest extends \PHPUnit\Framework\TestCase
             ->method('getLocalesByCodes')
             ->will($this->returnValue(['en', 'fr_FR']));
 
-        $this->type->buildForm($builder, ['additional_language_codes' => []]);
+        $this->type->buildForm($builder, []);
     }
 }
