@@ -1,4 +1,5 @@
 /* @theme: admin.oro; */
+@import 'oroui/css/scss/bootstrap/badge';
 
 .label {
     display: inline-block;
@@ -11,6 +12,13 @@
 
     &-large {
         font-size: $base-font-size;
+    }
+
+    .page-title__path & {
+        @extend .badge;
+        @extend .badge-pill;
+
+        border: none;
     }
 }
 

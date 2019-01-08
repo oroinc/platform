@@ -120,19 +120,19 @@
 {% block breadcrumbs %}
     {{ parent() }}
 
-    <div class="pull-left">
+    <span class="page-title__status">
         {% if entity.system %}
-            <div class="badge badge-pill badge-tentatively status-tentatively"><i class="icon-status-tentatively fa-circle"></i>{{ 'oro.workflow.status.system.label'|trans }}</div>
+            {{ UI.badge('oro.workflow.status.system.label'|trans, 'tentatively') }}
         {% endif %}
         {% if not edit_allowed %}
-            <div class="badge badge-pill badge-tentatively status-tentatively"><i class="icon-status-tentatively fa-circle"></i>{{ 'oro.workflow.status.readonly.label'|trans }}</div>
+            {{ UI.badge('oro.workflow.status.readonly.label'|trans, 'tentatively') }}
         {% endif %}
         {% if isActive %}
-            <div class="badge badge-pill badge-enabled status-enabled"><i class="icon-status-enabled fa-circle"></i>{{ 'Active'|trans }}</div>
+            {{ UI.badge('Active'|trans, 'enabled') }}
         {% else %}
-            <div class="badge badge-pill badge-disabled status-disabled"><i class="icon-status-disabled fa-circle"></i>{{ 'Inactive'|trans }}</div>
+            {{ UI.badge('Inactive'|trans, 'disabled') }}
         {% endif %}
-    </div>
+    </span>
 {% endblock breadcrumbs %}
 
 {% macro view_step_row(stepData, entity, translateLinks) %}

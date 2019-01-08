@@ -29,6 +29,10 @@
         font-weight: normal;
     }
 
+    &__entity-title-wrapper {
+        display: inline-block;
+    }
+
     &__icon {
         float: #{$start};
         top: -2px;

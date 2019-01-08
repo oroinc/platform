@@ -6,17 +6,17 @@
 {% block breadcrumbs %}
     {{ parent() }}
 
-    <div class="pull-left">
+    <span class="page-title__status">
         {% include 'OroMessageQueueBundle:Job/Datagrid:status.html.twig' with {'record': {'rootEntity': entity}} %}
 
         {% if entity.unique %}
-            <div class="badge badge-pill badge-info status-box"><i class="icon-status-enabled fa-circle"></i>{{ 'oro.message_queue_job.header.unique'|trans }}</div>
+            {{ UI.badge('oro.message_queue_job.header.unique'|trans, 'info') }}
         {% endif %}
 
         {% if entity.interrupted %}
-            <div class="badge badge-pill badge-info status-box"><i class="icon-status-enabled fa-circle"></i>{{ 'oro.message_queue_job.header.interrupted'|trans }}</div>
+            {{ UI.badge('oro.message_queue_job.header.interrupted'|trans, 'info') }}
         {% endif %}
-    </div>
+    </span>
 {% endblock breadcrumbs %}
 
 {% block stats %}
