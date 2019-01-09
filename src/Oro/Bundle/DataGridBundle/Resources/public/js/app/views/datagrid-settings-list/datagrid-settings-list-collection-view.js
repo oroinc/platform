@@ -13,7 +13,7 @@ define(function(require) {
     require('jquery-ui');
 
     config = _.extend({
-        fallbackSelector: '.datagrid-settings-no-columns'
+        fallbackSelector: '.no-data'
     }, config);
 
     /**

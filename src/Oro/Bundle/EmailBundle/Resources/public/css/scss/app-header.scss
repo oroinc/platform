@@ -1,11 +1,5 @@
 /* @theme: admin.oro; */
 
-.desktop-version {
-    .app-header .user-menu .email-notification-menu.dropdown > .dropdown-menu {
-        #{$end}: -7px;
-    }
-}
-
 .app-header .nav.pull-right {
     .email-notification-menu.dropdown .dropdown-menu li a {
         padding: 0;
