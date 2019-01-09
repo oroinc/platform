@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Behat\Element;
 
+use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class Select extends Element
@@ -20,5 +21,13 @@ class Select extends Element
         } else {
             $this->selectOption($value);
         }
+    }
+
+    /**
+     * @return NodeElement|null
+     */
+    public function getSelectedOption()
+    {
+        return $this->find('css', 'option[selected]');
     }
 }
