@@ -32,11 +32,6 @@ services:
         tags:
             - { name: oro.api.form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
-    oro_api.form.extension.datetime:
-        class: Oro\Bundle\ApiBundle\Form\Extension\DateTimeExtension
-        tags:
-            - { name: oro.api.form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType }
-
     oro_api.form.extension.customize_form_data:
         class: Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension
         arguments:

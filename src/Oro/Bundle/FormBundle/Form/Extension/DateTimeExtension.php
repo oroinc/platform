@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Form\Extension;
 
+use Oro\Bundle\FormBundle\Form\DataTransformer\RemoveMillisecondsFromDateTimeTransformer;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToHtml5LocalDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
@@ -36,7 +37,11 @@ class DateTimeExtension extends AbstractTypeExtension
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $pattern = is_string($options['format']) ? $options['format'] : null;
-        if (self::HTML5_FORMAT_WITHOUT_TIMEZONE === $pattern) {
+        if (self::HTML5_FORMAT_WITH_TIMEZONE === $pattern) {
+            // old REST API should accept values with milliseconds,
+            // like "2014-03-04T20:00:00.123Z" or "2014-03-04T20:00:00.123+01:00"
+            $this->wrapLocalizedStringWithRemoveMillisecondsTransformer($builder);
+        } elseif (self::HTML5_FORMAT_WITHOUT_TIMEZONE === $pattern) {
             $this->replaceHtml5LocalDateTimeWithLocalizedStringViewTransformer($builder, $pattern, $options);
         }
     }
@@ -62,6 +67,33 @@ class DateTimeExtension extends AbstractTypeExtension
     public function getExtendedType()
     {
         return DateTimeType::class;
+    }
+
+    /**
+     * Wraps DateTimeToLocalizedStringTransformer with RemoveMillisecondsFromDateTimeTransformer view transformer.
+     *
+     * @param FormBuilderInterface $builder
+     */
+    private function wrapLocalizedStringWithRemoveMillisecondsTransformer(FormBuilderInterface $builder)
+    {
+        $transformerKey = null;
+        $viewTransformers = $builder->getViewTransformers();
+        foreach ($viewTransformers as $key => $viewTransformer) {
+            if ($viewTransformer instanceof DateTimeToLocalizedStringTransformer) {
+                $transformerKey = $key;
+                break;
+            }
+        }
+        if (null !== $transformerKey) {
+            $builder->resetViewTransformers();
+            $viewTransformers[$transformerKey] = new RemoveMillisecondsFromDateTimeTransformer(
+                $viewTransformers[$transformerKey]
+            );
+            \rsort($viewTransformers);
+            foreach ($viewTransformers as $key => $viewTransformer) {
+                $builder->addViewTransformer($viewTransformer);
+            }
+        }
     }
 
     /**

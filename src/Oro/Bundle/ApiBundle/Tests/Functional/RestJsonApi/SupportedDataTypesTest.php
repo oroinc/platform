@@ -430,13 +430,13 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
             'JsonArray (not array)'          => ['fieldJsonArray', 0],
             'DateTime (empty string)'        => ['fieldDateTime', ''],
             'DateTime (invalid string)'      => ['fieldDateTime', 'a'],
-            'DateTime (not string)'          => ['fieldDateTime', 1],
+            'DateTime (not string)'          => ['fieldDateTime', false],
             'Date (empty string)'            => ['fieldDate', ''],
             'Date (invalid string)'          => ['fieldDate', 'a'],
-            'Date (not string)'              => ['fieldDate', 1],
+            'Date (not string)'              => ['fieldDate', false],
             'Time (empty string)'            => ['fieldTime', ''],
             'Time (invalid string)'          => ['fieldTime', 'a'],
-            'Time (not string)'              => ['fieldTime', 1],
+            'Time (not string)'              => ['fieldTime', false],
             'Percent (empty string)'         => ['fieldPercent', ''],
             'Percent (not number string)'    => ['fieldPercent', 'a'],
             'Money (empty string)'           => ['fieldMoney', ''],
@@ -493,10 +493,11 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         ];
     }
 
-    public function testShouldAcceptTimezoneInDateTimeField()
+    /**
+     * @dataProvider validDateTimeValueDataProvider
+     */
+    public function testValidValuesForDateTimeField($submittedValue, $responseValue, $entityValue)
     {
-        $inputDateTime = '2017-01-21T10:20:30+05:00';
-        $utcDateTime = '2017-01-21T05:20:30+0000';
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
         $data = [
@@ -504,7 +505,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
                 'type'       => $entityType,
                 'id'         => '<toString(@TestItem1->id)>',
                 'attributes' => [
-                    'fieldDateTime' => $inputDateTime
+                    'fieldDateTime' => $submittedValue
                 ]
             ]
         ];
@@ -512,17 +513,98 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data);
 
         $expectedResponseData = $data;
-        $expectedResponseData['data']['attributes']['fieldDateTime'] = str_replace('+0000', 'Z', $utcDateTime);
+        $expectedResponseData['data']['attributes']['fieldDateTime'] = $responseValue;
         $this->assertResponseContains($expectedResponseData, $response);
 
+        $this->getEntityManager()->clear();
         $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getResourceId($response));
-        self::assertEquals($utcDateTime, $entity->fieldDateTime->format('Y-m-d\TH:i:sO'));
+        self::assertEquals($entityValue, $entity->fieldDateTime->format('Y-m-d\TH:i:s.vO'));
     }
 
-    public function testShouldAcceptDateOnlyInDateTimeField()
+    /**
+     * @return array
+     */
+    public function validDateTimeValueDataProvider()
     {
-        $inputDateTime = '2017-01-21';
-        $utcDateTime = '2017-01-21T00:00:00+0000';
+        return [
+            'year only'                              => [
+                '2017',
+                '2017-01-01T00:00:00Z',
+                '2017-01-01T00:00:00.000+0000'
+            ],
+            'year and month only'                    => [
+                '2017-07',
+                '2017-07-01T00:00:00Z',
+                '2017-07-01T00:00:00.000+0000'
+            ],
+            'date only'                              => [
+                '2017-07-21',
+                '2017-07-21T00:00:00Z',
+                '2017-07-21T00:00:00.000+0000'
+            ],
+            'with timezone'                          => [
+                '2017-07-21T10:20:30+05:00',
+                '2017-07-21T05:20:30Z',
+                '2017-07-21T05:20:30.000+0000'
+            ],
+            'with UTC timezone'                      => [
+                '2017-07-21T10:20:30Z',
+                '2017-07-21T10:20:30Z',
+                '2017-07-21T10:20:30.000+0000'
+            ],
+            'without seconds, with timezone'         => [
+                '2017-07-21T10:20+05:00',
+                '2017-07-21T05:20:00Z',
+                '2017-07-21T05:20:00.000+0000'
+            ],
+            'without seconds, with UTC timezone'     => [
+                '2017-07-21T10:20Z',
+                '2017-07-21T10:20:00Z',
+                '2017-07-21T10:20:00.000+0000'
+            ],
+            'with milliseconds and timezone'         => [
+                '2017-07-21T10:20:30.123+05:00',
+                '2017-07-21T05:20:30.123Z',
+                '2017-07-21T05:20:30.000+0000'
+            ],
+            'with milliseconds and UTC timezone'     => [
+                '2017-07-21T10:20:30.123Z',
+                '2017-07-21T10:20:30.123Z',
+                '2017-07-21T10:20:30.000+0000'
+            ],
+            'max time'                               => [
+                '2017-07-21T23:59:59Z',
+                '2017-07-21T23:59:59Z',
+                '2017-07-21T23:59:59.000+0000'
+            ],
+            'year and time with timezone'            => [
+                '2017T10:20:30+05:00',
+                '2017-01-01T05:20:30Z',
+                '2017-01-01T05:20:30.000+0000'
+            ],
+            'year, month and time with timezone'     => [
+                '2017-07T10:20:30+05:00',
+                '2017-07-01T05:20:30Z',
+                '2017-07-01T05:20:30.000+0000'
+            ],
+            'year and time with UTC timezone'        => [
+                '2017T10:20:30Z',
+                '2017-01-01T10:20:30Z',
+                '2017-01-01T10:20:30.000+0000'
+            ],
+            'year, month and time with UTC timezone' => [
+                '2017-07T10:20:30Z',
+                '2017-07-01T10:20:30Z',
+                '2017-07-01T10:20:30.000+0000'
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider invalidDateTimeDataProvider
+     */
+    public function testInvalidValuesForDateTimeField($value)
+    {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
         $data = [
@@ -530,7 +612,60 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
                 'type'       => $entityType,
                 'id'         => '<toString(@TestItem1->id)>',
                 'attributes' => [
-                    'fieldDateTime' => $inputDateTime
+                    'fieldDateTime' => $value
+                ]
+            ]
+        ];
+
+        $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data, [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'form constraint',
+                'source' => ['pointer' => '/data/attributes/fieldDateTime']
+            ],
+            $response
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidDateTimeDataProvider()
+    {
+        return [
+            'without timezone'                        => ['2017-07-21T10:20:30'],
+            'without seconds and timezone'            => ['2017-07-21T10:20'],
+            'with milliseconds, but without timezone' => ['2017-07-21T10:20:30.123'],
+            'without minutes'                         => ['2017-07-21T10Z'],
+            'invalid time delimiter'                  => ['2017-07-21 10:20:30'],
+            'invalid date'                            => ['2017-02-30T10:20:30Z'],
+            'out of bounds for months'                => ['2017-13-21T10:20:30Z'],
+            'out of bounds for days'                  => ['2017-07-32T10:20:30Z'],
+            'out of bounds for hours'                 => ['2017-07-21T24:20:30Z'],
+            'out of bounds for minutes'               => ['2017-07-21T10:60:30Z'],
+            'out of bounds for seconds'               => ['2017-07-21T10:20:60Z'],
+            'without leading zero in months'          => ['2017-7-21T10:20:30Z'],
+            'without leading zero in days'            => ['2017-07-1T10:20:30Z'],
+            'without leading zero in hours'           => ['2017-07-21T1:20:30Z'],
+            'without leading zero in minutes'         => ['2017-07-21T10:1:30Z'],
+            'without leading zero in seconds'         => ['2017-07-21T10:20:1Z']
+        ];
+    }
+
+    /**
+     * @dataProvider validDateValueDataProvider
+     */
+    public function testValidValuesForDateField($submittedValue, $responseValue, $entityValue)
+    {
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+
+        $data = [
+            'data' => [
+                'type'       => $entityType,
+                'id'         => '<toString(@TestItem1->id)>',
+                'attributes' => [
+                    'fieldDate' => $submittedValue
                 ]
             ]
         ];
@@ -538,11 +673,182 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data);
 
         $expectedResponseData = $data;
-        $expectedResponseData['data']['attributes']['fieldDateTime'] = str_replace('+0000', 'Z', $utcDateTime);
+        $expectedResponseData['data']['attributes']['fieldDate'] = $responseValue;
         $this->assertResponseContains($expectedResponseData, $response);
 
+        $this->getEntityManager()->clear();
         $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getResourceId($response));
-        self::assertEquals($utcDateTime, $entity->fieldDateTime->format('Y-m-d\TH:i:sO'));
+        self::assertEquals($entityValue, $entity->fieldDate->format('Y-m-d\TH:i:s.vO'));
+    }
+
+    /**
+     * @return array
+     */
+    public function validDateValueDataProvider()
+    {
+        return [
+            'full date'           => [
+                '2017-07-21',
+                '2017-07-21',
+                '2017-07-21T00:00:00.000+0000'
+            ],
+            'year only'           => [
+                '2017',
+                '2017-01-01',
+                '2017-01-01T00:00:00.000+0000'
+            ],
+            'year and month only' => [
+                '2017-07',
+                '2017-07-01',
+                '2017-07-01T00:00:00.000+0000'
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider invalidDateDataProvider
+     */
+    public function testInvalidValuesForDateField($value)
+    {
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+
+        $data = [
+            'data' => [
+                'type'       => $entityType,
+                'id'         => '<toString(@TestItem1->id)>',
+                'attributes' => [
+                    'fieldDate' => $value
+                ]
+            ]
+        ];
+
+        $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data, [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'form constraint',
+                'source' => ['pointer' => '/data/attributes/fieldDate']
+            ],
+            $response
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidDateDataProvider()
+    {
+        return [
+            'with time'                      => ['2017-07-21T00:00:00'],
+            'with time and timezone'         => ['2017-07-21T00:00:00+05:00'],
+            'with time and UTC timezone'     => ['2017-07-21T00:00:00Z'],
+            'invalid date'                   => ['2017-02-30'],
+            'out of bounds for months'       => ['2017-13-21'],
+            'out of bounds for days'         => ['2017-07-32'],
+            'without leading zero in months' => ['2017-7-21'],
+            'without leading zero in days'   => ['2017-07-1']
+        ];
+    }
+
+    /**
+     * @dataProvider validTimeValueDataProvider
+     */
+    public function testValidValuesForTimeField($submittedValue, $responseValue, $entityValue)
+    {
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+
+        $data = [
+            'data' => [
+                'type'       => $entityType,
+                'id'         => '<toString(@TestItem1->id)>',
+                'attributes' => [
+                    'fieldTime' => $submittedValue
+                ]
+            ]
+        ];
+
+        $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data);
+
+        $expectedResponseData = $data;
+        $expectedResponseData['data']['attributes']['fieldTime'] = $responseValue;
+        $this->assertResponseContains($expectedResponseData, $response);
+
+        $this->getEntityManager()->clear();
+        $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getResourceId($response));
+        self::assertEquals($entityValue, $entity->fieldTime->format('Y-m-d\TH:i:s.vO'));
+    }
+
+    /**
+     * @return array
+     */
+    public function validTimeValueDataProvider()
+    {
+        return [
+            'full time'            => [
+                '10:20:30',
+                '10:20:30',
+                '1970-01-01T10:20:30.000+0000'
+            ],
+            'without seconds'      => [
+                '10:20',
+                '10:20:00',
+                '1970-01-01T10:20:00.000+0000'
+            ],
+            'max time'             => [
+                '23:59:59',
+                '23:59:59',
+                '1970-01-01T23:59:59.000+0000'
+            ],
+            'without leading zero' => [
+                '1:2:3',
+                '01:02:03',
+                '1970-01-01T01:02:03.000+0000'
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider invalidTimeDataProvider
+     */
+    public function testInvalidValuesForTimeField($value)
+    {
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+
+        $data = [
+            'data' => [
+                'type'       => $entityType,
+                'id'         => '<toString(@TestItem1->id)>',
+                'attributes' => [
+                    'fieldTime' => $value
+                ]
+            ]
+        ];
+
+        $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data, [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'form constraint',
+                'source' => ['pointer' => '/data/attributes/fieldTime']
+            ],
+            $response
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidTimeDataProvider()
+    {
+        return [
+            'with date'                 => ['2017-07-21T10:20:30Z'],
+            'with timezone'             => ['10:20:30+05:00'],
+            'with UTC timezone'         => ['10:20:30Z'],
+            'without minutes'           => ['10'],
+            'out of bounds for hours'   => ['24:20:30'],
+            'out of bounds for minutes' => ['10:60:30'],
+            'out of bounds for seconds' => ['10:20:60']
+        ];
     }
 
     public function testMoneyShouldBeRounded()
