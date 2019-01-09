@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\LocaleBundle\Provider;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Symfony\Component\Intl\Intl;
 
+/**
+ * Provides lists of languages and formatting codes translated on current system language.
+ */
 class LocalizationChoicesProvider
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var LocaleSettings */
+    protected $localeSettings;
 
     /** @var LanguageCodeFormatter */
     protected $languageFormatter;
@@ -24,18 +27,18 @@ class LocalizationChoicesProvider
     protected $localizationManager;
 
     /**
-     * @param ConfigManager $configManager
+     * @param LocaleSettings $localeSettings
      * @param LanguageCodeFormatter $languageFormatter
      * @param LanguageProvider $languageProvider
      * @param LocalizationManager $localizationManager
      */
     public function __construct(
-        ConfigManager $configManager,
+        LocaleSettings $localeSettings,
         LanguageCodeFormatter $languageFormatter,
         LanguageProvider $languageProvider,
         LocalizationManager $localizationManager
     ) {
-        $this->configManager = $configManager;
+        $this->localeSettings = $localeSettings;
         $this->languageFormatter = $languageFormatter;
         $this->languageProvider = $languageProvider;
         $this->localizationManager = $localizationManager;
@@ -86,6 +89,6 @@ class LocalizationChoicesProvider
      */
     protected function getSystemLanguage()
     {
-        return $this->configManager->get('oro_locale.language');
+        return $this->localeSettings->getLanguage();
     }
 }

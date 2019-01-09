@@ -106,14 +106,11 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
-        // null values set as default for language, country and currency because
-        // their values will be calculated by Extension based on chosen locale
+        // null values set as default for country because
+        // their values will be calculated by Extension based on kernel`s default locale
         SettingsBuilder::append(
             $rootNode,
             [
-                'locale' => ['value' => self::DEFAULT_LOCALE],
-                self::LANGUAGE => ['value' => null],
-                'languages' => ['value' => [self::DEFAULT_LANGUAGE], 'type' => 'array'],
                 'country' => ['value' => null],
                 'timezone' => ['value' => date_default_timezone_get()],
                 'format_address_by_address_country' => ['value' => true, 'type' => 'boolean'],

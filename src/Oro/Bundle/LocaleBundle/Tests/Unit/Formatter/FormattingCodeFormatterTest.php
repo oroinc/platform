@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -17,8 +17,8 @@ class FormattingCodeFormatterTest extends TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     protected $translator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    protected $configManager;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
+    protected $localeSettings;
 
     /**
      * {@inheritDoc}
@@ -27,11 +27,10 @@ class FormattingCodeFormatterTest extends TestCase
     {
         IntlTestHelper::requireIntl($this);
 
-        $this->translator   = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()->getMock();
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
 
-        $this->formatter = new FormattingCodeFormatter($this->translator, $this->configManager);
+        $this->formatter = new FormattingCodeFormatter($this->translator, $this->localeSettings);
     }
 
     /**
@@ -47,9 +46,8 @@ class FormattingCodeFormatterTest extends TestCase
             ->with('N/A')
             ->willReturn('N/A');
 
-        $this->configManager->expects($value ? $this->once() : $this->never())
-            ->method('get')
-            ->with(LanguageCodeFormatter::CONFIG_KEY_DEFAULT_LANGUAGE)
+        $this->localeSettings->expects($value ? $this->once() : $this->never())
+            ->method('getLanguage')
             ->willReturn('en');
 
         $this->assertSame($expected, $this->formatter->format($value));

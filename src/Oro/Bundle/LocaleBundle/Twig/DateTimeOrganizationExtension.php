@@ -3,6 +3,8 @@
 namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 /**
@@ -10,7 +12,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  *
  * @deprecated Since 1.11, will be removed after 1.13.
  *
- * @todo it's a temporary workaround to fix dates in reminder emails CRM-5745 until improvement CRM-5758 is implemented
+ * It's a temporary workaround to fix dates in reminder emails CRM-5745 until improvement CRM-5758 is implemented
  */
 class DateTimeOrganizationExtension extends DateTimeExtension
 {
@@ -20,6 +22,14 @@ class DateTimeOrganizationExtension extends DateTimeExtension
     protected function getConfigManager()
     {
         return $this->container->get('oro_config.global');
+    }
+
+    /**
+     * @return LocalizationManager
+     */
+    protected function getLocalizationManager()
+    {
+        return $this->container->get('oro_locale.manager.localization');
     }
 
     /**
@@ -78,7 +88,11 @@ class DateTimeOrganizationExtension extends DateTimeExtension
     {
         if ($organization instanceof OrganizationInterface) {
             $configManager = $this->getConfigManager();
-            $locale = $configManager->get('oro_locale.locale');
+            $localizationId = $configManager->get(
+                Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION)
+            );
+
+            $locale = $this->getFormattingCode((int) $localizationId);
             $timeZone = $configManager->get('oro_locale.timezone');
         } else {
             $locale = $this->getOption($options, 'locale');
@@ -94,5 +108,16 @@ class DateTimeOrganizationExtension extends DateTimeExtension
     public function getName()
     {
         return 'oro_locale_datetime_organization';
+    }
+
+    /**
+     * @param int $localizationId
+     * @return string
+     */
+    protected function getFormattingCode(int $localizationId)
+    {
+        $localizationData = $this->getLocalizationManager()->getLocalizationData($localizationId);
+
+        return $localizationData['formattingCode'] ?? Configuration::DEFAULT_LOCALE;
     }
 }

@@ -45,19 +45,31 @@ class LocalizationContext extends OroFeatureContext implements KernelAwareContex
     }
 
     /**
-     * @Given /^I enable "(?P<languageCode>(?:[^"]|\\")*)" language$/
+     * @Given /^I enable "(?P<localizationName>(?:[^"]|\\")*)" localization/
      *
-     * @param string $languageCode
+     * @param string $localizationName
      */
-    public function selectLanguage($languageCode)
+    public function selectLocalization($localizationName)
     {
         /** @var ContainerInterface $container */
         $container = $this->getContainer();
 
+        $localization = $container->get('doctrine')->getManagerForClass(Localization::class)
+            ->getRepository(Localization::class)
+            ->findOneBy(['name' => $localizationName]);
+
         /** @var ConfigManager $configManager */
         $configManager = $container->get('oro_config.global');
-        $configManager->set('oro_locale.languages', array_unique(['en', $languageCode]));
-        $configManager->set('oro_locale.language', $languageCode);
+        $configManager->set(
+            'oro_locale.enabled_localizations',
+            array_unique(
+                array_merge(
+                    $configManager->get('oro_locale.enabled_localizations'),
+                    [$localization->getId()]
+                )
+            )
+        );
+        $configManager->set('oro_locale.default_localization', $localization->getId());
         $configManager->flush();
     }
 }

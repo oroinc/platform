@@ -64,15 +64,8 @@ class OroLocaleExtension extends Extension
      */
     protected function prepareSettings(array $config, ContainerBuilder $container)
     {
-        $locale = LocaleSettings::getValidLocale(
-            $this->getFinalizedParameter($config['settings']['locale']['value'], $container)
-        );
-        $config['settings']['locale']['value'] = $locale;
-        if (empty($config['settings']['language']['value'])) {
-            $config['settings']['language']['value'] = $locale;
-        }
         if (empty($config['settings']['country']['value'])) {
-            $config['settings']['country']['value'] = LocaleSettings::getCountryByLocale($locale);
+            $config['settings']['country']['value'] = LocaleSettings::getCountryByLocale($config['formatting_code']);
         }
         $country = $config['settings']['country']['value'];
         if (empty($config['settings']['currency']['value'])
@@ -81,19 +74,6 @@ class OroLocaleExtension extends Extension
             $config['settings']['currency']['value'] = $config['locale_data'][$country]['currency_code'];
         }
         $container->prependExtensionConfig('oro_locale', $config);
-    }
-
-    /**
-     * @param string $parameter
-     * @param ContainerBuilder $container
-     * @return mixed
-     */
-    protected function getFinalizedParameter($parameter, ContainerBuilder $container)
-    {
-        if (is_string($parameter) && strpos($parameter, '%') === 0) {
-            return $container->getParameter(str_replace('%', '', $parameter));
-        }
-        return $parameter;
     }
 
     /**

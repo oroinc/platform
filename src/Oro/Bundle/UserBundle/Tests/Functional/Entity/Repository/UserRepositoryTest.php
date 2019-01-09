@@ -102,9 +102,12 @@ class UserRepositoryTest extends WebTestCase
         $user3 = $this->getReference(LoadUserData::SIMPLE_USER_2);
         $user4 = $this->getReference(LoadUserData::USER_WITH_CONFIRMATION_TOKEN);
 
-        $this->assertEquals(
-            [$user1->getId(), $user2->getId(), $user3->getId(), $user4->getId()],
-            $this->repository->findIdsByOrganizations([$organization])
-        );
+        $expected = [$user1->getId(), $user2->getId(), $user3->getId(), $user4->getId()];
+        sort($expected);
+
+        $actual = $this->repository->findIdsByOrganizations([$organization]);
+        sort($actual);
+
+        $this->assertEquals($expected, $actual);
     }
 }

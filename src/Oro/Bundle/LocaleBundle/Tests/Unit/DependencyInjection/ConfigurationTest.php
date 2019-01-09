@@ -40,18 +40,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'settings' => [
                         'resolved' => true,
-                        'locale' => [
-                            'value' => 'en',
-                            'scope' => 'app'
-                        ],
-                        'language' => [
-                            'value' => null,
-                            'scope' => 'app'
-                        ],
-                        'languages' => [
-                            'value' => ['en'],
-                            'scope' => 'app'
-                        ],
                         'country' => [
                             'value' => null,
                             'scope' => 'app'

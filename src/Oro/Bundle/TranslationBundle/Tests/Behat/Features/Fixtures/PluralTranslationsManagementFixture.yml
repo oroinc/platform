@@ -5,6 +5,17 @@ Oro\Bundle\TranslationBundle\Entity\Language:
         organization: '@organization'
         owner: '@admin'
 
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+    title_localization_ru:
+        string: 'Russian (Russia)'
+
+Oro\Bundle\LocaleBundle\Entity\Localization:
+    localization_ru:
+        name: 'Russian (Russia)'
+        language: '@language_ru'
+        formattingCode: 'ru'
+        titles: ['@title_localization_ru']
+
 Oro\Bundle\TranslationBundle\Entity\Translation:
     language_ru_translation:
         translationKey: '@oro_entity_pagination_translation_key'

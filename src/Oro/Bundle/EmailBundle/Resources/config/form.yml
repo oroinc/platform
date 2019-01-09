@@ -55,6 +55,7 @@ services:
             - '@oro_config.user'
             - '@oro_locale.settings'
             - '@doctrine'
+            - '@oro_locale.manager.localization'
         tags:
             - { name: form.type, alias: oro_email_autoresponse_template }
 

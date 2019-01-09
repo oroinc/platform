@@ -17,11 +17,10 @@ Feature: User role entity permissions translation
 
     # Prepare new label for Attachment entity in german language
     When I go to System / Configuration
-    And I follow "System Configuration/General Setup/Language Settings" on configuration sidebar
+    And I follow "System Configuration/General Setup/Localization" on configuration sidebar
     And I fill form with:
-      | Supported Languages | [English, German] |
-      | Use Default         | false             |
-      | Default Language    | German            |
+      | Enabled Localizations | [English, German Localization] |
+      | Default Localization  | German Localization            |
     And I submit form
     Then I should see "Configuration saved" flash message
     When I go to System / Entities / Entity Management

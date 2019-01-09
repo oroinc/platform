@@ -1,4 +1,6 @@
 @regression
+@fixture-OroNotificationBundle:NotifyAssignedSalesRepsFixture.yml
+
 Feature: Notify assigned Sales Representatives
   As an Administrator
   When I create email notification for Contact Request
@@ -9,11 +11,12 @@ Feature: Notify assigned Sales Representatives
     And go to System/ Emails/ Templates
     And click "Create Email Template"
     And fill form with:
-      |Owner         |John Doe       |
-      |Template Name |Test Template  |
-      |Type          |Plain Text     |
-      |Entity Name   |Contact Request|
-      |Subject       |Test Subject   |
+      | Owner         | John Doe        |
+      | Template Name | Test Template   |
+      | Type          | Html            |
+      | Entity Name   | Contact Request |
+      | Subject       | Test Subject    |
+      | Content       | Test Content    |
     When I save and close form
     Then I should see "Template saved" flash message
 
@@ -34,20 +37,18 @@ Feature: Notify assigned Sales Representatives
     When I save and close form
     Then I should see "Notification Rule saved" flash message
 
-  # TODO: unskip after BAP-13748
-  @skip
   Scenario: Create contact request
     Given go to Activities/ Contact Requests
     And click "Create Contact Request"
     And fill form with:
-      |First Name              | Test         |
-      |Last Name               | Testerson    |
-      |Prefered contact method | Email        |
-      |Email                   |test@test.com |
-      |Comment                 |Test comment  |
+      | First Name               | Test          |
+      | Last Name                | Testerson     |
+      | Preferred contact method | Email         |
+      | Email                    | test@test.com |
+      | Comment                  | Test comment  |
     When I save and close form
     Then I should see "Contact request has been saved successfully" flash message
-    And I should receive email with:
-      | Subject  | Test Subject   |
-      | DateSent | <Date:today>   |
-      | Receiver | admin@test.com |
+    And Email should contains the following:
+      | Subject | Test Subject   |
+      | To      | megan@test.com |
+      | Body    | Test Content   |
