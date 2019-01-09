@@ -37,8 +37,7 @@ define(function(require) {
             original.toggle.call(this);
 
             if (Dropdown._isShowing) {
-                // sets focus on first input
-                $(this._menu).find('input[type=text]:first').focus();
+                $(this._menu).focusFirstInput();
             }
 
             if (this._displayArrow()) {
