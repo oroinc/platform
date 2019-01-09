@@ -12,7 +12,7 @@
             </div>
             <div class="{% if showImage|default(false) %}page-title__path{% endif %} pull-left">
                 <div class="clearfix">
-                    <div class="pull-left">
+                    <div class="page-title__entity-title-wrapper">
                         <h1 class="page-title__entity-title">
                             {% if recordUrl is defined %}<a href="{{ recordUrl }}" {% if recordUrlCssClass is defined %}class="{{ recordUrlCssClass }}"{% endif %}>{% endif %}
                                 {{ title }}

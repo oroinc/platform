@@ -15,15 +15,28 @@ $badge-theme-danger: (
 $badge-theme-warning: (
     'background': $warning-light,
     'color': $warning-darken,
-    'icon-color': $warning-darken
+    'icon-color': $warning-dark
+) !default;
+
+$badge-theme-info: (
+    'background': $info-lighten,
+    'color': $info-ultra-dark,
+    'icon-color': $info-dark
+) !default;
+
+$badge-theme-primary: (
+    'background': $primary-860,
+    'color': $primary-400,
+    'icon-color': $primary-600
 ) !default;
 
 $badge-theme-keys: () !default;
 $badge-theme-keys: map-merge(
     (
         'enabled': $badge-theme-success,
-        'disabled': $badge-theme-danger,
+        'disabled': $badge-theme-primary,
         'tentatively': $badge-theme-warning,
+        'info': $badge-theme-info,
         'warning': $badge-theme-warning
     ),
     $badge-theme-keys

@@ -61,11 +61,11 @@ oro_behat_extension:
           Label: 'label'
 
     Workflow System Label:
-      selector: 'div.badge:contains("System") i.fa-circle'
+      selector: '.badge:contains("System") i.fa-circle'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Workflow Readonly Label:
-      selector: 'div.badge:contains("Read-only") i.fa-circle'
+      selector: '.badge:contains("Read-only") i.fa-circle'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     User Role View Workflow Permissions:
