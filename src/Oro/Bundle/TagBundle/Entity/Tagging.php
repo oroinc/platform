@@ -12,6 +12,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
+ * Relation between tag and entity.
+ *
  * @ORM\Table(
  *     name="oro_tag_tagging",
  *     uniqueConstraints={
@@ -25,11 +27,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @Config(
  *      mode="hidden",
  *      defaultValues={
- *          "ownership"={
- *              "owner_type"="USER",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="user_owner_id"
- *          },
  *          "note"={
  *              "immutable"=true
  *          },

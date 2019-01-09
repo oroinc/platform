@@ -18,6 +18,8 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
+ * Email box entity.
+ *
  * @ORM\Table(name="oro_email_mailbox")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository")
  * @UniqueEntity(fields={"email"})
@@ -27,6 +29,11 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      defaultValues={
  *          "entity"={
  *              "icon"="fa-envelope"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"="",
+ *              "category"=""
  *          },
  *          "ownership"={
  *              "owner_type"="ORGANIZATION",
