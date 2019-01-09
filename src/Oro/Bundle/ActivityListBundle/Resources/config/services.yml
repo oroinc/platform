@@ -228,6 +228,7 @@ services:
 
     oro_activity_list.access_rule.activity_list:
         class: Oro\Bundle\ActivityListBundle\AccessRule\ActivityListAccessRule
+        public: false
         arguments:
             - "@oro_security.orm.ownership_sql_walker_builder"
             - "@oro_activity_list.provider.chain"
