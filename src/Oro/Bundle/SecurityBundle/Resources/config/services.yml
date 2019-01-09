@@ -819,6 +819,7 @@ services:
 
     oro_security.access_rule.acl:
         class: Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule
+        public: false
         arguments:
             - '@oro_security.orm.ownership_sql_walker_builder'
             - '@oro_security.owner.metadata_provider.chain'
@@ -827,6 +828,7 @@ services:
 
     oro_security.access_rule.available_owner_check:
         class: Oro\Bundle\SecurityBundle\AccessRule\AvailableOwnerAccessRule
+        public: false
         arguments:
             - '@oro_security.orm.ownership_sql_walker_builder'
             - '@oro_security.owner.metadata_provider.chain'
