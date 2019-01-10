@@ -70,7 +70,7 @@ define(function(require) {
             var isActualClass = $input.hasClass(dropdownClassName) === isBelow &&
                 $input.hasClass(dropupClassName) !== isBelow;
 
-            if (!isActualClass && inst.dpDiv.is(':visible')) {
+            if (!isActualClass && inst.dpDiv.is(':visible') && $.datepicker._lastInput === input) {
                 $input.toggleClass(dropdownClassName, isBelow);
                 $input.toggleClass(dropupClassName, !isBelow);
                 $input.trigger('datepicker:dialogReposition', isBelow ? 'below' : 'above');

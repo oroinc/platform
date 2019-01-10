@@ -477,18 +477,6 @@ input[type='number'] {
     margin-bottom: 0;
 }
 
-input[type='text'].hasDatepicker.ui-datepicker-dialog-is-below:focus,
-.ui-datepicker-dialog-is-below,
-.timepicker-dialog-is-below,
-.input-append.select2-drop-below,
-.controls.select2-drop-below select,
-.controls.select2-drop-below .select2-container,
-.controls .selector.focus {
-    + span.validation-failed {
-        @include floating-validation-message();
-    }
-}
-
 .loading > .input-append {
     position: relative;
 
