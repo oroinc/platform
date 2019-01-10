@@ -126,9 +126,11 @@
 .custom-color {
     line-height: 1;
 
-    @include fa-icon($checkbox-checked-icon, before, true) {
-        color: $primary-inverse;
-    };
+    &[data-selected] {
+        @include fa-icon($checkbox-checked-icon, before, true) {
+            color: $primary-inverse;
+        };
+    }
 }
 
 .custom-color-wrapper {

@@ -11,7 +11,9 @@ define(function(require) {
 
     DatePickerView = BaseView.extend({
         defaults: {
-            dateInputAttrs: {},
+            dateInputAttrs: {
+                autocomplete: 'off'
+            },
             datePickerOptions: {}
         },
 

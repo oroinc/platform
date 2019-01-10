@@ -15,6 +15,19 @@ define(function(require) {
     var DATEPICKER_DROPUP_CLASS_NAME = 'ui-datepicker-dialog-is-above';
 
     /**
+     * Checks if parent form has validator and runs validation
+     *
+     * @param {jQuery} $field
+     */
+    function validateFieldSafely($field) {
+        var $form = $field.closest('form');
+
+        if ($form.length && $form.data('validator')) {
+            $form.validate().element($field);
+        }
+    }
+
+    /**
      * Mixin with prototype of TimePickerView implementation
      * (is used to extend some DatePickerView with timepicker functionality)
      * @interface TimePickerView
@@ -22,7 +35,9 @@ define(function(require) {
     dateTimePickerViewMixin = {
         defaults: {
             fieldsWrapper: '<div class="fields-row"></div>',
-            timeInputAttrs: {},
+            timeInputAttrs: {
+                autocomplete: 'off'
+            },
             timePickerOptions: {}
         },
 
@@ -163,7 +178,7 @@ define(function(require) {
         /**
          * Returns timepicker popup
          *
-         * @returns {JQuery}
+         * @returns {jQuery}
          */
         getTimePickerWidget: function() {
             return this.$frontTimeField.data('timepicker-list');
@@ -212,8 +227,11 @@ define(function(require) {
             if (this._preventFrontendUpdate) {
                 return;
             }
+
             this._super().updateFront.call(this);
+
             this.$frontTimeField.val(this.getFrontendFormattedTime());
+            validateFieldSafely(this.$frontTimeField);
             this.updateTimeFieldState();
         },
 
@@ -232,11 +250,13 @@ define(function(require) {
             if (this.$frontDateField.is(target) && isValidDate && !time) {
                 time = this.getDefaultTime();
                 this.$frontTimeField.val(time);
+                validateFieldSafely(this.$frontTimeField);
             // just changed the time
             } else if (this.$frontTimeField.is(target) && isValidTime && !date) {
                 // default day is today
                 date = moment().format(this.getDateFormat());
                 this.$frontDateField.val(date);
+                validateFieldSafely(this.$frontDateField);
             }
         },
 

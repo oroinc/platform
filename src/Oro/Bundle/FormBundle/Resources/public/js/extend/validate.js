@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    var $ = require('jquery.validate');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var tools = require('oroui/js/tools');
@@ -8,7 +9,8 @@ define(function(require) {
     var validationHandler = require('oroform/js/optional-validation-groups-handler');
     var validateTopmostLabelMixin = require('oroform/js/validate-topmost-label-mixin');
     var error = require('oroui/js/error');
-    var $ = require('jquery.validate');
+
+    var original = _.pick($.validator.prototype, 'init', 'showLabel', 'defaultShowErrors');
 
     /**
      * Collects all ancestor elements that have validation rules
@@ -157,7 +159,14 @@ define(function(require) {
             // add temporary elements names to support validation for frontend elements
             element.name = _.uniqueId('temp-validation-name-');
         }
-        return check.call(this, element);
+
+        var isValid = check.call(this, element);
+
+        if (isValid) {
+            validateTopmostLabelMixin.validationSuccessHandler.call(this, element);
+        }
+
+        return isValid;
     });
 
     $.validator.prototype.valid = _.wrap($.validator.prototype.valid, function(valid) {
@@ -182,21 +191,6 @@ define(function(require) {
     $.validator.prototype.formatAndAdd = _.wrap($.validator.prototype.formatAndAdd, function(func, element, rule) {
         $(element).data('violated', rule.method);
         return func.apply(this, _.rest(arguments));
-    });
-
-    // updates place for message label before show message
-    $.validator.prototype.showLabel = _.wrap($.validator.prototype.showLabel, function(originMethod, element, message) {
-        if (!message) {
-            return;
-        }
-
-        message = '<span><span>' + message + '</span></span>';
-        var label = this.errorsFor(element);
-        if (message && label.length) {
-            this.settings.errorPlacement(label, element);
-        }
-        originMethod.call(this, element, message);
-        validateTopmostLabelMixin.showLabel.call(this, element, message, label);
     });
 
     $.validator.prototype.destroy = _.wrap($.validator.prototype.destroy, function(originDestroy) {
@@ -229,28 +223,61 @@ define(function(require) {
         }
     });
 
-    /**
-     * change asterisk for optional validation group fields
-     */
-    $.validator.prototype.init = _.wrap($.validator.prototype.init, function(init) {
-        validationHandler.initialize($(this.currentForm));
-        validateTopmostLabelMixin.init.call(this);
-        $(this.currentForm).on('content:changed', function(event) {
-            validationHandler.initializeOptionalValidationGroupHandlers($(event.target));
-        }).on('disabled', _.bind(function(e) {
-            this.hideElementErrors(e.target);
-        }, this));
-        init.apply(this, _.rest(arguments));
-        // defer used there since `elements` method expects form has validator object that is created here
-        _.defer(_.bind(this.collectPristineValues, this));
-    });
-
     $.validator.prototype.resetForm = _.wrap($.validator.prototype.resetForm, function(resetForm) {
         resetForm.apply(this, _.rest(arguments));
         this.collectPristineValues();
     });
 
     _.extend($.validator.prototype, {
+        init: function() {
+            validationHandler.initialize($(this.currentForm));
+            validateTopmostLabelMixin.init.call(this);
+            $(this.currentForm).on('content:changed', function(event) {
+                validationHandler.initializeOptionalValidationGroupHandlers($(event.target));
+            }).on('disabled', function(e) {
+                this.hideElementErrors(e.target);
+            }.bind(this));
+
+            original.init.call(this);
+
+            this.bindInitialErrors();
+
+            // Following call is deferred since `elements` method expects form has validator object that is created here
+            _.defer(this.collectPristineValues.bind(this));
+        },
+
+        /**
+         * Searches through backend rendered inputs which have errors, registers them and adds ID's to its error labels
+         * to ability managing it in the same way as jquery.validate generated error labels
+         */
+        bindInitialErrors: function() {
+            this.elementsOf(this.currentForm).each(function(i, element) {
+                if (element.name && element.classList.contains('error')) {
+                    var $label;
+                    var classesSelector = this.settings.errorClass.split(' ').join('.');
+                    var selector = this.settings.errorElement + '.' + classesSelector + ':not([id])';
+                    var $placement = getErrorPlacement(element);
+
+                    if ($placement.is('.fields-row-error')) {
+                        $label = $placement.children(selector);
+                    } else {
+                        $label = $placement.nextAll(selector);
+                    }
+
+                    if ($label.length) {
+                        var labelId = this.idOrName(element) + '-error';
+
+                        if ($('#' + labelId).length === 0) {
+                            $label.attr( 'id', labelId);
+                            element.setAttribute('aria-describedby', labelId);
+                        }
+                    }
+
+                    this.invalid[element.name] = true;
+                }
+            }.bind(this));
+        },
+
         /**
          * Process server error response and shows messages on the form elements
          *
@@ -343,12 +370,20 @@ define(function(require) {
          */
         hideElementErrors: function(element) {
             var $placement = getErrorPlacement(element);
+            var selector = '#' + this.idOrName(element) + '-error';
+
             if ($placement.is('.fields-row-error')) {
-                $placement.find('.' + this.settings.errorClass).remove();
+                $placement.children(selector).remove();
             } else {
-                $placement.next('.' + this.settings.errorClass).remove();
+                $placement.nextAll(selector).remove();
             }
+
+            if (this.labelContainer.find(this.settings.errorClass.split(' ').join('.')).length === 0) {
+                this.labelContainer.hide();
+            }
+
             this.settings.unhighlight.call(this, element, this.settings.errorClass, this.settings.validClass);
+
             return this;
         },
 
@@ -363,6 +398,49 @@ define(function(require) {
                 .find('input, select, textarea')
                 .not(':submit, :reset, :image, [disabled]:not([data-validate-element])')
                 .not(this.settings.ignore);
+        },
+
+        hideThese: function(errors) {
+            errors.not(this.containers).text('');
+            this.addWrapper(errors).not(this.labelContainer).remove();
+
+            if (this.labelContainer.find(this.settings.errorClass.split(' ').join('.')).length === 0) {
+                this.labelContainer.hide();
+            }
+        },
+
+        /**
+         * Updates place for message label before show message
+         *
+         * @param {HTMLElement} element
+         * @param {string} message
+         */
+        showLabel: function(element, message) {
+            if (!message) {
+                return;
+            }
+
+            var label = this.errorsFor(element);
+
+            if (label.length) {
+                this.settings.errorPlacement(label, element);
+            }
+
+            message = '<span><span>' + message + '</span></span>';
+
+            original.showLabel.call(this, element, message);
+
+            validateTopmostLabelMixin.showLabel.call(this, element, message, label);
+
+            if (this.labelContainer.find(this.settings.errorClass.split(' ').join('.')).length) {
+                this.labelContainer.show();
+            }
+        },
+
+        defaultShowErrors: function() {
+            original.defaultShowErrors.call(this);
+
+            this.addWrapper(this.toShow).css('display', '');
         },
 
         /**
@@ -385,6 +463,8 @@ define(function(require) {
                 .find('.validate-equalTo-blur')
                 .off('.validate-equalTo')
                 .removeClass('validate-equalTo-blur');
+
+            validateTopmostLabelMixin.destroy.call(this);
         }
     });
 
@@ -408,14 +488,8 @@ define(function(require) {
             var $placement = getErrorPlacement($el);
             // we need this to remove server side error, because js does not know about it
             if ($placement.is('.fields-row-error')) {
-                $placement.find('.' + this.errorClass);
                 label.appendTo($placement);
             } else {
-                if (this.settings) {
-                    $placement.next('.' + this.settings.errorClass).remove();
-                } else {
-                    $placement.next('.' + this.errorClass).remove();
-                }
                 label.insertAfter($placement);
             }
         },
@@ -438,16 +512,25 @@ define(function(require) {
             if (!$(element).is(':disabled') && !this.checkable(element) && !this.isPristine(element)) {
                 if ($(element).hasClass('select2-focusser')) {
                     var $selectContainer = $(element).closest('.select2-container');
+
                     // prevent validation if selection still in progress
                     if ($selectContainer.hasClass('select2-dropdown-open')) {
                         return;
                     }
+
                     var realField = $selectContainer.parent()
                         .find('.select2[type=hidden], select.select2')[0];
-                    this.element(realField ? realField : element);
-                } else {
-                    this.element(element);
+
+                    if (realField) {
+                        if (!this.isPristine(realField) || realField.name in this.submitted) {
+                            this.element(realField);
+                        }
+
+                        return;
+                    }
                 }
+
+                this.element(element);
             }
         },
         onkeyup: function(element, event) {
