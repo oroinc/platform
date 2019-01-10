@@ -17,7 +17,12 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             groupContainer: '<div class="btn-group"></div>',
             minItemQuantity: 1,
             moreButtonAttrs: {},
-            decoreClass: null
+            decoreClass: null,
+            stickyButton: {
+                enabled: false,
+                btnClass: 'btn-sticky',
+                stubClass: 'btn-sticky-stub'
+            }
         },
 
         group: null,
@@ -34,6 +39,8 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
         },
 
         _destroy: function() {
+            this._disposeStickyButton();
+
             delete this.group;
             delete this.main;
             delete this.dropdown;
@@ -58,12 +65,88 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             // pushes rest buttons to dropdown
             $elems = $elems.not(this.group);
             if ($elems.length > this.options.minItemQuantity) {
-                this.group.append(this._moreButton());
+                var $moreButton = this._moreButton();
+                this.group.append($moreButton);
+
+                if (this.options.stickyButton.enabled) {
+                    _.defer(this._stickButton.bind(this, $moreButton));
+                }
+
                 $elems = this.dropdown = this._dropdownMenu($elems);
             }
             this.group.append($elems);
 
             this.element.find('.btn-group').remove().end().prepend(this.group);
+        },
+
+        /**
+         * Makes button stick to it's current position
+         *
+         * @param {jQuery} $button
+         * @returns {jQuery}
+         */
+        _stickButton: function($button) {
+            var boundaries = this._getBoundaries($button.get(0));
+
+            $('<span></span>')
+                .addClass(this.options.stickyButton.stubClass)
+                .css(_.extend({
+                    display: 'inline-block'
+                }, _.pick(boundaries, 'width', 'height')))
+                .insertAfter($button);
+
+            this._setStickyPosition = _.bind(this._setStickyPosition, this);
+
+            $button
+                .addClass(this.options.stickyButton.btnClass)
+                .css(_.extend({
+                    position: 'fixed'
+                }, _.pick(boundaries, 'top', 'left')));
+
+            $(window).on('resize.sticky', {
+                $element: $button
+            }, this._setStickyPosition);
+
+            return $button;
+        },
+
+        /**
+         * Gets coords object of element relative to body
+         *
+         * @param {element} element
+         * @returns {object}
+         */
+        _getBoundaries: function(element) {
+            var elemRect = element.getBoundingClientRect();
+            var bodyRect = document.body.getBoundingClientRect();
+
+            return {
+                left: elemRect.left - bodyRect.left,
+                top: elemRect.top - bodyRect.top,
+                width: elemRect.width,
+                height: elemRect.height
+            };
+        },
+
+        /**
+         * Sets coords to button from event data
+         *
+         * @param {event} event
+         */
+        _setStickyPosition: function(event) {
+            var $button = event.data.$element;
+            var $stub = $button.next('.' + this.options.stickyButton.stubClass);
+            var newCoords = $stub.length && this._getBoundaries($stub.get(0)) || {};
+
+            $button.css(_.pick(newCoords, 'top', 'left'));
+        },
+
+        /**
+         * Removes stickyButton data
+         *
+         */
+        _disposeStickyButton: function() {
+            $(window).off('resize.sticky', this._setStickyPosition);
         },
 
         /**

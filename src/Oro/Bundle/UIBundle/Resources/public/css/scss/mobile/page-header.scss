@@ -110,6 +110,23 @@
                 left: 50%;
                 transform: translate(-50%, -50%);
             };
+
+            &.btn-sticky {
+                background-color: $page-title-btn-more-actions-submittable-bg-color;
+                border-color: $page-title-btn-more-actions-submittable-bg-color;
+                color: $page-title-btn-more-actions-submittable-color;
+                z-index: 4;
+
+                @include fa-icon($page-title-btn-more-actions-submittable-icon, 'before', true) {
+                    margin-top: -2px;
+                };
+
+                &:not(:disabled):not(.disabled):active,
+                &:not(:disabled):not(.disabled).active {
+                    background-color: $page-title-btn-more-actions-submittable-bg-color-active;
+                    border-color: $page-title-btn-more-actions-submittable-bg-color-active;
+                }
+            }
         }
     }
 
