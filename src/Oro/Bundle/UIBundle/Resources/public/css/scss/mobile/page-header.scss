@@ -61,6 +61,8 @@
     .sub-title {
         float: none;
         font-size: $base-font-size;
+        display: block;
+        margin-bottom: 3px;
 
         & + .separator {
             display: none;
@@ -79,8 +81,7 @@
     &__entity-title {
         font-size: $base-font-size--xl;
         font-weight: normal;
-        margin: 0;
-        display: block;
+        display: inline;
     }
 
     &__icon {
