@@ -58,6 +58,10 @@
     {% endif %}
 {% endblock %}
 
+{% block attribute_decimal_widget %}
+    {{ value|oro_format_decimal }}
+{% endblock %}
+
 {% block attribute_html_escaped_widget %}
     {{ value|oro_html_escape }}
 {% endblock %}

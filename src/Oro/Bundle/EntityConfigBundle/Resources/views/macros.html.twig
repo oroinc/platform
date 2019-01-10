@@ -69,6 +69,8 @@
         {% set value = value ? 'Yes'|trans : 'No'|trans %}
     {% elseif type == 'money' %}
         {% set value = value ? value | oro_format_currency : null %}
+    {% elseif type == 'decimal' or type == 'float' %}
+        {% set value = value ? value | oro_format_decimal : null %}
     {% elseif type == 'percent' %}
         {% set value = value ? value | oro_format_percent : null %}
     {% elseif type == 'date' %}

@@ -46,6 +46,14 @@ services:
         tags:
              - { name: layout.block_type, alias: attribute_decimal }
 
+    oro_entity_config.block_type.attribute_float:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['attribute_float']]
+            - [setParent, ['attribute_decimal']]
+        tags:
+            - { name: layout.block_type, alias: attribute_float }
+
     oro_entity_config.block_type.attribute_file:
         parent: oro_layout.block_type.abstract_configurable
         calls:
