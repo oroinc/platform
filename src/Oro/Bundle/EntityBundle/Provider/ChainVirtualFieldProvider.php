@@ -8,16 +8,21 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 /**
  * Delegates building of virtual fields to child providers.
  */
-class ChainVirtualFieldProvider extends AbstractChainProvider implements VirtualFieldProviderInterface
+class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
 {
+    /** @var iterable|VirtualFieldProviderInterface[] */
+    private $providers;
+
     /** @var ConfigProvider  */
     private $configProvider;
 
     /**
-     * @param ConfigProvider $configProvider
+     * @param iterable|VirtualFieldProviderInterface[] $providers
+     * @param ConfigProvider                           $configProvider
      */
-    public function __construct(ConfigProvider $configProvider)
+    public function __construct(iterable $providers, ConfigProvider $configProvider)
     {
+        $this->providers = $providers;
         $this->configProvider = $configProvider;
     }
 
@@ -26,9 +31,7 @@ class ChainVirtualFieldProvider extends AbstractChainProvider implements Virtual
      */
     public function isVirtualField($className, $fieldName)
     {
-        /** @var VirtualFieldProviderInterface[] $providers */
-        $providers = $this->getProviders();
-        foreach ($providers as $provider) {
+        foreach ($this->providers as $provider) {
             if ($provider->isVirtualField($className, $fieldName)) {
                 return true;
             }
@@ -42,27 +45,17 @@ class ChainVirtualFieldProvider extends AbstractChainProvider implements Virtual
      */
     public function getVirtualFieldQuery($className, $fieldName)
     {
-        $foundProvider = null;
-        /** @var VirtualFieldProviderInterface[] $providers */
-        $providers = $this->getProviders();
-        foreach ($providers as $provider) {
+        foreach ($this->providers as $provider) {
             if ($provider->isVirtualField($className, $fieldName)) {
-                $foundProvider = $provider;
-                break;
+                return $provider->getVirtualFieldQuery($className, $fieldName);
             }
         }
 
-        if ($foundProvider === null) {
-            throw new \RuntimeException(
-                sprintf(
-                    'A query for field "%s" in class "%s" was not found.',
-                    $fieldName,
-                    $className
-                )
-            );
-        }
-
-        return $foundProvider->getVirtualFieldQuery($className, $fieldName);
+        throw new \RuntimeException(sprintf(
+            'A query for field "%s" in class "%s" was not found.',
+            $fieldName,
+            $className
+        ));
     }
 
     /**
@@ -74,13 +67,9 @@ class ChainVirtualFieldProvider extends AbstractChainProvider implements Virtual
             return [];
         }
 
-        /** @var VirtualFieldProviderInterface[] $providers */
-        $providers = $this->getProviders();
-        $result    = array();
-
-        foreach ($providers as $provider) {
+        $result = [];
+        foreach ($this->providers as $provider) {
             $virtualFields = $provider->getVirtualFields($className);
-
             if (!empty($virtualFields)) {
                 foreach ($virtualFields as $fieldName) {
                     $result[$fieldName] = true;

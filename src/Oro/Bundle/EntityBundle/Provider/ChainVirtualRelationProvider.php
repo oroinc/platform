@@ -8,16 +8,21 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 /**
  * Delegates building of virtual relations to child providers.
  */
-class ChainVirtualRelationProvider extends AbstractChainProvider implements VirtualRelationProviderInterface
+class ChainVirtualRelationProvider implements VirtualRelationProviderInterface
 {
+    /** @var iterable|VirtualRelationProviderInterface[] */
+    private $providers;
+
     /** @var ConfigProvider  */
     private $configProvider;
 
     /**
-     * @param ConfigProvider $configProvider
+     * @param iterable|VirtualRelationProviderInterface[] $providers
+     * @param ConfigProvider                              $configProvider
      */
-    public function __construct(ConfigProvider $configProvider)
+    public function __construct(iterable $providers, ConfigProvider $configProvider)
     {
+        $this->providers = $providers;
         $this->configProvider = $configProvider;
     }
 
@@ -26,9 +31,7 @@ class ChainVirtualRelationProvider extends AbstractChainProvider implements Virt
      */
     public function isVirtualRelation($className, $fieldName)
     {
-        /** @var VirtualRelationProviderInterface[] $providers */
-        $providers = $this->getProviders();
-        foreach ($providers as $provider) {
+        foreach ($this->providers as $provider) {
             if ($provider->isVirtualRelation($className, $fieldName)) {
                 return true;
             }
@@ -54,18 +57,18 @@ class ChainVirtualRelationProvider extends AbstractChainProvider implements Virt
             return [];
         }
 
-        /** @var VirtualRelationProviderInterface[] $providers */
-        $providers = $this->getProviders();
-        $result = [];
-
-        foreach ($providers as $provider) {
+        $relations = [];
+        foreach ($this->providers as $provider) {
             $virtualRelations = $provider->getVirtualRelations($className);
             if (!empty($virtualRelations)) {
-                $result = array_merge($result, $virtualRelations);
+                $relations[] = $virtualRelations;
             }
         }
+        if ($relations) {
+            $relations = array_merge(...$relations);
+        }
 
-        return $result;
+        return $relations;
     }
 
     /**
@@ -73,11 +76,8 @@ class ChainVirtualRelationProvider extends AbstractChainProvider implements Virt
      */
     public function getTargetJoinAlias($className, $fieldName, $selectFieldName = null)
     {
-        return $this->findProvider($className, $fieldName)->getTargetJoinAlias(
-            $className,
-            $fieldName,
-            $selectFieldName
-        );
+        return $this->findProvider($className, $fieldName)
+            ->getTargetJoinAlias($className, $fieldName, $selectFieldName);
     }
 
     /**
@@ -86,29 +86,19 @@ class ChainVirtualRelationProvider extends AbstractChainProvider implements Virt
      *
      * @return VirtualRelationProviderInterface
      */
-    protected function findProvider($className, $fieldName)
+    private function findProvider(string $className, string $fieldName): VirtualRelationProviderInterface
     {
-        $foundProvider = null;
-        /** @var VirtualRelationProviderInterface[] $providers */
-        $providers = $this->getProviders();
-        foreach ($providers as $provider) {
+        foreach ($this->providers as $provider) {
             if ($provider->isVirtualRelation($className, $fieldName)) {
-                $foundProvider = $provider;
-                break;
+                return $provider;
             }
         }
 
-        if ($foundProvider === null) {
-            throw new \RuntimeException(
-                sprintf(
-                    'A query for relation "%s" in class "%s" was not found.',
-                    $fieldName,
-                    $className
-                )
-            );
-        }
-
-        return $foundProvider;
+        throw new \RuntimeException(sprintf(
+            'A query for relation "%s" in class "%s" was not found.',
+            $fieldName,
+            $className
+        ));
     }
 
     /**

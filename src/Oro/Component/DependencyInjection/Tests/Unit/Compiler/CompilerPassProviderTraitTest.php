@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\DependencyInjection\Tests\Unit;
+namespace Oro\Component\DependencyInjection\Tests\Unit\Compiler;
 
 use Oro\Component\DependencyInjection\Tests\Unit\Stub\CompilerPassProviderStub;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;

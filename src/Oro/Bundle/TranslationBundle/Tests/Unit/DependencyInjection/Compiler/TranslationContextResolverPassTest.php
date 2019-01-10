@@ -4,36 +4,33 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationContextResolverPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class TranslationContextResolverPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $builder;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        $this->builder = $this->getMockBuilder(ContainerBuilder::class)->getMock();
-    }
-
     public function testProcess()
     {
-        /* @var $compilerPass TranslationContextResolverPass|\PHPUnit\Framework\MockObject\MockObject */
-        $compilerPass = $this->getMockBuilder(TranslationContextResolverPass::class)
-            ->setMethods(['registerTaggedServices'])
-            ->getMock();
+        $container = new ContainerBuilder();
 
-        $compilerPass->expects($this->once())
-            ->method('registerTaggedServices')
-            ->with(
-                $this->builder,
-                TranslationContextResolverPass::SERVICE_ID,
-                TranslationContextResolverPass::EXTENSION_TAG,
-                'addExtension'
-            );
+        $container->register('context_resolver1')
+            ->addTag('oro_translation.extension.translation_context_resolver', []);
+        $container->register('context_resolver2')
+            ->addTag('oro_translation.extension.translation_context_resolver', ['priority' => -10]);
+        $container->register('context_resolver3')
+            ->addTag('oro_translation.extension.translation_context_resolver', ['priority' => 10]);
 
-        $compilerPass->process($this->builder);
+        $translationContext = $container->register('oro_translation.provider.translation_context');
+
+        $compiler = new TranslationContextResolverPass();
+        $compiler->process($container);
+
+        self::assertEquals(
+            [
+                ['addExtension', [new Reference('context_resolver2'), 'context_resolver2']],
+                ['addExtension', [new Reference('context_resolver1'), 'context_resolver1']],
+                ['addExtension', [new Reference('context_resolver3'), 'context_resolver3']]
+            ],
+            $translationContext->getMethodCalls()
+        );
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Helper;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable;
@@ -10,17 +11,14 @@ use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\TestEntity;
 class TaggableHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TaggableHelper */
-    protected $helper;
+    private $helper;
 
     /** @var  \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    protected $configProvider;
+    private $configProvider;
 
     protected function setUp()
     {
-        $this->configProvider = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
 
         $this->helper = new TaggableHelper($this->configProvider);
     }
@@ -69,9 +67,9 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'implements Taggable' => [new Taggable(), true],
-            'enabled in config'   => [new \StdClass(), true, true, true, true],
-            'has no config'       => [new \StdClass(), false, true, false],
-            'disabled in config'  => [new \StdClass(), false, true, true, false]
+            'enabled in config'   => [new \stdClass(), true, true, true, true],
+            'has no config'       => [new \stdClass(), false, true, false],
+            'disabled in config'  => [new \stdClass(), false, true, true, false]
         ];
     }
 
@@ -136,7 +134,7 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
     public function shouldRenderDefaultDataProvider()
     {
         return [
-            'not implements Taggable' => [new \StdClass(), false, false],
+            'not implements Taggable' => [new \stdClass(), false, false],
             'enable rendering' => [new Taggable(), true, true],
             'disable rendering' => [new Taggable(), false, false],
         ];
@@ -147,7 +145,7 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'implements Taggable'     => [new Taggable(), true],
-            'not implements Taggable' => [new \StdClass(), false]
+            'not implements Taggable' => [new \stdClass(), false]
         ];
     }
 
@@ -160,25 +158,20 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function setConfigProvider($object, $hasConfig, $isEnabled)
+    private function setConfigProvider($object, $hasConfig, $isEnabled)
     {
-        $this->configProvider
-            ->expects($this->once())
+        $this->configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($object)
             ->willReturn($hasConfig);
 
         if ($hasConfig) {
-            $config = $this
-                ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
-                ->getMock();
-            $config
-                ->expects($this->once())
+            $config = $this->createMock(ConfigInterface::class);
+            $config->expects($this->once())
                 ->method('is')
                 ->willReturn($isEnabled);
 
-            $this->configProvider
-                ->expects($this->once())
+            $this->configProvider->expects($this->once())
                 ->method('getConfig')
                 ->with($object)
                 ->willReturn($config);

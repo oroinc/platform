@@ -32,9 +32,7 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->providers = [$highPriorityProvider, $lowPriorityProvider];
         $this->configProvider = $this->createMock(ConfigProvider::class);
 
-        $this->chainProvider = new ChainVirtualFieldProvider($this->configProvider);
-        $this->chainProvider->addProvider($lowPriorityProvider);
-        $this->chainProvider->addProvider($highPriorityProvider, -10);
+        $this->chainProvider = new ChainVirtualFieldProvider($this->providers, $this->configProvider);
     }
 
     public function testIsVirtualFieldByLowPriorityProvider()
@@ -81,6 +79,12 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue(false));
 
         $this->assertFalse($this->chainProvider->isVirtualField('testClass', 'testField'));
+    }
+
+    public function testIsVirtualFieldWithoutChildProviders()
+    {
+        $chainProvider = new ChainVirtualFieldProvider([], $this->configProvider);
+        $this->assertFalse($chainProvider->isVirtualField('testClass', 'testField'));
     }
 
     public function testGetVirtualFields()
@@ -135,6 +139,12 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
             [],
             $this->chainProvider->getVirtualFields($entityClass)
         );
+    }
+
+    public function testGetVirtualFieldsWithoutChildProviders()
+    {
+        $chainProvider = new ChainVirtualFieldProvider([], $this->configProvider);
+        $this->assertSame([], $chainProvider->getVirtualFields('testClass'));
     }
 
     public function testGetVirtualFieldQuery()
@@ -210,5 +220,15 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
                 $i++;
             }
         }
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage A query for field "testField" in class "testClass" was not found.
+     */
+    public function testGetVirtualFieldQueryWithoutChildProviders()
+    {
+        $chainProvider = new ChainVirtualFieldProvider([], $this->configProvider);
+        $chainProvider->getVirtualFieldQuery('testClass', 'testField');
     }
 }

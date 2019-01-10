@@ -47,12 +47,10 @@ class OroEntityBundle extends Bundle
         parent::build($container);
         $container->addCompilerPass(new Compiler\DatabaseCheckerCompilerPass());
         $container->addCompilerPass(new Compiler\EntityAliasProviderPass());
-        $container->addCompilerPass(new Compiler\EntityNameProviderPass());
         $container->addCompilerPass(new Compiler\EntityClassNameProviderPass());
         $container->addCompilerPass(new Compiler\ExclusionProviderPass());
         $container->addCompilerPass(new Compiler\VirtualFieldProvidersCompilerPass());
         $container->addCompilerPass(new Compiler\VirtualRelationProvidersCompilerPass());
-        $container->addCompilerPass(new Compiler\DictionaryValueListProviderPass());
         $container->addCompilerPass(new Compiler\QueryHintResolverPass());
         $container->addCompilerPass(new Compiler\EntityFieldHandlerPass());
         $container->addCompilerPass(new Compiler\CustomGridFieldValidatorCompilerPass());

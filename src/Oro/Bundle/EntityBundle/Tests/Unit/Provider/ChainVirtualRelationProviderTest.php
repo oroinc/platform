@@ -32,9 +32,7 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->providers = [$highPriorityProvider, $lowPriorityProvider];
         $this->configProvider = $this->createMock(ConfigProvider::class);
 
-        $this->chainProvider = new ChainVirtualRelationProvider($this->configProvider);
-        $this->chainProvider->addProvider($lowPriorityProvider);
-        $this->chainProvider->addProvider($highPriorityProvider, -10);
+        $this->chainProvider = new ChainVirtualRelationProvider($this->providers, $this->configProvider);
     }
 
     public function testIsVirtualRelationByLowPriorityProvider()
@@ -81,6 +79,12 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue(false));
 
         $this->assertFalse($this->chainProvider->isVirtualRelation('testClass', 'testField'));
+    }
+
+    public function testIsVirtualRelationWithoutChildProviders()
+    {
+        $chainProvider = new ChainVirtualRelationProvider([], $this->configProvider);
+        $this->assertFalse($chainProvider->isVirtualRelation('testClass', 'testField'));
     }
 
     public function testGetVirtualRelations()
@@ -173,6 +177,12 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetVirtualRelationsWithoutChildProviders()
+    {
+        $chainProvider = new ChainVirtualRelationProvider([], $this->configProvider);
+        $this->assertSame([], $chainProvider->getVirtualRelations('testClass'));
+    }
+
     public function testGetVirtualRelationQuery()
     {
         $className = 'stdClass';
@@ -208,12 +218,20 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage A query for relation "testField1" in class "stdClass" was not found.
+     * @expectedExceptionMessage A query for relation "testField" in class "stdClass" was not found.
      */
     public function testGetVirtualRelationQueryException()
     {
-        $className = 'stdClass';
-        $fieldName = 'testField1';
-        $this->chainProvider->getVirtualRelationQuery($className, $fieldName);
+        $this->chainProvider->getVirtualRelationQuery('stdClass', 'testField');
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage A query for relation "testField" in class "stdClass" was not found.
+     */
+    public function testGetVirtualRelationQueryWithoutChildProviders()
+    {
+        $chainProvider = new ChainVirtualRelationProvider([], $this->configProvider);
+        $chainProvider->getVirtualRelationQuery('stdClass', 'testField');
     }
 }
