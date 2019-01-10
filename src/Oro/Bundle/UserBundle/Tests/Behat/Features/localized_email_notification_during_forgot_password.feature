@@ -55,7 +55,7 @@ Feature: Localized email notification during forgot password
     And I fill form with:
       | Username or Email | admin@example.com |
     And I confirm reset password
-    Then I should see "An email has been sent to ...@example.com. It contains a link you must click to reset your password."
+    Then I should see "If there is a user account associated with ...@example.com you will receive an email with a link to reset your password."
     And Email should contains the following:
       | To      | admin@example.com              |
       | Subject | English Forgot Password Subject |
