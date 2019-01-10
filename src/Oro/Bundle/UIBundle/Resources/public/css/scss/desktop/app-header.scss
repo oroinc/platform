@@ -210,6 +210,8 @@
                 [class^="fa-"],
                 [class*=" fa-"] {
                     font-size: $app-header-icon-font-size;
+                    width: $app-header-icon-font-size;
+                    text-align: center;
                 }
 
                 &:hover {
@@ -227,12 +229,13 @@
                 &:before {
                     #{$end}: -$desktop-app-header-user-menu-offset;
                     #{$start}: auto;
+                    margin-right: 2px;
                 }
             }
         }
     }
 
-    .user-menu-dropdown {
+    .dropdown.user-menu-dropdown {
         &:before {
             content: '';
             display: inline-block;
@@ -245,10 +248,14 @@
             margin-#{$start}: $desktop-app-header-user-menu-margin-start;
         }
 
-        .dropdown-menu {
+        > .dropdown-menu {
             .divider {
                 border-bottom: $desktop-app-header-user-menu-divider-border-bottom;
                 margin: $desktop-app-header-user-menu-divider-margin;
+            }
+
+            &:before {
+                margin-right: -1px;
             }
         }
     }

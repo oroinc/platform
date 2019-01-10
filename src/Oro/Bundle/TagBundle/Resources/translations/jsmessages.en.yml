@@ -1,6 +1,7 @@
 "Not tagged": "Not tagged"
 oro:
     tag:
+        added_by: " - added by {{ first_name }} {{ last_name }}"
         inline_editing:
             new_tag: "New tag"
             existing_tag: "This tag is already added"

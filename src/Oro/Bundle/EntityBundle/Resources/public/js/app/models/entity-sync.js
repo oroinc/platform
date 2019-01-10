@@ -34,6 +34,11 @@ define(function(require) {
             }
         }
 
+        options.beforeSend = function(xhr) {
+            // do not request HATEOAS links
+            xhr.setRequestHeader('X-Include', 'noHateoas');
+        };
+
         return Backbone.sync.call(this, method, model, options);
     };
 

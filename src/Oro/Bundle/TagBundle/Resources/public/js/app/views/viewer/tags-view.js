@@ -51,15 +51,11 @@ define(function(require) {
 
         getTemplateData: function() {
             var tags = this.model.get(this.fieldName);
-            tags = _.sortBy(tags, this.tagSortCallback);
+            tags = _.sortBy(tags, 'owner');
             return {
                 tags: tags,
                 showDefault: this.showDefault
             };
-        },
-
-        tagSortCallback: function(a, b) {
-            return (a.owner ? 1 : 0) - (b.owner ? 1 : 0);
         }
     });
 

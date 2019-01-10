@@ -7,6 +7,63 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var $ = require('jquery');
     var _ = require('underscore');
+    var PLUGIN_PFX = 'mCS';
+
+    function onBeforeCustomScrollUpdate() {
+        var instance = $(this).data(PLUGIN_PFX);
+        var options = instance.opt;
+        var mCustomScrollBox = $('#mCSB_' + instance.idx);
+        var container = $('#mCSB_' + instance.idx + '_container');
+
+        // Logic is copied from libs method `_expandContentHorizontally` to take in account width changing during update
+        if (options.advanced.autoExpandHorizontalScroll && options.axis !== 'y') {
+            container.css({
+                'width': 'auto',
+                'min-width': 0,
+                'overflow-x': 'scroll'
+            });
+
+            var w = Math.ceil(container[0].scrollWidth);
+
+            if (
+                options.advanced.autoExpandHorizontalScroll === 3 ||
+                options.advanced.autoExpandHorizontalScroll !== 2 && w > container.parent().width()
+            ) {
+                container.css({
+                    'width': w,
+                    'min-width': '100%',
+                    'overflow-x': 'inherit'
+                });
+            }
+        }
+
+        var contentWidth = instance.overflowed == null ? container.width() : container.outerWidth(false);
+
+        contentWidth = Math.max(contentWidth, container[0].scrollWidth);
+
+        var difference = contentWidth - mCustomScrollBox.width();
+
+        // Fix to avoid unnecessary showing of scrollbar when mCustomScrollBox has fractional width
+        if (difference < 1 && difference > 0) {
+            mCustomScrollBox.css({
+                'max-width': 'none',
+                'min-width': 0,
+                'width': contentWidth
+            });
+        }
+    }
+
+    function onCustomScrollUpdate() {
+        var instance = $(this).data(PLUGIN_PFX);
+        var mCustomScrollBox = $('#mCSB_' + instance.idx);
+
+        mCustomScrollBox.css({
+            'max-width': '',
+            'min-width': '',
+            'width': ''
+        });
+    }
+
     require('jquery.mCustomScrollbar');
     require('jquery.mousewheel');
 
@@ -24,6 +81,10 @@ define(function(require) {
                 autoExpandHorizontalScroll: 3,
                 updateOnContentResize: false,
                 updateOnImageLoad: false
+            },
+            callbacks: {
+                onBeforeUpdate: onBeforeCustomScrollUpdate,
+                onUpdate: onCustomScrollUpdate
             }
         },
 
@@ -216,7 +277,7 @@ define(function(require) {
 
         updateCustomScrollbar: function() {
             this.manageScroll();
-            this.domCache.$container.mCustomScrollbar('update');
+            this.domCache.$container.mCustomScrollbar('update', false, 3);
         },
 
         onGridHeaderCellWidthBeforeUpdate: function() {

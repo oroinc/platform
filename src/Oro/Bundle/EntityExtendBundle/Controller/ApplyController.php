@@ -9,9 +9,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
- * EntityExtendBundle controller.
+ * Apply entity config controller.
+ *
  * @Route("/entity/extend")
- * BAP-17635 Discuss ACL impl., currently acl is disabled
  */
 class ApplyController extends Controller
 {
@@ -20,12 +20,6 @@ class ApplyController extends Controller
      *      "/update/{id}",
      *      name="oro_entityextend_update",
      *      defaults={"id"=0}
-     * )
-     * Acl(
-     *      id="oro_entityextend_update",
-     *      label="oro.entity_extend.action.apply_changes",
-     *      type="action",
-     *      group_name=""
      * )
      */
     public function updateAction()

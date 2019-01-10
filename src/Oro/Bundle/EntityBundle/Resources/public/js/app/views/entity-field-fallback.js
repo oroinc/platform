@@ -19,7 +19,8 @@ define(function(require) {
             selectors: {
                 useFallbackCheckbox: '.use-fallback-checkbox',
                 entityFieldValue: '.entity-field-value',
-                fallbackSelect: '.fallback-select'
+                fallbackSelect: '.fallback-select',
+                fallbackContainer: '.entity-fallback-container'
             }
         },
 
@@ -45,15 +46,17 @@ define(function(require) {
             $checkboxes.each(function() {
                 var $checkbox = $(this);
                 self.handleCheckboxValue($checkbox);
-                $checkbox.on('click', function() {
+                $checkbox.on('change', function() {
                     self.handleCheckboxValue($checkbox);
                 });
             });
         },
 
         handleCheckboxValue: function($checkbox) {
-            var $fieldValue = $checkbox.parents('table').find(this.options.selectors.entityFieldValue);
-            var $fallbackValue = $checkbox.parents('table').find(this.options.selectors.fallbackSelect);
+            var container = $checkbox.parents(this.options.selectors.fallbackContainer);
+            var $fieldValue = container.find(this.options.selectors.entityFieldValue);
+            var $fallbackValue = container.find(this.options.selectors.fallbackSelect);
+
             if ($checkbox.is(':checked')) {
                 this.disableElement($fieldValue);
                 this.enableElement($fallbackValue);

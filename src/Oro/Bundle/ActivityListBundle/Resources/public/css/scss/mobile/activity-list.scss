@@ -4,6 +4,7 @@
     .grid-toolbar {
         display: flex;
         flex-wrap: wrap;
+        padding: side-values(0 0 $content-padding-small);
     }
 
     .filter-box {
@@ -34,13 +35,6 @@
 
     .activity-actions {
         margin-#{$start}: 0;
-
-        .dropdown-toggle {
-            height: $activity-mobile-icon-size;
-            width: $activity-dropdown-toggle-size;
-
-            line-height: $activity-mobile-icon-size;
-        }
     }
 
     .accordion-heading {
@@ -69,13 +63,6 @@
         &:before {
             margin: 0;
         }
-    }
-
-    .accordion-icon {
-        padding-#{$start}: 0;
-        height: $activity-mobile-icon-size;
-
-        line-height: $activity-mobile-icon-size;
     }
 
     .comment {

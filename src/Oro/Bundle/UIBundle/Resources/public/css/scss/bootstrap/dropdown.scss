@@ -10,8 +10,8 @@
     }
 
     &[x-displayed-arrow] {
-        $arrow-offset: -5px;
-        $placeholder: 8px;
+        $arrow-offset: -4px;
+        $placeholder: 6px;
 
         &:before {
             position: absolute;
@@ -121,6 +121,12 @@
 .dropdown-toggle {
     &:after {
         vertical-align: $caret-width / 2;
+
+        margin-#{$start}: $content-padding-small;
+
+        border-top-width: 5px;
+        border-right-width: 5px;
+        border-left-width: 5px;
     }
 
     &--no-caret {
@@ -141,19 +147,17 @@
 
     [class^="fa-"],
     [class*=" fa-"] {
+        position: relative;
+
         min-width: $dropdown-item-icon-fa-size;
         height: $dropdown-item-icon-fa-size;
         margin-#{$end}: $dropdown-item-icon-fa-offset;
 
         text-align: center;
-        line-height: 0;
-
-        vertical-align: middle;
+        line-height: 1;
 
         &:before {
             font-size: $dropdown-item-icon-fa-font-size;
-
-            vertical-align: text-bottom;
         }
     }
 }

@@ -78,18 +78,9 @@
         .top-row {
             .pull-left {
                 float: none;
-                display: inline;
+                display: inline-block;
+                vertical-align: middle;
             }
         }
-    }
-
-    &__entity-title {
-        margin-#{$end}: 5px;
-    }
-
-    .sub-title,
-    .separator,
-    &__entity-title {
-        display: inline;
     }
 }

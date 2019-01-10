@@ -8,6 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 
 /**
+ * Base page element node.
+ *
  * @method OroSelenium2Driver getDriver()
  */
 class Element extends NodeElement
@@ -73,12 +75,12 @@ class Element extends NodeElement
 
     /**
      * @param string $key
-     * @return string|array
+     * @return string|array|null
      */
     public function getOption($key)
     {
         if (!isset($this->options[$key])) {
-            self::fail("Option with '$key' key not found'");
+            return null;
         }
 
         return $this->options[$key];

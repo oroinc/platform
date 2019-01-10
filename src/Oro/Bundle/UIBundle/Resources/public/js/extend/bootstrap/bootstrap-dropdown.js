@@ -25,7 +25,8 @@ define(function(require) {
     ].join(',');
 
     config = _.extend({
-        displayArrow: true
+        displayArrow: true,
+        keepSeparately: true
     }, config);
 
     _.extend(Dropdown.prototype, {
@@ -36,8 +37,7 @@ define(function(require) {
             original.toggle.call(this);
 
             if (Dropdown._isShowing) {
-                // sets focus on first input
-                $(this._menu).find('input[type=text]:first').focus();
+                $(this._menu).focusFirstInput();
             }
 
             if (this._displayArrow()) {
@@ -215,7 +215,16 @@ define(function(require) {
                 }
 
                 config.modifiers.arrow = _.extend(config.modifiers.arrow || {}, {
-                    element: arrow
+                    element: arrow,
+                    fn: function(data, options) {
+                        if (this._checkKeepSeparately()) {
+                            data.arrowStyles = _.extend({}, data.arrowStyles || {}, {
+                                visibility: 'hidden'
+                            });
+                        }
+
+                        return Popper.Defaults.modifiers.arrow.fn(data, options);
+                    }.bind(this)
                 });
             }
 
@@ -246,6 +255,10 @@ define(function(require) {
 
         _displayArrow: function() {
             return _.isBoolean(this._config.displayArrow) ? this._config.displayArrow : config.displayArrow;
+        },
+
+        _checkKeepSeparately: function() {
+            return _.isBoolean(this._config.keepSeparately) ? this._config.keepSeparately : config.keepSeparately;
         }
     });
 

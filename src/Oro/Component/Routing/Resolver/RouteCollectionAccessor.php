@@ -5,13 +5,16 @@ namespace Oro\Component\Routing\Resolver;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * Provides a set of methods to simplify the managing of a collection of routes.
+ */
 class RouteCollectionAccessor
 {
     /** @var EnhancedRouteCollection */
-    protected $collection;
+    private $collection;
 
-    /** @var array */
-    protected $routeMap;
+    /** @var array [route path => [route name => [string representation of methods, [method, ...], ...]], ...] */
+    private $routeMap;
 
     /**
      * @param EnhancedRouteCollection $collection
@@ -24,28 +27,40 @@ class RouteCollectionAccessor
     /**
      * Gets a route by path and methods.
      *
-     * @param string   $routePath
-     * @param string[] $routeMethods
+     * @param string   $routePath    The route name
+     * @param string[] $routeMethods The uppercased HTTP methods
+     * @param bool     $strict       TRUE if a searching route should have the exactly same methods
+     *                               as the given methods
+     *                               FALSE if a searching route should allow all the given methods,
+     *                               it means that the given methods should be a subset of the searching route methods
+     *                               or the searching route should allow all methods (its methods are empty)
      *
      * @return Route|null A Route instance or null when not found
      */
-    public function getByPath($routePath, $routeMethods)
+    public function getByPath($routePath, $routeMethods, $strict = true)
     {
         if (null === $this->routeMap) {
             $this->routeMap = [];
-            /** @var Route $route */
-            foreach ($this->collection->all() as $name => $route) {
-                $this->routeMap[$this->getRouteKey($route->getPath(), $route->getMethods())] = $name;
+            $this->addCollectionToRouteMap($this->collection);
+        }
+
+        $routeName = null;
+        if (isset($this->routeMap[$routePath])) {
+            if ($routeMethods || $strict) {
+                foreach ($this->routeMap[$routePath] as $name => list($methodsAsString, $methods)) {
+                    if (self::isMethodsAlowed($methods, $methodsAsString, $routeMethods, $strict)) {
+                        $routeName = $name;
+                        break;
+                    }
+                }
+            } else {
+                $routeName = key($this->routeMap[$routePath]);
             }
         }
 
-        $key = $this->getRouteKey($routePath, $routeMethods);
-
-        if (!isset($this->routeMap[$key])) {
-            return null;
-        }
-
-        return $this->collection->get($this->routeMap[$key]);
+        return $routeName
+            ? $this->collection->get($routeName)
+            : null;
     }
 
     /**
@@ -110,8 +125,7 @@ class RouteCollectionAccessor
     {
         $this->collection->insert($routeName, $route, $targetRouteName, $prepend);
         if (null !== $this->routeMap) {
-            $key = $this->getRouteKey($route->getPath(), $route->getMethods());
-            $this->routeMap[$key] = $routeName;
+            $this->addToRouteMap($routeName, $route->getPath(), $route->getMethods());
         }
     }
 
@@ -128,10 +142,7 @@ class RouteCollectionAccessor
     {
         $this->collection->insertCollection($collection, $targetRouteName, $prepend);
         if (null !== $this->routeMap) {
-            foreach ($collection->all() as $name => $route) {
-                $key = $this->getRouteKey($route->getPath(), $route->getMethods());
-                $this->routeMap[$key] = $name;
-            }
+            $this->addCollectionToRouteMap($collection);
         }
     }
 
@@ -143,11 +154,10 @@ class RouteCollectionAccessor
     public function remove($routeName)
     {
         $route = $this->collection->get($routeName);
-        if ($route) {
+        if (null !== $route) {
             $this->collection->remove($routeName);
             if (null !== $this->routeMap) {
-                $key = $this->getRouteKey($route->getPath(), $route->getMethods());
-                unset($this->routeMap[$key]);
+                $this->removeFromRouteMap($routeName, $route->getPath());
             }
         }
     }
@@ -189,13 +199,66 @@ class RouteCollectionAccessor
     }
 
     /**
+     * @param RouteCollection $collection
+     */
+    private function addCollectionToRouteMap(RouteCollection $collection)
+    {
+        foreach ($collection->all() as $name => $route) {
+            $this->addToRouteMap($name, $route->getPath(), $route->getMethods());
+        }
+    }
+
+    /**
+     * @param string   $routeName
      * @param string   $routePath
      * @param string[] $routeMethods
+     */
+    private function addToRouteMap($routeName, $routePath, $routeMethods)
+    {
+        $this->routeMap[$routePath][$routeName] = [
+            self::convertMethodsToString($routeMethods),
+            $routeMethods
+        ];
+    }
+
+    /**
+     * @param string $routeName
+     * @param string $routePath
+     */
+    private function removeFromRouteMap($routeName, $routePath)
+    {
+        unset($this->routeMap[$routePath][$routeName]);
+        if (empty($this->routeMap[$routePath])) {
+            unset($this->routeMap[$routePath]);
+        }
+    }
+
+    /**
+     * @param string[] $methods
+     * @param string   $methodsAsString
+     * @param string[] $requestedMethods
+     * @param bool     $strict
+     *
+     * @return bool
+     */
+    private static function isMethodsAlowed($methods, $methodsAsString, $requestedMethods, $strict)
+    {
+        if ($strict) {
+            return self::convertMethodsToString($requestedMethods) === $methodsAsString;
+        }
+
+        return !$methods || !array_diff($requestedMethods, $methods);
+    }
+
+    /**
+     * @param string[] $methods
      *
      * @return string
      */
-    protected function getRouteKey($routePath, $routeMethods)
+    private static function convertMethodsToString($methods)
     {
-        return implode('|', $routeMethods) . $routePath;
+        sort($methods);
+
+        return implode('|', $methods);
     }
 }

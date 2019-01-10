@@ -286,6 +286,12 @@ services:
         public: false
         lazy: true
 
+    oro_entity.entity_alias_duplicate_resolver:
+        class: Oro\Bundle\EntityBundle\Provider\DuplicateEntityAliasResolver
+        public: false
+        arguments:
+            - '@oro_entity_config.config_manager'
+
     oro_entity.entity_class_provider.orm:
         class: Oro\Bundle\EntityBundle\ORM\OrmEntityClassProvider
         public: false
@@ -495,6 +501,19 @@ services:
             - '@doctrine'
             - '@property_accessor'
 
+    oro_entity.entity_structure_cache:
+        parent: oro.cache.abstract
+        public: false
+        calls:
+            - [ setNamespace, [ 'oro_entity_structure' ] ]
+
+    oro_entity.listener.clear_entity_structure_cache:
+        class: Oro\Bundle\EntityBundle\EventListener\ClearEntityStructureCacheListener
+        arguments:
+            - '@oro_entity.entity_structure_cache'
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: clearCache, priority: -255 }
+
     oro_entity.provider.structure_data:
         class: 'Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider'
         public: false
@@ -502,6 +521,8 @@ services:
             - '@event_dispatcher'
             - '@oro_entity.entity_field_list_provider'
             - '@oro_entity.entity_class_name_helper'
+            - '@translator'
+            - '@oro_entity.entity_structure_cache'
 
     oro_entity.listener.structure_options.aliases:
         class: 'Oro\Bundle\EntityBundle\EventListener\EntityAliasStructureOptionsListener'

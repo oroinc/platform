@@ -3,15 +3,17 @@
 @import 'bowerassets/bootstrap/scss/badge';
 
 .badge {
-    [class^="fa-"],
-    [class*=" fa-"] {
+    [class^="icon-status-"],
+    [class*=" icon-status-"] {
+        font-size: $badge-icon-height;
         margin-#{$end}: $badge-icon-offset;
     }
 }
 
 .badge-pill {
     font-size: $badge-font-size;
-    line-height: 1.23;
+    line-height: $badge-line-height;
+    vertical-align: $badge-vertical-align;
 }
 
 @each $color, $values in $badge-theme-keys {

@@ -59,8 +59,6 @@
     Uploader uniform
 **/
 .uploader {
-    float: $uploader-float;
-
     color: $uploader-color;
     border-radius: $uploader-border-radius;
     background-color: $uploader-background-color;
@@ -82,15 +80,16 @@
         line-height: $uploader-action-line-height;
         display: $uploader-action-display;
         vertical-align: $uploader-action-vertical-align;
-        padding: $uploader-action-inner-offset;
         box-sizing: $uploader-action-box-sizing;
     }
 
     .filename {
+        padding: side-values($uploader-filename-inner-offset);
         @include text-line-truncate($uploader-filename-width);
     }
 
     .action {
+        padding: side-values($uploader-action-inner-offset);
         border-#{$start}: $input-border-width solid $input-border-color;
     }
 
@@ -336,6 +335,10 @@ select[multiple] {
         &:not(:first-of-type) {
             margin-#{$start}: $add-on-append-outer-offset-left;
         }
+
+        &:first-child {
+            margin-#{$start}: 0;
+        }
     }
 
     .input-prepend & {
@@ -356,6 +359,7 @@ select[multiple] {
 
             display: inline-flex;
             align-items: center;
+            justify-content: center;
         }
     }
 
@@ -414,6 +418,12 @@ select[multiple] {
         &--column {
             flex-direction: column;
         }
+
+        .reminders-collection {
+            + .add-list-item {
+                margin-top: 0;
+            }
+        }
     }
 }
 
@@ -434,6 +444,16 @@ select[multiple] {
         &--column:not(:last-of-type) {
             margin: 0;
         }
+
+        &.control-group-checkbox {
+            &:not(:last-of-type) {
+                margin-top: -$content-padding-small;
+            }
+        }
+    }
+
+    div[data-name="field__default-product-options"] {
+        margin: 0 0 $form-container-control-row-space;
     }
 
     + .form-horizontal,
@@ -457,18 +477,6 @@ input[type='number'] {
 
 .alert .message ul:last-child {
     margin-bottom: 0;
-}
-
-input[type='text'].hasDatepicker.ui-datepicker-dialog-is-below:focus,
-.ui-datepicker-dialog-is-below,
-.timepicker-dialog-is-below,
-.input-append.select2-drop-below,
-.controls.select2-drop-below select,
-.controls.select2-drop-below .select2-container,
-.controls .selector.focus {
-    + span.validation-failed {
-        @include floating-validation-message();
-    }
 }
 
 .loading > .input-append {

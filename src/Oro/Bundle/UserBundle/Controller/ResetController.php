@@ -34,42 +34,40 @@ class ResetController extends Controller
      */
     public function sendEmailAction(Request $request)
     {
-        $username = $request->request->get('username');
+        $email = $request->request->get('username');
         $frontend = $request->get('frontend', false);
-        $user = $this->get('oro_user.manager')->findUserByUsernameOrEmail($username);
+        /** @var User $user */
+        $user = $this->get('oro_user.manager')->findUserByUsernameOrEmail($email);
 
-        if (null === $user || !$user->isEnabled()) {
-            return $this->render('OroUserBundle:Reset:request.html.twig', array('invalid_username' => $username));
-        }
-
-        if ($user->isPasswordRequestNonExpired($this->container->getParameter('oro_user.reset.ttl'))) {
-            if (!($frontend && null === $user->getPasswordRequestedAt())) {
-                $this->get('session')->getFlashBag()->add(
-                    'warn',
-                    'oro.user.password.reset.ttl_already_requested.message'
-                );
+        if (null !== $user && $user->isEnabled()) {
+            $email = $user->getEmail();
+            if ($user->isPasswordRequestNonExpired($this->container->getParameter('oro_user.reset.ttl'))
+                && !($frontend && null === $user->getPasswordRequestedAt())
+            ) {
+                $this->get('session')->getFlashBag()
+                    ->add('warn', 'oro.user.password.reset.ttl_already_requested.message');
 
                 return $this->redirect($this->generateUrl('oro_user_reset_request'));
             }
-        }
 
-        if (null === $user->getConfirmationToken()) {
             $user->setConfirmationToken($user->generateToken());
+            try {
+                $this->get('oro_user.mailer.processor')->sendResetPasswordEmail($user);
+            } catch (\Exception $e) {
+                $this->get('logger')->error(
+                    'Unable to sent the reset password email.',
+                    ['email' => $email, 'exception' => $e]
+                );
+                $this->get('session')->getFlashBag()
+                    ->add('warn', $this->get('translator')->trans('oro.email.handler.unable_to_send_email'));
+
+                return $this->redirect($this->generateUrl('oro_user_reset_request'));
+            }
+            $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
+            $this->get('oro_user.manager')->updateUser($user);
         }
 
-        $this->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user->getEmail()));
-        try {
-            $this->get('oro_user.mailer.processor')->sendResetPasswordEmail($user);
-        } catch (\Exception $e) {
-            $this->get('session')->getFlashBag()->add(
-                'warn',
-                $this->get('translator')->trans('oro.email.handler.unable_to_send_email')
-            );
-
-            return $this->redirect($this->generateUrl('oro_user_reset_request'));
-        }
-        $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
-        $this->get('oro_user.manager')->updateUser($user);
+        $this->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($email));
 
         return $this->redirect($this->generateUrl('oro_user_reset_check_email'));
     }

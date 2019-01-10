@@ -1,15 +1,17 @@
-<div class="inline-editor__fields">
-    <textarea name="value" 
-           class="form-control" placeholder="<%= placeholder %>"
-           autocomplete="off"><%= value %></textarea>
-</div>
-<div class="inline-editor__actions">
-    <button class="inline-editor__action-item" type="submit"
-            title="<%= _.__('oro.form.inlineEditing.action.save') %>">
-        <span class="fa-check" aria-hidden="true"></span>
-    </button>
-    <button class="inline-editor__action-item" data-action="cancel"
-            title="<%= _.__('oro.form.inlineEditing.action.cancel') %>">
-        <span class="fa-ban" aria-hidden="true"></span>
-    </button>
+<div class="inline-editor__inner">
+    <div class="inline-editor__fields">
+        <textarea name="value"
+               class="form-control" placeholder="<%- placeholder %>"
+               autocomplete="off"><%= value %></textarea>
+    </div>
+    <div class="inline-editor__actions">
+        <button class="btn btn-icon btn-square-light inline-editor__action-item" type="submit"
+                title="<%- _.__('oro.form.inlineEditing.action.save') %>">
+            <span class="fa-check" aria-hidden="true"></span>
+        </button>
+        <button class="btn btn-icon btn-square-light inline-editor__action-item" data-action="cancel"
+                title="<%- _.__('oro.form.inlineEditing.action.cancel') %>">
+            <span class="fa-ban" aria-hidden="true"></span>
+        </button>
+    </div>
 </div>

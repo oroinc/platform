@@ -7,6 +7,9 @@ use Symfony\Component\PropertyAccess\Exception\ExceptionInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * Model represents datagrid result rows
+ */
 class ResultRecord implements ResultRecordInterface
 {
     /** @var array */
@@ -46,10 +49,7 @@ class ResultRecord implements ResultRecordInterface
     }
 
     /**
-     * Set value of property by name
-     *
-     * @param string $name
-     * @param mixed $value
+     * {@inheritdoc}
      */
     public function setValue($name, $value)
     {
@@ -73,11 +73,7 @@ class ResultRecord implements ResultRecordInterface
     }
 
     /**
-     * Get value of property by name
-     *
-     * @param  string $name
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getValue($name)
     {

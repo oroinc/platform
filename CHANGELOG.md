@@ -2,7 +2,9 @@
 
 ### Added
 #### AssetBundle
-* bundle replace AsseticBundle to build assets
+* `AssetBundle` replaces the deprecated `AsseticBundle` to build assets using Webpack. 
+It currently supports only styles assets. JS assets are still managed by [OroRequireJsBundle](src/Oro/Bundle/RequireJSBundle).
+
 #### ApiBundle
 * Added `custom_fields` as a possible value for `exclusion_policy` option of `entities` section of `Resources/config/oro/api.yml`. This value can be used if it is required to exclude all custom fields (fields with `is_extend` = `true` and `owner` = `Custom` in `extend` scope in entity configuration) that are not configured explicitly.
 
@@ -10,6 +12,22 @@
 #### AsseticBundle
 * Bundle was removed, use AssetBundle instead
 
+### Changed
+#### AssetBundle
+* Syntax of `Resources/config/oro/assets.yml` files for the management-console was changed to follow the same standard as the configuration files for the OroCommerce storefront.  
+Use the `inputs` node instead of the group names.
+```diff
+- assets:
+css:
+-    'my_custom_asset_group':
++    inputs:
+      - 'bundles/app/css/scss/first.scss'
+      - 'bundles/app/css/scss/second.scss'
+-    'another_asset_group':
+      - 'bundles/app/css/scss/third.scss'             
+```
+#### ApiBundle
+* Fixed the `depends_on` configuration option of the `entities.fields` section of `Resources/config/oro/api.yml`. Now, only entity property names (or paths that contain entity property names) can be used in it. In addition, exception handling of invalid values for this option was improved to return more useful exception messages.
 
 ## 3.1.0-rc (2018-11-30)
 [Show detailed list of changes](incompatibilities-3-1-rc.md)

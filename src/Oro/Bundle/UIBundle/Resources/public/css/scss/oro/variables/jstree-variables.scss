@@ -25,7 +25,7 @@ $jstree-open-font-style: normal !default;
 $jstree-open-color: $primary-550 !default;
 
 $jstree-open-jocl-content: $fa-var-angle-down !default;
-$jstree-closed-jocl-content: $fa-var-angle-right !default;
+$jstree-closed-jocl-content: if-ltr($fa-var-angle-right, $fa-var-angle-left) !default;
 
 $jstree-icon-width: 21px !default;
 $jstree-icon-height: 36px !default;

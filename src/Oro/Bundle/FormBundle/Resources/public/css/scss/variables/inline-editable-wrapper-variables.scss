@@ -6,8 +6,9 @@ $inline-editable-wrapper-loading-size: 12px !default;
 $inline-editable-wrapper-loading-width: 2px !default;
 
 $inline-actions-btn-offset: side-values(10px 8px) !default;
+
 $inline-actions-btn-s-offset: 4px !default;
+$inline-actions-btn-s-line-height: 1 !default;
 $inline-actions-btn-color: $secondary-100 !default;
 $inline-actions-btn-color-hover: $secondary !default;
 $inline-actions-btn-color-error: $danger-darken !default;
-

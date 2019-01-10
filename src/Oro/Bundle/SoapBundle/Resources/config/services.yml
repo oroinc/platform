@@ -144,6 +144,18 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
+    oro_soap.routing.options_resolver.old_options:
+        class: Oro\Bundle\SoapBundle\Routing\OldOptionsRouteOptionsResolver
+        public: false
+        tags:
+            - { name: routing.options_resolver }
+
+    oro_soap.api_doc_handler.old_options:
+        class: Oro\Bundle\SoapBundle\Routing\OldOptionsApiDocHandler
+        public: false
+        tags:
+            - { name: nelmio_api_doc.extractor.handler }
+
     oro_soap.listener.api_sub_request:
         class: 'Oro\Bundle\SoapBundle\EventListener\ApiSubRequestListener'
         arguments:

@@ -2,46 +2,45 @@
 
 namespace Oro\Bundle\EntityBundle\Model;
 
-class EntityStructure
+/**
+ * Represents detailed information about an entity type.
+ */
+class EntityStructure implements \Serializable
 {
-    /**
-     * This field required for JSON API
-     *
-     * @var string
-     */
-    protected $id;
+    /** @var string */
+    private $id;
 
     /** @var string */
-    protected $label;
+    private $label;
 
     /** @var string */
-    protected $pluralLabel;
+    private $pluralLabel;
 
     /** @var string */
-    protected $alias;
+    private $alias;
 
     /** @var string */
-    protected $pluralAlias;
+    private $pluralAlias;
 
     /** @var string */
-    protected $className;
+    private $className;
 
     /** @var string */
-    protected $icon;
+    private $icon;
 
-    /** @var array|EntityFieldStructure[] */
-    protected $fields = [];
+    /** @var EntityFieldStructure[] */
+    private $fields = [];
 
     /** @var array */
-    protected $options = [];
+    private $options = [];
 
     /** @var array */
-    protected $routes = [];
+    private $routes = [];
 
     /**
-     * @param $id
+     * @param string $id
      *
-     * @return $this
+     * @return self
      */
     public function setId($id)
     {
@@ -69,7 +68,7 @@ class EntityStructure
     /**
      * @param string $alias
      *
-     * @return $this
+     * @return self
      */
     public function setAlias($alias)
     {
@@ -89,7 +88,7 @@ class EntityStructure
     /**
      * @param string $pluralAlias
      *
-     * @return $this
+     * @return self
      */
     public function setPluralAlias($pluralAlias)
     {
@@ -109,7 +108,7 @@ class EntityStructure
     /**
      * @param string $className
      *
-     * @return $this
+     * @return self
      */
     public function setClassName($className)
     {
@@ -119,7 +118,7 @@ class EntityStructure
     }
 
     /**
-     * @return array|EntityFieldStructure[]
+     * @return EntityFieldStructure[]
      */
     public function getFields()
     {
@@ -127,14 +126,13 @@ class EntityStructure
     }
 
     /**
-     * @param array|EntityFieldStructure[] $fields
+     * @param EntityFieldStructure[] $fields
      *
-     * @return $this
+     * @return self
      */
     public function setFields(array $fields)
     {
         $this->fields = [];
-
         foreach ($fields as $field) {
             $this->addField($field);
         }
@@ -145,7 +143,7 @@ class EntityStructure
     /**
      * @param EntityFieldStructure $field
      *
-     * @return $this
+     * @return self
      */
     public function addField(EntityFieldStructure $field)
     {
@@ -164,7 +162,7 @@ class EntityStructure
 
     /**
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function addOption($name, $value)
     {
@@ -206,7 +204,7 @@ class EntityStructure
     /**
      * @param string $label
      *
-     * @return $this
+     * @return self
      */
     public function setLabel($label)
     {
@@ -226,7 +224,7 @@ class EntityStructure
     /**
      * @param string $pluralLabel
      *
-     * @return $this
+     * @return self
      */
     public function setPluralLabel($pluralLabel)
     {
@@ -246,7 +244,7 @@ class EntityStructure
     /**
      * @param string $icon
      *
-     * @return $this
+     * @return self
      */
     public function setIcon($icon)
     {
@@ -266,12 +264,50 @@ class EntityStructure
     /**
      * @param array $routes
      *
-     * @return $this
+     * @return self
      */
     public function setRoutes($routes)
     {
         $this->routes = $routes;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize([
+            $this->id,
+            $this->className,
+            $this->label,
+            $this->pluralLabel,
+            $this->alias,
+            $this->pluralAlias,
+            $this->icon,
+            $this->routes,
+            $this->options,
+            $this->fields
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        list(
+            $this->id,
+            $this->className,
+            $this->label,
+            $this->pluralLabel,
+            $this->alias,
+            $this->pluralAlias,
+            $this->icon,
+            $this->routes,
+            $this->options,
+            $this->fields
+            ) = unserialize($serialized, ['allowed_classes' => [EntityFieldStructure::class]]);
     }
 }

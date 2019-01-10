@@ -5,12 +5,14 @@
         <div class="accordion-heading">
             <a href="#<%- regionId %>" data-toggle="collapse" aria-expanded="<%- collapsed ? 'false' : 'true' %>"
                aria-controls="<%- regionId %>"
-               class="btn btn-light accordion-icon accordion-toggle<% if (collapsed) { %> collapsed<% } %>"
+               class="btn btn-icon btn-light-custom accordion-icon<% if (collapsed) { %> collapsed<% } %>"
                title="<%- _.__(collapsed ? 'Expand' : 'Collapse')%>"
                data-collapsed-title="{{ 'Expand'|trans }}"
                data-expanded-title="{{ 'Collapse'|trans }}"
                role="button"
-            ></a>
+            >
+                <span class="fa-icon"></span>
+            </a>
             <div class="icon">
                 {% block activityIcon %}
                 {% endblock %}

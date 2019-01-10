@@ -3,8 +3,12 @@
 namespace Oro\Bundle\DataAuditBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Combine author name and impersonation for audit data grid
+ */
 class AuthorProvider
 {
     /** @var TranslatorInterface */
@@ -21,30 +25,25 @@ class AuthorProvider
     /**
      * @param string $gridName
      * @param string $keyName
-     * @param array  $node
+     * @param array $node
      *
      * @return callable
      */
     public function getAuthor($gridName, $keyName, $node)
     {
         return function (ResultRecord $record) {
-            $user = $record->getValue('user');
-            if (!$user) {
-                return $record->getValue('owner_description');
-            }
-            $author = sprintf(
-                '%s %s - %s',
-                $user->getFirstName(),
-                $user->getLastName(),
-                $user->getEmail()
-            );
+            $author = $record->getValue('author');
 
+            /** @var Impersonation $impersonation */
             $impersonation = $record->getValue('impersonation');
+
             if ($impersonation) {
-                $author .= $this->translator->trans(
+                $impersonationTranslation = $this->translator->trans(
                     'oro.dataaudit.datagrid.author_impersonation',
-                    ['%ipAddress%' => $impersonation->getIpAddress()]
+                    ['%ipAddress%' => $impersonation->getIpAddress(), '%token%' => $impersonation->getToken()]
                 );
+
+                $author = trim(sprintf('%s %s', $author, $impersonationTranslation), ' ');
             }
 
             return $author;

@@ -1,10 +1,24 @@
 /* @theme: admin.oro; */
 
+// Remove the unit of a length
+// @return number
+// Use: $value: strip-units(10px); -> 10
+@function strip-units($value) {
+    @return $value / ($value * 0 + 1);
+}
+
+
+// Returns absolute value of line-height in font-size units, if it's given in relative units
+// @return number
+// Use: $value: absolute-line-height(10px, 1.5); -> 15px
+//      $value: absolute-line-height(10px, 1.5em); -> 15px
+//      $value: absolute-line-height(10px, 150%); -> 15px
+//      $value: absolute-line-height(10px, 15px); -> 15px
 @function absolute-line-height($font-size, $line-height: 1.2) {
     $line-unit: unit($line-height);
-    $line-value: $line-height / ($line-height * 0 + 1);
+    $line-value: strip-units($line-height);
 
-    @if $line-unit == "" or $line-unit == "em" {
+    @if $line-unit == "" or $line-unit == "em" or $line-unit == "rem" {
         @return $line-value * $font-size;
     } @else if $line-unit == "%"  {
         @return ($line-value / 100) * $font-size;

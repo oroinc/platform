@@ -11,6 +11,8 @@ use Oro\Bundle\TagBundle\Model\ExtendTagging;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
+ * The entity that is used to store tags associated to an entity.
+ *
  * @ORM\Table(
  *     name="oro_tag_tagging",
  *     uniqueConstraints={
@@ -24,11 +26,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @Config(
  *      mode="hidden",
  *      defaultValues={
- *          "ownership"={
- *              "owner_type"="USER",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="user_owner_id"
- *          },
  *          "note"={
  *              "immutable"=true
  *          },

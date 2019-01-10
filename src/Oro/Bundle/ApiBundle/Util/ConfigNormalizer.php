@@ -57,10 +57,17 @@ class ConfigNormalizer extends BaseConfigNormalizer
      */
     protected function processDependentField(array &$config, array $dependsOnPropertyPath)
     {
-        $dependsOnFieldName = $dependsOnPropertyPath[0];
         if (!\array_key_exists(ConfigUtil::FIELDS, $config)) {
             $config[ConfigUtil::FIELDS] = [];
         }
+        $dependsOnFieldName = $this->findFieldByPropertyPath(
+            $config[ConfigUtil::FIELDS],
+            $dependsOnPropertyPath[0]
+        );
+        if (!$dependsOnFieldName) {
+            return;
+        }
+
         if (!\array_key_exists($dependsOnFieldName, $config[ConfigUtil::FIELDS])) {
             $config[ConfigUtil::FIELDS][$dependsOnFieldName] = \count($dependsOnPropertyPath) > 1
                 ? []

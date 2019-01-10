@@ -38,7 +38,7 @@ $content-sidebar-hover-resizable-area-opacity: 1 !default;
 
 $content-sidebar-items-offset-inner: 0 $content-sidebar-horizontal-padding !default;
 
-$content-sidebar-jstree-offset: 8px -#{$content-sidebar-horizontal-padding} -#{$content-sidebar-horizontal-padding} !default;
+$content-sidebar-jstree-offset: side-values(8px -#{$content-sidebar-horizontal-padding} 0) !default;
 
 $content-sidebar-display: flex !default;
 $content-sidebar-justify-content: space-between !default;
@@ -62,4 +62,4 @@ $content-sidebar-container-display: flex !default;
 $content-sidebar-container-offset-left: null !default;
 $content-sidebar-container-flex: 1 1 auto !default;
 
-$content-sidebar-form-horizontal-offset-inner: $content-sidebar-horizontal-padding 0 !default;
+$content-sidebar-form-horizontal-offset-inner: 0 !default;

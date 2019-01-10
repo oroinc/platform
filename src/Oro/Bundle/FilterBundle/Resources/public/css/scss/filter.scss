@@ -458,6 +458,8 @@
 
 .ui-multiselect-menu {
     &.select-filter-widget {
+        z-index: $filter-box-criteria-z-index;
+
         padding: $select-filter-widget-inner-offset;
 
         ul {

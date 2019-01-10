@@ -9,6 +9,9 @@ use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Component\Config\Resolver\ResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Builds menu items based on configuration.
+ */
 class ConfigurationBuilder implements BuilderInterface
 {
     const DEFAULT_SCOPE_TYPE = 'menu_default_visibility';
@@ -122,7 +125,7 @@ class ConfigurationBuilder implements BuilderInterface
             $isAllowed = $isAllowed || $newMenuItem->getExtra('isAllowed');
         }
 
-        if ($menu->getExtra('isAllowed')) {
+        if ($menu->getExtra('isAllowed') && $menu->getDisplayChildren()) {
             $menu->setExtra('isAllowed', $isAllowed);
         }
     }

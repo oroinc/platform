@@ -2,7 +2,7 @@
     <div class="widget-header clearfix">
         <div class="actions-container">
             <div class="collapse-expand-action-container">
-                <button class="btn btn-icon btn-light collapse-action<%= collapsed ? ' collapsed' : '' %>"
+                <button class="btn btn-icon btn-light-custom collapse-action<%= collapsed ? ' collapsed' : '' %>"
                     data-collapsed-title="<%- _.__('Expand') %>"
                     data-expanded-title="<%- _.__('Collapse') %>"
                     aria-label="<%- _.__('Expand') %> / <%- _.__('Collapse') %>"
@@ -19,7 +19,7 @@
                 <% var dashboardActionId = _.uniqueId('dashboard-action-') %>
                 <div class="dropdown action-wrapper">
                     <button id="<%- dashboardActionId %>"
-                            class="btn btn-icon btn-light"
+                            class="btn btn-icon btn-light-custom dropdown-toggle dropdown-toggle--no-caret"
                             data-toggle="dropdown"
                             aria-label="<%- _.__('oro.dashboard.show_more_actions') %>"
                             aria-haspopup="true"

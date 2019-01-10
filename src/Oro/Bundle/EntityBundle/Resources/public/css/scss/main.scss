@@ -1,4 +1,10 @@
 /* @theme: admin.oro; */
 
+@import "oroui/css/scss/mixins";
+
 @import "variables";
 @import "entity-fallback";
+
+@import "desktop/main";
+
+@import "mobile/main";

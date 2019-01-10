@@ -146,7 +146,11 @@ class ConfigNormalizer
      */
     protected function processDependentField(EntityDefinitionConfig $config, array $dependsOnPropertyPath)
     {
-        $dependsOnFieldName = $dependsOnPropertyPath[0];
+        $dependsOnFieldName = $config->findFieldNameByPropertyPath($dependsOnPropertyPath[0]);
+        if (!$dependsOnFieldName) {
+            return;
+        }
+
         $dependsOnField = $config->getOrAddField($dependsOnFieldName);
         if ($dependsOnField->isExcluded()) {
             $dependsOnField->setExcluded(false);

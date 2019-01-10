@@ -3,12 +3,17 @@ oro_behat_extension:
     Additional Associations Section:
       selector: "div[id^='emailnotification_recipientList_additionalEmailAssociations']"
       class: Oro\Bundle\NotificationBundle\Tests\Behat\Element\AdditionalAssociationsSection
-
+    Notification Rules Section:
+      selector:
+        type: 'xpath'
+        locator: '//h5/span[text()="Notification Rules"]/ancestor::fieldset'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
   suites:
     OroNotificationBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
         - OroFormBundle::FormContext
+        - OroConfigBundle::FeatureContext
         - OroSecurityBundle::ACLContext
       paths:
         - '@OroNotificationBundle/Tests/Behat/Features'

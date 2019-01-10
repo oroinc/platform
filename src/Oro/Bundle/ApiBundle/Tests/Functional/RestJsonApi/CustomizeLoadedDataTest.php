@@ -69,6 +69,10 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
             self::FIELDS
         );
 
+        $computedId = $this->getComputedIds(
+            TestEntity1::class,
+            $this->getReference('entity1_1')->getId()
+        );
         $this->assertResponseContains(
             [
                 'data' => [
@@ -77,7 +81,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                     'attributes'    => [
                         'name'         => 'Entity 1_1',
                         'computedName' => 'Entity 1_1 (computed)',
-                        'computedIds'  => null
+                        'computedIds'  => $computedId
                     ],
                     'relationships' => [
                         'enumField'      => [
@@ -118,6 +122,10 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
             self::FIELDS
         );
 
+        $computedId = $this->getComputedIds(
+            TestEntity2::class,
+            $this->getReference('entity2_1')->getId()
+        );
         $this->assertResponseContains(
             [
                 'data' => [
@@ -126,7 +134,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                     'attributes'    => [
                         'name'         => 'Entity 2_1',
                         'computedName' => 'Entity 2_1 (computed)',
-                        'computedIds'  => null
+                        'computedIds'  => $computedId
                     ],
                     'relationships' => [
                         'biM2OOwners' => [
@@ -158,6 +166,10 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
             array_merge(self::FIELDS, ['include' => 'biM2M'])
         );
 
+        $computedId = $this->getComputedIds(
+            TestEntity1::class,
+            $this->getReference('entity1_1')->getId()
+        );
         $computedIdForBiM2M = $this->getComputedIds(
             TestEntity2::class,
             $this->getReference('entity2_1')->getId(),
@@ -171,7 +183,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                     'attributes' => [
                         'name'         => 'Entity 1_1',
                         'computedName' => 'Entity 1_1 (computed)',
-                        'computedIds'  => null
+                        'computedIds'  => $computedId
                     ]
                 ],
                 'included' => [
@@ -202,6 +214,10 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
             array_merge(self::FIELDS, ['include' => 'biM2MOwners'])
         );
 
+        $computedId = $this->getComputedIds(
+            TestEntity2::class,
+            $this->getReference('entity2_1')->getId()
+        );
         $computedIdForBiM2MOwners = $this->getComputedIds(
             TestEntity1::class,
             $this->getReference('entity1_1')->getId(),
@@ -215,7 +231,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                     'attributes' => [
                         'name'         => 'Entity 2_1',
                         'computedName' => 'Entity 2_1 (computed)',
-                        'computedIds'  => null
+                        'computedIds'  => $computedId
                     ]
                 ],
                 'included' => [

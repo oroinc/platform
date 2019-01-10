@@ -319,7 +319,7 @@ define(function(require) {
          * @returns {boolean}
          */
         hasHorizontalScroll: function() {
-            return $('body').outerWidth() > $(window).width();
+            return Math.round($('body').outerWidth()) > $(window).width();
         },
 
         /**

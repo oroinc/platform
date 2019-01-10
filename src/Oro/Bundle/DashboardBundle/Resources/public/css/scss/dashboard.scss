@@ -117,6 +117,7 @@
 
         .widget-actions-container,
         .default-actions-container {
+            line-height: 1;
             white-space: nowrap;
         }
 
@@ -131,8 +132,6 @@
         }
 
         .widget-actions-container {
-            margin: side-values(10px 0 8px 0);
-
             .action-wrapper {
                 padding: $dashboard-action-padding;
                 margin-#{$start}: 14px;
@@ -154,6 +153,7 @@
 
             color: $dashboard-widget-title-color;
             font-size: 18px;
+            line-height: 1;
             text-overflow: ellipsis;
             white-space: nowrap;
 

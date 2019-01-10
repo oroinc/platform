@@ -1,0 +1,6 @@
+/* @theme: admin.oro; */
+
+.mobile-version {
+    @import "oroui/css/scss/mobile/variables";
+    @import "entity-fallback";
+}

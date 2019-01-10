@@ -99,18 +99,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
     // @TODO should be refactored in BAP-4020
     $(function() {
         var adjustHeight;
-        var anchor = $('#bottom-anchor');
-        if (!anchor.length) {
-            anchor = $('<div id="bottom-anchor"/>')
-                .css({
-                    position: 'fixed',
-                    bottom: '0',
-                    left: '0',
-                    width: '1px',
-                    height: '1px'
-                })
-                .appendTo($(document.body));
-        }
 
         if (tools.isMobile()) {
             adjustHeight = function() {
@@ -118,36 +106,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                 mediator.trigger('layout:reposition');
             };
         } else {
-            /* dynamic height for central column */
-            var content = false;
-
-            var initializeContent = function() {
-                if (!content) {
-                    content = $('.scrollable-container').filter(':parents(.ui-widget)').add('.app-page__main');
-                    if (!tools.isMobile()) {
-                        content.css('overflow', 'inherit').last().css('overflow-y', 'auto');
-                        content.filter('.overflow-y').css('overflow-y', 'auto');
-                    } else {
-                        content.css('overflow', 'hidden');
-                        content.last().css('overflow-y', 'auto');
-                    }
-                }
-            };
             adjustHeight = function() {
-                initializeContent();
-
                 layout.updateResponsiveLayout();
 
                 var sfToolbar = $('.sf-toolbarreset');
                 var debugBarHeight = sfToolbar.is(':visible') ? sfToolbar.outerHeight() : 0;
-                var anchorTop = anchor.position().top;
-                var footerHeight = $('#footer:visible').height() || 0;
-                var fixContent = 1;
-
-                $(content.get().reverse()).each(function(pos, el) {
-                    el = $(el);
-                    el.height(anchorTop - el.position().top - footerHeight - debugBarHeight + fixContent);
-                });
 
                 scrollspy.adjust();
 
@@ -168,18 +131,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             };
         }
 
-        var adjustReloaded = function() {
-            content = false;
-            adjustHeight();
-        };
-
         layout.onPageRendered(adjustHeight);
 
         $(window).on('resize', _.debounce(adjustHeight, 40));
 
-        mediator.on('page:afterChange', adjustReloaded);
+        mediator.on('page:afterChange', adjustHeight);
 
-        mediator.on('layout:adjustReloaded', adjustReloaded);
+        mediator.on('layout:adjustReloaded', adjustHeight);
         mediator.on('layout:adjustHeight', adjustHeight);
         mediator.on('datagrid:rendered datagrid_filters:rendered widget_remove', scrollspy.adjust);
 

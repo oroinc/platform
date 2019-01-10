@@ -23,6 +23,16 @@
             display: none;
         }
 
+        ol,
+        ul,
+        dl {
+            &:not(.extra-list) {
+                margin: side-values(0 0 $content-padding-medium $content-padding);
+
+                word-break: break-word;
+            }
+        }
+
         @include responsive-inline-position();
     }
 
@@ -119,6 +129,17 @@
                 &:only-child {
                     padding-#{$end}: 0;
                     padding-#{$start}: 0;
+                    padding-bottom: 0;
+                }
+            }
+        }
+
+        &.responsive-big,
+        &.responsive-medium,
+        &:not(.responsive-small) {
+            form[name="oro_product"] & {
+                .responsive-cell {
+                    padding-bottom: $content-padding-medium;
                 }
             }
         }

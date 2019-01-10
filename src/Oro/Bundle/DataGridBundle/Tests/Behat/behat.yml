@@ -136,14 +136,6 @@ oro_behat_extension:
         type: xpath
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
-
-
-
-
-      selector:
-              locator: '//label[text()="Contact"]/../..//button[contains(@class,"entity-select-btn")]'
-              type: xpath
-
     TimePicker:
       selector: 'input.timepicker-input'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\TimePicker

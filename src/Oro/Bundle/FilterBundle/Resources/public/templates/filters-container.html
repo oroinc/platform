@@ -1,6 +1,6 @@
 <% if (!_.isEmpty(filters)) { %>
     <% if (_.isMobile()) { %>
-    <div class="filter-box oro-clearfix-width">
+    <div class="filter-box clearfix">
         <div class="dropdown">
             <a href="javascript:void(0);" class="btn btn-large dropdown-toggle" data-name="filters-dropdown">
                 <%= _.__('oro.filter.filter_results_trigger') %>
@@ -20,7 +20,7 @@
         </div>
     </div>
     <% } else { %>
-    <div class="filter-box oro-clearfix-width">
+    <div class="filter-box clearfix">
         <div class="filter-container">
             <span class="filter-items"></span>
             <div class="filter-items-hint">

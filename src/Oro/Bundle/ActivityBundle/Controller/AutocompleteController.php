@@ -13,6 +13,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
+ * Autocomplete search controller for Activities.
+ *
  * @Route("/activities")
  */
 class AutocompleteController extends Controller
@@ -25,7 +27,6 @@ class AutocompleteController extends Controller
      * @throws HttpException|AccessDeniedHttpException
      *
      * @Route("/{activity}/search/autocomplete", name="oro_activity_form_autocomplete_search")
-     * AclAncestor("oro_search")
      */
     public function autocompleteAction(Request $request, $activity)
     {

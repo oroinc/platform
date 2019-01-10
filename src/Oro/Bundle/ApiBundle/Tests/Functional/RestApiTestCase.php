@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * The base class for different kind of REST API functional tests.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class RestApiTestCase extends ApiTestCase
 {
@@ -66,6 +67,11 @@ abstract class RestApiTestCase extends ApiTestCase
     }
 
     /**
+     * @return string
+     */
+    abstract protected function getResponseContentType();
+
+    /**
      * Sends REST API request.
      *
      * @param string      $method
@@ -111,6 +117,566 @@ abstract class RestApiTestCase extends ApiTestCase
             $xInclude .= 'noHateoas';
             $server['HTTP_X-Include'] = $xInclude;
         }
+    }
+
+    /**
+     * Sends GET request for a list of entities.
+     *
+     * @param array $routeParameters
+     * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
+     *
+     * @return Response
+     */
+    protected function cget(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'GET',
+            $this->getUrl($this->getListRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->clearEntityManager();
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_OK,
+                $entityType,
+                'get list'
+            );
+            self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends DELETE request for a list of entities.
+     *
+     * @param array $routeParameters
+     * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
+     *
+     * @return Response
+     */
+    protected function cdelete(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'DELETE',
+            $this->getUrl($this->getListRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->clearEntityManager();
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_NO_CONTENT,
+                $entityType,
+                'delete list'
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends GET request for a single entity.
+     *
+     * @param array $routeParameters
+     * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
+     *
+     * @return Response
+     */
+    protected function get(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'GET',
+            $this->getUrl($this->getItemRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_OK,
+                $entityType,
+                'get'
+            );
+            self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends PATCH request for a single entity.
+     *
+     * @param array        $routeParameters
+     * @param array|string $parameters
+     * @param array        $server
+     * @param bool         $assertValid
+     *
+     * @return Response
+     */
+    protected function patch(
+        array $routeParameters = [],
+        $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = $this->getRequestData($parameters);
+        $response = $this->request(
+            'PATCH',
+            $this->getUrl($this->getItemRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->clearEntityManager();
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_OK,
+                $entityType,
+                'patch'
+            );
+            self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends POST request for an entity resource.
+     *
+     * @param array        $routeParameters
+     * @param array|string $parameters
+     * @param array        $server
+     * @param bool         $assertValid
+     *
+     * @return Response
+     */
+    protected function post(
+        array $routeParameters = [],
+        $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = $this->getRequestData($parameters);
+        $response = $this->request(
+            'POST',
+            $this->getUrl($this->getListRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->clearEntityManager();
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_CREATED,
+                $entityType,
+                'post'
+            );
+            self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends DELETE request for a single entity.
+     *
+     * @param array $routeParameters
+     * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
+     *
+     * @return Response
+     */
+    protected function delete(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'DELETE',
+            $this->getUrl($this->getItemRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->clearEntityManager();
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_NO_CONTENT,
+                $entityType,
+                'delete'
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends GET request for a relationship of a single entity.
+     *
+     * @param array $routeParameters
+     * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
+     *
+     * @return Response
+     */
+    protected function getRelationship(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'GET',
+            $this->getUrl($this->getRelationshipRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_OK,
+                $entityType,
+                'get relationship'
+            );
+            self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends PATCH request for a relationship of a single entity.
+     *
+     * @param array $routeParameters
+     * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
+     *
+     * @return Response
+     */
+    protected function patchRelationship(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'PATCH',
+            $this->getUrl($this->getRelationshipRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->clearEntityManager();
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_NO_CONTENT,
+                $entityType,
+                'patch relationship'
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends POST request for a relationship of a single entity.
+     *
+     * @param array $routeParameters
+     * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
+     *
+     * @return Response
+     */
+    protected function postRelationship(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'POST',
+            $this->getUrl($this->getRelationshipRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->clearEntityManager();
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_NO_CONTENT,
+                $entityType,
+                'post relationship'
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends DELETE request for a relationship of a single entity.
+     *
+     * @param array $routeParameters
+     * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
+     *
+     * @return Response
+     */
+    protected function deleteRelationship(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'DELETE',
+            $this->getUrl($this->getRelationshipRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->clearEntityManager();
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_NO_CONTENT,
+                $entityType,
+                'delete relationship'
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends GET request for a sub-resource of a single entity.
+     *
+     * @param array $routeParameters
+     * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
+     *
+     * @return Response
+     */
+    protected function getSubresource(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'GET',
+            $this->getUrl($this->getSubresourceRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_OK,
+                $entityType,
+                'get subresource'
+            );
+            self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends PATCH request for a sub-resource of a single entity.
+     *
+     * @param array        $routeParameters
+     * @param array|string $parameters
+     * @param array        $server
+     * @param bool         $assertValid
+     *
+     * @return Response
+     */
+    protected function patchSubresource(
+        array $routeParameters = [],
+        $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = $this->getRequestData($parameters);
+        $response = $this->request(
+            'PATCH',
+            $this->getUrl($this->getSubresourceRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->clearEntityManager();
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                [Response::HTTP_OK, Response::HTTP_NO_CONTENT],
+                $entityType,
+                'patch subresource'
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends POST request for a sub-resource of a single entity.
+     *
+     * @param array        $routeParameters
+     * @param array|string $parameters
+     * @param array        $server
+     * @param bool         $assertValid
+     *
+     * @return Response
+     */
+    protected function postSubresource(
+        array $routeParameters = [],
+        $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = $this->getRequestData($parameters);
+        $response = $this->request(
+            'POST',
+            $this->getUrl($this->getSubresourceRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->clearEntityManager();
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                [Response::HTTP_OK, Response::HTTP_CREATED, Response::HTTP_NO_CONTENT],
+                $entityType,
+                'post subresource'
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends DELETE request for a sub-resource of a single entity.
+     *
+     * @param array        $routeParameters
+     * @param array|string $parameters
+     * @param array        $server
+     * @param bool         $assertValid
+     *
+     * @return Response
+     */
+    protected function deleteSubresource(
+        array $routeParameters = [],
+        $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = $this->getRequestData($parameters);
+        $response = $this->request(
+            'DELETE',
+            $this->getUrl($this->getSubresourceRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->clearEntityManager();
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                [Response::HTTP_OK, Response::HTTP_NO_CONTENT],
+                $entityType,
+                'delete subresource'
+            );
+        }
+
+        return $response;
     }
 
     /**
@@ -246,5 +812,35 @@ abstract class RestApiTestCase extends ApiTestCase
             $config,
             $metadataExtras
         );
+    }
+
+    /**
+     * @param string $method
+     * @param string $uri
+     */
+    protected static function assertSessionNotStarted($method, $uri)
+    {
+        self::assertFalse(
+            self::getContainer()->get('oro_api.tests.test_session_listener')->isSessionStarted(),
+            sprintf(
+                'The Session must not be started because REST API is stateless. Request: %s %s',
+                $method,
+                $uri
+            )
+        );
+    }
+
+    /**
+     * @param array $parameters
+     *
+     * @return string
+     */
+    private static function extractEntityType(array $parameters)
+    {
+        if (empty($parameters['entity'])) {
+            return 'unknown';
+        }
+
+        return $parameters['entity'];
     }
 }

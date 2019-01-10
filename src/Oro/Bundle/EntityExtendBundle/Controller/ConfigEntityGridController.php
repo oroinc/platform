@@ -25,7 +25,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  * ConfigEntityGrid controller
  * @package Oro\Bundle\EntityExtendBundle\Controller
  * @Route("/entity/extend/entity")
- * BAP-17635 Discuss ACL impl., currently acl is disabled
  * @AclAncestor("oro_entityconfig_manage")
  */
 class ConfigEntityGridController extends Controller
@@ -40,12 +39,6 @@ class ConfigEntityGridController extends Controller
      *      name="oro_entityextend_entity_unique_key",
      *      requirements={"id"="\d+"},
      *      defaults={"id"=0}
-     * )
-     * Acl(
-     *      id="oro_entityextend_entity_unique_key",
-     *      label="oro.entity_extend.action.config_entity_grid.unique",
-     *      type="action",
-     *      group_name=""
      * )
      * @Template
      */
@@ -85,12 +78,6 @@ class ConfigEntityGridController extends Controller
 
     /**
      * @Route("/create", name="oro_entityextend_entity_create")
-     * Acl(
-     *      id="oro_entityextend_entity_create",
-     *      label="oro.entity_extend.action.config_entity_grid.create",
-     *      type="action",
-     *      group_name=""
-     * )
      * @Template
      * @param Request $request
      * @return array|RedirectResponse
@@ -169,12 +156,6 @@ class ConfigEntityGridController extends Controller
      *      requirements={"id"="\d+"},
      *      defaults={"id"=0}
      * )
-     * Acl(
-     *      id="oro_entityextend_entity_remove",
-     *      label="oro.entity_extend.action.config_entity_grid.remove",
-     *      type="action",
-     *      group_name=""
-     * )
      */
     public function removeAction(EntityConfigModel $entity)
     {
@@ -205,12 +186,6 @@ class ConfigEntityGridController extends Controller
      *      name="oro_entityextend_entity_unremove",
      *      requirements={"id"="\d+"},
      *      defaults={"id"=0}
-     * )
-     * Acl(
-     *      id="oro_entityextend_entity_unremove",
-     *      label="oro.entity_extend.action.config_entity_grid.unremove",
-     *      type="action",
-     *      group_name=""
      * )
      */
     public function unremoveAction(EntityConfigModel $entity)
