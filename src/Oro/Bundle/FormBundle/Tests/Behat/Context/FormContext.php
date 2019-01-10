@@ -615,7 +615,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         /** @var Select $element */
         $element = $this->createElement($selectField);
         /** @var NodeElement[] $options */
-        $option = $element->find('css', 'option[selected]');
+        $option = $element->getSelectedOption();
 
         if (null === $option) {
             $driver = $this->getSession()->getDriver();

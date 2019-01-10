@@ -9,6 +9,10 @@ search:
         search_template:                OroUserBundle:Search:result.html.twig
         fields:
             -
+                name:                   id
+                target_type:            integer
+                target_fields:          [oro_user_id]
+            -
                 name:                   username
                 target_type:            text
                 target_fields:          [username]

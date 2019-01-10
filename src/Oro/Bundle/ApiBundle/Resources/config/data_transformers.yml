@@ -9,19 +9,24 @@ services:
 
     oro_api.data_transformer.datetime:
         public: false
-        class: Oro\Bundle\ApiBundle\DataTransformer\DateTimeToStringTransformer
+        class: Oro\Bundle\ApiBundle\Form\DataTransformer\DateTimeToStringTransformer
         tags:
             - { name: oro.api.data_transformer, dataType: datetime, requestType: rest }
 
     oro_api.data_transformer.date:
         public: false
-        class: Oro\Bundle\ApiBundle\DataTransformer\DateToStringTransformer
+        class: Oro\Bundle\ApiBundle\Form\DataTransformer\DateTimeToStringTransformer
+        arguments:
+            - false
         tags:
             - { name: oro.api.data_transformer, dataType: date, requestType: rest }
 
     oro_api.data_transformer.time:
         public: false
-        class: Oro\Bundle\ApiBundle\DataTransformer\TimeToStringTransformer
+        class: Oro\Bundle\ApiBundle\Form\DataTransformer\DateTimeToStringTransformer
+        arguments:
+            - true
+            - false
         tags:
             - { name: oro.api.data_transformer, dataType: time, requestType: rest }
 
