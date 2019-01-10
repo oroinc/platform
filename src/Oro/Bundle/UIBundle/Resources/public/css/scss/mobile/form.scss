@@ -42,14 +42,14 @@
     justify-content: space-between;
     font-size: $base-font-size--m;
 
-    .filename {
-        width: 160px;
-    }
-
     .filename,
     .action {
         height: 36px;
         line-height: 36px;
+    }
+
+    .filename {
+        padding: side-values(0 12px 0 12px 0);
     }
 }
 
@@ -97,6 +97,10 @@
 
         .controls {
             margin-#{$start}: $form-horizontal-controls-offset-left;
+
+            &:first-child {
+                margin-#{$start}: $form-horizontal-controls-offset-left;
+            }
 
             .control-group-checkbox {
                 margin-top: $form-horizontal-controls-control-group-checkbox-offset-top;

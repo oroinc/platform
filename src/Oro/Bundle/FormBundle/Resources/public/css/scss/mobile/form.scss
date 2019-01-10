@@ -9,36 +9,59 @@
     }
 }
 
-.entities.list-group {
-    .list-group-item {
-        width: calc(#{$entities-list-mobile-group-item-width} - #{$entities-list-group-item-offset-start});
+fieldset .span6 {
+    margin-left: 0;
+    margin-right: 10px;
+}
 
-        &__header {
-            padding-#{$end}: $entities-list-group-item-header-mobile-inner-offset-end;
-        }
+.mce-tinymce.mce-fullscreen {
+    z-index: 10000;
+    border-radius: 0;
+
+    .mce-toolbar-grp {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
     }
 }
 
-@media screen and (min-width: 654px) {
-    .entities.list-group {
-        .list-group-item {
-            width: calc(#{($entities-list-mobile-group-item-width / 2)} - #{$entities-list-group-item-offset-start});
+.responsive-form-inner {
+    .input-append {
+        display: flex;
+        flex-grow: 1;
+    }
+
+    .float-holder {
+        width: calc(100% - 44px);
+        margin-#{$end}: $content-padding-small;
+    }
+
+    .select2-container {
+        width: 100% !important; //override js width setting
+    }
+
+    input[type="text"]:not(.precision, .conversionRate),
+    input[type="email"],
+    input[type="password"] {
+        width: 100%;
+    }
+
+    .control-group-checkbox {
+        .control-label {
+            margin-left: 26px;
+        }
+
+        .controls {
+            right: auto;
+            left: 0;
         }
     }
-}
 
-@media screen and (min-width: 950px) {
-    .entities.list-group {
-        .list-group-item {
-            width: calc(#{($entities-list-mobile-group-item-width / 3)} - #{$entities-list-group-item-offset-start});
-        }
-    }
-}
-
-@media screen and (min-width: 1252px) {
-    .entities.list-group {
-        .list-group-item {
-            width: calc(#{($entities-list-mobile-group-item-width / 4)} - #{$entities-list-group-item-offset-start});
+    .control-label.wrap {
+        + .controls {
+            > .input-widget-select,
+            > .input-widget-select span {
+                width: 100% !important //Override js width setting
+            }
         }
     }
 }
