@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager;
 use Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorageDecorator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
 class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
@@ -28,7 +29,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->mainTokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->mainTokenStorage = $this->createMock(ClearableTokenStorageInterface::class);
         $this->embeddedFormTokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->requestStack = $this->createMock(RequestStack::class);
 
@@ -189,5 +190,35 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_CSRF_TOKEN_ID);
 
         $this->csrfTokenStorageDecorator->removeToken(self::TEST_CSRF_TOKEN_ID);
+    }
+
+    public function testClearForMainTokenStorage()
+    {
+        $request = Request::create('http://test');
+        $request->attributes->set('_route', 'not_embedded_form_route');
+
+        $this->requestStack->expects(self::once())
+            ->method('getMasterRequest')
+            ->willReturn($request);
+
+        $this->mainTokenStorage->expects(self::once())
+            ->method('clear');
+
+        $this->csrfTokenStorageDecorator->clear();
+    }
+
+    public function testClearForEmbeddedFormTokenStorage()
+    {
+        $request = Request::create('http://test');
+        $request->attributes->set('_route', self::TEST_ROUTE_NAME);
+
+        $this->requestStack->expects(self::once())
+            ->method('getMasterRequest')
+            ->willReturn($request);
+
+        $this->mainTokenStorage->expects(self::never())
+            ->method('clear');
+
+        $this->csrfTokenStorageDecorator->clear();
     }
 }

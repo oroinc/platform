@@ -94,6 +94,11 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
+    oro_soap.listener.api_sub_request:
+         class: Oro\Bundle\SoapBundle\EventListener\ApiSubRequestListener
+         tags:
+             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
     oro_soap.routing.options_resolver.old_options:
         class: Oro\Bundle\SoapBundle\Routing\OldOptionsRouteOptionsResolver
         public: false

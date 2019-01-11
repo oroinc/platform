@@ -4,8 +4,6 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension;
 use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
-use Oro\Bundle\FormBundle\Form\Type\OroDateType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\TypeTestCase;
 
@@ -116,6 +114,17 @@ class OroDateTimeTypeTest extends TypeTestCase
                 '2002-10-02T15:00:00Z',
                 new \DateTime('2002-10-02T15:00:00Z')
             ),
+            array(
+                '2002-10-02 15:00:00',
+                new \DateTime('2002-10-02T15:00:00')
+            ),
         );
+    }
+
+    public function testSubmitInvalidData()
+    {
+        $form = $this->factory->create($this->type);
+        $form->submit('invalid');
+        $this->assertFalse($form->isValid());
     }
 }

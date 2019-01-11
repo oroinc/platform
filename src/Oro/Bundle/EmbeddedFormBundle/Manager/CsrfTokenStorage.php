@@ -3,10 +3,12 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\CacheProvider;
 
+use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
-class CsrfTokenStorage implements TokenStorageInterface
+class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageInterface
 {
     /** @var Cache */
     protected $tokenCache;
@@ -67,6 +69,16 @@ class CsrfTokenStorage implements TokenStorageInterface
     public function removeToken($tokenId)
     {
         $this->tokenCache->delete($this->getCacheKey($tokenId));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        if ($this->tokenCache instanceof CacheProvider) {
+            $this->tokenCache->deleteAll();
+        }
     }
 
     /**

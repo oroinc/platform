@@ -96,7 +96,7 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
                 ),
             ),
             'custom timezone' => array(
-                'bindData' => array('start' => '2010-06-02T03:04:00-10:00', 'end' => '2013-06-02T03:04:00-10:00'),
+                'bindData' => array('start' => '2010-06-02 03:04:00', 'end' => '2013-06-02 03:04:00'),
                 'formData' => array(
                     'start' => $this->createDateTime('2010-06-02 03:04', 'America/New_York')
                         ->setTimezone(new \DateTimeZone('America/Los_Angeles')),
@@ -105,6 +105,25 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
                 ),
                 'viewData' => array(
                     'value' => array('start' => '2010-06-02T03:04:00', 'end' => '2013-06-02T03:04:00'),
+                ),
+                'customOptions' => array(
+                    'field_options' => array(
+                        'model_timezone' => 'America/Los_Angeles',
+                        'view_timezone' => 'America/New_York',
+                        'format' => "yyyy-MM-dd'T'HH:mm:ss"
+                    )
+                )
+            ),
+            'custom timezone with timezone in input data' => array(
+                'bindData' => array('start' => '2010-06-02T03:04:00-10:00', 'end' => '2013-06-02T03:04:00-10:00'),
+                'formData' => array(
+                    'start' => $this->createDateTime('2010-06-02 09:04', 'America/New_York')
+                        ->setTimezone(new \DateTimeZone('America/Los_Angeles')),
+                    'end' => $this->createDateTime('2013-06-02 09:04:00', 'America/New_York')
+                        ->setTimezone(new \DateTimeZone('America/Los_Angeles')),
+                ),
+                'viewData' => array(
+                    'value' => array('start' => '2010-06-02T09:04:00', 'end' => '2013-06-02T09:04:00'),
                 ),
                 'customOptions' => array(
                     'field_options' => array(
