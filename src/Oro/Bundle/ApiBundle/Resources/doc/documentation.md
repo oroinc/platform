@@ -64,7 +64,7 @@ Each resource documentation should start with the `#` (h1) header that contains 
 
 As already mentioned above, a single documentation file may contain documentation for several resources. In general, such approach is used to document the main resource and related resources. For example, you can document resources for the User and UseStatus entities in the same file.
 
-Start the next level with the `##` (h2) header and use it to announce on of the documentation sections, e.g.:
+Start the next level with the `##` (h2) header and use it to announce one of the documentation sections, e.g.:
 
 ```markdown
 # Acme\Bundle\AcmeBundle\Entity\AcmeEntity

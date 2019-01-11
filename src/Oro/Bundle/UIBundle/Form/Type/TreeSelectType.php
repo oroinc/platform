@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type provides functionality to select an existing tree
+ */
 class TreeSelectType extends AbstractType
 {
     const NAME = 'oro_ui_tree_select';
@@ -38,7 +41,7 @@ class TreeSelectType extends AbstractType
         $resolver->setDefault('data_class', TreeItem::class);
         $resolver->setDefault(
             'page_component_module',
-            'oroform/js/app/components/entity-tree-select-form-type-component'
+            'oroform/js/app/components/entity-tree-select-form-type-view'
         );
 
         $resolver->setAllowedTypes('tree_data', ['array']);

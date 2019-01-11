@@ -1,0 +1,38 @@
+/* @theme: admin.oro; */
+
+.drag-n-drop-sorting-view {
+    width: $drag-n-drop-sorting-view-width;
+    overflow: $drag-n-drop-sorting-view-overflow;
+
+    &__wrapper {
+        &.disabled {
+            .removeRow {
+                pointer-events: $drag-n-drop-sorting-view-wrapper-remove-fow-pointer-events;
+            }
+        }
+    }
+
+    &__column {
+        width: $drag-n-drop-sorting-view-column-width;
+    }
+
+    &__column_options {
+        min-width: $drag-n-drop-sorting-view-column_options-min-width;
+    }
+
+    .table-bordered {
+        display: $drag-n-drop-sorting-view-table-bordered-display;
+    }
+
+    .grid-container {
+        margin-bottom: $drag-n-drop-sorting-view-grid-container-offset-bottom;
+    }
+
+    .sortable-wrapper .removeRow {
+        margin-left: $drag-n-drop-sorting-view-sortable-wrapper-remove-row-offset-left;
+    }
+
+    .ui-sortable-helper .removeRow {
+        margin: $drag-n-drop-sorting-view-offset-ui-sortable-helper-remove-row;
+    }
+}

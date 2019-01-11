@@ -1118,6 +1118,25 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * When I scroll modal window to bottom
+     *
+     * @When /I scroll modal window to bottom/
+     */
+    public function scrollModalWindowToBottom()
+    {
+        $modalWindow = $this->getPage()->findVisible('css', 'div.modal, div[role="dialog"]');
+        self::assertNotNull($modalWindow, 'There is no visible modal window on page at this moment');
+        $function = <<<JS
+(function(){
+    var scrollableElement = jQuery('section.widget-content').parent();
+    scrollableElement.scrollTop(scrollableElement.height());
+})()
+JS;
+
+        $this->getSession()->executeScript($function);
+    }
+
+    /**
      * Navigate through menu navigation
      * Every menu link must be separated by slash symbol "/"
      * Example: Given I go to System/ Channels
