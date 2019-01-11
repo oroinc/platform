@@ -262,7 +262,7 @@ class OroMainContext extends MinkContext implements
      */
     public function iFollow($title, $message)
     {
-        $flashMessage = $this->assertHasFlashMessageByTitle($message, 'Flash Message', 15);
+        $flashMessage = $this->assertHasFlashMessageByTitle($message, 'Flash Message', 30);
 
         if ($flashMessage) {
             $link = $flashMessage->findElementContains('Link', $title);
@@ -283,8 +283,12 @@ class OroMainContext extends MinkContext implements
      *
      * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message$/
      * @Then /^(?:|I )should see '(?P<title>[^']+)' flash message$/
+     *
+     * @param string $title
+     * @param string $flashMessageElement
+     * @param int $timeLimit
      */
-    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
+    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 30)
     {
         $this->assertFlashMessageByTitle($title, $flashMessageElement, $timeLimit);
     }
@@ -295,8 +299,12 @@ class OroMainContext extends MinkContext implements
      *
      * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message and keep it$/
      * @Then /^(?:|I )should see '(?P<title>[^']+)' flash message and keep it$/
+     *
+     * @param string $title
+     * @param string $flashMessageElement
+     * @param int $timeLimit
      */
-    public function iShouldSeeFlashMessageAndKeepIt($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
+    public function iShouldSeeFlashMessageAndKeepIt($title, $flashMessageElement = 'Flash Message', $timeLimit = 30)
     {
         $this->assertHasFlashMessageByTitle($title, $flashMessageElement, $timeLimit);
     }
@@ -307,8 +315,12 @@ class OroMainContext extends MinkContext implements
      *
      * @Then /^(?:|I )should not see "(?P<title>[^"]+)" flash message$/
      * @Then /^(?:|I )should not see '(?P<title>[^']+)' flash message$/
+     *
+     * @param string $title
+     * @param string $flashMessageElement
+     * @param int $timeLimit
      */
-    public function iShouldNotSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
+    public function iShouldNotSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 30)
     {
         $this->assertFlashMessageByTitle($title, $flashMessageElement, $timeLimit, false);
     }
