@@ -74,6 +74,12 @@ define(function(require) {
                 }
             }.bind(this));
 
+            $(window).on('resize' + this.eventNamespace(), _.debounce(function() {
+                if (this.isOpen) {
+                    this.setTitleWidth();
+                }
+            }.bind(this), this.timeout));
+
             return this;
         },
 
@@ -83,6 +89,7 @@ define(function(require) {
         undelegateEvents: function() {
             SideMenuOverlayView.__super__.undelegateEvents.call(this);
             $(document).off(this.eventNamespace());
+            $(window).off(this.eventNamespace());
             return this;
         },
 
@@ -112,12 +119,34 @@ define(function(require) {
         },
 
         /**
-         * @param title
+         * @param {String} title
          */
         setTitle: function(title) {
-            this.$('[data-role="overlay-title"]').text(title);
+            this.$('[data-role="overlay-title"]').text(title).attr('title', title);
 
             return this;
+        },
+
+        /**
+         * @param {Boolean|Undefined} [undoComputedWidth]
+         */
+        setTitleWidth: function(undoComputedWidth) {
+            if (!this.searchContent) {
+                return;
+            }
+
+            var $title = this.$('[data-role="overlay-title"]');
+            var $last = this.searchContent.filter(':visible').last();
+
+            if (undoComputedWidth || $last.length === 0 || $last.position().left === 0) {
+                $title.css('width', '');
+            } else {
+                $title.width(
+                    _.isRTL()
+                        ? $title.position().left + $title.width() - $last.position().left
+                        : $last.position().left + $last.width() - ($title.position().left / 2)
+                );
+            }
         },
 
         /**
@@ -128,6 +157,7 @@ define(function(require) {
             this.$el.addClass('open');
             this.clearSearch();
             this.setFocus();
+            this.setTitleWidth();
         },
 
         /**
@@ -137,6 +167,7 @@ define(function(require) {
             this.isOpen = false;
             this.$el.removeClass('open');
             this.$('[data-role="search"]').trigger('blur');
+            this.setTitleWidth(true);
         },
 
         /**
@@ -177,6 +208,7 @@ define(function(require) {
             }
 
             this.toggleNoResult();
+            this.setTitleWidth();
         },
 
         clearSearch: function() {
