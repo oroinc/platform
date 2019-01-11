@@ -135,7 +135,7 @@ class FieldDirectionTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'extra fields constraint',
-                'detail' => 'This form should not contain extra fields: "description"'
+                'detail' => 'This form should not contain extra fields: "description".'
             ],
             $response
         );

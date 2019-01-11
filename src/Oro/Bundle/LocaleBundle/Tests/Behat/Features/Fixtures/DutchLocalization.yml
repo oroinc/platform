@@ -1,0 +1,13 @@
+include:
+    - '@OroTranslationBundle:DutchLanguage.yml'
+
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+    title_localization_dutch:
+        string: 'Dutch'
+
+Oro\Bundle\LocaleBundle\Entity\Localization:
+    localization_ducth:
+        name: 'Dutch'
+        language: '@dutch_lang'
+        formattingCode: 'nl'
+        titles: ['@title_localization_dutch']

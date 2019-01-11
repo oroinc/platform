@@ -5,6 +5,7 @@ namespace Oro\Bundle\CurrencyBundle\Model;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings as BaseLocaleSettings;
 
@@ -28,16 +29,18 @@ class LocaleSettings extends BaseLocaleSettings
     /**
      * @param ConfigManager $configManager
      * @param CalendarFactoryInterface $calendarFactory
+     * @param LocalizationManager $localizationManager
      * @param ViewTypeProviderInterface $viewTypeProvider
      * @param CurrencyProviderInterface $currencyProvider
      */
     public function __construct(
         ConfigManager $configManager,
         CalendarFactoryInterface $calendarFactory,
+        LocalizationManager $localizationManager,
         ViewTypeProviderInterface $viewTypeProvider,
         CurrencyProviderInterface $currencyProvider
     ) {
-        parent::__construct($configManager, $calendarFactory);
+        parent::__construct($configManager, $calendarFactory, $localizationManager);
         $this->viewTypeProvider = $viewTypeProvider;
         $this->currencyProvider = $currencyProvider;
     }

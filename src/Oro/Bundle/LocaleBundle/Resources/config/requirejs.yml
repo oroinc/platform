@@ -37,8 +37,6 @@ config:
         'orolocale/js/moment-l10n': 'bundles/orolocale/js/moment-l10n.js'
         'orolocale/js/numeral-l10n': 'bundles/orolocale/js/numeral-l10n.js'
         'orolocale/js/app/views/fallback-view': 'bundles/orolocale/js/app/views/fallback-view.js'
-        'orolocale/js/app/views/language-select-view': 'bundles/orolocale/js/app/views/language-select-view.js'
-        'orolocale/js/app/views/languages-select-view': 'bundles/orolocale/js/app/views/languages-select-view.js'
         'orolocale/js/app/views/localization-select-view': 'bundles/orolocale/js/app/views/localization-select-view.js'
         'orolocale/js/app/views/localizations-select-view': 'bundles/orolocale/js/app/views/localizations-select-view.js'
         'orolocale/js/app/modules/locale-module': 'bundles/orolocale/js/app/modules/locale-module.js'

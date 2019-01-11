@@ -94,11 +94,10 @@ Feature: User back office login
   Scenario: Add translation for unsuccessful login error on back office and switch to second language
     Given I login as administrator
     And I go to System / Configuration
-    When I follow "System Configuration/General Setup/Language Settings" on configuration sidebar
+    When I follow "System Configuration/General Setup/Localization" on configuration sidebar
     And fill form with:
-      | Supported Languages | [English, Zulu] |
-      | Use Default         | false           |
-      | Default Language    | Zulu            |
+      | Enabled Localizations | [English, Zulu_Loc] |
+      | Default Localization  | Zulu_Loc            |
     And I submit form
     And go to System/Localization/Translations
     When filter Translated Value as is empty

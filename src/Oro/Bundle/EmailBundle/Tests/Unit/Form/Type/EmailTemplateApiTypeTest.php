@@ -2,38 +2,27 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateApiType;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class EmailTemplateApiTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EmailTemplateApiType
-     */
-    protected $type;
+    /** @var EmailTemplateApiType */
+    private $type;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $localeSettings;
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    private $localeSettings;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     protected function setUp()
     {
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()->getMock();
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->type = new EmailTemplateApiType(
-            $this->configManager,
-            $this->localeSettings
-        );
-    }
-
-    protected function tearDown()
-    {
-        unset($this->type);
+        $this->type = new EmailTemplateApiType($this->configManager, $this->localeSettings);
     }
 
     public function testConfigureOptions()
@@ -56,14 +45,12 @@ class EmailTemplateApiTypeTest extends \PHPUnit\Framework\TestCase
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber'));
 
-        $this->configManager->expects($this->any())
+        $this->configManager->expects($this->once())
             ->method('get')
-            ->will($this->returnValueMap([
-                ['oro_locale.languages', false, false, null, ['en', 'fr_FR']],
-                ['oro_email.sanitize_html', false, false, null, true]
-            ]));
+            ->with('oro_email.sanitize_html', false, false, null)
+            ->willReturn(true);
 
-        $this->localeSettings->expects($this->exactly(2))
+        $this->localeSettings->expects($this->once())
             ->method('getLanguage')
             ->will($this->returnValue('ru_UA'));
 
@@ -71,6 +58,6 @@ class EmailTemplateApiTypeTest extends \PHPUnit\Framework\TestCase
             ->method('getLocalesByCodes')
             ->will($this->returnValue(['en', 'fr_FR']));
 
-        $this->type->buildForm($builder, ['additional_language_codes' => []]);
+        $this->type->buildForm($builder, []);
     }
 }

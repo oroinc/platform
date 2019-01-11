@@ -242,7 +242,7 @@ By default, the following form options are set:
 | --- | --- |
 | data_class | The class name of the entity. |
 | validation_groups | Possible values: 'Default', 'api', and/or a custom group. |
-| extra_fields_message | This form should not contain extra fields: "{{ extra_fields }}". |
+| extra_fields_message | This form should not contain extra fields: {{ extra_fields }}. |
 
 **Example:**
 

@@ -3,7 +3,7 @@
 // Main menu
 $menu-animation: all 200ms linear !default;
 $menu-background-color: $primary-300 !default;
-$menu-font-size: $base-font-size + 1 !default;
+$menu-font-size: $base-font-size !default;
 $menu-background-color-active: $extra-200 !default;
 $menu-header-height: 48px !default;
 
@@ -47,6 +47,7 @@ $menu-item-text-color: $primary-300 !default;
 $menu-item-text-highlight-color: $extra-200 !default;
 $menu-item-offset: 9px 18px 9px 16px !default;
 $menu-item-divider-color: $primary-800 !default;
+$menu-item-line-height: 18px !default;
 
 $menu-minimized-item-first-level-text-color-active: $primary-400 !default;
 

@@ -132,6 +132,10 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         }
         $this->setCascadeOptions($builder, $cascade);
         $this->setFetchOption($builder, $this->getFetchOption($relation));
+        if (isset($relation['orphanRemoval']) && $relation['orphanRemoval']) {
+            $builder->orphanRemoval();
+        }
+
         $builder->build();
 
         if (!$relation['owner']

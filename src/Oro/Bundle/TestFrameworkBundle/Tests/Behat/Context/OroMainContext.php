@@ -272,8 +272,12 @@ class OroMainContext extends MinkContext implements
      *
      * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message$/
      * @Then /^(?:|I )should see '(?P<title>[^']+)' flash message$/
+     *
+     * @param string $title
+     * @param string $flashMessageElement
+     * @param int $timeLimit
      */
-    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
+    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 30)
     {
         $flashMessage = $this->getFlashMessage($title, $flashMessageElement, $timeLimit);
 
@@ -289,8 +293,12 @@ class OroMainContext extends MinkContext implements
      *
      * @Then /^(?:|I )should not see "(?P<title>[^"]+)" flash message$/
      * @Then /^(?:|I )should not see '(?P<title>[^']+)' flash message$/
+     *
+     * @param string $title
+     * @param string $flashMessageElement
+     * @param int $timeLimit
      */
-    public function iShouldNotSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
+    public function iShouldNotSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 30)
     {
         $flashMessage = $this->getFlashMessage($title, $flashMessageElement, $timeLimit);
 
@@ -306,8 +314,12 @@ class OroMainContext extends MinkContext implements
      *
      * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message and I close it$/
      * @Then /^(?:|I )should see '(?P<title>[^']+)' flash message and I close it$/
+     *
+     * @param string $title
+     * @param string $flashMessageElement
+     * @param int $timeLimit
      */
-    public function iShouldSeeFlashMessageAndCloseIt($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
+    public function iShouldSeeFlashMessageAndCloseIt($title, $flashMessageElement = 'Flash Message', $timeLimit = 30)
     {
         $flashMessage = $this->getFlashMessage($title, $flashMessageElement, $timeLimit);
 
@@ -327,7 +339,7 @@ class OroMainContext extends MinkContext implements
      * @param string $flashMessageElement
      * @param int $timeLimit
      */
-    public function shouldNotSeeFlashMessages($flashMessageElement = 'Flash Message', $timeLimit = 15)
+    public function shouldNotSeeFlashMessages($flashMessageElement = 'Flash Message', $timeLimit = 30)
     {
         $flashMessages = $this->spin(function (OroMainContext $context) use ($flashMessageElement) {
             return $context->findAllElements($flashMessageElement);
@@ -339,10 +351,10 @@ class OroMainContext extends MinkContext implements
     /**
      * @param string $title
      * @param string $flashMessageElement
-     * @param string $timeLimit
+     * @param int $timeLimit
      * @return Element|null
      */
-    protected function getFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
+    protected function getFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 30)
     {
         return $this->spin(
             function (OroMainContext $context) use ($title, $flashMessageElement) {
@@ -1103,6 +1115,25 @@ class OroMainContext extends MinkContext implements
                 throw $e;
             }
         }
+    }
+
+    /**
+     * When I scroll modal window to bottom
+     *
+     * @When /I scroll modal window to bottom/
+     */
+    public function scrollModalWindowToBottom()
+    {
+        $modalWindow = $this->getPage()->findVisible('css', 'div.modal, div[role="dialog"]');
+        self::assertNotNull($modalWindow, 'There is no visible modal window on page at this moment');
+        $function = <<<JS
+(function(){
+    var scrollableElement = jQuery('section.widget-content').parent();
+    scrollableElement.scrollTop(scrollableElement.height());
+})()
+JS;
+
+        $this->getSession()->executeScript($function);
     }
 
     /**

@@ -110,6 +110,7 @@ oro:
                     do_not_select: 'Do Not Select Sub {{ itemsLabel }}'
             search:
                 search_no_found: 'No result was found'
+            is_empty: 'No items exists'
         select2:
             input_too_short: "{1}Please enter {{ number }} more character|[2,Inf[Please enter {{ number }} more characters"
             input_too_long: "{1}Please delete {{ number }} character|[2,Inf[Please delete {{ number }} characters"

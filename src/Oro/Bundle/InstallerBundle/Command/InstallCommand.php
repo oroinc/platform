@@ -12,6 +12,7 @@ use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
+use Oro\Bundle\LocaleBundle\DependencyInjection\OroLocaleExtension;
 use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
@@ -20,6 +21,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Intl\Intl;
 
 /**
  * Command installs application with all schema and data migrations, prepares assets and application cache
@@ -78,6 +80,18 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 null,
                 InputOption::VALUE_NONE,
                 'Determines whether translation data need to be downloaded or not'
+            )
+            ->addOption(
+                'language',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Application language'
+            )
+            ->addOption(
+                'formatting-code',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Application formatting code'
             );
 
         parent::configure();
@@ -201,6 +215,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 )
             );
         }
+
+        $this->validateLocalizationOptions($input);
     }
 
     /**
@@ -305,16 +321,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ],
         ];
 
-        $commandParameters = [];
-        foreach ($options as $optionName => $optionData) {
-            $commandParameters['--' . $optionName] = $this->inputOptionProvider->get(
-                $optionName,
-                $optionData['label'],
-                $optionData['defaultValue'],
-                $optionData['options']
-            );
-        }
-
         $commandExecutor->runCommand(
             'oro:user:update',
             array_merge(
@@ -322,7 +328,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                     'user-name'           => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
                     '--process-isolation' => true
                 ],
-                $commandParameters
+                $this->getCommandParametersFromOptions($options)
             )
         );
     }
@@ -359,16 +365,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ]
         ];
 
-        $commandParameters = [];
-        foreach ($options as $optionName => $optionData) {
-            $commandParameters['--' . $optionName] = $this->inputOptionProvider->get(
-                $optionName,
-                $optionData['label'],
-                $optionData['defaultValue'],
-                $optionData['options']
-            );
-        }
-
         $commandExecutor->runCommand(
             'oro:organization:update',
             array_merge(
@@ -376,7 +372,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                     'organization-name' => 'default',
                     '--process-isolation' => true,
                 ],
-                $commandParameters
+                $this->getCommandParametersFromOptions($options)
             )
         );
     }
@@ -478,6 +474,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $this->updateSystemSettings();
         $this->updateOrganization($commandExecutor);
         $this->updateUser($commandExecutor);
+        $this->updateLocalization($commandExecutor);
 
         $isDemo = $this->inputOptionProvider->get(
             'sample-data',
@@ -563,6 +560,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
 
         if (!$skipAssets) {
+            /**
+             * Place this launch of command after the launch of 'assetic-dump' in BAP-16333
+             */
             $commandExecutor->runCommand(
                 'oro:translation:dump',
                 [
@@ -649,5 +649,152 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     private function getEventDispatcher()
     {
         return $this->getContainer()->get('event_dispatcher');
+    }
+
+    /**
+     * @param CommandExecutor $commandExecutor
+     */
+    private function updateLocalization(CommandExecutor $commandExecutor): void
+    {
+        $formattingCode = $this->getContainer()->getParameter(OroLocaleExtension::PARAMETER_FORMATTING_CODE);
+        $language = $this->getContainer()->getParameter(OroLocaleExtension::PARAMETER_LANGUAGE);
+
+        $options = [
+            'formatting-code' => [
+                'label' => 'Formatting Code',
+                'options' => [
+                    'constructorArgs' => [$formattingCode],
+                    'settings' => [
+                        'validator' => [
+                            function ($value) {
+                                $this->validateFormattingCode($value);
+                                return $value;
+                            }
+                        ]
+                    ]
+                ],
+                'defaultValue' => $formattingCode
+            ],
+            'language' => [
+                'label' => 'Language',
+                'options' => [
+                    'constructorArgs' => [$language],
+                    'settings' => [
+                        'validator' => [
+                            function ($value) {
+                                $this->validateLanguage($value);
+                                return $value;
+                            }
+                        ]
+                    ]
+                ],
+                'defaultValue' => $language
+            ]
+        ];
+
+        $commandExecutor->runCommand(
+            'oro:localization:update',
+            array_merge(
+                [
+                    '--process-isolation' => true
+                ],
+                $this->getCommandParametersFromOptions($options)
+            )
+        );
+    }
+
+    /**
+     * @param InputInterface $input
+     */
+    private function validateLocalizationOptions(InputInterface $input): void
+    {
+        $formattingCode = $input->getOption('formatting-code');
+        if ($formattingCode) {
+            $this->validateFormattingCode($formattingCode);
+        }
+
+        $language = (string)$input->getOption('language');
+        if ($language) {
+            $this->validateLanguage($language);
+        }
+    }
+
+    /**
+     * @param string $locale
+     * @throws \InvalidArgumentException
+     */
+    private function validateFormattingCode(string $locale): void
+    {
+        $locales = array_keys(Intl::getLocaleBundle()->getLocaleNames());
+        if (!in_array($locale, $locales, true)) {
+            throw new \InvalidArgumentException($this->getExceptionMessage('formatting', $locale, $locales));
+        }
+    }
+
+    /**
+     * @param string $language
+     * @throws \InvalidArgumentException
+     */
+    private function validateLanguage(string $language)
+    {
+        $languages = array_keys(Intl::getLanguageBundle()->getLanguageNames());
+        if (!in_array($language, $languages, true)) {
+            throw new \InvalidArgumentException($this->getExceptionMessage('language', $language, $languages));
+        }
+    }
+
+    /**
+     * @param string $optionName
+     * @param string $localeCode
+     * @param array $availableLocaleCodes
+     * @return string
+     */
+    private function getExceptionMessage(string $optionName, string $localeCode, array $availableLocaleCodes):string
+    {
+        $exceptionMessage = sprintf("There are no %s code '%s'!", $optionName, $localeCode);
+        $alternatives = $this->getAlternatives($localeCode, $availableLocaleCodes);
+        if ($alternatives) {
+            $exceptionMessage .= sprintf("\nDid you mean %s?\n", $alternatives);
+        }
+
+        return $exceptionMessage;
+    }
+
+    /**
+     * @param array $options
+     * @return array
+     */
+    private function getCommandParametersFromOptions(array $options): array
+    {
+        $commandParameters = [];
+        foreach ($options as $optionName => $optionData) {
+            $commandParameters['--' . $optionName] = $this->inputOptionProvider->get(
+                $optionName,
+                $optionData['label'],
+                $optionData['defaultValue'],
+                $optionData['options']
+            );
+        }
+
+        return $commandParameters;
+    }
+
+    /**
+     * @param string $name
+     * @param array $items
+     * @return string
+     */
+    private function getAlternatives(string $name, array $items): string
+    {
+        $alternatives = [];
+        foreach ($items as $item) {
+            $lev = levenshtein($name, $item);
+            if ($lev <= strlen($name) / 2 || false !== strpos($item, $name)) {
+                $alternatives[$item] = $lev;
+            }
+        }
+        asort($alternatives);
+
+        return implode(', ', array_keys($alternatives));
     }
 }

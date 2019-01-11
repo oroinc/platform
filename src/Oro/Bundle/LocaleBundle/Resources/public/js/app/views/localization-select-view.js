@@ -12,13 +12,19 @@ define(function(require) {
          * @property {Object}
          */
         options: {
-            selectSelector: 'select'
+            selectSelector: 'select',
+            useParentSelector: 'input[type="checkbox"]'
         },
 
         /**
          * @property {jQuery.Element}
          */
         $select: null,
+
+        /**
+         * @property {jQuery.Element}
+         */
+        $useParent: null,
 
         /**
          * @inheritDoc
@@ -34,6 +40,8 @@ define(function(require) {
             this.options = _.extend({}, this.options, options);
 
             this.$select = this.$el.find(this.options.selectSelector);
+            this.$useParent = this.$el.find(this.options.useParentSelector);
+            this.$useParent.on('change' + this.eventNamespace(), _.bind(this.onUseParentChange, this));
 
             mediator.on('enabled_localizations:changed', this.onEnabledLocalizationsChanged, this);
         },
@@ -46,7 +54,10 @@ define(function(require) {
                 return;
             }
 
+            this.$useParent.off('change' + this.eventNamespace());
             mediator.off(null, null, this);
+
+            LocalizationSelectView.__super__.dispose.call(this);
         },
 
         /**
@@ -71,6 +82,10 @@ define(function(require) {
             }
 
             select.change();
+        },
+
+        onUseParentChange: function() {
+            mediator.trigger('default_localization:use_parent_scope', this.$useParent.is(':checked'));
         }
     });
 

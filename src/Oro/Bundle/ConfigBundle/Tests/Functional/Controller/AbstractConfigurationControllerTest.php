@@ -63,6 +63,9 @@ abstract class AbstractConfigurationControllerTest extends WebTestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function getParameters()
     {
         return [
@@ -78,7 +81,7 @@ abstract class AbstractConfigurationControllerTest extends WebTestCase
                     'activeGroup' => 'platform',
                     'activeSubGroup' => 'localization',
                 ],
-                'expected' => ['Localization options', 'Primary Location']
+                'expected' => ['Location options', 'Primary Location']
             ],
         ];
     }

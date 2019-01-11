@@ -33,6 +33,7 @@ services:
         arguments:
             - '@oro_config.manager'
             - '@oro_locale.calendar_factory'
+            - '@oro_locale.manager.localization'
         calls:
             - [addNameFormats, ['%oro_locale.format.name%']]
             - [addAddressFormats, ['%oro_locale.format.address%']]
@@ -178,13 +179,13 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter'
         arguments:
             - '@translator'
-            - '@oro_config.global'
+            - '@oro_locale.settings'
 
     oro_locale.formatter.formatting_code:
         class: 'Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter'
         arguments:
             - '@translator'
-            - '@oro_config.global'
+            - '@oro_locale.settings'
 
     # Twig extensions
     oro_locale.twig.date_format:
@@ -307,7 +308,7 @@ services:
     oro_locale.provider.localization_choices:
         class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider'
         arguments:
-            - '@oro_config.manager'
+            - '@oro_locale.settings'
             - '@oro_locale.formatter.language_code'
             - '@oro_translation.provider.language'
             - '@oro_locale.manager.localization'
@@ -365,3 +366,11 @@ services:
             - '@oro_locale.settings'
         tags:
             - { name: oro_locale.preferred_language_provider, priority: 255 }
+
+    oro_locale_config.event_listener.localization_change:
+        class: 'Oro\Bundle\LocaleBundle\EventListener\LocalizationChangeListener'
+        arguments:
+            - '@oro_config.user'
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }

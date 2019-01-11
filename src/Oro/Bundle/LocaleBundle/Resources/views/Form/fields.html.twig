@@ -82,34 +82,32 @@
     </div>
 {% endblock %}
 
-{% block _language_settings_oro_locale___language_value_widget %}
+{% block _localization_oro_locale___default_localization_widget %}
     <span data-page-component-module="oroui/js/app/components/view-component"
-       data-page-component-options="{{ {view: 'orolocale/js/app/views/language-select-view'}|json_encode }}"
+          data-page-component-options="{{ {
+              view: 'orolocale/js/app/views/localization-select-view',
+              selectSelector: '#' ~ form.value.vars.id,
+              useParentSelector: '#' ~ form.use_parent_scope_value.vars.id
+          }|json_encode }}"
     >
         {{ form_widget(form) }}
     </span>
 {% endblock %}
 
-{% block _language_settings_oro_locale___languages_value_widget %}
+{% block _localization_oro_locale___enabled_localizations_widget %}
     <span data-page-component-module="oroui/js/app/components/view-component"
-          data-page-component-options="{{ {view: 'orolocale/js/app/views/languages-select-view'}|json_encode }}"
+          data-page-component-options="{{ {
+              view: 'orolocale/js/app/views/localizations-select-view',
+              selectSelector: '#' ~ form.value.vars.id,
+              useParentSelector: '#' ~ form.use_parent_scope_value.vars.id
+          }|json_encode }}"
     >
         {{ form_widget(form) }}
     </span>
 {% endblock %}
 
-{% block _localization_oro_locale___default_localization_value_widget %}
-    <span data-page-component-module="oroui/js/app/components/view-component"
-          data-page-component-options="{{ {view: 'orolocale/js/app/views/localization-select-view'}|json_encode }}"
-    >
-        {{ form_widget(form) }}
-    </span>
-{% endblock %}
-
-{% block _localization_oro_locale___enabled_localizations_value_widget %}
-    <span data-page-component-module="oroui/js/app/components/view-component"
-          data-page-component-options="{{ {view: 'orolocale/js/app/views/localizations-select-view'}|json_encode }}"
-    >
-        {{ form_widget(form) }}
+{% block _localization_oro_locale___enabled_localizations_use_parent_scope_value_row %}
+    <span class="hide">
+        {{ form_row(form, {'attr': attr}) }}
     </span>
 {% endblock %}
