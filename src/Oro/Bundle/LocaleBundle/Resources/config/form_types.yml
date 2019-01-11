@@ -24,14 +24,6 @@ services:
         tags:
             - { name: form.type, alias: oro_locale }
 
-    oro_locale.form.type.language:
-        class: '%oro_locale.form.type.language.class%'
-        arguments:
-            - '@oro_config.global'
-            - '@oro_translation.provider.language'
-        tags:
-            - { name: form.type, alias: oro_language }
-
     oro_locale.form.type.timezone:
         class: '%oro_locale.form.type.timezone.class%'
         arguments:
@@ -126,7 +118,6 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectionType'
         arguments:
             - '@oro_config.manager'
-            - '@oro_locale.settings'
             - '@oro_locale.manager.localization'
             - '@oro_locale.provider.localization_choices'
         tags:
@@ -141,3 +132,8 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Form\Extension\LocalizationScopeExtension'
         tags:
             - { name: form.type_extension, extended_type: Oro\Bundle\ScopeBundle\Form\Type\ScopeType }
+
+    oro_locale.configurator.localization_configurator:
+        class: Oro\Bundle\LocaleBundle\Form\Configurator\LocalizationConfigurator
+        arguments:
+            - '@oro_config.form.handler.config'

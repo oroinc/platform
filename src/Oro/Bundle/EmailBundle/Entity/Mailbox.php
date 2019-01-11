@@ -16,6 +16,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
+ * Represents system mailbox.
+ *
  * @ORM\Table(name="oro_email_mailbox")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository")
  * @UniqueEntity(fields={"email"})
@@ -25,6 +27,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *      defaultValues={
  *          "entity"={
  *              "icon"="fa-envelope"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"="",
+ *              "category"=""
  *          },
  *          "ownership"={
  *              "owner_type"="ORGANIZATION",

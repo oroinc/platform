@@ -83,14 +83,4 @@
             }
         }
     }
-
-    &__entity-title {
-        margin-#{$end}: 5px;
-    }
-
-    .sub-title,
-    .separator,
-    &__entity-title {
-        display: inline;
-    }
 }

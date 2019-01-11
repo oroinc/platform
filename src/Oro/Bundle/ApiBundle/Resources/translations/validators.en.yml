@@ -1,7 +1,7 @@
 oro:
     api:
         form:
-            extra_fields: 'This form should not contain extra fields: {{ extra_fields }}'
+            extra_fields: 'This form should not contain extra fields: {{ extra_fields }}.'
             no_access: 'The "{{ permission }}" permission is denied for the related resource.'
             no_adder_and_remover: 'The "{{ class }}" class should have both "{{ adder }}" and "{{ remover }}" methods.'
             no_adder_and_remover_multiple: 'The "{{ class }}" class should have any of the following method pairs: %s.'

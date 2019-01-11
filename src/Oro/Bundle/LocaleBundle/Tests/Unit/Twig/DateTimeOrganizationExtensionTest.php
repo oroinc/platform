@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Twig\DateTimeOrganizationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
@@ -20,18 +21,19 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
+    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
+    protected $localizationManager;
+
     protected function setUp()
     {
-        $this->formatter = $this->getMockBuilder(DateTimeFormatter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formatter = $this->createMock(DateTimeFormatter::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->localizationManager = $this->createMock(LocalizationManager::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_locale.formatter.date_time', $this->formatter)
             ->add('oro_config.global', $this->configManager)
+            ->add('oro_locale.manager.localization', $this->localizationManager)
             ->getContainer($this);
 
         $this->extension = new DateTimeOrganizationExtension($container);
@@ -50,7 +52,7 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturnMap(
                 [
-                    ['oro_locale.locale', false, false, null, $organizationLocale],
+                    ['oro_locale.default_localization', false, false, null, 42],
                     ['oro_locale.timezone', false, false, null, $organizationTimezone],
                 ]
             );
@@ -58,6 +60,11 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('format')
             ->with($date, null, null, $organizationLocale, $organizationTimezone)
             ->willReturn($expected);
+
+        $this->localizationManager->expects($this->any())
+            ->method('getLocalizationData')
+            ->with(42)
+            ->willReturn(['formattingCode' => $organizationLocale]);
 
         $options = [
             'locale'       => 'fr_FR',

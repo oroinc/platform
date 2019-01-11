@@ -1,36 +1,44 @@
 .page-title {
     .top-row {
         @include clearfix();
+
+        margin-bottom: 3px;
     }
 
     .nav {
         margin: 0;
     }
 
+    .sub-title,
+    .separator,
+    &__entity-title {
+        display: inline;
+        vertical-align: middle;
+    }
+
     .sub-title {
-        font-size: $base-font-size--xl;
         color: $primary-200;
-        display: inline-block;
-        margin-bottom: 3px;
     }
 
     .separator {
-        padding: 0 3px;
         color: $primary-700;
-        font-size: $base-font-size--xl;
     }
 
     &__entity-title {
-        margin: side-values(0 10px 3px 0);
         min-height: 15px;
-        display: inline-block;
         float: none !important;
         font-size: $base-font-size--xl;
         font-weight: normal;
+        margin-#{$end}: 2px;
+        line-height: $content-title-line-height;
     }
 
-    &__entity-title-wrapper {
-        display: inline-block;
+    &__entity-title-wrapper,
+    &__status {
+        display: inline;
+        vertical-align: middle;
+        font-size: $base-font-size--xl;
+        line-height: $content-title-line-height;
     }
 
     &__icon {
@@ -58,7 +66,6 @@
 
     &__path {
         line-height: 18px;
-        padding-top: 2px;
     }
 
     &__entity-info-state {

@@ -26,7 +26,7 @@ class ResourceFileImportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->contentFile = $this->createMock(\SplFileInfo::class);
         $this->parentProcessor = $this->createMock(ConfigImportProcessorInterface::class);
 
-        $this->processor = new ResourceFileImportProcessor($this->reader, 'relative path');
+        $this->processor = new ResourceFileImportProcessor($this->reader, 'relative path', ['OroWorkflowBundle']);
     }
 
     public function testProcessWithoutParent()
@@ -50,7 +50,7 @@ class ResourceFileImportProcessorTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->processor->process($content, $this->contentFile);
 
-        $this->assertSame(['a' => ['b' => ['c', 'd']]], $result);
+        $this->assertSame(['a' => ['b' => 'd']], $result);
     }
 
     public function testProcessWithParent()
@@ -76,6 +76,6 @@ class ResourceFileImportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->setParent($this->parentProcessor);
         $result = $this->processor->process($content, $this->contentFile);
 
-        $this->assertSame(['a' => ['b' => ['c', 'e']]], $result);
+        $this->assertSame(['a' => ['b' => 'e']], $result);
     }
 }

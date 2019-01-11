@@ -152,7 +152,6 @@ services:
         arguments:
             - '@oro_config.manager'
         tags:
-            - { name: oro_workflow.condition, alias: 'is_system_config_equal' }
             - { name: oro_action.condition, alias: 'is_system_config_equal' }
 
     oro_config.event_listener.cache_state:

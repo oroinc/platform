@@ -3,7 +3,7 @@
 "The entity was not found.": "The entity was not found."
 oro:
     form:
-        extra_fields: 'This form should not contain extra fields: {{ extra_fields }}'
+        extra_fields: 'This form should not contain extra fields: {{ extra_fields }}.'
         number:
             min: "]-Inf,Inf[The value have not to be less than {{ limit }}."
             max:  "]-Inf,Inf[The value have not to be more than {{ limit }}."

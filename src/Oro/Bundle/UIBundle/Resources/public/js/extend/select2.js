@@ -276,7 +276,7 @@ define(function(require) {
                 !$container.hasClass('select2-drop-above');
             if ($container.parent().hasClass(select2DropBelowClassName) !== dialogIsBelow) {
                 $container.parent().toggleClass(select2DropBelowClassName, dialogIsBelow);
-                this.opts.element.trigger('select2:dialogReposition');
+                this.opts.element.trigger('select2:dialogReposition', dialogIsBelow ? 'below' : 'top');
             }
         };
 

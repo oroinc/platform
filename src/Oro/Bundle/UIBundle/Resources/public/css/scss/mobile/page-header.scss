@@ -61,6 +61,8 @@
     .sub-title {
         float: none;
         font-size: $base-font-size;
+        display: block;
+        margin-bottom: 3px;
 
         & + .separator {
             display: none;
@@ -79,8 +81,7 @@
     &__entity-title {
         font-size: $base-font-size--xl;
         font-weight: normal;
-        margin: 0;
-        display: block;
+        display: inline;
     }
 
     &__icon {
@@ -109,6 +110,23 @@
                 left: 50%;
                 transform: translate(-50%, -50%);
             };
+
+            &.btn-sticky {
+                background-color: $page-title-btn-more-actions-submittable-bg-color;
+                border-color: $page-title-btn-more-actions-submittable-bg-color;
+                color: $page-title-btn-more-actions-submittable-color;
+                z-index: 4;
+
+                @include fa-icon($page-title-btn-more-actions-submittable-icon, 'before', true) {
+                    margin-top: -2px;
+                };
+
+                &:not(:disabled):not(.disabled):active,
+                &:not(:disabled):not(.disabled).active {
+                    background-color: $page-title-btn-more-actions-submittable-bg-color-active;
+                    border-color: $page-title-btn-more-actions-submittable-bg-color-active;
+                }
+            }
         }
     }
 

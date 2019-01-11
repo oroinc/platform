@@ -157,9 +157,7 @@ services:
             - { name: nelmio_api_doc.extractor.handler }
 
     oro_soap.listener.api_sub_request:
-        class: 'Oro\Bundle\SoapBundle\EventListener\ApiSubRequestListener'
-        arguments:
-            - '%fos_rest.format_listener.rules%'
+        class: Oro\Bundle\SoapBundle\EventListener\ApiSubRequestListener
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 

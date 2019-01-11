@@ -1357,6 +1357,79 @@
         <span class="{{ classNames }}" aria-hidden="true"></span>
     {% endif %}
 {% endmacro %}
+{#
+    Render sortable list for configuration options
+    Parameters:
+        widget - form widget data
+        attr - block attributes
+        options - additional options
+            - collection_class - Main class for sortable list,
+            - add_btn_label - Text label for add item button,
+            - column_label - Main column label,
+            - column_options_label - Options column label
+            - data_page_component_module - Class for data-page-component-module attribute
+            - show_form_when_empty - Show select box when a form is empty
+#}
+{% macro sortable_list_view(widget, attr = {}, options = {}) %}
+    {% if widget.vars.prototype is defined %}
+        {% set prototype_html = _self.sortable_list_view_collection_prototype(widget, options) %}
+    {% endif %}
+
+    {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection grid-container' }) %}
+
+    {% set id = widget.vars.id ~ '_collection' %}
+    <div class="{{ options.collection_class|default('') }} drag-n-drop-sorting-view" {% if options.data_page_component_module is defined %} data-page-component-module="{{ options.data_page_component_module|escape }}"{% endif %}>
+        <div class="drag-n-drop-sorting-view__wrapper row-oro" {{ _self.renderPageComponentAttributes({
+            module: 'oroui/js/app/components/view-component',
+            options: {
+                view: 'oroui/js/drag-n-drop-sorting',
+                autoRender: true
+            }
+        }) }}>
+            {% set prototype_name = widget.vars.prototype_name %}
+            <div {{ _self.attributes(attr) }}>
+                <table class="grid table-hover table table-bordered">
+                    <thead>
+                    <tr>
+                        <th class="drag-n-drop-sorting-view__column"><span>{{ options.column_label|default('') }}</span></th>
+                        <th class="drag-n-drop-sorting-view__column_options"><span>{{ options.column_options_label|default('') }}</span></th>
+                        <th></th>
+                        {% if form.mergeAllowed is defined %}
+                            <th></th>
+                        {% endif %}
+                    </tr>
+                    </thead>
+                    <tbody class="sortable-wrapper" data-last-index="{{ widget.children|length}}" data-prototype-name="{{ prototype_name }}"{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %} data-content>
+                    {% if widget.children|length %}
+                        {% for child in widget.children %}
+                            {{ _self.sortable_list_view_collection_prototype(child, options) }}
+                        {% endfor %}
+                    {% elseif options.show_form_when_empty is defined and prototype_html is defined %}
+                        {{ prototype_html|replace({(prototype_name): '0'})|raw }}
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <a class="btn add-list-item" data-container=".oro-item-collection tbody" href="javascript: void(0);">
+                {{ options.add_btn_label|default('') }}
+            </a>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro sortable_list_view_collection_prototype(widget, options) %}
+    {% if 'collection' in widget.vars.block_prefixes %}
+        {% set form = widget.vars.prototype %}
+        {% set name = widget.vars.full_name ~ '[' ~ widget.vars.prototype.vars.name ~ ']' %}
+    {% else %}
+        {% set form = widget %}
+        {% set name = widget.vars.full_name %}
+    {% endif %}
+    <tr data-content="{{ name }}" data-validation-optional-group {{ block('widget_container_attributes') }}
+        class="{{ options.collection_class|default('') }}">
+        {{ form_widget(form) }}
+    </tr>
+{% endmacro %}
 
 {% macro badge(label, badgeClass = 'info', iconClass = 'fa-circle') %}
     <span class="badge badge-pill badge-{{ badgeClass }} status-{{ badgeClass }}">

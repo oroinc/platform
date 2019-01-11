@@ -2,28 +2,29 @@
 
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Used to format the formatting code and the system language to the human readable locale name.
+ */
 class FormattingCodeFormatter
 {
-    const CONFIG_KEY_DEFAULT_LANGUAGE = 'oro_locale.language';
-
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var LocaleSettings */
+    protected $localeSettings;
 
     /**
      * @param TranslatorInterface $translator
-     * @param ConfigManager $configManager
+     * @param LocaleSettings $localeSettings
      */
-    public function __construct(TranslatorInterface $translator, ConfigManager $configManager)
+    public function __construct(TranslatorInterface $translator, LocaleSettings $localeSettings)
     {
         $this->translator = $translator;
-        $this->configManager = $configManager;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -38,7 +39,7 @@ class FormattingCodeFormatter
 
         $name = Intl::getLocaleBundle()->getLocaleName(
             $code,
-            $this->configManager->get(self::CONFIG_KEY_DEFAULT_LANGUAGE)
+            $this->localeSettings->getLanguage()
         );
 
         return $name ?: $code;

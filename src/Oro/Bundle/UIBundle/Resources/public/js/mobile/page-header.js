@@ -34,6 +34,9 @@ define(function(require) {
         if (label.length > 35) {
             options.minItemQuantity = 0;
         }
+        options.stickyButton = {
+            enabled: Boolean($container.closest('form').length)
+        };
         $container.dropdownButtonProcessor(options);
 
         showButtons();

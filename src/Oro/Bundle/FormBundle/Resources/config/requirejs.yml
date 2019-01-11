@@ -74,7 +74,7 @@ config:
         'oroform/js/app/components/create-or-select-choice-component': 'bundles/oroform/js/app/components/create-or-select-choice-component.js'
         'oro/select2-autocomplete-entity-parent-component': 'bundles/oroform/js/app/components/select2-autocomplete-entity-parent-component.js'
         'oroform/js/app/components/select-create-inline-type-async-component': 'bundles/oroform/js/app/components/select-create-inline-type-async-component.js'
-        'oroform/js/app/components/entity-tree-select-form-type-component': 'bundles/oroform/js/app/components/entity-tree-select-form-type-component.js'
+        'oroform/js/app/components/entity-tree-select-form-type-view': 'bundles/oroform/js/app/components/entity-tree-select-form-type-view.js'
         'oroform/js/app/views/week-day-picker-view': 'bundles/oroform/js/app/views/week-day-picker-view.js'
 
         'oroform/js/expression-editor-util': 'bundles/oroform/js/expression-editor-util.js'

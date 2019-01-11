@@ -80,15 +80,16 @@
         line-height: $uploader-action-line-height;
         display: $uploader-action-display;
         vertical-align: $uploader-action-vertical-align;
-        padding: $uploader-action-inner-offset;
         box-sizing: $uploader-action-box-sizing;
     }
 
     .filename {
+        padding: side-values($uploader-filename-inner-offset);
         @include text-line-truncate($uploader-filename-width);
     }
 
     .action {
+        padding: side-values($uploader-action-inner-offset);
         border-#{$start}: $input-border-width solid $input-border-color;
     }
 
@@ -358,6 +359,7 @@ select[multiple] {
 
             display: inline-flex;
             align-items: center;
+            justify-content: center;
         }
     }
 
@@ -475,18 +477,6 @@ input[type='number'] {
 
 .alert .message ul:last-child {
     margin-bottom: 0;
-}
-
-input[type='text'].hasDatepicker.ui-datepicker-dialog-is-below:focus,
-.ui-datepicker-dialog-is-below,
-.timepicker-dialog-is-below,
-.input-append.select2-drop-below,
-.controls.select2-drop-below select,
-.controls.select2-drop-below .select2-container,
-.controls .selector.focus {
-    + span.validation-failed {
-        @include floating-validation-message();
-    }
 }
 
 .loading > .input-append {

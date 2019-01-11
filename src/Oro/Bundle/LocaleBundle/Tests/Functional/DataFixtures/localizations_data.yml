@@ -1,0 +1,36 @@
+dependencies:
+  - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser
+  - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+
+Oro\Bundle\TranslationBundle\Entity\Language:
+  language1:
+    code: 'lang1'
+    enabled: true
+    organization: '@organization'
+    owner: '@user'
+
+  german_language:
+    code: 'de'
+    enabled: true
+    organization: '@organization'
+    owner: '@user'
+
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+  title_localization1:
+    string: 'English (Canada)'
+
+  title_german_localization:
+    string: 'German Localization'
+
+Oro\Bundle\LocaleBundle\Entity\Localization:
+  localization1:
+    name: 'English (Canada)'
+    language: '@language1'
+    formattingCode: 'en_CA'
+    titles: ['@title_localization1']
+
+  german_localization:
+    name: 'German Localization'
+    language: '@german_language'
+    formattingCode: 'de_DE'
+    titles: ['@title_german_localization']

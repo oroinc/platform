@@ -4,17 +4,27 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\BigNumber;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberDateHelper;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\Calendar;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactory;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Component\Testing\Unit\EntityTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class BigNumberDateHelperTest extends TestCase
 {
+    use EntityTrait;
+
     /**
      * @dataProvider localeDataProvider
+     *
+     * @param string $locale
+     * @param string $timezone
+     * @param string $expectedWeekStart
      */
     public function testGetLastWeekPeriodForLocale(string $locale, string $timezone, string $expectedWeekStart)
     {
@@ -30,11 +40,25 @@ class BigNumberDateHelperTest extends TestCase
             ->willReturnMap(
                 [
                     ['oro_locale.timezone', false, false, null, $timezone],
-                    ['oro_locale.locale', false, false, null, $locale],
+                    ['oro_locale.default_localization', false, false, null, 42],
                 ]
             );
 
-        $localeSettings = new LocaleSettings($configManager, $calendarFactory);
+        $localizationManager = $this->createMock(LocalizationManager::class);
+        $localizationManager->expects($this->any())
+            ->method('getLocalization')
+            ->with(42)
+            ->willReturn(
+                $this->getEntity(
+                    Localization::class,
+                    [
+                        'id' => 42,
+                        'language' => $this->getEntity(Language::class, ['code' => $locale])
+                    ]
+                )
+            );
+
+        $localeSettings = new LocaleSettings($configManager, $calendarFactory, $localizationManager);
         $helper = new BigNumberDateHelper(
             $this->createMock(RegistryInterface::class),
             $this->createMock(AclHelper::class),

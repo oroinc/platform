@@ -4,12 +4,7 @@ system_configuration:
             title: oro.locale.system_configuration.groups.localization.title
             icon:  'fa-flag'
             page_reload: true
-        language_settings:
-            title: oro.locale.system_configuration.groups.language_settings.title
-            icon:  'fa-font'
-            page_reload: true
-        language_languages:
-            title: oro.locale.system_configuration.groups.language_languages.title
+            configurator: '@oro_locale.configurator.localization_configurator::buildForm'
         locale_settings:
             title: oro.locale.system_configuration.groups.locale_settings.title
         map_settings:
@@ -18,17 +13,6 @@ system_configuration:
             title: oro.locale.system_configuration.groups.localization_settings.title
 
     fields:
-        oro_locale.locale:
-            data_type: string
-            type: Oro\Bundle\LocaleBundle\Form\Type\LocaleType
-            priority: 70
-            options:
-                label: oro.locale.system_configuration.fields.locale.label
-                tooltip: oro.locale.form.tooltip.locale
-                required: true
-                constraints:
-                    - NotBlank: ~
-
         oro_locale.country:
             data_type: string
             type: Oro\Bundle\LocaleBundle\Form\Type\CountryType
@@ -48,32 +32,6 @@ system_configuration:
                 label: oro.locale.system_configuration.fields.format_address_by_address_country.label
                 tooltip: oro.locale.form.tooltip.format_address_by_address_country
                 required: false
-
-        oro_locale.language:
-            data_type: string
-            type: Oro\Bundle\LocaleBundle\Form\Type\LanguageType
-            priority: 40
-            options:
-                label: oro.locale.system_configuration.fields.language.label
-                tooltip: oro.locale.form.tooltip.language
-                required: true
-                resettable: true
-                constraints:
-                    - NotBlank: ~
-
-        oro_locale.languages:
-            data_type: array
-            type: Oro\Bundle\LocaleBundle\Form\Type\LanguageType
-            priority: 35
-            options:
-                label: oro.locale.system_configuration.fields.languages.label
-                tooltip: oro.locale.form.tooltip.languages
-                required: true
-                multiple: true
-                show_all: true
-                resettable: false
-                constraints:
-                    - NotBlank: ~
 
         oro_locale.timezone:
             data_type: string
@@ -147,7 +105,7 @@ system_configuration:
                 label: oro.locale.system_configuration.fields.enabled_localizations.label
                 required: true
                 multiple: true
-                resettable: false
+                show_all: true
                 constraints:
                     - NotBlank: ~
 
@@ -159,7 +117,6 @@ system_configuration:
                 label: oro.locale.system_configuration.fields.default_localization.label
                 required: true
                 multiple: false
-                resettable: false
                 constraints:
                     - Oro\Bundle\LocaleBundle\Validator\Constraints\DefaultLocalization: ~
                     - NotBlank: ~
@@ -176,7 +133,6 @@ system_configuration:
                                     locale_settings:
                                         priority: 100
                                         children:
-                                            - oro_locale.locale
                                             - oro_locale.country
                                             - oro_locale.format_address_by_address_country
                                             - oro_locale.timezone
@@ -191,13 +147,7 @@ system_configuration:
                                         children:
                                             - oro_locale.enabled_localizations
                                             - oro_locale.default_localization
-                            language_settings:
-                                priority: 230
-                                children:
-                                    language_languages:
-                                        children:
-                                            - oro_locale.language
-                                            - oro_locale.languages
+
         user_configuration:
             platform:
                 children:
@@ -209,7 +159,6 @@ system_configuration:
                                     locale_settings:
                                         priority: 100
                                         children:
-                                            - oro_locale.locale
                                             - oro_locale.country
                                             - oro_locale.format_address_by_address_country
                                             - oro_locale.timezone
@@ -218,18 +167,13 @@ system_configuration:
                                         children:
                                             - oro_locale.temperature_unit
                                             - oro_locale.wind_speed_unit
-                            language_settings:
-                                priority: 230
-                                children:
-                                    language_languages:
+                                    localization_settings:
+                                        priority: 0
                                         children:
-                                            - oro_locale.language
+                                            - oro_locale.default_localization
 
     api_tree:
         localization:
-            oro_locale.language: ~
-            oro_locale.languages: ~
-            oro_locale.locale: ~
             oro_locale.country: ~
             oro_locale.format_address_by_address_country: ~
             oro_locale.timezone: ~

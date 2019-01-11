@@ -87,25 +87,25 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         yield 'put request without marker' => [
             'method' => Request::METHOD_PUT,
             'marker' => 'fake',
-            'expectedHandleRequest' => false
+            'expectedHandleRequest' => true
         ];
 
         yield 'post request without marker' => [
             'method' => Request::METHOD_POST,
             'marker' => 'fake',
-            'expectedHandleRequest' => false
+            'expectedHandleRequest' => true
         ];
 
         yield 'put request with marker' => [
             'method' => Request::METHOD_PUT,
-            'marker' => EmailNotificationHandler::SUBMIT_MARKER,
-            'expectedHandleRequest' => true
+            'marker' => EmailNotificationHandler::WITHOUT_SAVING_KEY,
+            'expectedHandleRequest' => false
         ];
 
         yield 'post request with marker' => [
             'method' => Request::METHOD_POST,
-            'marker' => EmailNotificationHandler::SUBMIT_MARKER,
-            'expectedHandleRequest' => true
+            'marker' => EmailNotificationHandler::WITHOUT_SAVING_KEY,
+            'expectedHandleRequest' => false
         ];
     }
 
@@ -117,7 +117,6 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->form->expects($this->once())->method('isValid')->willReturn(true);
 
         $this->request->initialize([], [
-            EmailNotificationHandler::SUBMIT_MARKER => true,
             'formName' => self::FORM_DATA
         ]);
         $this->request->setMethod('POST');

@@ -16,7 +16,7 @@
 
     .dropdown-menu {
         margin: 0;
-        padding: 3px 0;
+        padding: 2px 0;
         min-width: 175px;
 
         background-color: $menu-dropdown-background-color;
@@ -42,7 +42,7 @@
         white-space: nowrap;
 
         &-level-1 {
-            padding: 14px 16px;
+            padding: 15px 16px;
 
             font-weight: bold;
 
@@ -147,6 +147,7 @@
         // reset global styles .dropdown-menu > li > a
         > a {
             padding: 0;
+            line-height: $menu-item-line-height;
         }
 
         // reset global styles .dropdown-menu > li > div

@@ -2411,7 +2411,10 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
             ['name'],
             ['name'],
             ['name'],
-            ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+            ['extend' => [
+                'owner' => ExtendScope::OWNER_CUSTOM,
+                'orphanRemoval' => true
+            ]]
         );
 
         $selfRelationKey = 'manyToOne|Acme\AcmeBundle\Entity\Entity1|Acme\AcmeBundle\Entity\Entity1|selfRel';
@@ -2434,7 +2437,8 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                                 'users',
                                 'oneToMany'
                             ),
-                            'relation.' . $selfRelationKey . '.on_delete' => 'SET NULL'
+                            'relation.' . $selfRelationKey . '.on_delete' => 'SET NULL',
+                            'relation.' . $targetRelationKey . '.orphanRemoval' => true
                         ]
                     ],
                     'fields'  => [
@@ -2455,7 +2459,8 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                                     'bidirectional' => false,
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
-                                    'target_grid'     => ['name']
+                                    'target_grid'     => ['name'],
+                                    'orphanRemoval'   => true
                                 ]
                             ],
                             'type'    => 'oneToMany',

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
@@ -18,8 +18,8 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $localizationManager;
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    protected $localeSettings;
 
     /** @var LanguageCodeFormatter|\PHPUnit\Framework\MockObject\MockObject */
     protected $languageFormatter;
@@ -33,7 +33,7 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->localizationManager = $this->createMock(LocalizationManager::class);
-        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
 
         $this->languageFormatter = $this->createMock(LanguageCodeFormatter::class);
         $this->languageFormatter->expects($this->any())
@@ -47,7 +47,7 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
         $this->languageProvider = $this->createMock(LanguageProvider::class);
 
         $this->provider = new LocalizationChoicesProvider(
-            $this->configManager,
+            $this->localeSettings,
             $this->languageFormatter,
             $this->languageProvider,
             $this->localizationManager
@@ -124,6 +124,6 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function assertConfigManagerCalled()
     {
-        $this->configManager->expects($this->once())->method('get')->with('oro_locale.language')->willReturn('es');
+        $this->localeSettings->expects($this->once())->method('getLanguage')->willReturn('es');
     }
 }

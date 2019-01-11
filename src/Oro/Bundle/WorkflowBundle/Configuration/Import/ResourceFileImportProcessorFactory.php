@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Configuration\Import;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
@@ -14,12 +15,17 @@ class ResourceFileImportProcessorFactory implements ImportProcessorFactoryInterf
     /** @var ConfigFileReaderInterface */
     private $reader;
 
+    /** @var array */
+    private $kernelBundles;
+
     /**
      * @param ConfigFileReaderInterface $reader
+     * @param array $kernelBundles
      */
-    public function __construct(ConfigFileReaderInterface $reader)
+    public function __construct(ConfigFileReaderInterface $reader, array $kernelBundles)
     {
         $this->reader = $reader;
+        $this->kernelBundles = $kernelBundles;
     }
 
     /**
@@ -37,7 +43,7 @@ class ResourceFileImportProcessorFactory implements ImportProcessorFactoryInterf
     private function getPath($import): string
     {
         $import = (array)$import;
-        if (count($import) === 1) {
+        if (count($import) === 1 || count($import) === 2) {
             if (!ArrayUtil::isAssoc($import)) {
                 return (string)reset($import);
             }
@@ -59,6 +65,24 @@ class ResourceFileImportProcessorFactory implements ImportProcessorFactoryInterf
             throw new \InvalidArgumentException('Import options is not applicable for factory.');
         }
 
-        return new ResourceFileImportProcessor($this->reader, $this->getPath($import));
+        return new ResourceFileImportProcessor(
+            $this->reader,
+            $this->getPath($import),
+            $this->kernelBundles,
+            $this->ignoreErrors($import)
+        );
+    }
+
+    /**
+     * @param $import
+     * @return bool
+     */
+    private function ignoreErrors($import)
+    {
+        if (isset($import['ignore_errors'])) {
+            return (bool)$import['ignore_errors'];
+        }
+
+        return false;
     }
 }

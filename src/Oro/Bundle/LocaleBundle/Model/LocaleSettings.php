@@ -4,7 +4,8 @@ namespace Oro\Bundle\LocaleBundle\Model;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfig;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Symfony\Component\Intl\Intl;
 
 /**
@@ -66,7 +67,7 @@ class LocaleSettings
      *
      * @var array
      */
-    protected $nameFormats = array();
+    protected $nameFormats = [];
 
     /**
      * Format placeholders (lowercase and uppercase):
@@ -94,7 +95,7 @@ class LocaleSettings
      *
      * @var array
      */
-    protected $addressFormats = array();
+    protected $addressFormats = [];
 
     /**
      * Array format:
@@ -108,7 +109,7 @@ class LocaleSettings
      *
      * @var array
      */
-    protected $localeData = array();
+    protected $localeData = [];
 
     /**
      * @var ConfigManager
@@ -121,13 +122,23 @@ class LocaleSettings
     protected $calendarFactory;
 
     /**
+     * @var LocalizationManager
+     */
+    protected $localizationManager;
+
+    /**
      * @param ConfigManager $configManager
      * @param CalendarFactoryInterface $calendarFactory
+     * @param LocalizationManager $localizationManager
      */
-    public function __construct(ConfigManager $configManager, CalendarFactoryInterface $calendarFactory)
-    {
+    public function __construct(
+        ConfigManager $configManager,
+        CalendarFactoryInterface $calendarFactory,
+        LocalizationManager $localizationManager
+    ) {
         $this->configManager = $configManager;
         $this->calendarFactory = $calendarFactory;
+        $this->localizationManager = $localizationManager;
     }
 
     /**
@@ -220,10 +231,11 @@ class LocaleSettings
     public function getLocale()
     {
         if (null === $this->locale) {
-            $this->locale = $this->configManager->get('oro_locale.locale');
-            if (!$this->locale) {
-                $this->locale = LocaleConfiguration::DEFAULT_LOCALE;
-            }
+            $localization = $this->localizationManager->getLocalizationData(
+                (int)$this->configManager->get(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
+            );
+
+            $this->locale = $localization['formattingCode'] ?? Configuration::DEFAULT_LOCALE;
         }
         return $this->locale;
     }
@@ -242,6 +254,9 @@ class LocaleSettings
         return $this->language;
     }
 
+    /**
+     * @return string
+     */
     public function getActualLanguage()
     {
         return $this->getLanguageConfigurationValue();
@@ -328,8 +343,8 @@ class LocaleSettings
     public function getCalendar($locale = null, $language = null)
     {
         return $this->calendarFactory->getCalendar(
-            $locale ? : $this->getLocale(),
-            $language ? : $this->getLanguage()
+            $locale ?: $this->getLocale(),
+            $language ?: $this->getLanguage()
         );
     }
 
@@ -344,7 +359,7 @@ class LocaleSettings
     public static function getValidLocale($locale = null)
     {
         if (!$locale) {
-            $locale = LocaleConfiguration::DEFAULT_LOCALE;
+            $locale = Configuration::DEFAULT_LOCALE;
         }
 
         $localeParts = \Locale::parseLocale($locale);
@@ -362,15 +377,15 @@ class LocaleSettings
             $region = $localeParts[\Locale::REGION_TAG];
         }
 
-        $variants = array(
-            array($lang, $script, $region),
-            array($lang, $region),
-            array($lang, $script, LocaleConfiguration::DEFAULT_COUNTRY),
-            array($lang, LocaleConfiguration::DEFAULT_COUNTRY),
-            array($lang),
-            array(LocaleConfiguration::DEFAULT_LOCALE, LocaleConfiguration::DEFAULT_COUNTRY),
-            array(LocaleConfiguration::DEFAULT_LOCALE),
-        );
+        $variants = [
+            [$lang, $script, $region],
+            [$lang, $region],
+            [$lang, $script, Configuration::DEFAULT_COUNTRY],
+            [$lang, Configuration::DEFAULT_COUNTRY],
+            [$lang],
+            [Configuration::DEFAULT_LOCALE, Configuration::DEFAULT_COUNTRY],
+            [Configuration::DEFAULT_LOCALE],
+        ];
 
         $locales = self::getLocales();
         foreach ($variants as $elements) {
@@ -391,7 +406,7 @@ class LocaleSettings
     public static function getLocales()
     {
         if (null === self::$locales) {
-            self::$locales = array();
+            self::$locales = [];
             foreach (Intl::getLocaleBundle()->getLocales() as $locale) {
                 self::$locales[$locale] = $locale;
             }
@@ -413,7 +428,7 @@ class LocaleSettings
             return $region;
         }
 
-        return LocaleConfiguration::DEFAULT_COUNTRY;
+        return Configuration::DEFAULT_COUNTRY;
     }
 
     /**
@@ -496,8 +511,10 @@ class LocaleSettings
      */
     private function getLanguageConfigurationValue(): string
     {
-        $language = $this->configManager->get('oro_locale.language');
+        $localization = $this->localizationManager->getLocalizationData(
+            (int)$this->configManager->get(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
+        );
 
-        return $language ?? LocaleConfiguration::DEFAULT_LANGUAGE;
+        return $localization['languageCode'] ?? Configuration::DEFAULT_LANGUAGE;
     }
 }

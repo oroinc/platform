@@ -26,12 +26,11 @@ class EmailTemplateApiType extends EmailTemplateType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'data_class'      => 'Oro\Bundle\EmailBundle\Entity\EmailTemplate',
                 'csrf_token_id'   => 'emailtemplate',
-                'csrf_protection' => false,
-                'additional_language_codes' => [],
-            )
+                'csrf_protection' => false
+            ]
         );
     }
 

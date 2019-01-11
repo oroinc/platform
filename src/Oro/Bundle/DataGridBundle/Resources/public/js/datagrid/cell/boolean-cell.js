@@ -1,10 +1,9 @@
-define([
-    'backgrid',
-    'orotranslation/js/translator'
-], function(Backgrid, __) {
+define(function(require) {
     'use strict';
 
     var BooleanCell;
+    var Backgrid = require('backgrid');
+    var __ = require('orotranslation/js/translator');
 
     /**
      * Boolean column cell. Added missing behaviour.
@@ -17,11 +16,16 @@ define([
         /** @property {Boolean} */
         listenRowClick: true,
 
+        events: {
+            // no need for enterEditMode on click, boolean cell already in edit mode
+        },
+
         /**
          * @inheritDoc
          */
         constructor: function BooleanCell() {
             BooleanCell.__super__.constructor.apply(this, arguments);
+            this.listenTo(this.model, 'change:' + this.column.get('name'), this.onModelChange);
         },
 
         /**
@@ -30,7 +34,7 @@ define([
         render: function() {
             if (this.isEditableColumn()) {
                 // render a checkbox for editable cell
-                BooleanCell.__super__.render.apply(this, arguments);
+                this.enterEditMode();
             } else {
                 // render a yes/no text for non editable cell
                 this.$el.empty();
@@ -49,15 +53,10 @@ define([
         /**
          * @inheritDoc
          */
-        enterEditMode: function(e) {
-            BooleanCell.__super__.enterEditMode.apply(this, arguments);
-            if (this.isEditableColumn()) {
-                var $editor = this.currentEditor.$el;
-                $editor.prop('checked', !$editor.prop('checked')).change();
-                e.stopPropagation();
-                $editor.inputWidget('isInitialized')
-                    ? $editor.inputWidget('refresh')
-                    : $editor.inputWidget('create');
+        enterEditMode: function() {
+            BooleanCell.__super__.enterEditMode.call(this);
+            if (this.currentEditor) {
+                this.currentEditor.$el.inputWidget('create');
             }
         },
 
@@ -66,9 +65,22 @@ define([
          * @param {Event} e
          */
         onRowClicked: function(row, e) {
-            if (!this.$el.is(e.target) && !this.$el.has(e.target).length) {
-                // click on another cell of a row
-                this.enterEditMode(e);
+            if (this.currentEditor && !this.currentEditor.$el.is(e.target)) {
+                // click on the row, but outside of currentEditor
+                var columnName = this.column.get('name');
+                var currentValue = this.model.get(columnName);
+                this.model.set(columnName, !currentValue);
+            }
+        },
+
+        /**
+         * Handles model change and updates editor
+         * @param {Backbone.Model} model
+         */
+        onModelChange: function(model) {
+            if (this.currentEditor) {
+                var val = this.currentEditor.formatter.fromRaw(model.get(this.column.get('name')), model);
+                this.currentEditor.$el.prop('checked', val);
             }
         }
     });

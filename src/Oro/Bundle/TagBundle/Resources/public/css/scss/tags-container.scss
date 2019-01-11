@@ -9,11 +9,11 @@
         margin-#{$end}: $tag-item-icon-offset-end;
     }
 
-    &.tags-cell {
+    &.grid-body-cell-tags {
         padding: $tag-cell-container-inner-offset;
     }
 
-    .tags-cell & {
+    .grid-body-cell-tags & {
         display: block;
     }
 

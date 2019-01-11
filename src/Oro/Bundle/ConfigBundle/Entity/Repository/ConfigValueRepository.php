@@ -7,9 +7,7 @@ use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 
 /**
- * Class ConfigValueRepository
- *
- * @package Oro\Bundle\ConfigBundle\Entity\Repository
+ * Doctrine repository for ConfigValue entity.
  */
 class ConfigValueRepository extends EntityRepository
 {
@@ -18,8 +16,6 @@ class ConfigValueRepository extends EntityRepository
      *
      * @param Config $config
      * @param array  $removed [..., ['SECTION_IDENTIFIER', 'NAME_IDENTIFIER'], ...]
-     *
-     * @return array
      */
     public function removeValues(Config $config, array $removed)
     {
@@ -72,5 +68,32 @@ class ConfigValueRepository extends EntityRepository
             ])
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @param string $scope
+     * @param string $section
+     * @param string $name
+     *
+     * @return int[]
+     */
+    public function getConfigValueRecordIds($scope, $section, $name)
+    {
+        $qb = $this->createQueryBuilder('cv');
+
+        $rows = $qb->select('c.recordId')
+            ->join('cv.config', 'c')
+            ->where(
+                $qb->expr()->eq('c.scopedEntity', ':entityName'),
+                $qb->expr()->eq('cv.section', ':section'),
+                $qb->expr()->eq('cv.name', ':name')
+            )
+            ->setParameter('entityName', $scope)
+            ->setParameter('section', $section)
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_unique(array_column($rows, 'recordId'));
     }
 }

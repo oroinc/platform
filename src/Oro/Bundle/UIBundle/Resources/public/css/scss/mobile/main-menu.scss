@@ -11,9 +11,7 @@
     background: rgba($primary-inverse, .5);
     overflow: hidden;
 
-    @include fa-icon($fa-var-times, after);
-
-    &:after {
+    @include fa-icon($fa-var-times, after, true) {
         position: absolute;
         top: 5px;
         #{$start}: $main-menu-mobile-width - 36px;
@@ -50,6 +48,7 @@
         .title {
             margin: 0;
 
+            font-size: $menu-font-size + 2;
             font-weight: normal;
 
             background-color: transparent;
@@ -131,12 +130,12 @@
             display: none;
         }
 
-        .active {
-            background-color: $menu-background-color-active;
-        }
-
         .accordion-group {
             background-color: transparent;
+        }
+
+        .dropdown-menu-single-item.active {
+            background-color: $menu-background-color-active;
         }
     }
 

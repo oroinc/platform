@@ -835,6 +835,11 @@ class ExtendExtension implements NameGeneratorAwareInterface
         );
 
         $targetTableOptions['extend']['relation.' . $targetRelationKey . '.field_id'] = $targetFieldId;
+        if (isset($options['extend']['orphanRemoval'])) {
+            $targetTableOptions['extend']['relation.' . $targetRelationKey . '.orphanRemoval']
+                = $options['extend']['orphanRemoval'];
+        }
+
         $this->extendOptionsManager->setTableOptions(
             $targetTableName,
             $targetTableOptions

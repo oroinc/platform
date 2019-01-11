@@ -266,7 +266,7 @@ define(function(require) {
                 this.noColumnsFlag = true;
             }
 
-            _.extend(this, this.defaults, opts);
+            _.extend(this, tools.deepClone(this.defaults), opts);
             this._initToolbars(opts);
             this._initActions(opts);
             this.exportOptions = {};
@@ -478,8 +478,9 @@ define(function(require) {
          * @private
          */
         _initActions: function(opts) {
-            if (_.isObject(opts.themeOptions)) {
-                _.extend(this.actionOptions, opts.themeOptions.actionOptions);
+            var themeActionsOpts = opts.themeOptions.actionOptions;
+            if (_.isObject(themeActionsOpts)) {
+                this.actionOptions = $.extend(true, {}, this.actionOptions, themeActionsOpts);
             }
         },
 

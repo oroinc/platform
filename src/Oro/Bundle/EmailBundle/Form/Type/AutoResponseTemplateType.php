@@ -7,7 +7,9 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
-use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -19,6 +21,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Used to create rule for mailbox in system Configuration.
+ */
 class AutoResponseTemplateType extends AbstractType
 {
     /** @var ConfigManager */
@@ -33,22 +38,28 @@ class AutoResponseTemplateType extends AbstractType
     /** @var Registry */
     protected $registry;
 
+    /** @var LocalizationManager */
+    protected $localizationManager;
+
     /**
      * @param ConfigManager $cm
      * @param ConfigManager $userConfig
      * @param LocaleSettings $localeSettings
      * @param Registry $registry
+     * @param LocalizationManager $localizationManager
      */
     public function __construct(
         ConfigManager $cm,
         ConfigManager $userConfig,
         LocaleSettings $localeSettings,
-        Registry $registry
+        Registry $registry,
+        LocalizationManager $localizationManager
     ) {
-        $this->cm             = $cm;
-        $this->userConfig     = $userConfig;
+        $this->cm = $cm;
+        $this->userConfig = $userConfig;
         $this->localeSettings = $localeSettings;
-        $this->registry       = $registry;
+        $this->registry = $registry;
+        $this->localizationManager = $localizationManager;
     }
 
     /**
@@ -191,9 +202,21 @@ class AutoResponseTemplateType extends AbstractType
      */
     protected function getLanguages()
     {
-        $languages = $this->userConfig->get('oro_locale.languages');
+        return array_map(function (Localization $localization) {
+            return $localization->getLanguageCode();
+        }, $this->getEnabledLocalizations());
+    }
 
-        return array_unique(array_merge($languages, [$this->localeSettings->getLanguage()]));
+    /**
+     * @return Localization[]
+     */
+    private function getEnabledLocalizations()
+    {
+        $ids = array_map(function ($id) {
+            return (int)$id;
+        }, (array)$this->userConfig->get(Configuration::getConfigKeyByName(Configuration::ENABLED_LOCALIZATIONS)));
+
+        return $this->localizationManager->getLocalizations($ids);
     }
 
     /**
