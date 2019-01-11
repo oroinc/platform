@@ -99,7 +99,7 @@ class EmailTemplateType extends AbstractType
             )
         );
 
-        $this->languages = array_unique(array_merge($this->getLanguages(), $options['additional_language_codes']));
+        $this->languages = $this->getLanguages();
         $builder->add(
             'translations',
             EmailTemplateTranslationType::class,
@@ -168,11 +168,10 @@ class EmailTemplateType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'data_class' => 'Oro\Bundle\EmailBundle\Entity\EmailTemplate',
-                'csrf_token_id' => 'emailtemplate',
-                'additional_language_codes' => [],
-            )
+                'csrf_token_id' => 'emailtemplate'
+            ]
         );
     }
 
@@ -197,12 +196,9 @@ class EmailTemplateType extends AbstractType
      */
     protected function getLanguages()
     {
-        $languages = $this->userConfig->get('oro_locale.languages');
-        $localizations = array_map(function (Localization $localization) {
+        return array_map(function (Localization $localization) {
             return $localization->getLanguageCode();
         }, $this->getEnabledLocalizations());
-
-        return array_unique(array_merge($languages, [$this->localeSettings->getLanguage()], $localizations));
     }
 
     /**

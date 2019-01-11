@@ -7,6 +7,7 @@ use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -34,6 +35,9 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     /** @var RelationCalculator */
     protected $relationCalculator;
 
+    /** @var LocaleSettings */
+    protected $localeSettings;
+
     /** @var string */
     protected $relationDelimiter = ' ';
 
@@ -46,11 +50,16 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     /**
      * @param FieldHelper $fieldHelper
      * @param RelationCalculatorInterface $relationCalculator
+     * @param LocaleSettings $localeSettings
      */
-    public function __construct(FieldHelper $fieldHelper, RelationCalculatorInterface $relationCalculator)
-    {
+    public function __construct(
+        FieldHelper $fieldHelper,
+        RelationCalculatorInterface $relationCalculator,
+        LocaleSettings $localeSettings
+    ) {
         $this->fieldHelper = $fieldHelper;
         $this->relationCalculator = $relationCalculator;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -129,8 +138,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     {
         if ($this->headerConversionRules === null) {
             $this->assertEntityName();
-            if ($this->translateUsingLocale && $this->configManager) {
-                $this->fieldHelper->setLocale($this->configManager->get('oro_locale.language'));
+            if ($this->translateUsingLocale) {
+                $this->fieldHelper->setLocale($this->localeSettings->getLanguage());
             }
 
             $headerConversionRules = $this->getEntityRules(

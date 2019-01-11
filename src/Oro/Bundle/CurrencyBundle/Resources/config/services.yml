@@ -78,6 +78,7 @@ services:
         arguments:
             - '@oro_config.manager'
             - '@oro_locale.calendar_factory'
+            - '@oro_locale.manager.localization'
             - '@oro_currency.provider.view_type'
             - '@oro_currency.config.currency'
         calls:

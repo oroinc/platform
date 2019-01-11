@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Converter\RelationCalculator;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
 {
@@ -230,6 +231,11 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
      */
     protected $relationCalculator;
 
+    /**
+     * @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected $localeSettings;
+
     protected function setUp()
     {
         $configProvider = $this->createMock(ConfigProvider::class);
@@ -242,8 +248,13 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $this->relationCalculator = $this->createMock(RelationCalculator::class);
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
 
-        $this->converter = new ConfigurableTableDataConverter($this->fieldHelper, $this->relationCalculator);
+        $this->converter = new ConfigurableTableDataConverter(
+            $this->fieldHelper,
+            $this->relationCalculator,
+            $this->localeSettings
+        );
     }
 
     /**
@@ -603,13 +614,9 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
     ) {
         $this->converter->setTranslateUsingLocale($translateUsingLocale);
 
-        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
-        $configManager = $this->createMock(ConfigManager::class);
-        $configManager->expects($this->exactly($expectedCallsToGetLocale))
-            ->method('get')
-            ->with('oro_locale.language', false, false, null)
+        $this->localeSettings->expects($this->exactly($expectedCallsToGetLocale))
+            ->method('getLanguage')
             ->willReturn($locale);
-        $this->converter->setConfigManager($configManager);
 
         $this->fieldHelper->expects($this->exactly($translateUsingLocaleCalls))
             ->method('setLocale')

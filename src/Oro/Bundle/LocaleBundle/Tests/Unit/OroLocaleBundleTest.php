@@ -17,10 +17,8 @@ class OroLocaleBundleTest extends \PHPUnit\Framework\TestCase
     {
         $container = new ContainerBuilder();
 
-        $kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
-
         $passesBeforeBuild = $container->getCompiler()->getPassConfig()->getBeforeOptimizationPasses();
-        $bundle = new OroLocaleBundle($kernel);
+        $bundle = new OroLocaleBundle();
         $bundle->build($container);
 
         $passes = $container->getCompiler()->getPassConfig()->getBeforeOptimizationPasses();

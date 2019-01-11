@@ -45,5 +45,9 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
         $referenceRepository->set('adminRole', $adminRole);
         $referenceRepository->set('organization', $user->getOrganization());
         $referenceRepository->set('business_unit', $user->getOwner());
+
+        $groupRepository = $em->getRepository('OroUserBundle:Group');
+
+        $referenceRepository->set('adminsGroup', $groupRepository->findOneBy(['name' => 'Administrators']));
     }
 }

@@ -7,6 +7,8 @@ use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Provider\CurrencyListProviderStub;
 use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactory;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
@@ -18,15 +20,13 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
     private $viewType;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|\Oro\Bundle\LocaleBundle\Formatter\NumberFormatter
+     * @var \PHPUnit\Framework\MockObject\MockObject|NumberFormatter
      */
     protected $formatter;
 
     public function setUp()
     {
-        $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NumberFormatter')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formatter = $this->createMock(NumberFormatter::class);
     }
 
     public function testGetCurrencyName()
@@ -122,13 +122,20 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())
             ->method('get')
-            ->with('oro_locale.locale')
-            ->willReturn($localeCode);
+            ->with('oro_locale.default_localization')
+            ->willReturn(42);
 
         /** @var CalendarFactory $calendarFactory */
         $calendarFactory = $this->createMock(CalendarFactory::class);
 
-        return new LocaleSettings($configManager, $calendarFactory);
+        /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject $localizationManager */
+        $localizationManager = $this->createMock(LocalizationManager::class);
+        $localizationManager->expects($this->any())
+            ->method('getLocalizationData')
+            ->with(42)
+            ->willReturn(['id' => 42, 'formattingCode' => $localeCode]);
+
+        return new LocaleSettings($configManager, $calendarFactory, $localizationManager);
     }
 
     /**
@@ -167,7 +174,7 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
     {
         return [
             '$1,234.5' => [
-                'price' => new Price(1234.5, 'USD'),
+                'price' => Price::create(1234.5, 'USD'),
                 'options' => [
                     'attributes' => ['grouping_size' => 3],
                     'textAttributes' => ['grouping_separator_symbol' => ','],

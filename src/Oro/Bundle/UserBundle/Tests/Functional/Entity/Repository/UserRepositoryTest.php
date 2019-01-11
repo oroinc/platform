@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\Entity\Repository;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -26,7 +27,7 @@ class UserRepositoryTest extends WebTestCase
             ->getRepository(User::class);
     }
 
-    public function testFindUserByEmailSensitive()
+    public function testFindUserByEmailSensitive(): void
     {
         $this->loadFixtures([LoadUserData::class]);
 
@@ -38,7 +39,7 @@ class UserRepositoryTest extends WebTestCase
         $this->assertEquals($user, $this->repository->findUserByEmail($user->getEmail(), true));
     }
 
-    public function testFindUserByEmailInsensitive()
+    public function testFindUserByEmailInsensitive(): void
     {
         $this->loadFixtures([LoadUserData::class]);
 
@@ -50,7 +51,7 @@ class UserRepositoryTest extends WebTestCase
         $this->assertEquals($user, $this->repository->findUserByEmail($user->getEmail(), false));
     }
 
-    public function testFindLowercaseDuplicatedEmails()
+    public function testFindLowercaseDuplicatedEmails(): void
     {
         $this->loadFixtures([LoadUsersWithSameEmailInLowercase::class]);
 
@@ -60,7 +61,7 @@ class UserRepositoryTest extends WebTestCase
         );
     }
 
-    public function testFindEnabledUserEmails()
+    public function testFindEnabledUserEmails(): void
     {
         $this->loadFixtures([LoadUserData::class]);
 
@@ -83,5 +84,30 @@ class UserRepositoryTest extends WebTestCase
             ['id' => $simpleUser2->getId(), 'email' => $simpleUser2->getEmail()],
             ['id' => $userWithConfirmationToken->getId(), 'email' => $userWithConfirmationToken->getEmail()],
         ], $result);
+    }
+
+    public function testFindIdsByOrganizations(): void
+    {
+        $this->loadFixtures([LoadUserData::class]);
+
+        $organization = self::getContainer()->get('doctrine')
+            ->getManagerForClass(Organization::class)
+            ->getRepository(Organization::class)
+            ->getFirst();
+
+        $this->assertFalse(null === $organization);
+
+        $user1 = $this->repository->findOneBy(['username' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME]);
+        $user2 = $this->getReference(LoadUserData::SIMPLE_USER);
+        $user3 = $this->getReference(LoadUserData::SIMPLE_USER_2);
+        $user4 = $this->getReference(LoadUserData::USER_WITH_CONFIRMATION_TOKEN);
+
+        $expected = [$user1->getId(), $user2->getId(), $user3->getId(), $user4->getId()];
+        sort($expected);
+
+        $actual = $this->repository->findIdsByOrganizations([$organization]);
+        sort($actual);
+
+        $this->assertEquals($expected, $actual);
     }
 }

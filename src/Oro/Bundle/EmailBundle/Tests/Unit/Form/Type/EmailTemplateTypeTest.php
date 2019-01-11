@@ -130,11 +130,10 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit(EmailTemplate $defaultData, array $submittedData, EmailTemplate $expectedData)
     {
-        $this->assertLanguages(['en'], [777 => 'de'], 'en');
+        $this->assertLanguages([777 => 'en'], 'en');
         $form = $this->factory->create(
             EmailTemplateType::class,
-            $defaultData,
-            ['additional_language_codes' => ['fr']]
+            $defaultData
         );
 
         $this->assertEquals($defaultData, $form->getData());
@@ -193,18 +192,13 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param string[] $languages
      * @param string[] $localizations [id => languageCode, ...]
      * @param string $language
      */
-    private function assertLanguages(array $languages, array $localizations, string $language)
+    private function assertLanguages(array $localizations, string $language)
     {
-        $this->configManager->expects($this->at(0))
-            ->method('get')
-            ->with('oro_locale.languages')
-            ->willReturn($languages);
         $localizationIds = array_keys($localizations);
-        $this->configManager->expects($this->at(1))
+        $this->configManager->expects($this->at(0))
             ->method('get')
             ->with(Configuration::getConfigKeyByName(Configuration::ENABLED_LOCALIZATIONS))
             ->willReturn($localizationIds);

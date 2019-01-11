@@ -30,7 +30,7 @@ Feature: Entity select fields localization
     Then I should see Schema updated flash message
 
   Scenario: Update field`s options for second language
-    Given I enable "zu" language
+    Given I enable "Zulu_Loc" localization
     And I reload the page
     And I filter Name as is equal to "AcmeEntity"
     And I click view AcmeEntity in grid
@@ -46,7 +46,7 @@ Feature: Entity select fields localization
       | Option First | ACME_Zulu |
 
   Scenario: Check field`s options for default language
-    Given I enable "en" language
+    Given I enable "English" localization
     When I reload the page
     Then "Entity Config Form" must contains values:
       | Option First | ACME_Eng |

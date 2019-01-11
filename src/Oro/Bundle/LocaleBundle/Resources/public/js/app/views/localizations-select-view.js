@@ -12,13 +12,19 @@ define(function(require) {
          * @property {Object}
          */
         options: {
-            selectSelector: 'select'
+            selectSelector: 'select',
+            useParentSelector: 'input[type="checkbox"]'
         },
 
         /**
          * @property {jQuery.Element}
          */
         $select: null,
+
+        /**
+         * @property {jQuery.Element}
+         */
+        $useParent: null,
 
         /**
          * @inheritDoc
@@ -34,13 +40,16 @@ define(function(require) {
             this.options = _.extend({}, this.options, options);
 
             this.$select = this.$el.find(this.options.selectSelector);
-            this.$select.on('change' + this.eventNamespace(), _.bind(this.onChange, this));
+            this.$select.on('change' + this.eventNamespace(), _.bind(this.onSelectChange, this));
+            this.$useParent = this.$el.find(this.options.useParentSelector);
+
+            mediator.on('default_localization:use_parent_scope', this.onDefaultLocalizationUseParentScope, this);
         },
 
         /**
-         * Handle change select
+         * Handles change event of the select field
          */
-        onChange: function() {
+        onSelectChange: function() {
             var options = this.$select.find('option:selected');
             var selected = options.map(function(index, option) {
                 var $option = $(option);
@@ -55,6 +64,13 @@ define(function(require) {
         },
 
         /**
+         * @param {Boolean} data
+         */
+        onDefaultLocalizationUseParentScope: function(data) {
+            this.$useParent.prop('checked', data).change();
+        },
+
+        /**
          * {@inheritDoc}
          */
         dispose: function() {
@@ -63,6 +79,7 @@ define(function(require) {
             }
 
             this.$select.off('change' + this.eventNamespace());
+            mediator.off(null, null, this);
 
             LocalizationsSelectView.__super__.dispose.call(this);
         }

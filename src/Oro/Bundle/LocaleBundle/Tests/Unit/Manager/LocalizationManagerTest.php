@@ -3,13 +3,13 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Manager;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -20,41 +20,30 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ObjectRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $repository;
+    /** @var LocalizationRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var LocalizationManager */
-    protected $manager;
+    private $manager;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $cacheProvider;
+    private $cacheProvider;
 
     /** @var Localization[]|array */
-    protected $entities = [];
+    private $entities = [];
 
     public function setUp()
     {
-        $this->repository = $this->getMockBuilder(ObjectRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->cacheProvider = $this->getMockBuilder(CacheProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->repository = $this->createMock(LocalizationRepository::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->cacheProvider = $this->createMock(CacheProvider::class);
 
         /** @var Localization[] $entities */
         $this->entities = [
@@ -67,16 +56,6 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
             $this->doctrineHelper,
             $this->configManager,
             $this->cacheProvider
-        );
-    }
-
-    public function tearDown()
-    {
-        unset(
-            $this->repository,
-            $this->manager,
-            $this->configManager,
-            $this->entities
         );
     }
 
@@ -175,6 +154,60 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($entities, $result);
     }
 
+    public function testGetLocalizationData()
+    {
+        $this->assertGetEntityRepositoryForClassIsCalled();
+        $this->repository->expects($this->once())
+            ->method('getLocalizationsData')
+            ->willReturn(
+                [
+                    1001 => ['languageCode' => 'en', 'formattingCode' => 'en'],
+                    2002 => ['languageCode' => 'fr', 'formattingCode' => 'fr'],
+                ]
+            );
+        $this->assertCacheReads(false);
+
+        $this->assertEquals(
+            ['languageCode' => 'fr', 'formattingCode' => 'fr'],
+            $this->manager->getLocalizationData(2002)
+        );
+    }
+
+    public function testGetLocalizationDataCached()
+    {
+        $this->assertGetEntityRepositoryForClassIsNotCalled();
+        $this->assertCacheReads([1001 => ['languageCode' => 'en', 'formattingCode' => 'en']]);
+
+        $this->assertEquals(
+            ['languageCode' => 'en', 'formattingCode' => 'en'],
+            $this->manager->getLocalizationData(1001)
+        );
+    }
+
+    public function testGetLocalizationDataForcedCacheDisabled()
+    {
+        $this->assertGetEntityRepositoryForClassIsCalled();
+        $this->repository->expects($this->once())
+            ->method('getLocalizationsData')
+            ->willReturn(
+                [
+                    1001 => ['languageCode' => 'en', 'formattingCode' => 'en'],
+                    2002 => ['languageCode' => 'fr', 'formattingCode' => 'fr'],
+                ]
+            );
+
+        //Cache should not be accessed at all
+        $this->cacheProvider->expects($this->never())
+            ->method('fetch');
+        $this->cacheProvider->expects($this->never())
+            ->method('save');
+
+        $this->assertEquals(
+            ['languageCode' => 'fr', 'formattingCode' => 'fr'],
+            $this->manager->getLocalizationData(2002, false)
+        );
+    }
+
     public function testGetDefaultLocalization()
     {
         $this->assertGetEntityRepositoryForClassIsCalled();
@@ -249,11 +282,26 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testWarmUpCache()
     {
-        $this->assertGetEntityRepositoryForClassIsCalled();
-        $this->assertCacheReads(false);
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('getEntityRepositoryForClass')
+            ->with(Localization::class)
+            ->willReturn($this->repository);
+
+        $this->cacheProvider->expects($this->exactly(2))
+            ->method('fetch')
+            ->withConsecutive(
+                ['ORO_LOCALE_LOCALIZATION_DATA'],
+                ['ORO_LOCALE_LOCALIZATION_DATA_SIMPLE']
+            )
+            ->willReturn(false);
+
         $this->repository->expects($this->once())
             ->method('findBy')
             ->willReturn($this->entities);
+
+        $this->repository->expects($this->once())
+            ->method('getLocalizationsData')
+            ->willReturn([]);
 
         $this->manager->warmUpCache();
     }

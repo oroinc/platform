@@ -14,17 +14,13 @@ use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
  */
 class LocalizationManager
 {
-    const CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
+    private const ENTITIES_CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
+    private const SIMPLE_CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA_SIMPLE';
 
     /**
      * @var DoctrineHelper
      */
     private $doctrineHelper;
-
-    /**
-     * @var LocalizationRepository
-     */
-    private $repository;
 
     /**
      * @var ConfigManager
@@ -84,6 +80,27 @@ class LocalizationManager
         }
 
         return $cache;
+    }
+
+    /**
+     * @param int $id
+     * @param bool $useCache disable using cache, if you like to persist, delete, or assign Localization objects.
+     *                       Cache should be enabled, only if you want to read from the Localization.
+     *
+     * @return array
+     */
+    public function getLocalizationData(int $id, $useCache = true): array
+    {
+        $cache = !$useCache ? false : $this->cacheProvider->fetch(self::SIMPLE_CACHE_NAMESPACE);
+        if ($cache === false) {
+            $cache = $this->getRepository()->getLocalizationsData();
+        }
+
+        if ($useCache) {
+            $this->cacheProvider->save(self::SIMPLE_CACHE_NAMESPACE, $cache);
+        }
+
+        return $cache[$id] ?? [];
     }
 
     /**
@@ -154,17 +171,18 @@ class LocalizationManager
     {
         $this->clearCache();
         $this->getLocalizations();
+        $this->getLocalizationData(0);
     }
 
     /**
      * @param int $localizationId
      * @return string
      */
-    public static function getCacheKey($localizationId = null)
+    protected static function getCacheKey($localizationId = null)
     {
         return $localizationId !== null
-            ? sprintf('%s_%s', static::CACHE_NAMESPACE, $localizationId)
-            : static::CACHE_NAMESPACE;
+            ? sprintf('%s_%s', self::ENTITIES_CACHE_NAMESPACE, $localizationId)
+            : self::ENTITIES_CACHE_NAMESPACE;
     }
 
     /**
@@ -172,11 +190,7 @@ class LocalizationManager
      */
     protected function getRepository()
     {
-        if (!$this->repository) {
-            $this->repository = $this->doctrineHelper->getEntityRepositoryForClass(Localization::class);
-        }
-
-        return $this->repository;
+        return $this->doctrineHelper->getEntityRepositoryForClass(Localization::class);
     }
 
     /**

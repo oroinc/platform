@@ -39,7 +39,7 @@ class ConfigurationControllerTest extends AbstractConfigurationControllerTest
                     'activeGroup' => null,
                     'activeSubGroup' => null,
                 ],
-                'expected' => ['Localization options', 'Primary Location']
+                'expected' => ['Location options', 'Primary Location']
             ],
             'user configuration sub page' => [
                 'parameters' => [
