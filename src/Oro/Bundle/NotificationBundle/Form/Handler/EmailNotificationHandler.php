@@ -9,11 +9,14 @@ use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * The handler for email notification form.
+ */
 class EmailNotificationHandler implements FormHandlerInterface
 {
     use  RequestHandlerTrait;
 
-    const SUBMIT_MARKER = 'formSubmitMarker';
+    const WITHOUT_SAVING_KEY = 'reloadWithoutSaving';
 
     /** @var ManagerRegistry */
     protected $registry;
@@ -60,6 +63,6 @@ class EmailNotificationHandler implements FormHandlerInterface
     {
         $methods = [Request::METHOD_POST, Request::METHOD_PUT];
 
-        return in_array($request->getMethod(), $methods, true) && $request->get(self::SUBMIT_MARKER, false);
+        return in_array($request->getMethod(), $methods, true) && $request->get(self::WITHOUT_SAVING_KEY) === null;
     }
 }

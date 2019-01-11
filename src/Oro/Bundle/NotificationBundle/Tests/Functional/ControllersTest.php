@@ -133,7 +133,6 @@ class ControllersTest extends WebTestCase
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
         $formValues = $form->getPhpValues();
-        $formValues['formSubmitMarker'] = true;
         $formValues['emailnotification']['entityName'] = self::ENTITY_NAME;
         $formValues['emailnotification']['event'] = $event->getId();
         $formValues['emailnotification']['template'] = $this->getTemplate()->getId();
