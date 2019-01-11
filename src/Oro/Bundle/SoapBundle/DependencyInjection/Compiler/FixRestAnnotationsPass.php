@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Replace annotation readers to sets name="" for FOS Rest routing annotations.
- * @todo remove this class when https://github.com/FriendsOfSymfony/FOSRestBundle/issues/1086 will be fixed
+ * @link https://github.com/FriendsOfSymfony/FOSRestBundle/issues/1086
  */
 class FixRestAnnotationsPass implements CompilerPassInterface
 {

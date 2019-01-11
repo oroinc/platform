@@ -7,7 +7,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 
 /**
  * Sets name="" for FOS Rest routing annotations.
- * @todo remove this class when https://github.com/FriendsOfSymfony/FOSRestBundle/issues/1086 will be fixed
+ * @link https://github.com/FriendsOfSymfony/FOSRestBundle/issues/1086
  */
 class RestAnnotationReader implements Reader
 {

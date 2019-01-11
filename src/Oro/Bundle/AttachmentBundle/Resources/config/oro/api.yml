@@ -26,3 +26,4 @@ api:
                     depends_on: [filename]
                     form_options:
                         property_path: file
+                        allow_file_upload: true
