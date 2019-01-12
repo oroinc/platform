@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AssetBundle\Command;
 
-use Oro\Bundle\AssetBundle\Cache\BundlesPathCache;
+use Oro\Bundle\AssetBundle\Cache\AssetConfigCache;
 use Oro\Bundle\AssetBundle\NodeProcessFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -29,7 +29,7 @@ class OroAssetsBuildCommand extends Command
     private $nodeProcessFactory;
 
     /**
-     * @var BundlesPathCache
+     * @var AssetConfigCache
      */
     private $cache;
 
@@ -50,14 +50,14 @@ class OroAssetsBuildCommand extends Command
 
     /**
      * @param NodeProcessFactory $nodeProcessFactory
-     * @param BundlesPathCache   $cache
+     * @param AssetConfigCache   $cache
      * @param string             $npmPath
      * @param int|float|null     $buildTimeout
      * @param int|float|null     $npmInstallTimeout
      */
     public function __construct(
         NodeProcessFactory $nodeProcessFactory,
-        BundlesPathCache $cache,
+        AssetConfigCache $cache,
         string $npmPath,
         $buildTimeout,
         $npmInstallTimeout
@@ -122,7 +122,7 @@ DESCRIPTION
         $io = new SymfonyStyle($input, $output);
 
         if (!$this->cache->exists($kernel->getCacheDir())) {
-            $io->text('<info>Warming up the bundles.json cache.</info>');
+            $io->text('<info>Warming up the asset-config.json cache.</info>');
             $this->cache->warmUp($kernel->getCacheDir());
             $io->text('Done');
         }
