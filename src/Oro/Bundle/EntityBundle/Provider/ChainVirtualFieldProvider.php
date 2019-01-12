@@ -2,8 +2,25 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+
+/**
+ * Delegates building of virtual fields to child providers.
+ */
 class ChainVirtualFieldProvider extends AbstractChainProvider implements VirtualFieldProviderInterface
 {
+    /** @var ConfigProvider  */
+    private $configProvider;
+
+    /**
+     * @param ConfigProvider $configProvider
+     */
+    public function setConfigProvider(ConfigProvider $configProvider)
+    {
+        $this->configProvider = $configProvider;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -53,6 +70,10 @@ class ChainVirtualFieldProvider extends AbstractChainProvider implements Virtual
      */
     public function getVirtualFields($className)
     {
+        if (!$this->isEntityAccessible($className)) {
+            return [];
+        }
+
         /** @var VirtualFieldProviderInterface[] $providers */
         $providers = $this->getProviders();
         $result    = array();
@@ -68,5 +89,17 @@ class ChainVirtualFieldProvider extends AbstractChainProvider implements Virtual
         }
 
         return array_keys($result);
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return bool
+     */
+    private function isEntityAccessible(string $className): bool
+    {
+        return
+            !$this->configProvider->hasConfig($className)
+            || ExtendHelper::isEntityAccessible($this->configProvider->getConfig($className));
     }
 }

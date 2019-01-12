@@ -161,6 +161,8 @@ services:
 
     oro_entity.virtual_field_provider.chain:
         class: %oro_entity.virtual_field_provider.chain.class%
+        calls:
+            - [setConfigProvider, ['@oro_entity_config.provider.extend']]
 
     oro_entity.virtual_field_provider:
         class: %oro_entity.virtual_field_provider.class%
@@ -191,6 +193,8 @@ services:
 
     oro_entity.virtual_relation_provider.chain:
         class: %oro_entity.virtual_relation_provider.chain.class%
+        calls:
+            - [setConfigProvider, ['@oro_entity_config.provider.extend']]
 
     oro_entity.virtual_relation_provider.config:
         class: %oro_entity.virtual_relation_provider.config.class%

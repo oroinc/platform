@@ -2,8 +2,25 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+
+/**
+ * Delegates building of virtual relations to child providers.
+ */
 class ChainVirtualRelationProvider extends AbstractChainProvider implements VirtualRelationProviderInterface
 {
+    /** @var ConfigProvider  */
+    private $configProvider;
+
+    /**
+     * @param ConfigProvider $configProvider
+     */
+    public function setConfigProvider(ConfigProvider $configProvider)
+    {
+        $this->configProvider = $configProvider;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -33,6 +50,10 @@ class ChainVirtualRelationProvider extends AbstractChainProvider implements Virt
      */
     public function getVirtualRelations($className)
     {
+        if (!$this->isEntityAccessible($className)) {
+            return [];
+        }
+
         /** @var VirtualRelationProviderInterface[] $providers */
         $providers = $this->getProviders();
         $result = [];
@@ -88,5 +109,17 @@ class ChainVirtualRelationProvider extends AbstractChainProvider implements Virt
         }
 
         return $foundProvider;
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return bool
+     */
+    private function isEntityAccessible(string $className): bool
+    {
+        return
+            !$this->configProvider->hasConfig($className)
+            || ExtendHelper::isEntityAccessible($this->configProvider->getConfig($className));
     }
 }
