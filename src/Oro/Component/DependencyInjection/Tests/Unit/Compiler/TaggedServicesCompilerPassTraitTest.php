@@ -1,8 +1,9 @@
 <?php
 
-namespace Oro\Component\DependencyInjection\Tests\Unit;
+namespace Oro\Component\DependencyInjection\Tests\Unit\Compiler;
 
 use Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait;
+use Oro\Component\DependencyInjection\Tests\Unit\Stub\TaggedServicesCompilerPassTraitImplementation;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -19,13 +20,12 @@ class TaggedServicesCompilerPassTraitTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp()
     {
-        $this->trait = $this->getMockBuilder(TaggedServicesCompilerPassTrait::class)
-            ->getMockForTrait();
+        $this->trait = new TaggedServicesCompilerPassTraitImplementation();
     }
 
     public function testRegisterTaggedServicesAndNoServiceDefinition()
     {
-        $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
+        $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->once())->method('hasDefinition')->with('service1')->willReturn(false);
         $container->expects($this->never())->method('findTaggedServiceIds');
 
@@ -34,7 +34,7 @@ class TaggedServicesCompilerPassTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testRegisterTaggedServicesAndNoTaggedServices()
     {
-        $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
+        $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->once())->method('hasDefinition')->willReturn(true);
         $container->expects($this->once())->method('findTaggedServiceIds')->with('tag1')->willReturn([]);
         $container->expects($this->never())->method('getDefinition');
@@ -48,10 +48,9 @@ class TaggedServicesCompilerPassTraitTest extends \PHPUnit\Framework\TestCase
      */
     public function testRegisterTaggedServices(array $taggedServices)
     {
-        $service = $this->getMockBuilder(Definition::class)
-            ->getMock();
+        $service = $this->createMock(Definition::class);
 
-        $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
+        $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->once())->method('hasDefinition')->willReturn(true);
         $container->expects($this->once())->method('findTaggedServiceIds')
             ->willReturn($taggedServices);
@@ -103,6 +102,50 @@ class TaggedServicesCompilerPassTraitTest extends \PHPUnit\Framework\TestCase
                     'taggedService1' => [['priority' => 10, 'alias' => 'taggedService1Alias']],
                 ],
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider findAndSortTaggedServicesDataProvider
+     */
+    public function testFindAndSortTaggedServices(array $taggedServices, $expectedResult)
+    {
+        $tagName = 'tag1';
+
+        $container = $this->createMock(ContainerBuilder::class);
+        $container->expects($this->once())
+            ->method('findTaggedServiceIds')
+            ->with($tagName, true)
+            ->willReturn($taggedServices);
+
+        $this->assertEquals(
+            $expectedResult,
+            $this->trait->findAndSortTaggedServices($tagName, $container)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function findAndSortTaggedServicesDataProvider()
+    {
+        return [
+            'empty'         => [
+                'taggedServices' => [],
+                'expectedResult' => []
+            ],
+            'with priority' => [
+                'taggedServices' => [
+                    'taggedService2' => [],
+                    'taggedService3' => [['priority' => 10]],
+                    'taggedService1' => [['priority' => -10]]
+                ],
+                'expectedResult' => [
+                    new Reference('taggedService1'),
+                    new Reference('taggedService2'),
+                    new Reference('taggedService3')
+                ]
+            ]
         ];
     }
 }

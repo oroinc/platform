@@ -43,9 +43,6 @@ services:
         calls:
             - [addProvider, ['@oro_entity.exclusion_provider']]
 
-    oro_query_designer.virtual_field_provider:
-        alias: oro_entity.virtual_field_provider.chain
-
     oro_query_designer.entity_provider:
         class: '%oro_entity.entity_provider.class%'
         parent: oro_entity.entity_provider.abstract
