@@ -12,6 +12,7 @@ use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
+use Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand;
 use Oro\Bundle\LocaleBundle\DependencyInjection\OroLocaleExtension;
 use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
@@ -30,7 +31,7 @@ use Symfony\Component\Intl\Intl;
  */
 class InstallCommand extends AbstractCommand implements InstallCommandInterface
 {
-    const NAME = 'oro:install';
+    public const NAME = 'oro:install';
 
     /** @var InputOptionProvider */
     protected $inputOptionProvider;
@@ -82,16 +83,16 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 'Determines whether translation data need to be downloaded or not'
             )
             ->addOption(
-                'language',
+                UpdateLocalizationCommand::OPTION_LANGUAGE,
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Application language'
+                'Localization language'
             )
             ->addOption(
-                'formatting-code',
+                UpdateLocalizationCommand::OPTION_FORMATTING_CODE,
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Application formatting code'
+                'Localization formatting code'
             );
 
         parent::configure();
@@ -654,7 +655,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     /**
      * @param CommandExecutor $commandExecutor
      */
-    private function updateLocalization(CommandExecutor $commandExecutor): void
+    protected function updateLocalization(CommandExecutor $commandExecutor)
     {
         $formattingCode = $this->getContainer()->getParameter(OroLocaleExtension::PARAMETER_FORMATTING_CODE);
         $language = $this->getContainer()->getParameter(OroLocaleExtension::PARAMETER_LANGUAGE);
@@ -693,7 +694,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         ];
 
         $commandExecutor->runCommand(
-            'oro:localization:update',
+            UpdateLocalizationCommand::NAME,
             array_merge(
                 [
                     '--process-isolation' => true
@@ -751,7 +752,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      */
     private function getExceptionMessage(string $optionName, string $localeCode, array $availableLocaleCodes):string
     {
-        $exceptionMessage = sprintf("There are no %s code '%s'!", $optionName, $localeCode);
+        $exceptionMessage = sprintf('"%s" is not a valid %s code!', $localeCode, $optionName);
         $alternatives = $this->getAlternatives($localeCode, $availableLocaleCodes);
         if ($alternatives) {
             $exceptionMessage .= sprintf("\nDid you mean %s?\n", $alternatives);
