@@ -2,120 +2,21 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Workflow\Action;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
-use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
-use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
-use Oro\Bundle\EmailBundle\Workflow\Action\SendEmail;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate;
-use Oro\Bundle\LocaleBundle\Provider\PreferredLanguageProviderInterface;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
+class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $contextAccessor;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $emailProcessor;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityNameResolver;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $dispatcher;
-
-    /**
-     * @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $renderer;
-
-    /**
-     * @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $objectManager;
-
-    /**
-     * @var EmailTemplateRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $objectRepository;
-
-    /**
-     * @var EmailTemplateInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $emailTemplate;
-
-    /**
-     * @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $validator;
-
-    /**
-     * @var SendEmail
-     */
-    protected $action;
-
-    /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $logger;
-
-    /**
-     * @var PreferredLanguageProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $languageProvider;
-
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Component\ConfigExpression\ContextAccessor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->emailProcessor = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->renderer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->validator = $this->createMock(ValidatorInterface::class);
-        $this->objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->objectRepository = $this->getMockBuilder(
-            'Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
-        $this->objectManager->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($this->objectRepository);
-
-        $this->emailTemplate = $this->createMock(EmailTemplate::class);
-        $this->languageProvider = $this->createMock(PreferredLanguageProviderInterface::class);
+        $this->createDependencyMocks();
 
         $this->action = new SendEmailTemplate(
             $this->contextAccessor,
@@ -126,9 +27,9 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
             $this->objectManager,
             $this->validator
         );
+
         $this->action->setLogger($this->logger);
         $this->action->setPreferredLanguageProvider($this->languageProvider);
-
         $this->action->setDispatcher($this->dispatcher);
     }
 
@@ -829,20 +730,5 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
             ->with($context, $options['attribute'], $email);
         $this->action->initialize($options);
         $this->action->execute($context);
-    }
-
-    /**
-     * @param mixed $entity
-     */
-    private function expectsEntityClass($entity): void
-    {
-        $classMetadata = $this->createMock(ClassMetadata::class);
-        $this->objectManager->expects($this->any())
-            ->method('getClassMetadata')
-            ->with(get_class($entity))
-            ->willReturn($classMetadata);
-        $classMetadata->expects($this->any())
-            ->method('getName')
-            ->willReturn(get_class($entity));
     }
 }

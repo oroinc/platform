@@ -106,6 +106,9 @@ class SendEmailTemplate extends AbstractSendEmail
 
     /**
      * {@inheritdoc}
+     *
+     * @throws EntityNotFoundException if the specified email template cannot be found
+     * @throws \Twig_Error When an error occurred in Twig during email template loading, compilation or rendering
      */
     protected function executeAction($context)
     {
@@ -124,7 +127,6 @@ class SendEmailTemplate extends AbstractSendEmail
                 $emailTemplate,
                 ['entity' => $entity]
             );
-
             $emails = array_map(function ($recipient) {
                 return $recipient instanceof EmailHolderInterface ? $recipient->getEmail() : $recipient;
             }, $recipients);
@@ -224,8 +226,14 @@ class SendEmailTemplate extends AbstractSendEmail
             ->findOneLocalized($criteria, $language);
 
         if (!$emailTemplate) {
-            $errorMessage = sprintf('Template "%s" not found.', $emailTemplate);
-            $this->logger->error('Workflow send email action.' . $errorMessage);
+            $errorMessage = sprintf(
+                'Workflow @send_email_template action error: '
+                . 'template "%s" for entity "%s" and language "%s" not found.',
+                $criteria->getName(),
+                $criteria->getEntityName(),
+                $language
+            );
+            $this->logger->error($errorMessage);
             throw new EntityNotFoundException($errorMessage);
         }
 
