@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\DQL;
 
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class DQLNameFormatter
 {
@@ -54,7 +55,7 @@ class DQLNameFormatter
         $interfaces = class_implements($className);
         foreach ($this->namePartsMap as $part => $metadata) {
             if (in_array($metadata['interface'], $interfaces, true)) {
-                $nameParts[$part] = $alias . '.' . $metadata['suggestedFieldName'];
+                $nameParts[$part] = QueryBuilderUtil::getField($alias, $metadata['suggestedFieldName']);
             }
         }
 
@@ -137,7 +138,7 @@ class DQLNameFormatter
         }
 
         // join all as concat params
-        return sprintf('TRIM(CONCAT(%s))', join(', ', $items));
+        return sprintf('TRIM(CONCAT(%s))', implode(', ', $items));
     }
 
     /**

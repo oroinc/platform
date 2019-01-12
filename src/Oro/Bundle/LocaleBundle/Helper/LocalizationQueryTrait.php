@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Helper;
 
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 trait LocalizationQueryTrait
 {
@@ -22,6 +23,10 @@ trait LocalizationQueryTrait
         $fieldAlias,
         $joinType = Join::INNER_JOIN
     ) {
+        QueryBuilderUtil::checkIdentifier($joinAlias);
+        QueryBuilderUtil::checkIdentifier($fieldAlias);
+        QueryBuilderUtil::checkField($join);
+
         if ($joinType == Join::INNER_JOIN) {
             return $queryBuilder
                 ->addSelect(sprintf('%s.string as %s', $joinAlias, $fieldAlias))

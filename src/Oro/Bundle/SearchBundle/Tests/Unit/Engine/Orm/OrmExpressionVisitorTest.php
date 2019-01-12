@@ -47,7 +47,7 @@ class OrmExpressionVisitorTest extends \PHPUnit_Framework_TestCase
         $joinField = 'search.integerFields';
 
         $field = strpos($fieldName, '|') !== false ? explode('|', $fieldName) : $fieldName;
-        $joinAlias = sprintf('%sField%s_%s', $type, $fieldName, $index);
+        $joinAlias = str_replace('|', '_', sprintf('%sField%s_%s', $type, $fieldName, $index));
 
         $this->qb->expects($this->once())
             ->method('getAllAliases')

@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 
 /**
@@ -196,9 +197,9 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     {
         /** @var Connection $connection */
         $connection = $this->getEntityManager()->getConnection();
-        $tableName = $this->getContainer()
-            ->get('oro_entity.orm.native_query_executor_helper')
-            ->getTableName(Status::class);
+        /** @var NativeQueryExecutorHelper $nativeQueryExecutorHelper */
+        $nativeQueryExecutorHelper = $this->getContainer()->get('oro_entity.orm.native_query_executor_helper');
+        $tableName = $nativeQueryExecutorHelper->getTableName(Status::class);
         $selectQuery = <<<SQL
 SELECT MAX(a.id) AS id
 FROM 

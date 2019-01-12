@@ -101,6 +101,7 @@ class SegmentSnapshotRepository extends EntityRepository
         $segmentQB->select('s.id, s.entity')->from('OroSegmentBundle:Segment', 's');
 
         foreach ($entities as $key => $entity) {
+            QueryBuilderUtil::checkIdentifier($key);
             if (\is_array($entity) && array_key_exists('id', $entity)) {
                 $entityId  = $entity['id'];
                 $className = ClassUtils::getClass($entity['entity']);
@@ -156,7 +157,10 @@ class SegmentSnapshotRepository extends EntityRepository
                 ->orWhere(
                     $deleteQB->expr()->andX(
                         $deleteQB->expr()->in('snp.segment', ':segmentsIds'),
-                        $deleteQB->expr()->in('snp.' . $params['entityIdentifierField'], ':entityIds')
+                        $deleteQB->expr()->in(
+                            QueryBuilderUtil::getField('snp', $params['entityIdentifierField']),
+                            ':entityIds'
+                        )
                     )
                 )
                 ->setParameter('segmentsIds', $params['segmentIds'])

@@ -1,0 +1,38 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\ApiBundle\Util\EntityIdHelper:
+            applyEntityIdentifierRestriction:
+                propertyName: true
+        Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery:
+            process:
+                parentJoinAlias: true
+            addJoinToParentEntity:
+                parentClassName: true
+                joinAlias: true
+        Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor:
+            createQueryBuilder:
+                entityClass: true
+                alias: true
+            createInnerSubquery:
+                entityClass: true
+                alias: true
+                parentAlias: true
+                parentJoinAlias: true
+                associationName: true
+
+    safe_methods:
+        Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery:
+            getJoinFieldName: true
+        Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig:
+            findFieldNameByPropertyPath: true
+            getIdentifierFieldNames: true
+
+    check_methods:
+        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionInterface:
+            __all__: true
+            walkComparisonExpression: [1, 2, 3]
+
+    check_methods_safety:
+        Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor:
+            buildPlaceholder: true

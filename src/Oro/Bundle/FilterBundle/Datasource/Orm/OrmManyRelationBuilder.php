@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilderInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class OrmManyRelationBuilder implements ManyRelationBuilderInterface
 {
@@ -40,6 +41,7 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
         $filterName,
         $inverse = false
     ) {
+        QueryBuilderUtil::checkIdentifier($parameterName);
         list($entity, $alias, $field) = $this->getFilterParts($ds, $fieldName);
 
         $rootAlias = sprintf('filter_%s', $ds->generateParameterName($filterName));
@@ -62,6 +64,7 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
         $filterName,
         $inverse = false
     ) {
+        QueryBuilderUtil::checkIdentifier($filterName);
         list($entity, $alias, $field) = $this->getFilterParts($ds, $fieldName);
 
         $rootAlias = sprintf('null_filter_%s', $filterName);
@@ -165,14 +168,17 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
         $relAlias,
         $relJoinType
     ) {
+        QueryBuilderUtil::checkIdentifier($relAlias);
+        QueryBuilderUtil::checkIdentifier($rootAlias);
+
         $qb = $ds->createQueryBuilder()
             ->select($rootAlias)
             ->from($rootEntity, $rootAlias);
 
         if ($relJoinType === Join::LEFT_JOIN) {
-            $qb->leftJoin(sprintf('%s.%s', $rootAlias, $rootField), $relAlias);
+            $qb->leftJoin(QueryBuilderUtil::getField($rootAlias, $rootField), $relAlias);
         } else {
-            $qb->innerJoin(sprintf('%s.%s', $rootAlias, $rootField), $relAlias);
+            $qb->innerJoin(QueryBuilderUtil::getField($rootAlias, $rootField), $relAlias);
         }
 
         return $qb;

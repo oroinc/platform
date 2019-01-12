@@ -4,6 +4,7 @@ namespace Oro\Bundle\DashboardBundle\EventListener;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class WidgetSortByListener
 {
@@ -43,6 +44,9 @@ class WidgetSortByListener
 
         $qb
             ->resetDQLPart('orderBy')
-            ->orderBy(sprintf('%s.%s', reset($rootAliases), $sortBy['property']), $sortBy['order']);
+            ->orderBy(
+                QueryBuilderUtil::getField(reset($rootAliases), $sortBy['property']),
+                QueryBuilderUtil::getSortOrder($sortBy['order'])
+            );
     }
 }

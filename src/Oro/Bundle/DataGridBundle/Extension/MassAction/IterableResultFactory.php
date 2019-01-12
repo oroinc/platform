@@ -13,6 +13,7 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Creates IterableResultInterace for orm datasouce to pass to mass action handler through params.
@@ -96,6 +97,7 @@ class IterableResultFactory implements IterableResultFactoryInterface
         if (!$identifier) {
             throw new LogicException('Mass action must define identifier name');
         }
+        QueryBuilderUtil::checkField($identifier);
 
         return $identifier;
     }
@@ -106,7 +108,10 @@ class IterableResultFactory implements IterableResultFactoryInterface
      */
     private function getObjectIdentifier(ActionConfiguration $actionConfiguration)
     {
-        return $actionConfiguration->offsetGetOr('object_identifier');
+        $identifier = $actionConfiguration->offsetGetOr('object_identifier');
+        QueryBuilderUtil::checkIdentifier($identifier);
+
+        return $identifier;
     }
 
     /**

@@ -143,7 +143,8 @@ class CriteriaConnector
                 $sort = $aliases[0] . '.' . $sort;
             }
 
-            $qb->addOrderBy($sort, $order);
+            QueryBuilderUtil::checkField($sort);
+            $qb->addOrderBy($sort, QueryBuilderUtil::getSortOrder($order));
         }
     }
 }

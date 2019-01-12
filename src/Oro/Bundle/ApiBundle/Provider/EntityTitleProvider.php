@@ -5,8 +5,8 @@ namespace Oro\Bundle\ApiBundle\Provider;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\Expr;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -130,34 +130,38 @@ class EntityTitleProvider
      */
     private function getNameQuery(EntityManager $em, $entityClass, $idFieldName, array $ids)
     {
-        $qb = $em->getRepository($entityClass)
-            ->createQueryBuilder('e')
-            ->select(sprintf(
-                '\'%s\' AS entity, %s AS title',
-                $entityClass,
+        $qb = $em->getRepository($entityClass)->createQueryBuilder('e');
+        $qb
+            ->select(
+                (string)$qb->expr()->literal($entityClass) . ' AS entity',
                 $this->entityNameResolver->prepareNameDQL(
                     $this->entityNameResolver->getNameDQL($entityClass, 'e'),
                     true
-                )
-            ));
-        if (is_array($idFieldName)) {
+                ) . ' AS title'
+            );
+        if (\is_array($idFieldName)) {
             $i = 0;
             foreach ($idFieldName as $fieldName) {
                 $i++;
-                $qb->addSelect(sprintf('e.%s AS id%d', $fieldName, $i));
+                $qb->addSelect(QueryBuilderUtil::sprintf('e.%s AS id%d', $fieldName, $i));
             }
             foreach ($ids as $id) {
-                $expressions = [];
+                $expressions = $qb->expr()->andX();
                 $i = 0;
                 foreach ($idFieldName as $fieldName) {
-                    $expressions[] = $qb->expr()->eq('e.' . $fieldName, $qb->expr()->literal($id[$i]));
+                    $expressions->add(
+                        $qb->expr()->eq(
+                            QueryBuilderUtil::getField('e', $fieldName),
+                            $qb->expr()->literal($id[$i])
+                        )
+                    );
                     $i++;
                 }
-                $qb->orWhere(new Expr\Andx($expressions));
+                $qb->orWhere($expressions);
             }
         } else {
-            $qb->addSelect(sprintf('e.%s AS id', $idFieldName));
-            $qb->andWhere($qb->expr()->in('e.' . $idFieldName, $ids));
+            $qb->addSelect(QueryBuilderUtil::sprintf('e.%s AS id', $idFieldName));
+            $qb->andWhere($qb->expr()->in(QueryBuilderUtil::getField('e', $idFieldName), $ids));
         }
 
         return $qb->getQuery();

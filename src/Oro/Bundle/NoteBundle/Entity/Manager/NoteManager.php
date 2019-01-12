@@ -4,6 +4,7 @@ namespace Oro\Bundle\NoteBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
@@ -66,7 +67,7 @@ class NoteManager
         /** @var NoteRepository $repo */
         $repo = $this->em->getRepository('OroNoteBundle:Note');
         $qb   = $repo->getAssociatedNotesQueryBuilder($entityClass, $entityId)
-            ->orderBy('note.createdAt', $sorting);
+            ->orderBy('note.createdAt', QueryBuilderUtil::getSortOrder($sorting));
 
         $query = $this->aclHelper->apply($qb, 'VIEW', false);
 

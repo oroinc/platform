@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
@@ -147,8 +149,8 @@ class ActivityListManager
                 ->where($qb->expr()->in('activity.id', ':activitiesIds'))
                 ->setParameter('activitiesIds', $ids)
                 ->orderBy(
-                    'activity.' . $this->config->get('oro_activity_list.sorting_field'),
-                    $this->config->get('oro_activity_list.sorting_direction')
+                    QueryBuilderUtil::getField('activity', $this->config->get('oro_activity_list.sorting_field')),
+                    QueryBuilderUtil::getSortOrder($this->config->get('oro_activity_list.sorting_direction'))
                 )
                 ->setMaxResults($this->config->get('oro_activity_list.per_page'));
 
@@ -180,7 +182,7 @@ class ActivityListManager
      */
     protected function getListDataIds(QueryBuilder $qb, $entityClass, $entityId, $filter, $pageFilter)
     {
-        $pageSize = $this->config->get('oro_activity_list.per_page');
+        $pageSize = (int)$this->config->get('oro_activity_list.per_page');
         $ids = $this->loadListDataIds($qb, $entityClass, $entityId, $filter, $pageFilter, $pageSize);
         $ids = array_unique(array_column($ids, 'id'));
         $ids = array_slice($ids, 0, $pageSize);
@@ -201,12 +203,13 @@ class ActivityListManager
     private function loadListDataIds(QueryBuilder $qb, $entityClass, $entityId, $filter, $pageFilter, $pageSize)
     {
         $orderBy = $this->config->get('oro_activity_list.sorting_field');
+        $orderByField = QueryBuilderUtil::getField('activity', $orderBy);
         $grouping = $this->config->get('oro_activity_list.grouping');
 
         $getIdsQb = clone $qb;
         $getIdsQb->setMaxResults($pageSize * self::ACTIVITY_LIST_PAGE_SIZE_MULTIPLIER);
         $getIdsQb->resetDQLParts(['select']);
-        $getIdsQb->addSelect('activity.id, activity.' . $orderBy);
+        $getIdsQb->addSelect(['activity.id', $orderByField]);
         if ($grouping) {
             $getIdsQb->addSelect('activity.relatedActivityClass, activity.relatedActivityId');
         }
@@ -234,11 +237,11 @@ class ActivityListManager
             $lastRow = $ids[$numberOfIds - 1];
             $offsetDate = $lastRow[$orderBy];
             if (null === $qb->getParameter('offsetDate')) {
-                $whereComparison = 'gt';
                 if (!$this->isAscendingOrderForListData($pageFilter)) {
-                    $whereComparison = 'lt';
+                    $qb->andWhere($qb->expr()->lt($orderByField, ':offsetDate'));
+                } else {
+                    $qb->andWhere($qb->expr()->gt($orderByField, ':offsetDate'));
                 }
-                $qb->andWhere($qb->expr()->{$whereComparison}('activity.' . $orderBy, ':offsetDate'));
             }
             $qb->setParameter('offsetDate', $offsetDate);
             $rows = $this->loadListDataIds(
@@ -357,6 +360,7 @@ class ActivityListManager
     protected function applyPageFilter(QueryBuilder $qb, $pageFilter)
     {
         $orderBy = $this->config->get('oro_activity_list.sorting_field');
+        QueryBuilderUtil::checkIdentifier($orderBy);
 
         $orderDirection = 'ASC';
         if (!$this->isAscendingOrderForListData($pageFilter)) {
@@ -365,13 +369,14 @@ class ActivityListManager
 
         if (!empty($pageFilter['date']) && !empty($pageFilter['ids'])) {
             $dateFilter = new \DateTime($pageFilter['date'], new \DateTimeZone('UTC'));
-            $whereComparison = 'gte';
             if (!$this->isAscendingOrderForListData($pageFilter)) {
-                $whereComparison = 'lte';
+                $qb->andWhere($qb->expr()->lte('activity.' . $orderBy, ':dateFilter'));
+            } else {
+                $qb->andWhere($qb->expr()->gte('activity.' . $orderBy, ':dateFilter'));
             }
 
             $qb->andWhere($qb->expr()->notIn('activity.id', implode(',', $pageFilter['ids'])));
-            $qb->andWhere($qb->expr()->{$whereComparison}('activity.' . $orderBy, ':dateFilter'));
+
             $qb->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
         }
 
@@ -580,13 +585,17 @@ class ActivityListManager
         $ids = $this->getGroupedActivityListIds($entity, $targetActivityClass, $targetActivityId);
         if (!empty($ids)) {
             $qb = $this->getRepository()->createQueryBuilder('activity');
+            $orderByField = QueryBuilderUtil::getField(
+                'activity',
+                $this->config->get('oro_activity_list.sorting_field')
+            );
+            $orderByDirection = QueryBuilderUtil::getSortOrder(
+                $this->config->get('oro_activity_list.sorting_direction')
+            );
             $qb = $qb
                 ->where($qb->expr()->in('activity.id', ':activitiesIds'))
                 ->setParameter('activitiesIds', $ids)
-                ->orderBy(
-                    'activity.' . $this->config->get('oro_activity_list.sorting_field'),
-                    $this->config->get('oro_activity_list.sorting_direction')
-                );
+                ->orderBy($orderByField, $orderByDirection);
             $activityLists = $qb->getQuery()->getResult();
         }
 
@@ -863,16 +872,23 @@ class ActivityListManager
 
             // to avoid of duplication activity lists and activities items we need to clear these relations
             // from the master record before update
-            $where = "WHERE $targetField = :masterEntityId AND $activityField IN(" . implode(',', $activityIds) . ")";
-            $stmt = $dbConnection->prepare("DELETE FROM $tableName $where");
-            $stmt->bindValue('masterEntityId', $newTargetId);
-            $stmt->execute();
+            $deleteQb = $dbConnection->createQueryBuilder();
+            $deleteQb->delete($tableName)
+                ->where($deleteQb->expr()->eq($targetField, ':masterEntityId'))
+                ->andWhere($deleteQb->expr()->in($activityField, ':activityIds'))
+                ->setParameter('masterEntityId', $newTargetId)
+                ->setParameter('activityIds', $activityIds, Connection::PARAM_INT_ARRAY);
+            $deleteQb->execute();
 
-            $where = "WHERE $targetField = :sourceEntityId AND $activityField IN(" . implode(',', $activityIds) . ")";
-            $stmt = $dbConnection->prepare("UPDATE $tableName SET $targetField = :masterEntityId $where");
-            $stmt->bindValue('masterEntityId', $newTargetId);
-            $stmt->bindValue('sourceEntityId', $oldTargetId);
-            $stmt->execute();
+            $updateQb = $dbConnection->createQueryBuilder();
+            $updateQb->update($tableName)
+                ->set($targetField, ':masterEntityId')
+                ->where($updateQb->expr()->eq($targetField, ':sourceEntityId'))
+                ->andWhere($deleteQb->expr()->in($activityField, ':activityIds'))
+                ->setParameter('masterEntityId', $newTargetId)
+                ->setParameter('sourceEntityId', $oldTargetId)
+                ->setParameter('activityIds', $activityIds, Connection::PARAM_INT_ARRAY);
+            $updateQb->execute();
         }
 
         return $this;

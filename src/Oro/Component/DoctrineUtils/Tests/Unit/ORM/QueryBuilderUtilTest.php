@@ -472,6 +472,21 @@ class QueryBuilderUtilTest extends OrmTestCase
         $this->assertFalse(QueryBuilderUtil::isToOne($qb, 'nonExistingAlias'));
     }
 
+    public function testSprintfValid()
+    {
+        $this->assertEquals('tesT.One_1 > :param', QueryBuilderUtil::sprintf('%s.%s > :param', 'tesT', 'One_1'));
+    }
+
+    /**
+     * @dataProvider invalidDataProvider
+     * @param string $invalid
+     */
+    public function testSprintfInvalid($invalid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        QueryBuilderUtil::sprintf('%s.%s > 0', $invalid, 'id');
+    }
+
     public function testCheckIdentifierValid()
     {
         QueryBuilderUtil::checkIdentifier('tEs_T_01a');
@@ -485,6 +500,21 @@ class QueryBuilderUtilTest extends OrmTestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkIdentifier($invalid);
+    }
+
+    public function testGetFieldValid()
+    {
+        $this->assertEquals('a0_.Field0', QueryBuilderUtil::getField('a0_', 'Field0'));
+    }
+
+    /**
+     * @dataProvider invalidDataProvider
+     * @param string $invalid
+     */
+    public function testGetFieldInvalid($invalid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->assertEquals('a0_.Field0', QueryBuilderUtil::getField('a0_', $invalid));
     }
 
     /**

@@ -257,22 +257,23 @@ class AssociationManager
         $targetFieldName
     ) {
         $targetAlias = 'target';
-
-        return $this->doctrineHelper->getEntityManagerForClass($associationOwnerClass)
+        $qb = $this->doctrineHelper->getEntityManagerForClass($associationOwnerClass)
             ->getRepository($associationOwnerClass)
-            ->createQueryBuilder('e')
-            ->select(
-                sprintf(
-                    'e.id AS id, target.%s AS entityId, \'%s\' AS entityClass, %s AS entityTitle',
-                    $this->doctrineHelper->getSingleEntityIdentifierFieldName($targetEntityClass),
-                    $targetEntityClass,
-                    $this->entityNameResolver->prepareNameDQL(
-                        $this->entityNameResolver->getNameDQL($targetEntityClass, $targetAlias),
-                        true
-                    )
-                )
-            )
-            ->innerJoin('e.' . $targetFieldName, $targetAlias);
+            ->createQueryBuilder('e');
+
+        return $qb->select(
+            'e.id AS id',
+            sprintf(
+                'target.%s AS entityId',
+                $this->doctrineHelper->getSingleEntityIdentifierFieldName($targetEntityClass)
+            ),
+            (string)$qb->expr()->literal($targetEntityClass) . ' AS entityClass',
+            $this->entityNameResolver->prepareNameDQL(
+                $this->entityNameResolver->getNameDQL($targetEntityClass, $targetAlias),
+                true
+            ) . '  AS entityTitle'
+        )
+        ->innerJoin(QueryBuilderUtil::getField('e', $targetFieldName), $targetAlias);
     }
 
     /**
@@ -382,21 +383,21 @@ class AssociationManager
         $ownerFieldName,
         $targetIdFieldName
     ) {
-        return $this->doctrineHelper->getEntityManagerForClass($associationOwnerClass)
+        $qb = $this->doctrineHelper->getEntityManagerForClass($associationOwnerClass)
             ->getRepository($associationOwnerClass)
-            ->createQueryBuilder('e')
+            ->createQueryBuilder('e');
+
+        return $qb
             ->select(
-                sprintf(
-                    'target.%s AS id, e.id AS entityId, \'%s\' AS entityClass, %s AS entityTitle',
-                    $targetIdFieldName,
-                    $associationOwnerClass,
-                    $this->entityNameResolver->prepareNameDQL(
-                        $this->entityNameResolver->getNameDQL($associationOwnerClass, 'e'),
-                        true
-                    )
-                )
+                QueryBuilderUtil::sprintf('target.%s AS id', $targetIdFieldName),
+                'e.id AS entityId',
+                (string)$qb->expr()->literal($associationOwnerClass) . ' AS entityClass',
+                $this->entityNameResolver->prepareNameDQL(
+                    $this->entityNameResolver->getNameDQL($associationOwnerClass, 'e'),
+                    true
+                ) . ' AS entityTitle'
             )
-            ->innerJoin('e.' . $ownerFieldName, 'target');
+            ->innerJoin(QueryBuilderUtil::getField('e', $ownerFieldName), 'target');
     }
 
     /**

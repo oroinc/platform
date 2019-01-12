@@ -1,0 +1,24 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository:
+            findByStepNamesAndEntityClassQueryBuilder:
+                entityClass: true
+                dqlFilter: true
+        Oro\Bundle\WorkflowBundle\Helper\WorkflowAwareEntityFetcher:
+            getEntitiesWithoutWorkflowItem:
+                dqlFilter: true
+        Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessDefinitionRepository:
+            findLikeName:
+                escapeChar: true
+    properties:
+        Oro\Bundle\WorkflowBundle\Datagrid\GridEntityNameProvider:
+            getRelatedEntitiesChoice:
+                entityName: true
+    check_methods_safety:
+        Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener:
+            getWorkflowItemJoinCondition: [1]
+        Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider:
+            getWorkflowItemJoinCondition: [1]
+        Oro\Bundle\WorkflowBundle\Helper\WorkflowAwareEntityFetcher:
+            getWorkflowItemJoinCondition: [1]
