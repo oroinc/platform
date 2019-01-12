@@ -11,6 +11,8 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * REST API controller which provides a way to remove Taxonomy
+ *
  * @RouteResource("taxonomy")
  * @NamePrefix("oro_api_")
  */
@@ -51,7 +53,7 @@ class TaxonomyController extends RestController implements ClassResourceInterfac
      */
     public function getForm()
     {
-        return $this->get('oro_tag.form.taxonomy.api');
+        throw new \BadMethodCallException('Form is not available.');
     }
 
     /**
