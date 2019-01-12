@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass;
 
-use Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -12,7 +11,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class SelectedFieldsProvidersPass implements CompilerPassInterface
 {
-    use TaggedServicesCompilerPassTrait;
     use PriorityTaggedServiceTrait;
 
     private const COMPOSITE_PROVIDER_ID = 'oro_datagrid.provider.selected_fields';

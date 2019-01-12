@@ -11,10 +11,12 @@ It currently supports only styles assets. JS assets are still managed by [OroReq
 ### Removed
 #### AsseticBundle
 * Bundle was removed, use AssetBundle instead
+#### QueryDesignerBundle
+* The unused alias `oro_query_designer.virtual_field_provider` for the service `oro_entity.virtual_field_provider.chain` was removed.
 
 ### Changed
 #### AssetBundle
-* Syntax of `Resources/config/oro/assets.yml` files for the management-console was changed to follow the same standard as the configuration files for the OroCommerce storefront.  
+* Syntax of `Resources/config/oro/assets.yml` files for the management-console was changed to follow the same standard as the configuration files for the OroCommerce storefront.
 Use the `inputs` node instead of the group names.
 ```diff
 - assets:

@@ -109,14 +109,9 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      *
      * @param array|string $expectedContent The file name or full file path to YAML template file or array
      * @param Response     $response
-     * @param object|null  $entity          If not null, object will set as entity reference
      */
-    protected function assertResponseContains($expectedContent, Response $response, $entity = null)
+    protected function assertResponseContains($expectedContent, Response $response)
     {
-        if ($entity) {
-            $this->getReferenceRepository()->addReference('entity', $entity);
-        }
-
         $content = self::jsonToArray($response->getContent());
         $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
 

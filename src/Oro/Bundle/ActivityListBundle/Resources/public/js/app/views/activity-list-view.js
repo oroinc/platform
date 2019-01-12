@@ -484,7 +484,10 @@ define(function(require) {
         _getUrl: function(actionKey, model) {
             var routes = model.get('routes');
 
-            return routing.generate(routes[actionKey], {id: model.get('relatedActivityId')});
+            return routing.generate(routes[actionKey], {
+                entity: model.get('relatedActivityClass'),
+                id: model.get('relatedActivityId')
+            });
         },
 
         _getMessage: function(labelKey) {

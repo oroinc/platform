@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Command;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -13,35 +14,47 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Intl\Intl;
 
 /**
- * This command for internal use only!
- *
- * It update the localization with "en" language and "en" formatting code to localization passed as non-required options
- * "language" and "formatting-code" to `oro:install` command.
- * Additional language will be created if non-required option "language" will be passed to `oro:install` command.
+ * Replaces "en" language and "en" formatting code in the default localization.
  *
  * Example:
  *  `oro:install --language=de --formatting-code=de_DE`
- *  will change language to "de" language and change formatting code to de_DE for default localization.
+ *  will change "Language" value to "de" and "Formatting code" value to "de_DE" for the default localization.
  */
 class UpdateLocalizationCommand extends ContainerAwareCommand
 {
+    public const NAME = 'oro:localization:update';
+
+    public const OPTION_FORMATTING_CODE = 'formatting-code';
+    public const OPTION_LANGUAGE = 'language';
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName('oro:localization:update')
+        $description = <<<EOD
+This is a hidden command for internal use only (it's called from the installer).
+Do not run it directly!
+
+It replaces "en" in "Language" and "Formatting code" options of the default
+localization with the new values passed as optional "language" and
+"formatting-code" options to `oro:install` command.
+It will also create a new language entity for the "language" option value,
+if such language does not exist yet.
+EOD;
+
+        $this->setName(self::NAME)
             ->setHidden(true)
-            ->setDescription("This command for internal use only!.\nUpdate default en localization.")
+            ->setDescription($description)
             ->addOption(
-                'formatting-code',
+                self::OPTION_FORMATTING_CODE,
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Formatting code',
                 Translator::DEFAULT_LOCALE
             )
             ->addOption(
-                'language',
+                self::OPTION_LANGUAGE,
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Language',
@@ -54,15 +67,16 @@ class UpdateLocalizationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $languageCode = (string)$input->getOption('language');
-        $formattingCode = (string)$input->getOption('formatting-code');
+        $languageCode = (string)$input->getOption(self::OPTION_LANGUAGE);
+        $formattingCode = (string)$input->getOption(self::OPTION_FORMATTING_CODE);
 
         if ($languageCode === Translator::DEFAULT_LOCALE && $formattingCode === Translator::DEFAULT_LOCALE) {
             return;
         }
 
-        $localization = $this->getManager(Localization::class)
-            ->getRepository(Localization::class)
+        /** @var LocalizationRepository $localizationRepository */
+        $localizationRepository = $this->getManager(Localization::class)->getRepository(Localization::class);
+        $localization = $localizationRepository
             ->findOneByLanguageCodeAndFormattingCode(Translator::DEFAULT_LOCALE, Translator::DEFAULT_LOCALE);
 
         if ($localization) {

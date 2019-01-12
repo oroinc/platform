@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\Command;
 
+use Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -42,10 +43,10 @@ class UpdateLocalizationCommandTest extends WebTestCase
         $this->assertEnglishLanguageExists(); // And English language is not present
 
         $this->runCommand(
-            'oro:localization:update',
+            UpdateLocalizationCommand::NAME,
             [
-                '--formatting-code' => 'de_DE',
-                '--language' => 'de'
+                '--' . UpdateLocalizationCommand::OPTION_FORMATTING_CODE => 'de_DE',
+                '--' . UpdateLocalizationCommand::OPTION_LANGUAGE => 'de'
             ]
         );
 
@@ -56,10 +57,10 @@ class UpdateLocalizationCommandTest extends WebTestCase
 
         // Run command again for in order to make sure that it does not affect non default localization
         $this->runCommand(
-            'oro:localization:update',
+            UpdateLocalizationCommand::NAME,
             [
-                '--formatting-code' => 'it_IT',
-                '--language' => 'it'
+                '--' . UpdateLocalizationCommand::OPTION_FORMATTING_CODE => 'it_IT',
+                '--' . UpdateLocalizationCommand::OPTION_LANGUAGE => 'it'
             ]
         );
 

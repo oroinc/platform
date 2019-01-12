@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
+use Oro\Bundle\EntityBundle\Provider\DictionaryValueListProviderInterface;
 
 class ChainDictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -17,12 +19,10 @@ class ChainDictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->provider1 = $this->createMock('Oro\Bundle\EntityBundle\Provider\DictionaryValueListProviderInterface');
-        $this->provider2 = $this->createMock('Oro\Bundle\EntityBundle\Provider\DictionaryValueListProviderInterface');
+        $this->provider1 = $this->createMock(DictionaryValueListProviderInterface::class);
+        $this->provider2 = $this->createMock(DictionaryValueListProviderInterface::class);
 
-        $this->chainProvider = new ChainDictionaryValueListProvider();
-        $this->chainProvider->addProvider($this->provider1);
-        $this->chainProvider->addProvider($this->provider2, -100);
+        $this->chainProvider = new ChainDictionaryValueListProvider([$this->provider1, $this->provider2]);
     }
 
     public function testGetSerializationConfigForNullClassName()
@@ -37,7 +37,7 @@ class ChainDictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSerializationConfig()
     {
-        $class    = 'Test\Class';
+        $class = 'Test\Class';
         $expected = ['fields' => 'field'];
 
         $this->provider1->expects($this->once())
@@ -54,6 +54,12 @@ class ChainDictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->chainProvider->getSerializationConfig($class));
     }
 
+    public function testGetSerializationConfigWithoutChildProviders()
+    {
+        $chainProvider = new ChainDictionaryValueListProvider([]);
+        $this->assertNull($chainProvider->getSerializationConfig('Test\Class'));
+    }
+
     public function testGetValueListQueryBuilderForNullClassName()
     {
         $this->provider1->expects($this->never())
@@ -67,7 +73,7 @@ class ChainDictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetValueListQueryBuilder()
     {
         $class = 'Test\Class';
-        $qb    = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor();
+        $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor();
 
         $this->provider1->expects($this->once())
             ->method('supports')
@@ -83,6 +89,12 @@ class ChainDictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($qb);
 
         $this->assertEquals($qb, $this->chainProvider->getValueListQueryBuilder($class));
+    }
+
+    public function testGetValueListQueryBuilderWithoutChildProviders()
+    {
+        $chainProvider = new ChainDictionaryValueListProvider([]);
+        $this->assertNull($chainProvider->getValueListQueryBuilder('Test\Class'));
     }
 
     /**
@@ -119,5 +131,11 @@ class ChainDictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
                 ['Test\Status', 'Test\Priority', 'Test\Source'],
             ],
         ];
+    }
+
+    public function testGetSupportedEntityClassesWithoutChildProviders()
+    {
+        $chainProvider = new ChainDictionaryValueListProvider([]);
+        $this->assertSame([], $chainProvider->getSupportedEntityClasses());
     }
 }

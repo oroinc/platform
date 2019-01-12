@@ -10,6 +10,9 @@ use Oro\Bundle\NoteBundle\Entity\Note;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * This handler is setting updated date for notes
+ */
 class NoteHandler
 {
     use RequestHandlerTrait;
@@ -83,10 +86,6 @@ class NoteHandler
     protected function onSuccess(Note $entity)
     {
         $em = $this->getEntityManager();
-        if ($this->form->has('contexts')) {
-            $contexts = $this->form->get('contexts')->getData();
-            $this->activityManager->setActivityTargets($entity, $contexts);
-        }
         $entity->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
 
         $em->persist($entity);

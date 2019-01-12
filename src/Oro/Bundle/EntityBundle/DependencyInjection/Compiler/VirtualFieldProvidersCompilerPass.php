@@ -2,21 +2,24 @@
 
 namespace Oro\Bundle\EntityBundle\DependencyInjection\Compiler;
 
-class VirtualFieldProvidersCompilerPass extends AbstractProviderCompilerPass
+use Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+/**
+ * Registers all providers of virtual fields.
+ */
+class VirtualFieldProvidersCompilerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTag()
-    {
-        return 'oro_entity.virtual_field_provider';
-    }
+    use TaggedServicesCompilerPassTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getService()
+    public function process(ContainerBuilder $container)
     {
-        return 'oro_entity.virtual_field_provider.chain';
+        $providers = $this->findAndSortTaggedServices('oro_entity.virtual_field_provider', $container);
+        $container->getDefinition('oro_entity.virtual_field_provider.chain')
+            ->replaceArgument(0, $providers);
     }
 }

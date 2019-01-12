@@ -4,7 +4,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CleanupStatsPlugin = require('./cleanup-stats-plugin');
 
-const BundlesLoader = require('./bundles-loader');
+const AssetConfigLoader = require('./asset-config-loader');
 const ConfigLoader = require('./config-loader');
 const StyleLoader = require('./style-loader');
 const LayoutStyleLoader = require('./layout-style-loader');
@@ -150,7 +150,7 @@ class ConfigBuilder {
                             options: {
                                 limit: 1,
                                 emitFile: false,
-                                publicPath: '/',
+                                publicPath: this._configuration.applicationUrl,
                                 name: '[path][name].[ext]?[hash]'
                             }
                         }
@@ -193,12 +193,16 @@ class ConfigBuilder {
      * @private
      */
     _getEntryPoints(selectedTheme) {
-        const bundles = BundlesLoader.getBundles(this._cachePath, this._symfonyEnv);
+        this._configuration = AssetConfigLoader.getConfig(this._cachePath, this._symfonyEnv);
 
-        const configLoader = new ConfigLoader(bundles, '/Resources/public/themes/', 'settings.yml');
+        const configLoader = new ConfigLoader(this._configuration.paths, '/Resources/public/themes/', 'settings.yml');
         const entryPointFileWriter = new EntryPointFileWriter(this._publicPath);
         const styleLoader = new StyleLoader(configLoader);
-        const layoutConfigLoader = new ConfigLoader(bundles, '/Resources/views/layouts/', 'theme.yml');
+        const layoutConfigLoader = new ConfigLoader(
+            this._configuration.paths,
+            '/Resources/views/layouts/',
+            'theme.yml'
+        );
 
         let entryPoints = {};
         const adminThemes = configLoader.themeNames.map(themeName => 'admin.' + themeName);

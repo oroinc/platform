@@ -18,6 +18,14 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form extension that adds "contexts" field to forms for activity entities.
+ * This field is used to associate the activity entity with other entities
+ * that participates in the activity or have a relation to it.
+ *
+ * Example: if there is an email thread (an activity) where an user is having conversation with a customer (Account)
+ * about a deal (an Opportunity) - both these records will make sense as contexts for the email thread.
+ */
 class ContextsExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
@@ -95,6 +103,11 @@ class ContextsExtension extends AbstractTypeExtension
             FormEvents::POST_SET_DATA,
             [$this, 'addDefaultContextListener']
         );
+
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            [$this, 'setActivityTargetsContext']
+        );
     }
 
     /**
@@ -121,6 +134,23 @@ class ContextsExtension extends AbstractTypeExtension
             }
 
             $form->get('contexts')->setData($contexts);
+        }
+    }
+
+    /**
+     * Set activity targets with context data to the form
+     *
+     * @param FormEvent $event
+     */
+    public function setActivityTargetsContext(FormEvent $event)
+    {
+        /** @var ActivityInterface $entity */
+        $entity = $event->getData();
+        $form   = $event->getForm();
+
+        if ($entity && $form->isSubmitted() && $form->isValid() && $form->has('contexts')) {
+            $contexts = $form->get('contexts')->getData();
+            $this->activityManager->setActivityTargets($entity, $contexts);
         }
     }
 

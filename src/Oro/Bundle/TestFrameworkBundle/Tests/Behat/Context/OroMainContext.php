@@ -2145,7 +2145,7 @@ JS;
      * Examples: Then I should see "Closed Lost" gray status
      *           Then I should see "Open" green status
      *
-     * @Then /^I should see "(?P<status>[^"]+)" (?P<color>(green|gray)) status$/
+     * @Then /^I should see "(?P<status>[^"]+)" (?P<color>[\w\s]+) status$/
      */
     public function iShouldSeeColoredStatus($status, $color)
     {

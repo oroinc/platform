@@ -4,36 +4,33 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationStrategyPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class TranslationStrategyPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $builder;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        $this->builder = $this->getMockBuilder(ContainerBuilder::class)->getMock();
-    }
-
     public function testProcess()
     {
-        /** @var $compilerPass TranslationStrategyPass|\PHPUnit\Framework\MockObject\MockObject */
-        $compilerPass = $this->getMockBuilder(TranslationStrategyPass::class)
-            ->setMethods(['registerTaggedServices'])
-            ->getMock();
+        $container = new ContainerBuilder();
 
-        $compilerPass->expects($this->once())
-            ->method('registerTaggedServices')
-            ->with(
-                $this->builder,
-                TranslationStrategyPass::SERVICE_ID,
-                TranslationStrategyPass::EXTENSION_TAG,
-                'addStrategy'
-            );
+        $container->register('strategy1')
+            ->addTag('oro_translation.extension.translation_strategy', []);
+        $container->register('strategy2')
+            ->addTag('oro_translation.extension.translation_strategy', ['priority' => -10]);
+        $container->register('strategy3')
+            ->addTag('oro_translation.extension.translation_strategy', ['priority' => 10]);
 
-        $compilerPass->process($this->builder);
+        $strategyProvider = $container->register('oro_translation.strategy.provider');
+
+        $compiler = new TranslationStrategyPass();
+        $compiler->process($container);
+
+        self::assertEquals(
+            [
+                ['addStrategy', [new Reference('strategy2'), 'strategy2']],
+                ['addStrategy', [new Reference('strategy1'), 'strategy1']],
+                ['addStrategy', [new Reference('strategy3'), 'strategy3']]
+            ],
+            $strategyProvider->getMethodCalls()
+        );
     }
 }
