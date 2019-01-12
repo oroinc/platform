@@ -129,7 +129,7 @@ class CriteriaTest extends TestCase
         $this->assertEquals('default', $criteria->getOption('test', 'default'));
     }
 
-    public function testSet()
+    public function testSetOption()
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');
         $criteria->setOption('test', 'value');
@@ -144,5 +144,14 @@ class CriteriaTest extends TestCase
         $criteria = new Criteria($type, \stdClass::class, 'alias');
 
         $this->assertEquals($type, $criteria->getType());
+    }
+
+    public function testSetExpression()
+    {
+        $expression = new Comparison(new Path('owner'), Comparison::IN, [1,2,3,4,5]);
+        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');
+
+        $criteria->setExpression($expression);
+        $this->assertEquals($expression, $criteria->getExpression());
     }
 }
