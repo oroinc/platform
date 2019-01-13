@@ -967,6 +967,29 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: And I should see "file.jpg" file link with the url matches "#/folder/test.jpg#"
+     * Example: And I should see "file.jpg" file link with the url matches "/folder/"
+     *
+     * @Then /^(?:|I )should see "(?P<text>[^"]+)" link with the url matches (?P<url>"[^"]+")$/
+     */
+    public function iShouldSeeLinkWithUrl($text, $url)
+    {
+        $link = $this->elementFactory->findElementContains('Link', $text);
+        self::assertRegExp($url, $link->getAttribute('href'));
+    }
+
+    /**
+     * Example: And I should see "file.jpg" file link with the url matches "/admin/"
+     *
+     * @Then /^(?:|I )should not see "(?P<text>[^"]+)" link with the url matches (?P<url>"[^"]+")$/
+     */
+    public function iShouldNotSeeLinkWithUrl($text, $url)
+    {
+        $link = $this->elementFactory->findElementContains('Link', $text);
+        self::assertNotRegExp($url, $link->getAttribute('href'));
+    }
+
+    /**
      * Example: And I should see "My Link" button with attributes:
      *            | title | Button title |
      *            | alt   | Button alt   |
