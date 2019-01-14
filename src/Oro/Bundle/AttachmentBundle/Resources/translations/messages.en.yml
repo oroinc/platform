@@ -17,7 +17,8 @@ oro:
         enabled:              Enable attachments
         maxsize:              Max allowed file size, Mb
         mimetypes:            Allowed MIME types
-        mimetypes.tooltip:    'The format of MIME types must follow the examples: application/pdf, image/*'
+        mimetypes.tooltip:    The list of allowed MIME types.
+        mimetypes.placeholder: Please select MIME type...
 
         max_size.tooltip:     Max allowed file size to upload in MB.
         thumb_width.tooltip:  Thumbnail width in pixels.
@@ -47,7 +48,7 @@ oro:
                 description:         The size of a file in bytes.
             mime_type:
                 label:               Mime type
-                description:         A media type and subtype of the file. Allowed MIME types are "image/*", "application/pdf", "application/zip", "application/x-gzip", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation".
+                description:         A media type and subtype of the file.
             content:
                 label:               Content
                 description:         The content of the file as a string.

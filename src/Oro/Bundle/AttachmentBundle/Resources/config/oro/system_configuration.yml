@@ -9,18 +9,21 @@ system_configuration:
     fields:
         oro_attachment.upload_file_mime_types:
             data_type: string
-            type: Symfony\Component\Form\Extension\Core\Type\TextareaType
-            search_type: text
+            type: Oro\Bundle\AttachmentBundle\Form\Type\FileMimeTypeConfigType
             options:
-                label:   oro.attachment.config.upload_file_mime_types.label
+                label: oro.attachment.config.upload_file_mime_types.label
                 tooltip: oro.attachment.config.upload_file_mime_types.tooltip
+                constraints:
+                    - Oro\Bundle\AttachmentBundle\Validator\Constraints\MimeType: { type: file }
+
         oro_attachment.upload_image_mime_types:
             data_type: string
-            type: Symfony\Component\Form\Extension\Core\Type\TextareaType
-            search_type: text
+            type: Oro\Bundle\AttachmentBundle\Form\Type\ImageMimeTypeConfigType
             options:
                 label: oro.attachment.config.upload_image_mime_types.label
                 tooltip: oro.attachment.config.upload_image_mime_types.tooltip
+                constraints:
+                    - Oro\Bundle\AttachmentBundle\Validator\Constraints\MimeType: { type: image }
 
     tree:
         system_configuration:

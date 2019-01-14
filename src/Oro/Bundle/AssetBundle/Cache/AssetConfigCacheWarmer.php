@@ -5,16 +5,16 @@ namespace Oro\Bundle\AssetBundle\Cache;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
- * Cache Warmer for BundlesPathCache.
+ * Cache Warmer for AssetConfigCache.
  */
-class BundlesPathCacheWarmer implements CacheWarmerInterface
+class AssetConfigCacheWarmer implements CacheWarmerInterface
 {
     /**
-     * @var BundlesPathCache
+     * @var AssetConfigCache
      */
     private $cache;
 
-    public function __construct(BundlesPathCache $cache)
+    public function __construct(AssetConfigCache $cache)
     {
         $this->cache = $cache;
     }

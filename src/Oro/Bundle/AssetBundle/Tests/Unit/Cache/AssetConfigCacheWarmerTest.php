@@ -2,26 +2,26 @@
 
 namespace Oro\Bundle\AssetBundle\Tests\Unit\Cache;
 
-use Oro\Bundle\AssetBundle\Cache\BundlesPathCache;
-use Oro\Bundle\AssetBundle\Cache\BundlesPathCacheWarmer;
+use Oro\Bundle\AssetBundle\Cache\AssetConfigCache;
+use Oro\Bundle\AssetBundle\Cache\AssetConfigCacheWarmer;
 use PHPUnit\Framework\TestCase;
 
-class BundlesPathCacheWarmerTest extends TestCase
+class AssetConfigCacheWarmerTest extends TestCase
 {
     /**
-     * @var BundlesPathCache
+     * @var AssetConfigCache
      */
     private $cache;
 
     /**
-     * @var BundlesPathCacheWarmer
+     * @var AssetConfigCacheWarmer
      */
     private $warmer;
 
     protected function setUp()
     {
-        $this->cache = $this->createMock(BundlesPathCache::class);
-        $this->warmer = new BundlesPathCacheWarmer($this->cache);
+        $this->cache = $this->createMock(AssetConfigCache::class);
+        $this->warmer = new AssetConfigCacheWarmer($this->cache);
     }
 
     public function testIsOptional()

@@ -1539,9 +1539,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Then I should see First test group in grid
      *
      * @Then /^(?:|I )should see (?P<recordName>(?:[^"]|\\")*) in grid$/
-     * @Then /^(?:|I )should see (?P<recordName>(?:[^"]|\\")*) in grid "(?P<gridName>[^"]+)$"/
+     * @Then /^(?:|I )should see (?P<recordName>(?:[^"]|\\")*) in grid "(?P<gridName>[^"]+)"$/
      * @Then /^(?:|I )should see "(?P<recordName>(?:[^"]|\\")*)" in grid$/
-     * @Then /^(?:|I )should see "(?P<recordName>(?:[^"]|\\")*)" in grid "(?P<gridName>[^"]+)$"/
+     * @Then /^(?:|I )should see "(?P<recordName>(?:[^"]|\\")*)" in grid "(?P<gridName>[^"]+)"$/
      */
     public function iShouldSeeRecordInGrid($recordName, $gridName = null)
     {

@@ -14,11 +14,8 @@ parameters:
     oro_entity.event_listener.entity_modify_created_updated_properties_listener.class: Oro\Bundle\EntityBundle\EventListener\ModifyCreatedAndUpdatedPropertiesListener
     oro_entity.exclusion_provider.config.class:                                        Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
     oro_entity.exclusion_provider.chain.class:                                         Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
-    oro_entity.dictionary_value_list_provider.class:                                   Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider
     oro_entity.virtual_relation_provider.config.class:                                 Oro\Bundle\EntityBundle\Provider\ConfigVirtualRelationProvider
-    oro_entity.virtual_relation_provider.chain.class:                                  Oro\Bundle\EntityBundle\Provider\ChainVirtualRelationProvider
     oro_entity.virtual_field_provider.class:                                           Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider
-    oro_entity.virtual_field_provider.chain.class:                                     Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
     oro_entity.virtual_field_provider.dictionary.class:                                Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider
     oro_entity.virtual_field_provider.enum.class:                                      Oro\Bundle\EntityBundle\Provider\EnumVirtualFieldProvider
     oro_entity.entity_provider.class:                                                  Oro\Bundle\EntityBundle\Provider\EntityProvider
@@ -32,7 +29,6 @@ parameters:
     oro_entity.entity_alias_config_bag.class:                Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag
     oro_entity.entity_alias_provider.class:                  Oro\Bundle\EntityBundle\Provider\EntityAliasProvider
     oro_entity.entity_class_name_helper.class:               Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper
-    oro_entity.entity_name_resolver.class:                   Oro\Bundle\EntityBundle\Provider\EntityNameResolver
     oro_entity.entity_class_name_provider.default.class:     Oro\Bundle\EntityBundle\Provider\EntityClassNameProvider
     oro_entity.dictionary_value_list_provider.default.class: Oro\Bundle\EntityBundle\Provider\DictionaryValueListProvider
     oro_entity.orm.mapping.additional_metadata_provider.class: Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider
@@ -155,7 +151,10 @@ services:
             - { name: oro_entity.exclusion_provider.api, priority: 50 }
 
     oro_entity.virtual_field_provider.chain:
-        class: '%oro_entity.virtual_field_provider.chain.class%'
+        class: Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
+        arguments:
+            - [] # providers. Set by Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualFieldProvidersCompilerPass
+            - '@oro_entity_config.provider.extend'
 
     oro_entity.virtual_field_provider:
         class: '%oro_entity.virtual_field_provider.class%'
@@ -185,7 +184,10 @@ services:
             - { name: oro_entity.virtual_field_provider, priority: 100 }
 
     oro_entity.virtual_relation_provider.chain:
-        class: '%oro_entity.virtual_relation_provider.chain.class%'
+        class: Oro\Bundle\EntityBundle\Provider\ChainVirtualRelationProvider
+        arguments:
+            - [] # providers. Set by Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualRelationProvidersCompilerPass
+            - '@oro_entity_config.provider.extend'
 
     oro_entity.virtual_relation_provider.config:
         class: '%oro_entity.virtual_relation_provider.config.class%'
@@ -323,8 +325,9 @@ services:
             - '@oro_entity.entity_alias_resolver'
 
     oro_entity.entity_name_resolver:
-        class: '%oro_entity.entity_name_resolver.class%'
+        class: Oro\Bundle\EntityBundle\Provider\EntityNameResolver
         arguments:
+            - !tagged oro_entity.name_provider
             - '%oro_entity.entity_name_format.default%'
             - '%oro_entity.entity_name_formats%'
 
@@ -385,8 +388,10 @@ services:
             - '@doctrine.orm.default_metadata_cache'
 
     oro_entity.dictionary_value_list_provider:
-        class: '%oro_entity.dictionary_value_list_provider.class%'
+        class: Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider
         public: false
+        arguments:
+            - !tagged oro_entity.dictionary_value_list_provider
 
     oro_entity.routing.options_resolver.dictionary_entity:
         class: Oro\Bundle\EntityBundle\Routing\DictionaryEntityRouteOptionsResolver

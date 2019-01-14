@@ -54,6 +54,15 @@ services:
         class: Oro\Bundle\AttachmentBundle\Validator\ProtocolValidator
         public: false
 
+    oro_attachment.mime_type_validator:
+        class: Oro\Bundle\AttachmentBundle\Validator\Constraints\MimeTypeValidator
+        public: false
+        arguments:
+            - '%oro_attachment.upload_file_mime_types%'
+            - '%oro_attachment.upload_image_mime_types%'
+        tags:
+            - { name: validator.constraint_validator }
+
     oro_attachment.liip_imagine.binary.factory.guess_mime_type:
         class: 'Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\GuessMimeType\GuessMimeTypeByFileContextFactory'
         arguments:

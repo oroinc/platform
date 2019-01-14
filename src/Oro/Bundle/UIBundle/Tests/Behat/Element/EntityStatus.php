@@ -7,8 +7,9 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 class EntityStatus extends Element
 {
     private $selectorMap = [
-        'green' => 'status-enabled',
-        'gray'  => 'status-disabled'
+        'green'   => 'badge-enabled',
+        'gray'    => 'badge-disabled',
+        'yellow'  => 'badge-tentatively',
     ];
 
     /**
