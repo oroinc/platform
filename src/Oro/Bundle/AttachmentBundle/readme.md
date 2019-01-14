@@ -8,7 +8,25 @@ In the system configuration, under `General Setup > Upload settings`, a user can
 
 Each mime type should be set from a new line.
 
-Additionally, you can define mime types templates. For example, the `image/*` mime record supports all image file types.
+User can set only available mime types from configuration.
+
+To add or remove available mime types, add changes to the `upload_file_mime_types` section and `upload_image_mime_types` in the config.yml file:
+
+```yml
+oro_attachment:
+    upload_file_mime_types:
+        - application/msword
+        - application/vnd.ms-excel
+        - application/pdf
+        - application/zip
+        - image/gif
+        - image/jpeg
+        - image/png
+    upload_image_mime_types:
+        - image/gif
+        - image/jpeg
+        - image/png
+```
 
 ## File Type
 
