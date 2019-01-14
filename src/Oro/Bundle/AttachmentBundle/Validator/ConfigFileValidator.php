@@ -6,8 +6,8 @@ use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints\File as FileConstraint;
 
+use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager as Configuration;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -95,11 +95,6 @@ class ConfigFileValidator
      */
     protected function getMimeArray($mimeString)
     {
-        $mimeTypes = explode("\n", $mimeString);
-        if (count($mimeTypes) === 1 && $mimeTypes[0] === '') {
-            return [];
-        }
-
-        return $mimeTypes;
+        return MimeTypesConverter::convertToArray($mimeString);
     }
 }

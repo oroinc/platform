@@ -8,7 +8,23 @@ In system configuration where is block `Upload settings`. In this block user can
 
 Delimiter between each mime type is new line.
 
-Additional you can set mime types templates. For example, mime record `image/*` will support all images file types.
+To add or remove available mime types, add changes to the `upload_file_mime_types` section and `upload_image_mime_types` in the config.yml file:
+
+```yml
+oro_attachment:
+    upload_file_mime_types:
+        - application/msword
+        - application/vnd.ms-excel
+        - application/pdf
+        - application/zip
+        - image/gif
+        - image/jpeg
+        - image/png
+    upload_image_mime_types:
+        - image/gif
+        - image/jpeg
+        - image/png
+```
 
 ## File type
 

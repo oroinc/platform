@@ -3,10 +3,14 @@
 namespace Oro\Bundle\AttachmentBundle\Migration;
 
 use Doctrine\DBAL\Types\Type;
+use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * The migration query that allows to update image MIME types config with new values.
+ */
 class SetAllowedMimeTypesForImageFieldQuery extends ParametrizedMigrationQuery
 {
     /**
@@ -68,7 +72,7 @@ class SetAllowedMimeTypesForImageFieldQuery extends ParametrizedMigrationQuery
             $id = $row['id'];
             $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
             if (!isset($data['attachment']['mimetypes'])) {
-                $data['attachment']['mimetypes'] = implode("\n", $this->mimeTypes);
+                $data['attachment']['mimetypes'] = MimeTypesConverter::convertToString($this->mimeTypes);
                 $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
 
                 $this->updateEntityConfigField($id, $data, $logger, $dryRun);
