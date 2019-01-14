@@ -36,16 +36,17 @@ entity_config:
                             association_class: 'OroAttachmentBundle:Attachment'
 
                 # the list of all allowed MIME types for attachments
-                mimetypes: # string (actually MIME types are delimited by \n symbol)
+                mimetypes: # string (MIME types are delimited by linefeed (\n) symbol)
                     options:
                         priority:           80
+                    constraints:
+                        - Oro\Bundle\AttachmentBundle\Validator\Constraints\MimeType: ~
                     form:
-                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextAssociationPropertyType
+                        type:               Oro\Bundle\AttachmentBundle\Form\Type\FileMimeTypeConfigType
                         options:
                             block:          attachments
                             required:       false
                             label:          oro.attachment.mimetypes
-                            association_class: 'OroAttachmentBundle:Attachment'
                             tooltip:        oro.attachment.mimetypes.tooltip
 
                 # this attribute can be used to prohibit changing the attachment association state (no matter whether
@@ -123,14 +124,15 @@ entity_config:
                             empty_data:     32
                             tooltip:        oro.attachment.thumb_height.tooltip
 
-                # the list of all allowed MIME types for attachments
-                mimetypes:
+                # the list of all allowed MIME types
+                mimetypes: # string (MIME types are delimited by linefeed (\n) symbol)
+                    constraints:
+                        - Oro\Bundle\AttachmentBundle\Validator\Constraints\MimeType: ~
                     form:
-                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextAssociationPropertyType
+                        type:               Oro\Bundle\AttachmentBundle\Form\Type\FileMimeTypeConfigType
                         options:
                             block:          general
                             subblock:       properties
                             required:       false
                             label:          oro.attachment.mimetypes
-                            association_class: 'OroAttachmentBundle:Attachment'
                             tooltip:        oro.attachment.mimetypes.tooltip

@@ -2,17 +2,18 @@
 
 namespace Oro\Bundle\AttachmentBundle\Migration;
 
+use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
 /**
- * This class allows to update global image mime types config with new values
+ * The migration query that allows to update global image MIME types config with new values.
  */
 class GlobalAppendAllowedMimeTypesForImageQuery extends ParametrizedMigrationQuery
 {
-    const IMAGE_CONFIG_NAME = 'upload_image_mime_types';
-    const CONFIG_SECTION = 'oro_attachment';
+    private const IMAGE_CONFIG_NAME = 'upload_image_mime_types';
+    private const CONFIG_SECTION = 'oro_attachment';
 
     /**
      * @param array $mimeTypes
@@ -54,9 +55,13 @@ class GlobalAppendAllowedMimeTypesForImageQuery extends ParametrizedMigrationQue
     {
         foreach ($this->fetchConfigRows($logger) as $row) {
             $id = $row['id'];
-            $existingMimeTypes = !empty($row['text_value']) ? explode("\r\n", $row['text_value']) : [];
+            $existingMimeTypes = empty($row['text_value'])
+                ? []
+                : MimeTypesConverter::convertToArray($row['text_value']);
             // we must store client`s already added custom mime types + our new types without duplicates.
-            $updatedMimeTypes = implode("\r\n", array_unique(array_merge($existingMimeTypes, $this->mimeTypes)));
+            $updatedMimeTypes = MimeTypesConverter::convertToString(
+                array_unique(array_merge($existingMimeTypes, $this->mimeTypes))
+            );
             $this->updateConfigValue($id, $updatedMimeTypes, $logger, $dryRun);
         }
     }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\DependencyInjection;
 
+use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -14,42 +15,47 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root('oro_attachment');
+        $rootNode = $treeBuilder->root('oro_attachment');
         $rootNode
             ->children()
                 ->booleanNode('debug_images')
                     ->defaultTrue()
                 ->end()
+                ->arrayNode('upload_file_mime_types')
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
+                ->arrayNode('upload_image_mime_types')
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
             ->end();
-
-        /**
-         * See file types list -> http://www.freeformatter.com/mime-types-list.html
-         */
-        $mimeTypes
-            = <<<EOF
-application/msword
-application/vnd.ms-excel
-application/pdf
-application/zip
-image/gif
-image/jpeg
-image/png
-EOF;
-        $mimeTypesImage
-            = <<<EOF
-image/gif
-image/jpeg
-image/png
-image/svg+xml
-EOF;
 
         SettingsBuilder::append(
             $rootNode,
             [
-                'upload_file_mime_types'  => ['value' => $mimeTypes],
-                'upload_image_mime_types' => ['value' => $mimeTypesImage]
+                'upload_file_mime_types'  => ['value' => null],
+                'upload_image_mime_types' => ['value' => null]
             ]
         );
+
+        $rootNode
+            ->validate()
+                ->always(function ($v) {
+                    if (null === $v['settings']['upload_file_mime_types']['value']) {
+                        $v['settings']['upload_file_mime_types']['value'] = MimeTypesConverter::convertToString(
+                            $v['upload_file_mime_types']
+                        );
+                    }
+                    if (null === $v['settings']['upload_image_mime_types']['value']) {
+                        $v['settings']['upload_image_mime_types']['value'] = MimeTypesConverter::convertToString(
+                            $v['upload_image_mime_types']
+                        );
+                    }
+
+                    return $v;
+                })
+            ->end();
 
         return $treeBuilder;
     }

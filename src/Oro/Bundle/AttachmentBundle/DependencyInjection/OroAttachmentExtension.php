@@ -24,6 +24,8 @@ class OroAttachmentExtension extends Extension
         $loader->load('form.yml');
 
         $container->setParameter('oro_attachment.debug_images', $config['debug_images']);
+        $container->setParameter('oro_attachment.upload_file_mime_types', $config['upload_file_mime_types']);
+        $container->setParameter('oro_attachment.upload_image_mime_types', $config['upload_image_mime_types']);
 
         $yaml  = new Parser();
         $value = $yaml->parse(file_get_contents(__DIR__ . '/../Resources/config/files.yml'));

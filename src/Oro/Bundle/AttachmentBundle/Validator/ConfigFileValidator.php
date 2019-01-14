@@ -2,25 +2,27 @@
 
 namespace Oro\Bundle\AttachmentBundle\Validator;
 
+use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager as Configuration;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Validator\Constraints\File as FileConstraint;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * The validator that can be used to check that a file is allowed to be uploaded.
+ */
 class ConfigFileValidator
 {
     /** @var ValidatorInterface */
-    protected $validator;
+    private $validator;
+
+    /** @var ConfigManager */
+    private $configManager;
 
     /** @var Configuration */
-    protected $config;
-
-    /** @var ConfigProvider */
-    protected $attachmentConfigProvider;
+    private $config;
 
     /**
      * @param ValidatorInterface $validator
@@ -29,75 +31,46 @@ class ConfigFileValidator
      */
     public function __construct(ValidatorInterface $validator, ConfigManager $configManager, Configuration $config)
     {
-        $this->validator                = $validator;
-        $this->attachmentConfigProvider = $configManager->getProvider('attachment');
-        $this->config                   = $config;
+        $this->validator = $validator;
+        $this->configManager = $configManager;
+        $this->config = $config;
     }
 
     /**
      * @param ComponentFile $file      A file object to be validated
-     * @param string        $dataClass Parent entity class name
-     * @param string        $fieldName Field name where new file/image field was added
+     * @param string        $dataClass The FQCN of a parent entity
+     * @param string        $fieldName The name of file/image field
      *
-     * @return \Symfony\Component\Validator\ConstraintViolationListInterface
+     * @return ConstraintViolationListInterface
      */
     public function validate($file, $dataClass, $fieldName = '')
     {
-        /** @var Config $entityAttachmentConfig */
         if ($fieldName === '') {
-            $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass);
-            $mimeTypes              = $this->getMimeArray($entityAttachmentConfig->get('mimetypes'));
+            $config = $this->configManager->getEntityConfig('attachment', $dataClass);
+            $mimeTypes = MimeTypesConverter::convertToArray($config->get('mimetypes'));
             if (!$mimeTypes) {
-                $mimeTypes = array_merge(
-                    $this->getMimeArray($this->config->get('oro_attachment.upload_file_mime_types')),
-                    $this->getMimeArray($this->config->get('oro_attachment.upload_image_mime_types'))
-                );
+                $mimeTypes = array_unique(array_merge(
+                    MimeTypesConverter::convertToArray($this->config->get('oro_attachment.upload_file_mime_types')),
+                    MimeTypesConverter::convertToArray($this->config->get('oro_attachment.upload_image_mime_types'))
+                ));
             }
         } else {
-            $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass, $fieldName);
-            $mimeTypes = $this->getMimeArray($entityAttachmentConfig->get('mimetypes'));
+            $config = $this->configManager->getFieldConfig('attachment', $dataClass, $fieldName);
+            $mimeTypes = MimeTypesConverter::convertToArray($config->get('mimetypes'));
             if (!$mimeTypes) {
-                /** @var FieldConfigId $fieldConfigId */
-                $fieldConfigId = $entityAttachmentConfig->getId();
-                if ($fieldConfigId->getFieldType() === 'file') {
-                    $configValue = 'upload_file_mime_types';
-                } else {
-                    $configValue = 'upload_image_mime_types';
-                }
-                $mimeTypes = $this->getMimeArray($this->config->get('oro_attachment.' . $configValue));
+                $configKey = sprintf('oro_attachment.upload_%s_mime_types', $config->getId()->getFieldType());
+                $mimeTypes = MimeTypesConverter::convertToArray($this->config->get($configKey));
             }
         }
 
-        $fileSize = $entityAttachmentConfig->get('maxsize') * 1024 * 1024;
-
-        foreach ($mimeTypes as $id => $value) {
-            $mimeTypes[$id] = trim($value);
+        $maxFileSize = $config->get('maxsize');
+        if (null !== $maxFileSize) {
+            $maxFileSize *= 1024 * 1024;
         }
 
         return $this->validator->validate(
             $file,
-            [
-                new FileConstraint(
-                    [
-                        'maxSize'   => $fileSize,
-                        'mimeTypes' => $mimeTypes
-                    ]
-                )
-            ]
+            [new FileConstraint(['maxSize' => $maxFileSize, 'mimeTypes' => $mimeTypes])]
         );
-    }
-
-    /**
-     * @param string $mimeString
-     * @return array
-     */
-    protected function getMimeArray($mimeString)
-    {
-        $mimeTypes = explode("\n", $mimeString);
-        if (count($mimeTypes) === 1 && $mimeTypes[0] === '') {
-            return [];
-        }
-
-        return $mimeTypes;
     }
 }

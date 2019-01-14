@@ -1,0 +1,7 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\NotificationBundle\Provider\EmailNotificationGridHelper:
+            getEntityChoices:
+                select: true
+                entity: true
