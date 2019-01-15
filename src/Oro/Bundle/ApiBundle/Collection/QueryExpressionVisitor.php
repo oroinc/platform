@@ -12,6 +12,7 @@ use Doctrine\ORM\Query\QueryException;
 
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionInterface;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\CompositeExpressionInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * This expression visitor was created to be able to add custom composite and comparison expressions.
@@ -151,6 +152,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
         }
 
         $fieldName = $this->getFieldName($comparison->getField());
+        QueryBuilderUtil::checkPath($fieldName);
 
         if ('i' === $modifier) {
             $fieldName = sprintf('LOWER(%s)', $fieldName);

@@ -405,6 +405,20 @@ class QueryBuilderUtil
     }
 
     /**
+     * Check that passed path is safe for usage in dynamic DQL. Path may be in format (?alias.)field(.?field)...
+     *
+     * @param string $str
+     * @throws \InvalidArgumentException
+     */
+    public static function checkPath($str)
+    {
+        $items = explode('.', $str);
+        foreach ($items as $item) {
+            self::checkIdentifier($item);
+        }
+    }
+
+    /**
      * Check that passed parameter is safe for usage in dynamic DQL
      *
      * @param string $str

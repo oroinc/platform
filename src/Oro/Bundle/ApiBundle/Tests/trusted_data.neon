@@ -20,6 +20,8 @@ trusted_data:
                 parentAlias: true
                 parentJoinAlias: true
                 associationName: true
+            walkComparison:
+                comparison: true
 
     safe_methods:
         Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery:

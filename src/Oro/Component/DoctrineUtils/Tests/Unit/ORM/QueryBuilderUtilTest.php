@@ -502,6 +502,53 @@ class QueryBuilderUtilTest extends OrmTestCase
         QueryBuilderUtil::checkIdentifier($invalid);
     }
 
+    public function testCheckPathForValidFieldWithoutAlias()
+    {
+        QueryBuilderUtil::checkPath('tEs_T_01a');
+    }
+
+    public function testCheckPathForValidFieldWithAlias()
+    {
+        QueryBuilderUtil::checkPath('tEs_T_01a.tEs_T_01a');
+    }
+
+    public function testCheckPathForValidNestedField()
+    {
+        QueryBuilderUtil::checkPath('tEs_T_01a.tEs_T_01a.tEs_T_01a');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCheckPathForInvalidFieldWithoutAlias()
+    {
+        QueryBuilderUtil::checkPath('0_some//');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCheckPathForInvalidAliasPart()
+    {
+        QueryBuilderUtil::checkPath('0_some//.field');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCheckPathForInvalidFieldPart()
+    {
+        QueryBuilderUtil::checkPath('alias.0_some//');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCheckPathForInvalidNestedFieldPart()
+    {
+        QueryBuilderUtil::checkPath('alias.field.0_some//');
+    }
+
     public function testGetFieldValid()
     {
         $this->assertEquals('a0_.Field0', QueryBuilderUtil::getField('a0_', 'Field0'));
