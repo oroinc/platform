@@ -432,7 +432,12 @@ class ImapEmailManager
      */
     protected function getReceivedAt(Headers $headers)
     {
+        // Some messages do not contain Received header (e.g. from Sent folder)
         $val = $headers->get('Received');
+        if (false === $val) {
+            return $this->getDateTime($headers, 'Date');
+        }
+
         $str = '';
         if ($val instanceof HeaderInterface) {
             $str = $val->getFieldValue();
@@ -442,7 +447,7 @@ class ImapEmailManager
         }
 
         $delim = strrpos($str, ';');
-        if ($delim !== false) {
+        if (false !== $delim) {
             $str = trim(preg_replace('@[\r\n]+@', '', substr($str, $delim + 1)));
 
             return $this->convertToDateTime($str);
