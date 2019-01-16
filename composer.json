@@ -17,7 +17,7 @@
         "ext-xml": "*",
         "ext-zip": "*",
         "ext-openssl": "*",
-        "symfony/symfony": "~3.4.20",
+        "symfony/symfony": "3.4.20",
         "symfony/security-acl": "~3.0.0",
         "twig/twig": "1.35.*",
         "doctrine/orm": "2.6.*",
