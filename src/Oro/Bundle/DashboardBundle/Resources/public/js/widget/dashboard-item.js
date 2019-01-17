@@ -84,6 +84,9 @@ define([
             this.options.templateParams.collapsed = options.state.expanded;
             this.options.templateParams.showConfig = this.options.showConfig;
 
+            this.options.templateParams.headerClass = this.options.widgetName
+                ? this.options.widgetName.split('_').join('-') + '-widget-header' : '';
+
             if (!this.options.title) {
                 this.options.title = this.$el.data('widget-title');
             }
