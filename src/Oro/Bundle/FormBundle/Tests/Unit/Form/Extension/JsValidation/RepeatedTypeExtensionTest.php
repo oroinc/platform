@@ -72,9 +72,6 @@ class RepeatedTypeExtensionTest extends \PHPUnit\Framework\TestCase
                         'attr' => array(
                             'data-validation' => json_encode(
                                 array(
-                                    'NotBlank' => array(
-                                        'payload' => null
-                                    ),
                                     'Repeated' => array(
                                         'first_name' => 'first',
                                         'second_name' => 'second',
@@ -121,9 +118,6 @@ class RepeatedTypeExtensionTest extends \PHPUnit\Framework\TestCase
                         'attr' => array(
                             'data-validation' => json_encode(
                                 array(
-                                    'NotBlank' => array(
-                                        'payload' => null
-                                    ),
                                     'Repeated' => array(
                                         'first_name' => 'first',
                                         'second_name' => 'second',
