@@ -66,7 +66,10 @@ class DbalMessageQueueProcessor implements MessageQueueProcessorInterface
             }
         }
 
-        throw new \RuntimeException('Message Queue was not process messages during time limit');
+        throw new \RuntimeException(sprintf(
+            'The message queue has not been able to finish processing messages within the last %d seconds.',
+            $timeLimit
+        ));
     }
 
     /**
