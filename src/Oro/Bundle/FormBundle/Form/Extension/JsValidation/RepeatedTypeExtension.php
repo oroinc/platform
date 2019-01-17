@@ -24,7 +24,7 @@ class RepeatedTypeExtension extends AbstractTypeExtension
 
         $secondValue = array();
 
-        if ($options['required']) {
+        if (isset($options['required']) && $options['required']) {
             $secondValue['NotBlank'] = array(
                 'payload' => null
             );
