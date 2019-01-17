@@ -36,6 +36,16 @@ class ThemeProvider
 
     /**
      * @param string $themeName
+     *
+     * @return string
+     */
+    public function getLogo($themeName)
+    {
+        return $this->getTheme($themeName)->getLogo();
+    }
+
+    /**
+     * @param string $themeName
      * @param string $sectionName
      *
      * @return string|null
