@@ -245,9 +245,11 @@ define(function(require) {
 
     // Override methods of AbstractSelect2 class
     (function(prototype) {
+        var select2SearchName = _.uniqueId('select2searchname');
         var select2DropBelowClassName = 'select2-drop-below';
         var positionDropdown = prototype.positionDropdown;
         var close = prototype.close;
+        var open = prototype.open;
         var prepareOpts = prototype.prepareOpts;
         var init = prototype.init;
         var destroy = prototype.destroy;
@@ -280,9 +282,17 @@ define(function(require) {
             }
         };
 
+        prototype.open = function() {
+            // Add unique name for select2 search for disabling auto-fill, auto-complete functions.
+            this.search.attr('name', select2SearchName);
+            return open.apply(this, arguments);
+        };
+
         prototype.close = function() {
             close.apply(this, arguments);
             this.container.parent().removeClass(select2DropBelowClassName);
+            // Remove previously auto generated name
+            this.search.removeAttr('name');
         };
 
         prototype.init = function() {
@@ -296,6 +306,15 @@ define(function(require) {
                 e.stopPropagation();
             }, this));
             this.dropdown.prepend(this.breadcrumbs);
+            this.search
+                .on('focus', function() {
+                    // Add unique name for select2 search for disabling auto-fill, auto-complete functions.
+                    this.search.attr('name', select2SearchName);
+                }.bind(this))
+                .on('blur', function() {
+                    // Remove previously auto generated name
+                    this.search.removeAttr('name');
+                }.bind(this));
         };
 
         prototype.destroy = function() {
@@ -304,6 +323,8 @@ define(function(require) {
                 delete this.propertyObserver;
                 this.propertyObserver = null;
             }
+            // Remove previously auto generated name
+            this.search.removeAttr('name');
             destroy.call(this);
         };
 
