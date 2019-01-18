@@ -7,6 +7,13 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Create Repeated type for validation password fields
+ * Add NotBlank validation rule for second field
+ * Class RepeatedTypeExtension
+ *
+ * @package Oro\Bundle\FormBundle\Form\Extension\JsValidation
+ */
 class RepeatedTypeExtension extends AbstractTypeExtension
 {
     /**
