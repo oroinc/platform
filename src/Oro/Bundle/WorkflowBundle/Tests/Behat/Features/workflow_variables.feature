@@ -27,10 +27,10 @@ Feature: Workflow variables
     When I go to System/ Workflows
     And I click "Configuration" on row "Test Workflow" in grid
     And I fill form with:
-      | count         | 100000                                             |
-      | user          | User2 First Name User2 Last Name user2@example.com |
-      | guest         | User1 First Name User1 Last Name user1@example.com |
-      | Test Bool Var | false                                              |
+      | count         | 100000 |
+      | user          | user2  |
+      | guest         | user1  |
+      | Test Bool Var | false  |
     And I save and close form
     Then I should see "Workflow configuration successfully updated" flash message
 
