@@ -325,7 +325,9 @@ select[multiple] {
     }
 
     .error & {
-        border-color: $input-error-border-color;
+        &:not(.btn-square-light):not(.btn-square-lighter) {
+            border-color: $input-error-border-color;
+        }
     }
 
     .input-append & {

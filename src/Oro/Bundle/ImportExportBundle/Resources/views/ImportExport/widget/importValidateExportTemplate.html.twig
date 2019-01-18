@@ -67,7 +67,9 @@
                     {{ 'oro.importexport.import.columns_notice'|trans }}
                     {% if config.importAdditionalNotices is defined %}
                         {% for importAdditionalNotice in config.importAdditionalNotices %}
-                            {{ importAdditionalNotice|nl2br }}
+                            <div>
+                                {{ importAdditionalNotice|nl2br }}
+                            </div>
                         {% endfor %}
                     {% endif %}
                 </div>
@@ -94,10 +96,10 @@
                         <input type="hidden" name="isValidateJob" value="false" />
 
                         <fieldset class="form">
-                            <div class="import-file">
+                            <div class="control-group-container import-file">
                                 {{ form_row(form.file, {'label': 'oro.importexport.import.file'}) }}
                             </div>
-                            <div {% if form.processorAlias.vars.choices|length <= 1 %}style="display: none;"{% endif %}>
+                            <div class="control-group-container" {% if form.processorAlias.vars.choices|length <= 1 %}style="display: none;"{% endif %}>
                                 {{ form_row(form.processorAlias, {
                                     'label': 'oro.importexport.import.strategy',
                                     'tooltip': strategyTooltip

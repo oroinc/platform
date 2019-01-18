@@ -77,9 +77,12 @@ class AmqpMessageQueueProcessor implements MessageQueueProcessorInterface
             }
         }
 
-        $message = 'Message Queue was not process messages during time limit.';
+        $message = sprintf(
+            'The message queue has not been able to finish processing messages within the last %d seconds.',
+            $timeLimit
+        );
         $message .= sprintf(
-            ' Following messages was not consumed: %s',
+            ' The following messages have not been yet consumed: %s',
             implode(', ', array_keys($this->getMessages('send_messages')))
         );
 
