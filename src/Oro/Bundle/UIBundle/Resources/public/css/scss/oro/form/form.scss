@@ -70,6 +70,10 @@
     line-height: $uploader-line-height;
     font-family: $uploader-font-family;
 
+    @at-root div#{&} {
+        display: $uploader-display;
+    }
+
     input {
         width: $uploader-input-inner-width;
     }
@@ -86,6 +90,7 @@
     .filename {
         padding: side-values($uploader-filename-inner-offset);
         @include text-line-truncate($uploader-filename-width);
+        flex-grow: 1;
     }
 
     .action {

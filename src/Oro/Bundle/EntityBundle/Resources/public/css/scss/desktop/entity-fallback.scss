@@ -14,7 +14,9 @@
         }
 
         &__line {
-            width: 100%;
+            max-width: 75%;
+            min-width: 65%;
+            flex-grow: 1;
             margin-top: 0;
         }
     }
