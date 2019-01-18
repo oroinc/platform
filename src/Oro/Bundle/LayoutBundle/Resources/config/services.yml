@@ -121,6 +121,16 @@ services:
             - { name: requirejs.config_provider, alias: oro_layout_requirejs_config_provider }
         lazy: true
 
+    oro_layout.provider.no_image_file:
+        class: Oro\Bundle\LayoutBundle\Provider\NoImageFileProvider
+        arguments:
+            - '@oro_layout.layout_context_holder'
+            - '@oro_layout.theme_manager'
+            - '@oro_config.manager'
+            - '@oro_entity.doctrine_helper'
+            - '@liip_imagine.cache.manager'
+            - '@oro_attachment.manager'
+
     oro_layout.helper:
         class: Oro\Bundle\LayoutBundle\Request\LayoutHelper
         arguments:

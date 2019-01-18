@@ -19,6 +19,9 @@ class Theme
     protected $icon;
 
     /** @var string */
+    protected $noImage;
+
+    /** @var string */
     protected $logo;
 
     /** @var string */
@@ -107,6 +110,22 @@ class Theme
     public function setIcon($icon)
     {
         $this->icon = $icon;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNoImage()
+    {
+        return $this->noImage;
+    }
+
+    /**
+     * @param string $noImage
+     */
+    public function setNoImage($noImage)
+    {
+        $this->noImage = $noImage;
     }
 
     /**

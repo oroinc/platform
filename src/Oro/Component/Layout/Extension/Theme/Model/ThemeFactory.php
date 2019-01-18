@@ -40,6 +40,9 @@ class ThemeFactory implements ThemeFactoryInterface
         if (isset($themeDefinition['icon'])) {
             $theme->setIcon($themeDefinition['icon']);
         }
+        if (isset($themeDefinition['no_image'])) {
+            $theme->setNoImage($themeDefinition['no_image']);
+        }
         if (isset($themeDefinition['logo'])) {
             $theme->setLogo($themeDefinition['logo']);
         }

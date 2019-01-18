@@ -46,6 +46,16 @@ class ThemeProvider
 
     /**
      * @param string $themeName
+     *
+     * @return string
+     */
+    public function getNoImage($themeName)
+    {
+        return $this->getTheme($themeName)->getNoImage();
+    }
+
+    /**
+     * @param string $themeName
      * @param string $sectionName
      *
      * @return string|null
