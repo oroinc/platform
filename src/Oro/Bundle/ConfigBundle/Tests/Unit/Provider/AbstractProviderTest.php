@@ -254,6 +254,22 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
                 'method'    => 'getTree',
                 'arguments' => []
             ],
+            'bad field required without constraints' => [
+                'filename'  => 'bad_field_required_without_constraints.yml',
+                'exception' => InvalidConfigurationException::class,
+                'message'   => 'Invalid configuration for path "system_configuration.fields.some_field": ' .
+                    'The "constraints" option is required when field is required.',
+                'method'    => 'getTree',
+                'arguments' => []
+            ],
+            'bad_field_not_required_with_not_blank_constraint' => [
+                'filename'  => 'bad_field_not_required_with_not_blank_constraint.yml',
+                'exception' => InvalidConfigurationException::class,
+                'message'   => 'Invalid configuration for path "system_configuration.fields.some_field": ' .
+                    'Field must be required when field has NotBlank constraint.',
+                'method'    => 'getTree',
+                'arguments' => []
+            ],
             'bad group definition' => [
                 'filename'  => 'bad_group_definition.yml',
                 'exception' => ItemNotFoundException::class,

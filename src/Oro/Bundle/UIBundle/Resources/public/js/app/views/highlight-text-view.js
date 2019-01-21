@@ -63,6 +63,11 @@ define(function(require) {
         /**
          * @property {String}
          */
+        alwaysDisplaySelector: '.validation-error',
+
+        /**
+         * @property {String}
+         */
         replaceBy: '',
 
         /**
@@ -192,7 +197,7 @@ define(function(require) {
                 return;
             }
 
-            if (this.isElementHighlighted($el)) {
+            if (this.isElementHighlighted($el) || $el.find(this.alwaysDisplaySelector).length > 0) {
                 $el.addClass(this.foundClass);
                 return;
             }

@@ -106,7 +106,7 @@ class SystemConfigForm extends Form
      * @param string $name
      * @return bool
      */
-    private function isUseDefaultCheckboxExists($label, $name = 'Use default')
+    public function isUseDefaultCheckboxExists($label, $name = 'Use default')
     {
         $container = $this->getContainer($label);
 

@@ -24,7 +24,8 @@ define(function(require) {
 
         events: {
             'click :input[type=reset]': 'resetHandler',
-            'submit': 'submitHandler'
+            'submit': 'submitHandler',
+            'change .parent-scope-checkbox :input[type=checkbox]': 'onDefaultCheckboxStateChange'
         },
 
         /**
@@ -66,6 +67,22 @@ define(function(require) {
             this.options.pageReload = !_.isEmpty(this.changedValues);
         },
 
+        removeValidationErrors: function($field) {
+            var $container = $field.closest('.controls');
+            $container
+                .removeClass('validation-error')
+                .find('.error')
+                .removeClass('error');
+            $container.find('.validation-failed').remove();
+        },
+
+        onDefaultCheckboxStateChange: function(e) {
+            var $checkbox = $(e.target);
+            if ($checkbox.is(':checked')) {
+                this.removeValidationErrors($checkbox);
+            }
+        },
+
         /**
          * Resets form and default value checkboxes.
          *
@@ -81,6 +98,7 @@ define(function(require) {
                     className: 'modal modal-primary'
                 });
 
+            var self = this;
             confirm.on('ok', _.bind(function() {
                 this.$el.get(0).reset();
                 this.$el.find('.select2').each(function(key, elem) {
@@ -98,6 +116,11 @@ define(function(require) {
                     .attr('checked', true);
 
                 this.$el.find(':input').change();
+
+                this.$el.find(':input').each(function() {
+                    var $field = $(this);
+                    self.removeValidationErrors($field);
+                });
             }, this));
 
             confirm.open();

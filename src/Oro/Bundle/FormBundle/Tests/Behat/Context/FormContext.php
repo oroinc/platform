@@ -456,6 +456,32 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * This step used for system configuration field
+     * Example: And I should not see "Use default" for "Position" field
+     *
+     * @Given I should not see :checkbox for :label field
+     */
+    public function shouldNotSeeUseDefaultForField($label, $checkbox)
+    {
+        /** @var SystemConfigForm $form */
+        $form = $this->createElement('SystemConfigForm');
+        self::assertFalse($form->isUseDefaultCheckboxExists($label, $checkbox));
+    }
+
+    /**
+     * This step used for system configuration field
+     * Example: And I should see "Use default" for "Position" field
+     *
+     * @Given I should see :checkbox for :label field
+     */
+    public function shouldSeeUseDefaultForField($label, $checkbox)
+    {
+        /** @var SystemConfigForm $form */
+        $form = $this->createElement('SystemConfigForm');
+        self::assertTrue($form->isUseDefaultCheckboxExists($label, $checkbox));
+    }
+
+    /**
      * @Given /^(?:|I )uncheck "(?P<value>[^"]*)" element$/
      */
     public function iUncheckElement($elementName)
