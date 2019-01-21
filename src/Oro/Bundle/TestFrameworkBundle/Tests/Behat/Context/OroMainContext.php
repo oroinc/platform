@@ -259,8 +259,12 @@ class OroMainContext extends MinkContext implements
      *
      * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message$/
      * @Then /^(?:|I )should see '(?P<title>[^']+)' flash message$/
+     *
+     * @param string $title
+     * @param string $flashMessageElement
+     * @param int $timeLimit
      */
-    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
+    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 30)
     {
         $actualFlashMessages = [];
         /** @var Element|null $flashMessage */

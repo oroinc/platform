@@ -195,12 +195,14 @@ class Select2Entity extends Element implements ClearableInterface
      */
     public function isOpen()
     {
-        return 0 !== count(array_filter(
-            $this->getPage()->findAll('css', '.select2-search'),
-            function (NodeElement $element) {
-                return $element->isVisible();
-            }
-        ));
+        return $this->spin(function () {
+            return 0 !== count(array_filter(
+                $this->getPage()->findAll('css', '.select2-search'),
+                function (NodeElement $element) {
+                    return $element->isVisible();
+                }
+            ));
+        }, 5);
     }
 
     /**
