@@ -24,3 +24,30 @@ oro_behat_extension:
     AttachmentListRow:
       selector: '.attachment-list-row'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    Allowed MIME Types:
+      selector:
+        type: 'xpath'
+        locator: '//select[contains(@name, "oro_entity_config_type[attachment][mimetypes]")]'
+
+    File MIME Types:
+      selector:
+        type: 'xpath'
+        locator: '//select[contains(@name, "oro_attachment___upload_file_mime_types")]'
+
+    Image MIME Types:
+      selector:
+        type: 'xpath'
+        locator: '//select[contains(@name, "oro_attachment___upload_image_mime_types")]'
+
+  suites:
+    OroAttachmentBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroFormBundle::FormContext
+        - OroFormBundle::FeatureContext
+        - OroConfigBundle::FeatureContext
+        - OroDataGridBundle::GridContext
+        - OroSecurityBundle::ACLContext
+      paths:
+        - '@OroAttachmentBundle/Tests/Behat/Features'
