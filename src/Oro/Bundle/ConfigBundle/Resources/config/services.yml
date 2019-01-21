@@ -161,6 +161,12 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
 
+    oro_config.form.configurator.use_default_configurator.abstract:
+        class: Oro\Bundle\ConfigBundle\Form\Configurator\UseDefaultConfigurator
+        abstract: true
+        arguments:
+            - '@oro_config.form.handler.config'
+
     oro_config.configuration_search_provider.chain:
         class: Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider
         public: false

@@ -14,7 +14,7 @@ oro:
 
         controller:
             config.saved.message: "Configuration saved"
-            page.reload.message:  "Please wait for the page to reload"
+            page.reload.message:  "Please wait until page will be reloaded"
 
         system_configuration:
             groups:
