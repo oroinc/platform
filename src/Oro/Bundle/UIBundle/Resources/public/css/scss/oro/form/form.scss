@@ -88,8 +88,9 @@
     }
 
     .filename {
-        padding: side-values($uploader-filename-inner-offset);
         @include text-line-truncate($uploader-filename-width);
+
+        padding: side-values($uploader-filename-inner-offset);
         flex-grow: 1;
     }
 
