@@ -11,12 +11,6 @@
     &__inner {
         .dropdown-menu {
             color: $app-header-dropdown-menu-color;
-
-            .nav-header-title {
-                &:before {
-                    color: $app-header-dropdown-close-icon-color;
-                }
-            }
         }
     }
 
