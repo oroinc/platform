@@ -37,6 +37,17 @@ $theme-fonts: (
                 'style': normal
             )
         )
+    ),
+    'only-bullets': (
+        'family': 'only-bullets',
+        'variants': (
+            (
+                // This font based on 'Lato regular' font.
+                'path': '#{$global-url}/orofrontend/default/fonts/only-bullets/only-bullets-regular',
+                'weight': normal,
+                'style': normal
+            )
+        )
     )
 );
 
@@ -44,6 +55,7 @@ $theme-fonts: (
 $base-font: get-font-name('main'),'Helvetica', Arial, sans-serif;
 $base-font-minor: get-font-name('secondary'),'Helvetica', Arial, sans-serif;
 $base-font-icon: get-font-name('icon');
+$base-font-masked: get-font-name('only-bullets'), 'Helvetica', Arial, sans-serif;
 
 // Fonts sizes
 $base-font-size: 14px;
