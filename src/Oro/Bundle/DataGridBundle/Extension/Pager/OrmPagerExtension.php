@@ -35,6 +35,7 @@ class OrmPagerExtension extends AbstractPagerExtension
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         /** @var OrmDatasource $datasource */
+        $this->pager->setDatagrid($datasource->getDatagrid());
         if ($datasource->getCountQb()) {
             $this->pager->setCountQb($datasource->getCountQb(), $datasource->getCountQueryHints());
         }

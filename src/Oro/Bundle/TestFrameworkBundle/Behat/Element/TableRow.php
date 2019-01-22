@@ -4,9 +4,17 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
 
+/**
+ * Table Row element representation
+ */
 class TableRow extends Element
 {
     const HEADER_ELEMENT = 'TableHeader';
+
+    /**
+     * @var Table
+     */
+    protected $owner;
 
     /**
      * @param int $number Row index number starting from 0
@@ -57,6 +65,22 @@ class TableRow extends Element
         }
 
         return $values;
+    }
+
+    /**
+     * @param Table $owner
+     */
+    public function setOwner(Table $owner)
+    {
+        $this->owner = $owner;
+    }
+
+    /**
+     * @return Table
+     */
+    public function getOwner()
+    {
+        return $this->owner;
     }
 
     /**
@@ -123,8 +147,13 @@ class TableRow extends Element
      */
     private function getColumnNumberByHeader($header)
     {
-        /** @var TableHeader $tableHeader */
-        $tableHeader = $this->elementFactory->createElement(static::HEADER_ELEMENT, $this->getParent()->getParent());
+        if ($this->owner) {
+            $tableHeader = $this->owner->getHeader();
+        } else {
+            /** @var TableHeader $tableHeader */
+            $tableHeader = $this->elementFactory
+                ->createElement(static::HEADER_ELEMENT, $this->getParent()->getParent());
+        }
 
         return $tableHeader->getColumnNumber($header);
     }
