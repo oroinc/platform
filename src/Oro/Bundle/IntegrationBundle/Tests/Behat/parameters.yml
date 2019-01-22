@@ -1,0 +1,18 @@
+services:
+    oro_integration.integration.test_channel:
+        class: 'Oro\Bundle\IntegrationBundle\Tests\Behat\Stub\Integration\TestChannelType'
+        public: true
+        tags:
+            - { name: oro_integration.channel, type: test_channel }
+
+    oro_integration.integration.test_transport_1:
+        class: 'Oro\Bundle\IntegrationBundle\Tests\Behat\Stub\Integration\TestTransport1'
+        public: false
+        tags:
+            - { name: oro_integration.transport, type: test_transport_1, channel_type: test_channel }
+
+    oro_integration.integration.test_transport_2:
+        class: 'Oro\Bundle\IntegrationBundle\Tests\Behat\Stub\Integration\TestTransport2'
+        public: false
+        tags:
+            - { name: oro_integration.transport, type: test_transport_2, channel_type: test_channel }

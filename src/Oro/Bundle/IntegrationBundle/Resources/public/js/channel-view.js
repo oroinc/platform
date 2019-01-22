@@ -51,7 +51,13 @@ define([
                 throw new TypeError('Missing required option(s): ' + requiredMissed.join(','));
             }
 
-            _.extend(this.fieldsSets, options.fieldsSets);
+            for (var fieldSet in options.fieldsSets) {
+                if (fieldSet in this.fieldsSets) {
+                    this.fieldsSets[fieldSet] = _.union(this.fieldsSets[fieldSet], options.fieldsSets[fieldSet]);
+                } else {
+                    this.fieldsSets[fieldSet] = options.fieldsSets[fieldSet];
+                }
+            }
 
             this.processSelectorState();
             $(options.typeSelector).on('change', _.bind(this.changeHandler, this));
@@ -117,7 +123,7 @@ define([
             data = _.filter(data, function(field) {
                 return _.indexOf(fieldsSet, field.name) !== -1;
             });
-            data.push({name: this.UPDATE_MARKER, value: 1});
+            data.push({name: this.UPDATE_MARKER, value: $el.attr('name')});
 
             var event = {formEl: $form, data: data, reloadManually: true};
             mediator.trigger('integrationFormReload:before', event);

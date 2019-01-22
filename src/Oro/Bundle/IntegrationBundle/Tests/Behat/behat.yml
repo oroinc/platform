@@ -1,0 +1,14 @@
+oro_behat_extension:
+  suites:
+    OroIntegrationBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroDataGridBundle::GridContext
+        - OroFormBundle::FormContext
+      paths:
+        - '@OroIntegrationBundle/Tests/Behat/Features'
+
+  elements:
+    Integration Channel Form:
+      selector: 'form[name="oro_integration_channel_form"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
