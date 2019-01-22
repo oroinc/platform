@@ -11,6 +11,9 @@ use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ * Provides attachments linked to an entity.
+ */
 class AttachmentProvider
 {
     /** @var EntityManager */
@@ -58,8 +61,6 @@ class AttachmentProvider
     }
 
     /**
-     * @todo should be moved out after BAP-11405
-     *
      * @param $entity
      *
      * @return File
@@ -73,8 +74,6 @@ class AttachmentProvider
     }
 
     /**
-     * @todo should be marked as deprecated after BAP-11405
-     *
      * @param $entity
      *
      * @return array
@@ -105,8 +104,6 @@ class AttachmentProvider
     }
 
     /**
-     * @todo should be moved out after BAP-11405
-     *
      * @param $entity
      * @param File $attachment
      *
