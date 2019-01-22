@@ -738,9 +738,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      */
     private function validateLanguage(string $language)
     {
-        $languages = array_keys(Intl::getLanguageBundle()->getLanguageNames());
-        if (!in_array($language, $languages, true)) {
-            throw new \InvalidArgumentException($this->getExceptionMessage('language', $language, $languages));
+        $locales = Intl::getLocaleBundle()->getLocales();
+        if (!in_array($language, $locales, true)) {
+            throw new \InvalidArgumentException($this->getExceptionMessage('language', $language, $locales));
         }
     }
 
