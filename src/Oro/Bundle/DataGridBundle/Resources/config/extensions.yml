@@ -39,11 +39,13 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.pager.orm.pager:
+        class: '%oro_datagrid.extension.pager.orm.pager.class%'
         arguments:
             - '@oro_security.acl_helper'
             - '@oro_batch.orm.query_builder.count_query_optimizer'
             - '@oro_entity.query_hint_resolver'
-        class: '%oro_datagrid.extension.pager.orm.pager.class%'
+        calls:
+            - [ setQueryExecutor, [ '@oro_datagrid.orm.query_executor' ] ]
 
     oro_datagrid.extension.pager.array.pager:
         public: false

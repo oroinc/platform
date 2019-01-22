@@ -10,6 +10,8 @@ services:
             - '@oro_datagrid.event.dispatcher'
             - '@oro_datagrid.datasource.orm.parameter_binder'
             - '@oro_entity.query_hint_resolver'
+        calls:
+            - [ setQueryExecutor, [ '@oro_datagrid.orm.query_executor' ] ]
         tags:
             - { name: oro_datagrid.datasource, type: orm }
 
@@ -17,6 +19,10 @@ services:
         class: 'Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource'
         tags:
             - { name: oro_datagrid.datasource, type: array }
+
+    oro_datagrid.orm.query_executor:
+        class: Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutor
+        public: false
 
     oro_datagrid.datasource.orm.parameter_binder:
         class: '%oro_datagrid.datasource.orm.parameter_binder.class%'
