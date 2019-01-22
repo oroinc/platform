@@ -352,4 +352,35 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             'Email field must be one of '.implode(', ', $allowedFields)
         );
     }
+
+    /**
+     * Example: Then I follow "Confirm" link from the email
+     *
+     * @Given /^(?:|I )follow "(?P<linkCaption>[^"]+)" link from the email$/
+     *
+     * @param string $linkCaption
+     */
+    public function followLinkFromEmail(string $linkCaption)
+    {
+        $mailer = $this->getMailer();
+        if (!$mailer instanceof DirectMailerDecorator) {
+            return;
+        }
+
+        $pattern = sprintf('/<a\s+href\s*=\s*"(.+)">%s<\/a>/', $linkCaption);
+        $matches = [];
+
+        /** @var \Swift_Mime_Message $message */
+        foreach ($mailer->getSentMessages() as $message) {
+            $found = preg_match($pattern, $message->getBody(), $matches);
+            if ($found === 1) {
+                break;
+            }
+        }
+
+        self::assertArrayHasKey(1, $matches, sprintf('"%s" link not found in the email', $linkCaption));
+
+        $url = htmlspecialchars_decode($matches[1]);
+        $this->visitPath($url);
+    }
 }
