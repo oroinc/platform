@@ -6,7 +6,6 @@ use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputMethod;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputValue;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow;
 
 class GridRow extends TableRow
@@ -53,22 +52,6 @@ class GridRow extends TableRow
     }
 
     /**
-     * @param string $header
-     * @return NodeElement
-     */
-    public function getCell($header)
-    {
-        /** @var TableHeader $gridHeader */
-        $gridHeader = $this->elementFactory->createElement(static::HEADER_ELEMENT, $this->getParent()->getParent());
-        $columnNumber = $gridHeader->getColumnNumber($header);
-
-        /** @var NodeElement $cell */
-        $cell = $this->getCellByNumber($columnNumber);
-
-        return $cell;
-    }
-
-    /**
      * Inline edit row cell
      *
      * @param string $header Column header name
@@ -97,7 +80,7 @@ class GridRow extends TableRow
      */
     public function startInlineEditing($header)
     {
-        $cell = $this->getCell($header);
+        $cell = $this->getCellByHeader($header);
         $cell->mouseOver();
 
         /** @var NodeElement $pencilIcon */
@@ -151,7 +134,7 @@ class GridRow extends TableRow
      */
     public function setCellValueByDoubleClick($header, $value)
     {
-        $cell = $this->getCell($header);
+        $cell = $this->getCellByHeader($header);
 
         $cell->mouseOver();
         $cell->doubleClick();

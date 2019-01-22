@@ -30,7 +30,24 @@ class GridFilters extends Element
         } else {
             $filterItem = $this->elementFactory->findElementContains($name, $text, $this);
             if (!$filterItem->isValid()) {
-                $filterItem = $this->elementFactory->findElementContainsByXPath($name, $text, true, $this);
+                if ($filterItem->isIsset()) {
+                    // If more than one filter found perform detailed search by filter label only
+                    // For example fill State filter
+                    // and there are Country filter containing United States of America string and State filter
+                    $selector = $this->selectorManipulator->getContainsXPathSelector(
+                        "child::div[(@class " .
+                        "and contains(concat(' ', normalize-space(@class), ' '), ' filter-criteria-selector '))]" .
+                        "/self::*",
+                        $text,
+                        false
+                    );
+                    $filterItem = $this->elementFactory->wrapElement(
+                        $name,
+                        $filterItem->find($selector['type'], $selector['locator'])->getParent()
+                    );
+                } else {
+                    $filterItem = $this->elementFactory->findElementContainsByXPath($name, $text, true, $this);
+                }
             }
         }
 

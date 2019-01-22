@@ -39,7 +39,7 @@ Feature: Display settings manage
   Scenario: Change records in grid per page amount
     Given I go to Activities/ Calendar Events
     Then per page amount should be 25
-    And records in current page grid should be 25
+    And records in grid should be 25
     When I go to System/Configuration
     And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
@@ -47,7 +47,7 @@ Feature: Display settings manage
     And I save form
     And I go to Activities/ Calendar Events
     Then per page amount should be 10
-    And records in current page grid should be 10
+    And records in grid should be 10
 
   Scenario: Make grid header sticky
     Given I go to Activities/ Calendar Events
