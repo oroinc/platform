@@ -4,12 +4,8 @@
 
 ``` php
 <?php
-    //Accessing address manager from controller
-    /** @var  $addressManager \Oro\Bundle\AddressBundle\Entity\Manager\AddressManager */
-    $addressManager = $this->get('oro_address.address.provider')->getStorage();
-
     //create empty address entity
-    $address = $addressManager->createAddress();
+    $address = mew Address();
 
     //process insert/update
     $this->get('oro_address.form.handler.address')->process($entity)
