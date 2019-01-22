@@ -11,6 +11,16 @@ define(function(require) {
         e.preventDefault();
     });
 
+    $('body').on('click', function(e) {
+        // Fixes issue with extra click event in Safari browser. It triggers click event on body, even though
+        // preceding mousedown and mouseup events had different targets, example https://jsfiddle.net/bxm79u8o/27/
+        // Select2 opens its dropdown on mousedown event. With the dropdown opening, it adds transparent mask under it.
+        // And mouseup event is triggered on that mask.
+        if (e.target === e.currentTarget) {
+            e.stopPropagation();
+        }
+    });
+
     /**
      * An overload of populateResults method,
      * renders search results with collapsible groups
