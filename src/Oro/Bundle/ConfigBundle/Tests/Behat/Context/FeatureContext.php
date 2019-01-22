@@ -258,19 +258,23 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
-     * Enables (set to true) certain config option
+     * Enables (set to true) certain config options
      * Used instead of manual walking on configuration like "System/ Configuration"
      *
-     * Example: I enable 'some_configaration.option' configuration option
+     * Example: I enable configuration options:
+     *      | oro_config.setting1 |
+     *      | oro_config.setting2 |
      *
-     * @Given /^I enable "(?P<configSettingName>[^"]+)" configuration option$/
-     * @Given /^I enable '(?P<configSettingName>[^']+)' configuration option$/
-     * @param string $configSettingName
+     * @Given /^I enable configuration options:$/
+     * @param TableNode $table
      */
-    public function enableConfigOption(string $configSettingName): void
+    public function enableConfigOptions(TableNode $table): void
     {
         $configManager = $this->getContainer()->get('oro_config.global');
-        $configManager->set($configSettingName, true);
+        foreach ($table->getRows() as $row) {
+            $configManager->set($row[0], true);
+        }
+
         $configManager->flush();
     }
 }
