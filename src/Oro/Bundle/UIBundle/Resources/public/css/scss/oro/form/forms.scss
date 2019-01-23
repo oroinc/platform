@@ -152,6 +152,11 @@
                 margin-#{$start}: 0;
             }
         }
+
+        > .pull-right {
+            flex-grow: 1;
+            text-align: #{$end};
+        }
     }
 
     .control-group-oro_pricing_price_lists_settings,

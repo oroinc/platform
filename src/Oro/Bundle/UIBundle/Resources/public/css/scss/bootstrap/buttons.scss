@@ -275,6 +275,12 @@ fieldset:disabled a.btn {
     }
 }
 
+.btn-container {
+    *:not(:empty) + & {
+        margin-top: $content-padding-small;
+    }
+}
+
 // Specificity overrides
 input[type="submit"],
 input[type="reset"],
