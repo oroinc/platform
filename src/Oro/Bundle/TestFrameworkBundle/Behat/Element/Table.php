@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
-use Behat\Mink\Element\NodeElement;
-
+/**
+ * Table element representation
+ */
 class Table extends Element
 {
     const TABLE_HEADER_ELEMENT = 'TableHeader';
+    const TABLE_ROW_STRICT_ELEMENT = 'TableRowStrict';
     const TABLE_ROW_ELEMENT = 'TableRow';
     const ERROR_NO_ROW = "Can't get %s row, because there are only %s rows in table";
     const ERROR_NO_ROW_CONTENT = 'Table has no record with "%s" content';
@@ -48,7 +50,7 @@ class Table extends Element
      */
     public function getRows()
     {
-        return $this->getRowElements(static::TABLE_ROW_ELEMENT);
+        return $this->getRowElements(static::TABLE_ROW_STRICT_ELEMENT);
     }
 
     /**
@@ -57,9 +59,11 @@ class Table extends Element
      */
     public function getRowElements($elementName)
     {
-        return array_map(function (NodeElement $element) use ($elementName) {
-            return $this->elementFactory->wrapElement($elementName, $element);
-        }, $this->findAll('xpath', 'child::tbody/child::tr'));
+        return array_map(function (TableRow $row) {
+            $row->setOwner($this);
+
+            return $row;
+        }, $this->getElements($elementName));
     }
 
     /**
@@ -72,6 +76,7 @@ class Table extends Element
         /** @var TableRow $row */
         $row = $this->findElementContains($elementName, $content);
         self::assertTrue($row->isIsset(), sprintf(static::ERROR_NO_ROW_CONTENT, $content));
+        $row->setOwner($this);
 
         return $row;
     }

@@ -91,7 +91,7 @@
         }) %}
     {% endif %}
 
-    {% if type == 'password' %}
+    {% if type == 'password' and attr.autocomplete is not defined %}
         {% set attr = attr|merge({
             autocomplete: 'off'
         }) %}

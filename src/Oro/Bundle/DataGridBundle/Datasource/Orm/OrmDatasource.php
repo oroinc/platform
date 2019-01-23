@@ -51,22 +51,28 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     /** @var QueryHintResolver */
     protected $queryHintResolver;
 
+    /** @var QueryExecutorInterface */
+    private $queryExecutor;
+
     /**
      * @param ConfigProcessorInterface $processor
      * @param EventDispatcherInterface $eventDispatcher
      * @param ParameterBinderInterface $parameterBinder
      * @param QueryHintResolver        $queryHintResolver
+     * @param QueryExecutorInterface   $queryExecutor
      */
     public function __construct(
         ConfigProcessorInterface $processor,
         EventDispatcherInterface $eventDispatcher,
         ParameterBinderInterface $parameterBinder,
-        QueryHintResolver $queryHintResolver
+        QueryHintResolver $queryHintResolver,
+        QueryExecutorInterface $queryExecutor
     ) {
-        $this->configProcessor   = $processor;
-        $this->eventDispatcher   = $eventDispatcher;
-        $this->parameterBinder   = $parameterBinder;
+        $this->configProcessor = $processor;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->parameterBinder = $parameterBinder;
         $this->queryHintResolver = $queryHintResolver;
+        $this->queryExecutor = $queryExecutor;
     }
 
     /**
@@ -93,24 +99,33 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         );
 
         $query = $this->qb->getQuery();
+        $this->queryHintResolver->resolveHints($query, $this->queryHints ?? []);
 
-        $this->queryHintResolver->resolveHints(
-            $query,
-            null !== $this->queryHints ? $this->queryHints : []
+        $this->eventDispatcher->dispatch(
+            OrmResultBefore::NAME,
+            new OrmResultBefore($this->datagrid, $query)
         );
 
-        $event = new OrmResultBefore($this->datagrid, $query);
-        $this->eventDispatcher->dispatch(OrmResultBefore::NAME, $event);
-
-        $results = $event->getQuery()->execute();
-        $rows    = [];
-        foreach ($results as $result) {
-            $rows[] = new ResultRecord($result);
+        $rows = $this->queryExecutor->execute($this->datagrid, $query);
+        $records = [];
+        foreach ($rows as $row) {
+            $records[] = new ResultRecord($row);
         }
-        $event = new OrmResultAfter($this->datagrid, $rows, $query);
+
+        $event = new OrmResultAfter($this->datagrid, $records, $query);
         $this->eventDispatcher->dispatch(OrmResultAfter::NAME, $event);
 
         return $event->getRecords();
+    }
+
+    /**
+     * Gets datagrid this datasource belongs to.
+     *
+     * @return DatagridInterface
+     */
+    public function getDatagrid(): DatagridInterface
+    {
+        return $this->datagrid;
     }
 
     /**

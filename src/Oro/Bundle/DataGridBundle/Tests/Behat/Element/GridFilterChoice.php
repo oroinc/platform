@@ -14,7 +14,7 @@ class GridFilterChoice extends GridFilterStringItem
     public function setFilterValue($value)
     {
         /** @var Select2Entities $select2Element */
-        $select2Element = $this->getElement('Select2Entities');
+        $select2Element = $this->getElement('GridFilterChoiceValueInput');
         $select2Element->setValue($value);
     }
 }

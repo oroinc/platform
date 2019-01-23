@@ -54,9 +54,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @var int
+     * @var int[]
      */
-    protected $gridRecordsNumber;
+    protected $gridRecordsNumber = [];
 
     /**
      * @param string|null $gridName
@@ -360,7 +360,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iKeepInMindNumberOfRecordsInList($gridName = null)
     {
         $grid = $this->getGrid($gridName);
-        $this->gridRecordsNumber = $this->getGridPaginator($grid)->getTotalRecordsCount();
+        $this->gridRecordsNumber[$gridName] = $this->getGridPaginator($grid)->getTotalRecordsCount();
     }
 
     /**
@@ -503,7 +503,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $this->getSession()->getDriver()->waitForAjax();
         $grid = $this->getGrid($gridName);
         self::assertEquals(
-            $this->gridRecordsNumber - $number,
+            $this->gridRecordsNumber[$gridName] - $number,
             $this->getGridPaginator($grid)->getTotalRecordsCount()
         );
     }
@@ -531,7 +531,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
         self::assertEquals(
-            $this->gridRecordsNumber,
+            $this->gridRecordsNumber[$gridName],
             $this->getGridPaginator($grid)->getTotalRecordsCount()
         );
     }
@@ -1535,6 +1535,22 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Check that mass action link is available in grid mass actions
+     * Example: Then I should see Delete action
+     *
+     * @Then /^(?:|I )should see (?P<action>(?:[^"]|\\")*) action$/
+     * @Then /^(?:|I )should see (?P<action>(?:[^"]|\\")*) action in "(?P<gridName>[\w\s]+)"$/
+     */
+    public function iShouldSeeMassAction($action, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        self::assertTrue(
+            $grid->hasMassActionLink($action),
+            sprintf('%s mass action should be accessible', $action)
+        );
+    }
+
+    /**
      * Check that record with provided name exists in grid
      * Example: Then I should see First test group in grid
      *
@@ -1701,7 +1717,7 @@ TEXT;
     public function recordsInGridShouldBe($count, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
-        $gridRows = $grid->findAll('css', 'table.grid > tbody > tr');
+        $gridRows = $grid->getRows();
 
         self::assertCount((int)$count, $gridRows);
     }
@@ -1941,7 +1957,7 @@ TEXT;
      */
     private function getGridPaginator($grid, $element = 'GridToolbarPaginator')
     {
-        return $this->createElement($grid->getMappedChildElementName($element));
+        return $this->createElement($grid->getMappedChildElementName($element), $grid);
     }
 
     /**
@@ -1972,7 +1988,7 @@ TEXT;
      */
     private function getGridColumnManager($grid)
     {
-        return $this->createElement($grid->getMappedChildElementName('GridColumnManager'));
+        return $this->createElement($grid->getMappedChildElementName('GridColumnManager'), $grid);
     }
 
     /**
@@ -1983,15 +1999,7 @@ TEXT;
     {
         $grid = $this->getGrid($gridName);
 
-        $gridPaginatorContainer = $this->getSession()->getPage()->find(
-            'xpath',
-            sprintf(
-                '%s/ancestor::div[contains(concat(" ", normalize-space(@class), " "), " oro-datagrid ")]',
-                $grid->getXpath()
-            )
-        );
-
-        $gridPaginator = $this->elementFactory->createElement('GridToolbarPaginator', $gridPaginatorContainer);
+        $gridPaginator = $this->createElement($grid->getMappedChildElementName('GridToolbarPaginator'), $grid);
         $gridPaginator->pressButton($button);
     }
 

@@ -10,9 +10,10 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
+use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
+use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
-use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -25,6 +26,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * The API manager for Comment entity.
+ */
 class CommentApiManager extends ApiEntityManager
 {
     const AVATAR_FIELD_NAME = 'avatar';
@@ -32,8 +36,8 @@ class CommentApiManager extends ApiEntityManager
     /** @var ObjectManager */
     protected $em;
 
-    /** @var Pager */
-    protected $pager;
+    /** @var CountQueryBuilderOptimizer */
+    protected $countQueryBuilderOptimizer;
 
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
@@ -60,7 +64,7 @@ class CommentApiManager extends ApiEntityManager
      * @param Registry                      $doctrine
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param EntityNameResolver            $entityNameResolver
-     * @param Pager                         $pager
+     * @param CountQueryBuilderOptimizer    $countQueryBuilderOptimizer
      * @param EventDispatcherInterface      $eventDispatcher
      * @param AttachmentProvider            $attachmentProvider
      * @param AclHelper                     $aclHelper
@@ -70,7 +74,7 @@ class CommentApiManager extends ApiEntityManager
         Registry $doctrine,
         AuthorizationCheckerInterface $authorizationChecker,
         EntityNameResolver $entityNameResolver,
-        Pager $pager,
+        CountQueryBuilderOptimizer $countQueryBuilderOptimizer,
         EventDispatcherInterface $eventDispatcher,
         AttachmentProvider $attachmentProvider,
         AclHelper $aclHelper,
@@ -79,7 +83,7 @@ class CommentApiManager extends ApiEntityManager
         $this->em = $doctrine->getManager();
         $this->authorizationChecker = $authorizationChecker;
         $this->entityNameResolver = $entityNameResolver;
-        $this->pager = $pager;
+        $this->countQueryBuilderOptimizer = $countQueryBuilderOptimizer;
         $this->attachmentProvider = $attachmentProvider;
         $this->aclHelper = $aclHelper;
         $this->configManager = $configManager;
@@ -119,7 +123,7 @@ class CommentApiManager extends ApiEntityManager
         $entityName = $this->convertRelationEntityClassName($entityClass);
         $result     = [
             'count' => 0,
-            'data'  => [],
+            'data'  => []
         ];
 
         if ($this->isCorrectClassName($entityName)) {
@@ -128,19 +132,24 @@ class CommentApiManager extends ApiEntityManager
             /** @var CommentRepository $repository */
             $repository = $this->getRepository();
 
-            /** @var QueryBuilder $qb */
             $qb = $repository->getBaseQueryBuilder($fieldName, $entityId);
             $qb->orderBy('c.createdAt', 'DESC');
             $this->addFilters($qb, $filters);
 
-            $pager = clone $this->pager;
-            $pager->setQueryBuilder($qb);
-            $pager->setPage($page);
-            $pager->setMaxPerPage($limit);
-            $pager->init();
+            $count = QueryCountCalculator::calculateCount(
+                $this->aclHelper->apply($this->countQueryBuilderOptimizer->getCountQueryBuilder($qb))
+            );
 
-            $result['data']  = $this->getEntityViewModels($pager->getAppliedResult(), $entityClass, $entityId);
-            $result['count'] = $pager->getNbResults();
+            $qb->setMaxResults($limit);
+            $qb->setFirstResult($this->getOffset($page > 0 ? $page : 1, $limit));
+            $data = $this->getEntityViewModels(
+                $this->aclHelper->apply($qb)->execute(),
+                $entityClass,
+                $entityId
+            );
+
+            $result['data'] = $data;
+            $result['count'] = $count;
         }
 
         return $result;
@@ -243,7 +252,6 @@ class CommentApiManager extends ApiEntityManager
 
     /**
      * Get resized avatar
-     * @todo Should be moved after BAP-11405
      *
      * @param User $user
      *

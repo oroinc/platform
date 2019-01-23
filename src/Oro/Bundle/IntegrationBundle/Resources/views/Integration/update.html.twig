@@ -3,11 +3,8 @@
 
 {% form_theme form with oro_integration_themes(form) %}
 
-{% set entity = form.vars.value %}
-{% set formAction = formAction is defined
-    ? formAction
-    : (entity.id ? path('oro_integration_update', { id: entity.id }) : path('oro_integration_create'))
-%}
+{% set entity = entity is defined ? entity : form.vars.value %}
+{% set formAction = entity.id ? path('oro_integration_update', { id: entity.id }) : path('oro_integration_create') %}
 
 {% if entity.id %}
     {% oro_title_set({params : {"%integration.name%": entity.name } }) %}

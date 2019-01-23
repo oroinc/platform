@@ -96,7 +96,7 @@ Feature: User Case Insensitive Email Addresses
     Then I should see "there are existing users who have identical lowercase emails"
     When I click "Click here"
     Then I should be on User Index page
-    And records in current page grid should be 2
+    And records in grid should be 2
     And I should see following records in grid:
       | Charlie    |
       | John       |

@@ -31,7 +31,7 @@ define(function(require) {
             $(document).scrollTop($(document).scrollTop());
             mediator.trigger('layout:headerStateChange');
         }, 1);
-        $(document)
+        $('#central-panel')
             .on('focus', elementsWithKeyboardSelector, function() {
                 $body.addClass('input-focused');
                 mediator.trigger('layout:headerStateChange');

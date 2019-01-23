@@ -8,3 +8,4 @@ OroConfigBundle enables developers to define the application configuration setti
 - [Config management](./Resources/doc/config_management.md)
 - [Add new configuration scope](./Resources/doc/add_new_config_scope.md)
 - [Conditions](./Resources/doc/reference/conditions.md)
+- [Behat](./Resources/doc/behat.md)

@@ -54,29 +54,25 @@
                 text-overflow: ellipsis;
             }
 
-            .nav-header-title {
-                @include fa-icon($app-header-dropdown-close-icon);
+            .btn-close {
+                position: absolute;
+                top: 0;
+                #{$start}: auto;
+                #{$end}: 0;
+                z-index: $zindex-dropdown + 1;
+
+                margin: $app-header-dropdown-close-icon-margin;
+                padding: 0;
+
+                color: $app-header-dropdown-close-icon-color;
+                box-shadow: none;
+
+                &:focus {
+                    outline: none;
+                }
 
                 &:before {
-                    position: absolute;
-                    top: 0;
-                    #{$start}: auto;
-                    #{$end}: 0;
-                    z-index: $zindex-dropdown + 1;
-
-                    margin: $app-header-dropdown-close-icon-margin;
-                    padding: 0;
-
                     font-size: $app-header-dropdown-close-icon-font-size;
-                    line-height: $app-header-dropdown-close-icon-font-size;
-                    color: $app-header-dropdown-close-icon-color;
-
-                    background-color: transparent;
-                    background-image: none;
-                    border: 0 none;
-
-                    display: block;
-                    box-shadow: none;
                 }
             }
 
