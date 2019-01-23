@@ -52,10 +52,13 @@
         }
 
         .action {
+            width: auto;
             border: none;
             background: none;
             color: $link-color;
             cursor: pointer;
+            text-overflow: clip;
+            overflow: visible;
         }
 
         .active .action {

@@ -95,8 +95,12 @@
     }
 
     .action {
+        width: $uploader-action-width;
         padding: side-values($uploader-action-inner-offset);
         border-#{$start}: $input-border-width solid $input-border-color;
+        flex-shrink: 0;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
 
     &.focus,
