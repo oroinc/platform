@@ -33,7 +33,10 @@ define(function(require) {
             'change [name=from]': 'updateCollectionSearchParams',
             'mousedown [data-role=search-suggestion-list] a': 'onSuggestionMouseDown',
             'click .nav-content': 'stopPropagation',
-            'select2-open.dropdown.data-api': 'stopPropagation'
+            'select2-open.dropdown.data-api': 'stopPropagation',
+            'hiding.bs.dropdown': function() {
+                this.$('.select2-dropdown-open').inputWidget('close');
+            }
         },
 
         listen: {

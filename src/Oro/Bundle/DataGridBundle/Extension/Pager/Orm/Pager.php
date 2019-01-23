@@ -6,12 +6,20 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutorInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\AbstractPager;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 
+/**
+ * The pager for datagrids based on ORM datasource.
+ */
 class Pager extends AbstractPager
 {
+    /** @var DatagridInterface|null */
+    protected $datagrid;
+
     /** @var QueryBuilder */
     protected $qb;
 
@@ -42,6 +50,9 @@ class Pager extends AbstractPager
     /** @var QueryHintResolver */
     protected $queryHintResolver;
 
+    /** @var QueryExecutorInterface */
+    protected $queryExecutor;
+
     /** @var string */
     protected $aclPermission = 'VIEW';
 
@@ -58,6 +69,26 @@ class Pager extends AbstractPager
         $this->aclHelper                  = $aclHelper;
         $this->countQueryBuilderOptimizer = $countQueryOptimizer;
         $this->queryHintResolver          = $queryHintResolver;
+    }
+
+    /**
+     * @param QueryExecutorInterface $queryExecutor
+     */
+    public function setQueryExecutor(QueryExecutorInterface $queryExecutor)
+    {
+        $this->queryExecutor = $queryExecutor;
+    }
+
+    /**
+     * @param DatagridInterface $datagrid
+     *
+     * @return $this
+     */
+    public function setDatagrid(DatagridInterface $datagrid)
+    {
+        $this->datagrid = $datagrid;
+
+        return $this;
     }
 
     /**
@@ -107,12 +138,17 @@ class Pager extends AbstractPager
         }
         $this->queryHintResolver->resolveHints($query, $this->countQueryHints);
 
-        $useWalker = null;
-        if ($this->skipCountWalker !== null) {
-            $useWalker = !$this->skipCountWalker;
-        }
+        return $this->executeQuery(
+            $query,
+            function (Query $query) {
+                $useWalker = null;
+                if (null !== $this->skipCountWalker) {
+                    $useWalker = !$this->skipCountWalker;
+                }
 
-        return QueryCountCalculator::calculateCount($query, $useWalker);
+                return QueryCountCalculator::calculateCount($query, $useWalker);
+            }
+        );
     }
 
     /**
@@ -120,7 +156,12 @@ class Pager extends AbstractPager
      */
     public function getResults($hydrationMode = Query::HYDRATE_OBJECT)
     {
-        return $this->getQueryBuilder()->getQuery()->execute([], $hydrationMode);
+        return $this->executeQuery(
+            $this->getQueryBuilder()->getQuery(),
+            function (Query $query) use ($hydrationMode) {
+                return $query->execute([], $hydrationMode);
+            }
+        );
     }
 
     /**
@@ -135,7 +176,12 @@ class Pager extends AbstractPager
         $qb    = $this->getQueryBuilder();
         $query = $this->aclHelper->apply($qb);
 
-        return $query->execute([], $hydrationMode);
+        return $this->executeQuery(
+            $query,
+            function (Query $query) use ($hydrationMode) {
+                return $query->execute([], $hydrationMode);
+            }
+        );
     }
 
     /**
@@ -288,5 +334,24 @@ class Pager extends AbstractPager
     public function setCountQueryHints(array $countQueryHints)
     {
         $this->countQueryHints = $countQueryHints;
+    }
+
+    /**
+     * @param Query         $query
+     * @param callable|null $executeFunc function (Query $query): mixed
+     *
+     * @return mixed
+     */
+    private function executeQuery(Query $query, $executeFunc = null)
+    {
+        if (null !== $this->datagrid && null !== $this->queryExecutor) {
+            return $this->queryExecutor->execute($this->datagrid, $query, $executeFunc);
+        }
+
+        if (null !== $executeFunc) {
+            return $executeFunc($query);
+        }
+
+        return $query->execute();
     }
 }

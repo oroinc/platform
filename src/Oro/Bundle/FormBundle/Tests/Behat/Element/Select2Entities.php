@@ -16,6 +16,7 @@ class Select2Entities extends Element implements ClearableInterface
      */
     public function setValue($values)
     {
+        $this->getDriver()->waitForAjax();
         $this->clear();
         $this->focus();
         $values = true === is_array($values) ? $values : [$values];
