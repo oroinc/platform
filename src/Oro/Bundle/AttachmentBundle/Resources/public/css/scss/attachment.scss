@@ -65,6 +65,7 @@
         .filename {
             padding: 0;
             flex-shrink: 1;
+            flex-grow: 0;
 
             @include text-line-truncate(auto);
         }
