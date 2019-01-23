@@ -9,8 +9,15 @@
     border: $dialog-border;
     position: $dialog-position;
     border-radius: $dialog-border-radius;
-    display: $dialog-display;
-    flex-direction: $dialog-flex-direction;
+    display: flex;
+    flex-flow: row;
+
+    .ui-dialog-inner-wrapper {
+        // inner-wrapper fixes max-height for flex container in IE11 https://jsfiddle.net/d158647x/
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
 
     &-titlebar {
         background: $primary-300;
