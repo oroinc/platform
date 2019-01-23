@@ -68,10 +68,12 @@
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' logo'
     }) %}
+
+    {% set src = src|default(asset('bundles/orofrontend/blank/images/logo/logo-oroacem.svg')) %}
     
     {% set attr_img = attr_img|default({}) %}
     {% set attr_img = layout_attr_defaults(attr_img, {
-        'src': asset('bundles/orofrontend/blank/images/logo/logo-oroacem.svg'),
+        'src': src,
         '~class': ' logo-img',
         'alt': 'oro_frontend.logo.alt.label'|trans
     }) %}
