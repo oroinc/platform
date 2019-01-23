@@ -9,8 +9,8 @@
     }
 
     &__use {
-        min-width: 20%;
-        @include text-line-truncate($max-width: 50%);
+        min-width: 40%;
+        @include text-line-truncate($max-width: 40%);
 
         padding-#{$end}: $content-padding-small;
 
@@ -20,8 +20,8 @@
     }
 
     &__fallback {
-        min-width: 50%;
-        max-width: 80%;
+        min-width: 60%;
+        max-width: 60%;
         flex-grow: 1;
 
         @include selector-width(100%);

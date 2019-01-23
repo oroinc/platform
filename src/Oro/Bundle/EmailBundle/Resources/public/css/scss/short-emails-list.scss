@@ -20,6 +20,7 @@
             padding-#{$end}: $content-padding-small / 2;
             text-overflow: ellipsis;
             overflow: hidden;
+            white-space: nowrap;
         }
     }
 

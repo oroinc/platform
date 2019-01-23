@@ -7,7 +7,7 @@
 
         &__value {
             min-width: 25%;
-            max-width: 35%;
+            max-width: 25%;
 
             @include selector-width(100%);
             padding-#{$end}: $content-padding-small;
@@ -15,7 +15,7 @@
 
         &__line {
             max-width: 75%;
-            min-width: 65%;
+            min-width: 25%;
             flex-grow: 1;
             margin-top: 0;
         }
