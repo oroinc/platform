@@ -103,6 +103,15 @@ services:
         calls:
             - [ setNamespace, [ 'oro_user' ] ]
 
+    oro_user.security.login_attempts_log_subscriber:
+      class: Oro\Bundle\UserBundle\EventListener\LoginAttemptsLogSubscriber
+      arguments:
+        - '@oro_user.manager'
+        - '@oro_user.provider.user_logging_info_provider'
+        - '@monolog.logger.oro_account_security'
+      tags:
+        - { name: kernel.event_subscriber }
+
     oro_user.user_menu:
         class:                        %oro_user.user_menu.builder.class%
         tags:
@@ -494,6 +503,9 @@ services:
         class: %oro_user.provider.user_configuration.form_provider.class%
         parent: 'oro_config.provider.abstract_provider'
         lazy: true
+
+    oro_user.provider.user_logging_info_provider:
+        class: Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider
 
     oro_user.imap_configuration.subscriber:
         class: %oro_user.imap_configuration.subscriber.class%
