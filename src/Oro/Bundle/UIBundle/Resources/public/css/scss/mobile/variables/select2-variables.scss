@@ -46,3 +46,11 @@ $mobile-select2-container-multi-select2-search-field-height: 36px !default;
 $mobile-select2-container-multi-select2-search-field-line-height: 36px !default;
 
 $mobile-select2-container-multi-select2-search-field-top-offset: -4px !default;
+
+$mobile-select2-results-inner-offset: side-values(0 8px 8px) !default;
+
+$mobile-select2-result-label-font-size: $mobile-select2-container-font-size !default;
+$mobile-select2-result-label-line-height: 1.5 !default;
+$mobile-select2-result-label-inner-offset: side-values(4px 8px 5px) !default;
+
+$mobile-select2-drop-max-width: calc(100% - #{2 * $content-padding}) !default;

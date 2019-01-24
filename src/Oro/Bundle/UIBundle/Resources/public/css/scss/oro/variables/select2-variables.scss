@@ -88,7 +88,7 @@ $select2-search-choice-color: $primary-400 !default;
 $select2-search-choice-border-radius: 2px !default;
 $select2-search-choice-inner-offset-vertical: 4px !default;
 $select2-search-choice-inner-offset-horizontal: 8px !default;
-$select2-search-choice-offset: 3px !default;
+$select2-search-choice-offset: 4px !default;
 $select2-search-choice-position: relative !default;
 $select2-search-choice-box-sizing: border-box !default;
 $select2-search-choice-float: $start !default;
@@ -117,6 +117,8 @@ $select2-search-field-offset: 0 !default;
 $select2-search-field-inner-offset: 0 !default;
 $select2-search-field-white-space: nowrap !default;
 
+$select2-search-field-input-inner-offset-start: 6px !important !default;
+
 $select2-search-choice-close-width: 16px !default;
 $select2-search-choice-close-height: 16px !default;
 $select2-search-choice-close-display: none !default;
@@ -131,7 +133,14 @@ $select2-search-choice-close-outline: 0 !default;
 $select2-search-choice-close-z-index: 1 !default;
 
 $select2-search-multi-choices-list-style: none !default;
-$select2-search-multi-choices-inner-offset: 3px 0 0 3px !default;
+$select2-search-multi-choices-inner-offset-top: 4px !default;
+$select2-search-multi-choices-inner-offset-start: 4px !default;
+$select2-search-multi-choices-inner-offset: side-values(
+    $select2-search-multi-choices-inner-offset-top
+    0
+    0
+    $select2-search-multi-choices-inner-offset-start
+) !default;
 $select2-search-multi-choices-offset: 0 !default;
 $select2-search-multi-choices-height: auto !default;
 $select2-search-multi-choices-overflow: hidden !default;
@@ -212,6 +221,8 @@ $select2-result-label-color: $primary-200 !default;
 $select2-result-label-img-offset-right: 5px !default;
 $select2-result-label-img-offset-left: 2px !default;
 
+$select2-result-label-title-offset: 24px !default;
+
 $select2-result-label-icon-size:  $dropdown-item-icon-fa-size !default;
 $select2-result-label-icon-offset: $dropdown-item-icon-fa-offset !default;
 
@@ -277,9 +288,9 @@ $select2-drop-above-box-shadow: 1px 0 9px 3px rgba(0, 0, 0, .08), 1px 0 9px 3px 
 $select2-drop-above-border-radius: 4px 4px 0 0 !default;
 
 $select2-drop-result-font-style: italic !default;
-$select2-drop-result-color: $primary-800 !default;
+$select2-drop-result-color: $primary-700 !default;
 
-$select2-drop-highlighted-color: $primary-900 !default;
+$select2-drop-highlighted-color: $primary-700 !default;
 $select2-drop-highlighted-font-style: italic !default;
 
 $select2-drop-auto-width: auto !default;
