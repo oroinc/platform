@@ -74,5 +74,4 @@ features:
             - 'Oro\Bundle\EmailBundle\Entity\EmailUser'
         cron_jobs:
             - 'oro:cron:imap-sync'
-            - 'oro:cron:ews-sync'
             - 'oro:cron:email-body-sync'
