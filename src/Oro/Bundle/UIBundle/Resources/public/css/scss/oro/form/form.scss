@@ -70,6 +70,10 @@
     line-height: $uploader-line-height;
     font-family: $uploader-font-family;
 
+    @at-root div#{&} {
+        display: $uploader-display;
+    }
+
     input {
         width: $uploader-input-inner-width;
     }
@@ -85,12 +89,18 @@
 
     .filename {
         padding: side-values($uploader-filename-inner-offset);
+        flex-grow: 1;
+
         @include text-line-truncate($uploader-filename-width);
     }
 
     .action {
+        width: $uploader-action-width;
         padding: side-values($uploader-action-inner-offset);
         border-#{$start}: $input-border-width solid $input-border-color;
+        flex-shrink: 0;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
 
     &.focus,

@@ -41,6 +41,7 @@ $uploader-white-space: nowrap !default;
 $uploader-color: $input-color !default;
 $uploader-font-family: $input-font-family !default;
 $uploader-input-inner-width: 100% !default;
+$uploader-display: flex !default;
 
 $uploader-action-height: $field-size - 4px !default;
 $uploader-action-line-height: $field-size - 4px !default;
@@ -49,8 +50,10 @@ $uploader-action-vertical-align: top !default;
 $uploader-action-inner-offset: 0 6px 0 6px !default;
 $uploader-action-box-sizing: $input-box-sizing !default;
 
-$uploader-filename-width: 202px !default;
+$uploader-filename-width: auto !default;
 $uploader-filename-inner-offset: 0 $content-padding-small 0 $content-padding-small !default;
+
+$uploader-action-width: 90px !default;
 
 $uploader-hover-border-color: $input-focus-border-color !default;
 $uploader-hover-cursor: pointer !default;

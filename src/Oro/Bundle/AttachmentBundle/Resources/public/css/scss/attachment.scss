@@ -52,10 +52,13 @@
         }
 
         .action {
+            width: auto;
             border: none;
             background: none;
             color: $link-color;
             cursor: pointer;
+            text-overflow: clip;
+            overflow: visible;
         }
 
         .active .action {
@@ -65,6 +68,7 @@
         .filename {
             padding: 0;
             flex-shrink: 1;
+            flex-grow: 0;
 
             @include text-line-truncate(auto);
         }
