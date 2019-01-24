@@ -13,13 +13,16 @@ $tag-selector-item-min-width: 180px !default;
 $tag-selector-item-max-height: 40vh !default;
 $tag-selector-item-padding-horizontal: $content-padding-small !default;
 $tag-selector-item-padding-vertical: $content-padding-small / 2 !default;
-$tag-selector-item-offset-horizontal: 3px !default;
-$tag-selector-item-offset-vertical: 3px !default;
+$tag-selector-item-offset-horizontal: 4px !default;
+$tag-selector-item-offset-vertical: 4px !default;
 $tag-selector-item-border-radius: 2px !default;
 $tag-selector-item-close-icon-width: 24px;
 $tag-selector-item-color: $primary-400;
 $tag-selector-item-background: $primary-830;
 $tag-selector-item-input-inner-offset: 0 !default;
+$tag-selector-item-input-inner-offset-start:
+    $oro-datagrid-editable-action-item-inner-offset-horizontal -
+    $select2-search-multi-choices-inner-offset-start !default;
 $tag-selector-actions-width: 65px !default;
 $tag-selector-actions-font-size: $base-font-size--m !default;
 
