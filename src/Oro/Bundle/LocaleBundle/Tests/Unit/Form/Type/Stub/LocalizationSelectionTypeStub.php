@@ -6,7 +6,6 @@ use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizationSelectionTypeStub extends AbstractType
 {
@@ -17,16 +16,6 @@ class LocalizationSelectionTypeStub extends AbstractType
     {
         $builder->add('value', OroChoiceType::class);
         $builder->add('use_parent_scope_value', ParentScopeCheckbox::class, ['value' => 1]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults([
-            'show_all' => false,
-        ]);
     }
 
     /**
