@@ -1,3 +1,9 @@
+## 3.2.0-beta
+
+### Changed
+#### UserBundle
+* API processor `oro_user.api.create.save_entity` was renamed to `oro_user.api.create.save_user`.
+
 ## 3.1.0
 
 ### Added
