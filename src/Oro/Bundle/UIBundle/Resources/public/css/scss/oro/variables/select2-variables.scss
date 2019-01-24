@@ -117,6 +117,8 @@ $select2-search-field-offset: 0 !default;
 $select2-search-field-inner-offset: 0 !default;
 $select2-search-field-white-space: nowrap !default;
 
+$select2-search-field-input-inner-offset-start: 6px !important !default;
+
 $select2-search-choice-close-width: 16px !default;
 $select2-search-choice-close-height: 16px !default;
 $select2-search-choice-close-display: none !default;
@@ -211,6 +213,8 @@ $select2-result-label-color: $primary-200 !default;
 
 $select2-result-label-img-offset-right: 5px !default;
 $select2-result-label-img-offset-left: 2px !default;
+
+$select2-result-label-title-offset: 24px !default;
 
 $select2-result-label-icon-size:  $dropdown-item-icon-fa-size !default;
 $select2-result-label-icon-offset: $dropdown-item-icon-fa-offset !default;
