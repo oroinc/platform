@@ -7,14 +7,14 @@
     <div class="container">
         <div class="form-wrapper">
             <div class="form-wrapper__inner">
-                {%- set resetLabel = 'Request'|trans %}
-                {%- set cancelLabel = 'Cancel'|trans %}
-                {%- set showLabels = (resetLabel|length <= 9) and (cancelLabel|trans <= 9) %}
+                {% set resetLabel = 'Reset'|trans %}
+                {% set cancelLabel = 'Cancel'|trans %}
+                {% set showLabels = (resetLabel|length <= 9) and (cancelLabel|trans <= 9) %}
                 {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
                 {{ form_start(form, {
                     'action': path('oro_user_reset_reset', { token: token }),
                     'attr': {
-                        'class': 'form-signin form-reset' ~ layoutName
+                        'class': 'form-signin form-reset ' ~ layoutName
                     }
                 }) }}
                     <div class="title-box">
