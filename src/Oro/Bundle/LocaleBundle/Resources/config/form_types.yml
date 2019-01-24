@@ -117,7 +117,6 @@ services:
     oro_locale.form.type.localization_selection:
         class: 'Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectionType'
         arguments:
-            - '@oro_config.manager'
             - '@oro_locale.manager.localization'
             - '@oro_locale.provider.localization_choices'
         tags:
