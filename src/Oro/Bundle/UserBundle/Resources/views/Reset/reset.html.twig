@@ -8,7 +8,7 @@
         <div class="form-wrapper">
             <div class="form-wrapper__inner">
                 {%- set resetLabel = 'Request'|trans %}
-                {%- set cancelLabel = 'Return to Login'|trans %}
+                {%- set cancelLabel = 'Cancel'|trans %}
                 {%- set showLabels = (resetLabel|length <= 9) and (cancelLabel|trans <= 9) %}
                 {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
                 {{ form_start(form, {
@@ -28,8 +28,8 @@
                         {% endif %}
                         {{ form_rest(form) }}
                         <div class="form-row form-signin__footer form-signin__footer--reset">
-                            <button class="btn extra-submit btn-uppercase btn-primary" type="submit">{{ 'Reset'|trans }}</button>
-                            <a href="{{ path('oro_user_security_login') }}" class="form-signin__link btn">{{ 'Cancel'|trans }}</a>
+                            <button class="btn extra-submit btn-uppercase btn-primary" type="submit">{{ resetLabel }}</button>
+                            <a href="{{ path('oro_user_security_login') }}" class="form-signin__link btn">{{ cancelLabel }}</a>
                         </div>
                     </fieldset>
                 {{ form_end(form) }}
