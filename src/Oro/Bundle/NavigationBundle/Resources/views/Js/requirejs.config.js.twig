@@ -1,32 +1,27 @@
 require({
-    shim: {
-        'oro/routes': {
-            deps: ['routing'],
-            init: function(routing) {
-                {% if not app.debug %}
-                    {# processed correctly only in case when routing comes via controller #}
-                    {% set data = {'base_url': app.request.baseUrl, 'scheme': app.request.scheme, 'host': app.request.host } %}
-                    var data = {{ data|json_encode|raw }};
-                    data.routes = routing.getRoutes();
-                    fos.Router.setData(data);
-                {% endif %}
-                return routing;
-            }
-        }
-    },
     map: {
         '*': {
-            'routing': 'oro/routes'
+            'routing': 'oronavigation/js/routes-loader'
         },
-        'oro/routes': {
+        'oronavigation/js/routes-loader': {
             'routing': 'routing'
+        }
+    },
+    config: {
+        'oronavigation/js/routes-loader': {
+            debug: Boolean({{ app.debug }}),
+            data: {{ {
+                'base_url': app.request.baseUrl,
+                'scheme': app.request.scheme,
+                'host': app.request.host
+            }|json_encode|raw }}
         }
     },
     paths: {
     {% if app.debug %}
-        'oro/routes': '{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}'
+        'oro/routes': '{{ path('oro_navigation_js_routing_js', {_format: 'json'}) }}'
     {% else %}
-        'oro/routes': {{ asset('js/routes.js', 'routing')|json_encode|raw }}
+        'oro/routes': '{{ asset('media/js/routes.json', 'routing') }}'
     {% endif %}
     }
 });
