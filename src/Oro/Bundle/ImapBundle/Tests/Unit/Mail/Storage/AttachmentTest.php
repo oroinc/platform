@@ -169,16 +169,6 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($contentCharset));
         }
 
-        // Content-Transfer-Encoding header
-        $contentTransferEncodingHeader = $this->getMockBuilder('Zend\Mail\Header\GenericHeader')
-            ->disableOriginalConstructor()
-            ->getMock();
-        if ($contentTransferEncoding !== null) {
-            $contentTransferEncodingHeader->expects($this->once())
-                ->method('getFieldValue')
-                ->will($this->returnValue($contentTransferEncoding));
-        }
-
         // Headers object
         $headers = $this->getMockBuilder('Zend\Mail\Headers')
             ->disableOriginalConstructor()
@@ -205,7 +195,7 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
                 $this->returnValueMap(
                     [
                         ['Content-Type', null, $contentTypeHeader],
-                        ['Content-Transfer-Encoding', null, $contentTransferEncodingHeader],
+                        ['Content-Transfer-Encoding', 'array', (array)$contentTransferEncoding],
                     ]
                 )
             );
@@ -362,6 +352,14 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
                 new Content('A value', 'SomeContentType', 'BINARY', 'ISO-8859-1'),
                 'A value'
             ],
+            'multi Content-Transfer-Encoding' => [
+                ['8Bit', 'Base64'],
+                'SomeContentType',
+                'ISO-8859-1',
+                base64_encode('A value'),
+                new Content(base64_encode('A value'), 'SomeContentType', 'Base64', 'ISO-8859-1'),
+                'A value'
+            ]
         ];
     }
 }

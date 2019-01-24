@@ -6,6 +6,9 @@ use Zend\Mail\Headers;
 use \Zend\Mail\Storage\Part;
 use \Zend\Mime\Decode;
 
+/**
+ * Represent email attachement
+ */
 class Attachment
 {
     /**
@@ -106,12 +109,7 @@ class Attachment
             $encoding    = 'ASCII';
         }
 
-        $contentTransferEncoding = 'BINARY';
-        if ($this->part->getHeaders()->has('Content-Transfer-Encoding')) {
-            $contentTransferEncoding = $this->part->getHeader('Content-Transfer-Encoding')->getFieldValue();
-        }
-
-        return new Content($this->part->getContent(), $contentType, $contentTransferEncoding, $encoding);
+        return new Content($this->part->getContent(), $contentType, $this->getContentTransferEncoding(), $encoding);
     }
 
     /**
@@ -148,5 +146,19 @@ class Attachment
         return $this->part->getHeaders()->has('Content-Disposition')
             ? $this->part->getHeader('Content-Disposition')->getFieldValue()
             : null;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getContentTransferEncoding(): string
+    {
+        if ($this->part->getHeaders()->has('Content-Transfer-Encoding')) {
+            $contentTransferEncodings = $this->part->getHeader('Content-Transfer-Encoding', 'array');
+
+            return end($contentTransferEncodings);
+        }
+
+        return 'BINARY';
     }
 }
