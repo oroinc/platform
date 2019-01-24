@@ -4,12 +4,12 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\NavigationBundle\Event\JsRoutingDumpListener;
 use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
 
 class JsRoutingDumpListenerTest extends \PHPUnit\Framework\TestCase
 {

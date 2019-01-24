@@ -18,6 +18,7 @@ require({
         }
     },
     paths: {
+        'oronavigation/js/routes-loader': 'oronavigation/js/routes-loader',
     {% if app.debug %}
         'oro/routes': '{{ path('oro_navigation_js_routing_js', {_format: 'json'}) }}'
     {% else %}
