@@ -6,6 +6,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
+/**
+ * This class adds twig functions for configurations reading
+ */
 class ConfigExtension extends \Twig_Extension
 {
     /** @var ContainerInterface */
@@ -40,7 +43,8 @@ class ConfigExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_config_value', [$this, 'getConfigValue'])
+            new \Twig_SimpleFunction('oro_config_value', [$this, 'getConfigValue']),
+            new \Twig_SimpleFunction('oro_parameter', [$this, 'getParameter']),
         ];
     }
 
@@ -52,6 +56,16 @@ class ConfigExtension extends \Twig_Extension
     public function getConfigValue($name)
     {
         return $this->getConfigManager()->get($name);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getParameter($name)
+    {
+        return $this->container->getParameter($name);
     }
 
     /**
