@@ -35,7 +35,7 @@
         align-items: center;
         flex-grow: 1;
         margin: 0 auto;
-        padding: side-values(0 42px 0 46px);
+        padding: 0 65px;
         min-width: 100%;
     }
 }
@@ -46,7 +46,6 @@
     &__footer {
         display: flex;
         align-items: center;
-        justify-content: space-between;
 
         &--forgot {
             padding-#{$end}: 0;
@@ -162,6 +161,7 @@
     }
 
     .oro-forgot-password {
+        max-width: 270px;
         min-width: 270px;
 
         input {
@@ -171,6 +171,8 @@
 
     .oro-remember-me {
         margin-bottom: 14px;
+
+        line-height: 1.2;
     }
 
     .extra-btn-large {
@@ -181,7 +183,9 @@
     }
 
     .extra-submit {
-        float: right;
+        display: inline-block;
+
+        @include text-line-truncate(100%, true);
     }
 
     fieldset {
@@ -192,12 +196,27 @@
         margin: side-values(0 0 14px 14px);
     }
 
-    &.form-row-layout {
-        $form-row-offset: 91px !default;
+    .form-row {
+        margin-#{$start}: 0;
+        margin-#{$end}: 0;
+    }
 
-        .form-signin__footer,
+    .form-text {
+        width: $field-width;
+        margin-bottom: 8px;
+        margin-top: 0;
+    }
+
+    &.form-row-layout {
+        .form-signin__footer--login,
         .oro-remember-me {
-            padding-#{$start}: $form-row-offset;
+            padding-#{$start}: 91px;
+        }
+
+        .form-signin__footer {
+            justify-content: space-between;
+            flex-wrap: wrap;
+            flex-direction: row-reverse;
         }
 
         .add-on {
@@ -206,16 +225,24 @@
     }
 
     &.form-column-layout {
+        .form-signin__footer {
+            justify-content: center;
+            flex-wrap: wrap;
+            flex-direction: column;
+        }
+
         .input-prepend {
             flex-direction: column;
         }
 
-        .input {
-            margin-bottom: 0;
+        .input-field-group {
+            .input {
+                margin-bottom: 0;
+            }
         }
 
         .add-on {
-            width: auto;
+            width: 100%;
             height: auto;
 
             padding-#{$end}: 0;
@@ -223,6 +250,10 @@
 
             text-align: #{$start};
             line-height: 1.5;
+        }
+
+        .extra-submit {
+            margin-bottom: 4px;
         }
 
         .input-field-group {
@@ -256,15 +287,6 @@
         & + select {
             width: calc(100% - 178px);
         }
-    }
-}
-
-.form-two-factor {
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    select {
-        width: calc(100% - 24px);
     }
 }
 

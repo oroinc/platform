@@ -60,18 +60,20 @@
                         </div>
                     </div>
                     <div class="oro-remember-me">
-                        <span class="checkbox-view">
-                            <input type="checkbox"
-                                   id="remember_me"
-                                   name="_remember_me"
-                                   class="checkbox-view__input input-widget"
-                                   value="on">
-                            <span class="checkbox-view__icon"></span>
-                        </span><label for="remember_me">{{ 'Remember me on this computer'|trans }}</label>
+                        <label class="shift-checkbox" for="remember_me">
+                            <span class="checkbox-view">
+                                <input type="checkbox"
+                                       id="remember_me"
+                                       name="_remember_me"
+                                       class="checkbox-view__input input-widget"
+                                       value="on">
+                                <span class="checkbox-view__icon"></span>
+                            </span>{{ 'Remember me on this computer'|trans }}
+                        </label>
                     </div>
-                    <div class="form-signin__footer">
-                        <a href="{{ path('oro_user_reset_request') }}">{{ 'Forgot your password?'|trans }}</a>
-                        <button type="submit" class="btn btn-uppercase btn-primary pull-right" id="_submit" name="_submit">{{ 'Log in'|trans }}</button>
+                    <div class="form-signin__footer form-signin__footer--login">
+                        <button type="submit" class="btn extra-submit btn-uppercase btn-primary" id="_submit" name="_submit">{{ 'Log in'|trans }}</button>
+                        <a class="form-signin__link" href="{{ path('oro_user_reset_request') }}">{{ 'Forgot your password?'|trans }}</a>
                     </div>
                     {% if oro_config_value('oro_sso.enable_google_sso') %}
                         <div class="form-signin__oauth">
