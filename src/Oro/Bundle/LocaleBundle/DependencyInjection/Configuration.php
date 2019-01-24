@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\DependencyInjection;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -130,8 +131,17 @@ class Configuration implements ConfigurationInterface
      * @param string $name
      * @return string
      */
-    public static function getConfigKeyByName($name)
+    public static function getConfigKeyByName(string $name): string
     {
-        return sprintf('oro_locale%s%s', ConfigManager::SECTION_MODEL_SEPARATOR, $name);
+        return TreeUtils::getConfigKey(self::ROOT_NAME, $name, ConfigManager::SECTION_MODEL_SEPARATOR);
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    public static function getFieldKeyByName(string $name): string
+    {
+        return TreeUtils::getConfigKey(self::ROOT_NAME, $name, ConfigManager::SECTION_VIEW_SEPARATOR);
     }
 }

@@ -105,7 +105,6 @@ system_configuration:
                 label: oro.locale.system_configuration.fields.enabled_localizations.label
                 required: true
                 multiple: true
-                show_all: true
                 constraints:
                     - NotBlank: ~
 

@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Configurator;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 use Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as Config;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -38,17 +41,38 @@ class LocalizationConfigurator
                     return;
                 }
 
+                $form = $event->getForm();
                 $configManager = $this->configHandler->getConfigManager();
+
+                $this->setEnabledLocalizations($form, $configManager);
+
                 if ($configManager->getScopeEntityName() !== GlobalScopeManager::SCOPE_NAME) {
                     return;
                 }
 
-                $form = $event->getForm();
-
-                $this->hideUseParentScopeCheckbox($form->get('oro_locale___default_localization'));
-                $this->hideUseParentScopeCheckbox($form->get('oro_locale___enabled_localizations'));
+                $this->hideUseParentScopeCheckbox($form->get(Config::getFieldKeyByName(Config::DEFAULT_LOCALIZATION)));
+                $this->hideUseParentScopeCheckbox($form->get(Config::getFieldKeyByName(Config::ENABLED_LOCALIZATIONS)));
             }
         );
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param ConfigManager $configManager
+     */
+    private function setEnabledLocalizations(FormInterface $form, ConfigManager $configManager): void
+    {
+        $form = $form->get(Config::getFieldKeyByName(Config::DEFAULT_LOCALIZATION));
+
+        $options = $form->get('value')
+            ->getConfig()
+            ->getOptions();
+
+        $options[Config::ENABLED_LOCALIZATIONS] = $configManager->get(
+            Config::getConfigKeyByName(Config::ENABLED_LOCALIZATIONS)
+        );
+
+        $form->add('value', LocalizationSelectionType::class, $options);
     }
 
     /**
