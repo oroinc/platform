@@ -69,7 +69,6 @@
 
             .select2-search-choice {
                 font-size: $base-font-size--m;
-                height: 28px;
                 white-space: nowrap;
                 line-height: 20px;
                 max-width: 100%;
@@ -85,7 +84,7 @@
 
                 .select2-search-choice-close {
                     width: 24px;
-                    height: 26px;
+                    height: 28px;
                     line-height: normal;
                     top: 0;
                     #{$end}: 3px;
