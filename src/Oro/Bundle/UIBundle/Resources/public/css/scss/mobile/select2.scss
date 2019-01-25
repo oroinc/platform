@@ -109,6 +109,21 @@
             }
         }
     }
+
+    &-results {
+        padding: $mobile-select2-results-inner-offset;
+
+        .select2-result-label,
+        .select2-more-results {
+            font-size: $mobile-select2-result-label-font-size;
+            padding: $mobile-select2-result-label-inner-offset;
+            line-height: $mobile-select2-result-label-line-height;
+        }
+    }
+
+    &-drop {
+        max-width: $mobile-select2-drop-max-width;
+    }
 }
 
 .select2-container.select2-tree-autocomplete {
