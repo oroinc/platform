@@ -56,7 +56,7 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit\Framework\TestCase
         $maker = $this->createMock(
             'Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface'
         );
-        $maker->expects($this->once())
+        $maker->expects($this->atLeastOnce())
             ->method('supports')
             ->willReturn(true);
         $maker->expects($this->atLeastOnce())

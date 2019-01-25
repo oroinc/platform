@@ -20,6 +20,9 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEnt
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * @dbIsolationPerTest
+ */
 class IterableResultFactoryTest extends WebTestCase
 {
     use RolePermissionExtension;
