@@ -37,3 +37,20 @@ Feature: Create segment
     Then I should see "Segment saved" flash message
     And I should see "Apply segment Segment 1"
     And I should see "Apply segment Segment 2"
+
+  Scenario Outline: Check unique segments name validation
+    Given I go to Reports & Segments/ Manage Segments
+    And I click "Create Segment"
+    And I fill "Segment Form" with:
+      | Name         | <segment_name> |
+      | Entity       | Segment        |
+      | Segment Type | Manual         |
+    And I add the following columns:
+      | Id |
+    When I save form
+    Then I should see "There is another segment with a similar name."
+
+    Examples:
+      | segment_name |
+      | Segment 1    |
+      | segmENT 1    |

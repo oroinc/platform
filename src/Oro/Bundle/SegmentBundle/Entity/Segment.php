@@ -11,7 +11,7 @@ use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 use Oro\Bundle\SegmentBundle\Model\ExtendSegment;
 
 /**
- * Segment
+ * Main segment entity.
  *
  * @ORM\Table(name="oro_segment")
  * @ORM\Entity(repositoryClass="Oro\Bundle\SegmentBundle\Entity\Repository\SegmentRepository")
@@ -55,9 +55,17 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     protected $id;
 
     /**
-     * @ORM\Column(type="string", unique=true, length=255, nullable=false)
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
     protected $name;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name_lowercase", type="string", unique=true, length=255, nullable=false)
+     * @ConfigField(mode="hidden")
+     */
+    protected $nameLowercase;
 
     /**
      * @var string
@@ -180,8 +188,19 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     public function setName($name)
     {
         $this->name = $name;
+        $this->nameLowercase = mb_strtolower($name);
 
         return $this;
+    }
+
+    /**
+     * Get name in lowercase
+     *
+     * @return string|null
+     */
+    public function getNameLowercase(): ?string
+    {
+        return $this->nameLowercase;
     }
 
     /**

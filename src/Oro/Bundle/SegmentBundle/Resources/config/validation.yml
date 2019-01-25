@@ -1,8 +1,8 @@
 Oro\Bundle\SegmentBundle\Entity\Segment:
     constraints:
         - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
-            fields: [ name ]
-            message: "Segment name already in use"
+            fields: [ nameLowercase ]
+            message: 'oro.segment.validation.unique.name'
         - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint: ~
         - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\DefinitionQueryConstraint: ~
         - Oro\Bundle\SegmentBundle\Validator\Constraints\Sorting: ~
