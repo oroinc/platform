@@ -7,16 +7,20 @@
     <div class="container">
         <div class="form-wrapper">
             <div class="form-wrapper__inner">
+                {% set resetLabel = 'Reset'|trans %}
+                {% set cancelLabel = 'Cancel'|trans %}
+                {% set showLabels = (resetLabel|length <= 9) and (cancelLabel|trans <= 9) %}
+                {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
                 {{ form_start(form, {
                     'action': path('oro_user_reset_reset', { token: token }),
                     'attr': {
-                        'class': 'form-signin form-reset'
+                        'class': 'form-signin form-reset ' ~ layoutName
                     }
                 }) }}
                     <div class="title-box">
                         <h2 class="title">{{ 'Password Reset'|trans }}</h2>
                     </div>
-                    <fieldset class="oro-forgot-password">
+                    <fieldset class="field-set oro-forgot-password">
                         {% if form.vars.errors|length > 0 %}
                             <div class="alert alert-error" role="alert">
                                 {{ form_errors(form) }}
@@ -24,8 +28,8 @@
                         {% endif %}
                         {{ form_rest(form) }}
                         <div class="form-row form-signin__footer form-signin__footer--reset">
-                            <a href="{{ path('oro_user_security_login') }}" class="btn">{{ 'Cancel'|trans }}</a>
-                            <button class="btn extra-submit btn-uppercase btn-primary" type="submit">{{ 'Reset'|trans }}</button>
+                            <button class="btn extra-submit btn-uppercase btn-primary" type="submit">{{ resetLabel }}</button>
+                            <a href="{{ path('oro_user_security_login') }}" class="btn">{{ cancelLabel }}</a>
                         </div>
                     </fieldset>
                 {{ form_end(form) }}

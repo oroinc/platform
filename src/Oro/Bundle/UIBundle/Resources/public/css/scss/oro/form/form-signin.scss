@@ -46,20 +46,18 @@
     &__footer {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        padding-left: 91px;
 
         &--forgot {
-            padding-left: 0;
+            padding-#{$end}: 0;
         }
 
         &--reset {
-            padding-left: 155px;
+            padding-#{$end}: 155px;
         }
     }
 
     &__oauth {
-        padding: 24px 0 0 93px;
+        padding: side-values(24px 0 0 93px);
     }
 
     &__section {
@@ -88,10 +86,10 @@
     .title-box {
         color: $primary-200;
         margin: 0 0 27px;
-        text-align: left;
+        text-align: #{$start};
 
         .divider-vertical {
-            float: left;
+            float: #{$start};
             background: url(../../img/vertical-divider.png) no-repeat;
             width: 2px;
             height: 28px;
@@ -99,7 +97,7 @@
         }
 
         .oro-title {
-            float: left;
+            float: #{$start};
             font-size: 22px;
             line-height: 28px;
             margin: 0;
@@ -133,10 +131,9 @@
 
     .add-on {
         background: none;
-        width: 93px;
-        text-align: right;
+        text-align: #{$end};
         color: $primary-200;
-        padding: 0 25px 0 0;
+        padding: side-values(0 25px 0 0);
         border: none;
     }
 
@@ -152,18 +149,19 @@
     .organization-selector-arrow {
         position: relative;
         top: 8px;
-        left: -15px;
-        margin-right: -9px;
+        #{$start}: -15px;
+        margin-#{$end}: -9px;
         z-index: 5;
     }
 
     .forgot-pass {
-        float: left;
+        float: #{$start};
         font-weight: bold;
-        margin: 9px 10px 0 0;
+        margin: side-values(9px 10px 0 0);
     }
 
     .oro-forgot-password {
+        max-width: 270px;
         min-width: 270px;
 
         input {
@@ -173,18 +171,21 @@
 
     .oro-remember-me {
         margin-bottom: 14px;
-        padding-left: 91px;
+
+        line-height: 1.2;
     }
 
     .extra-btn-large {
         height: 32px;
         line-height: 32px;
         min-width: 95px;
-        float: left;
+        float: #{$start};
     }
 
     .extra-submit {
-        float: right;
+        display: inline-block;
+
+        @include text-line-truncate(100%, true);
     }
 
     fieldset {
@@ -192,7 +193,84 @@
     }
 
     span.validation-failed {
-        margin: 0 0 14px 14px;
+        margin: side-values(0 0 14px 14px);
+    }
+
+    .form-row {
+        margin-#{$start}: 0;
+        margin-#{$end}: 0;
+    }
+
+    .form-text {
+        width: $field-width;
+        margin-bottom: 8px;
+        margin-top: 0;
+    }
+
+    &.form-row-layout {
+        .form-signin__footer--login,
+        .oro-remember-me {
+            padding-#{$start}: 91px;
+        }
+
+        .form-signin__footer {
+            justify-content: space-between;
+            flex-wrap: wrap;
+            flex-direction: row-reverse;
+        }
+
+        .add-on {
+            width: 93px;
+        }
+    }
+
+    &.form-column-layout {
+        .form-signin__footer {
+            justify-content: center;
+            flex-wrap: wrap;
+            flex-direction: column;
+        }
+
+        .input-prepend {
+            flex-direction: column;
+        }
+
+        .input-field-group {
+            .input {
+                margin-bottom: 0;
+            }
+        }
+
+        .add-on {
+            width: 100%;
+            height: auto;
+
+            padding-#{$end}: 0;
+            padding-bottom: 4px;
+
+            text-align: #{$start};
+            line-height: 1.5;
+        }
+
+        .extra-submit {
+            margin-bottom: 4px;
+        }
+
+        .input-field-group {
+            margin-bottom: 8px;
+        }
+
+        .field-set,
+        .title-box {
+            margin-#{$start}: auto;
+            margin-#{$end}: auto;
+
+            width: $field-width;
+        }
+
+        .title-box {
+            margin-bottom: 18px;
+        }
     }
 }
 
@@ -209,15 +287,6 @@
         & + select {
             width: calc(100% - 178px);
         }
-    }
-}
-
-.form-two-factor {
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    select {
-        width: calc(100% - 24px);
     }
 }
 
