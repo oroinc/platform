@@ -33,7 +33,8 @@ Example:
          "username":"testapiuser",
          "email":"testuser@oroinc.com",
          "firstName":"Bob",
-         "lastName":"Fedeson"
+         "lastName":"Fedeson",
+         "password": "Password000!"
       },
       "relationships":{  
          "owner":{  
