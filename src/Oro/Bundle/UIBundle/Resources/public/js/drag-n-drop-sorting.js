@@ -33,6 +33,7 @@ define(function(require) {
                 tolerance: 'pointer',
                 delay: 100,
                 containment: 'parent',
+                handle: '[data-name="sortable-handle"]',
                 stop: _.bind(this.reindexValues, this)
             });
         }

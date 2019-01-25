@@ -78,6 +78,8 @@ $jstree-checked-background: $secondary !default;
 $jstree-checked-border-color: $secondary !default;
 $jstree-checked-content: "\f00c" !default;
 
+$jstree-loading-inner-offset: $content-padding - 4px !default;
+
 $jstree-search-component-position: relative !default;
 $jstree-search-component-bottom-offset: $content-padding-medium !default;
 

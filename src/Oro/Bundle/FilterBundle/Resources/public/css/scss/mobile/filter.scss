@@ -153,6 +153,10 @@
             .select2-container {
                 width: 100% !important;
                 margin-#{$start}: -2px;
+
+                input[type='text'] {
+                    padding: $mobile-filter-box-choice-filter-inner-offset;
+                }
             }
 
             &.number-range-filter {
