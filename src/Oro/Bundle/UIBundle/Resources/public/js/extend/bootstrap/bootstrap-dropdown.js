@@ -17,6 +17,7 @@ define(function(require) {
     var DATA_API_KEY = '.data-api';
     var HIDE_EVENT = 'hide' + EVENT_KEY;
     var TO_HIDE_EVENT = 'tohide' + EVENT_KEY;
+    var HIDING_EVENT = 'hiding' + EVENT_KEY;
     var GRID_SCROLLABLE_CONTAINER = '.grid-scrollable-container';
     var DIALOG_SCROLLABLE_CONTAINER = '.ui-dialog-content';
     var SCROLLABLE_CONTAINER = [
@@ -37,8 +38,7 @@ define(function(require) {
             original.toggle.call(this);
 
             if (Dropdown._isShowing) {
-                // sets focus on first input
-                $(this._menu).find('input[type=text]:first').focus();
+                $(this._menu).focusFirstInput();
             }
 
             if (this._displayArrow()) {
@@ -136,8 +136,6 @@ define(function(require) {
          * @protected
          */
         _onHide: function(event) {
-            var form;
-
             if (this._element !== event.relatedTarget) {
                 return;
             }
@@ -147,13 +145,21 @@ define(function(require) {
                 event.preventDefault();
             }
 
+            var $clickTarget;
+
             if (
                 Dropdown._clickEvent &&
-                (form = $(Dropdown._clickEvent.target).closest('form')[0]) &&
-                $.contains(this._menu, form)
+                this._config.preventCloseOnMenuClick === true &&
+                ($clickTarget = $(Dropdown._clickEvent.target)) &&
+                $clickTarget.closest('.dropdown-menu').is(this._menu) &&
+                !$clickTarget.is('[data-role="close"]')
             ) {
-                // prevent parent menu close on click inside its form
+                // prevent parent menu close on click inside
                 event.preventDefault();
+            }
+
+            if (!event.isDefaultPrevented()) {
+                $(this._menu).trigger(HIDING_EVENT);
             }
         },
 
@@ -272,6 +278,7 @@ define(function(require) {
             }
 
             if ($target.closest('.dropdown-menu.show').length) {
+                // Dropdown._clickEvent is defined only if the click occurred within some opened dropdown menu
                 // original click event is used in the hide event handler
                 Dropdown._clickEvent = event;
             }

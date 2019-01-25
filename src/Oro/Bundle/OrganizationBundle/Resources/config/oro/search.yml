@@ -5,6 +5,10 @@ search:
         title_fields:                   [name]
         fields:
             -
+                name:                   id
+                target_type:            integer
+                target_fields:          [oro_organization_id]
+            -
                 name:                   name
                 target_type:            text
                 target_fields:          [name]
@@ -17,7 +21,7 @@ search:
             -
                 name:                   id
                 target_type:            integer
-                target_fields:          [id]
+                target_fields:          [id, oro_business_unit_id]
             -
                 name:                   name
                 target_type:            text

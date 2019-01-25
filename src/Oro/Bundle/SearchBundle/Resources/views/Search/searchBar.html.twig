@@ -2,12 +2,17 @@
     {% set searchTogglerId = 'dropdown-'|uniqid %}
     <div class="dropdown header-dropdown-search">
         <button id="{{ searchTogglerId }}" class="dropdown-toggle dropdown-toggle--no-caret" data-toggle="dropdown" title="{{'Search'|trans}}"
-                aria-haspopup="true" aria-expanded="false" aria-label="{{ 'Search'|trans }}">
+                aria-haspopup="true" aria-expanded="false" aria-label="{{ 'Search'|trans }}"
+                data-prevent-close-on-menu-click="true">
             <span class="fa-search" aria-hidden="true"></span>
         </button>
         <ul class="dropdown-menu" aria-labelledby="{{ searchTogglerId }}"
             data-page-component-view="orosearch/js/app/views/search-suggestion-view">
-            {% if isMobileVersion() %}<li class="nav-header nav-header-title">{{'Search'|trans}}</li>{% endif %}
+            {% if isMobileVersion() %}
+                <li class="nav-header nav-header-title">{{'Search'|trans}}
+                    <button class="btn-link btn-close fa-close hide-text" data-role="close">{{ 'Close'|trans }}</button>
+                </li>
+            {% endif %}
             <li class="nav-content">
                 <form method="get" action="{{ path('oro_search_results') }}" class="search-form">
                     <div class="header-search">
@@ -24,7 +29,7 @@
                             {% endfor %}
                         </select>
                         <div class="search-field-container">
-                            <input type="text" class="span2 search" placeholder="" name="search" value="" autocomplete="off"/>
+                            <input type="text" class="span2 search" placeholder="" name="search" value="" autocomplete="off" data-autofocus />
                             <ul class="search-suggestion-list" data-role="search-suggestion-list">
                                 <li class="loading" data-role="loading">
                                     <div class="loader-mask"><div class="loader-frame"></div></div>

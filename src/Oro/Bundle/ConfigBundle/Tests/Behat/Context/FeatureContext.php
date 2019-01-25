@@ -256,4 +256,25 @@ class FeatureContext extends OroFeatureContext implements
         $sidebarConfigMenu = $this->createElement('SidebarConfigMenu');
         $sidebarConfigMenu->collapseAll();
     }
+
+    /**
+     * Enables (set to true) certain config options
+     * Used instead of manual walking on configuration like "System/ Configuration"
+     *
+     * Example: I enable configuration options:
+     *      | oro_config.setting1 |
+     *      | oro_config.setting2 |
+     *
+     * @Given /^I enable configuration options:$/
+     * @param TableNode $table
+     */
+    public function enableConfigOptions(TableNode $table): void
+    {
+        $configManager = $this->getContainer()->get('oro_config.global');
+        foreach ($table->getRows() as $row) {
+            $configManager->set($row[0], true);
+        }
+
+        $configManager->flush();
+    }
 }

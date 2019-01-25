@@ -4,3 +4,9 @@ services:
         class: Oro\Bundle\LocaleBundle\Command\OroLocalizationDumpCommand
         tags:
             - { name: console.command }
+
+    Oro\Bundle\LocaleBundle\Command\UpdatelocalizationCommand:
+        public: false
+        class: Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand
+        tags:
+            - { name: console.command }

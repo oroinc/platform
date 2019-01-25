@@ -32,6 +32,20 @@ services:
         tags:
             - { name: form.type, alias: oro_image }
 
+    oro_attachment.form.type.mime_type_config.file:
+        class: Oro\Bundle\AttachmentBundle\Form\Type\FileMimeTypeConfigType
+        arguments:
+            - '%oro_attachment.upload_file_mime_types%'
+        tags:
+            - { name: form.type, alias: oro_attachment_file_mime_type_config }
+
+    oro_attachment.form.type.mime_type_config.image:
+        class: Oro\Bundle\AttachmentBundle\Form\Type\ImageMimeTypeConfigType
+        arguments:
+            - '%oro_attachment.upload_image_mime_types%'
+        tags:
+            - { name: form.type, alias: oro_attachment_image_mime_type_config }
+
     oro_attachment.form.file_subscriber:
         class: '%oro_attachment.form.file_subscriber.class%'
         arguments: ['@oro_attachment.validator.file_config_validator']

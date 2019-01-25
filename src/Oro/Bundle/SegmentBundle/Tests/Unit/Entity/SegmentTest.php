@@ -26,6 +26,7 @@ class SegmentTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertNull($this->entity->getId());
         $this->assertNull($this->entity->getName());
+        $this->assertNull($this->entity->getNameLowercase());
         $this->assertNull($this->entity->getDefinition());
         $this->assertNull($this->entity->getDescription());
         $this->assertNull($this->entity->getType());

@@ -1,0 +1,114 @@
+{% block attribute_group_rest_widget -%}
+    {% import 'OroUIBundle::macros.html.twig' as UI -%}
+
+    {% set content = '' %}
+    {% set visibleTabsOptions = [] %}
+
+    {% set tabsOptionsById = [] %}
+    {% for tab in tabsOptions %}
+        {% set tabsOptionsById = tabsOptionsById|merge({
+            (tab.id): tab
+        }) %}
+    {% endfor %}
+
+    {% for child in block if child.vars.visible -%}
+        {% set childContent = block_widget(child) %}
+        {% if childContent|trim|length > 0 %}
+            {% set content = content ~ childContent %}
+            {% set visibleTabsOptions = visibleTabsOptions|merge([tabsOptionsById[child.vars.group]]) %}
+        {% endif %}
+    {%- endfor %}
+
+    {% if visibleTabsOptions is not empty %}
+        <div {{ block('block_attributes') }}>
+            <div {{ UI.renderPageComponentAttributes({
+                module: 'oroentityconfig/js/attribute-group-tabs-component',
+                options: {data: visibleTabsOptions}
+            }) }}></div>
+
+            {{ content|raw }}
+        </div>
+    {% endif %}
+{%- endblock %}
+
+{% block attribute_group_rest_attribute_group_widget %}
+    {% set content = block_widget(block) %}
+    {% if content|trim|length > 0 %}
+    {% set attr = layout_attr_defaults(attr, {
+        'data-page-component-module': 'oroentityconfig/js/attribute-group-tab-content-component',
+        '~data-page-component-options': {'id': group}|json_encode
+    }) %}
+    <div {{ block('block_attributes') }} style="display: none;" class="tab-content">
+        {{ content|raw }}
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block attribute_label_widget %}
+    {% if label|trans|first != '_' %}
+        <label>{{ label|trans }}:</label>
+    {% endif %}
+{% endblock %}
+
+{% block attribute_text_widget %}
+    {% if value is not iterable %}
+        {{ value|nl2br }}
+    {% else %}
+        {{ value|join('\n')|nl2br }}
+    {% endif %}
+{% endblock %}
+
+{% block attribute_decimal_widget %}
+    {{ value|oro_format_decimal }}
+{% endblock %}
+
+{% block attribute_html_escaped_widget %}
+    {{ value|oro_html_escape }}
+{% endblock %}
+
+{% block attribute_boolean_widget %}
+    {{ value ? 'Yes'|trans : 'No'|trans }}
+{% endblock %}
+
+{% block attribute_currency_widget %}
+    {{ value ? value | oro_format_currency : null }}
+{% endblock %}
+
+{% block attribute_percent_widget %}
+    {{ value ? value | oro_format_percent : null }}
+{% endblock %}
+
+{% block attribute_date_widget %}
+    {{ value ? value | oro_format_date : null }}
+{% endblock %}
+
+{% block attribute_datetime_widget %}
+    {{ value ? value | oro_format_datetime : null }}
+{% endblock %}
+
+{% block attribute_multiselect_widget %}
+    {%- for item in value -%}
+        {{- item -}}
+        {%- if not loop.last -%}
+            ,&nbsp;
+        {%- endif -%}
+    {%- else -%}
+        {{ 'N/A'|trans }}
+    {%- endfor -%}
+{% endblock %}
+
+{% block attribute_image_widget %}
+    <img src="{{ resized_image_url(value, width, height) }}" alt="{{ label }}" width="{{ width }}" height="{{ height }}">
+{% endblock %}
+
+{% block attribute_file_widget %}
+    {{ oro_file_view(entity, fieldName, value) }}
+{% endblock %}
+
+{% block attribute_localized_fallback_widget %}
+    {{ translated_value|oro_html_sanitize }}
+{% endblock %}
+
+{% block attribute_group_rest_attribute_widget %}
+    <div class="tab-content__wrapper">{{ block('attribute_label_widget') }} {{ block_widget(block) }}</div>
+{% endblock %}

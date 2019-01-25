@@ -7,7 +7,7 @@ use Oro\Bundle\EntityBundle\EventListener\EntityVirtualStructureOptionsListener;
 use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
-use Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
@@ -17,7 +17,7 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
     /** @var EntityVirtualStructureOptionsListener */
     protected $listener;
 
-    /** @var ChainVirtualFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $virtualFieldProvider;
 
     /**
@@ -25,7 +25,7 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
      */
     protected function setUp()
     {
-        $this->virtualFieldProvider = $this->createMock(ChainVirtualFieldProvider::class);
+        $this->virtualFieldProvider = $this->createMock(VirtualFieldProviderInterface::class);
         $this->listener = new EntityVirtualStructureOptionsListener($this->virtualFieldProvider);
     }
 

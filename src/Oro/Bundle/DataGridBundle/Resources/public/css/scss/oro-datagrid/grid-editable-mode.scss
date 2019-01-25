@@ -159,8 +159,6 @@
     }
 
     &-wrapper {
-        padding-#{$end}: 0;
-
         &:not(.tags-select-editor) {
             .inline-editor__actions .btn {
                 padding: $oro-datagrid-editable-action-item-inner-offset;
@@ -189,10 +187,6 @@
         &.tags-select-editor {
             .select2-container {
                 min-height: $oro-datagrid-editable-cell-min-height;
-            }
-
-            .inline-editor__inner {
-                margin-#{$end}: 0;
             }
         }
 

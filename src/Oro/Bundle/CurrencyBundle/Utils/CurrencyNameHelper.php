@@ -8,20 +8,27 @@ use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface;
 
 /**
  * Contains handy methods for working with currencies.
  */
 class CurrencyNameHelper
 {
-    /** @var ViewTypeProviderInterface  */
-    protected $viewTypeProvider;
-
-    /** @var \Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface  */
-    protected $intlCurrencyBundle;
+    /** @var $localeSettings */
+    protected $localeSettings;
 
     /** @var NumberFormatter */
     protected $formatter;
+
+    /** @var ViewTypeProviderInterface */
+    protected $viewTypeProvider;
+
+    /** @var CurrencyListProviderInterface */
+    protected $currencyProvider;
+
+    /** @var CurrencyBundleInterface */
+    protected $intlCurrencyBundle;
 
     /**
      * @param LocaleSettings $localeSettings
@@ -35,9 +42,9 @@ class CurrencyNameHelper
         ViewTypeProviderInterface $viewTypeProvider,
         CurrencyListProviderInterface $currencyListProvider
     ) {
-        $this->viewTypeProvider = $viewTypeProvider;
         $this->localeSettings = $localeSettings;
         $this->formatter = $formatter;
+        $this->viewTypeProvider = $viewTypeProvider;
         $this->currencyProvider = $currencyListProvider;
         $this->intlCurrencyBundle = Intl::getCurrencyBundle();
     }

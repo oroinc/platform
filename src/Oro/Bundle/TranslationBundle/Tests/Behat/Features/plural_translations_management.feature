@@ -14,11 +14,10 @@ Feature: Plural translations management
 
   Scenario: Change language settings
     Given I go to System/Configuration
-    And I follow "System Configuration/General Setup/Language Settings" on configuration sidebar
-    When I fill "Language Settings System Config Form" with:
-      | Supported languages  | Russian (Russia) |
-      | Use Default Language | false            |
-      | Default Language     | Russian (Russia) |
+    And I follow "System Configuration/General Setup/Localization" on configuration sidebar
+    When I fill form with:
+      | Enabled Localizations | Russian (Russia) |
+      | Default Localization  | Russian (Russia) |
     And I save form
     Then I should see "Configuration saved" flash message
 

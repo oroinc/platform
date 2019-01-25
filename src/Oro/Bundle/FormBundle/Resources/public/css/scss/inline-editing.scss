@@ -3,6 +3,10 @@
 .inline-editor__inner {
     position: relative;
     margin-#{$end}: $inline-editor-inner-offset;
+
+    .tags-column-editor.tags-select-editor & {
+        margin-#{$end}: 0;
+    }
 }
 
 .inline-editor__actions {
@@ -53,6 +57,10 @@
 .inline-editor-wrapper {
     position: absolute;
     padding-#{$end}: $inline-editor-action-item-fields-last-offset;
+
+    &[class*=-column-editor] {
+        padding-#{$end}: 0;
+    }
 
     min-width: $inline-editor-wrapper-width;
 

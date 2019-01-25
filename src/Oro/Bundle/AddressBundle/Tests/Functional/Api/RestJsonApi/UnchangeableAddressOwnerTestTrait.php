@@ -362,7 +362,7 @@ trait UnchangeableAddressOwnerTestTrait
         $this->assertResponseValidationError(
             [
                 'title'  => 'extra fields constraint',
-                'detail' => sprintf('This form should not contain extra fields: "%s"', self::OWNER_RELATIONSHIP),
+                'detail' => sprintf('This form should not contain extra fields: "%s".', self::OWNER_RELATIONSHIP),
                 'source' => ['pointer' => '/included/0']
             ],
             $response

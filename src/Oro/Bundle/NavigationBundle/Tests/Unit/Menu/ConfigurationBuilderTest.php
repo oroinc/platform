@@ -291,7 +291,13 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->configurationBuilder->build($menu, [], 'navbar');
     }
 
-    public function testBuildExtraIsAllowed()
+    /**
+     * @dataProvider isAllowedTreeDataProvider
+     * @param array $menuOptions
+     * @param bool $displayChildren
+     * @param bool $expected
+     */
+    public function testBuildExtraIsAllowed(array $menuOptions, bool $displayChildren, bool $expected)
     {
         $options = [
             'items' => [
@@ -321,8 +327,33 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 
         $menu = new MenuItem('navbar', $this->factory);
         $menu->setExtra('isAllowed', true);
-        $this->configurationBuilder->build($menu, [], 'navbar');
+        $menu->setDisplayChildren($displayChildren);
+        $this->configurationBuilder->build($menu, $menuOptions, 'navbar');
 
-        $this->assertFalse($menu->getExtra('isAllowed'));
+        $this->assertEquals($expected, $menu->getExtra('isAllowed'));
+    }
+
+    /**
+     * @return array
+     */
+    public function isAllowedTreeDataProvider(): array
+    {
+        return [
+            'is not allowed, as item has no allowed children' => [
+                'menuOptions' => [],
+                'displayChildren' => true,
+                'expected' => false
+            ],
+            'is allowed, as item has allowed children' => [
+                'menuOptions' => ['extras' => ['isAllowed' => true]],
+                'displayChildren' => true,
+                'expected' => true
+            ],
+            'is allowed, as item has no allowed children but children are not displayed' => [
+                'menuOptions' => [],
+                'displayChildren' => false,
+                'expected' => true
+            ],
+        ];
     }
 }

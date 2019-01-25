@@ -2,7 +2,6 @@
 {% form_theme form with [
     'OroFormBundle:Form:fields.html.twig',
     'OroUserBundle:Form:fields.html.twig',
-    'OroNotificationBundle:Form:fields.html.twig',
     'OroEmailBundle:Form:fields.html.twig'
 ]%}
 {% if form.vars.value.id %}
@@ -92,25 +91,21 @@
         ]
     } %}
 
-    <div class="responsive-form-inner"
-         data-page-component-module="oronotification/js/app/components/email-notification-form-component"
-         data-page-component-options="{{ {
-             'selectors': {
-                 'form': '#' ~ form.vars.id,
-                 'listenChangeElements': form.vars.listenChangeElements
-             }
-         }|json_encode }}"
-    >
+    <div class="responsive-form-inner">
         {{ parent() }}
     </div>
 {% endblock content_data %}
 
 {% block content %}
     <div class="scrollable-container"
-         data-page-component-module="oroui/js/app/components/view-component"
-         data-page-component-options="{{ {
-              view: 'oronotification/js/app/views/email-notification-form-view'
-          }|json_encode }}">
+        data-page-component-module="oroui/js/app/components/view-component"
+        data-page-component-options="{{ {
+            view: 'oronotification/js/app/views/email-notification-form-view',
+            selectors: {
+                form: '#' ~ form.vars.id,
+                listenChangeElements: form.vars.listenChangeElements
+            }
+        }|json_encode }}">
         {{ parent() }}
     </div>
 {% endblock %}

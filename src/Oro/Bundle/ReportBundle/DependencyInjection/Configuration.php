@@ -17,7 +17,26 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root('oro_report');
+        $rootNode = $treeBuilder->root('oro_report');
+        $rootNode
+            ->children()
+                ->arrayNode('dbal')
+                    ->children()
+                        ->scalarNode('connection')
+                            ->info('The name of DBAL connection that should be used to execute report queries.')
+                        ->end()
+                        ->arrayNode('datagrid_prefixes')
+                            ->info(
+                                'The list of name prefixes for datagrids that are reports'
+                                . ' and should use the DBAL connection configured in the "connection" option.'
+                            )
+                            ->example(['acme_report_'])
+                            ->prototype('scalar')
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
 
         SettingsBuilder::append(
             $rootNode,

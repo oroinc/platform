@@ -5,10 +5,13 @@ namespace Oro\Bundle\EntityBundle\Provider;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Provides functionality to get human-readable text representation of an entity.
+ */
 class EntityNameResolver
 {
     /** @var string */
-    protected $defaultFormat;
+    private $defaultFormat;
 
     /** @var array */
     private $config;
@@ -16,21 +19,19 @@ class EntityNameResolver
     /** @var array */
     private $normalizedConfig;
 
-    /** @var array */
+    /** @var iterable|EntityNameProviderInterface[] */
     private $providers;
 
-    /** @var EntityNameProviderInterface[] */
-    private $sorted;
-
     /**
-     * @param string $defaultFormat The default representation format
-     * @param array  $config        The configuration of representation formats
+     * @param iterable|EntityNameProviderInterface[] $providers     The entity name providers
+     * @param string                                 $defaultFormat The default representation format
+     * @param array                                  $config        The configuration of representation formats
      *
      * @throws \InvalidArgumentException if default format is not specified or does not exist
      */
-    public function __construct($defaultFormat, array $config)
+    public function __construct(iterable $providers, string $defaultFormat, array $config)
     {
-        if (empty($defaultFormat)) {
+        if (!$defaultFormat) {
             throw new \InvalidArgumentException('The default representation format must be specified.');
         }
         if (!isset($config[$defaultFormat])) {
@@ -39,20 +40,9 @@ class EntityNameResolver
             );
         }
 
+        $this->providers = $providers;
         $this->defaultFormat = $defaultFormat;
-        $this->config        = $config;
-    }
-
-    /**
-     * Registers the provider in the chain.
-     *
-     * @param EntityNameProviderInterface $provider
-     * @param int                         $priority
-     */
-    public function addProvider(EntityNameProviderInterface $provider, $priority = 0)
-    {
-        $this->providers[$priority][] = $provider;
-        $this->sorted                 = null;
+        $this->config = $config;
     }
 
     /**
@@ -72,20 +62,17 @@ class EntityNameResolver
             return null;
         }
 
-        $result    = null;
-        $formats   = $this->getFormatConfig($format ?: $this->defaultFormat);
-        $providers = $this->getProviders();
+        $formats = $this->getFormatConfig($format ?: $this->defaultFormat);
         foreach ($formats as $currentFormat) {
-            foreach ($providers as $provider) {
+            foreach ($this->providers as $provider) {
                 $val = $provider->getName($currentFormat['name'], $locale, $entity);
                 if (false !== $val) {
-                    $result = $val;
-                    break 2;
+                    return $val;
                 }
             }
         }
 
-        return $result;
+        return null;
     }
 
     /**
@@ -103,21 +90,18 @@ class EntityNameResolver
     public function getNameDQL($className, $alias, $format = null, $locale = null)
     {
         QueryBuilderUtil::checkIdentifier($alias);
-        $result = null;
 
-        $formats   = $this->getFormatConfig($format ?: $this->defaultFormat);
-        $providers = $this->getProviders();
+        $formats = $this->getFormatConfig($format ?: $this->defaultFormat);
         foreach ($formats as $currentFormat) {
-            foreach ($providers as $provider) {
+            foreach ($this->providers as $provider) {
                 $val = $provider->getNameDQL($currentFormat['name'], $locale, $className, $alias);
                 if (false !== $val) {
-                    $result = $val;
-                    break 2;
+                    return $val;
                 }
             }
         }
 
-        return $result;
+        return null;
     }
 
     /**
@@ -144,25 +128,6 @@ class EntityNameResolver
         }
 
         return $expr;
-    }
-
-    /**
-     * Returns the registered providers sorted by priority.
-     *
-     * @return EntityNameProviderInterface[]
-     */
-    protected function getProviders()
-    {
-        if (null === $this->sorted) {
-            if (empty($this->providers)) {
-                $this->sorted = [];
-            } else {
-                krsort($this->providers);
-                $this->sorted = call_user_func_array('array_merge', $this->providers);
-            }
-        }
-
-        return $this->sorted;
     }
 
     /**
@@ -194,14 +159,14 @@ class EntityNameResolver
     protected function normalizeConfig($config)
     {
         $result = [];
-        $names  = array_keys($config);
+        $names = array_keys($config);
         foreach ($names as $name) {
             $fallback = $name;
             while ($fallback) {
-                $format          = $config[$fallback];
-                $format['name']  = $fallback;
+                $format = $config[$fallback];
+                $format['name'] = $fallback;
                 $result[$name][] = $format;
-                $fallback        = $format['fallback'];
+                $fallback = $format['fallback'];
             }
         }
 

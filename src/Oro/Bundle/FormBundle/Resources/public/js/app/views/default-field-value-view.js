@@ -3,18 +3,35 @@ define(function(require) {
 
     var DefaultFieldValueView;
     var $ = require('jquery');
+    var _ = require('underscore');
     var tinyMCE = require('tinymce/tinymce');
     var BaseView = require('oroui/js/app/views/base/view');
 
     DefaultFieldValueView = BaseView.extend({
+        /**
+         * @inheritDoc
+         * @property
+         */
         autoRender: true,
 
+        /**
+         * @inheritDoc
+         */
         optionNames: BaseView.prototype.optionNames.concat(['prepareTinymce', 'fieldSelector', 'checkboxSelector']),
 
+        /**
+         * @property {Boolean}
+         */
         prepareTinymce: true,
 
+        /**
+         * @property {String}
+         */
         checkboxSelector: '[data-role="changeUseDefault"]',
 
+        /**
+         * @inheritDoc
+         */
         events: {
             'change [data-role="changeUseDefault"]': 'onDefaultCheckboxChange'
         },
@@ -26,19 +43,40 @@ define(function(require) {
             DefaultFieldValueView.__super__.constructor.apply(this, arguments);
         },
 
+        /**
+         * @inheritDoc
+         * @returns {*}
+         */
         render: function() {
-            if (this.fieldSelector && this.$(this.checkboxSelector).is(':checked')) {
-                this.$(this.fieldSelector).prop('disabled', true);
+            if (this.$(this.checkboxSelector).is(':checked')) {
+                this.$(this.checkboxSelector).filter(':checked').each(_.bind(function(i, e) {
+                    this._setFieldsState($(e), true);
+                }, this));
             }
 
             return DefaultFieldValueView.__super__.render.apply(this, arguments);
         },
 
+        /**
+         * On change checkbox handler
+         * @param e
+         */
         onDefaultCheckboxChange: function(e) {
             var $currentTarget = $(e.currentTarget);
-            var $controls = $currentTarget.parents('.controls');
-
             var value = $currentTarget.is(':checked');
+
+            this._setFieldsState($currentTarget, value);
+        },
+
+        /**
+         * Change field status
+         *
+         * @param $element
+         * @param value
+         * @private
+         */
+        _setFieldsState: function($element, value) {
+            var $controls = $element.parents('.controls');
             var valueEls = $controls.find(':input, a.btn, button')
                 .not(this.$(this.checkboxSelector))
                 .not('[readonly]');
@@ -59,6 +97,12 @@ define(function(require) {
             }
         },
 
+        /**
+         * Set enable/disable tinymce field
+         *
+         * @param $textareas
+         * @private
+         */
         _prepareTinymce: function($textareas) {
             $textareas.each(function(i, el) {
                 var editor = tinyMCE.get(el.id);

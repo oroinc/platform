@@ -1,0 +1,4 @@
+oro:
+    attachment:
+        mimetypes:
+            not_allowed: 'MIME type {{ notAllowedMimeTypes }} is not allowed, please contact your system administrator.|MIME types {{ notAllowedMimeTypes }} are not allowed, please contact your system administrator.'

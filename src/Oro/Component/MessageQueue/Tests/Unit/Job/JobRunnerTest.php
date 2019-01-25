@@ -20,10 +20,10 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var JobProcessor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var JobProcessor|\PHPUnit\Framework\MockObject\MockObject */
     private $jobProcessor;
 
-    /** @var ExtensionInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $jobExtension;
 
     /** @var JobRunner */

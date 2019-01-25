@@ -1,0 +1,27 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\SecurityBundle\Search\AclHelper:
+            apply:
+                orExpression: true
+        Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider:
+            executeQuery:
+                query: true
+        Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper:
+            addOwnershipField:
+                fieldExpr: true
+    safe_methods:
+        Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata:
+            getOwnerColumnName: true
+            getOwnerFieldName: true
+            getOrganizationFieldName: true
+            getOrganizationColumnName: true
+        Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface:
+            getOwnerColumnName: true
+            getOwnerFieldName: true
+            getOrganizationFieldName: true
+            getOrganizationColumnName: true
+        Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider:
+            getUpdateSecurityIdentitySql: true
+            getDeleteSecurityIdentityIdSql: true
+            getDeleteClassIdSql: true

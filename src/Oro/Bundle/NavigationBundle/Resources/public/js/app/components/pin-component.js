@@ -90,10 +90,10 @@ define(function(require) {
                 },
                 position: function() {
                     if (pinBar.el) {
+                        var left = Math.ceil(pinBar.$el.position().left);
+
                         return {
-                            left: _.isRTL()
-                                ? Math.ceil(pinBar.el.offsetLeft)
-                                : Math.ceil(pinBar.el.offsetLeft) + Math.ceil(pinBar.el.offsetWidth)
+                            left: _.isRTL() ? left : left + Math.ceil(pinBar.$el.width())
                         };
                     } else {
                         return null;

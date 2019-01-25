@@ -60,6 +60,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             this._verifySettings();
             this._initBottomLine();
 
+            // inner-wrapper fixes max-height for flex container in IE11 https://jsfiddle.net/d158647x/
+            this.uiDialog.wrapInner('<div class="ui-dialog-inner-wrapper"></div>');
+
             this._onBackspacePress = $.proxy(this._onBackspacePress, this);
             this._windowResizeHandler = $.proxy(this._windowResizeHandler, this);
 
@@ -147,7 +150,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         showActionsContainer: function() {
             if (!this.uiDialogButtonPane.parent().length) {
                 this.uiDialog.addClass('ui-dialog-buttons');
-                this.uiDialogButtonPane.appendTo( this.uiDialog );
+                this.uiDialogButtonPane.appendTo(this.uiDialog.find('.ui-dialog-inner-wrapper'));
             }
         },
 

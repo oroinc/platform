@@ -11,6 +11,16 @@ define(function(require) {
         e.preventDefault();
     });
 
+    $('body').on('click', function(e) {
+        // Fixes issue with extra click event in Safari browser. It triggers click event on body, even though
+        // preceding mousedown and mouseup events had different targets, example https://jsfiddle.net/bxm79u8o/27/
+        // Select2 opens its dropdown on mousedown event. With the dropdown opening, it adds transparent mask under it.
+        // And mouseup event is triggered on that mask.
+        if (e.target === e.currentTarget) {
+            e.stopPropagation();
+        }
+    });
+
     /**
      * An overload of populateResults method,
      * renders search results with collapsible groups
@@ -245,9 +255,11 @@ define(function(require) {
 
     // Override methods of AbstractSelect2 class
     (function(prototype) {
+        var select2SearchName = _.uniqueId('select2searchname');
         var select2DropBelowClassName = 'select2-drop-below';
         var positionDropdown = prototype.positionDropdown;
         var close = prototype.close;
+        var open = prototype.open;
         var prepareOpts = prototype.prepareOpts;
         var init = prototype.init;
         var destroy = prototype.destroy;
@@ -276,13 +288,21 @@ define(function(require) {
                 !$container.hasClass('select2-drop-above');
             if ($container.parent().hasClass(select2DropBelowClassName) !== dialogIsBelow) {
                 $container.parent().toggleClass(select2DropBelowClassName, dialogIsBelow);
-                this.opts.element.trigger('select2:dialogReposition');
+                this.opts.element.trigger('select2:dialogReposition', dialogIsBelow ? 'below' : 'top');
             }
+        };
+
+        prototype.open = function() {
+            // Add unique name for select2 search for disabling auto-fill, auto-complete functions.
+            this.search.attr('name', select2SearchName);
+            return open.apply(this, arguments);
         };
 
         prototype.close = function() {
             close.apply(this, arguments);
             this.container.parent().removeClass(select2DropBelowClassName);
+            // Remove previously auto generated name
+            this.search.removeAttr('name');
         };
 
         prototype.init = function() {
@@ -296,6 +316,15 @@ define(function(require) {
                 e.stopPropagation();
             }, this));
             this.dropdown.prepend(this.breadcrumbs);
+            this.search
+                .on('focus', function() {
+                    // Add unique name for select2 search for disabling auto-fill, auto-complete functions.
+                    this.search.attr('name', select2SearchName);
+                }.bind(this))
+                .on('blur', function() {
+                    // Remove previously auto generated name
+                    this.search.removeAttr('name');
+                }.bind(this));
         };
 
         prototype.destroy = function() {
@@ -304,6 +333,8 @@ define(function(require) {
                 delete this.propertyObserver;
                 this.propertyObserver = null;
             }
+            // Remove previously auto generated name
+            this.search.removeAttr('name');
             destroy.call(this);
         };
 

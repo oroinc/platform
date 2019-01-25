@@ -3,30 +3,36 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainVirtualFieldProvider */
-    protected $chainProvider;
+    private $chainProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject[] */
-    protected $providers = [];
+    private $providers = [];
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
 
     protected function setUp()
     {
-        $this->chainProvider = new ChainVirtualFieldProvider();
-
-        $highPriorityProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface')
+        $highPriorityProvider = $this->getMockBuilder(VirtualFieldProviderInterface::class)
             ->setMockClassName('HighPriorityVirtualFieldProvider')
             ->getMock();
-        $lowPriorityProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface')
+        $lowPriorityProvider = $this->getMockBuilder(VirtualFieldProviderInterface::class)
             ->setMockClassName('LowPriorityVirtualFieldProvider')
             ->getMock();
 
-        $this->chainProvider->addProvider($lowPriorityProvider);
-        $this->chainProvider->addProvider($highPriorityProvider, -10);
-
         $this->providers = [$highPriorityProvider, $lowPriorityProvider];
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+
+        $this->chainProvider = new ChainVirtualFieldProvider($this->providers, $this->configProvider);
     }
 
     public function testIsVirtualFieldByLowPriorityProvider()
@@ -75,23 +81,70 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->chainProvider->isVirtualField('testClass', 'testField'));
     }
 
+    public function testIsVirtualFieldWithoutChildProviders()
+    {
+        $chainProvider = new ChainVirtualFieldProvider([], $this->configProvider);
+        $this->assertFalse($chainProvider->isVirtualField('testClass', 'testField'));
+    }
+
     public function testGetVirtualFields()
     {
-        $this->providers[0]
-            ->expects($this->once())
+        $entityClass = 'testClass';
+
+        $this->configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(false);
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->providers[0]->expects($this->once())
             ->method('getVirtualFields')
-            ->with('testClass')
+            ->with($entityClass)
             ->will($this->returnValue(['testField1', 'testField2']));
-        $this->providers[1]
-            ->expects($this->once())
+        $this->providers[1]->expects($this->once())
             ->method('getVirtualFields')
-            ->with('testClass')
+            ->with($entityClass)
             ->will($this->returnValue(['testField1', 'testField3']));
 
         $this->assertEquals(
             ['testField1', 'testField2', 'testField3'],
-            $this->chainProvider->getVirtualFields('testClass')
+            $this->chainProvider->getVirtualFields($entityClass)
         );
+    }
+
+    public function testGetVirtualFieldsForNotAccessibleEntity()
+    {
+        $entityClass = 'testClass';
+
+        $entityConfig = new Config(
+            $this->createMock(ConfigIdInterface::class),
+            ['is_extend' => true, 'state' => ExtendScope::STATE_NEW]
+        );
+        $this->configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($entityClass)
+            ->willReturn($entityConfig);
+
+        $this->providers[0]->expects($this->never())
+            ->method('getVirtualFields');
+        $this->providers[1]->expects($this->never())
+            ->method('getVirtualFields');
+
+        $this->assertSame(
+            [],
+            $this->chainProvider->getVirtualFields($entityClass)
+        );
+    }
+
+    public function testGetVirtualFieldsWithoutChildProviders()
+    {
+        $chainProvider = new ChainVirtualFieldProvider([], $this->configProvider);
+        $this->assertSame([], $chainProvider->getVirtualFields('testClass'));
     }
 
     public function testGetVirtualFieldQuery()
@@ -167,5 +220,15 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
                 $i++;
             }
         }
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage A query for field "testField" in class "testClass" was not found.
+     */
+    public function testGetVirtualFieldQueryWithoutChildProviders()
+    {
+        $chainProvider = new ChainVirtualFieldProvider([], $this->configProvider);
+        $chainProvider->getVirtualFieldQuery('testClass', 'testField');
     }
 }

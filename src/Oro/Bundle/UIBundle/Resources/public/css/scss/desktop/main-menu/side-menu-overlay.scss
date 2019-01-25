@@ -1,6 +1,10 @@
 /* @theme: admin.oro; */
 
 .side-menu-overlay {
+    $overlay-header-offset-start: 16px !default;
+    $overlay-header-offset-end: 32px !default;
+    $menu-item-width: 258px !default;
+
     position: absolute;
     top: 0;
     bottom: 0;
@@ -33,20 +37,20 @@
     &__header {
         position: relative;
 
-        padding: side-values(24px 16px 20px 32px);
-        width: 248px;
+        padding: side-values(24px $overlay-header-offset-start 18px $overlay-header-offset-end);
         height: $side-menu-overlay-header-height;
     }
 
     &__search {
         position: relative;
+
+        width: $menu-item-width - $overlay-header-offset-start - $overlay-header-offset-end;
     }
 
     &__search-icon {
         position: absolute;
         top: 0;
         #{$end}: 8px;
-        bottom: 0;
         padding: 4px;
 
         background-color: transparent;
@@ -72,8 +76,13 @@
     }
 
     &__title {
+        width: $menu-item-width - $overlay-header-offset-start - $overlay-header-offset-end;
+        margin-bottom: 12px;
+
         font-size: $side-menu-overlay-title-font-size;
         line-height: 1.2;
+
+        @include text-truncate();
     }
 
     &__content {
@@ -170,8 +179,8 @@
     }
 
     .menu-item {
-        width: 248px;
-        padding: 0 15px;
+        width: $menu-item-width;
+        padding: 0 16px;
 
         line-height: 1.3;
 

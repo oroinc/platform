@@ -442,6 +442,46 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * This step used for system configuration field
+     * Go to System/Configuration and see the fields with default checkboxes
+     * Example: And uncheck "Use default" for "Position" field in section "Section"
+     *
+     * @Given uncheck :checkbox for :label field in section :section
+     */
+    public function uncheckUseDefaultForFieldInSection($label, $checkbox, $section)
+    {
+        /** @var SystemConfigForm $form */
+        $form = $this->createElement('SystemConfigForm');
+        $form->uncheckCheckboxByLabel($label, $checkbox, $section);
+    }
+
+    /**
+     * This step used for system configuration field
+     * Example: And I should not see "Use default" for "Position" field
+     *
+     * @Given I should not see :checkbox for :label field
+     */
+    public function shouldNotSeeUseDefaultForField($label, $checkbox)
+    {
+        /** @var SystemConfigForm $form */
+        $form = $this->createElement('SystemConfigForm');
+        self::assertFalse($form->isUseDefaultCheckboxExists($label, $checkbox));
+    }
+
+    /**
+     * This step used for system configuration field
+     * Example: And I should see "Use default" for "Position" field
+     *
+     * @Given I should see :checkbox for :label field
+     */
+    public function shouldSeeUseDefaultForField($label, $checkbox)
+    {
+        /** @var SystemConfigForm $form */
+        $form = $this->createElement('SystemConfigForm');
+        self::assertTrue($form->isUseDefaultCheckboxExists($label, $checkbox));
+    }
+
+    /**
      * @Given /^(?:|I )uncheck "(?P<value>[^"]*)" element$/
      */
     public function iUncheckElement($elementName)
@@ -601,7 +641,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         /** @var Select $element */
         $element = $this->createElement($selectField);
         /** @var NodeElement[] $options */
-        $option = $element->find('css', 'option[selected]');
+        $option = $element->getSelectedOption();
 
         if (null === $option) {
             $driver = $this->getSession()->getDriver();

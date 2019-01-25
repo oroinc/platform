@@ -3,11 +3,15 @@
 namespace Oro\Bundle\AttachmentBundle\Migration\Extension;
 
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Provides an ability to create file and attachment fields and attachment association.
+ */
 class AttachmentExtension implements ExtendExtensionAwareInterface
 {
     const FILE_TABLE_NAME       = 'oro_attachment_file';
@@ -76,9 +80,9 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
         $entityTable = $schema->getTable($sourceTable);
 
         $options['attachment']['maxsize'] = $maxFileSize;
-        $options['attachment']['width']   = $thumbWidth;
-        $options['attachment']['height']  = $thumbHeight;
-        $options['attachment']['mimetypes']  = implode("\n", $mimeTypes);
+        $options['attachment']['width'] = $thumbWidth;
+        $options['attachment']['height'] = $thumbHeight;
+        $options['attachment']['mimetypes'] = MimeTypesConverter::convertToString($mimeTypes);
 
         $this->extendExtension->addManyToOneRelation(
             $schema,
@@ -114,7 +118,7 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
         $options = new OroOptions();
         $options->set('attachment', 'enabled', true);
         $options->set('attachment', 'maxsize', $maxFileSize);
-        $options->set('attachment', 'mimetypes', implode("\n", $allowedMimeTypes));
+        $options->set('attachment', 'mimetypes', MimeTypesConverter::convertToString($allowedMimeTypes));
         $targetTable->addOption(OroOptions::KEY, $options);
 
         $associationName = ExtendHelper::buildAssociationName(

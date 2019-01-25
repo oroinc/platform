@@ -17,6 +17,13 @@
         display: inline-block;
         margin-right: 6px;
     }
+
+    /* Following css rule covers case when a few inputs has the same place for errors (e.g. datetime picker).
+     * `id` is used to cover only auto-generated jQuery.validate labels and leave posibility to show a few messages
+     * when it rendered intentionally */
+    & + &[id] {
+        display: none;
+    }
 }
 
 .validation-warning {

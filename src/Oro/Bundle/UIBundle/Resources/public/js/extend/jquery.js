@@ -77,7 +77,7 @@ define(['jquery'], function($) {
         focusFirstInput: function() {
             var $input = this.find(':input:visible, [data-focusable]')
                 .not(':checkbox, :radio, :button, :submit, :disabled, :file');
-            var $autoFocus = $input.filter('[autofocus]');
+            var $autoFocus = $input.filter('[autofocus], [data-autofocus]');
             if ($autoFocus.length || $input.length) {
                 var $element = ($autoFocus.length ? $autoFocus : $input).first();
                 if ($element.isInViewPort()) {

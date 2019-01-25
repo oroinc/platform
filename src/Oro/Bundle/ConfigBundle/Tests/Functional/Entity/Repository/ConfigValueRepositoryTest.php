@@ -29,7 +29,7 @@ class ConfigValueRepositoryTest extends WebTestCase
             ->getRepository(ConfigValue::class);
     }
 
-    public function testRemoveSection()
+    public function testRemoveSection(): void
     {
         $section = 'general';
 
@@ -44,7 +44,7 @@ class ConfigValueRepositoryTest extends WebTestCase
         $this->assertEmpty($configValues);
     }
 
-    public function testGetConfigValues()
+    public function testGetConfigValues(): void
     {
         /** @var ConfigValue $configValue */
         $configValue = $this->repository->findOneBy(['section' => 'additional']);
@@ -55,5 +55,19 @@ class ConfigValueRepositoryTest extends WebTestCase
         );
 
         $this->assertEquals([$configValue], $result);
+    }
+
+    public function testGetConfigValueRecordIds(): void
+    {
+        /** @var ConfigValue $configValue */
+        $configValue = $this->repository->findOneBy(['section' => 'additional']);
+
+        $result = $this->repository->getConfigValueRecordIds(
+            $configValue->getConfig()->getScopedEntity(),
+            $configValue->getSection(),
+            $configValue->getName()
+        );
+
+        $this->assertEquals([$configValue->getConfig()->getRecordId()], $result);
     }
 }

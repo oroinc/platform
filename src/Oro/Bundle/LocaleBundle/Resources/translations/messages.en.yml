@@ -102,9 +102,7 @@ oro.locale:
     system_configuration:
         groups:
             localization.title: 'Localization'
-            language_settings.title: 'Language Settings'
-            language_languages.title: 'Languages'
-            locale_settings.title: 'Localization options'
+            locale_settings.title: 'Location options'
             map_settings.title: 'Map options'
             localization_settings.title: 'Localization settings'
         fields:

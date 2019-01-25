@@ -4,36 +4,33 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ButtonProviderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class ButtonProviderPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $builder;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        $this->builder = $this->getMockBuilder(ContainerBuilder::class)->getMock();
-    }
-
     public function testProcess()
     {
-        /* @var $compilerPass ButtonProviderPass|\PHPUnit\Framework\MockObject\MockObject */
-        $compilerPass = $this->getMockBuilder(ButtonProviderPass::class)
-            ->setMethods(['registerTaggedServices'])
-            ->getMock();
+        $container = new ContainerBuilder();
 
-        $compilerPass->expects($this->once())
-            ->method('registerTaggedServices')
-            ->with(
-                $this->builder,
-                ButtonProviderPass::SERVICE_ID,
-                ButtonProviderPass::EXTENSION_TAG,
-                'addExtension'
-            );
+        $container->register('provider1')
+            ->addTag('oro.action.extension.button_provider', []);
+        $container->register('provider2')
+            ->addTag('oro.action.extension.button_provider', ['priority' => -10]);
+        $container->register('provider3')
+            ->addTag('oro.action.extension.button_provider', ['priority' => 10]);
 
-        $compilerPass->process($this->builder);
+        $chainProvider = $container->register('oro_action.provider.button');
+
+        $compiler = new ButtonProviderPass();
+        $compiler->process($container);
+
+        self::assertEquals(
+            [
+                ['addExtension', [new Reference('provider2'), 'provider2']],
+                ['addExtension', [new Reference('provider1'), 'provider1']],
+                ['addExtension', [new Reference('provider3'), 'provider3']]
+            ],
+            $chainProvider->getMethodCalls()
+        );
     }
 }

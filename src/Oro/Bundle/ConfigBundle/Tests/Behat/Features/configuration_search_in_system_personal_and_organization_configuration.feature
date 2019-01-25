@@ -38,14 +38,6 @@ Feature: Configuration Search in System, Personal and Organization configuration
     And I expand all on configuration sidebar
     Then I should see "Localization" in the "Configuration Sidebar Content" element
 
-  Scenario: Settings with search type text should be searchable
-    When I type "image/jpeg" in "Configuration Quick Search"
-    Then I should see "Upload Settings" in the "Configuration Sidebar Content" element
-    And I should not see "Localization" in the "Configuration Sidebar Content" element
-    When I click "Clear Sidebar Search"
-    And I expand all on configuration sidebar
-    Then I should see "Localization" in the "Configuration Sidebar Content" element
-
   Scenario: Settings with search type choice should be searchable
     When I type "Never" in "Configuration Quick Search"
     Then I should see "Routing" in the "Configuration Sidebar Content" element
@@ -107,15 +99,15 @@ Feature: Configuration Search in System, Personal and Organization configuration
 
   Scenario: The Configuration Search Box in Personal Configuration
     Given I click My Configuration in user menu
-    And I type "language" in "Configuration Quick Search"
-    Then I should see "Language Settings" in the "Configuration Sidebar Content" element
+    And I type "localization" in "Configuration Quick Search"
+    Then I should see "Localization" in the "Configuration Sidebar Content" element
     And I should not see "Email Configuration" in the "Configuration Sidebar Content" element
 
   Scenario: The Configuration Search Box in Organization Configuration
     Given I go to System/ User Management/ Organizations
     And I click Configuration "Oro" in grid
-    And I type "language" in "Configuration Quick Search"
-    Then I should see "Language Settings" in the "Configuration Sidebar Content" element
+    And I type "localization" in "Configuration Quick Search"
+    Then I should see "Localization" in the "Configuration Sidebar Content" element
     And I should not see "Quick Order Form" in the "Configuration Sidebar Content" element
 
   Scenario: The Configuration Search show/hide all results

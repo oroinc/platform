@@ -2,27 +2,29 @@
 
 .inline-editable-wrapper:not(:hover) {
     &.save-success .inline-actions-element {
-        background: $cell-success-background;
-
-        .inline-actions-element_actions {
-            display: none;
+        &_wrapper {
+            background: $cell-success-background;
         }
     }
 
     &.save-fail .inline-actions-element {
-        background: $cell-error-background;
+        &_wrapper {
+            background: $cell-error-background;
+        }
+    }
 
-        .inline-actions-element_actions {
-            display: none;
+    &.loading .inline-actions-element {
+        &_wrapper {
+            background: $cell-loading-background;
         }
     }
 }
 
 .inline-editable-wrapper {
     &.loading {
-        .inline-actions-element {
-            background: $cell-loading-background;
+        min-height: auto;
 
+        .inline-actions-element {
             &:before {
                 position: absolute;
                 top: $inline-editable-wrapper-loading-top;

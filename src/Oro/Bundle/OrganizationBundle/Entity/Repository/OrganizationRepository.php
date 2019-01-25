@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\OrganizationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
@@ -201,5 +202,23 @@ class OrganizationRepository extends EntityRepository
         }
 
         return $queryBuilder->getQuery()->execute();
+    }
+
+    /**
+     * @param array $excludeIds
+     *
+     * @return Organization[]
+     */
+    public function getOrganizationIds(array $excludeIds = [])
+    {
+        $qb = $this->createQueryBuilder('org');
+        $qb->select('org.id');
+
+        if ($excludeIds) {
+            $qb->where($qb->expr()->notIn('org.id', ':ids'))
+                ->setParameter('ids', $excludeIds);
+        }
+
+        return array_column($qb->getQuery()->getArrayResult(), 'id');
     }
 }

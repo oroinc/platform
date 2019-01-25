@@ -33,10 +33,9 @@
 
     .dropdown-menu {
         background-color: $email-dropdown-bg;
-        width: $email-recent-emails-popup-width !important;
+        width: $email-recent-emails-popup-width;
         padding: 0;
         outline: none;
-        #{$end}: -7px;
 
         .empty {
             padding: 5px 10px;

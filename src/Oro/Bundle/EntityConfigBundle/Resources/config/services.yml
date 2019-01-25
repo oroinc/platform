@@ -357,6 +357,7 @@ services:
             - [addBlockType, ['date', 'attribute_date']]
             - [addBlockType, ['datetime', 'attribute_datetime']]
             - [addBlockType, ['decimal', 'attribute_decimal']]
+            - [addBlockType, ['float', 'attribute_float']]
             - [addBlockType, ['file', 'attribute_file']]
             - [addBlockType, ['image', 'attribute_image']]
             - [addBlockType, ['boolean', 'attribute_boolean']]

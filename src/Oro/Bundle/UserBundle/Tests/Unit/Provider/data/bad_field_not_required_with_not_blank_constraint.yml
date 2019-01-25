@@ -1,0 +1,10 @@
+user_configuration:
+    fields:
+        some_field:
+            data_type: string
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
+            options:
+                tooltip: tooltip some field
+                label: title some field
+                constraints:
+                    - NotBlank: ~

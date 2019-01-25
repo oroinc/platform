@@ -14,6 +14,7 @@ services:
         arguments:
             - '@oro_entity.helper.field_helper'
             - '@oro_importexport.data_converter.relation_calculator'
+            - '@oro_locale.settings'
         calls:
             - [setDispatcher, ['@event_dispatcher']]
             - [setConfigManager, ['@oro_config.manager']]
@@ -24,6 +25,7 @@ services:
         arguments:
             - '@oro_entity.helper.field_helper'
             - '@oro_importexport.data_converter.template_fixture.relation_calculator'
+            - '@oro_locale.settings'
         calls:
             - [setDispatcher, ['@event_dispatcher']]
 

@@ -8,13 +8,35 @@ It currently supports only styles assets. JS assets are still managed by [OroReq
 #### ApiBundle
 * Added `custom_fields` as a possible value for `exclusion_policy` option of `entities` section of `Resources/config/oro/api.yml`. This value can be used if it is required to exclude all custom fields (fields with `is_extend` = `true` and `owner` = `Custom` in `extend` scope in entity configuration) that are not configured explicitly.
 
+#### AttachmentBundle
+* Added possibility to set available mime types from configuration.
+To add or remove available mime types, add changes to the `upload_file_mime_types` section and `upload_image_mime_types` in the config.yml file:
+
+```yml
+oro_attachment:
+    upload_file_mime_types:
+        - application/msword
+        - application/vnd.ms-excel
+        - application/pdf
+        - application/zip
+        - image/gif
+        - image/jpeg
+        - image/png
+    upload_image_mime_types:
+        - image/gif
+        - image/jpeg
+        - image/png
+```
+
 ### Removed
 #### AsseticBundle
 * Bundle was removed, use AssetBundle instead
+#### QueryDesignerBundle
+* The unused alias `oro_query_designer.virtual_field_provider` for the service `oro_entity.virtual_field_provider.chain` was removed.
 
 ### Changed
 #### AssetBundle
-* Syntax of `Resources/config/oro/assets.yml` files for the management-console was changed to follow the same standard as the configuration files for the OroCommerce storefront.  
+* Syntax of `Resources/config/oro/assets.yml` files for the management-console was changed to follow the same standard as the configuration files for the OroCommerce storefront.
 Use the `inputs` node instead of the group names.
 ```diff
 - assets:

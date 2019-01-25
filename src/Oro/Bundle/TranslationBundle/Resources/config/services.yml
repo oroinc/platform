@@ -236,14 +236,6 @@ services:
         tags:
             - {name: kernel.event_listener, event: oro.import_export.after_job_execution, method: onAfterImportTranslations}
 
-    oro_organization_config.event_listener.languages_change:
-        class: 'Oro\Bundle\TranslationBundle\EventListener\LanguagesChangeListener'
-        arguments:
-            - '@oro_config.user'
-            - '@doctrine'
-        tags:
-            - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
-
     oro_translation.strategy.default:
         class: '%oro_translation.strategy.default.class%'
         public: false

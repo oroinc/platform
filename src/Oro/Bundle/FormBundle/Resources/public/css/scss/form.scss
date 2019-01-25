@@ -300,3 +300,54 @@
         margin-#{$end}: ($content-padding-small / 2);
     }
 }
+
+.floating-error-message {
+    $arrow-height: 6px;
+
+    padding: side-values(4px 8px 5px 30px);
+    margin-bottom: $arrow-height;
+    border-radius: $input-field-border-radius;
+    font-size: $base-font-size - 1;
+    line-height: $floating-error-message-line-height;
+    background-color: $danger-lighten;
+    color: $danger-ultra-dark;
+    z-index: 2;
+
+    .arrow {
+        display: block;
+        position: absolute;
+        top: 100%;
+        width: 0;
+
+        &:after {
+            content: '';
+            display: block;
+            position: absolute;
+            #{$start}: 10px;
+            border-style: solid;
+            border-color: $danger-lighten transparent;
+            border-width: $arrow-height ($arrow-height - 1) 0;
+        }
+    }
+
+    .content {
+        @include fa-icon($fa-var-times, before, true) {
+            position: absolute;
+            #{$start}: 9px;
+            top: 3px;
+            font-size: $icon-font-size;
+            line-height: 1;
+            color: $danger-darken;
+        }
+    }
+
+    &[x-out-of-boundaries] {
+        // Avoid 'display: none' to ability getting real size of popper element before showing
+
+        position: fixed;
+
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
+    }
+}

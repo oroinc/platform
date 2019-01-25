@@ -2,23 +2,24 @@
 
 namespace Oro\Bundle\SoapBundle\EventListener;
 
+use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Reverts https://github.com/symfony/symfony/pull/28565 for REST API sub-requests to avoid BC break.
  */
 class ApiSubRequestListener
 {
-    /** @var array */
+    /** @var array [[request matcher, options], ...] */
     private $rules;
 
     /**
-     * @param array $rules
+     * @param RequestMatcherInterface $requestMatcher
+     * @param array                   $options
      */
-    public function __construct(array $rules)
+    public function addRule(RequestMatcherInterface $requestMatcher, array $options = []): void
     {
-        $this->rules = $rules;
+        $this->rules[] = [$requestMatcher, $options];
     }
 
     /**
@@ -27,12 +28,13 @@ class ApiSubRequestListener
     public function onKernelRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
-        if ($event->getRequestType() !== HttpKernelInterface::SUB_REQUEST || !$request->getRequestFormat(null)) {
+        if ($event->isMasterRequest() || !$request->getRequestFormat(null)) {
             return;
         }
 
-        foreach ($this->rules as $rule) {
-            if (!$rule['stop'] && preg_match('#' . $rule['path'] . '/.+#', $request->getRequestUri())) {
+        /** @var RequestMatcherInterface $requestMatcher */
+        foreach ($this->rules as list($requestMatcher, $options)) {
+            if ((!isset($options['stop']) || !$options['stop']) && $requestMatcher->matches($request)) {
                 $request->setRequestFormat(null);
                 break;
             }

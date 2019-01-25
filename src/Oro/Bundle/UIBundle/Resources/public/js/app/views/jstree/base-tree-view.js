@@ -10,6 +10,8 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     var Chaplin = require('chaplin');
     var FuzzySearch = require('oroui/js/fuzzy-search');
+    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    var ApiAccessor = require('oroui/js/tools/api-accessor');
 
     require('jquery.jstree');
 
@@ -27,7 +29,7 @@ define(function(require) {
 
         optionNames: BaseView.prototype.optionNames.concat([
             'onSelectRoute', 'onSelectRouteParameters', 'onRootSelectRoute',
-            'autoSelectFoundNode', 'viewGroup', 'autohideNeighbors'
+            'autoSelectFoundNode', 'viewGroup', 'updateApiAccessor', 'autohideNeighbors'
         ]),
 
         /**
@@ -134,6 +136,21 @@ define(function(require) {
          */
         _foundNodes: false,
 
+        /**
+         * @property {Object}
+         */
+        updateApiAccessor: false,
+
+        /**
+         * @property {Object}
+         */
+        apiAccessor: null,
+
+        /**
+         * @property {String}
+         */
+        isEmptyTreeMessage: _.__('oro.ui.jstree.is_empty'),
+
         autohideNeighbors: false,
 
         /**
@@ -185,6 +202,10 @@ define(function(require) {
             }));
 
             this._deferredRender();
+
+            if (this.updateApiAccessor) {
+                this._registerUpdateData();
+            }
         },
 
         render: function() {
@@ -269,6 +290,23 @@ define(function(require) {
             }
 
             return config;
+        },
+
+        /**
+         * Update core config for the tree
+         *
+         * @param {Object} config
+         */
+        updateTreeConfig: function(key, config) {
+            if (_.isString(key)) {
+                this.jsTreeConfig[key] = _.extend(this.jsTreeConfig[key], config);
+                return;
+            }
+
+            if (_.isObject(key)) {
+                this.jsTreeConfig = _.extend(this.jsTreeConfig, key);
+                return;
+            }
         },
 
         isNodeHasHandler: function(node) {
@@ -592,9 +630,74 @@ define(function(require) {
             return node;
         },
 
+        /**
+         * Disable/enable search field in the tree
+         *
+         * @param {Boolean} state
+         */
+        disableSearchField: function(state) {
+            $(this.$searchField).prop('disabled', state);
+        },
+
+        /**
+         *
+         */
+        updateTree: function(params) {
+            if (!this.apiAccessor) {
+                return;
+            }
+
+            this.loadingMask.show();
+            this.apiAccessor.send(params).then(_.bind(this._updateTreeFromData, this));
+        },
+
+        /**
+         *
+         * @param param
+         * @param value
+         * @private
+         */
         _changeUrlParam: function(param, value) {
             param = this.viewGroup + '[' + param + ']';
             mediator.execute('changeUrlParam', param, value);
+        },
+
+        /**
+         *
+         * @private
+         */
+        _registerUpdateData: function() {
+            this.apiAccessor = new ApiAccessor(
+                this.updateApiAccessor
+            );
+
+            this.loadingMask = new LoadingMaskView({
+                container: this.$el
+            });
+        },
+
+        /**
+         * Re-render tree with new data
+         *
+         * @param {*} data
+         * @private
+         */
+        _updateTreeFromData: function(data) {
+            data = data.tree;
+            this.updateTreeConfig('core', {
+                data: _.isString(data) ? JSON.parse(data) : data
+            });
+
+            if (!_.isEmpty(data)) {
+                this.disableSearchField(false);
+                this.render();
+            } else {
+                this.showSearchResultMessage(this.isEmptyTreeMessage);
+                this.disableSearchField(true);
+                this.onDeselect();
+            }
+
+            this.loadingMask.hide();
         },
 
         dispose: function() {

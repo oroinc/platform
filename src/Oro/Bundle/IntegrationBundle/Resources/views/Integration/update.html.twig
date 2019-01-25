@@ -3,11 +3,8 @@
 
 {% form_theme form with oro_integration_themes(form) %}
 
-{% set entity = form.vars.value %}
-{% set formAction = formAction is defined
-    ? formAction
-    : (entity.id ? path('oro_integration_update', { id: entity.id }) : path('oro_integration_create'))
-%}
+{% set entity = entity is defined ? entity : form.vars.value %}
+{% set formAction = entity.id ? path('oro_integration_update', { id: entity.id }) : path('oro_integration_create') %}
 
 {% if entity.id %}
     {% oro_title_set({params : {"%integration.name%": entity.name } }) %}
@@ -15,15 +12,13 @@
 
 {% block breadcrumbs %}
     {{ parent() }}
-    <div class="pull-left">
+    <span class="page-title__status">
         {% if entity.enabled %}
-            <div class="badge badge-pill badge-enabled status-enabled">
-                <i class="icon-status-enabled fa-circle"></i>{{ 'oro.integration.integration.enabled.active.label'|trans }}</div>
+            {{ UI.badge('oro.integration.integration.enabled.active.label'|trans, 'enabled') }}
         {% else %}
-            <div class="badge badge-pill badge-disabled status-disabled">
-                <i class="icon-status-disabled fa-circle"></i>{{ 'oro.integration.integration.enabled.inactive.label'|trans }}</div>
+            {{ UI.badge('oro.integration.integration.enabled.inactive.label'|trans, 'disabled') }}
         {% endif %}
-    </div>
+    </span>
 {% endblock breadcrumbs %}
 
 {% block navButtons %}

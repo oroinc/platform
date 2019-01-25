@@ -40,7 +40,7 @@ services:
             - '@doctrine'
             - '@security.authorization_checker'
             - '@oro_entity.entity_name_resolver'
-            - '@oro_datagrid.extension.pager.orm.pager'
+            - '@oro_batch.orm.query_builder.count_query_optimizer'
             - '@event_dispatcher'
             - '@oro_attachment.provider.attachment'
             - '@oro_security.acl_helper'

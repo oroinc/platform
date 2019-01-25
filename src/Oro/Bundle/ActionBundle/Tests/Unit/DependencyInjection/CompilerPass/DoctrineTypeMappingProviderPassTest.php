@@ -4,36 +4,33 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\DoctrineTypeMappingProviderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class DoctrineTypeMappingProviderPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $builder;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        $this->builder = $this->getMockBuilder(ContainerBuilder::class)->getMock();
-    }
-
     public function testProcess()
     {
-        /* @var $compilerPass DoctrineTypeMappingProviderPass|\PHPUnit\Framework\MockObject\MockObject */
-        $compilerPass = $this->getMockBuilder(DoctrineTypeMappingProviderPass::class)
-            ->setMethods(['registerTaggedServices'])
-            ->getMock();
+        $container = new ContainerBuilder();
 
-        $compilerPass->expects($this->once())
-            ->method('registerTaggedServices')
-            ->with(
-                $this->builder,
-                DoctrineTypeMappingProviderPass::SERVICE_ID,
-                DoctrineTypeMappingProviderPass::EXTENSION_TAG,
-                'addExtension'
-            );
+        $container->register('type_mapping1')
+            ->addTag('oro.action.extension.doctrine_type_mapping', []);
+        $container->register('type_mapping2')
+            ->addTag('oro.action.extension.doctrine_type_mapping', ['priority' => -10]);
+        $container->register('type_mapping3')
+            ->addTag('oro.action.extension.doctrine_type_mapping', ['priority' => 10]);
 
-        $compilerPass->process($this->builder);
+        $chainProvider = $container->register('oro_action.provider.doctrine_type_mapping');
+
+        $compiler = new DoctrineTypeMappingProviderPass();
+        $compiler->process($container);
+
+        self::assertEquals(
+            [
+                ['addExtension', [new Reference('type_mapping2'), 'type_mapping2']],
+                ['addExtension', [new Reference('type_mapping1'), 'type_mapping1']],
+                ['addExtension', [new Reference('type_mapping3'), 'type_mapping3']]
+            ],
+            $chainProvider->getMethodCalls()
+        );
     }
 }

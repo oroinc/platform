@@ -3,24 +3,26 @@
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
 use FOS\RestBundle\Util\Codes;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
-use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
+ * Controller for Integrations config page
+ *
  * @Route("/integration")
  */
 class IntegrationController extends Controller
 {
+    use RequestHandlerTrait;
+
     /**
      * @Route("/", name="oro_integration_index")
      * @Acl(
@@ -128,7 +130,9 @@ class IntegrationController extends Controller
      */
     protected function update(Integration $integration)
     {
-        if ($this->get('oro_integration.form.handler.integration')->process($integration)) {
+        $formHandler = $this->get('oro_integration.form.handler.integration');
+
+        if ($formHandler->process($integration)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
                 $this->get('translator')->trans('oro.integration.controller.integration.message.saved')
@@ -136,30 +140,12 @@ class IntegrationController extends Controller
 
             return $this->get('oro_ui.router')->redirect($integration);
         }
-        $form = $this->getForm();
+
+        $form = $formHandler->getForm();
         
         return [
             'entity' => $integration,
             'form'   => $form->createView()
         ];
-    }
-
-    /**
-     * Returns form instance
-     *
-     * @return FormInterface
-     */
-    protected function getForm()
-    {
-        $isUpdateOnly = $this->get('request_stack')->getCurrentRequest()->get(ChannelHandler::UPDATE_MARKER, false);
-
-        $form = $this->get('oro_integration.form.channel');
-        // take different form due to JS validation should be shown even in case when it was not validated on backend
-        if ($isUpdateOnly) {
-            $form = $this->get('form.factory')
-                ->createNamed('oro_integration_channel_form', ChannelType::class, $form->getData());
-        }
-
-        return $form;
     }
 }

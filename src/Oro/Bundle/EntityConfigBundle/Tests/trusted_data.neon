@@ -1,0 +1,13 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\EntityConfigBundle\EventListener\AbstractConfigGridListener:
+            prepareQuery:
+                item: true
+    safe_methods:
+        Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily:
+            getEntityClass: true
+        Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider:
+            getScope: true
+        Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel:
+            getClassName: true

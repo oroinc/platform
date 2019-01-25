@@ -56,7 +56,7 @@
         }
 
         &.select2-container-active .select2-search-choice-close {
-            border-#{$start}-color: $select2-container-active-border-color
+            border-#{$start}-color: $select2-container-active-border-color;
         }
     }
 
@@ -65,14 +65,11 @@
         height: $mobile-select2-container-multi-top-height;
 
         .select2-choices {
-            margin: side-values($mobile-select2-search-multi-choices-offset);
+            padding: $mobile-select2-search-multi-choices-inner-offset;
 
             .select2-search-choice {
                 font-size: $base-font-size--m;
-                padding: side-values($mobile-select2-search-choice-inner-offset);
-                height: 32px;
-                background: $additional-extra-light;
-                margin: side-values($mobile-select2-search-choice-offset);
+                height: 28px;
                 white-space: nowrap;
                 line-height: 20px;
                 max-width: 100%;
@@ -87,27 +84,44 @@
                 }
 
                 .select2-search-choice-close {
-                    height: 32px;
+                    width: 24px;
+                    height: 26px;
+                    line-height: normal;
                     top: 0;
+                    #{$end}: 3px;
                     border: none;
+                    justify-content: center;
 
                     &:before {
                         font-size: 16px;
-                        color: $primary-200;
-                        line-height: 32px;
+                        height: auto;
                         display: block;
                     }
                 }
             }
-        }
 
-        .select2-search-field {
-            input {
-                height: $mobile-select2-container-multi-select2-search-field-height;
-                line-height: $mobile-select2-container-multi-select2-search-field-line-height;
-                margin-top: $mobile-select2-container-multi-select2-search-field-top-offset;
+            .select2-search-field {
+                input {
+                    height: $mobile-select2-container-multi-select2-search-field-height;
+                    margin-top: $mobile-select2-container-multi-select2-search-field-top-offset;
+                }
             }
         }
+    }
+
+    &-results {
+        padding: $mobile-select2-results-inner-offset;
+
+        .select2-result-label,
+        .select2-more-results {
+            font-size: $mobile-select2-result-label-font-size;
+            padding: $mobile-select2-result-label-inner-offset;
+            line-height: $mobile-select2-result-label-line-height;
+        }
+    }
+
+    &-drop {
+        max-width: $mobile-select2-drop-max-width;
     }
 }
 

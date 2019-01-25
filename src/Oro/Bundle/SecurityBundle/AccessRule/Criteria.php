@@ -113,6 +113,16 @@ class Criteria
     }
 
     /**
+     * Sets an expression.
+     *
+     * @param ExpressionInterface $expression
+     */
+    public function setExpression(ExpressionInterface $expression): void
+    {
+        $this->expression = $expression;
+    }
+
+    /**
      * Appends an expression that should be concatenated with existing expressions by logical AND operator.
      *
      * @param ExpressionInterface $expression

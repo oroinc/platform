@@ -47,7 +47,7 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $fileReader = new YamlFileCachedReader();
 
         $importsProcessor = new WorkflowConfigurationImportsProcessor();
-        $importsProcessor->addImportProcessorFactory(new ResourceFileImportProcessorFactory($fileReader));
+        $importsProcessor->addImportProcessorFactory(new ResourceFileImportProcessorFactory($fileReader, []));
         $importsProcessor->addImportProcessorFactory(new WorkflowFileImportProcessorFactory($fileReader));
         $importsProcessor->addImportProcessorFactory(
             new WorkflowImportProcessorSupervisorFactory($fileReader, $workflowFinderBuilder)
