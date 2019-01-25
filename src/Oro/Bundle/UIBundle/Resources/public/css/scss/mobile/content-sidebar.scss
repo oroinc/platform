@@ -12,12 +12,23 @@
     &--sidebar {
         max-width: $content-sidebar-mobile-max-width;
         min-height: $content-sidebar-mobile-min-height;
-        margin: $content-sidebar-mobile-margin;
 
         overflow: visible;
 
         &.content-sidebar-maximized {
             width: 100%;
+        }
+
+        .sidebar-items {
+            padding: $content-sidebar-items-mobile-offset-inner;
+        }
+
+        .jstree-wrapper {
+            padding: $content-sidebar-jstree-wrapper-mobile-inner-offset;
+
+            .jstree {
+                margin: side-values($content-sidebar-jstree-wrapper-jstree-mobile-inner-offset);
+            }
         }
     }
 
@@ -27,5 +38,18 @@
 
     &--control {
         width: auto;
+    }
+
+    &--header {
+        padding: $content-padding;
+    }
+}
+
+.layout-content,
+.scrollable-container {
+    .content-with-sidebar {
+        &--sidebar {
+            margin: $content-sidebar-mobile-margin;
+        }
     }
 }

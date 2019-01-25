@@ -332,7 +332,7 @@ define(function(require) {
                 my: 'left top+8',
                 at: 'left bottom',
                 of: this.$el,
-                collision: 'fit none',
+                collision: _.isMobile() ? 'none' : 'fit none',
                 within: this._findDropdownFitContainer(this.dropdownContainer) || this.dropdownContainer
             };
         },
