@@ -117,8 +117,7 @@ define(function(require) {
             }
 
             _.each(this.options.pluginsMap, function(url, name) {
-                var baseUrl = location.protocol + '//' + location.host + window.location.port + '/';
-                url = baseUrl + this.options.assets_base_url + url;
+                url = location.origin + '/' + this.options.assets_base_url + url;
                 if (this.options.plugins.indexOf(name) !== -1) {
                     tinyMCE.PluginManager.load(name, url);
                 }
