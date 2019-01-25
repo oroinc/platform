@@ -198,7 +198,9 @@ abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwners
             return false;
         }
 
-        $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
+        $ownerId = $domainObject instanceof DomainObjectReference ?
+            $domainObject->getOwnerId() :
+            $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
         if ($metadata->isOrganizationOwned()) {
             return $organizationId ? $ownerId === $organizationId : in_array($ownerId, $userOrganizationIds, true);
         }
