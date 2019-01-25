@@ -22,12 +22,10 @@ abstract class AbstractLoadUserData extends AbstractFixture
         $userManager = $this->container->get('oro_user.manager');
 
         foreach ($this->getUsersData() as $userData) {
-            $role = $userManager->getStorageManager()
-                ->getRepository(Role::class)
+            $role = $manager->getRepository(Role::class)
                 ->findOneBy(['role' => $userData['role']]);
 
-            $group = $userManager->getStorageManager()
-                ->getRepository(Group::class)
+            $group = $manager->getRepository(Group::class)
                 ->findOneBy(['name' => $userData['group']]);
 
             /** @var User $user */
@@ -55,7 +53,7 @@ abstract class AbstractLoadUserData extends AbstractFixture
             $userManager->updateUser($user, false);
         }
 
-        $userManager->getStorageManager()->flush();
+        $manager->flush();
     }
 
     /**

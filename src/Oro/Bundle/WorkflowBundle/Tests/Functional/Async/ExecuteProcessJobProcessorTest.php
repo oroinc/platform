@@ -30,7 +30,7 @@ class ExecuteProcessJobProcessorTest extends WebTestCase
         $userManager = $this->getContainer()->get('oro_user.manager');
 
         /** @var User $user */
-        $user = $userManager->getRepository()->findOneBy(['username' => 'admin']);
+        $user = $userManager->findUserByUsername('admin');
         $user->setFirstName('New First Name');
         $userManager->updateUser($user);
 

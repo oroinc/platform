@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Unit\Validator\Constraints;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -151,6 +151,20 @@ class UserAuthenticationFieldsValidatorTest extends \PHPUnit\Framework\TestCase
             ->willReturnSelf();
 
         $this->violation->expects($this->once())
+            ->method('addViolation');
+
+        $this->validator->validate($user, $this->constraint);
+    }
+
+    public function testUsernameIsNull()
+    {
+        $user = $this->getUser(1);
+        $user->setEmail('test@example.com');
+
+        $this->userManager->expects($this->never())
+            ->method('findUserByEmail');
+
+        $this->violation->expects($this->never())
             ->method('addViolation');
 
         $this->validator->validate($user, $this->constraint);

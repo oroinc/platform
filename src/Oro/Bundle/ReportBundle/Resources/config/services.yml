@@ -60,12 +60,14 @@ services:
 
     oro_report.grid.base_configuration_builder:
         class: '%oro_report.grid.base_configuration_builder.class%'
+        public: false
         parent: oro_query_designer.grid.datagrid_configuration_builder
         calls:
             - [setConfigManager, ['@oro_entity_config.config_manager']]
 
     oro_report.grid.datagrid_configuration_builder:
         class: '%oro_report.grid.datagrid_configuration_builder.class%'
+        public: false
         parent: oro_report.grid.base_configuration_builder
         calls:
             - [setDateGroupingBuilder, ['@oro_report.grid.date_grouping_builder']]

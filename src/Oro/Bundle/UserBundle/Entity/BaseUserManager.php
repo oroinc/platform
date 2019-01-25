@@ -3,57 +3,50 @@
 namespace Oro\Bundle\UserBundle\Entity;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\ORMInvalidArgumentException;
-use Oro\Bundle\UserBundle\Entity\Repository\AbstractUserRepository;
-use Oro\Bundle\UserBundle\Entity\UserInterface as OroUserInterface;
+use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
-use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * The base class for work with a user entity.
  *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class BaseUserManager implements UserProviderInterface
+class BaseUserManager
 {
-    /** @var string */
-    protected $class;
+    /** @var UserLoaderInterface */
+    private $userLoader;
 
     /** @var ManagerRegistry */
-    protected $registry;
+    private $doctrine;
 
     /** @var EncoderFactoryInterface */
-    protected $encoderFactory;
+    private $encoderFactory;
 
     /**
-     * @param string                  $class Entity name
-     * @param ManagerRegistry         $registry
+     * @param UserLoaderInterface     $userLoader
+     * @param ManagerRegistry         $doctrine
      * @param EncoderFactoryInterface $encoderFactory
      */
     public function __construct(
-        $class,
-        ManagerRegistry $registry,
+        UserLoaderInterface $userLoader,
+        ManagerRegistry $doctrine,
         EncoderFactoryInterface $encoderFactory
     ) {
-        $this->class = $class;
-        $this->registry = $registry;
+        $this->userLoader = $userLoader;
+        $this->doctrine = $doctrine;
         $this->encoderFactory = $encoderFactory;
     }
 
     /**
      * Returns an empty user instance
      *
-     * @return OroUserInterface
+     * @return UserInterface
      */
-    public function createUser()
+    public function createUser(): UserInterface
     {
-        $class = $this->getClass();
+        $class = $this->userLoader->getUserClass();
 
         return new $class;
     }
@@ -61,57 +54,82 @@ class BaseUserManager implements UserProviderInterface
     /**
      * Updates a user
      *
-     * @param  OroUserInterface $user
-     * @param  bool             $flush Whether to flush the changes (default true)
+     * @param  UserInterface $user
+     * @param  bool          $flush Whether to flush the changes (default true)
      */
-    public function updateUser(OroUserInterface $user, $flush = true)
+    public function updateUser(UserInterface $user, bool $flush = true): void
     {
         $this->assertRoles($user);
         $this->updatePassword($user);
 
-        $storageManager = $this->getStorageManager();
-        $storageManager->persist($user);
+        $em = $this->getEntityManager();
+        $em->persist($user);
         if ($flush) {
-            $storageManager->flush();
+            $em->flush();
         }
     }
 
     /**
      * Updates a user password if a plain password is set
      *
-     * @param OroUserInterface $user
+     * @param UserInterface $user
      */
-    public function updatePassword(OroUserInterface $user)
+    public function updatePassword(UserInterface $user): void
     {
         $password = $user->getPlainPassword();
         if (0 !== strlen($password)) {
-            $encoder = $this->getEncoder($user);
-
+            $encoder = $this->encoderFactory->getEncoder($user);
             $user->setPassword($encoder->encodePassword($password, $user->getSalt()));
             $user->eraseCredentials();
         }
     }
 
     /**
-     * Deletes a user
+     * Generates a random string that can be used as a password for a user.
      *
-     * @param object $user
+     * @param int $maxLength
+     *
+     * @return string
      */
-    public function deleteUser($user)
+    public function generatePassword(int $maxLength = 30): string
     {
-        $storageManager = $this->getStorageManager();
-        $storageManager->remove($user);
-        $storageManager->flush();
+        return str_shuffle(
+            substr(
+                sprintf(
+                    '%s%s%s',
+                    // get one random upper case letter
+                    substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 1),
+                    // get one random digit
+                    substr(str_shuffle('1234567890'), 0, 1),
+                    // get some random string
+                    $this->generateToken()
+                ),
+                0,
+                $maxLength
+            )
+        );
     }
 
     /**
-     * Finds one user by the given criteria
+     * Deletes a user
      *
-     * @param  array $criteria
-     *
-     * @return OroUserInterface
+     * @param UserInterface $user
      */
-    public function findUserBy(array $criteria)
+    public function deleteUser(UserInterface $user): void
+    {
+        $em = $this->getEntityManager();
+        $em->remove($user);
+        $em->flush();
+    }
+
+    /**
+     * Finds a user by the given criteria
+     *
+     * @param array $criteria
+     *
+     * @return UserInterface|null
+     */
+    public function findUserBy(array $criteria): ?UserInterface
     {
         return $this->getRepository()->findOneBy($criteria);
     }
@@ -119,67 +137,47 @@ class BaseUserManager implements UserProviderInterface
     /**
      * Finds a user by email
      *
-     * @param  string $email
+     * @param string $email
      *
-     * @return OroUserInterface
+     * @return UserInterface|null
      */
-    public function findUserByEmail($email)
+    public function findUserByEmail(string $email): ?UserInterface
     {
-        $repository = $this->getRepository();
-
-        // Check if repository supports case insensitive search by email.
-        if ($repository instanceof AbstractUserRepository) {
-            return $repository->findUserByEmail((string)$email, $this->isCaseInsensitiveEmailAddressesEnabled());
-        }
-
-        return $this->findUserBy(['email' => $email]);
-    }
-
-    /**
-     * @return bool
-     */
-    protected function isCaseInsensitiveEmailAddressesEnabled(): bool
-    {
-        return false;
+        return $this->userLoader->loadUserByEmail($email);
     }
 
     /**
      * Finds a user by username
      *
-     * @param  string $username
+     * @param string $username
      *
-     * @return OroUserInterface
+     * @return UserInterface|null
      */
-    public function findUserByUsername($username)
+    public function findUserByUsername(string $username): ?UserInterface
     {
-        return $this->findUserBy(['username' => $username]);
+        return $this->userLoader->loadUserByUsername($username);
     }
 
     /**
-     * Finds a user either by email, or username
+     * Finds a user either by email or username
      *
-     * @param  string $usernameOrEmail
+     * @param string $usernameOrEmail
      *
-     * @return OroUserInterface
+     * @return UserInterface|null
      */
-    public function findUserByUsernameOrEmail($usernameOrEmail)
+    public function findUserByUsernameOrEmail(string $usernameOrEmail): ?UserInterface
     {
-        $user = $this->findUserByUsername($usernameOrEmail);
-        if (!$user && filter_var($usernameOrEmail, FILTER_VALIDATE_EMAIL)) {
-            $user = $this->findUserByEmail($usernameOrEmail);
-        }
-
-        return $user;
+        return $this->userLoader->loadUser($usernameOrEmail);
     }
 
     /**
-     * Finds a user either by confirmation token
+     * Finds a user by confirmation token
      *
-     * @param  string $token
+     * @param string $token
      *
-     * @return OroUserInterface
+     * @return UserInterface|null
      */
-    public function findUserByConfirmationToken($token)
+    public function findUserByConfirmationToken(string $token): ?UserInterface
     {
         return $this->findUserBy(['confirmationToken' => $token]);
     }
@@ -187,135 +185,50 @@ class BaseUserManager implements UserProviderInterface
     /**
      * Reloads a user
      *
-     * @param object $user
+     * @param UserInterface $user
      */
-    public function reloadUser($user)
+    public function reloadUser(UserInterface $user): void
     {
-        $this->getStorageManager()->refresh($user);
+        $this->getEntityManager()->refresh($user);
     }
 
     /**
-     * Refreshed a user by User Instance
-     *
-     * It is strongly discouraged to use this method manually as it bypasses
-     * all ACL checks.
-     *
-     * @param  SecurityUserInterface $user
-     *
-     * @return OroUserInterface
-     * @throws UnsupportedUserException if a User Instance is given which is not managed by this UserManager
-     *                                  (so another Manager could try managing it)
-     * @throws UsernameNotFoundException if user could not be reloaded
-     */
-    public function refreshUser(SecurityUserInterface $user)
-    {
-        $class = $this->getClass();
-        if (!$user instanceof $class) {
-            throw new UnsupportedUserException('Account is not supported');
-        }
-        if (!$user instanceof OroUserInterface) {
-            throw new UnsupportedUserException(
-                sprintf('Expected an instance of %s, but got "%s"', OroUserInterface::class, get_class($user))
-            );
-        }
-
-        // Refresh user should revert entity back to it's initial state using non changed field
-        // Otherwise entity may be replaced with another as some field may be changed in memory
-        // Example: user changed username, change was rejected by validation but in memory value was changed
-        // Calling to refreshUser and using username as criteria will lead to user replacing with another user
-        // UoW has internal identity cache which will not actually reload user just by calling to findOneBy
-        try {
-            // Try to reload existing entity to revert it's state to initial
-            $this->reloadUser($user);
-        } catch (ORMInvalidArgumentException $e) {
-            // If entity is not managed and can not be reloaded - load it by ID from database
-            $user = $this->getRepository()->find($user->getId());
-        }
-
-        if (!$user instanceof UserInterface) {
-            throw new UsernameNotFoundException('User can not be loaded.');
-        }
-
-        return $user;
-    }
-
-    /**
-     * Loads a user by username.
-     * It is strongly discouraged to call this method manually as it bypasses
-     * all ACL checks.
-     *
-     * @param  string $username
-     *
-     * @return OroUserInterface
-     * @throws UsernameNotFoundException if user not found
-     */
-    public function loadUserByUsername($username)
-    {
-        $user = $this->findUserByUsername($username);
-        if (!$user) {
-            throw new UsernameNotFoundException(sprintf('No user with name "%s" was found.', $username));
-        }
-
-        return $user;
-    }
-
-    /**
-     * Returns the user's fully qualified class name.
-     *
-     * @return string
-     */
-    public function getClass()
-    {
-        return $this->class;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function supportsClass($class)
-    {
-        return $class === $this->getClass();
-    }
-
-    /**
-     * @param OroUserInterface|string $user
-     *
-     * @return PasswordEncoderInterface
-     */
-    protected function getEncoder($user)
-    {
-        return $this->encoderFactory->getEncoder($user);
-    }
-
-    /**
-     * Return related repository
+     * Returns user repository
      *
      * @return EntityRepository
      */
-    public function getRepository()
+    protected function getRepository(): EntityRepository
     {
-        return $this->getStorageManager()->getRepository($this->getClass());
+        return $this->getEntityManager()->getRepository($this->userLoader->getUserClass());
     }
 
     /**
-     * @return EntityManager
-     */
-    public function getStorageManager()
-    {
-        return $this->registry->getManagerForClass($this->getClass());
-    }
-
-    /**
-     * We need to make sure to have at least one role.
+     * Returns user entity manager
      *
+     * @return EntityManagerInterface
+     */
+    protected function getEntityManager(): EntityManagerInterface
+    {
+        return $this->doctrine->getManagerForClass($this->userLoader->getUserClass());
+    }
+
+    /**
      * @param UserInterface $user
      *
      * @throws \RuntimeException
      */
-    protected function assertRoles(UserInterface $user)
+    protected function assertRoles(UserInterface $user): void
     {
         if (count($user->getRoles()) === 0) {
-            throw new \RuntimeException('User has not default role');
+            throw new \RuntimeException('User must have at least one role.');
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function generateToken(): string
+    {
+        return rtrim(strtr(base64_encode(hash('sha256', uniqid(mt_rand(), true), true)), '+/', '-_'), '=');
     }
 }

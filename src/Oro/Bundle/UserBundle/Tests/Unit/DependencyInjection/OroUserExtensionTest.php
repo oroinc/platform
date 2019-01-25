@@ -6,27 +6,37 @@ use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
 use Oro\Bundle\UserBundle\DependencyInjection\OroUserExtension;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Yaml\Parser;
 
 class OroUserExtensionTest extends ExtensionTestCase
 {
-    /**
-     * @var ContainerBuilder
-     */
-    protected $configuration;
-
     public function testLoadWithDefaults()
     {
-        $this->createEmptyConfiguration();
+        $config = [];
 
-        $this->assertParameter(86400, 'oro_user.reset.ttl');
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
+
+        $extension = new OroUserExtension();
+        $extension->load([$config], $container);
+
+        $this->assertEquals(86400, $container->getParameter('oro_user.reset.ttl'));
     }
 
     public function testLoad()
     {
-        $this->createFullConfiguration();
+        $config = [
+            'reset' => [
+                'ttl' => 1800
+            ]
+        ];
 
-        $this->assertParameter(1800, 'oro_user.reset.ttl');
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
+
+        $extension = new OroUserExtension();
+        $extension->load([$config], $container);
+
+        $this->assertEquals(1800, $container->getParameter('oro_user.reset.ttl'));
     }
 
     public function testLoadDefinitions()
@@ -56,79 +66,17 @@ class OroUserExtensionTest extends ExtensionTestCase
             ]
         ];
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ExtendedContainerBuilder $containerBuilder */
-        $containerBuilder = $this->getMockBuilder('Oro\Component\DependencyInjection\ExtendedContainerBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $containerBuilder->expects($this->once())
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ExtendedContainerBuilder $container */
+        $container = $this->createMock(ExtendedContainerBuilder::class);
+        $container->expects($this->once())
             ->method('getExtensionConfig')
             ->with('security')
             ->willReturn([$inputSecurityConfig]);
-        $containerBuilder->expects($this->once())
+        $container->expects($this->once())
             ->method('setExtensionConfig')
             ->with('security', [$expectedSecurityConfig]);
 
         $extension = new OroUserExtension();
-        $extension->prepend($containerBuilder);
-    }
-
-    protected function createEmptyConfiguration()
-    {
-        $this->configuration = new ContainerBuilder();
-
-        $loader = new OroUserExtension();
-        $config = $this->getEmptyConfig();
-
-        $loader->load(array($config), $this->configuration);
-
-        $this->assertTrue($this->configuration instanceof ContainerBuilder);
-    }
-
-    protected function createFullConfiguration()
-    {
-        $this->configuration = new ContainerBuilder();
-
-        $loader = new OroUserExtension();
-        $config = $this->getFullConfig();
-
-        $loader->load(array($config), $this->configuration);
-
-        $this->assertTrue($this->configuration instanceof ContainerBuilder);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getEmptyConfig()
-    {
-        $yaml   = '';
-        $parser = new Parser();
-
-        return $parser->parse($yaml);
-    }
-
-    protected function getFullConfig()
-    {
-        $yaml = <<<EOF
-reset:
-    ttl: 1800
-EOF;
-        $parser = new Parser();
-
-        return  $parser->parse($yaml);
-    }
-
-    /**
-     * @param mixed  $value
-     * @param string $key
-     */
-    protected function assertParameter($value, $key)
-    {
-        $this->assertEquals($value, $this->configuration->getParameter($key), sprintf('%s parameter is correct', $key));
-    }
-
-    protected function tearDown()
-    {
-        unset($this->configuration);
+        $extension->prepend($container);
     }
 }

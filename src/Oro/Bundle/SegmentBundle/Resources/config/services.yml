@@ -25,6 +25,7 @@ services:
 
     oro_segment.segment_manager:
         class: '%oro_segment.segment_manager.class%'
+        lazy: true
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_segment.query_builder_registry'
@@ -110,6 +111,7 @@ services:
 
     oro_segment.grid.datagrid_configuration_builder:
         class: '%oro_segment.grid.datagrid_configuration_builder.class%'
+        public: false
         parent: oro_report.grid.base_configuration_builder
 
     oro_segment.twig.extension.segment:

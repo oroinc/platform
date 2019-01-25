@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Validator;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
-use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Validator\Constraints\EmailCaseInsensitiveOptionConstraint;
 use Oro\Bundle\UserBundle\Validator\EmailCaseInsensitiveOptionValidator;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -19,9 +21,6 @@ class EmailCaseInsensitiveOptionValidatorTest extends \PHPUnit\Framework\TestCas
 {
     /** @var UserRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $userRepository;
-
-    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userManager;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
@@ -45,14 +44,22 @@ class EmailCaseInsensitiveOptionValidatorTest extends \PHPUnit\Framework\TestCas
     {
         $this->userRepository = $this->createMock(UserRepository::class);
 
-        $this->userManager = $this->createMock(UserManager::class);
-        $this->userManager->expects($this->any())->method('getRepository')->willReturn($this->userRepository);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->with(User::class)
+            ->willReturn($em);
+        $em->expects($this->any())
+            ->method('getRepository')
+            ->with(User::class)
+            ->willReturn($this->userRepository);
 
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->datagridRouteHelper = $this->createMock(DatagridRouteHelper::class);
 
         $this->validator = new EmailCaseInsensitiveOptionValidator(
-            $this->userManager,
+            $doctrine,
             $this->translator,
             $this->datagridRouteHelper
         );

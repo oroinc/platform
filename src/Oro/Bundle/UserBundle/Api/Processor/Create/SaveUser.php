@@ -11,10 +11,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 /**
  * Saves new User entity to the database.
  */
-class SaveEntity implements ProcessorInterface
+class SaveUser implements ProcessorInterface
 {
     /** @var UserManager */
-    protected $userManager;
+    private $userManager;
 
     /**
      * @param UserManager $userManager
@@ -38,8 +38,8 @@ class SaveEntity implements ProcessorInterface
             return;
         }
 
-        // Generate random secure password for user.
-        if (!$user->getPassword()) {
+        // generate random secure password for a user
+        if (!$user->getPlainPassword()) {
             $user->setPlainPassword($this->userManager->generatePassword());
         }
 

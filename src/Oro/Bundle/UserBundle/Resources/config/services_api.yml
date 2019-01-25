@@ -6,8 +6,8 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: normalize_input, class: Oro\Bundle\UserBundle\Api\Model\UserProfile }
 
-    oro_user.api.create.save_entity:
-        class: Oro\Bundle\UserBundle\Api\Processor\Create\SaveEntity
+    oro_user.api.create.save_user:
+        class: Oro\Bundle\UserBundle\Api\Processor\Create\SaveUser
         arguments:
             - '@oro_user.manager'
         tags:

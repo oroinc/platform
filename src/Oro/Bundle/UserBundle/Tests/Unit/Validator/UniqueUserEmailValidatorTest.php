@@ -39,6 +39,17 @@ class UniqueUserEmailValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->initialize($this->executionContext);
     }
 
+    public function testValidateNewUserWhenEmailIsNull()
+    {
+        /** @var User $newUser */
+        $newUser = $this->getEntity(User::class, ['email' => null]);
+        $this->userManager->expects(self::never())
+            ->method('findUserByEmail');
+        $this->executionContext->expects(self::never())
+            ->method('buildViolation');
+        $this->validator->validate($newUser, $this->constraint);
+    }
+
     public function testValidateNewUserEmailIsUnique()
     {
         $newUserEmail = 'foo';

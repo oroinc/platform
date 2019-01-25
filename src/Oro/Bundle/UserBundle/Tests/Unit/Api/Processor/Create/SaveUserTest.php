@@ -3,27 +3,25 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Api\Processor\Create;
 
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
-use Oro\Bundle\UserBundle\Api\Processor\Create\SaveEntity;
+use Oro\Bundle\UserBundle\Api\Processor\Create\SaveUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
-class SaveEntityTest extends FormProcessorTestCase
+class SaveUserTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $userManager;
+    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $userManager;
 
-    /** @var SaveEntity */
-    protected $processor;
+    /** @var SaveUser */
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->userManager = $this->getMockBuilder(UserManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->userManager = $this->createMock(UserManager::class);
 
-        $this->processor = new SaveEntity($this->userManager);
+        $this->processor = new SaveUser($this->userManager);
     }
 
     public function testProcessWhenNoResult()
@@ -45,13 +43,14 @@ class SaveEntityTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultIsObject()
+    public function testProcessWhenUserDoesNotHavePassword()
     {
-        $user = $this->getMockBuilder(User::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $user = $this->createMock(User::class);
         $plainPassword = 'some_password';
 
+        $user->expects(self::once())
+            ->method('getPlainPassword')
+            ->willReturn(null);
         $user->expects(self::once())
             ->method('setPlainPassword')
             ->with($plainPassword);
@@ -67,19 +66,21 @@ class SaveEntityTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testPasswordAlreadySet()
+    public function testProcessWhenUserPasswordAlreadySet()
     {
-        $user = $this->getMockBuilder(User::class)
-            ->getMock();
-        $user->expects(self::once())
-            ->method('getPassword')
-            ->willReturn('test_password');
+        $user = $this->createMock(User::class);
 
+        $user->expects(self::once())
+            ->method('getPlainPassword')
+            ->willReturn('test_password');
         $user->expects(self::never())
             ->method('setPlainPassword');
 
         $this->userManager->expects(self::never())
             ->method('generatePassword');
+        $this->userManager->expects(self::once())
+            ->method('updateUser')
+            ->with(self::identicalTo($user));
 
         $this->context->setResult($user);
         $this->processor->process($this->context);
