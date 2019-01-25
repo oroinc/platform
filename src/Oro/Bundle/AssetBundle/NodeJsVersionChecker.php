@@ -17,7 +17,7 @@ class NodeJsVersionChecker
      */
     public static function satisfies(string $nodeJsExecutable, string $constraints): bool
     {
-        $process = new Process($nodeJsExecutable.' -v');
+        $process = new Process([$nodeJsExecutable, '-v']);
         $process->run();
         if (!$process->isSuccessful()) {
             throw new \RuntimeException(
