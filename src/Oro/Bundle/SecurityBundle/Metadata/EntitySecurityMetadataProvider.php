@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -52,14 +53,18 @@ class EntitySecurityMetadataProvider
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var AclGroupProviderInterface */
+    private $aclGroupProvider;
+
     /**
-     * @param ConfigProvider      $securityConfigProvider
-     * @param ConfigProvider      $entityConfigProvider
-     * @param ConfigProvider      $extendConfigProvider
-     * @param ManagerRegistry     $doctrine
+     * @param ConfigProvider $securityConfigProvider
+     * @param ConfigProvider $entityConfigProvider
+     * @param ConfigProvider $extendConfigProvider
+     * @param ManagerRegistry $doctrine
      * @param TranslatorInterface $translator
-     * @param CacheProvider|null  $cache
+     * @param CacheProvider|null $cache
      * @param EventDispatcherInterface $eventDispatcher
+     * @param AclGroupProviderInterface $aclGroupProvider
      */
     public function __construct(
         ConfigProvider $securityConfigProvider,
@@ -68,7 +73,8 @@ class EntitySecurityMetadataProvider
         ManagerRegistry $doctrine,
         TranslatorInterface $translator,
         CacheProvider  $cache = null,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        AclGroupProviderInterface $aclGroupProvider
     ) {
         $this->securityConfigProvider = $securityConfigProvider;
         $this->entityConfigProvider = $entityConfigProvider;
@@ -77,6 +83,7 @@ class EntitySecurityMetadataProvider
         $this->translator = $translator;
         $this->cache = $cache;
         $this->eventDispatcher = $eventDispatcher;
+        $this->aclGroupProvider = $aclGroupProvider;
     }
 
     /**
@@ -91,7 +98,19 @@ class EntitySecurityMetadataProvider
     {
         $this->ensureMetadataLoaded($securityType);
 
-        return isset($this->localCache[$securityType][$className]);
+        if (isset($this->localCache[$securityType][$className])) {
+            // For entities under protection check that current group is configured for entity
+            $group = $this->aclGroupProvider->getGroup();
+            if ($group) {
+                $metadata = $this->getMetadata($className, $securityType);
+
+                return $metadata->getGroup() === $group;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
