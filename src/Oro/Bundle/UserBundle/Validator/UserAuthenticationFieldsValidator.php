@@ -9,6 +9,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/**
+ * Validates that username is not equal to Primary Email for another user.
+ */
 class UserAuthenticationFieldsValidator extends ConstraintValidator
 {
     const VIOLATION_PATH = 'username';
@@ -73,13 +76,14 @@ class UserAuthenticationFieldsValidator extends ConstraintValidator
      */
     protected function isSameUserExists(User $entity)
     {
-        /** @var User $result */
-        $result = $this->userManager->findUserByEmail($entity->getUsername());
+        $username = $entity->getUsername();
+        if (!$username) {
+            return false;
+        }
 
-        if ($result) {
-            if ($entity->getId() && $result->getId() === $entity->getId()) {
-                return false;
-            }
+        /** @var User $existingUser */
+        $existingUser = $this->userManager->findUserByEmail($entity->getUsername());
+        if ($existingUser && (!$entity->getId() || $existingUser->getId() !== $entity->getId())) {
             return true;
         }
 

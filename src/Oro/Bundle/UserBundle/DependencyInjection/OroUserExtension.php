@@ -10,11 +10,6 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-/**
- * This is the class that loads and manages your bundle configuration
- *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
- */
 class OroUserExtension extends Extension implements PrependExtensionInterface
 {
     const ALIAS = 'oro_user';
@@ -39,6 +34,10 @@ class OroUserExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('oro_user.privileges', $config['privileges']);
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
     }
 
     /**

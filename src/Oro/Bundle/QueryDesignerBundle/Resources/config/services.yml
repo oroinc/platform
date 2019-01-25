@@ -10,6 +10,7 @@ parameters:
 services:
     oro_query_designer.query_designer.manager:
         class: '%oro_query_designer.query_designer.manager.class%'
+        lazy: true
         arguments:
             - []
             - '@oro_query_designer.config.resolver'
@@ -66,6 +67,7 @@ services:
 
     oro_query_designer.grid.datagrid_configuration_builder:
         class: '%oro_query_designer.grid.datagrid_configuration_builder.class%'
+        public: false
         arguments:
             - '@oro_query_designer.query_designer.manager'
             - '@oro_entity.virtual_field_provider.chain'

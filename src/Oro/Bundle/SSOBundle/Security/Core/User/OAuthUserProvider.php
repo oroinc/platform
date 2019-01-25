@@ -58,10 +58,13 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
         $user = $this->userManager->findUserBy([$this->getOAuthProperty($response) => $username]);
 
         if (!$user) {
-            $user = $this->userManager->findUserByEmail($response->getEmail());
-            if ($user) {
-                $user->setGoogleId($username);
-                $this->userManager->updateUser($user);
+            $email = $response->getEmail();
+            if ($email) {
+                $user = $this->userManager->findUserByEmail($email);
+                if (null !== $user) {
+                    $user->setGoogleId($username);
+                    $this->userManager->updateUser($user);
+                }
             }
         }
 

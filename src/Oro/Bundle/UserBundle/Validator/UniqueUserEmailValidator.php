@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
- * Constraint validator which checks that User entity has unique email.
+ * Validates that User entity has unique email.
  */
 class UniqueUserEmailValidator extends ConstraintValidator
 {
@@ -34,14 +34,18 @@ class UniqueUserEmailValidator extends ConstraintValidator
      */
     public function validate($entity, Constraint $constraint)
     {
+        $email = $entity->getEmail();
+        if (!$email) {
+            return;
+        }
+
         /** @var User $existingUser */
-        $existingUser = $this->userManager->findUserByEmail($entity->getEmail());
-        if ($existingUser && $entity->getId() !== $existingUser->getId()) {
+        $existingUser = $this->userManager->findUserByEmail($email);
+        if (null !== $existingUser && $existingUser->getId() !== $entity->getId()) {
             $this->context->buildViolation($constraint->message)
                 ->atPath('email')
                 ->setInvalidValue($entity->getEmail())
                 ->addViolation();
-            return;
         }
     }
 }

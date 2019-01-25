@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Validator;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
-use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Validator\Constraints\EmailCaseInsensitiveOptionConstraint;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
@@ -22,8 +23,8 @@ class EmailCaseInsensitiveOptionValidator extends ConstraintValidator
 {
     private const LIMIT = 10;
 
-    /** @var UserManager */
-    private $userManager;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
     /** @var TranslatorInterface */
     private $translator;
@@ -32,16 +33,16 @@ class EmailCaseInsensitiveOptionValidator extends ConstraintValidator
     private $datagridRouteHelper;
 
     /**
-     * @param UserManager $userManager
+     * @param ManagerRegistry     $doctrine
      * @param TranslatorInterface $translator
      * @param DatagridRouteHelper $datagridRouteHelper
      */
     public function __construct(
-        UserManager $userManager,
+        ManagerRegistry $doctrine,
         TranslatorInterface $translator,
         DatagridRouteHelper $datagridRouteHelper
     ) {
-        $this->userManager = $userManager;
+        $this->doctrine = $doctrine;
         $this->translator = $translator;
         $this->datagridRouteHelper = $datagridRouteHelper;
     }
@@ -126,6 +127,8 @@ class EmailCaseInsensitiveOptionValidator extends ConstraintValidator
      */
     private function getRepository()
     {
-        return $this->userManager->getRepository();
+        return $this->doctrine
+            ->getManagerForClass(User::class)
+            ->getRepository(User::class);
     }
 }
