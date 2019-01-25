@@ -88,6 +88,7 @@ $select2-search-choice-color: $primary-400 !default;
 $select2-search-choice-border-radius: 2px !default;
 $select2-search-choice-inner-offset-vertical: 4px !default;
 $select2-search-choice-inner-offset-horizontal: 8px !default;
+$select2-search-choice-inner-offset-horizontal-unlocked: $content-padding !default;
 $select2-search-choice-offset: 4px !default;
 $select2-search-choice-position: relative !default;
 $select2-search-choice-box-sizing: border-box !default;
@@ -149,7 +150,7 @@ $select2-search-multi-choice-close-display: flex !default;
 $select2-search-multi-choice-close-align-items: center !default;
 $select2-search-multi-choice-close-width: 12px !default;
 $select2-search-multi-choice-close-height: 16px !default;
-$select2-search-multi-choice-close-right: 3px !default;
+$select2-search-multi-choice-close-right: $content-padding-small !default;
 $select2-search-multi-choice-close-top: 2px !default;
 
 $select2-search-choice-close-icon: "\f00d" !default;
@@ -197,6 +198,7 @@ $select2-results-overflow-x: hidden !default;
 $select2-results-overflow-y: auto !default;
 
 $select2-results-image-border-radius: 16px !default;
+$select2-results-image-vertical-align: -3px !default;
 
 $select2-results-sub-offset: 0 !default;
 $select2-results-sub-inner-offset-left: 0 !default;
@@ -288,9 +290,9 @@ $select2-drop-above-box-shadow: 1px 0 9px 3px rgba(0, 0, 0, .08), 1px 0 9px 3px 
 $select2-drop-above-border-radius: 4px 4px 0 0 !default;
 
 $select2-drop-result-font-style: italic !default;
-$select2-drop-result-color: $primary-700 !default;
+$select2-drop-result-color: $primary-800 !default;
 
-$select2-drop-highlighted-color: $primary-700 !default;
+$select2-drop-highlighted-color: $primary-900 !default;
 $select2-drop-highlighted-font-style: italic !default;
 
 $select2-drop-auto-width: auto !default;
