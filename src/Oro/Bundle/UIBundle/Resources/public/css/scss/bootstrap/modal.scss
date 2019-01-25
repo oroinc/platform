@@ -205,6 +205,13 @@
     overflow: scroll;
 }
 
+.modal,
+.modal-backdrop {
+    &.suspend-mode {
+        display: none !important;
+    }
+}
+
 // Scale up the modal
 @include media-breakpoint-up(sm) {
     // Automatically set modal's width for larger viewports

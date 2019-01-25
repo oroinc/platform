@@ -139,7 +139,12 @@ define(function(require) {
             delete this.datagrid;
             delete this.launcherOptions;
             delete this.messages;
-            delete this.confirmModal;
+
+            if (this.confirmModal) {
+                this.confirmModal.dispose();
+                delete this.confirmModal;
+            }
+
             AbstractAction.__super__.dispose.apply(this, arguments);
         },
 
@@ -336,18 +341,31 @@ define(function(require) {
          * @return {oroui.Modal}
          */
         getConfirmDialog: function(callback) {
-            if (!this.confirmModal) {
-                this.confirmModal = (new this.confirmModalConstructor({
-                    title: __(this.messages.confirm_title),
-                    content: this.getConfirmContentMessage(),
-                    okText: __(this.messages.confirm_ok),
-                    cancelText: __(this.messages.confirm_cancel)
-                }));
-                this.listenTo(this.confirmModal, 'ok', callback);
-
-                this.subviews.push(this.confirmModal);
+            if (this.confirmModal) {
+                this.confirmModal.dispose();
+                delete this.confirmModal;
             }
+
+            this.confirmModal = new this.confirmModalConstructor(this.getConfirmDialogOptions());
+
+            this.confirmModal
+                .on('ok', callback)
+                .on('hidden', function() {
+                    delete this.confirmModal;
+                }.bind(this));
+
             return this.confirmModal;
+        },
+
+        getConfirmDialogOptions: function() {
+            var options = {
+                title: __(this.messages.confirm_title),
+                content: this.getConfirmContentMessage(),
+                okText: __(this.messages.confirm_ok),
+                cancelText: __(this.messages.confirm_cancel)
+            };
+
+            return options;
         },
 
         /**
