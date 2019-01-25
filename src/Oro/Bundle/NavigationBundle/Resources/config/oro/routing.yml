@@ -1,3 +1,10 @@
+oro_navigation_js_routing_js:
+    path: "/media/js/routes.{_format}"
+    methods: [GET]
+    defaults: { _controller: fos_js_routing.controller:indexAction }
+    requirements:
+        _format: json
+
 oro_navigation_bundle:
     resource:     "@OroNavigationBundle/Controller"
     type:         annotation
