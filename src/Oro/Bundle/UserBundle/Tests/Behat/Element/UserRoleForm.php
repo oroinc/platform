@@ -14,8 +14,8 @@ class UserRoleForm extends Form
      */
     public function setPermission($entity, $action, $accessLevel)
     {
-        $entityRow = $this->getEntityRow($entity);
-        $actionRow = $this->getActionRow($entityRow, $action);
+        $entityRows = $this->getEntityRows($entity);
+        $actionRow = $this->getActionRow($entityRows, $action);
         $this->getDriver()->waitForAjax();
         $levels = $actionRow->findAll('css', '.dropdown-menu li a');
         $availableLevels = [];
@@ -59,15 +59,23 @@ class UserRoleForm extends Form
     }
 
     /**
-     * @param NodeElement $entityRow
+     * @param NodeElement[]|array $entityRows
      * @param string $action
      * @return NodeElement
      */
-    protected function getActionRow(NodeElement $entityRow, $action)
+    protected function getActionRow(array $entityRows, $action)
     {
-        /** @var NodeElement $label */
-        foreach ($entityRow->findAll('css', 'span.action-permissions__label') as $label) {
-            if (preg_match(sprintf('/%s/i', $action), $label->getText())) {
+        foreach ($entityRows as $entityRow) {
+            // Case-insensitive search for action containing given $action text
+            $label = $entityRow->find(
+                'xpath',
+                '//span[@class="action-permissions__label"]' .
+                '[contains(' .
+                    'translate(text(),"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz"),' .
+                     '"'.strtolower($action).'"' .
+                ')]'
+            );
+            if ($label) {
                 $label->click();
 
                 $dropDown = $this->getPage()->findVisible('css', '.dropdown-menu__permissions-item.show');
@@ -82,20 +90,14 @@ class UserRoleForm extends Form
 
     /**
      * @param string $entity
-     * @return NodeElement
+     * @return NodeElement[]
      */
-    protected function getEntityRow($entity)
+    protected function getEntityRows($entity)
     {
-        $entityTrs = $this->findAll('css', 'div[id*=permission-grid].inner-permissions-grid table.grid tbody tr');
-        self::assertNotCount(0, $entityTrs, 'Can\'t find table with permissions on the page');
+        // Find TR element which contains element div.entity-name with text $entity
+        $entityTrs = $this->findAll('xpath', "//div[contains(@class,'entity-name')][text()='$entity']/ancestor::tr");
+        self::assertNotCount(0, $entityTrs, sprintf('There is no "%s" entity row', $entity));
 
-        /** @var NodeElement $entityTr */
-        foreach ($entityTrs as $entityTr) {
-            if ($entityTr->find('css', 'td div.entity-name')->getText() === $entity) {
-                return $entityTr;
-            }
-        }
-
-        self::fail(sprintf('There is no "%s" entity row', $entity));
+        return $entityTrs;
     }
 }

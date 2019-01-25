@@ -1,6 +1,4 @@
 parameters:
-    oro_user.manager.base.class:                  Oro\Bundle\UserBundle\Entity\BaseUserManager
-    oro_user.manager.class:                       Oro\Bundle\UserBundle\Entity\UserManager
     oro_user.manager.api.class:                   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_user.permission.manager.api.class:        Oro\Bundle\UserBundle\Entity\Manager\UserPermissionApiEntityManager
     oro_user.status.manager.class:                Oro\Bundle\UserBundle\Entity\Manager\StatusManager
@@ -28,7 +26,6 @@ parameters:
     oro_user.role.handler.delete.class:           Oro\Bundle\UserBundle\Handler\RoleDeleteHandler
     oro_user.activity_widget_provider.class:      '%oro_activity.widget_provider.activities.menu.class%'
     oro_user.event_listener.owner_user_grid_listener.class: Oro\Bundle\UserBundle\EventListener\OwnerUserGridListener
-    oro_user.mailer.processor.class:              Oro\Bundle\UserBundle\Mailer\Processor
     oro_user.placeholder.filter.class:            Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter
     oro_user.listener.choice_tree_filter_load_data_listener.class: Oro\Bundle\UserBundle\EventListener\ChoiceTreeFilterLoadDataListener
 
@@ -52,13 +49,18 @@ parameters:
 
 services:
     oro_user.manager:
-        class: '%oro_user.manager.class%'
+        class: Oro\Bundle\UserBundle\Entity\UserManager
         arguments:
-            - '%oro_user.entity.class%'
+            - '@oro_user.security.user_loader'
             - '@doctrine'
             - '@security.encoder_factory'
             - '@oro_entity_extend.enum_value_provider'
-            - '@oro_config.manager'
+            - '@oro_user.manager.mailer_processor_link'
+
+    oro_user.manager.mailer_processor_link:
+        public: false
+        tags:
+            - { name: oro_service_link, service: oro_user.mailer.processor }
 
     oro_user.manager.api:
         class: '%oro_user.manager.api.class%'
@@ -84,10 +86,19 @@ services:
         tags:
             - { name: doctrine.event_subscriber }
 
+    oro_user.security.user_loader:
+        class: Oro\Bundle\UserBundle\Security\UserLoader
+        public: false
+        arguments:
+            - '@doctrine'
+            - '@oro_config.manager'
+
     oro_user.security.provider:
-        class:                        '%oro_user.security.provider.class%'
-        public:                       false
-        arguments:                    ["@oro_user.manager"]
+        class: '%oro_user.security.provider.class%'
+        public: false
+        arguments:
+            - '@oro_user.security.user_loader'
+            - '@doctrine'
 
     oro_user.security.login:
         class:                        '%oro_user.security.login.class%'
@@ -356,12 +367,14 @@ services:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.owner-users-select-grid, method: onBuildBefore }
 
     oro_user.mailer.processor:
-        class: '%oro_user.mailer.processor.class%'
+        class: Oro\Bundle\UserBundle\Mailer\Processor
+        public: false
         arguments:
             - '@oro_user.mailer.user_template_email_sender'
 
     oro_user.mailer.user_template_email_sender:
         class: 'Oro\Bundle\UserBundle\Mailer\UserTemplateEmailSender'
+        lazy: true
         arguments:
             - '@oro_notification.model.notification_settings'
             - '@oro_email.manager.template_email'
@@ -461,7 +474,7 @@ services:
     oro_user.validator.email_case_insensitive_option:
         class: Oro\Bundle\UserBundle\Validator\EmailCaseInsensitiveOptionValidator
         arguments:
-            - '@oro_user.manager'
+            - '@doctrine'
             - '@translator'
             - '@oro_datagrid.helper.route'
         tags:

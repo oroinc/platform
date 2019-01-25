@@ -142,6 +142,42 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
+     * Asserts the response content does not contain the given attributes.
+     *
+     * @param string[] $attributes The names of attributes
+     * @param Response $response
+     */
+    protected function assertResponseNotHasAttributes(array $attributes, Response $response)
+    {
+        $content = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('data', $content);
+        self::assertInternalType('array', $content['data']);
+        self::assertArrayHasKey('attributes', $content['data']);
+        self::assertInternalType('array', $content['data']['attributes']);
+        foreach ($attributes as $name) {
+            self::assertArrayNotHasKey($name, $content['data']['attributes']);
+        }
+    }
+
+    /**
+     * Asserts the response content does not contain the given relationships.
+     *
+     * @param string[] $relationships The names of relationships
+     * @param Response $response
+     */
+    protected function assertResponseNotHasRelationships(array $relationships, Response $response)
+    {
+        $content = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('data', $content);
+        self::assertInternalType('array', $content['data']);
+        self::assertArrayHasKey('relationships', $content['data']);
+        self::assertInternalType('array', $content['data']['relationships']);
+        foreach ($relationships as $name) {
+            self::assertArrayNotHasKey($name, $content['data']['relationships']);
+        }
+    }
+
+    /**
      * Asserts the response content contains the given validation error.
      *
      * @param array    $expectedError

@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInt
 use Oro\Bundle\SecurityBundle\Exception\NotFoundSupportedOwnershipDecisionMakerException;
 
 /**
- * Chain on entity ownership decision makers
+ * Makes decisions on ownership of domain objects based on decision makers registered in chain.
  */
 class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionMakerInterface
 {
@@ -15,11 +15,6 @@ class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionM
      * @var ArrayCollection|AccessLevelOwnershipDecisionMakerInterface[]
      */
     protected $ownershipDecisionMakers;
-
-    /**
-     * @var AccessLevelOwnershipDecisionMakerInterface
-     */
-    protected $ownershipDecisionMaker;
     
     /**
      * @param AccessLevelOwnershipDecisionMakerInterface[] $ownershipDecisionMakers
@@ -123,15 +118,9 @@ class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionM
      */
     protected function getSupportedOwnershipDecisionMaker()
     {
-        if ($this->ownershipDecisionMaker) {
-            return $this->ownershipDecisionMaker;
-        }
-
         foreach ($this->ownershipDecisionMakers as $ownershipDecisionMaker) {
             if ($ownershipDecisionMaker->supports()) {
-                $this->ownershipDecisionMaker = $ownershipDecisionMaker;
-
-                return $this->ownershipDecisionMaker;
+                return $ownershipDecisionMaker;
             }
         }
 

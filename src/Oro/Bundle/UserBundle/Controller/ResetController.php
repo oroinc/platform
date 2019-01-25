@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Util\ObfuscatedEmailTrait;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -35,14 +36,15 @@ class ResetController extends Controller
     public function sendEmailAction(Request $request)
     {
         $email = $request->request->get('username');
-        $frontend = $request->get('frontend', false);
+
+        $userManager = $this->getUserManager();
         /** @var User $user */
-        $user = $this->get('oro_user.manager')->findUserByUsernameOrEmail($email);
+        $user = $userManager->findUserByUsernameOrEmail($email);
 
         if (null !== $user && $user->isEnabled()) {
             $email = $user->getEmail();
             if ($user->isPasswordRequestNonExpired($this->container->getParameter('oro_user.reset.ttl'))
-                && !($frontend && null === $user->getPasswordRequestedAt())
+                && !($request->get('frontend', false) && null === $user->getPasswordRequestedAt())
             ) {
                 $this->get('session')->getFlashBag()
                     ->add('warn', 'oro.user.password.reset.ttl_already_requested.message');
@@ -50,9 +52,8 @@ class ResetController extends Controller
                 return $this->redirect($this->generateUrl('oro_user_reset_request'));
             }
 
-            $user->setConfirmationToken($user->generateToken());
             try {
-                $this->get('oro_user.mailer.processor')->sendResetPasswordEmail($user);
+                $userManager->sendResetPasswordEmail($user);
             } catch (\Exception $e) {
                 $this->get('logger')->error(
                     'Unable to sent the reset password email.',
@@ -63,11 +64,10 @@ class ResetController extends Controller
 
                 return $this->redirect($this->generateUrl('oro_user_reset_request'));
             }
-            $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
             $this->get('monolog.logger.oro_account_security')->notice('Reset password email has been sent', [
                 'user' => $this->get('oro_user.provider.user_logging_info_provider')->getUserLoggingInfo($user),
             ]);
-            $this->get('oro_user.manager')->updateUser($user);
+            $userManager->updateUser($user);
         }
 
         $this->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($email));
@@ -200,7 +200,7 @@ class ResetController extends Controller
      */
     public function resetAction($token)
     {
-        $user = $this->get('oro_user.manager')->findUserByConfirmationToken($token);
+        $user = $this->getUserManager()->findUserByConfirmationToken($token);
         $session = $this->get('session');
 
         if (null === $user) {
@@ -278,5 +278,13 @@ class ResetController extends Controller
     protected function getEntityRoutingHelper()
     {
         return $this->get('oro_entity.routing_helper');
+    }
+
+    /**
+     * @return UserManager
+     */
+    protected function getUserManager()
+    {
+        return $this->get('oro_user.manager');
     }
 }

@@ -40,7 +40,6 @@ class OroUIExtension extends Extension
         $loader->load('layouts.yml');
         $loader->load('block_types.yml');
         $loader->load('form_types.yml');
-        $loader->load('commands.yml');
 
         $container->setParameter(
             'oro_ui.placeholders',

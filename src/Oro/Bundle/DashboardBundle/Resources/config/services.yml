@@ -81,6 +81,7 @@ services:
 
     oro_dashboard.factory:
         class: '%oro_dashboard.factory.class%'
+        lazy: true
         arguments:
             - '@oro_dashboard.config_provider'
             - '@oro_dashboard.manager.state'

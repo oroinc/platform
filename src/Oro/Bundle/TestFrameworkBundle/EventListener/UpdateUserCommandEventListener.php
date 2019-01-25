@@ -40,7 +40,7 @@ class UpdateUserCommandEventListener
             }
 
             /** @var User $user */
-            $user = $this->userManager->loadUserByUsername($userName);
+            $user = $this->userManager->findUserByUsername($userName);
             $user
                 ->setUsername('admin')
                 ->setPlainPassword('admin')

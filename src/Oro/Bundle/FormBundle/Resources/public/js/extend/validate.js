@@ -550,6 +550,7 @@ define(function(require) {
         'oroform/js/validator/notblank',
         'oroform/js/validator/notnull',
         'oroform/js/validator/number',
+        'oroform/js/validator/numeric-range',
         'oroform/js/validator/range',
         'oroform/js/validator/open-range',
         'oroform/js/validator/regex',

@@ -17,7 +17,7 @@ class OroSegmentBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_8';
+        return 'v1_9';
     }
 
     /**
@@ -82,6 +82,7 @@ class OroSegmentBundleInstaller implements Installation
         $table->addColumn('type', 'string', ['length' => 32]);
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('name_lowercase', 'string', ['length' => 255]);
         $table->addColumn('description', 'text', ['notnull' => false]);
         $table->addColumn('entity', 'string', ['length' => 255]);
         $table->addColumn('definition', 'text', []);
@@ -91,7 +92,7 @@ class OroSegmentBundleInstaller implements Installation
         $table->addColumn('records_limit', 'integer', ['notnull' => false]);
         $table->addIndex(['organization_id'], 'idx_d02603b332c8a3de', []);
         $table->addIndex(['business_unit_owner_id'], 'idx_d02603b359294170', []);
-        $table->addUniqueIndex(['name'], 'uniq_d02603b35e237e06');
+        $table->addUniqueIndex(['name_lowercase'], 'uniq_d02603b37edd63ff');
         $table->setPrimaryKey(['id']);
         $table->addIndex(['type'], 'idx_d02603b38cde5729', []);
     }

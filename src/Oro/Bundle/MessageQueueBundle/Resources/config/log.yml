@@ -20,11 +20,13 @@ services:
 
     oro_message_queue.log.message_processor_class_provider:
         class: Oro\Component\MessageQueue\Log\MessageProcessorClassProvider
+        lazy: true
         arguments:
             - '@oro_message_queue.client.message_processor_registry'
 
     oro_message_queue.log.message_to_array_converter:
         class: Oro\Component\MessageQueue\Log\Converter\ChainMessageToArrayConverter
+        lazy: true
         arguments:
             - []
 

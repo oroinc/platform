@@ -28,6 +28,7 @@ services:
 
     oro_message_queue.client.message_producer:
         class: 'Oro\Component\MessageQueue\Client\MessageProducer'
+        lazy: true
         arguments: ['@oro_message_queue.client.driver']
 
     oro_message_queue.message_producer:

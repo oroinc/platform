@@ -1,14 +1,14 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Functional\Entity;
+namespace Oro\Bundle\UserBundle\Tests\Functional\Security;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Security\UserProvider;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
 
-class UserManagerTest extends WebTestCase
+class UserProviderTest extends WebTestCase
 {
     /**
      * {@inheritdoc}
@@ -21,6 +21,14 @@ class UserManagerTest extends WebTestCase
         );
         $this->client->useHashNavigation(true);
         $this->loadFixtures([LoadUserData::class]);
+    }
+
+    private function refreshUser($user)
+    {
+        /** @var UserProvider $userProvider */
+        $userProvider = $this->getContainer()->get('oro_user.tests.security.provider');
+
+        return $userProvider->refreshUser($user);
     }
 
     public function testUserReloadWhenEntityIsChangedByReference()
@@ -42,9 +50,7 @@ class UserManagerTest extends WebTestCase
         $this->assertSame($originalId, $customerUser->getId());
         $this->assertSame($originalId, $loggedUser->getId());
 
-        /** @var UserManager $userManager */
-        $userManager = $this->getContainer()->get('oro_user.manager');
-        $userManager->refreshUser($customerUser);
+        $this->refreshUser($customerUser);
 
         $this->assertSame(LoadUserData::SIMPLE_USER, $loggedUser->getUsername(), 'username after refresh');
         $this->assertSame($originalId, $loggedUser->getId());
@@ -67,9 +73,7 @@ class UserManagerTest extends WebTestCase
         $loggedUser->setUsername(LoadUserData::SIMPLE_USER_2);
         $em->detach($loggedUser);
 
-        /** @var UserManager $userManager */
-        $userManager = $this->getContainer()->get('oro_user.manager');
-        $loggedUser = $userManager->refreshUser($loggedUser);
+        $loggedUser = $this->refreshUser($loggedUser);
 
         $this->assertSame(LoadUserData::SIMPLE_USER, $loggedUser->getUsername(), 'username after refresh');
         $this->assertSame($originalId, $loggedUser->getId());

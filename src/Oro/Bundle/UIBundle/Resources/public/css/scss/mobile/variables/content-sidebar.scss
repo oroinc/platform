@@ -8,3 +8,8 @@ $content-sidebar-min-height: 90vh !default;
 $content-sidebar-mobile-max-width: $content-sidebar-width !default;
 $content-sidebar-mobile-min-height: $content-sidebar-min-height !default;
 $content-sidebar-mobile-margin: side-values(0 0 0 (-$content-padding)) !default;
+
+$content-sidebar-items-mobile-offset-inner: 0 $content-padding !default;
+
+$content-sidebar-jstree-wrapper-mobile-inner-offset: 0 $content-padding !default;
+$content-sidebar-jstree-wrapper-jstree-mobile-inner-offset: 0 -#{$content-padding} 0 -#{$content-padding + $content-padding-medium} !default;
