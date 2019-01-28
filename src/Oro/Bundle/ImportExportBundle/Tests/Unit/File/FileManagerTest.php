@@ -6,11 +6,14 @@ use Gaufrette\File;
 use Gaufrette\Filesystem;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\SEOBundle\Sitemap\Exception\LogicException;
+use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class FileManagerTest extends TestCase
 {
+    use TempDirExtension;
+
     const FILENAME = 'file.png';
 
     /** @var FileManager */
@@ -86,5 +89,72 @@ class FileManagerTest extends TestCase
             ->with(self::FILENAME)
             ->willThrowException(new LogicException('no mime type.'));
         $this->assertNull($this->fileManager->getMimeType(self::FILENAME));
+    }
+
+    /**
+     * @dataProvider fileContentDataProvider
+     * @param string $fileContent
+     * @param string $expectedContent
+     */
+    public function testSaveFileToStorage(string $fileContent, string $expectedContent)
+    {
+        /** @var \SplFileObject|MockObject $fileObject */
+        $fileObject = $this->getMockBuilder(\SplFileObject::class)
+            ->setConstructorArgs(['php://memory'])
+            ->getMock();
+
+        $fileObject
+            ->expects($this->once())
+            ->method('fread')
+            ->willReturn($fileContent);
+
+        /** @var \SplFileInfo|MockObject $fileInfo */
+        $fileInfo = $this->getMockBuilder(\SplFileInfo::class)
+            ->setConstructorArgs(['testFileName'])
+            ->getMock();
+
+        $fileInfo
+            ->expects($this->once())
+            ->method('openFile')
+            ->willReturn($fileObject);
+
+        $this->filesystem->expects($this->once())
+            ->method('write')
+            ->with('fileNameForSave', $expectedContent, false);
+
+        $this->fileManager->saveFileToStorage($fileInfo, 'fileNameForSave', false);
+    }
+
+    /**
+     * @dataProvider fileContentDataProvider
+     * @param string $fileContent
+     * @param string $expectedContent
+     */
+    public function testWriteFileToStorage(string $fileContent, string $expectedContent)
+    {
+        $tmpFileName = $this->getTempFile('import_export_file_manager');
+
+        file_put_contents($tmpFileName, $fileContent);
+
+        $this->filesystem->expects($this->once())
+            ->method('write')
+            ->with('fileNameForSave', $expectedContent, false);
+
+        $this->fileManager->writeFileToStorage($tmpFileName, 'fileNameForSave', false);
+
+        if (file_exists($tmpFileName)) {
+            unlink($tmpFileName);
+        }
+    }
+
+    public function fileContentDataProvider()
+    {
+        $bomBytes = pack('H*', 'EFBBBF');
+
+        return [
+            [$bomBytes . 'Col1,Col2,Col3\nVal1Val2Val3', 'Col1,Col2,Col3\nVal1Val2Val3'],
+            [$bomBytes . ' some Test Content ', ' some Test Content '],
+            ['Test content ' . $bomBytes, 'Test content ' . $bomBytes],
+        ];
     }
 }
