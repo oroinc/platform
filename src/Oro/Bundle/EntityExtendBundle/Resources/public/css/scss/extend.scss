@@ -1,9 +1,5 @@
 /* @theme: admin.oro; */
 
-#entity_extend_unique_key_collection select {
-    margin: 0;
-}
-
 div.disabled-choice {
     div.selector {
         background: none;
@@ -17,8 +13,4 @@ div.disabled-choice {
             }
         }
     }
-}
-
-.unique-keys {
-    width: 500px;
 }
