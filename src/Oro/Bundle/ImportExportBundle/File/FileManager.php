@@ -6,9 +6,12 @@ use Gaufrette\Adapter;
 use Gaufrette\File;
 use Gaufrette\Filesystem;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
-
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * Handles file manipulation logic and all related stuff such as creating path, etc.
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class FileManager
 {
     /** @var Filesystem */
@@ -99,7 +102,11 @@ class FileManager
      */
     public function saveFileToStorage(\SplFileInfo $file, $fileName, $overwrite = false)
     {
-        $this->filesystem->write($fileName, $file->openFile()->fread($file->getSize()), $overwrite);
+        $this->filesystem->write(
+            $fileName,
+            $this->removeByteOrderMark($file->openFile()->fread($file->getSize())),
+            $overwrite
+        );
     }
 
     /**
@@ -109,7 +116,11 @@ class FileManager
      */
     public function writeFileToStorage($localFilePath, $fileName, $overwrite = false)
     {
-        $this->filesystem->write($fileName, @file_get_contents($localFilePath, 'r'), $overwrite);
+        $this->filesystem->write(
+            $fileName,
+            $this->removeByteOrderMark(@file_get_contents($localFilePath, 'r')),
+            $overwrite
+        );
     }
 
     /**
@@ -248,5 +259,19 @@ class FileManager
         }
 
         return null;
+    }
+
+    /**
+     * Remove byte order mark (BOM) from the beginning of the file.
+     *
+     * @param string $fileContent
+     * @return string
+     */
+    private function removeByteOrderMark(string $fileContent): string
+    {
+        $bom = pack('H*', 'EFBBBF');
+        $sanitizedFileContent = preg_replace("/^$bom/", '', $fileContent);
+
+        return !is_string($sanitizedFileContent) ? '' : $sanitizedFileContent;
     }
 }

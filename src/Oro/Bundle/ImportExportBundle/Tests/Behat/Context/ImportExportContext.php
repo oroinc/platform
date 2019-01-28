@@ -422,6 +422,41 @@ class ImportExportContext extends OroFeatureContext implements
     }
 
     /**
+     * @When /^(?:|I )save import file with BOM/
+     */
+    public function iSaveImportFileWithBOM()
+    {
+        $newImportFile = tempnam(
+            $this->getKernel()->getRootDir() . DIRECTORY_SEPARATOR . 'import_export',
+            'import_data_'
+        );
+
+        file_put_contents($newImportFile, pack('H*', 'EFBBBF'));
+
+        $readTheFile = function ($path) {
+            $handle = fopen($path, "r");
+
+            while (!feof($handle)) {
+                yield fgets($handle);
+            }
+
+            fclose($handle);
+        };
+
+        $modifiedImportFile = fopen($newImportFile, 'a');
+        $iterator = $readTheFile($this->importFile);
+
+        foreach ($iterator as $iteration) {
+            fputs($modifiedImportFile, $iteration);
+        }
+
+        fclose($modifiedImportFile);
+        unlink($this->importFile);
+
+        $this->importFile = $newImportFile;
+    }
+
+    /**
      * Example: When I validate file
      *
      * @When /^(?:|I )validate file$/
