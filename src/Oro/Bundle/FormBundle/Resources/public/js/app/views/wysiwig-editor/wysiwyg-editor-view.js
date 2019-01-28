@@ -26,7 +26,7 @@ define(function(require) {
             enabled: true,
             plugins: ['textcolor', 'code', 'bdesk_photo', 'paste', 'lists', 'advlist'],
             pluginsMap: {
-                bdesk_photo: '/bundles/oroform/lib/bdeskphoto/plugin.min.js'
+                bdesk_photo: 'bundles/oroform/lib/bdeskphoto/plugin.min.js'
             },
             menubar: false,
             toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | bdesk_photo'],
@@ -117,6 +117,7 @@ define(function(require) {
             }
 
             _.each(this.options.pluginsMap, function(url, name) {
+                url = location.origin + '/' + this.options.assets_base_url + url;
                 if (this.options.plugins.indexOf(name) !== -1) {
                     tinyMCE.PluginManager.load(name, url);
                 }
