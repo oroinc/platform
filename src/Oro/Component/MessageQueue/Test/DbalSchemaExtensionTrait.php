@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Component\MessageQueue\Test;
 
-use Doctrine\DBAL\Exception\DriverException;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
 

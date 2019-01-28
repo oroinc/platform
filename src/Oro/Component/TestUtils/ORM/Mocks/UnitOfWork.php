@@ -2,7 +2,6 @@
 
 namespace Oro\Component\TestUtils\ORM\Mocks;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork as BaseUnitOfWork;
 
 class UnitOfWork extends BaseUnitOfWork

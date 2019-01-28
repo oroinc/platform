@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Functional\Grid;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension;

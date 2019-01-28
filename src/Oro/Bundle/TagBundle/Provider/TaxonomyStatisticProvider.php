@@ -5,7 +5,6 @@ namespace Oro\Bundle\TagBundle\Provider;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\Taxonomy;
 use Oro\Bundle\TagBundle\Security\SecurityProvider;
 

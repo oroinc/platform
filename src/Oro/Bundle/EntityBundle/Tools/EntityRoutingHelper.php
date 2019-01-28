@@ -7,7 +7,6 @@ use Oro\Bundle\EntityBundle\Exception\RecordNotFoundException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**

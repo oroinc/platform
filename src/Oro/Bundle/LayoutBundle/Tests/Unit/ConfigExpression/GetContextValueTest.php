@@ -3,7 +3,6 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\Func;
 
 use Oro\Bundle\LayoutBundle\ConfigExpression\GetContextValue;
-use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
 class GetContextValueTest extends \PHPUnit\Framework\TestCase

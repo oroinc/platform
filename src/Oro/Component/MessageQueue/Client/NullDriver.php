@@ -2,7 +2,6 @@
 namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\MessageQueue\Transport\QueueInterface;

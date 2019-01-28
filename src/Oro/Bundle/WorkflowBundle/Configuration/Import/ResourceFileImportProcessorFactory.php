@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Configuration\Import;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**

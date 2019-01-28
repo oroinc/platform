@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Model\Action;
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;

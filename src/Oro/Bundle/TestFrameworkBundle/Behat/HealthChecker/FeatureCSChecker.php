@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker;
 
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
-use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
 
 /**
  * Feature code style checker

@@ -4,7 +4,6 @@ namespace Oro\Bundle\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @ORM\Entity()

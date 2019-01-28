@@ -2,12 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Twig;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityRepository;
-use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Twig\EnumExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 

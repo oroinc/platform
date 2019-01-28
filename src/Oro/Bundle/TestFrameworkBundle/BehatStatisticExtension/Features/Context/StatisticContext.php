@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Features\Context;
 
 use Behat\Behat\Context\Context;
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Doctrine\DBAL\DriverManager;

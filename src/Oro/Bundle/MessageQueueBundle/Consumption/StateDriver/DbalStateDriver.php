@@ -6,7 +6,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Types\Type;
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\MessageQueueBundle\Consumption\StateDriverInterface;
 use Psr\Log\LoggerInterface;
 

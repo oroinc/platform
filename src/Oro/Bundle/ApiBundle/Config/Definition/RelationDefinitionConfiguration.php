@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 

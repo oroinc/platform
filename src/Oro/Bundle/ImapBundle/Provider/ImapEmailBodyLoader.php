@@ -12,7 +12,6 @@ use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
-use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;

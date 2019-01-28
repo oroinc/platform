@@ -4,7 +4,6 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBu
 
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder\DatagridConfigurationBuilderTestCase;
 
 class VirtualRelationsTest extends DatagridConfigurationBuilderTestCase
 {

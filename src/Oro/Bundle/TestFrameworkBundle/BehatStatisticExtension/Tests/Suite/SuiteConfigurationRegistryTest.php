@@ -6,7 +6,6 @@ use Behat\Testwork\Specification\SpecificationFinder;
 use Behat\Testwork\Suite\Generator\GenericSuiteGenerator;
 use Behat\Testwork\Suite\Suite;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\FeatureAvgTimeRegistry;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\FeatureStatisticRepository;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\FeaturePathLocator;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\SpecificationCountDivider;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\SuiteConfigurationDivider;

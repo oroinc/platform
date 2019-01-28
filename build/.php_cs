@@ -21,6 +21,7 @@ return PhpCsFixer\Config::create()
 
             // imports
             'ordered_imports' => true,
+            'no_unused_imports' => true,
             'no_extra_consecutive_blank_lines' => ['use'],
             'php_unit_namespaced' => ['target' => '6.0'],
             'php_unit_expectation' => true,

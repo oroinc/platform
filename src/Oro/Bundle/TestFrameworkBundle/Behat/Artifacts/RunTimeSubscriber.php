@@ -2,23 +2,11 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Artifacts;
 
-use Behat\Behat\EventDispatcher\Event\AfterOutlineTested;
 use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
-use Behat\Behat\EventDispatcher\Event\AfterStepTested;
-use Behat\Behat\EventDispatcher\Event\ExampleTested;
-use Behat\Behat\EventDispatcher\Event\OutlineTested;
-use Behat\Behat\Output\Statistics\TotalStatistics;
-use Behat\Mink\Mink;
-use Behat\Testwork\EventDispatcher\Event\BeforeExerciseCompleted;
 use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
 use Behat\Testwork\Output\NodeEventListeningFormatter;
-use Behat\Testwork\Output\OutputManager;
-use Behat\Testwork\Output\Printer\OutputPrinter;
-use Behat\Testwork\Tester\Result\TestResult;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class RunTimeSubscriber implements EventSubscriberInterface
 {

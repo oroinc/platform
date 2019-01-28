@@ -4,7 +4,6 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\EventListener\MultipleEntitySubscriber;
-use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;

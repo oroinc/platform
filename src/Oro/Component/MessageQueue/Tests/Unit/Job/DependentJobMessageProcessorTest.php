@@ -2,7 +2,6 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Oro\Component\MessageQueue\Client\Message;
-use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobMessageProcessor;

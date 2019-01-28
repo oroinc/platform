@@ -7,7 +7,6 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Validator\Constraints\UserWithoutRole;
 use Oro\Bundle\UserBundle\Validator\UserWithoutRoleValidator;
-use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class UserWithoutRoleValidatorTest extends \PHPUnit\Framework\TestCase

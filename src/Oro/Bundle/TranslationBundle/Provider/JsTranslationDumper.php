@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Oro\Bundle\TranslationBundle\Controller\Controller;
-use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;

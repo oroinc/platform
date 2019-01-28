@@ -7,7 +7,6 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\Parameter;
 use Oro\Component\Action\Exception\InvalidParameterException;
-use Symfony\Component\Validator\Constraints as Assert;
 
 class ParametersResolver
 {

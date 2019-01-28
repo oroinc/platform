@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AccessRulesPass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;

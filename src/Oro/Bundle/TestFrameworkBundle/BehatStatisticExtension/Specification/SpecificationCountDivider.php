@@ -2,16 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification;
 
-use Behat\Gherkin\Node\FeatureNode;
-use Behat\Testwork\Specification\SpecificationFinder;
-use Behat\Testwork\Suite\Exception\SuiteConfigurationException;
-use Behat\Testwork\Suite\Generator\GenericSuiteGenerator;
-use Behat\Testwork\Suite\GenericSuite;
 use Behat\Testwork\Suite\Suite;
-use Behat\Testwork\Suite\SuiteRegistry;
-use Guzzle\Iterator\ChunkedIterator;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 class SpecificationCountDivider implements SpecificationDividerInterface
 {

@@ -5,7 +5,6 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntityType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 

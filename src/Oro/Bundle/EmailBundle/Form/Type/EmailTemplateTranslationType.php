@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\TranslationBundle\Form\Type\GedmoTranslationsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;

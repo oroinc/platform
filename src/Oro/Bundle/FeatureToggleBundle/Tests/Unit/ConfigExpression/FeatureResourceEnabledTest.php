@@ -3,7 +3,6 @@
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\ConfigExpression;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureEnabled;
 use Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureResourceEnabled;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;

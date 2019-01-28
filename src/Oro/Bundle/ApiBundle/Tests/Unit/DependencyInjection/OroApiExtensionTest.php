@@ -8,7 +8,6 @@ use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Provider\CombinedConfigBag;
-use Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Fixtures;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

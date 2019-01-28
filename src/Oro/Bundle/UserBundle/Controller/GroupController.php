@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Controller;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;

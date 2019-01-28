@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Event;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Allows to do things after the database schema is changed.

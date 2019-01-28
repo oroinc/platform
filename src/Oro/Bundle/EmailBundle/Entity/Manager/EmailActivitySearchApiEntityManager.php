@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
