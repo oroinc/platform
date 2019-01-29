@@ -199,7 +199,7 @@ class ConnectionController extends Controller
 
         if ($origin->getImapHost() !== null) {
             $response['imap'] = [];
-            $password = $this->get('oro_security.encoder.default')->decryptData($origin->getPassword());
+            $password = $this->get('oro_security.encoder.mcrypt')->decryptData($origin->getPassword());
 
             $config = new ImapConfig(
                 $origin->getImapHost(),
