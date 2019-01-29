@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType as SymfonyFormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
 {
@@ -27,10 +29,16 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
      */
     private static $encryptor;
 
+    /**
+     * @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private static $validator;
+
     protected function setUp()
     {
         parent::setUp();
         self::$encryptor = $this->createMock(SymmetricCrypterInterface::class);
+        self::$validator = $this->createMock(ValidatorInterface::class);
     }
 
     public function testConfigureWhenNoSmtpPasswordSetting(): void
@@ -94,6 +102,57 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
         self::assertArraySubset($expectedData, $form->getData());
     }
 
+    public function testConfigureWithParentScopeValue(): void
+    {
+        $hostKey = $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_HOST);
+        $portKey = $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_PORT);
+        $encKey = $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_ENC);
+        $userKey = $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_USER);
+        $passKey = $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_PASS);
+
+        $builder = $this->createFormBuilder();
+        $builder->add($hostKey, FormFieldType::class);
+        $builder->add($portKey, FormFieldType::class);
+        $builder->add($encKey, FormFieldType::class);
+        $builder->add($userKey, FormFieldType::class);
+        $builder->add($passKey, FormFieldType::class);
+
+        self::$validator->expects($this->never())
+            ->method('validate');
+
+        $builder->getForm()->submit(
+            [
+                $hostKey => ['use_parent_scope_value' => true],
+                $portKey => ['use_parent_scope_value' => true],
+                $encKey => ['use_parent_scope_value' => true],
+                $userKey => ['use_parent_scope_value' => true],
+                $passKey => ['use_parent_scope_value' => true]
+            ]
+        );
+    }
+
+    public function testConfigureSmtpConnectionConfigurationError(): void
+    {
+        $builder = $this->createFormBuilder();
+        $builder->add($this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_HOST), FormFieldType::class);
+        $builder->add($this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_PORT), FormFieldType::class);
+        $builder->add($this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_ENC), FormFieldType::class);
+        $builder->add($this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_USER), FormFieldType::class);
+        $builder->add($this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_PASS), FormFieldType::class);
+
+        $error = $this->createMock(ConstraintViolationInterface::class);
+        $error->expects($this->once())
+            ->method('getMessage')
+            ->willReturn('Test error');
+        self::$validator->expects($this->once())
+            ->method('validate')
+            ->willReturn([$error]);
+
+        $form = $builder->getForm();
+        $form->submit([]);
+        $this->assertCount(1, $form->getErrors());
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -128,7 +187,7 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
      */
     public static function configure(FormBuilderInterface $builder, $options): void
     {
-        $emailConfigurationConfigurator = new EmailConfigurationConfigurator(self::$encryptor);
+        $emailConfigurationConfigurator = new EmailConfigurationConfigurator(self::$encryptor, self::$validator);
         $emailConfigurationConfigurator->configure($builder, $options);
     }
 
@@ -164,8 +223,18 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
      */
     private function getSmtpPasswordFieldKey(): string
     {
+        return $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_PASS);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    private function getConfigKey($name): string
+    {
         return Configuration::getConfigKeyByName(
-            Configuration::KEY_SMTP_SETTINGS_PASS,
+            $name,
             ConfigManager::SECTION_VIEW_SEPARATOR
         );
     }
