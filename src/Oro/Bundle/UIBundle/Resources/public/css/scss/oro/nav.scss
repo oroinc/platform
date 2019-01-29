@@ -137,6 +137,11 @@
     .nav-item {
         float: $nav-item-float;
         margin-bottom: $nav-item-offset-bottom;
+
+        &.pull-right {
+            flex-grow: 1;
+            text-align: #{$end};
+        }
     }
 
     .nav-item.active .nav-link,

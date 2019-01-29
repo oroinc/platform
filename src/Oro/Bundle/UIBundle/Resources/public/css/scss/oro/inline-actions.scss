@@ -3,7 +3,7 @@
 .inline-actions-element {
     display: inline-flex;
     align-items: flex-start;
-    margin: (-$content-padding-small / 2 - 2px) (-$content-padding-small / 2) (-$content-padding-small / 2);
+    margin: (-$content-padding-small / 2 - 2px) (-$content-padding-small / 2) (-$content-padding-small / 2 - 3px);
     padding: ($content-padding-small / 2) ($content-padding-small / 2);
 
     transition: $hover-transition;
@@ -27,6 +27,8 @@
     .inline-actions-element_wrapper {
         word-break: break-all;
         display: inline-block;
+        padding: ($content-padding-small / 2) 0 ($content-padding-small / 2) ($content-padding-small / 2);
+        margin: (-$content-padding-small / 2) 0 (-$content-padding-small / 2) (-$content-padding-small / 2);
     }
 
     &.truncate {

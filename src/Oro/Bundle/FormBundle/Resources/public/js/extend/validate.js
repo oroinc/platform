@@ -509,9 +509,18 @@ define(function(require) {
         // ignore all invisible elements except input type=hidden, which are ':input[data-validate-element]'
         ignore: ':hidden:not([type=hidden]), [data-validation-ignore] :input',
         onfocusout: function(element) {
-            if (!$(element).is(':disabled') && !this.checkable(element) && !this.isPristine(element)) {
+            if (
+                !$(element).is(':disabled, [data-validation-ignore-onblur]') &&
+                !this.checkable(element) &&
+                !this.isPristine(element)
+            ) {
                 if ($(element).hasClass('select2-focusser')) {
                     var $selectContainer = $(element).closest('.select2-container');
+
+                    // if this is a compound field, check parent container for ignore data attribute
+                    if ($selectContainer.parents('[data-validation-ignore-onblur]').length) {
+                        return;
+                    }
 
                     // prevent validation if selection still in progress
                     if ($selectContainer.hasClass('select2-dropdown-open')) {
@@ -550,6 +559,7 @@ define(function(require) {
         'oroform/js/validator/notblank',
         'oroform/js/validator/notnull',
         'oroform/js/validator/number',
+        'oroform/js/validator/numeric-range',
         'oroform/js/validator/range',
         'oroform/js/validator/open-range',
         'oroform/js/validator/regex',

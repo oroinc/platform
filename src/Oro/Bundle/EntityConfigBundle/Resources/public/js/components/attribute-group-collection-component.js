@@ -58,7 +58,9 @@ define(function(require) {
                 return true;
             });
             // temporary width fix
-            $(this.options._sourceElement).parents().find('.oro-item-collection .row-oro').width(960);
+            if (_.isDesktop()) {
+                $(this.options._sourceElement).parents().find('.oro-item-collection .row-oro').width(960);
+            }
         },
 
         showConfirmModal: function(removeBtn) {

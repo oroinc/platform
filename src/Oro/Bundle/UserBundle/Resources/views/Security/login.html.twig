@@ -22,7 +22,11 @@
 <div class="container">
     <div class="form-wrapper">
         <div class="form-wrapper__inner">
-            <form id="login-form" action="{{ path('oro_user_security_check') }}" method="post" class="form-signin">
+            {% set usernameLabel = 'Username'|trans %}
+            {% set passwordLabel = 'Password'|trans %}
+            {% set showLabels = (usernameLabel|length <= 9) and (passwordLabel|trans <= 9) %}
+            {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
+            <form id="login-form" action="{{ path('oro_user_security_check') }}" method="post" class="form-signin {{ layoutName }}">
                 <div class="form-description">
                     {% if oro_theme_logo() %}
                         <div class="form-description__logo">
@@ -37,44 +41,38 @@
                 <div class="title-box">
                     <h2 class="title">{{ 'Login'|trans }}</h2>
                 </div>
-                <fieldset>
+                <fieldset class="field-set">
                     {% if error %}
                         <div class="alert alert-error" role="alert">
                             <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                         </div>
                     {% endif %}
                     {{ messagesContent }}
-                    {%- set usernameLabel = 'Username'|trans %}
-                    {%- set passwordLabel = 'Password'|trans %}
-                    {%- set organizationLabel = 'Organization'|trans %}
-                    {%- set showLabels = (usernameLabel|length <= 9) and (passwordLabel|trans <= 9) %}
                     <div class="input-field-group">
                         <div class="input-prepend">
-                            {% if showLabels %}
                             <label for="prependedInput" class="add-on">{{ usernameLabel }}</label>
-                            {% endif %}
-                            <input type="text" id="prependedInput" class="span2" name="_username" value="{{ last_username }}" required="required" placeholder="{{ 'Username or Email'|trans }}" autofocus/>
+                            <input type="text" id="prependedInput" class="input" autocomplete="username" name="_username" value="{{ last_username }}" required="required" placeholder="{{ 'Username or Email'|trans }}" autofocus>
                         </div>
                         <div class="input-prepend input-prepend--last">
-                            {% if showLabels %}
                             <label for="prependedInput2" class="add-on">{{ passwordLabel }}</label>
-                            {% endif %}
-                            <input type="password" id="prependedInput2" class="span2" name="_password" required="required" placeholder="{{ 'Password'|trans }}" autocomplete="off" />
+                            <input type="password" id="prependedInput2" class="input" autocomplete="current-password" name="_password" required="required" placeholder="{{ 'Password'|trans }}">
                         </div>
                     </div>
                     <div class="oro-remember-me">
-                        <span class="checkbox-view">
-                            <input type="checkbox"
-                                   id="remember_me"
-                                   name="_remember_me"
-                                   class="checkbox-view__input input-widget"
-                                   value="on">
-                            <span class="checkbox-view__icon"></span>
-                        </span><label for="remember_me">{{ 'Remember me on this computer'|trans }}</label>
+                        <label class="shift-checkbox" for="remember_me">
+                            <span class="checkbox-view">
+                                <input type="checkbox"
+                                       id="remember_me"
+                                       name="_remember_me"
+                                       class="checkbox-view__input input-widget"
+                                       value="on">
+                                <span class="checkbox-view__icon"></span>
+                            </span>{{ 'Remember me on this computer'|trans }}
+                        </label>
                     </div>
-                    <div class="form-signin__footer">
+                    <div class="form-signin__footer form-signin__footer--login">
+                        <button type="submit" class="btn extra-submit btn-uppercase btn-primary" id="_submit" name="_submit">{{ 'Log in'|trans }}</button>
                         <a href="{{ path('oro_user_reset_request') }}">{{ 'Forgot your password?'|trans }}</a>
-                        <button type="submit" class="btn btn-uppercase btn-primary pull-right" id="_submit" name="_submit">{{ 'Log in'|trans }}</button>
                     </div>
                     {% if oro_config_value('oro_sso.enable_google_sso') %}
                         <div class="form-signin__oauth">
@@ -82,11 +80,10 @@
                         </div>
                     {% endif %}
                 </fieldset>
-                <input type="hidden" name="_target_path" value="" />
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+                <input type="hidden" name="_target_path" value="">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
             </form>
         </div>
-        
         <div class="login-copyright">{{ 'oro.auth.copy'|trans }}</div>
     </div>
     <script type="text/javascript">

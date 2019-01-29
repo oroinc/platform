@@ -11,9 +11,16 @@
         padding: 2px 18px;
 
         > a {
-            padding: 0 !important;
             font-size: 12px;
             line-height: 20px;
+        }
+
+        .my-emails {
+            width: 50%;
+            padding-#{$end}: $content-padding-small / 2;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
         }
     }
 
@@ -21,9 +28,13 @@
     .mark-visible-as-read {
         cursor: pointer;
         height: 19px;
-        padding: 0;
         font-size: 12px;
         line-height: 15px;
+        width: 50%;
+        display: block;
+        padding: side-values(0 0 0 $content-padding-small / 2);
+        text-overflow: ellipsis;
+        overflow: hidden;
 
         [class^="fa-"] {
             float: left;

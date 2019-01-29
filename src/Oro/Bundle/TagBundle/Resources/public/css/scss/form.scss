@@ -8,6 +8,10 @@
         height: auto;
         box-shadow: none;
         border: $border-width solid $primary-750;
+
+        &.select2-container-active {
+            border-color: $input-focus-border-color;
+        }
     }
 
     .select2-choices {
@@ -39,6 +43,7 @@
             .select2-search-field input:last-child {
                 margin-#{$end}: -$tag-selector-actions-width;
                 padding-#{$end}: $tag-selector-actions-width;
+                padding-#{$start}: $tag-selector-item-input-inner-offset-start;
             }
         }
 

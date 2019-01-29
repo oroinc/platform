@@ -20,3 +20,9 @@ $base-font-size--m: $base-font-size * 1.15; // ~16px
 $headerHeight: 54px;
 
 $oro-mobile-header-zindex: 9999;
+
+$dropdown-item-font-size: $base-font-size--m !default;
+$dropdown-item-inner-offset-top: 4px !default;
+$dropdown-item-inner-offset-bottom: 5px !default;
+$dropdown-item-line-height: 1.5;
+$dropdown-item-icon-fa-offset: 8px;

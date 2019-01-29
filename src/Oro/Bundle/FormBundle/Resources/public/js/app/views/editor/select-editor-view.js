@@ -281,9 +281,8 @@ define(function(require) {
          */
         onFocusout: function(e) {
             var select2 = this.$('input[name=value]').data('select2');
-            if (this._isSelection) {
-                this.$('.select2-focused').focus();
-            } else if (!select2 || !select2.opened()) {
+
+            if (!this._isSelection && !select2 || !select2.opened()) {
                 _.defer(_.bind(function() {
                     if (!this.disposed && !$.contains(this.el, document.activeElement)) {
                         SelectEditorView.__super__.onFocusout.call(this, e);

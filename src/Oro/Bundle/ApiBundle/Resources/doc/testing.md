@@ -37,6 +37,8 @@ To simplify creation of the functional test for REST API resources that conform 
 | assertResponseContains | Asserts that the response content contains the given data. If the first parameter is a file name, the file should be located in the `responses` directory next to the PHP file that contains the test. |
 | assertResponseCount | Asserts that the response contains the given number of data items. |
 | assertResponseNotEmpty | Asserts that the response data are not empty. |
+| assertResponseNotHasAttributes | Asserts the response content does not contain the given attributes. |
+| assertResponseNotHasRelationships | Asserts the response content does not contain the given relationships. |
 | assertResponseValidationError | Asserts that the response content contains the given validation error. |
 | assertResponseValidationErrors | Asserts that the response content contains the given validation errors. |
 | assertAllowResponseHeader | Asserts "Allow" response header equals to the expected value. |

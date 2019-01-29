@@ -14,16 +14,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
     /** @var RequestStack */
     protected $requestStack;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormEvent|\PHPUnit\Framework\MockObject\MockObject */
     protected $eventMock;
 
     /** @var  UserImapConfigSubscriber */
@@ -44,25 +44,10 @@ class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             [
                 FormEvents::PRE_SET_DATA => 'preSetData',
-                FormEvents::POST_SUBMIT => 'postSubmit',
                 FormEvents::PRE_SUBMIT => 'preSubmit',
             ],
             $this->subscriber->getSubscribedEvents()
         );
-    }
-
-    public function testPostSubmit()
-    {
-        $user = new User();
-
-        $this->eventMock->expects($this->once())
-            ->method('getData')
-            ->will($this->returnValue($user));
-
-        $this->manager->expects($this->once())->method('persist')->with($this->equalTo($user));
-        $this->manager->expects($this->once())->method('flush');
-
-        $this->subscriber->postSubmit($this->eventMock);
     }
 
     public function testPreSetDataForUserConfig()

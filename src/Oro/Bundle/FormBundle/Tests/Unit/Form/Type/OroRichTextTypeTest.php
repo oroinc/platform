@@ -8,7 +8,6 @@ use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Packages;
-use Symfony\Component\Asset\PathPackage;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
@@ -115,6 +114,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             ->willReturn($elements);
 
         $viewData['attr']['data-page-component-options']['enabled'] = $expectedEnable;
+        $viewData['attr']['data-page-component-options']['assets_base_url'] = ltrim($subfolder . '/', '/');
         $viewData['attr']['data-page-component-options'] = json_encode(
             $viewData['attr']['data-page-component-options']
         );
