@@ -2,17 +2,19 @@
 
 namespace Oro\Bundle\RequireJSBundle\Command;
 
+use Doctrine\Common\Cache\CacheProvider;
+use Oro\Bundle\RequireJSBundle\DependencyInjection\Compiler\ConfigProviderCompilerPass;
+use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
-use Symfony\Component\Process\Process;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\Process;
 
-use Oro\Bundle\RequireJSBundle\DependencyInjection\Compiler\ConfigProviderCompilerPass;
-use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
-
+/**
+ * Build single optimized js resource
+ */
 class OroBuildCommand extends ContainerAwareCommand
 {
     const BUILD_CONFIG_FILE_NAME    = 'build.js';
@@ -29,6 +31,11 @@ class OroBuildCommand extends ContainerAwareCommand
     protected $config;
 
     /**
+     * @var CacheProvider
+     */
+    private $cache;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct($name = null)
@@ -36,6 +43,14 @@ class OroBuildCommand extends ContainerAwareCommand
         parent::__construct($name);
 
         $this->filesystem = new Filesystem();
+    }
+
+    /**
+     * @param CacheProvider $cache
+     */
+    public function setCache(CacheProvider $cache)
+    {
+        $this->cache = $cache;
     }
 
     /**
@@ -92,6 +107,10 @@ class OroBuildCommand extends ContainerAwareCommand
                 );
             }
         }
+
+        $output->writeln('Clearing the cache');
+
+        $this->cache->deleteAll();
     }
 
     /**

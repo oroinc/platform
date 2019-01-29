@@ -45,3 +45,11 @@ services:
         tags:
             - { name: requirejs.config_provider, alias: oro_requirejs_config_provider }
         lazy: true
+
+    oro_requirejs.command.build:
+        class: Oro\Bundle\RequireJSBundle\Command\OroBuildCommand
+        tags:
+            - { name: 'console.command' }
+        calls:
+            - [setCache, ['@oro_requirejs.cache']]
+        lazy: true
