@@ -36,7 +36,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             ),
             array(
                 array(
-                    'building_timeout' => -3,
+                    'build_timeout' => -3,
                 ),
                 '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException'
             ),
@@ -72,7 +72,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                     'web_root' => '%kernel.project_dir%/public/',
                     'build_path' => 'js/app.min.js',
-                    'building_timeout' => 60,
+                    'build_timeout' => 60,
                     'build_logger' => false,
                     'build' => [
                         'optimize' => 'uglify2',
@@ -88,7 +88,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'scriptType' => 'text/javascript'
                     ],
                     'build_path' => 'js/test/app.min.js',
-                    'building_timeout' => 3600,
+                    'build_timeout' => 3600,
                     'build_logger' => false,
                     'build' => [
                         'optimize' => 'none',
@@ -106,7 +106,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                     'web_root' => '%kernel.project_dir%/public/',
                     'build_path' => 'js/test/app.min.js',
-                    'building_timeout' => 3600,
+                    'build_timeout' => 3600,
                     'build_logger' => false,
                     'build' => [
                         'optimize' => 'none',
