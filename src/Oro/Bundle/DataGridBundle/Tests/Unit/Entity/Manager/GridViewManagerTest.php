@@ -7,8 +7,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
-use Oro\Bundle\DataGridBundle\Entity\GridView;
-use Oro\Bundle\DataGridBundle\Entity\GridViewUser;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewApiEntityManager;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;

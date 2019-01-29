@@ -4,7 +4,6 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
-use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * Base class for filter that supports multi choices.

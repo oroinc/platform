@@ -5,10 +5,7 @@ use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtens
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumerMemoryExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtension;
 use Oro\Component\MessageQueue\Tests\Unit\Consumption\Mock\LimitsExtensionsCommand;
-use Symfony\Component\Console\Input\InputDefinition;
-use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Console\Tests\Output\TestOutput;
 
 class LimitsExtensionsCommandTraitTest extends \PHPUnit\Framework\TestCase
 {

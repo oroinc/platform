@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Filter;
 
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Model\FolderType;

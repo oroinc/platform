@@ -237,6 +237,7 @@ services:
         class: 'Oro\Bundle\EmailBundle\Form\Configurator\EmailConfigurationConfigurator'
         arguments:
             - '@oro_security.encoder.default'
+            - '@validator'
 
     oro_email.form.factory:
         class: '%oro_email.form.factory.class%'

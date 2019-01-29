@@ -103,7 +103,7 @@ Build configuration starts in ```config.yml```
 
     oro_require_js:
         build_path: "js/oro.min.js"     # relative path from document root folder to project built
-        building_timeout: 3600
+        build_timeout: 3600
         build_logger: false             # show in browser console not optimized RequireJS modules 
         build:                          # build.js's common options
             optimize: "uglify2"

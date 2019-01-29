@@ -6,7 +6,6 @@ use Behat\Testwork\Cli\Controller;
 use Behat\Testwork\Tester\Result\ResultInterpreter;
 use Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\HealthCheckerAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\HealthCheckerAwareTrait;
-use Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\HealthCheckerInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\ResultInterpretation;
 use Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\ResultPrinterSubscriber;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;

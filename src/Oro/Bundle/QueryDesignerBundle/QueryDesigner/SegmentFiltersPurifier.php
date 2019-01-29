@@ -3,7 +3,6 @@
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidFiltersException;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FiltersParserContext;
 
 /**
  * Purifies segment filters from definition skipping incomplete parts (i.e. filters and groups).

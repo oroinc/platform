@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\EntityPaginationBundle\EventListener\EntityPaginationListener;
 

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\MappingException;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 

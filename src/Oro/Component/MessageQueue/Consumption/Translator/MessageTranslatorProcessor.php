@@ -3,7 +3,6 @@ namespace Oro\Component\MessageQueue\Consumption\Translator;
 
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Transport\MessageProducerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 class MessageTranslatorProcessor implements MessageProcessorInterface

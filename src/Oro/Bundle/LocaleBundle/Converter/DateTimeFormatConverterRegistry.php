@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\LocaleBundle\Converter;
 
-use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterInterface;
-
 class DateTimeFormatConverterRegistry
 {
     /**

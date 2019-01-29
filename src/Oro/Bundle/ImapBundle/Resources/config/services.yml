@@ -279,3 +279,16 @@ services:
             - '@gos_web_socket.websocket.client_manipulator'
         tags:
             - { name: gos_web_socket.topic }
+
+    oro_imap.manager.checker.imap_settings:
+        class: 'Oro\Bundle\ImapBundle\Manager\ImapSettingsChecker'
+        arguments:
+            - '@oro_imap.connector.factory'
+            - '@oro_security.encoder.default'
+
+    oro_imap.validator.connection_configuration.imap:
+        class: 'Oro\Bundle\ImapBundle\Validator\ImapConnectionConfigurationValidator'
+        arguments:
+            - '@oro_imap.manager.checker.imap_settings'
+        tags:
+            - { name: validator.constraint_validator }

@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Translation;
 
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class KeyTemplateParametersResolver

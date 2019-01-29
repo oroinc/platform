@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Doctrine\ORM\Query;
 use Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor;
 
 class InsertFromSelectWriter extends AbstractNativeQueryWriter

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\RequireJSBundle\Command;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\AssetBundle\NodeProcessFactory;
 use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
 use Symfony\Component\Console\Command\Command;
@@ -44,24 +45,32 @@ class OroBuildCommand extends Command
     private $webRoot;
 
     /**
+     * @var CacheProvider
+     */
+    private $cache;
+
+    /**
      * @param NodeProcessFactory    $nodeProcessFactory
      * @param ConfigProviderManager $configProviderManager
      * @param Filesystem            $filesystem
      * @param string                $webRoot
      * @param int|float|null        $timeout
+     * @param CacheProvider         $cache
      */
     public function __construct(
         NodeProcessFactory $nodeProcessFactory,
         ConfigProviderManager $configProviderManager,
         Filesystem $filesystem,
         string $webRoot,
-        $timeout
+        $timeout,
+        CacheProvider $cache
     ) {
         $this->nodeProcessFactory = $nodeProcessFactory;
         $this->configProviderManager = $configProviderManager;
         $this->filesystem = $filesystem;
         $this->webRoot = $webRoot;
         $this->timeout = $timeout;
+        $this->cache = $cache;
         parent::__construct();
     }
 
@@ -110,6 +119,10 @@ class OroBuildCommand extends Command
                 );
             }
         }
+
+        $output->writeln('Clearing the cache');
+
+        $this->cache->deleteAll();
     }
 
     /**

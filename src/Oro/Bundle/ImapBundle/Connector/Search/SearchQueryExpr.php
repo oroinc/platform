@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Connector\Search;
 
-use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExprInterface;
-
 /**
  * Represents the search query expression
  */

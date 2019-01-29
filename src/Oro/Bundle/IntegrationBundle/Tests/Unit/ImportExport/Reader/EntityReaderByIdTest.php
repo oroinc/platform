@@ -5,7 +5,6 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Reader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\Query;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\IntegrationBundle\Reader\EntityReaderById;
 use Oro\Component\TestUtils\ORM\OrmTestCase;

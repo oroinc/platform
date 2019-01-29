@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Helper;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Helper\RelationHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
-use Oro\Bundle\EntityBundle\Tests\Unit\Helper\Stub;
 
 class RelationHelperTest extends \PHPUnit\Framework\TestCase
 {
