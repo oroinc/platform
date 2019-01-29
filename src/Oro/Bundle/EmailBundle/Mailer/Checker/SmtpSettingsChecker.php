@@ -5,6 +5,9 @@ namespace Oro\Bundle\EmailBundle\Mailer\Checker;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 
+/**
+ * Checks that connection can be established with the given SmtpSettings.
+ */
 class SmtpSettingsChecker
 {
     /** @var DirectMailer */
@@ -27,6 +30,10 @@ class SmtpSettingsChecker
      */
     public function checkConnection(SmtpSettings $smtpSettings)
     {
+        if (!$smtpSettings->isEligible()) {
+            return 'Not eligible SmtpSettings are given';
+        }
+
         $error = '';
         $this->directMailer->afterPrepareSmtpTransport($smtpSettings);
 

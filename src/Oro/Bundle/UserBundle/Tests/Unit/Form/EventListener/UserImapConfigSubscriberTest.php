@@ -16,16 +16,16 @@ use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
 
 class UserImapConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $manager;
 
     /** @var RequestStack */
     protected $requestStack;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormEvent|\PHPUnit_Framework_MockObject_MockObject */
     protected $eventMock;
 
     /** @var  UserImapConfigSubscriber */
@@ -55,16 +55,7 @@ class UserImapConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPostSubmit()
     {
-        $user = new User();
-
-        $this->eventMock->expects($this->once())
-            ->method('getData')
-            ->will($this->returnValue($user));
-
-        $this->manager->expects($this->once())->method('persist')->with($this->equalTo($user));
-        $this->manager->expects($this->once())->method('flush');
-
-        $this->subscriber->postSubmit($this->eventMock);
+        $this->assertNull($this->subscriber->postSubmit($this->eventMock));
     }
 
     public function testPreSetDataForUserConfig()

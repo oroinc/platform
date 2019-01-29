@@ -320,6 +320,26 @@ class UserEmailOrigin extends EmailOrigin
     }
 
     /**
+     * Check is configured imap.
+     *
+     * @return bool
+     */
+    public function isImapConfigured()
+    {
+        $imapHost = $this->getImapHost();
+        $imapPort = $this->getImapPort();
+        $user = $this->getUser();
+        $password = $this->getPassword();
+        $token = $this->getAccessToken();
+
+        if (!empty($imapHost) && $imapPort > 0 && !empty($user) && (!empty($password) || !empty($token))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get a human-readable representation of this object.
      *
      * @return string

@@ -1,4 +1,7 @@
 oro.imap:
+    connection:
+        malformed_parameters.error: Parameters are not valid!
+        retrieve_folders.error: Could not retrieve folders
     system_configuration:
         groups:
             google_imap_settings.title: OAuth 2.0 for email sync

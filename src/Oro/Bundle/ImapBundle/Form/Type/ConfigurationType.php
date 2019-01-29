@@ -356,14 +356,14 @@ class ConfigurationType extends AbstractType
 
                 $isSubmitted = $form->isSubmitted() === true;
                 if (($form->has('useImap') && $form->get('useImap')->getData() === true) || !$isSubmitted) {
-                    $groups[] = 'Imap';
+                    array_push($groups, 'Imap', 'ImapConnection');
 
                     if (!$form->getConfig()->getOption('skip_folders_validation')) {
                         $groups[] = 'CheckFolderSelection';
                     }
                 }
                 if (($form->has('useSmtp') && $form->get('useSmtp')->getData() === true) || !$isSubmitted) {
-                    $groups[] = 'Smtp';
+                    array_push($groups, 'Smtp', 'SmtpConnection');
                 }
 
                 return $groups;

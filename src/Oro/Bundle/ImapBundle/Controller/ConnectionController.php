@@ -3,22 +3,23 @@
 namespace Oro\Bundle\ImapBundle\Controller;
 
 use FOS\RestBundle\Util\Codes;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintViolation;
 
+/**
+ * Contains actions for an IMAP connection
+ */
 class ConnectionController extends Controller
 {
     /**
@@ -27,12 +28,14 @@ class ConnectionController extends Controller
     protected $manager;
 
     /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     *
      * @Route("/connection/check", name="oro_imap_connection_check", methods={"POST"})
      */
     public function checkAction(Request $request)
     {
-        $responseCode = Codes::HTTP_BAD_REQUEST;
-
         $data = null;
         $id = $request->get('id', false);
         if (false !== $id) {
@@ -49,70 +52,17 @@ class ConnectionController extends Controller
         /** @var UserEmailOrigin $origin */
         $origin = $form->getData();
 
-        if ($form->isValid() && null !== $origin) {
-            $response = [];
-            $password = $this->get('oro_security.encoder.mcrypt')->decryptData($origin->getPassword());
-
-            if ($origin->getImapHost() !== null) {
-                $response['imap'] = [];
-
-                $config = new ImapConfig(
-                    $origin->getImapHost(),
-                    $origin->getImapPort(),
-                    $origin->getImapEncryption(),
-                    $origin->getUser(),
-                    $password
-                );
-
-                try {
-                    $connector = $this->get('oro_imap.connector.factory')->createImapConnector($config);
-                    $this->manager = new ImapEmailFolderManager(
-                        $connector,
-                        $this->getDoctrine()->getManager(),
-                        $origin
-                    );
-
-                    $emailFolders = $this->manager->getFolders();
-                    $origin->setFolders($emailFolders);
-
-                    $entity = $request->get('for_entity', 'user');
-                    $organizationId = $request->get('organization');
-                    $organization = $this->getOrganization($organizationId);
-                    if ($entity === 'user') {
-                        $response['imap']['folders'] = $this->getFoldersViewForUserMailBox(
-                            $origin,
-                            $organization
-                        );
-                    } elseif ($entity === 'mailbox') {
-                        $response['imap']['folders'] = $this->getFoldersViewForSystemMailBox(
-                            $origin,
-                            $organization
-                        );
-                    }
-                } catch (\Exception $e) {
-                    $response['imap']['error'] = $e->getMessage();
-                }
-            }
-
-            if ($origin->getSmtpHost() !== null) {
-                $response['smtp'] = [];
-
-                try {
-                    /** @var DirectMailer $mailer */
-                    $mailer = $this->get('oro_email.direct_mailer');
-                    // Prepare Smtp Transport
-                    $mailer->prepareSmtpTransport($origin);
-                    $transport = $mailer->getTransport();
-                    $transport->start();
-                } catch (\Exception $e) {
-                    $response['smtp']['error'] = $e->getMessage();
-                }
-            }
-
-            return new JsonResponse($response);
+        if ($form->isSubmitted() && $form->isValid() && null !== $origin) {
+            $response = $this->handleUserEmailOrigin(
+                $origin,
+                $request->get('for_entity', 'user'),
+                $request->get('organization')
+            );
+        } else {
+            $response = ['errors' => $this->handleFormErrors($form)];
         }
 
-        return new Response('', $responseCode);
+        return new JsonResponse($response, !empty($response['errors']) ? Codes::HTTP_BAD_REQUEST : Codes::HTTP_OK);
     }
 
     /**
@@ -198,5 +148,103 @@ class ConnectionController extends Controller
                 'form' => $mailboxForm->createView(),
             ]
         );
+    }
+
+    /**
+     * @param FormInterface $form
+     *
+     * @return array
+     */
+    private function handleFormErrors(FormInterface $form)
+    {
+        $nestedErrors = new \SplObjectStorage();
+        foreach ($form->getErrors(true) as $error) {
+            $nestedErrors->attach($error);
+        }
+
+        foreach ($form->getErrors(false) as $error) {
+            $nestedErrors->detach($error);
+        }
+
+        // Check if there are some nested errors
+        if ($nestedErrors->count() || null === $form->getData()) {
+            return [
+                $this->get('translator')->trans('oro.imap.connection.malformed_parameters.error')
+            ];
+        }
+
+        $errorMessages = [];
+        foreach ($form->getErrors() as $error) {
+            $cause = $error->getCause();
+            if ($cause instanceof ConstraintViolation
+                && $cause->getConstraint() instanceof Constraint
+            ) {
+                $errorMessages[] = $error->getMessage();
+            }
+        }
+
+        return $errorMessages;
+    }
+
+    /**
+     * @param UserEmailOrigin $origin
+     * @param string $entity
+     * @param string|int $organizationId
+     *
+     * @return array
+     */
+    private function handleUserEmailOrigin(UserEmailOrigin $origin, string $entity, $organizationId)
+    {
+        $response = [];
+
+        if ($origin->getImapHost() !== null) {
+            $response['imap'] = [];
+            $password = $this->get('oro_security.encoder.default')->decryptData($origin->getPassword());
+
+            $config = new ImapConfig(
+                $origin->getImapHost(),
+                $origin->getImapPort(),
+                $origin->getImapEncryption(),
+                $origin->getUser(),
+                $password
+            );
+
+            try {
+                $connector = $this->get('oro_imap.connector.factory')->createImapConnector($config);
+                $this->manager = new ImapEmailFolderManager(
+                    $connector,
+                    $this->getDoctrine()->getManager(),
+                    $origin
+                );
+
+                $emailFolders = $this->manager->getFolders();
+                $origin->setFolders($emailFolders);
+
+                $organization = $this->getOrganization($organizationId);
+                if ($entity === 'user') {
+                    $response['imap']['folders'] = $this->getFoldersViewForUserMailBox(
+                        $origin,
+                        $organization
+                    );
+                } elseif ($entity === 'mailbox') {
+                    $response['imap']['folders'] = $this->getFoldersViewForSystemMailBox(
+                        $origin,
+                        $organization
+                    );
+                }
+            } catch (\Exception $e) {
+                $this->get('logger')->error(
+                    sprintf('Could not retrieve folders via imap because of "%s"', $e->getMessage())
+                );
+
+                $response['errors'] = $this->get('translator')->trans('oro.imap.connection.retrieve_folders.error');
+            }
+        }
+
+        if ($origin->getSmtpHost() !== null) {
+            $response['smtp'] = [];
+        }
+
+        return $response;
     }
 }

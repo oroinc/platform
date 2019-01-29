@@ -7,15 +7,23 @@ use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
+use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker;
+use Oro\Bundle\EmailBundle\Validator\Constraints\SmtpConnectionConfiguration;
+use Oro\Bundle\EmailBundle\Validator\SmtpConnectionConfigurationValidator;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\ImapBundle\Manager\ImapSettingsChecker;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\ImapBundle\Validator\Constraints\EmailFolders;
+use Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfiguration;
 use Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator;
+use Oro\Bundle\ImapBundle\Validator\ImapConnectionConfigurationValidator;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
@@ -38,6 +46,12 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
+
+    /** @var ImapSettingsChecker|\PHPUnit_Framework_MockObject_MockObject */
+    private $imapSettingsChecker;
+
+    /** @var SmtpSettingsChecker|\PHPUnit_Framework_MockObject_MockObject */
+    private $smtpSettingsChecker;
 
     protected function setUp()
     {
@@ -66,6 +80,9 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             ->setMethods(['hasConfig', 'getConfig', 'get'])
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->imapSettingsChecker = $this->createMock(ImapSettingsChecker::class);
+        $this->smtpSettingsChecker = $this->createMock(SmtpSettingsChecker::class);
 
         parent::setUp();
     }
@@ -99,10 +116,30 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     {
         $valid = new Valid();
         $emailFolders = new EmailFolders();
+        $imapConnectionConfiguration = new ImapConnectionConfiguration();
+        $smtpConnectionConfiguration = new SmtpConnectionConfiguration();
+        $this->imapSettingsChecker->expects($this->any())
+            ->method('checkConnection')
+            ->willReturn(true);
+        /** @var SmtpSettingsFactory|\PHPUnit_Framework_MockObject_MockObject $smtpSettingsFactory */
+        $smtpSettingsFactory = $this->createMock(SmtpSettingsFactory::class);
+        $smtpSettingsFactory->expects($this->any())
+            ->method('create')
+            ->willReturn(new SmtpSettings());
+        $this->smtpSettingsChecker->expects($this->any())
+            ->method('checkConnection')
+            ->willReturn('');
 
         return [
             $valid->validatedBy() => $this->createMock(ConstraintValidatorInterface::class),
             $emailFolders->validatedBy() => new EmailFoldersValidator($this->translator),
+            $imapConnectionConfiguration->validatedBy() => new ImapConnectionConfigurationValidator(
+                $this->imapSettingsChecker
+            ),
+            $smtpConnectionConfiguration->validatedBy() => new SmtpConnectionConfigurationValidator(
+                $this->smtpSettingsChecker,
+                $smtpSettingsFactory
+            )
         ];
     }
 

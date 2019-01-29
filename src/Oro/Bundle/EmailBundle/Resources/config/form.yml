@@ -242,6 +242,8 @@ services:
         class: 'Oro\Bundle\EmailBundle\Form\Configurator\EmailConfigurationConfigurator'
         arguments:
             - '@oro_security.encoder.mcrypt'
+        calls:
+            - [setValidator, ['@validator']]
 
     oro_email.form.factory:
         class: %oro_email.form.factory.class%

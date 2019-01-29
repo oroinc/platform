@@ -1321,6 +1321,24 @@ services:
             - '@oro_email.manager.template_email'
             - '@oro_entity.doctrine_helper'
 
+    oro_email.form.handler.user_email_config:
+        class: 'Oro\Bundle\EmailBundle\Form\Handler\UserEmailConfigHandler'
+        arguments:
+            - '@doctrine.orm.entity_manager'
+
+    oro_email.validator.connection_configuration.smtp:
+        class: 'Oro\Bundle\EmailBundle\Validator\SmtpConnectionConfigurationValidator'
+        arguments:
+            - '@oro_email.mailer.checker.smtp_settings'
+            - '@oro_email.smtp_settings_factory'
+        tags:
+            - { name: validator.constraint_validator }
+
+    oro_email.smtp_settings_factory:
+        class: 'Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory'
+        calls:
+            - [setMcrypt, ['@oro_security.encoder.mcrypt']]
+
     oro_email.entity_name_provider:
         class: 'Oro\Bundle\EmailBundle\Provider\EmailEntityNameProvider'
         public: false

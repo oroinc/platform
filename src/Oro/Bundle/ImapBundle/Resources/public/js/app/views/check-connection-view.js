@@ -66,25 +66,23 @@ define(function(require) {
                 data: $.param(this.prepareData(data)),
                 success: _.bind(function(response) {
                     if (response.imap) {
-                        if (response.imap.error) {
-                            this.showMessage('error', 'oro.imap.connection.imap.error', $messageContainer);
-                        } else {
-                            this.showMessage('success', 'oro.imap.connection.imap.success', $messageContainer);
-                            this.model.set('imap', response.imap);
-                        }
+                        this.showMessage('success', 'oro.imap.connection.imap.success', $messageContainer);
+                        this.model.set('imap', response.imap);
                     }
                     if (response.smtp) {
-                        if (response.smtp.error) {
-                            this.showMessage('error', 'oro.imap.connection.smtp.error', $messageContainer);
-                        } else {
-                            this.showMessage('success', 'oro.imap.connection.smtp.success', $messageContainer);
-                            this.model.set('smtp', response.smtp);
-                        }
+                        this.showMessage('success', 'oro.imap.connection.smtp.success', $messageContainer);
+                        this.model.set('smtp', response.smtp);
                     }
                 }, this),
                 errorHandlerMessage: false,
-                error: _.bind(function() {
-                    this.showMessage('error', 'oro.imap.connection.error', $messageContainer);
+                error: _.bind(function(response) {
+                    var responseJSON = response.responseJSON;
+                    _.each(responseJSON.errors, function(errorMessage) {
+                        messenger.notificationFlashMessage('error', errorMessage, {
+                            container: $messageContainer,
+                            delay: 0
+                        });
+                    });
                 }, this),
                 complete: function() {
                     mediator.execute('hideLoading');

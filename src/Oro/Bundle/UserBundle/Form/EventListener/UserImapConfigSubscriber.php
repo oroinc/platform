@@ -12,6 +12,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Handles user's imap settings by passing a currently configured user to the form and updating configuration form
+ * with data from ajax-generated form.
+ */
 class UserImapConfigSubscriber implements EventSubscriberInterface
 {
     /** @var EntityManager */
@@ -51,18 +55,11 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Save user with new imap configuration
-     *
      * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {
-        /** @var User $user */
-        $user = $event->getData();
-        if ($user) {
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
-        }
+        // Do nothing, left here to avoid BC break
     }
 
     /**
