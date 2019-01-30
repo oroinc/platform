@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Processor;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Processor\EntityRouteVariableProcessor;
+use Oro\Bundle\EmailBundle\Provider\UrlProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -27,14 +27,14 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var  DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var  ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
-
     /** @var  EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigManager;
 
     /** @var  ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendConfigProvider;
+
+    /** @var UrlProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $urlProvider;
 
     /**
      * {@inheritDoc}
@@ -43,8 +43,8 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $this->router = $this->createMock(RouterInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->configManager = $this->createMock(ConfigManager::class);
         $this->entityConfigManager = $this->createMock(EntityConfigManager::class);
+        $this->urlProvider = $this->createMock(UrlProvider::class);
 
         $this->extendConfigProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
@@ -57,17 +57,9 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new EntityRouteVariableProcessor(
             $this->router,
             $this->doctrineHelper,
-            $this->configManager,
-            $this->entityConfigManager
+            $this->entityConfigManager,
+            $this->urlProvider
         );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->processor, $this->router, $this->doctrineHelper, $this->configManager, $this->entityConfigManager);
     }
 
     /**
@@ -88,7 +80,6 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
                 ->willReturnArgument(0);
     
             $this->router->expects($this->once())->method('getRouteCollection')->willReturn($routeCollection);
-            $this->router->expects($this->once())->method('generate')->willReturn(self::TEST_GENERATED_ROUTE);
     
             if (!preg_match('/^.*_index$/', $definition['route'])) {
                 $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->willReturn(1);
@@ -96,8 +87,10 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
                 $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifier');
             }
     
-            $this->configManager->expects($this->once())->method('get')->with('oro_ui.application_url')
-                ->willReturn(self::TEST_BASE_PATH);
+            $this->urlProvider->expects($this->once())
+                ->method('getAbsoluteUrl')
+                ->with($definition['route'])
+                ->willReturn(self::TEST_BASE_PATH . self::TEST_GENERATED_ROUTE);
         }
     
         if (isset($data['entity'])) {
