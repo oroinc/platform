@@ -7,8 +7,10 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     var logger = require('oroui/js/tools/logger');
     var validationHandler = require('oroform/js/optional-validation-groups-handler');
-    var validateTopmostLabelMixin = require('oroform/js/validate-topmost-label-mixin');
     var error = require('oroui/js/error');
+    var config = require('module').config();
+    var validateTopmostLabelMixin = config.useTopmostLabelMixin
+        ? require('oroform/js/validate-topmost-label-mixin') : null;
 
     var original = _.pick($.validator.prototype, 'init', 'showLabel', 'defaultShowErrors');
 
@@ -162,7 +164,7 @@ define(function(require) {
 
         var isValid = check.call(this, element);
 
-        if (isValid) {
+        if (validateTopmostLabelMixin && isValid) {
             validateTopmostLabelMixin.validationSuccessHandler.call(this, element);
         }
 
@@ -194,7 +196,10 @@ define(function(require) {
     });
 
     $.validator.prototype.destroy = _.wrap($.validator.prototype.destroy, function(originDestroy) {
-        validateTopmostLabelMixin.destroy.call(this);
+        if (validateTopmostLabelMixin) {
+            validateTopmostLabelMixin.destroy.call(this);
+        }
+
         originDestroy.call(this);
     });
 
@@ -231,7 +236,11 @@ define(function(require) {
     _.extend($.validator.prototype, {
         init: function() {
             validationHandler.initialize($(this.currentForm));
-            validateTopmostLabelMixin.init.call(this);
+
+            if (validateTopmostLabelMixin) {
+                validateTopmostLabelMixin.init.call(this);
+            }
+
             $(this.currentForm).on('content:changed', function(event) {
                 validationHandler.initializeOptionalValidationGroupHandlers($(event.target));
             }).on('disabled', function(e) {
@@ -430,7 +439,9 @@ define(function(require) {
 
             original.showLabel.call(this, element, message);
 
-            validateTopmostLabelMixin.showLabel.call(this, element, message, label);
+            if (validateTopmostLabelMixin) {
+                validateTopmostLabelMixin.showLabel.call(this, element, message, label);
+            }
 
             if (this.labelContainer.find(this.settings.errorClass.split(' ').join('.')).length) {
                 this.labelContainer.show();
@@ -464,7 +475,9 @@ define(function(require) {
                 .off('.validate-equalTo')
                 .removeClass('validate-equalTo-blur');
 
-            validateTopmostLabelMixin.destroy.call(this);
+            if (validateTopmostLabelMixin) {
+                validateTopmostLabelMixin.destroy.call(this);
+            }
         }
     });
 
