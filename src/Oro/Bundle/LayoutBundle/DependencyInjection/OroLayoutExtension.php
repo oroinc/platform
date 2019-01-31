@@ -84,11 +84,7 @@ class OroLayoutExtension extends Extension
 
         $excludedPaths = $this->getExcludedPaths($excludedResources);
         $themeResourceProviderDef = $container->getDefinition(self::THEME_RESOURCE_PROVIDER_SERVICE_ID);
-        $themeResourceProviderDef->replaceArgument(2, $excludedPaths);
-
-        if ($container->getParameter('kernel.debug')) {
-            $loader->load('debug.yml');
-        }
+        $themeResourceProviderDef->replaceArgument(5, $excludedPaths);
 
         $this->addClassesToCompile([
             'Oro\Bundle\LayoutBundle\EventListener\ThemeListener',
@@ -113,13 +109,14 @@ class OroLayoutExtension extends Extension
      */
     protected function loadThemeResources(ContainerBuilder $container)
     {
-        $resourceLoader = new FolderingCumulativeFileLoader(
-            self::RESOURCES_FOLDER_PLACEHOLDER,
-            self::RESOURCES_FOLDER_PATTERN,
-            new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/theme.yml')
+        $configLoader = new CumulativeConfigLoader(
+            'oro_layout',
+            new FolderingCumulativeFileLoader(
+                self::RESOURCES_FOLDER_PLACEHOLDER,
+                self::RESOURCES_FOLDER_PATTERN,
+                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/theme.yml')
+            )
         );
-
-        $configLoader = new CumulativeConfigLoader('oro_layout', $resourceLoader);
 
         return $configLoader->load($container);
     }
@@ -133,19 +130,18 @@ class OroLayoutExtension extends Extension
      */
     protected function loadAdditionalResources(ContainerBuilder $container)
     {
-        $resourceLoaders = [];
-
-        $resourceLoaders[] = new FolderingCumulativeFileLoader(
-            self::RESOURCES_FOLDER_PLACEHOLDER,
-            self::RESOURCES_FOLDER_PATTERN,
-            [
-                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/assets.yml'),
-                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/images.yml'),
-                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/page_templates.yml'),
-            ]
+        $configLoader = new CumulativeConfigLoader(
+            'oro_layout',
+            new FolderingCumulativeFileLoader(
+                self::RESOURCES_FOLDER_PLACEHOLDER,
+                self::RESOURCES_FOLDER_PATTERN,
+                [
+                    new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/assets.yml'),
+                    new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/images.yml'),
+                    new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/page_templates.yml')
+                ]
+            )
         );
-
-        $configLoader = new CumulativeConfigLoader('oro_layout', $resourceLoaders);
 
         return $configLoader->load($container);
     }

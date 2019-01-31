@@ -2,89 +2,125 @@
 
 namespace Oro\Component\Layout\Extension\Theme\ResourceProvider;
 
-use Doctrine\Common\Cache\Cache;
+use Oro\Component\Config\Cache\PhpArrayConfigProvider;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\ResourcesContainerInterface;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\Config\Loader\LayoutUpdateCumulativeResourceLoader;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
 
 /**
- * The provider of layout theme resources.
+ * The provider for layout theme resources
+ * that are loaded from "Resources/views/layouts" directories.
  */
-class ThemeResourceProvider implements ResourceProviderInterface
+class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourceProviderInterface
 {
-    const CACHE_KEY = 'oro_layout.theme_updates_resources';
-    const CACHE_LAST_MODIFICATION_DATE = 'oro_layout.last_modification_date';
+    /** @var LastModificationDateProvider */
+    private $lastModificationDateProvider;
 
     /** @var LayoutUpdateLoaderInterface */
     private $loader;
 
     /** @var array */
-    private $resources = [];
-
-    /** @var array */
-    private $excludedPaths = [];
-
-    /** @var Cache */
-    private $cache;
+    private $excludedPaths;
 
     /** @var BlockViewCache */
     private $blockViewCache;
 
     /**
+     * @param string                      $cacheFile
+     * @param ConfigCacheFactoryInterface $configCacheFactory
+     * @param LastModificationDateProvider $lastModificationDateProvider
      * @param LayoutUpdateLoaderInterface $loader
-     * @param BlockViewCache $blockViewCache
-     * @param array $excludedPaths
+     * @param BlockViewCache              $blockViewCache
+     * @param string[]                    $excludedPaths
      */
     public function __construct(
+        string $cacheFile,
+        ConfigCacheFactoryInterface $configCacheFactory,
+        LastModificationDateProvider $lastModificationDateProvider,
         LayoutUpdateLoaderInterface $loader,
         BlockViewCache $blockViewCache,
         array $excludedPaths = []
     ) {
+        parent::__construct($cacheFile, $configCacheFactory);
+        $this->lastModificationDateProvider = $lastModificationDateProvider;
         $this->loader = $loader;
         $this->excludedPaths = $excludedPaths;
         $this->blockViewCache = $blockViewCache;
     }
 
     /**
-     * @param Cache $cache
-     *
-     * @return ThemeResourceProvider
+     * {@inheritdoc}
      */
-    public function setCache(Cache $cache)
+    public function getResources(): array
     {
-        $this->cache = $cache;
-
-        return $this;
+        return $this->doGetConfig();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResources()
+    public function findApplicableResources(array $paths): array
     {
-        if (!$this->resources) {
-            $resources = false;
-            if (null !== $this->cache) {
-                $resources = $this->cache->fetch(self::CACHE_KEY);
+        $values = [];
+        $resources = $this->getResources();
+        foreach ($paths as $path) {
+            $value = $resources;
+            $pathElements = \explode(DIRECTORY_SEPARATOR, $path);
+            foreach ($pathElements as $pathElement) {
+                $value = $this->readValue($value, $pathElement);
+                if (null === $value) {
+                    break;
+                }
             }
-            if (false === $resources) {
-                $this->loadResources();
-            } else {
-                $this->resources = $resources;
+
+            if ($value && \is_array($value)) {
+                $values[] = \array_filter($value, '\is_string');
             }
         }
+        if (!empty($values)) {
+            $values = \array_merge(...$values);
+        }
 
-        return $this->resources;
+        return $values;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function loadResources(ContainerBuilder $container = null, array $resources = [])
+    protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
-        $resources = array_merge($resources, $this->getConfigLoader()->load($container));
+        $themeLayoutUpdates = $this->loadThemeLayoutUpdates($resourcesContainer);
+
+        $this->lastModificationDateProvider->updateLastModificationDate(
+            new \DateTime('now', new \DateTimeZone('UTC'))
+        );
+
+        $this->blockViewCache->reset();
+
+        return $themeLayoutUpdates;
+    }
+
+    /**
+     * @param ResourcesContainerInterface $resourcesContainer
+     *
+     * @return array
+     */
+    private function loadThemeLayoutUpdates(ResourcesContainerInterface $resourcesContainer)
+    {
+        $themeLayoutUpdates = [];
+        $configLoader = new CumulativeConfigLoader(
+            'oro_layout_updates_list',
+            new LayoutUpdateCumulativeResourceLoader(
+                'Resources/views/layouts/',
+                -1,
+                false,
+                $this->loader->getUpdateFileNamePatterns()
+            )
+        );
+        $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
             /**
              * $resource->data contains data in following format
@@ -98,58 +134,10 @@ class ThemeResourceProvider implements ResourceProviderInterface
             $resourceThemeLayoutUpdates = $this->filterThemeLayoutUpdates($this->excludedPaths, $resource->data);
             $resourceThemeLayoutUpdates = $this->sortThemeLayoutUpdates($resourceThemeLayoutUpdates);
 
-            $this->resources = array_merge_recursive($this->resources, $resourceThemeLayoutUpdates);
+            $themeLayoutUpdates = \array_merge_recursive($themeLayoutUpdates, $resourceThemeLayoutUpdates);
         }
 
-        if ($this->cache instanceof Cache) {
-            $this->cache->save(self::CACHE_KEY, $this->resources);
-
-            $now = new \DateTime('now', new \DateTimeZone('UTC'));
-            $this->cache->save(self::CACHE_LAST_MODIFICATION_DATE, $now);
-
-            $this->blockViewCache->reset();
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function findApplicableResources(array $paths)
-    {
-        $result = [];
-
-        foreach ($paths as $path) {
-            $pathArray = explode(DIRECTORY_SEPARATOR, $path);
-
-            $value = $this->getResources();
-            for ($i = 0, $length = count($pathArray); $i < $length; ++$i) {
-                $value = $this->readValue($value, $pathArray[$i]);
-
-                if (null === $value) {
-                    break;
-                }
-            }
-
-            if ($value && is_array($value)) {
-                $result = array_merge($result, array_filter($value, 'is_string'));
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return CumulativeConfigLoader
-     */
-    private function getConfigLoader()
-    {
-        $filenamePatterns = $this->loader->getUpdateFileNamePatterns();
-        $configLoader = new CumulativeConfigLoader(
-            'oro_layout_updates_list',
-            [new LayoutUpdateCumulativeResourceLoader('Resources/views/layouts/', -1, false, $filenamePatterns)]
-        );
-
-        return $configLoader;
+        return $themeLayoutUpdates;
     }
 
     /**
@@ -162,7 +150,7 @@ class ThemeResourceProvider implements ResourceProviderInterface
     {
         foreach ($themes as $theme => $themePaths) {
             foreach ($themePaths as $pathIndex => $path) {
-                if (is_string($path) && isset($existThemePaths[$path])) {
+                if (\is_string($path) && isset($existThemePaths[$path])) {
                     unset($themePaths[$pathIndex]);
                 }
             }
@@ -187,7 +175,7 @@ class ThemeResourceProvider implements ResourceProviderInterface
         $directories = [];
         $files = [];
         foreach ($updates as $key => $update) {
-            if (is_array($update)) {
+            if (\is_array($update)) {
                 $update = $this->sortThemeLayoutUpdates($update);
                 $directories[$key] = $update;
             } else {
@@ -195,22 +183,22 @@ class ThemeResourceProvider implements ResourceProviderInterface
             }
         }
 
-        sort($files);
-        ksort($directories);
-        $updates = array_merge($files, $directories);
+        \sort($files);
+        \ksort($directories);
+        $updates = \array_merge($files, $directories);
 
         return $updates;
     }
 
     /**
-     * @param array $array
+     * @param mixed  $array
      * @param string $property
      *
      * @return array|null
      */
     private function readValue($array, $property)
     {
-        if (is_array($array) && isset($array[$property])) {
+        if (\is_array($array) && isset($array[$property])) {
             return $array[$property];
         }
 

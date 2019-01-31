@@ -5,49 +5,43 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Command;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Command\ValidateActionConfigurationCommand;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationValidatorInterface;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ValidateActionConfigurationCommand
-     */
-    protected $command;
+    /** @var ValidateActionConfigurationCommand */
+    private $command;
 
-    /**
-     * @var ConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $provider;
+    /** @var ConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $provider;
 
-    /**
-     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $container;
+    /** @var ConfigurationValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $validator;
 
-    /**
-     * @var InputInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $input;
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
-    /**
-     * @var OutputStub
-     */
-    protected $output;
+    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $input;
+
+    /** @var OutputStub */
+    private $output;
 
     protected function setUp()
     {
-        $this->provider = $this->createMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
+        $this->provider = $this->createMock(ConfigurationProviderInterface::class);
+        $this->validator = $this->createMock(ConfigurationValidatorInterface::class);
 
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->container->expects($this->any())
-            ->method('get')
-            ->with('oro_action.configuration.provider.operations', 1)
-            ->willReturn($this->provider);
+        $this->container = TestContainerBuilder::create()
+            ->add('oro_action.configuration.provider.operations', $this->provider)
+            ->add('oro_action.configuration.validator.operations', $this->validator)
+            ->getContainer($this);
 
-        $this->input = $this->createMock('Symfony\Component\Console\Input\InputInterface');
-
+        $this->input = $this->createMock(InputInterface::class);
         $this->output = new OutputStub();
 
         $this->command = new ValidateActionConfigurationCommand();
@@ -70,14 +64,19 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
     {
         $this->provider->expects($this->once())
             ->method('getConfiguration')
-            ->with(true, $this->isInstanceOf('Doctrine\Common\Collections\Collection'))
             ->willReturnCallback(
-                function ($ignoreCache, Collection $errors) use ($inputData) {
+                function () use ($inputData) {
+                    return $inputData['actionConfiguration'];
+                }
+            );
+        $this->validator->expects($this->any())
+            ->method('validate')
+            ->willReturnCallback(
+                function ($configuration, Collection $errors) use ($inputData) {
+                    $this->assertEquals($inputData['actionConfiguration'], $configuration);
                     foreach ($inputData['configurationErrors'] as $error) {
                         $errors->add($error);
                     }
-
-                    return $inputData['actionConfiguration'];
                 }
             );
 

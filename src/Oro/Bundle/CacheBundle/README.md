@@ -6,11 +6,11 @@ OroCacheBundle introduces the configuration of the application data cache storag
 
 ## Table of Contents
 
- - [Abstract cache services](#abstract-cache-services) 
- - [Warm up config cache](#warm-up-config-cache)
+ - [Abstract Cache Services](#abstract-cache-services)
+ - [Warming up Config Cache](#warming-up-config-cache)
  - [Caching of Symfony Validation rules](#caching-of-symfony-validation-rules)
 
-## Abstract cache services
+## Abstract Cache Services
 
 There are three abstract services you can use as a parent for your cache services:
 
@@ -43,73 +43,77 @@ The `oro.cache.abstract.without_memory_cache` service is always declared automat
 
 Read more about the [caching policy and default implementation](Resources/doc/caching_policy.md).
 
-## Warm up config cache
+## Warming up Config Cache
 
 The purpose is to update only cache that will be needed by the application without updating the cache of those resources,
 that have not been changed. This gives a big performance over the approach when the all cache is updated. Cache warming 
 occurs in debug mode whenever you updated the resource files. 
 
-The following example shows how this services can be used:
-
-```yaml
-# To register your config dumper:
-oro.config.dumper:
-    class: 'Oro\Example\Dumper\CumulativeConfigMetadataDumper'
-    public: false
-
-# To register your config warmer with oro.config_cache_warmer.provider tag:
-oro.configuration.provider.test:
-    class: 'Oro\Example\Dumper\ConfigurationProvider'
-    tags:
-        - { name: oro.config_cache_warmer.provider, dumper: 'oro.config.dumper' }
-
-```
+The following example shows how to create a confiruration provider and register cache warmer for it:
 
 ```php
 <?php
 
-namespace Oro\Example\Dumper;
+namespace Acme\Bundle\AcmeBundle\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Oro\Component\Config\Cache\PhpArrayConfigProvider;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\ResourcesContainerInterface;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
 
-use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
-use Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface;
-
-class CumulativeConfigMetadataDumper implements ConfigMetadataDumperInterface
+class ConfigurationProvider extends PhpArrayConfigProvider
 {
-    
+    private const CONFIG_FILE = 'Resources/config/oro/test_config.yml';
+
     /**
-     * Write meta file with resources related to specific config type
-     *
-     * @param ContainerBuilder $container container with resources to dump
+     * @return array
      */
-    public function dump(ContainerBuilder $container)
+    public function getConfiguration(): array
     {
+        return $this->doGetConfig();
     }
-    
+
     /**
-     * Check are config resources fresh?
-     *
-     * @return bool true if data in cache is present and up to date, false otherwise
+     * {@inheritdoc}
      */
-    public function isFresh()
+    protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
-        return true;
+        $configs = [];
+        $configLoader = new CumulativeConfigLoader(
+            'acme_test_config',
+            new YamlCumulativeFileLoader(self::CONFIG_FILE)
+        );
+        $resources = $configLoader->load($resourcesContainer);
+        foreach ($resources as $resource) {
+            $configs[] = $resource->data;
+        }
+
+        return CumulativeConfigProcessorUtil::processConfiguration(
+            self::CONFIG_FILE,
+            new Configuration(),
+            $configs
+        );
     }
 }
+```
 
-class ConfigurationProvider implements ConfigCacheWarmerInterface
-{
-    /**
-    * @param ContainerBuilder $containerBuilder
-    */
-    public function warmUpResourceCache(ContainerBuilder $containerBuilder)
-    {
-        // some logic
-        $resource = new CumulativeResource();
-        $containerBuilder->addResource($resource);
-    }
-}
+```yaml
+services:
+    acme.configuration_provider:
+        class: Acme\Bundle\AcmeBundle\Provider\ConfigurationProvider
+        arguments:
+            - '%kernel.cache_dir%/oro/test_config.php'
+            - '@oro_cache.config_cache_factory'
+
+    acme.configuration_warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        public: false
+        arguments:
+            - '@acme.configuration_provider'
+        tags:
+            - { name: kernel.cache_warmer }
 ```
 
 ## Caching of Symfony Validation rules

@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller;
 
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
 use Oro\Bundle\ActionBundle\Tests\Functional\Stub\ButtonProviderExtensionStub;
 use Oro\Bundle\ActionBundle\Tests\Functional\Stub\ButtonStub;
-use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
+use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
 use Oro\Component\PropertyAccess\PropertyAccessor;
@@ -14,34 +15,32 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class WidgetControllerTest extends WebTestCase
 {
-    const ROOT_NODE_NAME = 'operations';
-
     /** @var int */
     private $entityId;
 
-    /** @var FilesystemCache */
-    protected $cacheProvider;
+    /** @var ConfigurationProvider */
+    private $configProvider;
+
+    /** @var PhpArrayConfigCacheModifier */
+    private $configModifier;
 
     /** @var PropertyAccessor */
-    protected $propertyAccessor;
+    private $propertyAccessor;
 
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
-        $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider.operations');
-        $this->loadFixtures([
-            'Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData',
-            'Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems',
-        ]);
+        $this->configProvider = $this->getContainer()->get('oro_action.tests.configuration.provider');
+        $this->configModifier = new PhpArrayConfigCacheModifier($this->configProvider);
+
+        $this->loadFixtures([LoadTestEntityData::class, LoadItems::class]);
         $this->entityId = $this->getReference(LoadTestEntityData::TEST_ENTITY_1)->getId();
     }
 
     protected function tearDown()
     {
-        $this->cacheProvider->delete(self::ROOT_NODE_NAME);
-
-        parent::tearDown();
+        $this->configModifier->resetCache();
     }
 
     /**
@@ -55,7 +54,7 @@ class WidgetControllerTest extends WebTestCase
      */
     public function testButtonsOperation(array $config, $route, $entityId, $entityClass, array $expected)
     {
-        $this->cacheProvider->save(self::ROOT_NODE_NAME, $config);
+        $this->setOperationsConfig($config);
         $this->getContainer()->get('oro_action.provider.button')->addExtension(new ButtonProviderExtensionStub());
 
         if ($entityId) {
@@ -106,7 +105,7 @@ class WidgetControllerTest extends WebTestCase
         array $expectedData,
         $expectedMessage
     ) {
-        $this->cacheProvider->save(self::ROOT_NODE_NAME, $this->getConfigurationForFormOperation());
+        $this->setOperationsConfig($this->getConfigurationForFormOperation());
 
         $entity = $this->getReference($entity);
 
@@ -283,7 +282,7 @@ class WidgetControllerTest extends WebTestCase
      * @param object $entity
      * @param array $fields
      */
-    protected function assertEntityFields($entity, array $fields)
+    private function assertEntityFields($entity, array $fields)
     {
         $entity = $this->getEntity($entity->getId());
 
@@ -296,7 +295,7 @@ class WidgetControllerTest extends WebTestCase
      * @param int $id
      * @return object|null
      */
-    protected function getEntity($id)
+    private function getEntity($id)
     {
         return $this->getContainer()
             ->get('doctrine')
@@ -307,7 +306,7 @@ class WidgetControllerTest extends WebTestCase
     /**
      * @return PropertyAccessor
      */
-    protected function getPropertyAccessor()
+    private function getPropertyAccessor()
     {
         if (!$this->propertyAccessor) {
             $this->propertyAccessor = new PropertyAccessor();
@@ -537,7 +536,7 @@ class WidgetControllerTest extends WebTestCase
     /**
      * @return array
      */
-    protected function getConfigurationForFormOperation()
+    private function getConfigurationForFormOperation()
     {
         return [
             'oro_action_test_operation' => [
@@ -615,5 +614,15 @@ class WidgetControllerTest extends WebTestCase
                 OperationDefinition::ACTIONS => ['Edit', 'Delete'],
             ],
         ];
+    }
+
+    /**
+     * @param array $operations
+     */
+    private function setOperationsConfig(array $operations)
+    {
+        $config = $this->configProvider->getConfiguration();
+        $config['operations'] = $operations;
+        $this->configModifier->updateCache($config);
     }
 }

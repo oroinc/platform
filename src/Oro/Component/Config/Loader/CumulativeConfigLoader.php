@@ -5,6 +5,7 @@ namespace Oro\Component\Config\Loader;
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\ResourcesContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -17,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *      new YamlCumulativeFileLoader('Resources/config/acme.yml')
  *  );
  *  $acmeConfig = [];
- *  $resources = $configLoader->load($container);
+ *  $resources = $configLoader->load(new ContainerBuilderAdapter($container));
  *  foreach ($resources as $resource) {
  *      $acmeConfig = array_merge($acmeConfig, $resource->data);
  *  }
@@ -55,13 +56,11 @@ class CumulativeConfigLoader
     /**
      * Loads resources
      *
-     * @param ContainerBuilder|null $container The container builder
-     *                                         If NULL the loaded resources will not be registered in the container
-     *                                         and as result will not be monitored for changes
+     * @param ResourcesContainerInterface|ContainerBuilder|null $resourcesContainer
      *
      * @return CumulativeResourceInfo[]
      */
-    public function load(ContainerBuilder $container = null): array
+    public function load($resourcesContainer = null): array
     {
         $result = [];
 
@@ -87,8 +86,8 @@ class CumulativeConfigLoader
             }
         }
 
-        if ($container) {
-            $this->registerResources($container);
+        if ($resourcesContainer) {
+            $this->registerResources($resourcesContainer);
         }
 
         return $result;
@@ -98,11 +97,14 @@ class CumulativeConfigLoader
      * Adds a resource objects to the container.
      * These objects will be used to monitor whether resources are up-to-date or not.
      *
-     * @param ContainerBuilder $container
+     * @param ResourcesContainerInterface|ContainerBuilder $resourcesContainer
      */
-    public function registerResources(ContainerBuilder $container): void
+    public function registerResources($resourcesContainer): void
     {
-        $container->addResource($this->getResources());
+        if ($resourcesContainer instanceof ContainerBuilder) {
+            $resourcesContainer = new ContainerBuilderAdapter($resourcesContainer);
+        }
+        $resourcesContainer->addResource($this->getResources());
     }
 
     /**

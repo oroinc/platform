@@ -2,66 +2,94 @@
 
 namespace Oro\Bundle\DataGridBundle\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
+use Oro\Component\Config\Cache\PhpConfigCacheAccessor;
+use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\ResourcesContainer;
+use Oro\Component\Config\ResourcesContainerInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
+use Symfony\Component\Config\ConfigCacheInterface;
+use Symfony\Component\Config\ResourceCheckerConfigCache;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Load data grids configuration from Resources/config/oro/datagrids.yml files
+ * The provider for datagrids configuration
+ * that is loaded from "Resources/config/oro/datagrids.yml" files.
  */
-class ConfigurationProvider implements ConfigurationProviderInterface
+class ConfigurationProvider implements ConfigurationProviderInterface, WarmableConfigCacheInterface
 {
-    private const ROOT_PARAMETER   = 'datagrids';
-    private const MIXINS_PARAMETER = 'mixins';
+    private const CONFIG_FILE = 'Resources/config/oro/datagrids.yml';
 
-    /** @var array */
-    private $rawConfiguration = [];
+    private const ROOT_SECTION   = 'datagrids';
+    private const MIXINS_SECTION = 'mixins';
+
+    /** @var string */
+    private $cacheDir;
+
+    /** @var ConfigCacheFactoryInterface */
+    private $configCacheFactory;
 
     /** @var SystemAwareResolver */
     private $resolver;
 
+    /** @var PhpConfigCacheAccessor */
+    private $rootCacheAccessor;
+
+    /** @var PhpConfigCacheAccessor */
+    private $gridCacheAccessor;
+
+    /** @var bool */
+    private $hasCache = false;
+
+    /** @var array */
+    private $rawConfiguration = [];
+
     /** @var array */
     private $processedConfiguration = [];
 
-    /** @var CacheProvider */
-    private $cache;
+    /** @var int */
+    private $cacheDirLength;
 
     /**
-     * Constructor
-     *
-     * @param SystemAwareResolver $resolver
-     * @param CacheProvider       $cache
+     * @param string                      $cacheDir
+     * @param ConfigCacheFactoryInterface $configCacheFactory
+     * @param SystemAwareResolver         $resolver
      */
-    public function __construct(SystemAwareResolver $resolver, CacheProvider $cache)
-    {
+    public function __construct(
+        string $cacheDir,
+        ConfigCacheFactoryInterface $configCacheFactory,
+        SystemAwareResolver $resolver
+    ) {
+        $this->cacheDir = $cacheDir;
+        $this->configCacheFactory = $configCacheFactory;
         $this->resolver = $resolver;
-        $this->cache = $cache;
+        $this->cacheDirLength = \strlen($this->cacheDir);
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isApplicable($gridName)
     {
-        $this->ensureConfigurationLoaded($gridName);
+        $this->ensureRawConfigurationLoaded($gridName);
 
         return isset($this->rawConfiguration[$gridName]);
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getConfiguration($gridName)
     {
         if (!isset($this->processedConfiguration[$gridName])) {
-            $rawConfiguration = $this->getRawConfiguration($gridName);
-            $config = $this->resolver->resolve($gridName, $rawConfiguration);
-
-            $this->processedConfiguration[$gridName] = $config;
+            $this->processedConfiguration[$gridName] = $this->resolver->resolve(
+                $gridName,
+                $this->getRawConfiguration($gridName)
+            );
         }
 
         return DatagridConfiguration::createNamed($gridName, $this->processedConfiguration[$gridName]);
@@ -72,89 +100,182 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      *
      * @return array
      */
-    public function getRawConfiguration($gridName)
+    public function getRawConfiguration(string $gridName): array
     {
         if (!$this->isApplicable($gridName)) {
-            throw new RuntimeException(sprintf('A configuration for "%s" datagrid was not found.', $gridName));
+            throw new RuntimeException(\sprintf(
+                'A configuration for "%s" datagrid was not found.',
+                $gridName
+            ));
         }
 
         return $this->rawConfiguration[$gridName];
     }
 
     /**
-     * Make sure that configuration saved to cache
-     *
+     * {@inheritdoc}
+     */
+    public function warmUpCache(): void
+    {
+        $this->hasCache = false;
+        if (\is_dir($this->cacheDir)) {
+            $fs = new Filesystem();
+            $fs->remove($this->cacheDir);
+        }
+        $this->ensureCacheWarmedUp();
+    }
+
+    /**
+     * Makes sure that configuration cache was warmed up.
+     */
+    private function ensureCacheWarmedUp(): void
+    {
+        if (!$this->hasCache) {
+            $rootCacheFile = $this->cacheDir . '/datagrids.php';
+            $cache = $this->configCacheFactory->cache($rootCacheFile, function (ConfigCacheInterface $cache) {
+                $resourcesContainer = new ResourcesContainer();
+                $gridCacheAccessor = $this->getGridCacheAccessor();
+                $aggregatedConfigs = $this->loadConfiguration($resourcesContainer);
+                foreach ($aggregatedConfigs as $gridName => $gridConfigs) {
+                    $gridCacheAccessor->save($this->getGridConfigCache($gridName), $gridConfigs);
+                }
+                $this->getRootCacheAccessor()->save($cache, true, $resourcesContainer->getResources());
+            });
+
+            $this->hasCache = $this->getRootCacheAccessor()->load($cache);
+        }
+    }
+
+    /**
      * @param string $gridName
      */
-    private function ensureConfigurationLoaded($gridName)
+    private function ensureRawConfigurationLoaded(string $gridName): void
     {
+        $this->ensureCacheWarmedUp();
         if (!isset($this->rawConfiguration[$gridName])) {
-            $data = $this->cache->fetch($gridName);
-            if (false === $data) {
-                $this->loadConfiguration();
-                $data = $this->cache->fetch($gridName);
-            }
-            if ($data) {
-                $this->rawConfiguration = array_merge($this->rawConfiguration, $data);
+            $gridCache = $this->getGridConfigCache($gridName);
+            if (\is_file($gridCache->getPath())) {
+                $this->rawConfiguration = \array_merge(
+                    $this->rawConfiguration,
+                    $this->getGridCacheAccessor()->load($gridCache)
+                );
             }
         }
     }
 
     /**
-     * Loads configurations and save them in cache
+     * @param ResourcesContainerInterface $resourcesContainer
      *
-     * @param ContainerBuilder $container The container builder
-     *                                    If NULL the loaded resources will not be registered in the container
-     *                                    and as result will not be monitored for changes
+     * @return array [grid name => [grid name => config, mixin grid name => config, ...], ...]
      */
-    public function loadConfiguration(ContainerBuilder $container = null)
+    private function loadConfiguration(ResourcesContainerInterface $resourcesContainer): array
     {
-        $config = [];
-        $configLoader = $this->getDatagridConfigurationLoader();
-        $resources = $configLoader->load($container);
+        $configs = [];
+        $configLoader = new CumulativeConfigLoader(
+            'oro_datagrid',
+            new YamlCumulativeFileLoader(self::CONFIG_FILE)
+        );
+        $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
-            if (isset($resource->data[self::ROOT_PARAMETER])) {
-                $grids = $resource->data[self::ROOT_PARAMETER];
-                if (is_array($grids)) {
-                    $config = ArrayUtil::arrayMergeRecursiveDistinct($config, $grids);
+            if (isset($resource->data[self::ROOT_SECTION])) {
+                $grids = $resource->data[self::ROOT_SECTION];
+                if (\is_array($grids)) {
+                    $configs = ArrayUtil::arrayMergeRecursiveDistinct($configs, $grids);
                 }
             }
         }
 
-        $this->rawConfiguration = $config;
-        $this->aggregateGridCacheConfig();
+        return $this->aggregateConfiguration($configs);
     }
 
     /**
      * Group grid config with their mixins and save to cache
+     *
+     * @param array $configs [grid name => config, ...]
+     *
+     * @return array [grid name => [grid name => config, mixin grid name => config, ...], ...]
      */
-    private function aggregateGridCacheConfig()
+    private function aggregateConfiguration(array $configs): array
     {
-        foreach ($this->rawConfiguration as $gridName => $gridConfig) {
-            $aggregatedConfig = [];
-            $aggregatedConfig[$gridName] = $gridConfig;
-            if (isset($gridConfig[self::MIXINS_PARAMETER])) {
-                $mixins = $gridConfig[self::MIXINS_PARAMETER];
-                if (is_array($mixins)) {
+        $result = [];
+        foreach ($configs as $gridName => $gridConfig) {
+            $aggregatedConfig = [$gridName => $gridConfig];
+            if (isset($gridConfig[self::MIXINS_SECTION])) {
+                $mixins = $gridConfig[self::MIXINS_SECTION];
+                if (\is_array($mixins)) {
                     foreach ($mixins as $mixin) {
-                        $aggregatedConfig[$mixin] = $this->rawConfiguration[$mixin];
+                        $aggregatedConfig[$mixin] = $configs[$mixin];
                     }
-                } elseif (is_string($mixins)) {
-                    $aggregatedConfig[$mixins] = $this->rawConfiguration[$mixins];
+                } elseif (\is_string($mixins)) {
+                    $aggregatedConfig[$mixins] = $configs[$mixins];
                 }
             }
-            $this->cache->save($gridName, $aggregatedConfig);
+            $result[$gridName] = $aggregatedConfig;
         }
+
+        return $result;
     }
 
     /**
-     * @return CumulativeConfigLoader
+     * @return PhpConfigCacheAccessor
      */
-    private function getDatagridConfigurationLoader()
+    private function getRootCacheAccessor(): PhpConfigCacheAccessor
     {
-        return new CumulativeConfigLoader(
-            'oro_datagrid',
-            new YamlCumulativeFileLoader('Resources/config/oro/datagrids.yml')
-        );
+        if (null === $this->rootCacheAccessor) {
+            $this->rootCacheAccessor = new PhpConfigCacheAccessor(function ($config) {
+                if (true !== $config) {
+                    throw new \LogicException('Expected boolean TRUE.');
+                }
+            });
+        }
+
+        return $this->rootCacheAccessor;
+    }
+
+    /**
+     * @return PhpConfigCacheAccessor
+     */
+    private function getGridCacheAccessor(): PhpConfigCacheAccessor
+    {
+        if (null === $this->gridCacheAccessor) {
+            $this->gridCacheAccessor = new PhpConfigCacheAccessor(function ($config) {
+                if (!\is_array($config)) {
+                    throw new \LogicException('Expected an array.');
+                }
+            });
+        }
+
+        return $this->gridCacheAccessor;
+    }
+
+    /**
+     * @param string $gridName
+     *
+     * @return ConfigCacheInterface
+     */
+    private function getGridConfigCache(string $gridName): ConfigCacheInterface
+    {
+        return new ResourceCheckerConfigCache($this->getGridFile($gridName));
+    }
+
+    /**
+     * @param string $gridName
+     *
+     * @return string
+     */
+    private function getGridFile(string $gridName): string
+    {
+        // This ensures that the filename does not contain invalid chars.
+        $fileName = \preg_replace('#[^a-z0-9-_]#i', '-', $gridName);
+
+        // This ensures that the filename is not too long.
+        // Most filesystems have a limit of 255 chars for each path component.
+        // On Windows the the whole path is limited to 260 chars (including terminating null char).
+        $fileNameLength = \strlen($fileName) + 4; // 4 === strlen('.php')
+        if ($fileNameLength > 255 || $this->cacheDirLength + $fileNameLength > 259) {
+            $fileName = \hash('sha256', $gridName);
+        }
+
+        return \sprintf('%s/%s.php', $this->cacheDir, $fileName);
     }
 }

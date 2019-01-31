@@ -3,22 +3,24 @@
 namespace Oro\Bundle\SecurityBundle\Annotation\Loader;
 
 use Doctrine\Common\Annotations\Reader as AnnotationReader;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\ResourcesContainerInterface;
 
+/**
+ * Loads ACL anotations from PHP classes of controllers.
+ */
 class AclAnnotationLoader implements AclAnnotationLoaderInterface
 {
-    const ANNOTATION_CLASS = 'Oro\Bundle\SecurityBundle\Annotation\Acl';
-    const ANCESTOR_CLASS   = 'Oro\Bundle\SecurityBundle\Annotation\AclAncestor';
+    private const ANNOTATION_CLASS = Acl::class;
+    private const ANCESTOR_CLASS   = AclAncestor::class;
 
-    /**
-     * @var AnnotationReader
-     */
+    /** @var AnnotationReader */
     private $reader;
 
     /**
-     * Constructor
-     *
      * @param AnnotationReader $reader
      */
     public function __construct(AnnotationReader $reader)
@@ -27,14 +29,15 @@ class AclAnnotationLoader implements AclAnnotationLoaderInterface
     }
 
     /**
-     * Loads ACL annotations from PHP files
-     *
-     * @param AclAnnotationStorage $storage
+     * {@inheritdoc}
      */
-    public function load(AclAnnotationStorage $storage)
+    public function load(AclAnnotationStorage $storage, ResourcesContainerInterface $resourcesContainer): void
     {
-        $configLoader = self::getAclAnnotationResourceLoader();
-        $resources    = $configLoader->load();
+        $configLoader = new CumulativeConfigLoader(
+            'oro_acl_annotation',
+            new AclAnnotationCumulativeResourceLoader(['Controller'])
+        );
+        $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
             foreach ($resource->data as $file) {
                 $className = $this->getClassName($file);
@@ -77,7 +80,7 @@ class AclAnnotationLoader implements AclAnnotationLoaderInterface
      * @param  string $fileName
      * @return null|string the fully qualified class name or null if the class name cannot be extracted
      */
-    protected function getClassName($fileName)
+    private function getClassName($fileName)
     {
         $src = $this->getFileContent($fileName);
         if (!preg_match('#' . str_replace("\\", "\\\\", self::ANNOTATION_CLASS) . '#', $src)) {
@@ -102,7 +105,7 @@ class AclAnnotationLoader implements AclAnnotationLoaderInterface
      * @param  string $className
      * @return \ReflectionClass
      */
-    protected function getReflectionClass($className)
+    private function getReflectionClass($className)
     {
         return new \ReflectionClass($className);
     }
@@ -113,19 +116,8 @@ class AclAnnotationLoader implements AclAnnotationLoaderInterface
      * @param  string $fileName
      * @return string
      */
-    protected function getFileContent($fileName)
+    private function getFileContent($fileName)
     {
         return file_get_contents($fileName);
-    }
-
-    /**
-     * @return CumulativeConfigLoader
-     */
-    public static function getAclAnnotationResourceLoader()
-    {
-        return new CumulativeConfigLoader(
-            'oro_acl_annotation',
-            new AclAnnotationCumulativeResourceLoader(['Controller'])
-        );
     }
 }

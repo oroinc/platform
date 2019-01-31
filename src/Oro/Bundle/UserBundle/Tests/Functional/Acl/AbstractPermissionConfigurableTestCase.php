@@ -2,22 +2,21 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\Acl;
 
-use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
-use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
+use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Role;
 
 abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
 {
-    /** @var FilesystemCache */
-    protected $cacheProvider;
-
     /**
-     * {@inheritdoc}
+     * @return PhpArrayConfigCacheModifier
      */
-    protected function setUp()
+    private static function getConfigurationModifier(): PhpArrayConfigCacheModifier
     {
-        $this->cacheProvider = $this->getContainer()->get('oro_security.cache.provider.configurable_permission');
+        return new PhpArrayConfigCacheModifier(
+            self::getClientInstance()->getContainer()
+                ->get('oro_security.configuration.provider.configurable_permission_configuration')
+        );
     }
 
     /**
@@ -25,8 +24,7 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
      */
     public static function buildOriginCache()
     {
-        $provider = self::getClientInstance()->getContainer()->get('oro_security.acl.configurable_permission_provider');
-        $provider->buildCache();
+        self::getConfigurationModifier()->resetCache();
     }
 
     /**
@@ -38,7 +36,7 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
      */
     public function testConfigurableCapabilities(array $config, $action, $expected)
     {
-        $this->cacheProvider->save(ConfigurablePermissionProvider::CACHE_ID, $config);
+        self::getConfigurationModifier()->updateCache($config);
 
         $crawler = $this->client->request(
             'GET',
@@ -60,7 +58,7 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
      */
     public function testConfigurableEntities(array $config, \Closure $assertGridData)
     {
-        $this->cacheProvider->save(ConfigurablePermissionProvider::CACHE_ID, $config);
+        self::getConfigurationModifier()->updateCache($config);
 
         /** @var Role $role */
         $role = $this->getRole();

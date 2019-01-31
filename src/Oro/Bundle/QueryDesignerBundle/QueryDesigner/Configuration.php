@@ -6,19 +6,22 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Provides schema for configuration that is loaded from "Resources/config/oro/query_designer.yml" files.
+ */
 class Configuration implements ConfigurationInterface
 {
-    const ROOT_NODE_NAME = 'query_designer';
+    public const ROOT_NODE_NAME = 'query_designer';
 
-    /** @var array */
-    protected $types;
+    /** @var string[] */
+    private $filterTypes;
 
     /**
-     * @param $types
+     * @param string[] $filterTypes
      */
-    public function __construct($types)
+    public function __construct($filterTypes)
     {
-        $this->types = $types;
+        $this->filterTypes = $filterTypes;
     }
 
     /**
@@ -44,7 +47,7 @@ class Configuration implements ConfigurationInterface
      *
      * @return NodeDefinition
      */
-    protected function getFiltersConfigTree()
+    private function getFiltersConfigTree()
     {
         $builder = new TreeBuilder();
         $node    = $builder->root('filters');
@@ -73,7 +76,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('type')
                         ->isRequired()
                         ->validate()
-                        ->ifNotInArray($this->types)
+                        ->ifNotInArray($this->filterTypes)
                             ->thenInvalid('Invalid filter type "%s"')
                         ->end()
                     ->end()
@@ -121,7 +124,7 @@ class Configuration implements ConfigurationInterface
      *
      * @return NodeDefinition
      */
-    protected function getGroupingConfigTree()
+    private function getGroupingConfigTree()
     {
         $builder = new TreeBuilder();
         $node    = $builder->root('grouping');
@@ -153,7 +156,7 @@ class Configuration implements ConfigurationInterface
      *
      * @return NodeDefinition
      */
-    protected function getConvertersConfigTree()
+    private function getConvertersConfigTree()
     {
         $builder = new TreeBuilder();
         $node    = $builder->root('converters');
@@ -228,7 +231,7 @@ class Configuration implements ConfigurationInterface
      *
      * @return NodeDefinition
      */
-    protected function getAggregatorsConfigTree()
+    private function getAggregatorsConfigTree()
     {
         $builder = new TreeBuilder();
         $node    = $builder->root('aggregates');

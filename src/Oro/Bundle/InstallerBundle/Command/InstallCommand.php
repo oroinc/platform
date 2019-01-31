@@ -14,7 +14,6 @@ use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand;
 use Oro\Bundle\LocaleBundle\DependencyInjection\OroLocaleExtension;
-use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
@@ -433,12 +432,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             )
             ->runCommand(
                 LoadPermissionConfigurationCommand::NAME,
-                [
-                    '--process-isolation' => true
-                ]
-            )
-            ->runCommand(
-                LoadConfigurablePermissionCommand::NAME,
                 [
                     '--process-isolation' => true
                 ]

@@ -50,13 +50,13 @@ class AnnotationsReaderTest extends \PHPUnit\Framework\TestCase
         $this->cache
             ->expects($this->once())
             ->method('fetch')
-            ->with(AnnotationsReader::CACHE_KEY)
+            ->with('controller_classes')
             ->willReturn(false);
 
         $this->cache
             ->expects($this->once())
             ->method('save')
-            ->with(AnnotationsReader::CACHE_KEY, $classes);
+            ->with('controller_classes', $classes);
 
         $route = new Route('/');
         $route->setDefault('_controller', AnnotationsReaderTest::class . '::testGetTitleWithoutCache');
@@ -91,7 +91,7 @@ class AnnotationsReaderTest extends \PHPUnit\Framework\TestCase
         $this->cache
             ->expects($this->once())
             ->method('fetch')
-            ->with(AnnotationsReader::CACHE_KEY)
+            ->with('controller_classes')
             ->willReturn($classes);
 
 
@@ -115,7 +115,7 @@ class AnnotationsReaderTest extends \PHPUnit\Framework\TestCase
         $this->cache
             ->expects($this->once())
             ->method('fetch')
-            ->with(AnnotationsReader::CACHE_KEY)
+            ->with('controller_classes')
             ->willReturn($classes);
 
         $reflectionMethod = new \ReflectionMethod(AnnotationsReaderTest::class, 'testGetTitleEmpty');
@@ -138,7 +138,7 @@ class AnnotationsReaderTest extends \PHPUnit\Framework\TestCase
         $this->cache
             ->expects($this->once())
             ->method('fetch')
-            ->with(AnnotationsReader::CACHE_KEY)
+            ->with('controller_classes')
             ->willReturn($classes);
 
         $this->reader
@@ -157,7 +157,7 @@ class AnnotationsReaderTest extends \PHPUnit\Framework\TestCase
         $this->cache
             ->expects($this->once())
             ->method('fetch')
-            ->with(AnnotationsReader::CACHE_KEY)
+            ->with('controller_classes')
             ->willReturn($classes);
 
         $this->reader

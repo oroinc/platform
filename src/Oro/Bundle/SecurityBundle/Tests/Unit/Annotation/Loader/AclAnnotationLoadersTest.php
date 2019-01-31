@@ -8,6 +8,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\TestBundle;
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\ResourcesContainer;
 
 class AclAnnotationLoadersTest extends \PHPUnit\Framework\TestCase
 {
@@ -26,10 +27,11 @@ class AclAnnotationLoadersTest extends \PHPUnit\Framework\TestCase
             ->setBundles([$bundle->getName() => get_class($bundle)]);
 
         $storage = new AclAnnotationStorage();
+        $resourcesContainer = new ResourcesContainer();
         $annotationLoader = new AclAnnotationLoader(new AnnotationReader());
-        $annotationLoader->load($storage);
+        $annotationLoader->load($storage, $resourcesContainer);
         $configLoader = new AclConfigLoader();
-        $configLoader->load($storage);
+        $configLoader->load($storage, $resourcesContainer);
 
         $a = $storage->findById('user_test_main_controller');
         $this->assertNotNull($a);

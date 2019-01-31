@@ -93,16 +93,19 @@ services:
     oro_datagrid.configuration.provider:
         class: '%oro_datagrid.configuration.provider.class%'
         arguments:
+            - '%kernel.cache_dir%/oro/datagrids'
+            - '@oro_cache.config_cache_factory'
             - '@oro_datagrid.provider.resolver'
-            - '@oro_datagrid.configuration_provider.cache'
         tags:
             - { name: oro_datagrid.configuration.provider, priority: -10 }
 
-    oro_datagrid.configuration_provider.cache:
+    oro_datagrid.configuration.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_datagrid_configuration' ] ]
+        arguments:
+            - '@oro_datagrid.configuration.provider'
+        tags:
+            - { name: kernel.cache_warmer }
 
     oro_datagrid.configuration.provider.chain:
         class: '%oro_datagrid.configuration.provider.chain.class%'
@@ -291,13 +294,6 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_security.acl_helper'
-
-    oro_datagrid.cache.datagrid_configuration_cache_warmer:
-        class: Oro\Bundle\DataGridBundle\Cache\DatagridConfigurationCacheWarmer
-        arguments:
-            - '@oro_datagrid.configuration.provider'
-        tags:
-            - { name: kernel.cache_warmer }
 
     oro_datagrid.helper.route:
         class: 'Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper'

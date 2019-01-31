@@ -64,11 +64,12 @@ services:
         public: false
         class: 'Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToCronFormatTransformer'
 
+    oro_cache.config_cache_factory:
+        class: Oro\Component\Config\Cache\ConfigCacheFactory
+        public: false
+        arguments:
+            - '%kernel.debug%'
+
     oro.cache.memory_cache_chain:
         public: false
         class: Oro\Bundle\CacheBundle\Provider\MemoryCacheChain
-
-    oro.cache.configuration_loader:
-        class: Oro\Bundle\CacheBundle\Loader\ConfigurationLoader
-        calls:
-            - [ setParameterBag, ['@=service("kernel").getContainer().getParameterBag()']]

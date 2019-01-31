@@ -321,8 +321,8 @@ class OroTestFrameworkExtension implements TestworkExtension
             'oro_behat_isolators',
             new YamlCumulativeFileLoader('Tests/Behat/isolators.yml')
         );
-
-        foreach (array_reverse($configLoader->load()) as $resource) {
+        $resources = array_reverse($configLoader->load());
+        foreach ($resources as $resource) {
             $loader = new YamlFileLoader($container, new FileLocator(rtrim($resource->path, 'isolators.yml')));
             $loader->load('isolators.yml');
         }

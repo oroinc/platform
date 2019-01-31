@@ -2,27 +2,34 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundle\BarBundle;
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Testing\TempDirExtension;
+use Symfony\Component\Config\ConfigCacheFactory;
 
 class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigurationProvider */
-    protected $configurationProvider;
+    use TempDirExtension;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $cache;
+    /** @var ConfigurationProvider */
+    private $configurationProvider;
+
+    /** @var string */
+    private $cacheFile;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->cache = $this->getMockBuilder(CacheProvider::class)->getMock();
-        $this->configurationProvider = new ConfigurationProvider($this->cache);
+        $this->cacheFile = $this->getTempFile('ConfigurationProvider');
+
+        $this->configurationProvider = new ConfigurationProvider(
+            $this->cacheFile,
+            new ConfigCacheFactory(false)
+        );
     }
 
     /**
@@ -37,17 +44,6 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles);
-
-        $this->cache
-            ->expects($this->once())
-            ->method('save')
-            ->with(ConfigurationProvider::CACHE_KEY);
-
-        $this->cache
-            ->expects($this->once())
-            ->method('fetch')
-            ->with(ConfigurationProvider::CACHE_KEY)
-            ->willReturn(false);
 
         $this->assertEquals(
             $expectedResult,

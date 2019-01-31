@@ -2,22 +2,48 @@
 
 namespace Oro\Bundle\SecurityBundle\Configuration;
 
-class PermissionConfigurationProvider extends AbstractPermissionsConfigurationProvider
+use Oro\Component\Config\Cache\PhpArrayConfigProvider;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Merger\ConfigurationMerger;
+use Oro\Component\Config\ResourcesContainerInterface;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
+
+/**
+ * The provider for secutity permissions configuration
+ * that is loaded from "Resources/config/oro/permissions.yml" files.
+ */
+class PermissionConfigurationProvider extends PhpArrayConfigProvider
 {
-    const CONFIG_PATH = 'Resources/config/oro/permissions.yml';
+    private const CONFIG_FILE = 'Resources/config/oro/permissions.yml';
+
+    /** @var string[] */
+    private $bundles;
+
+    /**
+     * @param string                      $cacheFile
+     * @param ConfigCacheFactoryInterface $configCacheFactory
+     * @param string[]                    $bundles
+     */
+    public function __construct(string $cacheFile, ConfigCacheFactoryInterface $configCacheFactory, array $bundles)
+    {
+        parent::__construct($cacheFile, $configCacheFactory);
+        $this->bundles = $bundles;
+    }
 
     /**
      * @param array $acceptedPermissions
+     *
      * @return array
      */
-    public function getPermissionConfiguration(array $acceptedPermissions = null)
+    public function getPermissionConfiguration(array $acceptedPermissions = null): array
     {
-        $permissions = $this->parseConfiguration($this->loadConfiguration());
-
-        if ($acceptedPermissions !== null) {
+        $permissions = $this->doGetConfig();
+        if (null !== $acceptedPermissions) {
             foreach ($permissions as $permissionName => $permissionConfiguration) {
                 // skip not used permissions
-                if (!in_array($permissionName, $acceptedPermissions, true)) {
+                if (!\in_array($permissionName, $acceptedPermissions, true)) {
                     unset($permissions[$permissionName]);
                 }
             }
@@ -29,16 +55,27 @@ class PermissionConfigurationProvider extends AbstractPermissionsConfigurationPr
     /**
      * {@inheritdoc}
      */
-    protected function getRootName()
+    protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
-        return PermissionListConfiguration::ROOT_NODE_NAME;
-    }
+        $configs = [];
+        $configLoader = new CumulativeConfigLoader(
+            'oro_security_permissions',
+            new YamlCumulativeFileLoader(self::CONFIG_FILE)
+        );
+        $resources = $configLoader->load($resourcesContainer);
+        foreach ($resources as $resource) {
+            if (\array_key_exists(PermissionConfiguration::ROOT_NODE_NAME, $resource->data)) {
+                $configs[$resource->bundleClass] = $resource->data;
+            }
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getConfigPath()
-    {
-        return self::CONFIG_PATH;
+        $merger = new ConfigurationMerger($this->bundles);
+        $mergedConfig = $merger->mergeConfiguration($configs);
+
+        return CumulativeConfigProcessorUtil::processConfiguration(
+            self::CONFIG_FILE,
+            new PermissionConfiguration(),
+            $mergedConfig
+        );
     }
 }

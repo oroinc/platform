@@ -7,12 +7,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
-use Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository;
 
+/**
+ * The manager for security permissions.
+ */
 class PermissionManager
 {
     const CACHE_PERMISSIONS = 'permissions';
@@ -231,7 +234,7 @@ class PermissionManager
     protected function normalizeGroupName(&$groupName)
     {
         if ($groupName !== null && empty($groupName)) {
-            $groupName = PermissionListConfiguration::DEFAULT_GROUP_NAME;
+            $groupName = PermissionConfiguration::DEFAULT_GROUP_NAME;
         }
     }
 

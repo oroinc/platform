@@ -22,11 +22,12 @@ class OroSearchExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         // load entity search configuration from search.yml files
-        $ymlLoader = new YamlCumulativeFileLoader('Resources/config/oro/search.yml');
-        $configurationLoader = new CumulativeConfigLoader('oro_search', $ymlLoader);
-        $engineResources = $configurationLoader->load($container);
-
         $entitiesConfigPart = [];
+        $configurationLoader = new CumulativeConfigLoader(
+            'oro_search',
+            new YamlCumulativeFileLoader('Resources/config/oro/search.yml')
+        );
+        $engineResources = $configurationLoader->load($container);
         foreach ($engineResources as $resource) {
             $entitiesConfigPart[] = $resource->data[self::SEARCH_FILE_ROOT_NODE];
         }
@@ -52,10 +53,11 @@ class OroSearchExtension extends Extension
         $serviceLoader->load('filters.yml');
         $serviceLoader->load('commands.yml');
 
-        $ymlLoader = new YamlCumulativeFileLoader('Resources/config/oro/search_engine/' . $config['engine'] . '.yml');
-        $engineLoader = new CumulativeConfigLoader('oro_search', $ymlLoader);
+        $engineLoader = new CumulativeConfigLoader(
+            'oro_search',
+            new YamlCumulativeFileLoader('Resources/config/oro/search_engine/' . $config['engine'] . '.yml')
+        );
         $engineResources = $engineLoader->load($container);
-
         foreach ($engineResources as $engineResource) {
             $serviceLoader->load($engineResource->path);
         }

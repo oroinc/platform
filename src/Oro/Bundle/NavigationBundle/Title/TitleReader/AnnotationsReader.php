@@ -5,14 +5,15 @@ namespace Oro\Bundle\NavigationBundle\Title\TitleReader;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\NavigationBundle\Annotation\TitleTemplate;
+use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
 use Symfony\Component\Routing\Router;
 
 /**
  * Reads page titles from TitleTemplate annotations of controllers.
  */
-class AnnotationsReader implements ReaderInterface
+class AnnotationsReader implements ReaderInterface, WarmableConfigCacheInterface
 {
-    const CACHE_KEY = 'controller_classes';
+    private const CACHE_KEY = 'controller_classes';
 
     /** @var Reader */
     private $reader;
@@ -62,9 +63,18 @@ class AnnotationsReader implements ReaderInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function warmUpCache(): void
+    {
+        $this->cache->delete(self::CACHE_KEY);
+        $this->getControllerClasses();
+    }
+
+    /**
      * @return array
      */
-    public function getControllerClasses()
+    private function getControllerClasses(): array
     {
         $classes = $this->cache->fetch(self::CACHE_KEY);
         if (false !== $classes) {

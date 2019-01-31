@@ -32,12 +32,6 @@ parameters:
     oro_security.entity_security_metadata_provider.class:      Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider
     oro_security.action_metadata_provider.class:               Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider
 
-    oro_security.acl.annotation_provider.class:                Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider
-    oro_security.acl.annotation_loader.class:                  Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader
-    oro_security.acl.config_loader.class:                      Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader
-
-    oro_security.acl.annotation_provider.cache.warmer.class:   Oro\Bundle\SecurityBundle\Cache\AclAnnotationCacheWarmer
-    oro_security.acl.annotation_provider.cache.clearer.class:  Oro\Bundle\SecurityBundle\Cache\AclAnnotationCacheClearer
     oro_security.action_metadata_provider.cache.warmer.class:  Oro\Bundle\SecurityBundle\Cache\ActionMetadataCacheWarmer
     oro_security.action_metadata_provider.cache.clearer.class: Oro\Bundle\SecurityBundle\Cache\ActionMetadataCacheClearer
     oro_security.entity_security_metadata_provider.cache.warmer.class:  Oro\Bundle\SecurityBundle\Cache\EntitySecurityMetadataCacheWarmer
@@ -65,12 +59,6 @@ parameters:
     oro_security.listener.search_listener.class:               Oro\Bundle\SecurityBundle\EventListener\SearchListener
 
     oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
-
-    oro_security.orm.acl_conditional_factor_builder.class:     Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionalFactorBuilder
-
-    oro_security.configuration.permission_list_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration
-    oro_security.configuration.provider.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider
-    oro_security.configuration.builder.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder
 
     oro_security.serializer.filter_chain.class:                Oro\Component\EntitySerializer\Filter\EntityAwareFilterChain
     oro_security.serializer.acl_filter:                        Oro\Bundle\SecurityBundle\Filter\SerializerFieldFilter
@@ -234,16 +222,10 @@ services:
             - '@oro_security.configuration.builder.permission_configuration'
             - '@oro_security.cache.provider.permission'
 
-    oro_security.cache.provider.configurable_permission:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_security_configurable_permission' ] ]
-
     oro_security.acl.configurable_permission_provider:
         class: Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider
         arguments:
             - '@oro_security.configuration.provider.configurable_permission_configuration'
-            - '@oro_security.cache.provider.configurable_permission'
 
     oro_security.filter.privilege_capability_filter:
         class: 'Oro\Bundle\SecurityBundle\Filter\AclPrivilegeCapabilityFilter'
@@ -354,28 +336,23 @@ services:
             - [ setNamespace, [ 'oro_acl_actions' ] ]
 
     oro_security.acl.annotation_provider:
-        class: '%oro_security.acl.annotation_provider.class%'
+        class: Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider
         arguments:
+            - '%kernel.cache_dir%/oro/acl_annotations.php'
+            - '@oro_cache.config_cache_factory'
             - '@oro_entity.orm.entity_class_resolver'
-            - '@oro_security.acl.annotation_provider.cache'
-
-    oro_security.acl.annotation_provider.cache:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_acl_annotations' ] ]
 
     oro_security.acl.annotation_loader:
+        class: Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader
         public: false
-        class: '%oro_security.acl.annotation_loader.class%'
         arguments:
             - '@annotation_reader'
         tags:
             - { name: oro_security.acl.config_loader }
 
     oro_security.acl.config_loader:
+        class: Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader
         public: false
-        class: '%oro_security.acl.config_loader.class%'
         tags:
             - { name: oro_security.acl.config_loader }
 
@@ -387,20 +364,12 @@ services:
             - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
 
     oro_security.acl.annotation_provider.cache.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
         public: false
-        class: '%oro_security.acl.annotation_provider.cache.warmer.class%'
         arguments:
             - '@oro_security.acl.annotation_provider'
         tags:
             - { name: kernel.cache_warmer, priority: 5 }
-
-    oro_security.acl.annotation_provider.cache.clearer:
-        public: false
-        class: '%oro_security.acl.annotation_provider.cache.clearer.class%'
-        arguments:
-            - '@oro_security.acl.annotation_provider'
-        tags:
-            - { name: kernel.cache_clearer }
 
     oro_security.action_metadata_provider.cache.warmer:
         public: false
@@ -645,26 +614,38 @@ services:
                 tree_walker: Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker
                 walker_hint_provider: oro_security.walker_hint_provider.current_user
 
-    oro_security.configuration.permission_list_configuration:
-        class: '%oro_security.configuration.permission_list_configuration.class%'
-
-    oro_security.configurable_configuration.permission_list_configuration:
-        class: 'Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionListConfiguration'
-
     oro_security.configuration.provider.permission_configuration:
-        class: '%oro_security.configuration.provider.permission_configuration.class%'
+        class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider
         arguments:
-            - '@oro_security.configuration.permission_list_configuration'
+            - '%kernel.cache_dir%/oro/permissions.php'
+            - '@oro_cache.config_cache_factory'
             - '%kernel.bundles%'
+
+    oro_security.permission_configuration.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        public: false
+        arguments:
+            - '@oro_security.configuration.provider.permission_configuration'
+        tags:
+            - { name: kernel.cache_warmer }
 
     oro_security.configuration.provider.configurable_permission_configuration:
-        class: 'Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider'
+        class: Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider
         arguments:
-            - '@oro_security.configurable_configuration.permission_list_configuration'
+            - '%kernel.cache_dir%/oro/configurable_permissions.php'
+            - '@oro_cache.config_cache_factory'
             - '%kernel.bundles%'
 
+    oro_security.configurable_permission_configuration.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        public: false
+        arguments:
+            - '@oro_security.configuration.provider.configurable_permission_configuration'
+        tags:
+            - { name: kernel.cache_warmer }
+
     oro_security.configuration.builder.permission_configuration:
-        class: '%oro_security.configuration.builder.permission_configuration.class%'
+        class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@validator'

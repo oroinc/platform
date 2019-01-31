@@ -293,6 +293,7 @@ services:
 
     oro_navigation.title_annotations_reader:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader
+        public: false
         arguments:
             - '@oro_navigation.cached_reader.title_annotations'
             - '@router'
@@ -300,19 +301,21 @@ services:
         tags:
             - { name: oro_navigation.title_reader, priority: 10}
 
-    oro_navigation.cache_warmer.title_annotations:
-        class: Oro\Bundle\NavigationBundle\CacheWarmer\TitleAnnotationsCacheWarmer
+    oro_navigation.title_annotations_warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        public: false
         arguments:
             - '@oro_navigation.title_annotations_reader'
         tags:
-            - { name: 'kernel.cache_warmer' }
+            - { name: kernel.cache_warmer }
 
     oro_navigation.title_config_reader:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader
+        public: false
         arguments:
             - '@oro_navigation.configuration.provider'
         tags:
-            - { name: oro_navigation.title_reader, priority: 0}
+            - { name: oro_navigation.title_reader}
 
     oro_navigation.title_service.twig.extension:
         class: Oro\Bundle\NavigationBundle\Twig\TitleExtension
@@ -510,13 +513,16 @@ services:
     oro_navigation.configuration.provider:
         class: Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider
         arguments:
-            - '@oro_navigation.configuration_provider.cache'
+            - '%kernel.cache_dir%/oro/navigation.php'
+            - '@oro_cache.config_cache_factory'
 
-    oro_navigation.configuration_provider.cache:
+    oro_navigation.configuration.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_navigation_configuration' ] ]
+        arguments:
+            - '@oro_navigation.configuration.provider'
+        tags:
+            - { name: kernel.cache_warmer }
 
     oro_navigation.event_listener.scope_grid_listener:
         class: 'Oro\Bundle\NavigationBundle\EventListener\MenuGridListener'
