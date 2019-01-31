@@ -2,16 +2,21 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
+use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Provider\MappingConfigurationProvider;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class IndexerTest extends \PHPUnit\Framework\TestCase
 {
@@ -34,17 +39,19 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         $this->config        = require rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'searchConfig.php';
         $this->engine        = $this->createMock(EngineInterface::class);
-        $this->mapper        = new ObjectMapper(
-            $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'),
-            $this->config
-        );
 
+        $configProvider = $this->createMock(MappingConfigurationProvider::class);
+        $configProvider->expects($this->any())
+            ->method('getConfiguration')
+            ->willReturn($this->config);
+        $cache = $this->createMock(Cache::class);
+        $cache->expects($this->any())
+            ->method('fetch')
+            ->willReturn(false);
         /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
         $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()->getMock();
-        $mapperProvider = new SearchMappingProvider($eventDispatcher);
-        $mapperProvider->setMappingConfig($this->config);
-        $this->mapper->setMappingProvider($mapperProvider);
+        $mapperProvider = new SearchMappingProvider($eventDispatcher, $configProvider, $cache);
 
         $this->securityProvider = $this->getMockBuilder('Oro\Bundle\SearchBundle\Security\SecurityProvider')
             ->disableOriginalConstructor()->getMock();
@@ -67,6 +74,13 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
                     return $query;
                 }
             );
+
+        $this->mapper = new ObjectMapper(
+            $mapperProvider,
+            PropertyAccess::createPropertyAccessor(),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(HtmlTagHelper::class)
+        );
 
         $this->indexService = new Indexer(
             $this->engine,

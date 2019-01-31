@@ -10,10 +10,11 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-class EntitiesConfigConfiguration implements ConfigurationInterface
+class MappingConfiguration implements ConfigurationInterface
 {
-    const ROOT_NODE = 'entities_config';
-    const RELATION_FIELDS_NODE_MAX_LEVEL = 4;
+    public const ROOT_NODE = 'search';
+
+    private const RELATION_FIELDS_NODE_MAX_LEVEL = 4;
 
     /** @var array */
     protected $targetTypes = array(
@@ -36,21 +37,10 @@ class EntitiesConfigConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
-        $this->getEntitiesConfigurationNode($builder);
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root(self::ROOT_NODE);
 
-        return $builder;
-    }
-
-    /**
-     * @param TreeBuilder $builder
-     * @return \Symfony\Component\Config\Definition\Builder\NodeDefinition
-     */
-    public function getEntitiesConfigurationNode(TreeBuilder $builder)
-    {
-        $node = $builder->root(self::ROOT_NODE);
-
-        $node
+        $rootNode
             ->useAttributeAsKey('name')
             ->prototype('array')
             ->children()
@@ -102,7 +92,7 @@ class EntitiesConfigConfiguration implements ConfigurationInterface
                 ->end()
             ->end();
 
-        return $node;
+        return $treeBuilder;
     }
 
     /**

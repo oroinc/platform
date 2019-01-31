@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
@@ -67,8 +68,14 @@ class UserWithoutCurrentHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->aclHelper = $this->createMock(AclHelper::class);
 
+        $searchMappingProvider = $this->createMock(SearchMappingProvider::class);
+        $searchMappingProvider->expects($this->once())
+            ->method('getEntityAlias')
+            ->with(self::NAME)
+            ->willReturn('user');
+
         $this->handler = new UserWithoutCurrentHandler($this->tokenAccessor, $attachmentManager, self::NAME, []);
-        $this->handler->initSearchIndexer($this->indexer, [self::NAME => ['alias' => 'user']]);
+        $this->handler->initSearchIndexer($this->indexer, $searchMappingProvider);
         $this->handler->initDoctrinePropertiesByEntityManager($this->manager);
         $this->handler->setAclHelper($this->aclHelper);
     }

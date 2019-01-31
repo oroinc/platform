@@ -10,14 +10,16 @@ use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
+use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
+use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class that provides possibility to collect and receive metadata for classes and their fields by security type
+ * The provider for entity related secutity metadata.
  */
-class EntitySecurityMetadataProvider
+class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, ClearableConfigCacheInterface
 {
     const ACL_SECURITY_TYPE = 'ACL';
     const ALL_PERMISSIONS = 'All';
@@ -41,13 +43,7 @@ class EntitySecurityMetadataProvider
     /**  @var CacheProvider */
     protected $cache;
 
-    /**
-     * @var array
-     *     key = security type
-     *     value = array
-     *         key = class name
-     *         value = EntitySecurityMetadata
-     */
+    /** @var array [security type => [class name => EntitySecurityMetadata, ...], ...] */
     protected $localCache = [];
 
     /** @var EventDispatcherInterface */
@@ -57,13 +53,13 @@ class EntitySecurityMetadataProvider
     private $aclGroupProvider;
 
     /**
-     * @param ConfigProvider $securityConfigProvider
-     * @param ConfigProvider $entityConfigProvider
-     * @param ConfigProvider $extendConfigProvider
-     * @param ManagerRegistry $doctrine
-     * @param TranslatorInterface $translator
-     * @param CacheProvider|null $cache
-     * @param EventDispatcherInterface $eventDispatcher
+     * @param ConfigProvider            $securityConfigProvider
+     * @param ConfigProvider            $entityConfigProvider
+     * @param ConfigProvider            $extendConfigProvider
+     * @param ManagerRegistry           $doctrine
+     * @param TranslatorInterface       $translator
+     * @param CacheProvider             $cache
+     * @param EventDispatcherInterface  $eventDispatcher
      * @param AclGroupProviderInterface $aclGroupProvider
      */
     public function __construct(
@@ -72,7 +68,7 @@ class EntitySecurityMetadataProvider
         ConfigProvider $extendConfigProvider,
         ManagerRegistry $doctrine,
         TranslatorInterface $translator,
-        CacheProvider  $cache = null,
+        CacheProvider $cache,
         EventDispatcherInterface $eventDispatcher,
         AclGroupProviderInterface $aclGroupProvider
     ) {
@@ -129,9 +125,9 @@ class EntitySecurityMetadataProvider
     }
 
     /**
-     * Warms up the cache.
+     * {@inheritdoc}
      */
-    public function warmUpCache()
+    public function warmUpCache(): void
     {
         $securityTypes = [];
         foreach ($this->securityConfigProvider->getConfigs() as $securityConfig) {
@@ -146,26 +142,12 @@ class EntitySecurityMetadataProvider
     }
 
     /**
-     * Clears the cache by security type.
-     *
-     * If the $securityType is not specified, clear all cached data
-     *
-     * @param string|null $securityType The security type.
+     * {@inheritdoc}
      */
-    public function clearCache($securityType = null)
+    public function clearCache(): void
     {
-        if ($this->cache) {
-            if ($securityType !== null) {
-                $this->cache->delete($securityType);
-            } else {
-                $this->cache->deleteAll();
-            }
-        }
-        if ($securityType !== null) {
-            unset($this->localCache[$securityType]);
-        } else {
-            $this->localCache = [];
-        }
+        $this->localCache = [];
+        $this->cache->deleteAll();
     }
 
     /**
@@ -197,11 +179,8 @@ class EntitySecurityMetadataProvider
     protected function ensureMetadataLoaded($securityType)
     {
         if (!isset($this->localCache[$securityType])) {
-            $data = null;
-            if ($this->cache) {
-                $data = $this->cache->fetch($securityType);
-            }
-            if ($data) {
+            $data = $this->cache->fetch($securityType);
+            if (false !== $data) {
                 $this->localCache[$securityType] = $data;
             } else {
                 $this->loadMetadata($securityType);
@@ -246,9 +225,7 @@ class EntitySecurityMetadataProvider
             }
         }
 
-        if ($this->cache) {
-            $this->cache->save($securityType, $data);
-        }
+        $this->cache->save($securityType, $data);
 
         $this->localCache[$securityType] = $data;
     }
@@ -259,7 +236,7 @@ class EntitySecurityMetadataProvider
      * @param $securityConfig
      * @param string $className
      *
-     * @return array|FieldSecurityMetadata[]
+     * @return FieldSecurityMetadata[]
      */
     protected function getFields(ConfigInterface $securityConfig, $className)
     {
@@ -324,7 +301,7 @@ class EntitySecurityMetadataProvider
      *
      * @param ConfigInterface $securityConfig
      *
-     * @return array|null Array with permissions, f.e. ['VIEW', 'CREATE']
+     * @return string[] Array with permissions, f.e. ['VIEW', 'CREATE']
      */
     protected function getPermissionsList(ConfigInterface $securityConfig)
     {
@@ -340,7 +317,7 @@ class EntitySecurityMetadataProvider
     }
 
     /**
-     * @param array|EntitySecurityMetadata[] $classMetadataArray
+     * @param EntitySecurityMetadata[] $classMetadataArray
      */
     protected function translateMetadata(array $classMetadataArray)
     {

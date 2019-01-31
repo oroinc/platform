@@ -3,11 +3,16 @@
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
+use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ActionMetadataProvider
+/**
+ * The provider for action (another name is a capability) related secutity metadata.
+ */
+class ActionMetadataProvider implements WarmableConfigCacheInterface, ClearableConfigCacheInterface
 {
-    const CACHE_KEY = 'data';
+    private const CACHE_KEY = 'data';
 
     /** @var AclAnnotationProvider */
     protected $annotationProvider;
@@ -22,16 +27,14 @@ class ActionMetadataProvider
     protected $localCache;
 
     /**
-     * Constructor
-     *
      * @param AclAnnotationProvider $annotationProvider
      * @param TranslatorInterface   $translator
-     * @param CacheProvider|null    $cache
+     * @param CacheProvider         $cache
      */
     public function __construct(
         AclAnnotationProvider $annotationProvider,
         TranslatorInterface $translator,
-        CacheProvider $cache = null
+        CacheProvider $cache
     ) {
         $this->annotationProvider = $annotationProvider;
         $this->translator = $translator;
@@ -64,22 +67,20 @@ class ActionMetadataProvider
     }
 
     /**
-     * Warms up the cache
+     * {@inheritdoc}
      */
-    public function warmUpCache()
+    public function warmUpCache(): void
     {
         $this->loadMetadata();
     }
 
     /**
-     * Clears the cache
+     * {@inheritdoc}
      */
-    public function clearCache()
+    public function clearCache(): void
     {
-        if ($this->cache) {
-            $this->cache->delete(self::CACHE_KEY);
-        }
         $this->localCache = null;
+        $this->cache->delete(self::CACHE_KEY);
     }
 
     /**
@@ -87,12 +88,9 @@ class ActionMetadataProvider
      */
     protected function ensureMetadataLoaded()
     {
-        if ($this->localCache === null) {
-            $data = null;
-            if ($this->cache) {
-                $data = $this->cache->fetch(self::CACHE_KEY);
-            }
-            if ($data) {
+        if (null === $this->localCache) {
+            $data = $this->cache->fetch(self::CACHE_KEY);
+            if (false !== $data) {
                 $this->localCache = $data;
             } else {
                 $this->loadMetadata();
@@ -120,9 +118,7 @@ class ActionMetadataProvider
             );
         }
 
-        if ($this->cache) {
-            $this->cache->save(self::CACHE_KEY, $data);
-        }
+        $this->cache->save(self::CACHE_KEY, $data);
 
         $this->localCache = $data;
     }

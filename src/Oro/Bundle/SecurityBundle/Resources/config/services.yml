@@ -32,11 +32,6 @@ parameters:
     oro_security.entity_security_metadata_provider.class:      Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider
     oro_security.action_metadata_provider.class:               Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider
 
-    oro_security.action_metadata_provider.cache.warmer.class:  Oro\Bundle\SecurityBundle\Cache\ActionMetadataCacheWarmer
-    oro_security.action_metadata_provider.cache.clearer.class: Oro\Bundle\SecurityBundle\Cache\ActionMetadataCacheClearer
-    oro_security.entity_security_metadata_provider.cache.warmer.class:  Oro\Bundle\SecurityBundle\Cache\EntitySecurityMetadataCacheWarmer
-    oro_security.entity_security_metadata_provider.cache.clearer.class: Oro\Bundle\SecurityBundle\Cache\EntitySecurityMetadataCacheClearer
-
     oro_security.listener.controller.class:                    Oro\Bundle\SecurityBundle\EventListener\ControllerListener
 
     oro_security.token.factory.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
@@ -47,8 +42,6 @@ parameters:
     oro_security.orm.ownership_sql_walker_builder.class:       Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder
     oro_security.ownership_tree_provider.class:                Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider
     oro_security.ownership_tree_provider.chain.class:          Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider
-    oro_security.ownership_tree.cache.warmer.class:            Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheWarmer
-    oro_security.ownership_tree.cache.clearer.class:           Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheCleaner
     oro_security.ownership_tree_subscriber.class:              Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener
     oro-security.authentication.listener.basic.class:          Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationBasicAuthenticationListener
     oro_security.authentication.provider.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
@@ -369,39 +362,23 @@ services:
         arguments:
             - '@oro_security.acl.annotation_provider'
         tags:
-            - { name: kernel.cache_warmer, priority: 5 }
+            - { name: kernel.cache_warmer }
 
     oro_security.action_metadata_provider.cache.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
         public: false
-        class: '%oro_security.action_metadata_provider.cache.warmer.class%'
         arguments:
             - '@oro_security.action_metadata_provider'
         tags:
-            - { name: kernel.cache_warmer, priority: 4 }
-
-    oro_security.action_metadata_provider.cache.clearer:
-        public: false
-        class: '%oro_security.action_metadata_provider.cache.clearer.class%'
-        arguments:
-            - '@oro_security.action_metadata_provider'
-        tags:
-            - { name: kernel.cache_clearer }
+            - { name: kernel.cache_warmer }
 
     oro_security.entity_security_metadata_provider.cache.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
         public: false
-        class: '%oro_security.entity_security_metadata_provider.cache.warmer.class%'
         arguments:
             - '@oro_security.entity_security_metadata_provider'
         tags:
             - { name: kernel.cache_warmer }
-
-    oro_security.entity_security_metadata_provider.cache.clearer:
-        public: false
-        class: '%oro_security.entity_security_metadata_provider.cache.clearer.class%'
-        arguments:
-            - '@oro_security.entity_security_metadata_provider'
-        tags:
-            - { name: kernel.cache_clearer }
 
     oro_security.listener.controller:
         class: '%oro_security.listener.controller.class%'
@@ -489,20 +466,12 @@ services:
             - [ setNamespace, [ 'oro_acl_owner_tree' ] ]
 
     oro_security.ownership_tree.cache.warmer:
+        class: Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheWarmer
         public: false
-        class: '%oro_security.ownership_tree.cache.warmer.class%'
         arguments:
             - '@oro_security.ownership_tree_provider.chain'
         tags:
             - { name: kernel.cache_warmer }
-
-    oro_security.ownership_tree.cache.cleaner:
-        public: false
-        class: '%oro_security.ownership_tree.cache.clearer.class%'
-        arguments:
-            - '@oro_security.ownership_tree_provider.chain'
-        tags:
-            - { name: kernel.cache_clearer }
 
     oro_security.ownership_tree_subscriber:
         class: '%oro_security.ownership_tree_subscriber.class%'

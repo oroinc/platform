@@ -62,6 +62,23 @@ class PhpArrayConfigProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($cachedConfig, $provider->getConfig());
     }
 
+    public function testClearCache()
+    {
+        $cachedConfig = ['test'];
+        $initialConfig = ['initial'];
+
+        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export($cachedConfig, true)));
+
+        $provider = $this->getProvider($initialConfig);
+
+        $provider->clearCache();
+        self::assertAttributeSame(null, 'config', $provider);
+        self::assertFileNotExists($this->cacheFile);
+
+        // test that the cache is built after it was cleared
+        self::assertEquals($initialConfig, $provider->getConfig());
+    }
+
     public function testWarmUpCache()
     {
         $cachedConfig = ['test'];

@@ -16,8 +16,6 @@ oro_search:
         ...
     log_queries: true
     item_container_template: MyBundle:Search:itemContainer.html.twig
-    entities_config:
-        ...
 ```
 
 Description of parameters:
@@ -31,9 +29,6 @@ whether need to log search queries to the database;
 - **item_container_template**, default "OroSearchBundle:Datagrid:itemContainer.html.twig"
 (converted to container parameter _oro_search.twig.item_container_template_) - template used to render entity row
 in search results;
-- **entities_config** (converted to container parameter _oro_search.entities_config_) - entity search configuration,
-can be used to override default entity search configuration (see section [Entity Configuration](#entity-configuration)).
-
 
 Configuration Merging
 =====================
@@ -112,8 +107,7 @@ After insert, update or delete entity records, search index must be updated. Sea
 consist of data from entities by mapping parameters. Entity search configuration entity maps
 fields to virtual search fields in search index.
 
-Entity search configuration can be store in main `config.yml` file (in `oro_search` config section)
-or in `search.yml` files in config directory of the bundle.
+This configuration can be defined in `Resources/config/oro/search.yml` files of any bundle.
 
 Configuration is array that contain info about bundle name, entity name and array of fields. Fields array
 contain array of field name and field type. All text fields data will be store in **all_text** virtual field.
@@ -122,7 +116,8 @@ Additionally, all the fields will be stored in `fieldName` virtual fields, if no
 Example:
 
 ```yml
-Acme\DemoBundle\Entity\Product:
+search:
+  Acme\DemoBundle\Entity\Product:
     alias: demo_product                                      # Alias for 'from' keyword in advanced search
     search_template: AcmeDemoBundle:result.html.twig         # Template to use in search result page for this entity type
     label: Demo products                                     # Label for entity to identify entity in search results

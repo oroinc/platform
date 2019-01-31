@@ -13,6 +13,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 use Oro\Bundle\FormBundle\Tests\Unit\MockHelper;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -160,13 +161,15 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
             ->setMethods(['apply'])
             ->getMock();
 
-        $this->searchHandler = new SearchHandler(
-            self::TEST_ENTITY_CLASS,
-            $this->testProperties
-        );
+        $searchMappingProvider = $this->createMock(SearchMappingProvider::class);
+        $searchMappingProvider->expects($this->once())
+            ->method('getEntityAlias')
+            ->with(self::TEST_ENTITY_CLASS)
+            ->willReturn($this->testSearchConfig[self::TEST_ENTITY_CLASS]['alias']);
 
+        $this->searchHandler = new SearchHandler(self::TEST_ENTITY_CLASS, $this->testProperties);
         $this->searchHandler->initDoctrinePropertiesByManagerRegistry($this->managerRegistry);
-        $this->searchHandler->initSearchIndexer($this->indexer, $this->testSearchConfig);
+        $this->searchHandler->initSearchIndexer($this->indexer, $searchMappingProvider);
         $this->searchHandler->setAclHelper($this->aclHelper);
     }
 

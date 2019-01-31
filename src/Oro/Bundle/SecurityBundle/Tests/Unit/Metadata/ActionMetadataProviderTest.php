@@ -55,7 +55,7 @@ class ActionMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->cache->expects($this->any())
             ->method('fetch')
-            ->with(ActionMetadataProvider::CACHE_KEY)
+            ->with('data')
             ->will($this->returnValue(array('SomeAction' => new ActionMetadata())));
 
         $this->assertTrue($this->provider->isKnownAction('SomeAction'));
@@ -94,15 +94,15 @@ class ActionMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->cache->expects($this->at(0))
             ->method('fetch')
-            ->with(ActionMetadataProvider::CACHE_KEY)
+            ->with('data')
             ->will($this->returnValue(false));
         $this->cache->expects($this->at(2))
             ->method('fetch')
-            ->with(ActionMetadataProvider::CACHE_KEY)
+            ->with('data')
             ->will($this->returnValue(array('test' => $action)));
         $this->cache->expects($this->once())
             ->method('save')
-            ->with(ActionMetadataProvider::CACHE_KEY, array('test' => $action));
+            ->with('data', array('test' => $action));
 
         // call without cache
         $actions = $this->provider->getActions();
@@ -131,22 +131,23 @@ class ActionMetadataProviderTest extends \PHPUnit\Framework\TestCase
         // First warmUpCache
         $this->cache->expects($this->at(0))
             ->method('save')
-            ->with(ActionMetadataProvider::CACHE_KEY);
+            ->with('data');
         // clearCache
         $this->cache->expects($this->at(1))
             ->method('delete')
-            ->with(ActionMetadataProvider::CACHE_KEY);
+            ->with('data');
         // First isKnownAction
         $this->cache->expects($this->at(2))
             ->method('fetch')
-            ->with(ActionMetadataProvider::CACHE_KEY);
+            ->with('data')
+            ->willReturn(false);
         $this->cache->expects($this->at(3))
             ->method('save')
-            ->with(ActionMetadataProvider::CACHE_KEY);
+            ->with('data');
         // Second warmUpCache
         $this->cache->expects($this->at(4))
             ->method('save')
-            ->with(ActionMetadataProvider::CACHE_KEY);
+            ->with('data');
 
         $this->provider->warmUpCache();
         $this->provider->clearCache();

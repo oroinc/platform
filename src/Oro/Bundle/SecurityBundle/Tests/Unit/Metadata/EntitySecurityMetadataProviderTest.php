@@ -242,10 +242,6 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     public function testClearCache()
     {
         $this->cache->expects($this->once())
-            ->method('delete')
-            ->with('SomeType');
-
-        $this->cache->expects($this->once())
             ->method('deleteAll');
 
         $eventDispatcher = $this->getMockForAbstractClass(
@@ -263,7 +259,6 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
             $this->aclGroupProvider
         );
 
-        $provider->clearCache('SomeType');
         $provider->clearCache();
     }
 

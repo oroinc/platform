@@ -3,7 +3,7 @@
 namespace Oro\Component\Config\Cache;
 
 /**
- * An tnterface for classes contains aconfiguration cache and able to warm up it.
+ * An interface for classes contains a configuration cache and able to warm up it.
  */
 interface WarmableConfigCacheInterface
 {

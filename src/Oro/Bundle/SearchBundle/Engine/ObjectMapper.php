@@ -4,27 +4,41 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
  * Preparing storable index data from entities.
- *
- * @package Oro\Bundle\SearchBundle\Engine
  */
 class ObjectMapper extends AbstractMapper
 {
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
+
     /**
+     * @param SearchMappingProvider $mappingProvider
+     * @param PropertyAccessorInterface $propertyAccessor
      * @param EventDispatcherInterface $dispatcher
-     * @param                          $mappingConfig
+     * @param HtmlTagHelper $htmlTagHelper
      */
-    public function __construct(EventDispatcherInterface $dispatcher, $mappingConfig)
-    {
-        $this->dispatcher    = $dispatcher;
-        $this->mappingConfig = $mappingConfig;
+    public function __construct(
+        SearchMappingProvider $mappingProvider,
+        PropertyAccessorInterface $propertyAccessor,
+        EventDispatcherInterface $dispatcher,
+        HtmlTagHelper $htmlTagHelper
+    ) {
+        parent::__construct($mappingProvider, $propertyAccessor);
+        $this->dispatcher = $dispatcher;
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
