@@ -516,14 +516,19 @@ class EmailActivityListProvider implements
 
     /**
      * @param EmailOwnerInterface $owner
-     * @param $data
+     * @param array $data
      *
      * @return mixed
      */
     protected function setOwnerLink($owner, $data)
     {
-        $route = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))
-            ->getRoute('view');
+        $route = null;
+        $entityMetadata = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner));
+
+        if (null !== $entityMetadata) {
+            $route = $entityMetadata->getRoute('view');
+        }
+
         if (null !== $route && $this->authorizationChecker->isGranted('VIEW', $owner)) {
             $id = $this->doctrineHelper->getSingleEntityIdentifier($owner);
             try {
