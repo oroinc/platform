@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Registers twig function to work with email
+ */
 class EmailExtension extends \Twig_Extension
 {
     const NAME = 'oro_email';
@@ -122,7 +125,8 @@ class EmailExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_can_attache', [$this, 'canReAttach']),
             new \Twig_SimpleFunction('oro_get_mailbox_process_label', [$this, 'getMailboxProcessLabel']),
             new \Twig_SimpleFunction('oro_get_email_ws_event', [$this, 'getEmailWSChannel']),
-            new \Twig_SimpleFunction('oro_get_unread_emails_count', [$this, 'getUnreadEmailsCount'])
+            new \Twig_SimpleFunction('oro_get_unread_emails_count', [$this, 'getUnreadEmailsCount']),
+            new \Twig_SimpleFunction('oro_get_absolute_url', [$this, 'getAbsoluteUrl'])
         ];
     }
 
@@ -283,5 +287,16 @@ class EmailExtension extends \Twig_Extension
     public function getName()
     {
         return self::NAME;
+    }
+
+
+    /**
+     * @param $route
+     * @param array $routeParams
+     * @return string
+     */
+    public function getAbsoluteUrl($route, $routeParams = []): string
+    {
+        return $this->container->get('oro_email.provider.url_provider')->getAbsoluteUrl($route, $routeParams);
     }
 }
