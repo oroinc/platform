@@ -163,54 +163,6 @@ class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', $manager->getDefaultSuccessMessageByType(uniqid('type')));
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnEmptyCustomFormLayoutByFormType()
-    {
-        $manager = new EmbeddedFormManager($this->createFormRegistryMock(), $this->createFormFactoryMock());
-        $this->assertEquals('', $manager->getCustomFormLayoutByFormType(uniqid('type')));
-    }
-
-    /**
-     * @test
-     * @dataProvider customLayoutTypesProvider
-     * @param object $typeInstance
-     * @param object $expectedLayout
-     */
-    public function shouldReturnCustomFormLayoutByFormType($typeInstance, $expectedLayout)
-    {
-        $formRegistry = $this->createFormRegistryMock($typeInstance);
-        $formFactory = $this->createFormFactoryMock();
-
-        $type = 'type';
-        $manager = new EmbeddedFormManager($formRegistry, $formFactory);
-        $this->assertEquals($expectedLayout, $manager->getCustomFormLayoutByFormType($type));
-    }
-
-    /**
-     * @return array
-     */
-    public function customLayoutTypesProvider()
-    {
-        $customLayout = 'layout.html.twig';
-        $typeInstance = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface');
-        $newInterfaceTypeInstance = $this
-            ->createMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface');
-
-        $typeInstance->expects($this->any())->method('geFormLayout')
-            ->will($this->returnValue($customLayout));
-
-        $newInterfaceTypeInstance->expects($this->any())->method('getFormLayout')
-            ->will($this->returnValue($customLayout));
-
-        return [
-            'not custom layout aware form'         => [null, ''],
-            'deprecated interface, should be used' => [$typeInstance, $customLayout],
-            'new interface, should be used'        => [$newInterfaceTypeInstance, $customLayout],
-        ];
-    }
-
     public function testGetAllChoices()
     {
         $type1 = 'type1';
