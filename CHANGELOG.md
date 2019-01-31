@@ -4,6 +4,10 @@
 #### UserBundle
 * API processor `oro_user.api.create.save_entity` was renamed to `oro_user.api.create.save_user`.
 
+### Removed
+#### EmbeddedFormBundle
+* Layout context parameter `embedded_form_custom_layout` has been removed. Use layout updates instead.
+
 ## 3.1.0
 
 ### Added
