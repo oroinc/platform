@@ -9,7 +9,6 @@ services:
     oro_importexport.field.database_helper:
         class: '%oro_importexport.field.database_helper.class%'
         arguments:
-            - '@doctrine'
             - '@oro_entity.doctrine_helper'
             - '@oro_importexport.field.field_helper.link'
             - '@oro_security.token_accessor'
