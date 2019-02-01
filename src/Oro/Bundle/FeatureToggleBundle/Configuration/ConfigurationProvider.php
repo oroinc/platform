@@ -2,157 +2,160 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Configuration;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\FeatureToggleBundle\Exception\CircularReferenceException;
+use Oro\Component\Config\Cache\PhpArrayConfigProvider;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Merger\ConfigurationMerger;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Oro\Component\Config\ResourcesContainerInterface;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
 
 /**
- * Provides an entry point for configuration of features.
+ * The provider for features configuration
+ * that is loaded from "Resources/config/oro/features.yml" files.
  */
-class ConfigurationProvider
+class ConfigurationProvider extends PhpArrayConfigProvider
 {
-    const INTERNAL = '__internal__';
-    const FEATURES = '__features__';
-    const BY_RESOURCE = 'by_resource';
-    const DEPENDENCIES = 'dependencies';
-    const DEPENDENT_FEATURES = 'dependent_features';
-    const DEPENDENCY_KEY = 'dependencies';
+    private const CONFIG_FILE = 'Resources/config/oro/features.yml';
+
+    private const INTERNAL = '__internal__';
+    private const FEATURES = '__features__';
+    private const BY_RESOURCE = 'by_resource';
+    private const DEPENDENCIES = 'dependencies';
+    private const DEPENDENT_FEATURES = 'dependent_features';
+    private const DEPENDENCY_KEY = 'dependencies';
+
+    /** @var string[] */
+    private $bundles;
+
+    /** @var FeatureToggleConfiguration */
+    private $configuration;
 
     /**
-     * @var array
-     */
-    protected $rawConfiguration;
-
-    /**
-     * @var array
-     */
-    protected $kernelBundles;
-
-    /**
-     * @var FeatureToggleConfiguration
-     */
-    protected $configuration;
-
-    /**
-     * @var CacheProvider
-     */
-    protected $cache;
-
-    /**
-     * @param array $rawConfiguration
-     * @param array $kernelBundles
-     * @param FeatureToggleConfiguration $configuration
-     * @param CacheProvider $cache
+     * @param string                      $cacheFile
+     * @param ConfigCacheFactoryInterface $configCacheFactory
+     * @param string[]                    $bundles
+     * @param FeatureToggleConfiguration  $configuration
      */
     public function __construct(
-        array $rawConfiguration,
-        array $kernelBundles,
-        FeatureToggleConfiguration $configuration,
-        CacheProvider $cache
+        string $cacheFile,
+        ConfigCacheFactoryInterface $configCacheFactory,
+        array $bundles,
+        FeatureToggleConfiguration $configuration
     ) {
-        $this->rawConfiguration = $rawConfiguration;
-        $this->kernelBundles = array_values($kernelBundles);
+        parent::__construct($cacheFile, $configCacheFactory);
+        $this->bundles = $bundles;
         $this->configuration = $configuration;
-        $this->cache = $cache;
-    }
-
-    public function warmUpCache()
-    {
-        $this->cache->save(FeatureToggleConfiguration::ROOT, $this->resolveConfiguration());
-    }
-
-    public function clearCache()
-    {
-        $this->cache->delete(FeatureToggleConfiguration::ROOT);
     }
 
     /**
-     * @param bool $ignoreCache
      * @return array
      */
-    public function getFeaturesConfiguration($ignoreCache = false)
+    public function getFeaturesConfiguration()
     {
-        return $this->getConfiguration($ignoreCache)[self::FEATURES];
+        return $this->getConfiguration(self::FEATURES);
     }
 
     /**
-     * @param bool $ignoreCache
      * @return array
      */
-    public function getResourcesConfiguration($ignoreCache = false)
+    public function getResourcesConfiguration()
     {
-        return $this->getConfiguration($ignoreCache)[self::INTERNAL][self::BY_RESOURCE];
+        return $this->getInternalConfiguration(self::BY_RESOURCE);
     }
 
     /**
-     * @param bool $ignoreCache
      * @return array
      */
-    public function getDependenciesConfiguration($ignoreCache = false)
+    public function getDependenciesConfiguration()
     {
-        return $this->getConfiguration($ignoreCache)[self::INTERNAL][self::DEPENDENCIES];
+        return $this->getInternalConfiguration(self::DEPENDENCIES);
     }
 
     /**
-     * @param bool $ignoreCache
      * @return array
      */
-    public function getDependentsConfiguration($ignoreCache = false)
+    public function getDependentsConfiguration()
     {
-        return $this->getConfiguration($ignoreCache)[self::INTERNAL][self::DEPENDENT_FEATURES];
+        return $this->getInternalConfiguration(self::DEPENDENT_FEATURES);
     }
 
     /**
-     * @param bool $ignoreCache
-     * @return array
-     * @throws InvalidConfigurationException
+     * {@inheritdoc}
      */
-    protected function getConfiguration($ignoreCache = false)
+    protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
-        if ($ignoreCache) {
-            $configuration = $this->resolveConfiguration();
-        } else {
-            $configuration = $this->cache->fetch(FeatureToggleConfiguration::ROOT);
-            if (false === $configuration) {
-                $configuration = $this->resolveConfiguration();
-                $this->cache->save(FeatureToggleConfiguration::ROOT, $configuration);
+        $configs = [];
+        $configLoader = new CumulativeConfigLoader(
+            'oro_features',
+            new YamlCumulativeFileLoader(self::CONFIG_FILE)
+        );
+        $resources = $configLoader->load($resourcesContainer);
+        foreach ($resources as $resource) {
+            if (!empty($resource->data[FeatureToggleConfiguration::ROOT_NODE_NAME])) {
+                $configs[$resource->bundleClass] = $resource->data[FeatureToggleConfiguration::ROOT_NODE_NAME];
             }
         }
 
-        return $configuration;
+        $merger = new ConfigurationMerger($this->bundles);
+        $mergedConfig = $merger->mergeConfiguration($configs);
+
+        $processedConfig = CumulativeConfigProcessorUtil::processConfiguration(
+            self::CONFIG_FILE,
+            $this->configuration,
+            [$mergedConfig]
+        );
+
+        return $this->resolveConfiguration($processedConfig);
     }
 
     /**
+     * @param string $sectionName
      * @return array
      */
-    protected function resolveConfiguration()
+    private function getConfiguration(string $sectionName)
     {
-        $data = [
-            self::FEATURES => [],
+        $configuration = $this->doGetConfig();
+
+        return $configuration[$sectionName];
+    }
+
+    /**
+     * @param string $sectionName
+     * @return array
+     */
+    private function getInternalConfiguration(string $sectionName)
+    {
+        $internalConfiguration = $this->getConfiguration(self::INTERNAL);
+
+        return $internalConfiguration[$sectionName];
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
+    private function resolveConfiguration(array $data): array
+    {
+        $dependencies = $this->resolveDependencies($data);
+
+        return [
+            self::FEATURES => $data,
             self::INTERNAL => [
-                self::DEPENDENCIES => [],
-                self::BY_RESOURCE => []
+                self::DEPENDENCIES => $dependencies,
+                self::DEPENDENT_FEATURES => $this->resolveDependentFeatures($dependencies),
+                self::BY_RESOURCE => $this->resolveResources($data)
             ]
         ];
-        $configs = $this->getMergedConfigs();
-        if (count($configs) > 0) {
-            $data[self::FEATURES] = $this->configuration->processConfiguration($configs);
-            $data[self::INTERNAL][self::DEPENDENCIES] = $this->resolveDependencies($data[self::FEATURES]);
-            $data[self::INTERNAL][self::DEPENDENT_FEATURES] = $this->resolveDependentFeatures(
-                $data[self::INTERNAL][self::DEPENDENCIES]
-            );
-            $data[self::INTERNAL][self::BY_RESOURCE] = $this->resolveResources($data[self::FEATURES]);
-        }
-
-        return $data;
     }
 
     /**
      * @param array $data
      * @return array
      */
-    protected function resolveResources(array $data)
+    private function resolveResources(array $data)
     {
         $resourceFeatures = [];
         foreach ($data as $feature => $resourceItems) {
@@ -173,7 +176,7 @@ class ConfigurationProvider
      * @return array
      * @throws CircularReferenceException
      */
-    protected function resolveDependencies(array $data)
+    private function resolveDependencies(array $data)
     {
         $featureDependencies = [];
         foreach (array_keys($data) as $feature) {
@@ -189,7 +192,7 @@ class ConfigurationProvider
      * @return array
      * @throws CircularReferenceException
      */
-    protected function resolveDependentFeatures(array $data)
+    private function resolveDependentFeatures(array $data)
     {
         $featureDependents = [];
         foreach (array_keys($data) as $feature) {
@@ -207,7 +210,7 @@ class ConfigurationProvider
      * @return array
      * @throws CircularReferenceException
      */
-    protected function getFeatureDependencies($feature, array $data, array $topLevelDependencies = [])
+    private function getFeatureDependencies($feature, array $data, array $topLevelDependencies = [])
     {
         $hasDependencies = !empty($data[$feature][self::DEPENDENCY_KEY]);
         $dependsOnFeatures = [];
@@ -239,7 +242,7 @@ class ConfigurationProvider
      * @param array $dependenciesData
      * @return array
      */
-    protected function getFeatureDependents($feature, array $dependenciesData)
+    private function getFeatureDependents($feature, array $dependenciesData)
     {
         $depended = [];
         foreach ($dependenciesData as $featureName => $dependencies) {
@@ -249,15 +252,5 @@ class ConfigurationProvider
         }
 
         return $depended;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getMergedConfigs()
-    {
-        $merger = new ConfigurationMerger($this->kernelBundles);
-
-        return $merger->mergeConfiguration($this->rawConfiguration);
     }
 }

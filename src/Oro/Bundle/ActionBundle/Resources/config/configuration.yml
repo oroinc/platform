@@ -14,7 +14,9 @@ services:
         arguments:
             - '@oro_action.configuration.provider'
         tags:
-            - { name: kernel.cache_warmer }
+            # add the warmer for this System cache at the begin of the warmers chain
+            # to prevent double warmup in case some Application cache depends on this cache
+            - { name: kernel.cache_warmer, priority: 200 }
 
     oro_action.configuration.validator.action_group:
         class: Oro\Bundle\ActionBundle\Configuration\ActionGroupConfigurationValidator

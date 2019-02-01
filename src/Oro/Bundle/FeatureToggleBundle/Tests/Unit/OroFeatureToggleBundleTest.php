@@ -13,10 +13,8 @@ class OroFeatureToggleBundleTest extends \PHPUnit\Framework\TestCase
     {
         $container = new ContainerBuilder();
 
-        $kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
-
         $passesBeforeBuild = $container->getCompiler()->getPassConfig()->getBeforeOptimizationPasses();
-        $bundle = new OroFeatureToggleBundle($kernel);
+        $bundle = new OroFeatureToggleBundle();
         $bundle->build($container);
 
         $passes = $container->getCompiler()->getPassConfig()->getBeforeOptimizationPasses();
@@ -34,9 +32,7 @@ class OroFeatureToggleBundleTest extends \PHPUnit\Framework\TestCase
     {
         $container = new ContainerBuilder();
 
-        $kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
-
-        $bundle = new OroFeatureToggleBundle($kernel);
+        $bundle = new OroFeatureToggleBundle();
         $bundle->build($container);
 
         $passes = $container->getCompiler()->getPassConfig()->getAfterRemovingPasses();

@@ -1,9 +1,4 @@
 services:
-    oro_featuretoggle.cache.provider.features:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_featuretoggle_features' ] ]
-
     oro_featuretoggle.expression.feature_enabled:
         class: 'Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureEnabled'
         arguments:
@@ -21,29 +16,25 @@ services:
     oro_featuretoggle.configuration.provider:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider'
         arguments:
-            - []
+            - '%kernel.cache_dir%/oro/features.php'
+            - '@oro_cache.config_cache_factory'
             - '%kernel.bundles%'
             - '@oro_featuretoggle.configuration'
-            - '@oro_featuretoggle.cache.provider.features'
+
+    oro_featuretoggle.configuration.warmer:
+        class: 'Oro\Component\Config\Cache\ConfigCacheWarmer'
+        public: false
+        arguments:
+            - '@oro_featuretoggle.configuration.provider'
+        tags:
+            # add the warmer for this System cache at the begin of the warmers chain
+            # to prevent double warmup in case some Application cache depends on this cache
+            - { name: kernel.cache_warmer, priority: 200 }
 
     oro_featuretoggle.configuration.manager:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager'
         arguments:
             - '@oro_featuretoggle.configuration.provider'
-
-    oro_featuretoggle.cache.clearer:
-        class: 'Oro\Bundle\FeatureToggleBundle\Cache\CacheClearer'
-        arguments:
-            - '@oro_featuretoggle.configuration.provider'
-        tags:
-            - { name: kernel.cache_clearer }
-
-    oro_featuretoggle.cache.warmer:
-        class: 'Oro\Bundle\FeatureToggleBundle\Cache\CacheWarmer'
-        arguments:
-            - '@oro_featuretoggle.configuration.provider'
-        tags:
-            - { name: kernel.cache_warmer }
 
     oro_featuretoggle.configuration:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration'

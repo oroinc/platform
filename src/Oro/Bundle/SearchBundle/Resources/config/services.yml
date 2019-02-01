@@ -201,7 +201,9 @@ services:
         arguments:
             - '@oro_search.mapping_configuration.provider'
         tags:
-            - { name: kernel.cache_warmer }
+            # add the warmer for this System cache at the begin of the warmers chain
+            # to prevent double warmup in case some Application cache depends on this cache
+            - { name: kernel.cache_warmer, priority: 200 }
 
     oro_search.cache.search_mapping.warmer:
         class: Oro\Component\Config\Cache\ConfigCacheWarmer
@@ -209,7 +211,7 @@ services:
         arguments:
             - '@oro_search.provider.search_mapping'
         tags:
-            - { name: kernel.cache_warmer, priority: -5 }
+            - { name: kernel.cache_warmer }
 
     oro_search.cache.doctrine_metadata:
         public: false

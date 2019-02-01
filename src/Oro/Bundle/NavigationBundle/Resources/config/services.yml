@@ -522,15 +522,17 @@ services:
         arguments:
             - '@oro_navigation.configuration.provider'
         tags:
-            - { name: kernel.cache_warmer }
+            # add the warmer for this System cache at the begin of the warmers chain
+            # to prevent double warmup in case some Application cache depends on this cache
+            - { name: kernel.cache_warmer, priority: 200 }
 
     oro_navigation.event_listener.scope_grid_listener:
-        class: 'Oro\Bundle\NavigationBundle\EventListener\MenuGridListener'
+        class: Oro\Bundle\NavigationBundle\EventListener\MenuGridListener
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.menu-by-scope-grid, method: onPreBuild }
 
     oro_navigation.provider.menu_update_provider:
-        class: 'Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider'
+        class: Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider
         arguments:
             - '@oro_scope.scope_manager'
             - '@oro_navigation.manager.menu_update'

@@ -362,7 +362,9 @@ services:
         arguments:
             - '@oro_security.acl.annotation_provider'
         tags:
-            - { name: kernel.cache_warmer }
+            # add the warmer for this System cache at the begin of the warmers chain
+            # to prevent double warmup in case some Application cache depends on this cache
+            - { name: kernel.cache_warmer, priority: 200 }
 
     oro_security.action_metadata_provider.cache.warmer:
         class: Oro\Component\Config\Cache\ConfigCacheWarmer
@@ -596,7 +598,9 @@ services:
         arguments:
             - '@oro_security.configuration.provider.permission_configuration'
         tags:
-            - { name: kernel.cache_warmer }
+            # add the warmer for this System cache at the begin of the warmers chain
+            # to prevent double warmup in case some Application cache depends on this cache
+            - { name: kernel.cache_warmer, priority: 200 }
 
     oro_security.configuration.provider.configurable_permission_configuration:
         class: Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider
@@ -611,7 +615,9 @@ services:
         arguments:
             - '@oro_security.configuration.provider.configurable_permission_configuration'
         tags:
-            - { name: kernel.cache_warmer }
+            # add the warmer for this System cache at the begin of the warmers chain
+            # to prevent double warmup in case some Application cache depends on this cache
+            - { name: kernel.cache_warmer, priority: 200 }
 
     oro_security.configuration.builder.permission_configuration:
         class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder
