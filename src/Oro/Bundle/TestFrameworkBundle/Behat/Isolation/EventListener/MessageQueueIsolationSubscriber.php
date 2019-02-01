@@ -94,7 +94,7 @@ class MessageQueueIsolationSubscriber implements EventSubscriberInterface
         $this->output->writeln('<info>Stop message queue</info>');
         $this->getMessageQueueProcessor()->stopMessageQueue();
 
-        $this->output->writeln('<info>Clenup message queue</info>');
+        $this->output->writeln('<info>Cleanup message queue</info>');
         $this->getMessageQueueProcessor()->cleanUp();
     }
 

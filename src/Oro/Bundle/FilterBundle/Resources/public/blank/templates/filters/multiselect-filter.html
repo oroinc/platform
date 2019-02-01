@@ -12,15 +12,20 @@
             <% _.each(options, function (option) { %>
                 <option value="<%= option.value %>"
                         title="<%- option.label %>"
-                    <% if (option.count !== undefined && option.count == 0) { %>
-                        disabled="disabled"
-                    <% } %>
+                    <% var isSelected = false; %>
                     <% if (_.isArray(selected.value)) { %>
                         <% if (_.indexOf(selected.value, option.value) !== -1) { %>
-                            selected="selected"
-                        <% } %>
+                            <% isSelected = true; %>
+                        <% }%>
                     <% } else if (option.value == selected.value) { %>
+                        <% isSelected = true; %>
+                    <% } %>
+                    <% if (isSelected === true) { %>
                         selected="selected"
+                    <% } else { %>
+                        <% if (option.count !== undefined && option.count == 0) { %>
+                            disabled="disabled"
+                        <% } %>
                     <% } %>
                 >
                     <%- option.label %> <% if (option.count !== undefined) { %>(<%- option.count %>)<% } %>

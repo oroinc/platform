@@ -93,7 +93,7 @@ class SystemConfigForm extends Form
                 "//h5/span[text()=\"$section\"]/../..//label[text()=\"$label\"]"
             );
         } else {
-            $labelElement = $this->find('css', "label:contains('$label')");
+            $labelElement = $this->find('css', "label:contains(\"$label\")");
         }
 
         self::assertNotNull($labelElement, "Label element for $label not found");
