@@ -2,28 +2,13 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Process\Process;
 
-class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implements IsolatorInterface
+/**
+ * Manages actualization of cache during tests.
+ */
+class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
 {
-    /** @var array */
-    protected $cacheDirectories = [
-        'doctrine',
-        'oro_data',
-        'oro_entities',
-    ];
-
-    /** {@inheritdoc} */
-    public function isApplicable(ContainerInterface $container)
-    {
-        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
-            $this->cacheDirectories['oro'] = 'oro';
-        }
-
-        return $this->isApplicableOS();
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -52,7 +37,7 @@ class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implem
             }
 
             $commands[] = sprintf(
-                "move %s %s",
+                'move %s %s',
                 $cacheTempDirPath,
                 $this->cacheDir.'\\'.$directory
             );
@@ -67,7 +52,7 @@ class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implem
 
         foreach ($this->cacheDirectories as $directory) {
             $commands[] = sprintf(
-                "xcopy %s %s /E /R /H /I /K /Y",
+                'xcopy %s %s /E /R /H /I /K /Y',
                 $this->cacheDumpDir.'\\'.$directory,
                 $this->cacheTempDir.'\\'.$directory
             );
