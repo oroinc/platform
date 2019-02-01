@@ -31,7 +31,11 @@ class Select2Entity extends Element implements ClearableInterface
         if (1 < count($results)) {
             // Try remove (Add new) records
             $results = array_filter($results, function (NodeElement $result) {
-                return !stripos($result->getText(), 'Add new');
+                $text = $this->spin(function () use ($result) {
+                    return $result->getText();
+                });
+
+                return !stripos($text, 'Add new');
             });
 
             if (1 === count($results)) {
