@@ -8,6 +8,9 @@
 #### EmbeddedFormBundle
 * Layout context parameter `embedded_form_custom_layout` has been removed. Use layout updates instead.
 
+#### SecurityBundle
+* Twig function `resource_granted` has been removed. Use `is_granted` from Symfony instead.
+
 ## 3.1.0
 
 ### Added

@@ -49,20 +49,6 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('oro_security_extension', $this->extension->getName());
     }
 
-    /**
-     * @deprecated since 2.3. Use Symfony "is_granted" function instead
-     */
-    public function testCheckResourceIsGranted()
-    {
-        $this->authorizationChecker->expects($this->once())
-            ->method('isGranted')
-            ->with($this->equalTo('test_acl'))
-            ->will($this->returnValue(true));
-        $this->assertTrue(
-            self::callTwigFunction($this->extension, 'resource_granted', ['test_acl'])
-        );
-    }
-
     public function testGetOrganizations()
     {
         $user = new User();
