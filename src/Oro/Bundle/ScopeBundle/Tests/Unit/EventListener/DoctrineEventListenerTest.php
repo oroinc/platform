@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Oro\Bundle\RedirectBundle\Entity\Repository\SlugRepository;
 use Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository;
 use Oro\Bundle\ScopeBundle\EventListener\DoctrineEventListener;
 use Oro\Bundle\ScopeBundle\Manager\ScopeEntityStorage;

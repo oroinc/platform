@@ -7,7 +7,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataBuilder;
-use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
 class MetadataBuilderTest extends \PHPUnit\Framework\TestCase
 {

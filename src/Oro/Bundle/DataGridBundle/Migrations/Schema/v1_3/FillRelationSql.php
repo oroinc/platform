@@ -3,9 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Migrations\Schema\v1_3;
 
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
-use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Psr\Log\LoggerInterface;
 
 class FillRelationSql extends ParametrizedMigrationQuery

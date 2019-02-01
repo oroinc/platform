@@ -3,7 +3,6 @@
 namespace Oro\Component\Layout\Tests\Unit\Block\Type;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
-use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 
 class ContainerTypeTest extends BaseBlockTypeTestCase

@@ -8,6 +8,7 @@ services:
             - '@oro_requirejs.config_provider.manager'
             - '@filesystem'
             - '%oro_require_js.web_root%'
-            - '%oro_require_js.building_timeout'
+            - '%oro_require_js.build_timeout%'
+            - '@oro_requirejs.cache'
         tags:
             - { name: console.command, command: oro:requirejs:build }

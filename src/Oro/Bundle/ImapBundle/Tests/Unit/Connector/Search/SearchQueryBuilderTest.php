@@ -5,10 +5,8 @@ use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExprItem;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExprOperator;
-use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExprValue;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryMatch;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryValueBuilder;
-use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface;
 
 class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
 {

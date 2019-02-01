@@ -8,9 +8,6 @@ use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 
 class SmtpSettingsCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SmtpSettings */
-    protected $smtpSettings;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|SmtpSettingsChecker */
     protected $smtpSettingsChecker;
 
@@ -22,10 +19,6 @@ class SmtpSettingsCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->smtpSettings = $this->getMockBuilder(SmtpSettings::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->mailerTransport = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -37,11 +30,26 @@ class SmtpSettingsCheckerTest extends \PHPUnit\Framework\TestCase
         $this->smtpSettingsChecker = new SmtpSettingsChecker($this->directMailer);
     }
 
+    public function testCheckConnectionWithNotEligibleSmtpSettings()
+    {
+        $this->directMailer->expects($this->never())
+            ->method($this->anything());
+
+        $this->mailerTransport->expects($this->never())
+            ->method($this->anything());
+
+        $this->assertNotEmpty(
+            'Not eligible SmtpSettings are given',
+            $this->smtpSettingsChecker->checkConnection(new SmtpSettings())
+        );
+    }
+
     public function testCheckConnectionWithNoError()
     {
+        $smtpSettings = new SmtpSettings('smtp.host', 25, 'ssl');
         $this->directMailer->expects($this->once())
             ->method('afterPrepareSmtpTransport')
-            ->with($this->smtpSettings);
+            ->with($smtpSettings);
 
         $this->directMailer->expects($this->once())
             ->method('getTransport')
@@ -50,14 +58,15 @@ class SmtpSettingsCheckerTest extends \PHPUnit\Framework\TestCase
         $this->mailerTransport->expects($this->once())
             ->method('start');
 
-        $this->assertEmpty($this->smtpSettingsChecker->checkConnection($this->smtpSettings));
+        $this->assertEmpty($this->smtpSettingsChecker->checkConnection($smtpSettings));
     }
 
     public function testCheckConnectionWithError()
     {
+        $smtpSettings = new SmtpSettings('smtp.host', 25, 'ssl');
         $this->directMailer->expects($this->once())
             ->method('afterPrepareSmtpTransport')
-            ->with($this->smtpSettings);
+            ->with($smtpSettings);
 
         $this->directMailer->expects($this->once())
             ->method('getTransport')
@@ -69,6 +78,6 @@ class SmtpSettingsCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('start')
             ->will($this->throwException($exception));
 
-        $this->assertSame($this->smtpSettingsChecker->checkConnection($this->smtpSettings), $exception->getMessage());
+        $this->assertSame($this->smtpSettingsChecker->checkConnection($smtpSettings), $exception->getMessage());
     }
 }

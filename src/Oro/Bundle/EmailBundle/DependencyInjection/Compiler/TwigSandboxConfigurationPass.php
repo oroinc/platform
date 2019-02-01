@@ -6,11 +6,15 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers new functions to twig sandbox configuration
+ */
 class TwigSandboxConfigurationPass implements CompilerPassInterface
 {
     const EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY = 'oro_email.twig.email_security_policy';
     const EMAIL_TEMPLATE_RENDERER_SERVICE_KEY                = 'oro_email.email_renderer';
     const CONFIG_EXTENSION_SERVICE_KEY                       = 'oro_config.twig.config_extension';
+    const EMAIL_EXTENSION_SERVICE_KEY                        = 'oro_email.twig.extension.email';
 
     const FORMATTER_EXTENSION_SERVICE_KEY = 'oro_ui.twig.extension.formatter';
 
@@ -28,10 +32,11 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
 
             if ($container->hasDefinition(self::CONFIG_EXTENSION_SERVICE_KEY)) {
                 $functions = $securityPolicyDef->getArgument(4);
-                $functions = array_merge($functions, ['oro_config_value']);
+                $functions = array_merge($functions, ['oro_config_value', 'oro_get_absolute_url']);
                 $securityPolicyDef->replaceArgument(4, $functions);
                 // register an twig extension implements this function
                 $rendererDef->addMethodCall('addExtension', [new Reference(self::CONFIG_EXTENSION_SERVICE_KEY)]);
+                $rendererDef->addMethodCall('addExtension', [new Reference(self::EMAIL_EXTENSION_SERVICE_KEY)]);
             }
 
             if ($container->hasDefinition(self::FORMATTER_EXTENSION_SERVICE_KEY)) {

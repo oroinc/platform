@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\Indexer;

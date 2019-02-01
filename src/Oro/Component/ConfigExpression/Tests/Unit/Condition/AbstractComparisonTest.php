@@ -3,7 +3,6 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\Condition\AbstractComparison;
 use Symfony\Component\PropertyAccess\PropertyPath;
 

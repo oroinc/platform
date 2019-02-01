@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
-use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 
 /**

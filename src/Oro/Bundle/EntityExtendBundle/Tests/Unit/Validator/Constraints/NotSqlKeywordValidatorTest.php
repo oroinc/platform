@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
-use Doctrine\DBAL\Platforms\Keywords\MySQLKeywords;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeyword;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeywordValidator;

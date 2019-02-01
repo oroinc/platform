@@ -3,7 +3,6 @@
 namespace Oro\Bundle\IntegrationBundle\Test;
 
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientFactoryInterface;
-use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
 use Oro\Bundle\IntegrationBundle\Test\FakeRestResponse as Response;
 use Symfony\Component\Yaml\Yaml;
 

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Repository;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 
 class ActivityListRepositoryTest extends \PHPUnit\Framework\TestCase

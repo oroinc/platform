@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use Composer\Config;
-use Composer\Package\PackageInterface;
-use Oro\Bundle\DistributionBundle\Manager\PackageManager;
-
 /**
  * Provider that returns the list of installed packages collected from the bundles and inner package providers.
  */

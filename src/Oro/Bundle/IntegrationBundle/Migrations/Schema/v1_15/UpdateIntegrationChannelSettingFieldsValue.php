@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_15;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType;

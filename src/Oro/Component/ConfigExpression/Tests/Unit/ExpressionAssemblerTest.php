@@ -2,9 +2,7 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit;
 
-use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ExpressionAssembler;
-use Oro\Component\ConfigExpression\Func;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ExpressionStub;
 
 class ExpressionAssemblerTest extends \PHPUnit\Framework\TestCase

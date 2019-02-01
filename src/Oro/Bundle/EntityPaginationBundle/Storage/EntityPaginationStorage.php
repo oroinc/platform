@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityPaginationBundle\Storage;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class EntityPaginationStorage

@@ -2,7 +2,6 @@
 namespace Oro\Component\Testing\Doctrine;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ConnectionException;
 use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 

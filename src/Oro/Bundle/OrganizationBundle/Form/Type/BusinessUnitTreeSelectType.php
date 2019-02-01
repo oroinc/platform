@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
-use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;

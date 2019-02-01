@@ -14,7 +14,6 @@ use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundle2\TestBund
 use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundleIncorrect\TestBundleIncorrect;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Config\CumulativeResourceManager;
-use Symfony\Component\Console\Tester\CommandTester;
 
 class LoadPermissionConfigurationCommandTest extends WebTestCase
 {

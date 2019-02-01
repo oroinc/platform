@@ -7,7 +7,6 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
-use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Symfony\Component\Form\AbstractType;
@@ -362,14 +361,14 @@ class ConfigurationType extends AbstractType
 
                 $isSubmitted = $form->isSubmitted() === true;
                 if (($form->has('useImap') && $form->get('useImap')->getData() === true) || !$isSubmitted) {
-                    $groups[] = 'Imap';
+                    array_push($groups, 'Imap', 'ImapConnection');
 
                     if (!$form->getConfig()->getOption('skip_folders_validation')) {
                         $groups[] = 'CheckFolderSelection';
                     }
                 }
                 if (($form->has('useSmtp') && $form->get('useSmtp')->getData() === true) || !$isSubmitted) {
-                    $groups[] = 'Smtp';
+                    array_push($groups, 'Smtp', 'SmtpConnection');
                 }
 
                 return $groups;

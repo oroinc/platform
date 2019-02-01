@@ -10,7 +10,6 @@ use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Form\Model\EmailFolderModel;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
-use Zend\Mail\Storage\Exception as MailException;
 
 /**
  * Class ImapEmailFolderManager

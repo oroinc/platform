@@ -6,7 +6,6 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterManager;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity\TestFilter;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class WidgetProviderFilterTest extends \PHPUnit\Framework\TestCase
 {

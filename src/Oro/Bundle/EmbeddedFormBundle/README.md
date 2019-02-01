@@ -81,10 +81,7 @@ The "Get code" section is located on the view embedded form page. Example:
 The `iframe` object properties will be directly mapped onto create iframe element properties. So, it possible to change the iframe sizes or add/remove the frame border.
 
 ## Custom form layout
-For backward compatibility, the legacy mechanism of customizing the embedded form layout is supported:
-for this a FormType should implement `Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface`.
-
-However, it is advisable to use the Layouts engine from the Oro LayoutBundle to customize the form layout.
+Layout engine from  OroLayoutBundle should be used to customize form layout.
 Embedded forms use the `embedded_form` layout theme and layout update files should be placed in `Acme\Bundle\DemoBundle\Resources\layouts\embedded_form` directory.
 
 Layout update files can be placed in a subdirectory corresponding to a route name (e.g. `oro_embedded_form_submit`, `oro_embedded_form_success`) if it needs to be applied a specific action only.

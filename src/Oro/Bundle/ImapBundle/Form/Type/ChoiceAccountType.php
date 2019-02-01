@@ -4,8 +4,6 @@ namespace Oro\Bundle\ImapBundle\Form\Type;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
-use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
-use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,7 +12,6 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 
 class ChoiceAccountType extends AbstractType
 {

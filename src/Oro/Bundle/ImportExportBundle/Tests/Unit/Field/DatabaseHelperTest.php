@@ -61,9 +61,6 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $registry->expects($this->never())->method($this->anything());
-
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -98,7 +95,6 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->ownershipMetadataProvider);
 
         $this->helper = new DatabaseHelper(
-            $registry,
             $this->doctrineHelper,
             $fieldHelper,
             $this->tokenAccessor,

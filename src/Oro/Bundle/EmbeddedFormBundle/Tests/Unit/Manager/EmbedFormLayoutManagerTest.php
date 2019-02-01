@@ -51,11 +51,6 @@ class EmbedFormLayoutManagerTest extends \PHPUnit\Framework\TestCase
         $formEntity = new EmbeddedForm();
         $formEntity->setFormType('testForm');
 
-        $this->formManager->expects(self::once())
-            ->method('getCustomFormLayoutByFormType')
-            ->with($formEntity->getFormType())
-            ->willReturn(null);
-
         $layoutBuilder = $this->createMock(LayoutBuilderInterface::class);
         $this->layoutManager->expects(self::once())
             ->method('getLayoutBuilder')
@@ -77,7 +72,6 @@ class EmbedFormLayoutManagerTest extends \PHPUnit\Framework\TestCase
                     self::assertEquals('embedded_default', $context->get('theme'));
                     self::assertNull($context->get('embedded_form'));
                     self::assertEquals($formEntity->getFormType(), $context->get('embedded_form_type'));
-                    self::assertNull($context->get('embedded_form_custom_layout'));
                     self::assertFalse($context->get('embedded_form_inline'));
                     self::assertSame($formEntity, $context->data()->get('embedded_form_entity'));
 
@@ -96,11 +90,6 @@ class EmbedFormLayoutManagerTest extends \PHPUnit\Framework\TestCase
         $formEntity = new EmbeddedForm();
         $formEntity->setFormType('testForm');
         $form = $this->createMock(FormInterface::class);
-
-        $this->formManager->expects(self::once())
-            ->method('getCustomFormLayoutByFormType')
-            ->with($formEntity->getFormType())
-            ->willReturn(null);
 
         $this->sessionIdProvider->expects(self::once())
             ->method('getSessionId')
@@ -127,7 +116,6 @@ class EmbedFormLayoutManagerTest extends \PHPUnit\Framework\TestCase
                     self::assertEquals('embedded_default', $context->get('theme'));
                     self::assertInstanceOf(FormAccessor::class, $context->get('embedded_form'));
                     self::assertEquals($formEntity->getFormType(), $context->get('embedded_form_type'));
-                    self::assertNull($context->get('embedded_form_custom_layout'));
                     self::assertFalse($context->get('embedded_form_inline'));
                     self::assertSame($formEntity, $context->data()->get('embedded_form_entity'));
                     self::assertEquals(
