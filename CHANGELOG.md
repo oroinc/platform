@@ -8,6 +8,9 @@
 #### EmbeddedFormBundle
 * Layout context parameter `embedded_form_custom_layout` has been removed. Use layout updates instead.
 
+#### SecurityBundle
+* Twig function `resource_granted` has been removed. Use `is_granted` from Symfony instead.
+
 ## 3.1.0
 
 ### Added
@@ -43,6 +46,8 @@ oro_attachment:
 * Bundle was removed, use AssetBundle instead
 #### QueryDesignerBundle
 * The unused alias `oro_query_designer.virtual_field_provider` for the service `oro_entity.virtual_field_provider.chain` was removed.
+#### InstallerBundle
+* Environment variable `ORO_PHP_PATH` is no longer supported for specifying path to PHP executable.
 
 ### Changed
 #### AssetBundle

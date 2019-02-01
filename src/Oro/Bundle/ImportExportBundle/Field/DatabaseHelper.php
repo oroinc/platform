@@ -2,25 +2,22 @@
 
 namespace Oro\Bundle\ImportExportBundle\Field;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * Provides interface for encapsulated operations with persistent layer for import/export handlers.
+ * Adds additional cache to avoid redundant repository operations.
+ */
 class DatabaseHelper
 {
-    /**
-     * @var ManagerRegistry
-     *
-     * @deprecated since 1.9
-     */
-    protected $registry;
-
     /**
      * @var DoctrineHelper
      */
@@ -52,20 +49,17 @@ class DatabaseHelper
     protected $organizationLimitsByEntity = [];
 
     /**
-     * @param ManagerRegistry        $registry
      * @param DoctrineHelper         $doctrineHelper
      * @param ServiceLink            $fieldHelperLink
      * @param TokenAccessorInterface $tokenAccessor
      * @param ServiceLink            $ownershipMetadataProviderLink
      */
     public function __construct(
-        ManagerRegistry $registry,
         DoctrineHelper $doctrineHelper,
         ServiceLink $fieldHelperLink,
         TokenAccessorInterface $tokenAccessor,
         ServiceLink $ownershipMetadataProviderLink
     ) {
-        $this->registry = $registry;
         $this->doctrineHelper = $doctrineHelper;
         $this->fieldHelperLink = $fieldHelperLink;
         $this->tokenAccessor = $tokenAccessor;
@@ -315,13 +309,5 @@ class DatabaseHelper
         }
 
         return $this->organizationLimitsByEntity[$entityName];
-    }
-
-    /**
-     * @deprecated since 1.9
-     */
-    public function getRegistry()
-    {
-        return $this->registry;
     }
 }

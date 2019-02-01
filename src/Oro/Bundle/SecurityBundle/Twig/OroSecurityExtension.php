@@ -9,9 +9,11 @@ use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provides custom twig functions for security check purposes.
+ */
 class OroSecurityExtension extends \Twig_Extension
 {
     /** @var ContainerInterface */
@@ -55,35 +57,10 @@ class OroSecurityExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
-                'resource_granted',
-                [$this, 'checkResourceIsGranted'],
-                ['deprecated' => true, 'alternative' => 'is_granted']
-            ),
             new \Twig_SimpleFunction('get_enabled_organizations', [$this, 'getOrganizations']),
             new \Twig_SimpleFunction('get_current_organization', [$this, 'getCurrentOrganization']),
             new \Twig_SimpleFunction('acl_permission', [$this, 'getPermission']),
         ];
-    }
-
-    /**
-     * Check if ACL resource is granted for current user
-     *
-     * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id
-     *                                    or something else, it depends on registered security voters
-     * @param mixed           $object     A domain object, object identity or object identity descriptor (id:type)
-     * @param string          $fieldName  Field name in case if Field ACL check should be used
-     *
-     * @return bool
-     * @deprecated since 2.3. Use Symfony "is_granted" function instead
-     */
-    public function checkResourceIsGranted($attributes, $object = null, $fieldName = null)
-    {
-        if ($fieldName) {
-            return $this->getAuthorizationChecker()->isGranted($attributes, new FieldVote($object, $fieldName));
-        }
-
-        return $this->getAuthorizationChecker()->isGranted($attributes, $object);
     }
 
     /**
