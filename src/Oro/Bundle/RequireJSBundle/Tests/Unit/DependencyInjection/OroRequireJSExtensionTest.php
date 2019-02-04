@@ -13,6 +13,7 @@ class OroRequireJSExtensionTest extends \PHPUnit\Framework\TestCase
         'oro_require_js' => array(),
         'oro_require_js.web_root' => '/path/to/web_root',
         'oro_require_js.build_path' => 'js/app.min.js',
+        'oro_require_js.build_timeout' => 65,
     );
 
     /**
@@ -22,6 +23,7 @@ class OroRequireJSExtensionTest extends \PHPUnit\Framework\TestCase
         'oro_translation' => array(
             'web_root' => '/path/to/web_root',
             'build_path' => 'js/app.min.js',
+            'build_timeout' => 65,
         )
     );
 

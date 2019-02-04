@@ -45,7 +45,6 @@ services:
         class: '%oro_embedded_form.embed_form_layout_manager.class%'
         arguments:
             - '@oro_embedded_form.layout_manager'
-            - '@oro_embedded_form.manager'
         calls:
             - [setSessionIdProvider, ['@oro_embedded_form.session_id_provider']]
             - [setSessionIdFieldName, ['%oro_embedded_form.session_id_field_name%']]
@@ -84,14 +83,6 @@ services:
             - [setName, ['embed_form_success']]
         tags:
              - { name: layout.block_type, alias: embed_form_success }
-
-    oro_embedded_form.layout.block_type.default_form:
-        parent: oro_layout.block_type.abstract_configurable
-        calls:
-            - [setOptionsConfig, [{form: {default: null}, form_layout: {default: null}}]]
-            - [setName, ['embed_form_legacy_form']]
-        tags:
-             - { name: layout.block_type, alias: embed_form_legacy_form }
 
     oro_embedded_form.form_layout_builder:
         class: Oro\Bundle\EmbeddedFormBundle\Layout\Form\GroupingFormLayoutBuilder

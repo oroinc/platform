@@ -2,26 +2,19 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Process\Process;
 
-class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implements IsolatorInterface
+/**
+ * Manages actualization of cache during tests.
+ */
+class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
 {
-    /** @var array */
-    protected $cacheDirectories = [
-        'doctrine',
-        'oro_data',
-        'oro_entities',
-    ];
-
-    /** {@inheritdoc} */
-    public function isApplicable(ContainerInterface $container)
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
     {
-        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
-            $this->cacheDirectories['oro'] = 'oro';
-        }
-
-        return $this->isApplicableOS();
+        return 'Cache';
     }
 
     /** {@inheritdoc} */
@@ -45,7 +38,7 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
             }
 
             $commands[] = sprintf(
-                "mv %s %s",
+                'mv %s %s',
                 $cacheTempDirPath,
                 $this->cacheDir.DIRECTORY_SEPARATOR.$directory
             );
@@ -57,7 +50,7 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
     protected function startCopyDumpToTempDir()
     {
         $this->copyDumpToTempDirProcess = new Process(sprintf(
-            "exec cp -rp %s %s",
+            'exec cp -rp %s %s',
             $this->cacheDumpDir.'/*',
             $this->cacheTempDir.DIRECTORY_SEPARATOR
         ));
@@ -118,13 +111,5 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
         }
 
         $this->runProcess(implode(' && ', $commands));
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'Cache';
     }
 }

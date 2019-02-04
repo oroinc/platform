@@ -17,6 +17,9 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Exception\RefreshOAuthAccessTokenFailureException;
 
+/**
+ * Manager to work with mailings via IMAP.
+ */
 class ImapEmailGoogleOauth2Manager
 {
     const OAUTH2_ACCESS_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token';
@@ -93,25 +96,6 @@ class ImapEmailGoogleOauth2Manager
         $resourceOwner = $this->resourceOwnerMap->getResourceOwnerByName(self::RESOURCE_OWNER_GOOGLE);
 
         return $resourceOwner->getUserInformation(['access_token' => $accessToken]);
-    }
-
-    /**
-     * @param UserEmailOrigin $origin
-     *
-     * @return string
-     *
-     * @deprecated since 1.10. Use refreshAccessToken or getAccessTokenWithCheckingExpiration
-     */
-    public function getAccessToken(UserEmailOrigin $origin)
-    {
-        $this->refreshAccessToken($origin);
-
-        /** @var EntityManager $em */
-        $em = $this->doctrine->getManagerForClass(ClassUtils::getClass($origin));
-        $em->persist($origin);
-        $em->flush();
-
-        return $origin->getAccessToken();
     }
 
     /**
