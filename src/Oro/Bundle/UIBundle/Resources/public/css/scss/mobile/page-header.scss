@@ -14,7 +14,7 @@
 }
 
 .container-fluid.page-title {
-    margin-bottom: 10px;
+    margin-bottom: $mobile-page-title-margin-bottom;
 
     @include safe-area-offset(padding, $content-padding);
 
