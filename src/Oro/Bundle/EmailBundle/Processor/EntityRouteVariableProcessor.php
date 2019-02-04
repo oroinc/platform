@@ -3,12 +3,15 @@
 namespace Oro\Bundle\EmailBundle\Processor;
 
 use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Provider\UrlProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Processes route variables (see ::supports) from email template to corresponding entity url
+ */
 class EntityRouteVariableProcessor implements VariableProcessorInterface
 {
     /** @var RouterInterface */
@@ -17,25 +20,28 @@ class EntityRouteVariableProcessor implements VariableProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var ConfigManager */
-    protected $configManager;
-
     /** @var EntityConfigManager */
     protected $entityConfigManager;
 
-    /** @var string */
-    protected $basePath;
+    /** @var UrlProvider */
+    private $urlProvider;
 
+    /**
+     * @param RouterInterface $router
+     * @param DoctrineHelper $doctrineHelper
+     * @param EntityConfigManager $entityConfigManager
+     * @param UrlProvider $urlProvider
+     */
     public function __construct(
         RouterInterface $router,
         DoctrineHelper $doctrineHelper,
-        ConfigManager $configManager,
-        EntityConfigManager $entityConfigManager
+        EntityConfigManager $entityConfigManager,
+        UrlProvider $urlProvider
     ) {
         $this->router = $router;
         $this->doctrineHelper = $doctrineHelper;
-        $this->configManager = $configManager;
         $this->entityConfigManager = $entityConfigManager;
+        $this->urlProvider = $urlProvider;
     }
 
     /**
@@ -55,7 +61,9 @@ class EntityRouteVariableProcessor implements VariableProcessorInterface
             ];
         }
 
-        return sprintf('{{ \'%s\' }}', $this->getBasePath() . $this->router->generate($definition['route'], $params));
+        $websiteUrl = $this->urlProvider->getAbsoluteUrl($definition['route'], $params);
+
+        return sprintf('{{ \'%s\' }}', $websiteUrl);
     }
 
     /**
@@ -105,17 +113,5 @@ class EntityRouteVariableProcessor implements VariableProcessorInterface
         }
 
         return true;
-    }
-
-    /**
-     * @return string
-     */
-    private function getBasePath()
-    {
-        if (!isset($this->basePath)) {
-            $this->basePath = $this->configManager->get('oro_ui.application_url');
-        }
-
-        return $this->basePath;
     }
 }

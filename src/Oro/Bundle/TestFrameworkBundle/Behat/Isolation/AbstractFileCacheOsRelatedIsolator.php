@@ -7,14 +7,21 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
+/**
+ * Abstraction for file cache isolator.
+ */
 abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsolator implements IsolatorInterface
 {
     const TIMEOUT = 240;
+
+    /** @var array */
+    protected $cacheDirectories;
 
     /** @var  string */
     protected $cacheDir;
@@ -28,13 +35,28 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     /** @var  Process */
     protected $copyDumpToTempDirProcess;
 
-    /** @param KernelInterface $kernel */
-    public function __construct(KernelInterface $kernel)
+    /**
+     * @param KernelInterface $kernel
+     * @param array $cacheDirectories
+     */
+    public function __construct(KernelInterface $kernel, array $cacheDirectories)
     {
         $this->cacheDir     = realpath($kernel->getCacheDir());
         $this->cacheTempDir = $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'Temp';
         $this->cacheDumpDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'oro_application_cache_dump_'.
             TokenGenerator::generateToken('cache');
+
+        $this->cacheDirectories = $cacheDirectories;
+    }
+
+    /** {@inheritdoc} */
+    public function isApplicable(ContainerInterface $container)
+    {
+        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
+            $this->cacheDirectories['oro'] = 'oro';
+        }
+
+        return $this->isApplicableOS();
     }
 
     /** {@inheritdoc} */
@@ -113,6 +135,9 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
         return false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getTag()
     {
         return 'cache';
