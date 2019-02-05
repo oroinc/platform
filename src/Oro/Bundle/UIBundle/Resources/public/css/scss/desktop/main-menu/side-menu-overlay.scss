@@ -27,7 +27,7 @@
     visibility: hidden;
 
     &.open {
-        z-index: $zindex-dropdown - 70;
+        z-index: $zindex-modal;
 
         visibility: visible;
 
