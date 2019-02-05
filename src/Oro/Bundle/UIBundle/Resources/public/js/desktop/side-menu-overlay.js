@@ -153,8 +153,12 @@ define(function(require) {
          * Action fot open
          */
         open: function() {
-            this.isOpen = true;
-            this.$el.addClass('open');
+            if (!this.isOpen) {
+                this.isOpen = true;
+                this.$el.addClass('open');
+                this.trigger('open');
+            }
+
             this.clearSearch();
             this.setFocus();
             this.setTitleWidth();
@@ -164,8 +168,12 @@ define(function(require) {
          *  Action for close
          */
         close: function() {
-            this.isOpen = false;
-            this.$el.removeClass('open');
+            if (this.isOpen) {
+                this.isOpen = false;
+                this.$el.removeClass('open');
+                this.trigger('close');
+            }
+
             this.$('[data-role="search"]').trigger('blur');
             this.setTitleWidth(true);
         },
