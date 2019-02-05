@@ -20,6 +20,8 @@ define(function(require) {
     });
     Backbone.View.prototype = OriginalBackboneView.prototype;
 
+    var original = _.pick(Backbone.View.prototype, 'remove');
+
     // Backbone.View
     Backbone.View.prototype.subviews = null;
     Backbone.View.prototype.subviewsByName = null;
@@ -110,7 +112,7 @@ define(function(require) {
         this.stopListening();
 
         if (this.keepElement === false) {
-            this.$el.remove();
+            this.remove();
         } else {
             this.undelegateEvents();
         }
@@ -287,6 +289,14 @@ define(function(require) {
         }
         this.disposed = true;
         return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
+    };
+
+    Backbone.View.prototype.remove = function() {
+        // Since we often override original `delegateEvents` to bind events on elements placed outside view el
+        // it needs call `undelegateEvents` even view el is going to be removed
+        this.undelegateEvents();
+
+        return original.remove.call(this);
     };
 
     return Backbone;

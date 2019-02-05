@@ -52,19 +52,19 @@ define(function(require) {
             var entityLabel = $el.find(':selected').data('label');
 
             if (!this.view.isEmpty()) {
-                if (this.confirm) {
-                    this.confirm.remove();
-                }
-                this.confirm = new DeleteConfirmation({
+                var confirm = new DeleteConfirmation({
                     title: __('Change Entity Confirmation'),
                     okText: __('Yes'),
                     content: __('oro.email.emailtemplate.change_entity_confirmation')
                 });
-                this.confirm.on('ok', function() {
+
+                confirm.on('ok', function() {
                     view.clear();
                 });
-                this.confirm.open();
+
+                confirm.open();
             }
+
             this.model.setEntity(entityName, entityLabel);
         },
 
@@ -72,12 +72,10 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            if (this.confirm) {
-                this.confirm.remove();
-                delete this.confirm;
-            }
+
             this.entityChoice.off('.' + this.cid);
             delete this.entityChoice;
+
             EmailVariableComponent.__super__.dispose.call(this);
         }
     });

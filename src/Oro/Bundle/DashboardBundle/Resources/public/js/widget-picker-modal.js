@@ -63,6 +63,13 @@ define(function(require) {
             });
         },
 
+        close: function() {
+            if (this.component) {
+                this.component.dispose();
+                this.component = null;
+            }
+        },
+
         /**
          *
          * @param {WidgetPickerModel} widgetModel
@@ -83,6 +90,10 @@ define(function(require) {
                 },
                 'json'
             );
+        },
+
+        setTargetColumn: function(targetColumn) {
+            this.options.targetColumn = targetColumn;
         }
     });
 
