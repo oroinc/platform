@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LayoutBundle\Twig;
 
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
-use Oro\Bundle\LayoutBundle\Provider\NoImageFileProvider;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
@@ -11,6 +10,9 @@ use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Provides twig filters and functions for working with layout blocks.
+ */
 class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRuntimeInterface
 {
     const RENDER_BLOCK_NODE_CLASS = 'Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode';
@@ -25,9 +27,6 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
 
     /** @var TextHelper */
     private $textHelper;
-
-    /** @var NoImageFileProvider */
-    private $noImageFileProvider;
 
     /** @var ContainerInterface */
     private $container;
@@ -96,10 +95,6 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
             new \Twig_SimpleFunction(
                 'convert_value_to_string',
                 [$this, 'convertValueToString']
-            ),
-            new \Twig_SimpleFunction(
-                'no_image_path',
-                [$this, 'getNoImagePath']
             )
         ];
     }
@@ -216,18 +211,5 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
         }
 
         return $value;
-    }
-
-    /**
-     * @param string|null $filter
-     * @return string
-     */
-    public function getNoImagePath(?string $filter = null): string
-    {
-        if (!$this->noImageFileProvider) {
-            $this->noImageFileProvider = $this->container->get('oro_layout.provider.no_image_file');
-        }
-
-        return $this->noImageFileProvider->getNoImagePath($filter);
     }
 }

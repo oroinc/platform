@@ -47,11 +47,11 @@ class ThemeProvider
     /**
      * @param string $themeName
      *
-     * @return string
+     * @return array
      */
-    public function getNoImage($themeName)
+    public function getImagePlaceholders($themeName): array
     {
-        return $this->getTheme($themeName)->getNoImage();
+        return $this->getTheme($themeName)->getImagePlaceholders();
     }
 
     /**
