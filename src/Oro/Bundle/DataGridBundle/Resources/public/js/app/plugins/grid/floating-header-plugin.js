@@ -152,13 +152,13 @@ define(function(require) {
                 return a + b;
             });
 
-            if (sumWidth > totalWidth) {
-                widthDecrement = (sumWidth - totalWidth) / widths.length;
+            if (sumWidth !== totalWidth) {
+                widthDecrement = (totalWidth - sumWidth) / widths.length;
             }
 
             // set exact sizes to header cells and cells in first row
             headerCells.each(function(i, headerCell) {
-                var cellWidth = widths[i] - widthDecrement;
+                var cellWidth = widths[i] + widthDecrement;
                 headerCell.style.width = cellWidth + 'px';
                 headerCell.style.maxWidth = cellWidth + 'px';
                 headerCell.style.minWidth = cellWidth + 'px';

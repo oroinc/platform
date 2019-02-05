@@ -19,7 +19,8 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
- * The ACL extensions that check permissions for ORM entities.
+ * The ACL extension that works with Doctrine entities.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityAclExtension extends AbstractAccessLevelAclExtension

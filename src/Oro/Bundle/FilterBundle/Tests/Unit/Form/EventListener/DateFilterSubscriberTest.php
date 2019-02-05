@@ -28,20 +28,19 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $localeSettings */
-        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->setMethods(['getTimezone'])
-            ->getMock();
-        $localeSettings->expects($this->any())
+        $localeSettings = self::createMock(LocaleSettings::class);
+        $localeSettings
+            ->expects(self::any())
             ->method('getTimezone')
-            ->will($this->returnValue(self::TIMEZONE));
+            ->will(self::returnValue(self::TIMEZONE));
 
         /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translatorMock */
-        $translatorMock = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        /** @var DateModifierProvider|\PHPUnit\Framework\MockObject\MockObject $providerMock */
-        $providerMock = $this->createMock('Oro\Bundle\FilterBundle\Provider\DateModifierProvider');
+        $translatorMock = self::createMock(TranslatorInterface::class);
 
-        $this->modifier   = new DateFilterModifier(
+        /** @var DateModifierProvider|\PHPUnit\Framework\MockObject\MockObject $providerMock */
+        $providerMock = self::createMock(DateModifierProvider::class);
+
+        $this->modifier = new DateFilterModifier(
             new Compiler(new Lexer($translatorMock, $providerMock), new Parser($localeSettings))
         );
         $this->subscriber = new DateFilterSubscriber($this->modifier);
@@ -50,10 +49,10 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testSubscribedEvents()
     {
         $events = DateFilterSubscriber::getSubscribedEvents();
-        $this->assertCount(1, $events);
+        self::assertCount(1, $events);
 
         $eventNames = array_keys($events);
-        $this->assertEquals(FormEvents::PRE_SUBMIT, $eventNames[0]);
+        self::assertEquals(FormEvents::PRE_SUBMIT, $eventNames[0]);
     }
 
     /**
@@ -66,21 +65,19 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testPreSubmit(array $data, array $expectedData, $valueSubforms = [], $shouldAddFields = [])
     {
-        $form      = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $valueForm = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form      = self::createMock('Symfony\Component\Form\Test\FormInterface');
+        $valueForm = self::createMock('Symfony\Component\Form\Test\FormInterface');
         $event     = new FormEvent($form, $data);
 
-        $form->expects($this->any())->method('get')->with($this->equalTo('value'))
-            ->will($this->returnValue($valueForm));
-        $valueForm->expects($this->any())->method('all')->will($this->returnValue($valueSubforms));
-
-        $valueForm->expects($this->exactly(count($shouldAddFields)))->method('add');
+        $form->expects(self::any())->method('get')->with(self::equalTo('value'))->will(self::returnValue($valueForm));
+        $valueForm->expects(self::any())->method('all')->will(self::returnValue($valueSubforms));
+        $valueForm->expects(self::exactly(count($shouldAddFields)))->method('add');
 
         $this->subscriber->preSubmit($event);
         // should process only once, do not break expectation
         $this->subscriber->preSubmit($event);
 
-        $this->assertEquals($expectedData, $event->getData());
+        self::assertEquals($expectedData, $event->getData());
     }
 
     /**
@@ -94,6 +91,8 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
         // Needed because Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult changes first day of week
         $weekNumber = $weekDateTime->format('W');
 
+        $yearDateTime = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
+        $yearNumber = $yearDateTime->format('Y');
         return [
             'should process date value'                                           => [
                 ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01']],
@@ -174,7 +173,7 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
                     'type'  => AbstractDateFilterType::TYPE_BETWEEN,
                     'value' => [
                         'start' => '{{' . DateModifierInterface::VAR_SOY . '}}',
-                        'end' => date('Y') . '-01-02 00:00'
+                        'end' => $yearNumber . '-01-02 00:00'
                     ]
                 ]
             ],
@@ -188,7 +187,7 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
                     'part'  => DateModifierInterface::PART_VALUE,
                     'type'  => AbstractDateFilterType::TYPE_NOT_BETWEEN,
                     'value' => [
-                        'end' => date('Y') . '-01-02 00:00',
+                        'end' => $yearNumber . '-01-02 00:00',
                         'start' => '{{' . DateModifierInterface::VAR_SOY . '}}'
                     ]
                 ]

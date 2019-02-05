@@ -12,20 +12,32 @@ oro_behat_extension:
       selector: 'tbody tr'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow
 
+    TableRowStrict:
+      selector:
+        type: 'xpath'
+        locator: 'child::tbody/child::tr'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow
+
     Grid:
-      selector: 'div.grid-container'
+      selector: 'div.oro-datagrid'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
 
     GridHeader:
-      selector: '.grid-header:nth-child(1)'
+      selector: '.grid-container .grid-header:nth-child(1)'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader
 
     GridRow:
       selector: 'tbody tr'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow
 
+    GridRowStrict:
+      selector:
+        type: 'xpath'
+        locator: "child::tbody/child::tr"
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow
+
     GridTable:
-      selector: 'table.grid'
+      selector: '.grid-container table.grid'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Table
 
     GridRowAction:
@@ -59,6 +71,10 @@ oro_behat_extension:
     GridFilterChoice:
       selector: 'div.filter-item'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterChoice
+
+    GridFilterChoiceValueInput:
+      selector: '.value-field-frame .select2-input'
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entities
 
     GridFilterItem:
       selector: 'div.filter-item'

@@ -38,8 +38,8 @@ class SaveEntity implements ProcessorInterface
             return;
         }
 
-        // Generate random secure password for user.
-        if (!$user->getPassword()) {
+        // generate random secure password for a user
+        if (!$user->getPlainPassword()) {
             $user->setPlainPassword($this->userManager->generatePassword());
         }
 

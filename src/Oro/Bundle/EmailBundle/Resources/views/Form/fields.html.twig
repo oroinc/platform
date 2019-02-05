@@ -1,28 +1,34 @@
-{% block _email_configuration_oro_email___smtp_settings_password_value_widget %}
-    {% if form.parent.parent.parent is not null %}
-        {% set data = form.parent.parent.parent.vars.value %}
-    {% else %}
-        {% set data = form.parent.parent.vars.value %}
-    {% endif %}
-    {% set options = form.vars.options|default({})|merge({
-        elementNamePrototype: full_name,
-        id: form.parent.vars.value and form.parent.vars.value.id is defined ? form.parent.vars.value.id : null,
-        forEntity: 'user',
-        organization: data and data.organization is defined and data.organization ? data.organization.id : null,
-        parentElementSelector: 'fieldset',
-        showLoading: true
-    }) %}
-    {{ form_widget(form) }}
-    {% if is_granted('oro_config_system') %}
-        <span class="form-text">
-            <button class="btn btn-primary check-connection-messages"
-               data-role="check-smtp-connection"
-               data-page-component-module="{{ 'oroemail/js/app/components/check-smtp-connection-component' }}"
-               data-page-component-options="{{ options|json_encode }}"
-            >{{ 'oro.email.system_configuration.smtp_settings.check_connection.label'|trans }}</button>
-        </span>
-    <div class="check-connection-messages check-smtp-connection-messages"></div>
-    {% endif %}
+{% block _email_configuration_oro_email___smtp_settings_password_row %}
+    {% spaceless %}
+        {{ form_row(form) }}
+
+        {% if form.parent.parent is not null %}
+            {% set data = form.parent.parent.vars.value %}
+        {% else %}
+            {% set data = form.parent.vars.value %}
+        {% endif %}
+
+        {% set options = form.vars.options|default({})|merge({
+            elementNamePrototype: full_name,
+            id: form.vars.value and form.vars.value.id is defined ? form.vars.value.id : null,
+            forEntity: 'user',
+            organization: data and data.organization is defined and data.organization ? data.organization.id : null,
+            parentElementSelector: 'fieldset',
+            showLoading: true
+        }) %}
+        <div class="control-group">
+            <div class="controls">
+                <span class="form-text">
+                    <button class="btn btn-primary check-connection-messages"
+                            data-role="check-smtp-connection"
+                            data-page-component-module="{{ 'oroemail/js/app/components/check-smtp-connection-component' }}"
+                            data-page-component-options="{{ options|json_encode }}"
+                    >{{ 'oro.email.system_configuration.smtp_settings.check_connection.label'|trans }}</button>
+                </span>
+                <div class="check-connection-messages check-smtp-connection-messages"></div>
+            </div>
+        </div>
+    {% endspaceless %}
 {% endblock %}
 
 {% block _email_configuration_oro_email___attachment_sync_max_size_value_widget %}

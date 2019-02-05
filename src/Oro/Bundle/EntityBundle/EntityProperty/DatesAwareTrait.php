@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\EntityProperty;
 
-use JMS\Serializer\Annotation as Serializer;
-
+/**
+ * Add create and update dates support to entities
+ */
 trait DatesAwareTrait
 {
     use CreatedAtAwareTrait;

@@ -51,6 +51,9 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     /** @var QueryHintResolver */
     protected $queryHintResolver;
 
+    /** @var QueryExecutorInterface */
+    private $queryExecutor;
+
     /**
      * @param ConfigProcessorInterface $processor
      * @param EventDispatcherInterface $eventDispatcher
@@ -67,6 +70,14 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         $this->eventDispatcher   = $eventDispatcher;
         $this->parameterBinder   = $parameterBinder;
         $this->queryHintResolver = $queryHintResolver;
+    }
+
+    /**
+     * @param QueryExecutorInterface $queryExecutor
+     */
+    public function setQueryExecutor(QueryExecutorInterface $queryExecutor)
+    {
+        $this->queryExecutor = $queryExecutor;
     }
 
     /**
@@ -102,7 +113,9 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         $event = new OrmResultBefore($this->datagrid, $query);
         $this->eventDispatcher->dispatch(OrmResultBefore::NAME, $event);
 
-        $results = $event->getQuery()->execute();
+        $results = null === $this->queryExecutor
+            ? $event->getQuery()->execute()
+            : $this->queryExecutor->execute($this->datagrid, $event->getQuery());
         $rows    = [];
         foreach ($results as $result) {
             $rows[] = new ResultRecord($result);
@@ -111,6 +124,16 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         $this->eventDispatcher->dispatch(OrmResultAfter::NAME, $event);
 
         return $event->getRecords();
+    }
+
+    /**
+     * Gets datagrid this datasource belongs to.
+     *
+     * @return DatagridInterface
+     */
+    public function getDatagrid(): DatagridInterface
+    {
+        return $this->datagrid;
     }
 
     /**

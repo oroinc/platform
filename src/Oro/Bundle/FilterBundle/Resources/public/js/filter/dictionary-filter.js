@@ -188,6 +188,7 @@ define(function(require) {
             this.applySelect2();
             this._updateCriteriaHint();
             this.renderDeferred.resolve();
+            this.trigger('update');
         },
 
         /**
@@ -199,6 +200,7 @@ define(function(require) {
             this.updateLocalValues(response.results);
             this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
             this._updateCriteriaHint();
+            this.trigger('update');
         },
 
         /**

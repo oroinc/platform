@@ -8,11 +8,16 @@
                 {{ UI.renderPageComponentAttributes({view: 'oronavigation/js/app/views/shortcuts-view'}) }}>
                 <button class="dropdown-toggle dropdown-toggle--no-caret" data-toggle="dropdown" id="{{ togglerId }}"
                     aria-haspopup="true" aria-expanded="false" aria-label="{{ 'oro.navigation.shortcuts.title'|trans }}"
-                    title="{{ 'oro.navigation.shortcuts.title'|trans }}">
+                    title="{{ 'oro.navigation.shortcuts.title'|trans }}"
+                    data-prevent-close-on-menu-click="true">
                     <span class="fa-share-square" aria-hidden="true"></span>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="{{ togglerId }}">
-                    <li class="nav-header nav-header-title">{{ 'oro.navigation.shortcuts.title'|trans }}</li>
+                    <li class="nav-header nav-header-title">{{ 'oro.navigation.shortcuts.title'|trans }}
+                    {% if isMobileVersion() %}
+                        <button class="btn-link btn-close fa-close hide-text" data-role="close">{{ 'Close'|trans }}</button>
+                    {% endif %}
+                    </li>
                     <li class="nav-content">
                         <form>
                             <input type="text"

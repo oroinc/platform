@@ -78,7 +78,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         /** @var Table $table */
         $table = $this->findElementContains('Table', $tableContent);
         self::assertTrue(
-            $table->has('css', 'tbody tr i.handle'),
+            $table->has('css', 'tbody tr span.handle'),
             "There is no drag-n-drop icon among rows in '$tableContent' table"
         );
     }
