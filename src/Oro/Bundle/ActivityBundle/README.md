@@ -291,8 +291,8 @@ If you want to define a context grid for an entity (e.g User) in the activity co
  * @Config(
  *      defaultValues={
  *          "grid"={
- *              default="default-grid",
- *              context="default-context-grid"
+ *              "default"="default-grid",
+ *              "context"="default-context-grid"
  *          }
  *     }
  * )
