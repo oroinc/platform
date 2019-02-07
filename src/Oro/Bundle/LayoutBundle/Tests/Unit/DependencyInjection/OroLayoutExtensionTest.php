@@ -8,6 +8,7 @@ use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
 use Oro\Bundle\LayoutBundle\EventListener\ThemeListener;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -170,6 +171,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
+        $container->set('property_accessor', new PropertyAccessor());
 
         $extensionConfig = [
             [
@@ -177,7 +179,8 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
                     'gold' => [
                         'label'  => 'Gold theme',
                         'icon'   => 'gold.ico',
-                        'groups' => ['main', 'another']
+                        'groups' => ['main', 'another'],
+                        'image_placeholders' => ['placeholder' => '/path/to/test.img']
                     ]
                 ],
                 'active_theme' => 'gold'
@@ -195,6 +198,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('gold.ico', $result->getIcon());
         $this->assertSame('gold', $result->getDirectory());
         $this->assertEquals(['main', 'another'], $result->getGroups());
+        $this->assertEquals(['placeholder' => '/path/to/test.img'], $result->getImagePlaceholders());
     }
 
     public function testGetAlias()
@@ -203,6 +207,9 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('oro_layout', $extension->getAlias());
     }
 
+    /**
+     * @param array $resources
+     */
     protected function normalizeResources(array &$resources)
     {
         ksort($resources);

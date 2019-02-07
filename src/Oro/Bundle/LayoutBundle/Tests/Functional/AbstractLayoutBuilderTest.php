@@ -12,6 +12,7 @@ use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 abstract class AbstractLayoutBuilderTest extends WebTestCase
 {
@@ -68,7 +69,7 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
         CumulativeResourceManager::getInstance()->clear();
 
         $themeManager = new ThemeManager(
-            new ThemeFactory(),
+            new ThemeFactory(new PropertyAccessor()),
             [
                 'base' => [
                     'label' => 'base'
