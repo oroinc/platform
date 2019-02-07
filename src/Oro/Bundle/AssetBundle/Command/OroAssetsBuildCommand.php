@@ -21,7 +21,7 @@ class OroAssetsBuildCommand extends Command
 {
     protected static $defaultName = 'oro:assets:build';
 
-    protected const BUILD_DIR = './vendor/oro/platform/build/';
+    protected const BUILD_DIR = '/vendor/oro/platform/build/';
 
     /**
      * @var NodeProcessFactory
@@ -127,7 +127,7 @@ DESCRIPTION
             $io->text('Done');
         }
 
-        $nodeModulesDir = $kernel->getProjectDir().'/'.self::BUILD_DIR.'node_modules';
+        $nodeModulesDir = $kernel->getProjectDir().self::BUILD_DIR.'node_modules';
         if (!file_exists($nodeModulesDir) || $input->getOption('npm-install')) {
             $output->writeln('<info>Installing npm dependencies.</info>');
             $this->npmInstall($output);
@@ -163,6 +163,7 @@ DESCRIPTION
             $this->getKernel()->getProjectDir(),
             $this->buildTimeout
         );
+        $output->writeln($process->getCommandLine());
         $this->enableTty($process);
 
         if ($input->getOption('watch')) {
@@ -185,9 +186,10 @@ DESCRIPTION
      */
     protected function npmInstall(OutputInterface $output): void
     {
-        $command = $this->npmPath.' --prefix '.self::BUILD_DIR.' --no-audit install '.self::BUILD_DIR;
-
-        $process = new Process($command, $this->getKernel()->getProjectDir());
+        $command = $this->npmPath.' --no-audit install';
+        $output->writeln($command);
+        $path = $this->getKernel()->getProjectDir().self::BUILD_DIR;
+        $process = new Process($command, $path);
         $process->setTimeout($this->npmInstallTimeout);
 
         $process->run();

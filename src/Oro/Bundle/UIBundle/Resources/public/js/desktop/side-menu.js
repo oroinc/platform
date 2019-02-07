@@ -64,14 +64,11 @@ define(function(require) {
             });
 
             this.overlay = new SideMenuOverlay();
+            this.overlay
+                .on('open', this._attachHandlersFormDocument.bind(this))
+                .on('close', this._removeHandlersFormDocument.bind(this));
             this.overlay.render();
             this.$menu.after(this.overlay.$el);
-
-            $(document).on('focusout' + this.eventNamespace, _.debounce(function() {
-                if (!$.contains(this.$menu.parent()[0], document.activeElement)) {
-                    this.overlay.trigger('leave-focus');
-                }
-            }.bind(this), this.timeout));
         },
 
         /**
@@ -112,10 +109,39 @@ define(function(require) {
         _destroy: function() {
             this._super();
 
+            this.overlay.off();
             this.overlay.dispose();
             delete this.overlay;
             delete this.dropdownIndex;
 
+            this._removeHandlersFormDocument();
+        },
+
+        /**
+         * Attach event handlers for document
+         * @private
+         */
+        _attachHandlersFormDocument: function() {
+            var actionInMenu = true;
+            var menuContainer = this.$menu.parent()[0];
+
+            $(document)
+                .on('click' + this.eventNamespace + ' keydown' + this.eventNamespace, _.debounce(function(e) {
+                    // event was fired on scope of menu or not
+                    actionInMenu = $.contains(menuContainer, e.target);
+                }, this.timeout))
+                .on('keyup' + this.eventNamespace, _.debounce(function() {
+                    if (actionInMenu && !$.contains(menuContainer, document.activeElement)) {
+                        this.overlay.trigger('leave-focus');
+                    }
+                }.bind(this), this.timeout));
+        },
+
+        /**
+         * Remove all event handlers for document
+         * @private
+         */
+        _removeHandlersFormDocument: function() {
             $(document).off(this.eventNamespace);
         },
 

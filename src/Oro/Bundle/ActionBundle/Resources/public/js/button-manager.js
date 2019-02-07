@@ -243,6 +243,7 @@ define(function(require) {
          */
         showConfirmDialog: function(callback) {
             var options = {};
+
             if (!_.isEmpty(this.options.confirmation)) {
                 var placeholders = this.options.confirmation.message_parameters || {};
 
@@ -265,8 +266,13 @@ define(function(require) {
                 };
             }
 
-            this.confirmModal = (new this.confirmModalConstructor(options));
-            Backbone.listenTo(this.confirmModal, 'ok', callback);
+            this.confirmModal = new this.confirmModalConstructor(options);
+
+            this.confirmModal
+                .on('ok', callback)
+                .on('hidden', function() {
+                    delete this.confirmModal;
+                }.bind(this));
 
             this.confirmModal.open();
         },
@@ -310,7 +316,12 @@ define(function(require) {
                 return;
             }
 
-            delete this.confirmModal;
+            if (this.confirmModal) {
+                this.confirmModal.dispose();
+                delete this.confirmModal;
+            }
+
+            this.disposed = true;
         }
     });
 

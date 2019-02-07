@@ -50,7 +50,8 @@ define(function(require) {
                 content: __('Your local changes will be lost. Are you sure you want to refresh the page?'),
                 okText: __('OK, got it.'),
                 className: 'modal modal-primary',
-                cancelText: __('Cancel')
+                cancelText: __('Cancel'),
+                disposeOnHidden: false
             });
             this.subview('confirmModal', confirmModal);
 

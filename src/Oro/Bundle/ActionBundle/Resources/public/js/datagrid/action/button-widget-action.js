@@ -47,6 +47,10 @@ define(function(require) {
                 return;
             }
 
+            if (_.isFunction(this.buttonManager.dispose)) {
+                this.buttonManager.dispose();
+            }
+
             delete this.buttonManager;
 
             ButtonWidgetAction.__super__.dispose.call(this);

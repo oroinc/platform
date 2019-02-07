@@ -371,7 +371,7 @@ services:
         arguments:
             - '@annotation_reader'
         tags:
-            - { name: oro_security.acl.config_loader }
+            - { name: oro_security.acl.config_loader, priority: -10 }
 
     oro_security.acl.config_loader:
         public: false

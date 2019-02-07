@@ -205,7 +205,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         $(document).on('click', '.remove-button', function(e) {
             var el = $(this);
             if (!(el.is('[disabled]') || el.hasClass('disabled'))) {
-                var data = {content: el.data('message')};
+                var data = {
+                    content: el.data('message')
+                };
 
                 var okText = el.data('ok-text');
                 if (okText) {
@@ -254,6 +256,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                         }
                     });
                 });
+
                 confirm.open();
             }
 
