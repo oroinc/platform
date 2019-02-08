@@ -34,6 +34,7 @@ class OroNavigationExtension extends Extension
         }
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
+        $container->setParameter('oro_navigation.js_routing_filename_prefix', $config['js_routing_filename_prefix']);
 
         $this->addClassesToCompile(
             [
