@@ -21,6 +21,17 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root(self::ROOT_NODE, 'array', new MenuTreeBuilder());
 
         $node = $rootNode->children();
+        $node->scalarNode('js_routing_filename_prefix')
+            ->defaultValue('')
+            ->beforeNormalization()
+                ->always(
+                    function ($data) {
+                        return ltrim($data, '/');
+                    }
+                )
+                ->end()
+            ->end();
+
         $this->setChildren($node);
         $node->end();
 
