@@ -37,10 +37,28 @@
         }
     }
 
-    .page-title-center.under-left-block {
-        clear: #{$start};
+    .page-title-center {
         position: relative;
-        top: 8px;
+        min-width: 150px;
+        flex-grow: 100;
+
+        &:empty {
+            display: none;
+        }
+    }
+
+    .center-under-both {
+        .page-title-center {
+            flex-basis: 100%;
+            order: 3;
+            height: 31px;
+        }
+    }
+
+    .center-under-left {
+        .pull-left-extra {
+            flex-basis: 100%;
+        }
     }
 
     .navigation {
@@ -68,6 +86,7 @@
 
             > .pull-right {
                 flex-shrink: 0;
+                order: 2;
             }
         }
     }

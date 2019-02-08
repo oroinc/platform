@@ -1974,7 +1974,7 @@ TEXT;
             }
 
             $filterState = $this->elementFactory->createElement($gridName . 'FiltersState');
-            if ($filterState->isValid()) {
+            if ($filterState->isValid() && $filterState->isVisible()) {
                 $filterState->click();
             }
         }

@@ -76,7 +76,17 @@
         {% endblock content_side %}
         <div class="app-page__content">
             {% block header %}
-                <header class="app-header{% if oro_config_value('oro_ui.navbar_position') != 'top' %} thick{% endif %}" id="oroplatform-header">
+                <header class="app-header{% if oro_config_value('oro_ui.navbar_position') != 'top' %} thick{% endif %}" id="oroplatform-header"
+                    {% if isMobileVersion() %}
+                        {{ UI.renderPageComponentAttributes({
+                            view: 'oroui/js/app/views/sticky-element/sticky-element-view',
+                            options: {
+                                stickyOptions: {
+                                    enabled: true
+                                }
+                            }
+                        }) }}
+                    {% endif %}>
                     {% placeholder before_navigation %}
                     <div class="app-header__inner">
                         <div class="app-header__container">

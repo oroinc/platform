@@ -5,6 +5,7 @@ define(function(require) {
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var pageHeader = require('oroui/js/mobile/page-header');
+    var scrollHelper = require('oroui/js/tools/scroll-helper');
     require('oroui/js/mobile/side-menu');
 
     /**
@@ -40,6 +41,14 @@ define(function(require) {
                 $body.removeClass('input-focused');
                 forceHeaderLayoutUpdate();
             });
+
+        mediator.on('scroll:direction:change', function(direction) {
+            if (direction) {
+                $body
+                    .toggleClass('scrolled-down', direction > 0)
+                    .toggleClass('scrolled-up', direction < 0);
+            }
+        });
     }
 
     /**
@@ -66,9 +75,9 @@ define(function(require) {
 
             // any modal is opened  -- prevent page scrolling under the modal window
             if (_.some(modals)) {
-                $('html').addClass('lock-page-scroll');
+                scrollHelper.disableBodyTouchScroll();
             } else {
-                $('html').removeClass('lock-page-scroll');
+                scrollHelper.enableBodyTouchScroll();
             }
         }
 

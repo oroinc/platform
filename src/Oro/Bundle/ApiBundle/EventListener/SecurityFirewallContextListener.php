@@ -21,23 +21,23 @@ class SecurityFirewallContextListener implements ListenerInterface
     private $innerListener;
 
     /** @var array */
-    private $sessionName;
+    private $sessionOptions;
 
     /** @var TokenStorageInterface */
     private $tokenStorage;
 
     /**
      * @param ListenerInterface     $innerListener
-     * @param string                $sessionName
+     * @param array                 $sessionOptions
      * @param TokenStorageInterface $tokenStorage
      */
     public function __construct(
         ListenerInterface $innerListener,
-        string $sessionName,
+        array $sessionOptions,
         TokenStorageInterface $tokenStorage
     ) {
         $this->innerListener = $innerListener;
-        $this->sessionName = $sessionName;
+        $this->sessionOptions = $sessionOptions;
         $this->tokenStorage = $tokenStorage;
     }
 
@@ -72,7 +72,7 @@ class SecurityFirewallContextListener implements ListenerInterface
     private function isAjaxRequest(Request $request)
     {
         return
-            $request->cookies->has($this->sessionName)
+            $request->cookies->has($this->sessionOptions['name'])
             && $request->headers->has('X-CSRF-Header');
     }
 }

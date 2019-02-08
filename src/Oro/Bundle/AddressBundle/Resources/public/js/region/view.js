@@ -82,9 +82,6 @@ define(function(require) {
                 if (this.regionRequired) {
                     this.removeRequiredFlag();
                 }
-                if (this.target.closest('form').data('validator')) {
-                    this.target.validate().hideElementErrors(this.target);
-                }
             }
         },
 
@@ -144,6 +141,12 @@ define(function(require) {
         },
 
         render: function() {
+            var validator = this.target.closest('form').data('validator');
+
+            if (validator) {
+                validator.hideElementErrors(this.target[0]);
+            }
+
             if (this.collection.models.length > 0) {
                 this.target.show();
                 this.displaySelect2(true);
