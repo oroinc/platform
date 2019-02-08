@@ -64,9 +64,10 @@ class ResetController extends Controller
 
                 return $this->redirect($this->generateUrl('oro_user_reset_request'));
             }
-            $this->get('monolog.logger.oro_account_security')->notice('Reset password email has been sent', [
-                'user' => $this->get('oro_user.provider.user_logging_info_provider')->getUserLoggingInfo($user),
-            ]);
+            $this->get('monolog.logger.oro_account_security')->notice(
+                'Reset password email has been sent',
+                $this->get('oro_user.provider.user_logging_info_provider')->getUserLoggingInfo($user)
+            );
             $userManager->updateUser($user);
         }
 
