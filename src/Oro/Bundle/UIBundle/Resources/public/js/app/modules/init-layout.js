@@ -1,8 +1,8 @@
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
     'oroui/js/mediator', 'oroui/js/layout',
-    'oroui/js/delete-confirmation', 'oroui/js/scrollspy',
+    'oroui/js/delete-confirmation', 'oroui/js/scrollspy', 'oroui/js/tools/scroll-helper',
     'bootstrap', 'jquery-ui'
-], function($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
+], function($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy, scrollHelper) {
     'use strict';
 
     /**
@@ -69,9 +69,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                 var $dropdownMenu = $('>.dropdown-menu', this);
 
                 if ($dropdownMenu.css('position') === 'fixed' && $dropdownMenu.outerWidth() === $html.width()) {
-                    $html.addClass('modal-dropdown-shown');
+                    scrollHelper.disableBodyTouchScroll();
                     $(this).one('hide.bs.dropdown', function() {
-                        $html.removeClass('modal-dropdown-shown');
+                        scrollHelper.enableBodyTouchScroll();
                     });
                 }
             });
