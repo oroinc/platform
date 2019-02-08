@@ -25,7 +25,7 @@ class JsRoutingDumpListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->assetVersionManager = $this->createMock(DynamicAssetVersionManager::class);
 
-        $this->listener = new JsRoutingDumpListener($this->assetVersionManager, self::PROJECT_DIR);
+        $this->listener = new JsRoutingDumpListener($this->assetVersionManager, self::PROJECT_DIR, 'prefix');
     }
 
     public function testOnConsoleCommandForUnsupportedCommand(): void
@@ -66,7 +66,7 @@ class JsRoutingDumpListenerTest extends \PHPUnit\Framework\TestCase
         $targetOption = $this->createMock(InputOption::class);
         $targetOption->expects($this->once())
             ->method('setDefault')
-            ->with(implode(DIRECTORY_SEPARATOR, [self::PROJECT_DIR, 'public', 'media', 'js', 'routes.json']));
+            ->with(implode(DIRECTORY_SEPARATOR, [self::PROJECT_DIR, 'public', 'media', 'js', 'prefix_routes.json']));
 
         /** @var InputDefinition|\PHPUnit\Framework\MockObject\MockObject $inputDefinition */
         $inputDefinition = $this->createMock(InputDefinition::class);

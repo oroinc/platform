@@ -16,14 +16,22 @@ class JsRoutingDumpListener
     /** @var string */
     private $projectDir;
 
+    /** @var string */
+    private $filenamePrefix;
+
     /**
      * @param DynamicAssetVersionManager $assetVersionManager
      * @param string $projectDir
+     * @param string $filenamePrefix
      */
-    public function __construct(DynamicAssetVersionManager $assetVersionManager, string $projectDir)
-    {
+    public function __construct(
+        DynamicAssetVersionManager $assetVersionManager,
+        string $projectDir,
+        string $filenamePrefix
+    ) {
         $this->assetVersionManager = $assetVersionManager;
         $this->projectDir = $projectDir;
+        $this->filenamePrefix = $filenamePrefix;
     }
 
     /**
@@ -53,9 +61,17 @@ class JsRoutingDumpListener
                         'public',
                         'media',
                         'js',
-                        'routes.' . $input->getOption('format')
+                        sprintf('%s.%s', $this->getFilename(), $input->getOption('format'))
                     ]
                 )
             );
+    }
+
+    /**
+     * @return string
+     */
+    private function getFilename(): string
+    {
+        return implode('_', array_filter([$this->filenamePrefix, 'routes']));
     }
 }
