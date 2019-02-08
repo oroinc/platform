@@ -640,6 +640,8 @@ define(function(require) {
 
             this.$el.append(html);
 
+            mediator.trigger('layout:reposition');
+
             return this;
         },
 

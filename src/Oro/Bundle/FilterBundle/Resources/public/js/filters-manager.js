@@ -14,6 +14,7 @@ define(function(require) {
     var FiltersStateView = require('./app/views/filters-state-view');
     var persistentStorage = require('oroui/js/persistent-storage');
     var FilterDialogWidget = require('orofilter/js/app/views/filter-dialog-widget');
+    var config = require('module').config();
 
     /**
      * View that represents all grid filters
@@ -186,9 +187,8 @@ define(function(require) {
             }, this);
 
             if (this.isFiltersStateViewNeeded(options)) {
-                var $container = this.$el.closest('body, .ui-dialog');
                 var filtersStateView = new FiltersStateView({
-                    el: $container.find(options.filtersStateElement).first(),
+                    el: options.filtersStateElement,
                     filters: options.filters
                 });
 
@@ -253,7 +253,7 @@ define(function(require) {
          * @returns {boolean}
          */
         isFiltersStateViewNeeded: function(options) {
-            return 'filtersStateElement' in options;
+            return 'filtersStateElement' in options && config.useFilterStateView;
         },
 
         /**
@@ -521,10 +521,13 @@ define(function(require) {
                 filtersStateView.render();
                 if (this.viewMode === FiltersManager.MANAGE_VIEW_MODE) {
                     filtersStateView.hide();
-                } else if (this.viewMode === FiltersManager.STATE_VIEW_MODE) {
-                    this.$el.hide();
                 }
             }
+
+            if (this.viewMode === FiltersManager.STATE_VIEW_MODE) {
+                this.$el.hide();
+            }
+
             return this;
         },
 
