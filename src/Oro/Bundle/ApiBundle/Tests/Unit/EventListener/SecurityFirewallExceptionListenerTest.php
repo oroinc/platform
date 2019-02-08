@@ -20,13 +20,15 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit\Framework\TestCase
 {
     private const SESSION_NAME = 'TEST_SESSION_ID';
 
-    public function testSetSessionName()
+    public function testSetSessionOptions()
     {
-        $listener = $this->createSecurityFirewallExceptionListener();
-        $listener->setSessionName(self::SESSION_NAME);
+        $options = ['name' => self::SESSION_NAME];
 
-        self::assertObjectHasAttribute('sessionName', $listener);
-        self::assertAttributeEquals(self::SESSION_NAME, 'sessionName', $listener);
+        $listener = $this->createSecurityFirewallExceptionListener();
+        $listener->setSessionOptions($options);
+
+        self::assertObjectHasAttribute('sessionOptions', $listener);
+        self::assertAttributeEquals($options, 'sessionOptions', $listener);
     }
 
     /**
@@ -46,7 +48,7 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit\Framework\TestCase
         $event->getRequest()->setSession($session);
 
         $listener = $this->createSecurityFirewallExceptionListener(true);
-        $listener->setSessionName(self::SESSION_NAME);
+        $listener->setSessionOptions(['name' => self::SESSION_NAME]);
         $listener->onKernelException($event);
     }
 
@@ -64,7 +66,7 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit\Framework\TestCase
         $event->getRequest()->setSession($session);
 
         $listener = $this->createSecurityFirewallExceptionListener(true);
-        $listener->setSessionName(self::SESSION_NAME);
+        $listener->setSessionOptions(['name' => self::SESSION_NAME]);
         $listener->onKernelException($event);
     }
 
