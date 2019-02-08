@@ -190,6 +190,53 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    /**
+     * @dataProvider resetFiltersDataProvider
+     *
+     * @param array $originalParameters
+     * @param array $expectedParameters
+     */
+    public function testResetFilters(array $originalParameters, array $expectedParameters): void
+    {
+        $parameters = new ParameterBag($originalParameters);
+        $this->datagridParametersHelper->resetFilters($parameters);
+
+        self::assertEquals(new ParameterBag($expectedParameters), $parameters);
+    }
+
+    /**
+     * @return array
+     */
+    public function resetFiltersDataProvider(): array
+    {
+        return [
+            'all filters removed from root param' => [
+                'originalParameters' => [
+                    AbstractFilterExtension::FILTER_ROOT_PARAM => [
+                        'some_filter' => ['some' => 'data']
+                    ]
+                ],
+                'expectedParameters' => [
+                    AbstractFilterExtension::FILTER_ROOT_PARAM => []
+                ]
+            ],
+            'all filters removed from minified param' => [
+                'originalParameters' => [
+                    ParameterBag::MINIFIED_PARAMETERS => [
+                        AbstractFilterExtension::MINIFIED_FILTER_PARAM => [
+                            'some_filter' => ['some' => 'data']
+                        ]
+                    ]
+                ],
+                'expectedParameters' => [
+                    ParameterBag::MINIFIED_PARAMETERS => [
+                        AbstractFilterExtension::MINIFIED_FILTER_PARAM => []
+                    ]
+                ]
+            ]
+        ];
+    }
+
     public function testDatagridSkipExtensionParam()
     {
         $parameterBag = new ParameterBag();
