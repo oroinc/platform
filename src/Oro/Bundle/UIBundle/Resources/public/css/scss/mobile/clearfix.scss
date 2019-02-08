@@ -4,9 +4,10 @@
     overflow-x: hidden;
     overflow-y: auto;
 
-    &.lock-page-scroll,
-    &.modal-dropdown-shown {
+    &.disable-touch-scrolling,
+    &.disable-touch-scrolling body {
         overflow: hidden;
+        height: 100%;
     }
 }
 
