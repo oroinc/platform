@@ -7,6 +7,7 @@ use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
 use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\Extractor\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 use Symfony\Component\Routing\Route;
@@ -76,13 +77,31 @@ trait DocumentationTestTrait
 
     /**
      * @param string $entityClass
-     * @param string $associationName
+     * @param string $fieldName
      *
      * @return bool
      */
     private function isSkippedField($entityClass, $fieldName)
     {
         return false;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    private function isTestField($entityClass, $fieldName)
+    {
+        $configManager = $this->getEntityConfigManager();
+        if (!$configManager->hasConfig($entityClass, $fieldName)) {
+            return false;
+        }
+
+        $label = $configManager->getFieldConfig('entity', $entityClass, $fieldName)->get('label');
+
+        return 0 === strpos($label, 'extend.entity.test');
     }
 
     /**
@@ -99,6 +118,14 @@ trait DocumentationTestTrait
     private function getSimpleFormatter()
     {
         return self::getContainer()->get('nelmio_api_doc.formatter.simple_formatter');
+    }
+
+    /**
+     * @return ConfigManager
+     */
+    private function getEntityConfigManager()
+    {
+        return self::getContainer()->get('oro_entity_config.config_manager');
     }
 
     private function warmUpDocumentationCache()
@@ -161,6 +188,7 @@ trait DocumentationTestTrait
         } elseif (isset(self::$defaultDocumentation[$action])
             && in_array($definition['documentation'], (array)self::$defaultDocumentation[$action], true)
             && !$this->isSkippedField($entityClass, $association)
+            && !$this->isTestField($entityClass, $association)
         ) {
             $missingDocs[] = sprintf(
                 'Missing documentation. Default value is used: "%s"',
@@ -171,7 +199,10 @@ trait DocumentationTestTrait
         }
         if (!empty($definition['parameters'])) {
             foreach ($definition['parameters'] as $name => $item) {
-                if (empty($item['description']) && !$this->isSkippedField($entityClass, $name)) {
+                if (empty($item['description'])
+                    && !$this->isSkippedField($entityClass, $name)
+                    && !$this->isTestField($entityClass, $name)
+                ) {
                     $missingDocs[] = sprintf('Input Field: %s. Empty description.', $name);
                 }
             }
@@ -185,7 +216,10 @@ trait DocumentationTestTrait
         }
         if (!$association && !empty($definition['response'])) {
             foreach ($definition['response'] as $name => $item) {
-                if (empty($item['description']) && !$this->isSkippedField($entityClass, $name)) {
+                if (empty($item['description'])
+                    && !$this->isSkippedField($entityClass, $name)
+                    && !$this->isTestField($entityClass, $name)
+                ) {
                     $missingDocs[] = sprintf('Output Field: %s. Empty description.', $name);
                 }
             }
