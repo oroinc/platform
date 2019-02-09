@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\EventListener;
 use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
@@ -20,17 +20,6 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit\Framework\TestCase
 {
     private const SESSION_NAME = 'TEST_SESSION_ID';
 
-    public function testSetSessionOptions()
-    {
-        $options = ['name' => self::SESSION_NAME];
-
-        $listener = $this->createSecurityFirewallExceptionListener();
-        $listener->setSessionOptions($options);
-
-        self::assertObjectHasAttribute('sessionOptions', $listener);
-        self::assertAttributeEquals($options, 'sessionOptions', $listener);
-    }
-
     /**
      * @param \Exception $exception
      *
@@ -41,14 +30,16 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit\Framework\TestCase
         $event = $this->createEvent($exception);
         $event->getRequest()->cookies->add([self::SESSION_NAME => 'o595fqdg5214u4e4nfcs3uc923']);
 
-        $session = $this->createMock(Session::class);
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())
+            ->method('getName')
+            ->willReturn(self::SESSION_NAME);
         $session->expects(self::once())
             ->method('set')
             ->with('_security.key.target_path', 'http://localhost/');
         $event->getRequest()->setSession($session);
 
         $listener = $this->createSecurityFirewallExceptionListener(true);
-        $listener->setSessionOptions(['name' => self::SESSION_NAME]);
         $listener->onKernelException($event);
     }
 
@@ -61,12 +52,14 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit\Framework\TestCase
     {
         $event = $this->createEvent($exception);
 
-        $session = $this->createMock(Session::class);
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())
+            ->method('getName')
+            ->willReturn(self::SESSION_NAME);
         $session->expects(self::never())->method('set');
         $event->getRequest()->setSession($session);
 
         $listener = $this->createSecurityFirewallExceptionListener(true);
-        $listener->setSessionOptions(['name' => self::SESSION_NAME]);
         $listener->onKernelException($event);
     }
 

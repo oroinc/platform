@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -77,8 +78,8 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
             ->register($apiContextListenerId, SecurityFirewallContextListener::class)
             ->setArguments([
                 new Reference($listenerId),
-                '%session.storage.options%',
-                new Reference('security.token_storage')
+                new Reference('security.token_storage'),
+                new Reference('session', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
             ]);
         $contextListeners = [];
         /** @var IteratorArgument $listeners */
@@ -96,7 +97,6 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
         // replace the exception listener class
         $exceptionListenerDef = $container->getDefinition($contextDef->getArgument(1));
         $exceptionListenerDef->setClass(SecurityFirewallExceptionListener::class);
-        $exceptionListenerDef->addMethodCall('setSessionOptions', ['%session.storage.options%']);
     }
 
     /**

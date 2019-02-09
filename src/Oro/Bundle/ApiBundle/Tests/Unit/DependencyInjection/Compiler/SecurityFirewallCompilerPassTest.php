@@ -9,6 +9,7 @@ use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -46,7 +47,6 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
             'security',
             ['firewalls' => ['testFirewall' => ['stateless' => false, 'context' => 'main']]]
         );
-        $this->container->setParameter('session.storage.options', ['name' => 'test']);
 
         $this->compiler->process($this->container);
     }
@@ -57,7 +57,6 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
             'security',
             ['firewalls' => ['testFirewall' => ['stateless' => true]]]
         );
-        $this->container->setParameter('session.storage.options', ['name' => 'test']);
 
         $this->compiler->process($this->container);
     }
@@ -68,7 +67,6 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
             'security',
             ['firewalls' => ['testFirewall' => ['stateless' => true, 'context' => 'main']]]
         );
-        $this->container->setParameter('session.storage.options', ['name' => 'test']);
 
         $this->compiler->process($this->container);
     }
@@ -97,7 +95,6 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
             'security.firewall.map.context.testFirewall',
             $contextFirewallContext
         );
-        $this->container->setParameter('session.storage.options', ['name' => 'test']);
 
         $this->compiler->process($this->container);
 
@@ -109,8 +106,8 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 new Reference('oro_security.context_listener.main'),
-                '%session.storage.options%',
-                new Reference('security.token_storage')
+                new Reference('security.token_storage'),
+                new Reference('session', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
             ],
             $contextFirewallListener->getArguments()
         );
@@ -121,12 +118,5 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         // Context serializer listener should does before the access listener
         self::assertEquals('oro_security.context_listener.main.testFirewall', (string)$listeners[0]);
         self::assertEquals('security.access_listener', (string)$listeners[1]);
-
-        self::assertEquals(
-            [
-                ['setSessionOptions', ['%session.storage.options%']]
-            ],
-            $exceptionListenerDefinition->getMethodCalls()
-        );
     }
 }

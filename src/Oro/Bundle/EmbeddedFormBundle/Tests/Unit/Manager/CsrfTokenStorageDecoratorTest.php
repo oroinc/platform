@@ -6,26 +6,26 @@ use Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorage;
 use Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorageDecorator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
 class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_SESSION_FIELD_NAME = '_test_sid';
-    const TEST_PHP_SESSION_NAME   = 'test_php_sid';
-    const TEST_ROUTE_NAME         = 'test_route';
-    const TEST_CSRF_TOKEN_ID      = 'test_token_id';
+    private const TEST_PHP_SESSION_NAME = 'test_php_sid';
+    private const TEST_ROUTE_NAME       = 'test_route';
+    private const TEST_CSRF_TOKEN_ID    = 'test_token_id';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $mainTokenStorage;
+    private $mainTokenStorage;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $embeddedFormTokenStorage;
+    private $embeddedFormTokenStorage;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $requestStack;
+    private $requestStack;
 
     /** @var CsrfTokenStorageDecorator */
-    protected $csrfTokenStorageDecorator;
+    private $csrfTokenStorageDecorator;
 
     protected function setUp()
     {
@@ -37,9 +37,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
             $this->mainTokenStorage,
             $this->embeddedFormTokenStorage,
             $this->requestStack,
-            ['name' => self::TEST_PHP_SESSION_NAME],
-            self::TEST_ROUTE_NAME,
-            self::TEST_SESSION_FIELD_NAME
+            self::TEST_ROUTE_NAME
         );
     }
 
@@ -62,7 +60,14 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTokenWhenSessionIdCookieExists()
     {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())
+            ->method('getName')
+            ->willReturn(self::TEST_PHP_SESSION_NAME);
+
         $request = Request::create('http://test');
+        $request->setSession($session);
+        $request->attributes->set('_route', self::TEST_ROUTE_NAME);
         $request->cookies->set(self::TEST_PHP_SESSION_NAME, 'php_sid');
 
         $this->requestStack->expects(self::once())
@@ -82,7 +87,12 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTokenForNotEmbeddedFormRoute()
     {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::never())
+            ->method('getName');
+
         $request = Request::create('http://test');
+        $request->setSession($session);
         $request->attributes->set('_route', 'not_embedded_form_route');
 
         $this->requestStack->expects(self::once())
@@ -102,7 +112,13 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTokenForEmbeddedFormRoute()
     {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())
+            ->method('getName')
+            ->willReturn(self::TEST_PHP_SESSION_NAME);
+
         $request = Request::create('http://test');
+        $request->setSession($session);
         $request->attributes->set('_route', self::TEST_ROUTE_NAME);
 
         $this->requestStack->expects(self::once())
@@ -122,7 +138,13 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTokenForEmbeddedFormRouteButWithSessionIdCookie()
     {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())
+            ->method('getName')
+            ->willReturn(self::TEST_PHP_SESSION_NAME);
+
         $request = Request::create('http://test');
+        $request->setSession($session);
         $request->attributes->set('_route', self::TEST_ROUTE_NAME);
         $request->cookies->set(self::TEST_PHP_SESSION_NAME, 'php_sid');
 
@@ -143,7 +165,13 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
 
     public function testHasToken()
     {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())
+            ->method('getName')
+            ->willReturn(self::TEST_PHP_SESSION_NAME);
+
         $request = Request::create('http://test');
+        $request->setSession($session);
         $request->attributes->set('_route', self::TEST_ROUTE_NAME);
 
         $this->requestStack->expects(self::once())
@@ -162,7 +190,13 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetToken()
     {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())
+            ->method('getName')
+            ->willReturn(self::TEST_PHP_SESSION_NAME);
+
         $request = Request::create('http://test');
+        $request->setSession($session);
         $request->attributes->set('_route', self::TEST_ROUTE_NAME);
 
         $this->requestStack->expects(self::once())
@@ -178,7 +212,13 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveToken()
     {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())
+            ->method('getName')
+            ->willReturn(self::TEST_PHP_SESSION_NAME);
+
         $request = Request::create('http://test');
+        $request->setSession($session);
         $request->attributes->set('_route', self::TEST_ROUTE_NAME);
 
         $this->requestStack->expects(self::once())
@@ -194,7 +234,13 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
 
     public function testClear()
     {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())
+            ->method('getName')
+            ->willReturn(self::TEST_PHP_SESSION_NAME);
+
         $request = Request::create('http://test');
+        $request->setSession($session);
         $request->attributes->set('_route', self::TEST_ROUTE_NAME);
 
         $this->requestStack->expects(self::once())
