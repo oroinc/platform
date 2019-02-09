@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -20,25 +21,25 @@ class SecurityFirewallContextListener implements ListenerInterface
     /** @var ListenerInterface */
     private $innerListener;
 
-    /** @var array */
-    private $sessionOptions;
-
     /** @var TokenStorageInterface */
     private $tokenStorage;
 
+    /** @var SessionInterface|null */
+    private $session;
+
     /**
      * @param ListenerInterface     $innerListener
-     * @param array                 $sessionOptions
      * @param TokenStorageInterface $tokenStorage
+     * @param SessionInterface|null $session
      */
     public function __construct(
         ListenerInterface $innerListener,
-        array $sessionOptions,
-        TokenStorageInterface $tokenStorage
+        TokenStorageInterface $tokenStorage,
+        SessionInterface $session = null
     ) {
         $this->innerListener = $innerListener;
-        $this->sessionOptions = $sessionOptions;
         $this->tokenStorage = $tokenStorage;
+        $this->session = $session;
     }
 
     /**
@@ -72,7 +73,8 @@ class SecurityFirewallContextListener implements ListenerInterface
     private function isAjaxRequest(Request $request)
     {
         return
-            $request->cookies->has($this->sessionOptions['name'])
+            null !== $this->session
+            && $request->cookies->has($this->session->getName())
             && $request->headers->has('X-CSRF-Header');
     }
 }

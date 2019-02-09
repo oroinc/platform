@@ -12,23 +12,13 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SecurityFirewallExceptionListener extends ExceptionListener
 {
-    /** @var array */
-    private $sessionOptions;
-
-    /**
-     * @param array $sessionOptions
-     */
-    public function setSessionOptions(array $sessionOptions): void
-    {
-        $this->sessionOptions = $sessionOptions;
-    }
-
     /**
      * {@inheritdoc}
      */
     protected function setTargetPath(Request $request): void
     {
-        if ($request->cookies->has($this->sessionOptions['name'])) {
+        $session = $request->getSession();
+        if (null !== $session && $request->cookies->has($session->getName())) {
             parent::setTargetPath($request);
         }
     }
