@@ -24,6 +24,8 @@ trusted_data:
         Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository:
             findBySettingsClassAndEmail:
                 settingsClass: true
+            findForEmail:
+                emailUsersDql: true
         Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository:
             getOwnerIdsWithEmailsQb:
                 ownerClassName: true
