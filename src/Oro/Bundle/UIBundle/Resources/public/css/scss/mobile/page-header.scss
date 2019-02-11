@@ -14,7 +14,7 @@
 }
 
 .container-fluid.page-title {
-    margin-bottom: 10px;
+    margin-bottom: $mobile-page-title-margin-bottom;
 
     @include safe-area-offset(padding, $content-padding);
 
@@ -111,7 +111,7 @@
                 transform: translate(-50%, -50%);
             };
 
-            &.btn-sticky {
+            &.sticky {
                 background-color: $page-title-btn-more-actions-submittable-bg-color;
                 border-color: $page-title-btn-more-actions-submittable-bg-color;
                 color: $page-title-btn-more-actions-submittable-color;

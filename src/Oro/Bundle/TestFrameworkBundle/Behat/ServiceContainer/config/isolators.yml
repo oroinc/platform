@@ -19,6 +19,11 @@ services:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixFileCacheIsolator'
     arguments:
       - '@symfony2_extension.kernel'
+      -
+        - 'doctrine'
+        - 'oro_data'
+        - 'oro_entities'
+        - 'translations'
     tags:
       - { name: 'oro_behat.isolator', priority: 100 }
 
@@ -26,6 +31,11 @@ services:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\WindowsFileCacheIsolator'
     arguments:
       - '@symfony2_extension.kernel'
+      -
+        - 'doctrine'
+        - 'oro_data'
+        - 'oro_entities'
+        - 'translations'
     tags:
       - { name: 'oro_behat.isolator', priority: 100 }
 

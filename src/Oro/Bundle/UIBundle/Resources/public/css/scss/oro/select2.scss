@@ -583,3 +583,70 @@
     height: $select2-measure-scrollbar-height;
     overflow: $select2-measure-scrollbar-overflow;
 }
+
+.select2-container.select2-tree-autocomplete {
+    &.select2-container-multi {
+        background: transparent;
+        border: none;
+
+        &.hide-all-tree-related-ui {
+            .select2-search-choice {
+                display: none;
+            }
+        }
+
+        .select2-choices {
+            background: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            box-shadow: none;
+            flex-direction: column;
+
+            .select2-search-field {
+                order: -1;
+                padding: 0;
+
+                .select2-input {
+                    border: $selector-border;
+                    padding: $input-inner-offset;
+                    min-width: 100%;
+                }
+            }
+
+            .select2-search-choice {
+                max-width: initial;
+
+                &:first-child {
+                    margin-top: 11px;
+                }
+
+                > div {
+                    background-color: transparent;
+                    width: calc(100% - 24px);
+                    white-space: normal;
+                    padding: 0;
+                    color: $select2-tree-autocomplete-choice-item-color;
+                    font-size: $select2-tree-autocomplete-choice-item-font-size;
+                    line-height: $select2-tree-autocomplete-choice-item-line-height;
+                }
+            }
+
+            .select2-search-choice-close {
+                #{$end}: 3px;
+                top: 1px;
+
+                @include fa-icon($select2-tree-autocomplete-choice-item-close-icon, before, true) {
+                    font-size: $select2-tree-autocomplete-choice-item-close-font-size;
+                }
+            }
+        }
+    }
+
+    .select2-choice {
+        span.select2-tree-result-item-divider {
+            display: inline;
+        }
+    }
+}
+

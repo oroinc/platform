@@ -1,8 +1,19 @@
+Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that should be addressed before attempting to upgrade or during the upgrade of a vanilla Oro application.
+
+The current file describes significant changes in the code that may affect the upgrade of your customizations.
+
 ## 3.2.0-beta
 
 ### Changed
 #### UserBundle
 * API processor `oro_user.api.create.save_entity` was renamed to `oro_user.api.create.save_user`.
+
+### Removed
+#### EmbeddedFormBundle
+* Layout context parameter `embedded_form_custom_layout` has been removed. Use layout updates instead.
+
+#### SecurityBundle
+* Twig function `resource_granted` has been removed. Use `is_granted` from Symfony instead.
 
 ## 3.1.0
 
@@ -39,6 +50,8 @@ oro_attachment:
 * Bundle was removed, use AssetBundle instead
 #### QueryDesignerBundle
 * The unused alias `oro_query_designer.virtual_field_provider` for the service `oro_entity.virtual_field_provider.chain` was removed.
+#### InstallerBundle
+* Environment variable `ORO_PHP_PATH` is no longer supported for specifying path to PHP executable.
 
 ### Changed
 #### AssetBundle

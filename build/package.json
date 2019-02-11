@@ -32,7 +32,7 @@
     "karma-requirejs": "1.1.0",
     "karma-requirejs-exposure": "git://github.com/laboro/karma-requirejs-exposure.git#master",
     "mini-css-extract-plugin": "^0.4.2",
-    "node-sass": "4.8.3",
+    "node-sass": "^4.8.3",
     "optimize-css-assets-webpack-plugin": "^4.0.3",
     "path": "^0.12.7",
     "postcss-loader": "^3.0.0",
@@ -44,6 +44,7 @@
     "url-loader": "^1.1.1",
     "webpack": "^4.17.2",
     "webpack-cli": "^3.1.0",
-    "webpack-merge": "^4.1.2"
+    "webpack-merge": "^4.1.2",
+    "terser": "3.14.1"
   }
 }

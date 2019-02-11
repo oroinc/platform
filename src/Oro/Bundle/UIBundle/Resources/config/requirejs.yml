@@ -241,6 +241,8 @@ config:
         'oroui/js/app/components/widget-form-component': 'bundles/oroui/js/app/components/widget-form-component.js'
         'oroui/js/app/views/jstree/base-tree-view': 'bundles/oroui/js/app/views/jstree/base-tree-view.js'
         'oroui/js/app/views/jstree/base-tree-manage-view': 'bundles/oroui/js/app/views/jstree/base-tree-manage-view.js'
+        'oroui/js/app/views/sticky-element/sticky-element-mixin': 'bundles/oroui/js/app/views/sticky-element/sticky-element-mixin.js'
+        'oroui/js/app/views/sticky-element/sticky-element-view': 'bundles/oroui/js/app/views/sticky-element/sticky-element-view.js'
         'oroui/js/app/components/widget-picker-component': 'bundles/oroui/js/app/components/widget-picker-component.js'
         'oroui/js/app/components/element-value-copy-to-clipboard-component': 'bundles/oroui/js/app/components/element-value-copy-to-clipboard-component.js'
         'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'

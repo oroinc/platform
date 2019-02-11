@@ -20,6 +20,17 @@ define(['jquery'], function($) {
         }
     };
 
+    // Overriden since original `exceptionHook` doesn't take in account regular Error type
+    var rerrorNames = /^\w*Error$/;
+
+    $.Deferred.exceptionHook = function(error, stack) {
+        // Support: IE 8 - 9 only
+        // Console exists when dev tools are open, which can happen at any time
+        if ( window.console && window.console.warn && error && rerrorNames.test(error.name) ) {
+            window.console.warn('jQuery.Deferred exception: ' + error.message, error.stack, stack);
+        }
+    };
+
     $.fn.extend({
         focus: (function(originalFocus) {
             return function() {

@@ -335,19 +335,19 @@ services:
             - '@oro_cache.config_cache_factory'
             - '@oro_entity.orm.entity_class_resolver'
 
+    oro_security.acl.config_loader:
+        class: Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader
+        public: false
+        tags:
+            - { name: oro_security.acl.config_loader }
+
     oro_security.acl.annotation_loader:
         class: Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader
         public: false
         arguments:
             - '@annotation_reader'
         tags:
-            - { name: oro_security.acl.config_loader }
-
-    oro_security.acl.config_loader:
-        class: Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader
-        public: false
-        tags:
-            - { name: oro_security.acl.config_loader }
+            - { name: oro_security.acl.config_loader, priority: -10 }
 
     oro_security.entity_security_config_listener:
         class: Oro\Bundle\SecurityBundle\EventListener\EntitySecurityMetadataConfigListener

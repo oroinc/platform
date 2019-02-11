@@ -11,7 +11,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @todo temporary workaround. will be removed in BAP-16194
+ * The listener that moves 'bowerassets', 'npmassets' and 'components' directories
+ * from "public/bundles" directory to a temporary directory before "assets:install" command
+ * and restore these directories after this command finished.
+ * This is required because this command removes all assets that are not related to bundles.
  */
 class AssetsInstallCommandListener
 {
@@ -25,7 +28,7 @@ class AssetsInstallCommandListener
      * @param Filesystem $filesystem
      * @param string     $kernelProjectDir
      */
-    public function __construct(Filesystem $filesystem, $kernelProjectDir)
+    public function __construct(Filesystem $filesystem, string $kernelProjectDir)
     {
         $this->filesystem = $filesystem;
         $this->kernelProjectDir = $kernelProjectDir;
@@ -124,9 +127,22 @@ class AssetsInstallCommandListener
      */
     private function getPublicDir(InputInterface $input)
     {
+        $defaultPublicDir = 'public';
         $dir = rtrim($input->getArgument('target'), '/');
 
-        if ('public' === $dir) {
+        if (!$dir) {
+            $composerFilePath = $this->kernelProjectDir . '/composer.json';
+            if (!file_exists($composerFilePath)) {
+                $dir = $defaultPublicDir;
+            } else {
+                $composerConfig = json_decode(file_get_contents($composerFilePath), true);
+                if (isset($composerConfig['extra']['public-dir'])) {
+                    $dir = $composerConfig['extra']['public-dir'];
+                }
+            }
+        }
+
+        if ($dir === $defaultPublicDir) {
             $dir = $this->kernelProjectDir . DIRECTORY_SEPARATOR . $dir;
         }
 

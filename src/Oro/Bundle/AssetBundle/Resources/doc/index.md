@@ -119,7 +119,8 @@ After the update of NodeJs you might experience an error because node modules we
 To fix the error, remove the existing node modules and re-build the assets:
 ```bash
 rm -rf vendor/oro/platform/build/node_modules
-php bin/console oro:assets:install
+php bin/console cache:clear
+php bin/console oro:assets:build
 ```
 
 ##  JS engine not found
@@ -130,3 +131,5 @@ To fix the error, remove an application cache and warm it up:
 rm -rf var/cache/*
 php bin/console cache:warmup
 ```
+## Error: "output" for "assets" group in theme "oro" is not defined
+Please follow [upgrade documentation](../../../../../../CHANGELOG.md#assetbundle-1) to update `assets.yml` files according to new requirements.

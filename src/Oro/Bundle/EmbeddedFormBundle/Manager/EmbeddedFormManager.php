@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
-use Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface;
-use Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -122,28 +120,6 @@ class EmbeddedFormManager
 
         if ($typeInstance instanceof EmbeddedFormInterface) {
             return $typeInstance->getDefaultSuccessMessage();
-        }
-
-        return '';
-    }
-
-    /**
-     * @param string $type
-     *
-     * @return string
-     *
-     * @deprecated since 1.7. Please implement LayoutUpdateInterface in your form type instead.
-     */
-    public function getCustomFormLayoutByFormType($type)
-    {
-        $typeInstance = $this->getTypeInstance($type);
-
-        if ($typeInstance instanceof CustomLayoutFormTypeInterface) {
-            return $typeInstance->geFormLayout();
-        }
-
-        if ($typeInstance instanceof CustomLayoutFormInterface) {
-            return $typeInstance->getFormLayout();
         }
 
         return '';

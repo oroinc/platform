@@ -5,6 +5,7 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var $ = require('jquery');
+    var Backbone = require('backbone');
     var BaseView = require('oroui/js/app/views/base/view');
     var template = require('tpl!oroui/templates/modal-dialog.html');
     var mediator = require('oroui/js/mediator');
@@ -12,6 +13,8 @@ define(function(require) {
     var module = require('module');
     var config = module.config();
 
+    var SUSPEND_MODE_CLASS = 'suspend-mode';
+    var DATA_KEY = 'bs.modal';
     var EVENT_KEY = '.bs.modal';
     var EVENTS = {
         CLOSE: 'close',
@@ -44,7 +47,8 @@ define(function(require) {
             title: null,
             focusOk: true,
             okCloses: true,
-            animate: false
+            animate: false,
+            disposeOnHidden: true
         }
     }, config);
 
@@ -59,6 +63,10 @@ define(function(require) {
     ModalView = BaseView.extend({
         template: template,
 
+        hasOpenModal: false,
+
+        suspended: false,
+
         /**
          * @inheritDoc
          */
@@ -69,6 +77,9 @@ define(function(require) {
             events[EVENTS.CLICK + ' .cancel'] = this.handlerClick.bind(this, EVENTS.CANCEL);
             events[EVENTS.CLICK + ' .ok'] = this.handlerClick.bind(this, EVENTS.OK);
             events[EVENTS.CLICK + ' [data-button-id]'] = this.handlerClick.bind(this, EVENTS.BUTTONCLICK);
+            events[EVENTS.HIDDEN + EVENT_KEY] = 'onModalHidden';
+            events[EVENTS.SHOWN + EVENT_KEY] = 'onModalShown';
+            events[EVENTS.FOCUSIN + EVENT_KEY] = 'onModalFocusin';
 
             return events;
         },
@@ -108,6 +119,7 @@ define(function(require) {
             if (this.options.template) {
                 this.template = this.options.template;
             }
+
             ModalView.__super__.initialize.call(this, options);
         },
 
@@ -119,11 +131,10 @@ define(function(require) {
 
             var content = this.options.content;
 
-            this.$el.html(this.getTemplateFunction(this.options));
             this.$content = this.$('.modal-body');
 
             // Insert the main content if it's a view
-            if (content.$el) {
+            if (content instanceof Backbone.View) {
                 content.render();
                 this.$content.html(content.$el);
             }
@@ -165,10 +176,10 @@ define(function(require) {
 
             event.preventDefault();
 
-            this.trigger(eventName, $(event.target).data('button-id') || this);
             this.triggerEventOnContent(eventName);
+            this.trigger(eventName, $(event.target).data('button-id') || this);
 
-            if (this.options.okCloses &&
+            if (this.options && this.options.okCloses &&
                 (eventName === EVENTS.OK || eventName === EVENTS.BUTTONCLICK)
             ) {
                 this.close();
@@ -181,9 +192,36 @@ define(function(require) {
          * @params {String} eventName
          */
         triggerEventOnContent: function(eventName) {
-            if (_.isObject(this.options.content) && this.options.content.trigger) {
+            if (this.options && this.options.content instanceof Backbone.View) {
                 this.options.content.trigger(eventName, this);
             }
+        },
+
+        onModalHidden: function() {
+            this.hasOpenModal = false;
+
+            ModalView.count--;
+            mediator.trigger('modal:close', this);
+            this.trigger(EVENTS.HIDDEN);
+            this.triggerEventOnContent(EVENTS.HIDDEN);
+            this.undelegateEvents();
+
+            if (this.options.disposeOnHidden) {
+                this.dispose();
+            }
+        },
+
+        onModalShown: function() {
+            this.trigger(EVENTS.SHOWN);
+            this.triggerEventOnContent(EVENTS.SHOWN);
+        },
+
+        onModalFocusin: function(e) {
+            /*
+             * Prevents jquery-ui from focusing different dialog
+             * (which is happening when focusin is triggered on document
+             */
+            e.stopPropagation();
         },
 
         /**
@@ -192,6 +230,10 @@ define(function(require) {
          * @param {Function} [callback] Optional callback that runs only when OK is pressed.
          */
         open: function(callback) {
+            if (this.disposed) {
+                return;
+            }
+
             if (!this.isRendered) {
                 this.render();
             }
@@ -220,14 +262,6 @@ define(function(require) {
                 }.bind(this));
             }
 
-            this.once(EVENTS.CANCEL, function() {
-                this.close();
-            }.bind(this));
-
-            this.once(EVENTS.CLOSE, function() {
-                this.close();
-            }.bind(this));
-
             ModalView.count++;
 
             // Run callback on OK if provided
@@ -246,6 +280,8 @@ define(function(require) {
                 this.$('.ok').focus();
             }
 
+            this.hasOpenModal = true;
+
             return this;
         },
 
@@ -253,18 +289,48 @@ define(function(require) {
          * Handle for close the modal
          */
         close: function() {
+            if (this.disposed) {
+                return;
+            }
+
             // Check if the modal should stay open
             if (this._preventClose) {
                 this._preventClose = false;
                 return;
             }
 
-            this.$el.modal('hide');
-            ModalView.count--;
+            if (this.suspended) {
+                this._setSuspendState(false);
+            }
 
-            this.undelegateEvents();
-            this.stopListening();
-            mediator.trigger('modal:close', this);
+            this.$el.modal('hide');
+        },
+
+        isOpen: function() {
+            return this.hasOpenModal;
+        },
+
+        suspend: function() {
+            if (!this.suspended) {
+                this._setSuspendState(true);
+            }
+        },
+
+        restore: function() {
+            if (this.suspended) {
+                this._setSuspendState(false);
+            }
+        },
+
+        _setSuspendState: function(isSuspended) {
+            if (this.disposed) {
+                return;
+            }
+
+            var modal = this.$el.data(DATA_KEY);
+
+            $([modal._element, modal._backdrop]).toggleClass(SUSPEND_MODE_CLASS, isSuspended);
+            this.suspended = isSuspended;
         },
 
         /**
@@ -290,30 +356,6 @@ define(function(require) {
          */
         delegateEvents: function(events) {
             ModalView.__super__.delegateEvents.call(this, events);
-
-            this.$el.one(EVENTS.HIDDEN + EVENT_KEY, function onHidden(event) {
-                // Ignore events propagated from interior objects, like bootstrap tooltips
-                if (event.target !== event.currentTarget) {
-                    return this.$el.one(EVENTS.HIDDEN + + EVENT_KEY, onHidden);
-                }
-                this.remove();
-
-                this.trigger(EVENTS.HIDDEN);
-                this.triggerEventOnContent(EVENTS.HIDDEN);
-            }.bind(this));
-
-            this.$el.one(EVENTS.SHOWN + EVENT_KEY, function() {
-                this.trigger(EVENTS.SHOWN);
-                this.triggerEventOnContent(EVENTS.SHOWN);
-            }.bind(this));
-
-            this.$el.on(EVENTS.FOCUSIN + EVENT_KEY, function(e) {
-                /*
-                 * Prevents jquery-ui from focusing different dialog
-                 * (which is happening when focusin is triggered on document
-                 */
-                e.stopPropagation();
-            });
 
             $(document).one(EVENTS.KEYUP_DISMISS + EVENT_KEY + this.eventNamespace(), function(event) {
                 if (event.which !== 27) {
@@ -349,6 +391,12 @@ define(function(require) {
         dispose: function() {
             if (this.disposed) {
                 return;
+            }
+
+            var content = this.options.content;
+
+            if (content instanceof Backbone.View && !content.disposed) {
+                content.$el.detach();
             }
 
             delete this.$content;

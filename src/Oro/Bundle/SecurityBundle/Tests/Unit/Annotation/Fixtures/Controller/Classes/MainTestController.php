@@ -57,6 +57,20 @@ class MainTestController extends Controller
         return new Response('test');
     }
 
+    /**
+     * @Acl(
+     *      id = "user_test_main_controller_action4",
+     *      type="action",
+     *      group_name="Another Group",
+     *      label="Action 4"
+     * )
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function test4Action()
+    {
+        return new Response('test');
+    }
+
     public function testNoAclAction()
     {
         return new Response('test');

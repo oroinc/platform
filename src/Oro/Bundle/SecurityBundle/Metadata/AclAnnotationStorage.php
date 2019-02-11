@@ -6,7 +6,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor as AclAnnotationAncestor;
 
 /**
- * The storage for ACL annotations.
+ * The storage for ACL annotations and bindings.
  */
 class AclAnnotationStorage implements \Serializable
 {
@@ -165,6 +165,49 @@ class AclAnnotationStorage implements \Serializable
     }
 
     /**
+     * Gets bindings for class.
+     *
+     * @param string $class
+     *
+     * @return array [method name => annotation, ...]
+     */
+    public function getBindings(string $class): array
+    {
+        return $this->classes[$class] ?? [];
+    }
+
+    /**
+     * Removes bindings for class.
+     *
+     * @param string $class
+     */
+    public function removeBindings(string $class): void
+    {
+        unset($this->classes[$class]);
+    }
+
+    /**
+     * Removes an annotation binding.
+     *
+     * @param string      $class
+     * @param string|null $method
+     */
+    public function removeBinding(string $class, string $method = null): void
+    {
+        if (empty($class)) {
+            throw new \InvalidArgumentException('$class must not be empty.');
+        }
+
+        if (empty($method)) {
+            $method = '!';
+        }
+
+        if (isset($this->classes[$class][$method])) {
+            unset($this->classes[$class][$method]);
+        }
+    }
+
+    /**
      * Adds an annotation binding
      *
      * @param  string                    $id
@@ -203,12 +246,10 @@ class AclAnnotationStorage implements \Serializable
                 }
                 $this->classes[$class][$method] = $id;
             }
+        } elseif (empty($method)) {
+            $this->classes[$class] = ['!' => $id];
         } else {
-            if (empty($method)) {
-                $this->classes[$class] = ['!' => $id];
-            } else {
-                $this->classes[$class] = [$method => $id];
-            }
+            $this->classes[$class] = [$method => $id];
         }
     }
 
@@ -249,9 +290,9 @@ class AclAnnotationStorage implements \Serializable
     // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
-        $result              = new AclAnnotationStorage();
+        $result = new AclAnnotationStorage();
         $result->annotations = $data['annotations'];
-        $result->classes     = $data['classes'];
+        $result->classes = $data['classes'];
 
         return $result;
     }
