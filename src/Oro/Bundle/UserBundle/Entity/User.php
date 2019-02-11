@@ -465,6 +465,7 @@ class User extends ExtendUser implements
 
         $this->statuses = new ArrayCollection();
         $this->emails = new ArrayCollection();
+        $this->organizations = new ArrayCollection();
         $this->businessUnits = new ArrayCollection();
         $this->emailOrigins = new ArrayCollection();
         $this->apiKeys = new ArrayCollection();
