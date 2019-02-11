@@ -269,7 +269,7 @@ class AssociationManager
                 'target.%s AS entityId',
                 $this->doctrineHelper->getSingleEntityIdentifierFieldName($targetEntityClass)
             ),
-            (string)$qb->expr()->literal($targetEntityClass) . ' AS entityClass',
+            'CAST(' . ((string)$qb->expr()->literal($targetEntityClass)) . ' AS string) AS entityClass',
             $this->entityNameResolver->prepareNameDQL(
                 $this->entityNameResolver->getNameDQL($targetEntityClass, $targetAlias),
                 true
