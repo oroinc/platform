@@ -27,7 +27,7 @@ class ImportLayoutUpdateVisitorTest extends \PHPUnit\Framework\TestCase
         $phpClass->setMethod($method);
         $strategy = new DefaultGeneratorStrategy();
         $this->assertSame(
-<<<CLASS
+            <<<CLASS
 use Oro\Component\Layout\ImportLayoutManipulator;
 
 class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportInterface, \Oro\Component\Layout\IsApplicableLayoutUpdateInterface
@@ -72,7 +72,7 @@ class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportIn
 }
 CLASS
         ,
-        $strategy->generate($visitContext->getClass())
+            $strategy->generate($visitContext->getClass())
         );
     }
     //codingStandardsIgnoreEnd
