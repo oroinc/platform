@@ -64,7 +64,7 @@ class PermissionConfigurationProvider extends PhpArrayConfigProvider
         );
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
-            if (\array_key_exists(PermissionConfiguration::ROOT_NODE_NAME, $resource->data)) {
+            if (\array_key_exists(PermissionConfiguration::ROOT_NODE, $resource->data)) {
                 $configs[$resource->bundleClass] = $resource->data;
             }
         }

@@ -12,7 +12,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class FeatureToggleConfiguration implements ConfigurationInterface
 {
-    public const ROOT_NODE_NAME = 'features';
+    public const ROOT_NODE = 'features';
 
     /** @var ConfigurationExtensionInterface[] */
     private $extensions = [];
@@ -31,7 +31,7 @@ class FeatureToggleConfiguration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $builder = new TreeBuilder();
-        $root = $builder->root(self::ROOT_NODE_NAME);
+        $root = $builder->root(self::ROOT_NODE);
 
         $children = $root->useAttributeAsKey('name')->prototype('array')->children();
 

@@ -93,8 +93,8 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         );
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
-            if (!empty($resource->data[FeatureToggleConfiguration::ROOT_NODE_NAME])) {
-                $configs[$resource->bundleClass] = $resource->data[FeatureToggleConfiguration::ROOT_NODE_NAME];
+            if (!empty($resource->data[FeatureToggleConfiguration::ROOT_NODE])) {
+                $configs[$resource->bundleClass] = $resource->data[FeatureToggleConfiguration::ROOT_NODE];
             }
         }
 

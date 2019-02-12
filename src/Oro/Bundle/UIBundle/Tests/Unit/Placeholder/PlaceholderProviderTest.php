@@ -3,39 +3,33 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Placeholder;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\UIBundle\Placeholder\PlaceholderConfigurationProvider;
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Oro\Component\Config\Resolver\ResolverInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_PLACEHOLDER = 'test_placeholder';
+    private const TEST_PLACEHOLDER = 'test_placeholder';
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ResolverInterface
-     */
-    protected $resolver;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResolverInterface */
+    private $resolver;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface
-     */
-    protected $authorizationChecker;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
+    private $authorizationChecker;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|FeatureChecker
-     */
-    protected $featureChecker;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FeatureChecker */
+    private $featureChecker;
 
     protected function setUp()
     {
-        $this->resolver       = $this->createMock('Oro\Component\Config\Resolver\ResolverInterface');
+        $this->resolver = $this->createMock(ResolverInterface::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $this->featureChecker = $this->getMockBuilder('Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
+
         $this->featureChecker->expects($this->any())
             ->method('isResourceEnabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
     }
 
     public function testOnlyTemplateDefined()
@@ -264,19 +258,24 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
      * @param array $items
      * @return PlaceholderProvider
      */
-    protected function createProvider(array $items)
+    private function createProvider(array $items)
     {
-        $placeholders = [
-            'placeholders' => [
-                self::TEST_PLACEHOLDER => [
-                    'items' => array_keys($items)
-                ]
-            ],
-            'items' => $items
-        ];
+        $configProvider = $this->createMock(PlaceholderConfigurationProvider::class);
+        $configProvider->expects(self::any())
+            ->method('getPlaceholderItems')
+            ->willReturnCallback(function ($placeholderName) use ($items) {
+                return self::TEST_PLACEHOLDER === $placeholderName
+                    ? array_keys($items)
+                    : null;
+            });
+        $configProvider->expects(self::any())
+            ->method('getItemConfiguration')
+            ->willReturnCallback(function ($itemName) use ($items) {
+                return $items[$itemName] ?? null;
+            });
 
         return new PlaceholderProvider(
-            $placeholders,
+            $configProvider,
             $this->resolver,
             $this->authorizationChecker,
             $this->featureChecker

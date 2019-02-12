@@ -13,7 +13,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    public const ROOT_NODE_NAME = 'actions';
+    public const ROOT_NODE = 'actions';
 
     /**
      * {@inheritdoc}
@@ -21,7 +21,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::ROOT_NODE_NAME);
+        $rootNode = $treeBuilder->root(self::ROOT_NODE);
 
         $node = $rootNode->children();
         $this->appendActionGroups($node);

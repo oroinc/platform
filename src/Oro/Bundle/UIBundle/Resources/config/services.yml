@@ -1,8 +1,4 @@
 parameters:
-    oro_ui.placeholder.provider.class:                     Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider
-    oro_ui.placeholder.resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
-    oro_ui.placeholder.filter.class:                       Oro\Bundle\UIBundle\Placeholder\PlaceholderFilter
-
     oro_ui.router.class:                                   Oro\Bundle\UIBundle\Route\Router
     oro_ui.format_converter.date_time.jquery_ui.class:     Oro\Bundle\UIBundle\Converter\JqueryUiDateTimeFormatConverter
 
@@ -25,20 +21,38 @@ parameters:
 services:
     # Placeholder services
     oro_ui.placeholder.provider:
-        class: '%oro_ui.placeholder.provider.class%'
+        class: Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider
         arguments:
-            - '%oro_ui.placeholders%'
+            - '@oro_ui.placeholder.configuration.provider'
             - '@oro_ui.placeholder.resolver'
             - '@security.authorization_checker'
             - '@oro_featuretoggle.checker.feature_checker'
 
     oro_ui.placeholder.resolver:
-        class: '%oro_ui.placeholder.resolver.class%'
+        class: Oro\Component\Config\Resolver\SystemAwareResolver
+        public: false
         arguments:
             - '@service_container'
 
     oro_ui.placeholder.filter:
-        class: '%oro_ui.placeholder.filter.class%'
+        class: Oro\Bundle\UIBundle\Placeholder\PlaceholderFilter
+
+    oro_ui.placeholder.configuration.provider:
+        class: Oro\Bundle\UIBundle\Placeholder\PlaceholderConfigurationProvider
+        public: false
+        arguments:
+            - '%kernel.cache_dir%/oro/placeholders.php'
+            - '@oro_cache.config_cache_factory'
+
+    oro_ui.placeholder.configuration.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        public: false
+        arguments:
+            - '@oro_ui.placeholder.configuration.provider'
+        tags:
+            # add the warmer for this System cache at the begin of the warmers chain
+            # to prevent double warmup in case some Application cache depends on this cache
+            - { name: kernel.cache_warmer, priority: 200 }
 
     # Other services
     oro_ui.router:

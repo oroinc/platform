@@ -10,7 +10,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class PermissionConfiguration implements ConfigurationInterface
 {
-    public const ROOT_NODE_NAME = 'oro_permissions';
+    public const ROOT_NODE          = 'oro_permissions';
     public const DEFAULT_GROUP_NAME = 'default';
 
     /**
@@ -19,7 +19,7 @@ class PermissionConfiguration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $builder = new TreeBuilder();
-        $rootNode = $builder->root(self::ROOT_NODE_NAME);
+        $rootNode = $builder->root(self::ROOT_NODE);
 
         $rootNode->useAttributeAsKey('name')
             ->beforeNormalization()

@@ -29,7 +29,7 @@ class ConfigurablePermissionConfigurationTest extends \PHPUnit\Framework\TestCas
     public function testProcessConfiguration(array $config, array $expected)
     {
         $config = [
-            ConfigurablePermissionConfiguration::ROOT_NODE_NAME => $config
+            ConfigurablePermissionConfiguration::ROOT_NODE => $config
         ];
 
         $this->assertEquals($expected, $this->processConfiguration($config));
@@ -138,7 +138,7 @@ class ConfigurablePermissionConfigurationTest extends \PHPUnit\Framework\TestCas
     public function testProcessConfigurationException(array $config, $exception, $exceptionMessage)
     {
         $config = [
-            ConfigurablePermissionConfiguration::ROOT_NODE_NAME => $config
+            ConfigurablePermissionConfiguration::ROOT_NODE => $config
         ];
         $this->expectException($exception);
         $this->expectExceptionMessage($exceptionMessage);

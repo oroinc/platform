@@ -12,7 +12,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  */
 class ConfigurablePermissionConfiguration implements ConfigurationInterface
 {
-    public const ROOT_NODE_NAME = 'oro_configurable_permissions';
+    public const ROOT_NODE = 'oro_configurable_permissions';
 
     /**
      * {@inheritdoc}
@@ -20,7 +20,7 @@ class ConfigurablePermissionConfiguration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $builder = new TreeBuilder();
-        $rootNode = $builder->root(self::ROOT_NODE_NAME);
+        $rootNode = $builder->root(self::ROOT_NODE);
 
         $rootNode->useAttributeAsKey('name')
             ->isRequired()
