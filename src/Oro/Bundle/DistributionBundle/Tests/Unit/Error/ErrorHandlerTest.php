@@ -35,10 +35,11 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
      * @param string $message
      * @param bool $silenced
      * @dataProvider warningDataProvider
+     * @throws \ErrorException
      */
-    public function testHandleWarning($message, $silenced = true)
+    public function testHandleWarning($message, $silenced = true): void
     {
-        $this->assertEquals($silenced, $this->handler->handleWarning(E_WARNING, $message));
+        $this->assertEquals($silenced, $this->handler->handleErrors(E_WARNING, $message, '', 0));
     }
 
     /**

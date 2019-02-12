@@ -39,7 +39,7 @@ class ImportsAwareLayoutUpdateVisitorTest extends \PHPUnit\Framework\TestCase
         $phpClass->setMethod($method);
         $strategy = new DefaultGeneratorStrategy();
         $this->assertSame(
-<<<CLASS
+            <<<CLASS
 class LayoutUpdateWithImport implements \Oro\Component\Layout\ImportsAwareLayoutUpdateInterface
 {
     public function testMethod()
@@ -67,7 +67,7 @@ class LayoutUpdateWithImport implements \Oro\Component\Layout\ImportsAwareLayout
 }
 CLASS
         ,
-        $strategy->generate($visitContext->getClass())
+            $strategy->generate($visitContext->getClass())
         );
     }
     //codingStandardsIgnoreEnd
