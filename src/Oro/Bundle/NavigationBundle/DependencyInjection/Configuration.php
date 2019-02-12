@@ -23,6 +23,7 @@ class Configuration implements ConfigurationInterface
         $node = $rootNode->children();
         $node->scalarNode('js_routing_filename_prefix')
             ->defaultValue('')
+            ->info('The prefix in the name of the file with a list of js routes.')
             ->beforeNormalization()
                 ->always(
                     function ($data) {
