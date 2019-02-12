@@ -1,6 +1,4 @@
 parameters:
-    oro_config.config_bag.class:                                                 Oro\Bundle\ConfigBundle\Config\ConfigBag
-    oro_config.config_definition_bag.class:                                      Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag
     oro_config.global.class:                                                     Oro\Bundle\ConfigBundle\Config\GlobalScopeManager
     oro_config.user.class:                                                       Oro\Bundle\ConfigBundle\Config\UserScopeManager
     oro_config.provider.system_configuration.form_provider.class:                Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider
@@ -19,15 +17,16 @@ parameters:
 
 services:
     oro_config.config_bag:
-        class: '%oro_config.config_bag.class%'
+        class: Oro\Bundle\ConfigBundle\Config\ConfigBag
         arguments:
-            - []
+            - [] # config; it is set by Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
             - '@service_container'
 
     oro_config.config_definition_bag:
-        class: '%oro_config.config_definition_bag.class%'
+        class: Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag
+        public: false
         arguments:
-            - []
+            - [] # settings; they are set by Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
 
     oro_config.cache:
         public: false
@@ -87,8 +86,6 @@ services:
             - '@form.registry'
         calls:
             - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
-        tags:
-            -  { name: oro_config.configuration_provider }
 
     oro_config.provider.system_configuration.form_provider:
         class: '%oro_config.provider.system_configuration.form_provider.class%'
