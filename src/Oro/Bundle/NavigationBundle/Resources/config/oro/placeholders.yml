@@ -36,6 +36,7 @@ placeholders:
     items:
         routing_requirejs_config:
             template: OroNavigationBundle:Js:requirejs.config.js.twig
+            applicable: "@oro_user.placeholder.filter->isUserApplicable()"
         shortcuts:
             template: OroNavigationBundle:Shortcut:shortcuts.html.twig
             applicable: "@oro_user.placeholder.filter->isUserApplicable()"

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -16,6 +15,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Select organization form type.
+ */
 class OrganizationsSelectType extends AbstractType
 {
     /** @var  EntityManager */
@@ -55,7 +57,6 @@ class OrganizationsSelectType extends AbstractType
                 ],
                 'organization_tree_ids'   => [],
                 'selected_organizations'  => [],
-                'selected_business_units' => [],
                 'inherit_data'            => true,
             ]
         );
@@ -109,9 +110,11 @@ class OrganizationsSelectType extends AbstractType
                 'required' => false,
                 'label' => 'oro.user.form.business_units.label',
                 'autocomplete_alias' => 'business_units_tree_search_handler',
+                'label_attr' => [
+                    'class' => 'business-units-label'
+                ],
                 'configs'            => [
                     'multiple'    => true,
-                    'width'       => '400px',
                     'component'   => 'bu-tree-autocomplete',
                     'placeholder' => 'oro.dashboard.form.choose_business_unit',
                     'allowClear'  => true,
@@ -130,21 +133,8 @@ class OrganizationsSelectType extends AbstractType
         );
 
         $view->vars['organization_tree_ids'] = $buTree;
-
-        /** @var PersistentCollection $businessUnitData */
-        $businessUnitData = $view->vars['data']->getBusinessUnits();
-        if ($businessUnitData) {
-            $businessUnitData = $businessUnitData->map(
-                function ($item) {
-                    return $item->getId();
-                }
-            )->getValues();
-        }
-
         $view->vars['default_organization'] = $this->tokenAccessor->getOrganizationId();
-        $view->vars['selected_organizations']  = [$this->tokenAccessor->getOrganizationId()];
-        $view->vars['selected_business_units'] = $businessUnitData;
-        $view->vars['accordion_enabled'] = $this->buManager->getTreeNodesCount($buTree) > 1000;
+        $view->vars['selected_organizations'] = [$this->tokenAccessor->getOrganizationId()];
     }
 
     /**

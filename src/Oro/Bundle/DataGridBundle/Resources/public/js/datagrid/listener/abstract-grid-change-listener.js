@@ -169,7 +169,8 @@ define([
                 this.confirmModal[type] = new Modal(_.extend({
                     title: __('Confirmation'),
                     okText: __('OK, got it.'),
-                    className: 'modal modal-primary'
+                    className: 'modal modal-primary',
+                    disposeOnHidden: false
                 }, options));
                 this.confirmModal[type].on('ok', _.bind(callback, this));
             }

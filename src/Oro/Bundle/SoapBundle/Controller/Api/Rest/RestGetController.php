@@ -4,7 +4,6 @@ namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Proxy\Proxy;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\UnitOfWork;
 use FOS\RestBundle\Controller\FOSRestController;
@@ -19,11 +18,13 @@ use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use Oro\Component\EntitySerializer\DataAccessorInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 /**
+ * The base class for REST API controllers that implement GET HTTP method.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class RestGetController extends FOSRestController implements EntityManagerAwareInterface, RestApiReadInterface
@@ -190,6 +191,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                     'title'  => $entity->getRecordTitle()
                 ];
             } else {
+                $entityClass = get_class($entity);
                 /** @var UnitOfWork $uow */
                 $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
                 foreach ($uow->getOriginalEntityData($entity) as $field => $value) {
@@ -197,26 +199,27 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                         continue;
                     }
 
-                    $accessors = ['get' . ucfirst($field), 'is' . ucfirst($field), 'has' . ucfirst($field)];
-                    foreach ($accessors as $accessor) {
-                        if (method_exists($entity, $accessor)) {
-                            $isForbidden = !$this->isGranted('VIEW', new FieldVote($entity, $field));
-                            if ($isForbidden) {
-                                continue;
-                            }
-
-                            $value = $entity->$accessor();
-
-                            $this->transformEntityField($field, $value);
-                            $result[$field] = $value;
-                            break;
-                        }
+                    $dataAccessor = $this->getDataAccessor();
+                    if ($dataAccessor->hasGetter($entityClass, $field)
+                        && $this->isGranted('VIEW', new FieldVote($entity, $field))
+                    ) {
+                        $value = $dataAccessor->getValue($entity, $field);
+                        $this->transformEntityField($field, $value);
+                        $result[$field] = $value;
                     }
                 }
             }
         }
 
         return $result;
+    }
+
+    /**
+     * @return DataAccessorInterface
+     */
+    protected function getDataAccessor()
+    {
+        return $this->get('oro_soap.entity_serializer.entity_accessor');
     }
 
     /**

@@ -18,6 +18,12 @@ define(function(require) {
         /** @property {String} */
         className: 'modal oro-modal-normal',
 
+        defaultOptions: {
+            title: __('Confirmation'),
+            okText: __('Yes'),
+            cancelText: __('Cancel')
+        },
+
         /**
          * @inheritDoc
          */
@@ -29,14 +35,9 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            options = _.extend({
-                title: __('Confirmation'),
-                okText: __('Yes'),
-                cancelText: __('Cancel')
-            }, options);
+            options = _.defaults(options, this.defaultOptions);
 
-            arguments[0] = options;
-            ModalView.prototype.initialize.apply(this, arguments);
+            StandartConfirmationView.__super__.initialize.call(this, options);
         }
     });
 

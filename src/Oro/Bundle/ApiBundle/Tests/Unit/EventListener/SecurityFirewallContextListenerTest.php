@@ -20,6 +20,21 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
     private const AJAX_HEADER  = 'X-CSRF-Header';
 
     /**
+     * @param ContextListener       $innerListener
+     * @param TokenStorageInterface $tokenStorage
+     *
+     * @return SecurityFirewallContextListener
+     */
+    private function getListener(ContextListener $innerListener, TokenStorageInterface $tokenStorage)
+    {
+        return new SecurityFirewallContextListener(
+            $innerListener,
+            ['name' => self::SESSION_NAME],
+            $tokenStorage
+        );
+    }
+
+    /**
      * @return GetResponseEvent
      */
     private function createMasterRequestEvent()
@@ -49,7 +64,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('handle')
             ->with($event);
 
-        $listener = new SecurityFirewallContextListener($innerListener, self::SESSION_NAME, $tokenStorage);
+        $listener = $this->getListener($innerListener, $tokenStorage);
         $listener->handle($event);
     }
 
@@ -68,7 +83,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
         $innerListener->expects(self::never())
             ->method('handle');
 
-        $listener = new SecurityFirewallContextListener($innerListener, self::SESSION_NAME, $tokenStorage);
+        $listener = $this->getListener($innerListener, $tokenStorage);
         $listener->handle($event);
     }
 
@@ -86,7 +101,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
         $innerListener->expects(self::never())
             ->method('handle');
 
-        $listener = new SecurityFirewallContextListener($innerListener, self::SESSION_NAME, $tokenStorage);
+        $listener = $this->getListener($innerListener, $tokenStorage);
         $listener->handle($event);
     }
 
@@ -104,7 +119,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
         $innerListener->expects(self::never())
             ->method('handle');
 
-        $listener = new SecurityFirewallContextListener($innerListener, self::SESSION_NAME, $tokenStorage);
+        $listener = $this->getListener($innerListener, $tokenStorage);
         $listener->handle($event);
     }
 
@@ -128,7 +143,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
                 $tokenStorage->setToken($sessionToken);
             });
 
-        $listener = new SecurityFirewallContextListener($innerListener, self::SESSION_NAME, $tokenStorage);
+        $listener = $this->getListener($innerListener, $tokenStorage);
         $listener->handle($event);
 
         self::assertSame($sessionToken, $tokenStorage->getToken());
@@ -153,7 +168,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
                 $tokenStorage->setToken(null);
             });
 
-        $listener = new SecurityFirewallContextListener($innerListener, self::SESSION_NAME, $tokenStorage);
+        $listener = $this->getListener($innerListener, $tokenStorage);
         $listener->handle($event);
 
         self::assertSame($anonymousToken, $tokenStorage->getToken());
@@ -173,7 +188,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
         $innerListener->expects(self::never())
             ->method('handle');
 
-        $listener = new SecurityFirewallContextListener($innerListener, self::SESSION_NAME, $tokenStorage);
+        $listener = $this->getListener($innerListener, $tokenStorage);
         $listener->handle($event);
     }
 
@@ -191,7 +206,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
         $innerListener->expects(self::never())
             ->method('handle');
 
-        $listener = new SecurityFirewallContextListener($innerListener, self::SESSION_NAME, $tokenStorage);
+        $listener = $this->getListener($innerListener, $tokenStorage);
         $listener->handle($event);
     }
 }

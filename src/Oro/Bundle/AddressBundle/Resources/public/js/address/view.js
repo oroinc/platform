@@ -87,7 +87,7 @@ define([
 
             this.$el.attr('id', 'address-book-' + this.model.id);
             this.template = _.template($(options.template || '#template-addressbook-item').html());
-            this.listenTo(this.model, 'destroy', this.remove);
+            this.listenTo(this.model, 'destroy', this.dispose);
             this.listenTo(this.model, 'change:active', this.toggleActive);
         },
 
@@ -129,9 +129,16 @@ define([
 
         confirmClose: function(callback) {
             if (this.options.confirmRemove) {
-                var confirmRemoveComponent = new this.confirmRemoveComponent(this.confirmRemoveMessages);
-                this.subview('confirmRemoveComponent', confirmRemoveComponent);
-                confirmRemoveComponent.on('ok', callback)
+                var confirmRemoveView = this.subview('confirmRemoveView');
+
+                if (!confirmRemoveView) {
+                    var confirmRemoveView = new this.confirmRemoveComponent(this.confirmRemoveMessages);
+                    this.subview('confirmRemoveView', confirmRemoveView);
+                } else {
+                    confirmRemoveView.off('ok');
+                }
+
+                confirmRemoveView.on('ok', callback)
                     .open();
             } else {
                 callback();

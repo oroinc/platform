@@ -22,13 +22,13 @@ class LoginAttemptsLogSubscriber implements EventSubscriberInterface
     const UNSUCCESSFUL_LOGIN_MESSAGE = 'Unsuccessful login';
 
     /** @var BaseUserManager */
-    protected $userManager;
+    private $userManager;
 
     /** @var UserLoggingInfoProvider */
-    protected $infoProvider;
+    private $infoProvider;
 
     /** @var LoggerInterface */
-    protected $logger;
+    private $logger;
 
     /**
      * @param BaseUserManager $userManager
@@ -71,12 +71,12 @@ class LoginAttemptsLogSubscriber implements EventSubscriberInterface
         if ($user instanceof User) {
             $this->logger->notice(
                 self::UNSUCCESSFUL_LOGIN_MESSAGE,
-                ['user' => $this->infoProvider->getUserLoggingInfo($user)]
+                $this->infoProvider->getUserLoggingInfoData($user)
             );
         } elseif ($token instanceof UsernamePasswordToken && $token->getProviderKey() === 'main') {
             $this->logger->notice(
                 self::UNSUCCESSFUL_LOGIN_MESSAGE,
-                ['username' => $token->getUser()]
+                $this->infoProvider->getUserLoggingInfoData($token->getUser())
             );
         }
     }
@@ -92,7 +92,7 @@ class LoginAttemptsLogSubscriber implements EventSubscriberInterface
         if ($user instanceof User) {
             $this->logger->info(
                 self::SUCCESSFUL_LOGIN_MESSAGE,
-                ['user' => $this->infoProvider->getUserLoggingInfo($user)]
+                $this->infoProvider->getUserLoggingInfoData($user)
             );
         }
     }

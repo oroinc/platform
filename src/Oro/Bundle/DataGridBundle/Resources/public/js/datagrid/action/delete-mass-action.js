@@ -64,25 +64,12 @@ define([
             this.confirmation = false;
         },
 
-        /**
-         * Get view for confirm modal
-         *
-         * @return {oroui.Modal}
-         */
-        getConfirmDialog: function(callback) {
-            if (!this.confirmModal) {
-                this.confirmModal = (new this.confirmModalConstructor({
-                    title: __(this.messages.confirm_title),
-                    content: this.getConfirmContentMessage(),
-                    okText: __(this.messages.confirm_ok),
-                    cancelText: __(this.messages.confirm_cancel),
-                    allowOk: this.allowOk
-                }));
-                this.listenTo(this.confirmModal, 'ok', callback);
+        getConfirmDialogOptions: function() {
+            var options = DeleteMassAction.__super__.getConfirmDialogOptions.call(this);
 
-                this.subviews.push(this.confirmModal);
-            }
-            return this.confirmModal;
+            options.allowOk = this.allowOk;
+
+            return options;
         },
 
         /**

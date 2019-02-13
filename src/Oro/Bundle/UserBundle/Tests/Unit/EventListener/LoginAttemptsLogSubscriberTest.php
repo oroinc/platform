@@ -17,16 +17,16 @@ use Symfony\Component\Security\Http\SecurityEvents;
 class LoginAttemptsLogSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $userManager;
+    private $userManager;
 
     /** @var UserLoggingInfoProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $infoProvider;
+    private $infoProvider;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private $logger;
 
     /** @var LoginAttemptsLogSubscriber */
-    protected $subscriber;
+    private $subscriber;
 
     public function setUp()
     {
@@ -34,11 +34,7 @@ class LoginAttemptsLogSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->infoProvider = $this->createMock(UserLoggingInfoProvider::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->subscriber = new LoginAttemptsLogSubscriber(
-            $this->userManager,
-            $this->infoProvider,
-            $this->logger
-        );
+        $this->subscriber = new LoginAttemptsLogSubscriber($this->userManager, $this->infoProvider, $this->logger);
     }
 
     public function testGetSubscribedEvents()
@@ -60,13 +56,13 @@ class LoginAttemptsLogSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new AuthenticationFailureEvent($token, $this->createMock(AuthenticationException::class));
 
         $this->infoProvider->expects($this->once())
-            ->method('getUserLoggingInfo')
+            ->method('getUserLoggingInfoData')
             ->with($user)
             ->willReturn($userInfo);
 
         $this->logger->expects($this->once())
             ->method('notice')
-            ->with(LoginAttemptsLogSubscriber::UNSUCCESSFUL_LOGIN_MESSAGE, ['user' => $userInfo]);
+            ->with(LoginAttemptsLogSubscriber::UNSUCCESSFUL_LOGIN_MESSAGE, $userInfo);
 
         $this->subscriber->onAuthenticationFailure($event);
     }
@@ -74,6 +70,10 @@ class LoginAttemptsLogSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnAuthenticationFailureWithUserAsString()
     {
         $user = 'some wrong username';
+        $userInfo = [
+            'username' => 'some wrong username',
+            'ipaddress' => '127.0.0.1'
+        ];
 
         $token = $this->createMock(UsernamePasswordToken::class);
         $token->expects($this->atLeastOnce())->method('getUser')->willReturn($user);
@@ -86,9 +86,14 @@ class LoginAttemptsLogSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with($user)
             ->willReturn(null);
 
+        $this->infoProvider->expects($this->once())
+            ->method('getUserLoggingInfoData')
+            ->with($user)
+            ->willReturn($userInfo);
+
         $this->logger->expects($this->once())
             ->method('notice')
-            ->with(LoginAttemptsLogSubscriber::UNSUCCESSFUL_LOGIN_MESSAGE, ['username' => 'some wrong username']);
+            ->with(LoginAttemptsLogSubscriber::UNSUCCESSFUL_LOGIN_MESSAGE, $userInfo);
 
         $this->subscriber->onAuthenticationFailure($event);
     }
@@ -119,7 +124,7 @@ class LoginAttemptsLogSubscriberTest extends \PHPUnit\Framework\TestCase
         $userInfo = ['user', 'info', 'that', 'must', 'be', 'written', 'into', 'log'];
 
         $this->infoProvider->expects($this->once())
-            ->method('getUserLoggingInfo')
+            ->method('getUserLoggingInfoData')
             ->with($user)
             ->willReturn($userInfo);
 
@@ -131,7 +136,7 @@ class LoginAttemptsLogSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->logger->expects($this->once())
             ->method('info')
-            ->with(LoginAttemptsLogSubscriber::SUCCESSFUL_LOGIN_MESSAGE, ['user' => $userInfo]);
+            ->with(LoginAttemptsLogSubscriber::SUCCESSFUL_LOGIN_MESSAGE, $userInfo);
 
         $this->subscriber->onInteractiveLogin($event);
     }

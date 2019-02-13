@@ -93,17 +93,14 @@ define([
 
             var confirm = new Modal(modalOptions);
 
-            if (callback) {
-                confirm.on('ok', callback);
-            } else {
-                confirm.on('ok', function() {
-                    performTransition(element, null, pageRefresh);
-                });
-            }
-            confirm.on('cancel', function() {
-                resetInProgress();
-            });
-            confirm.open();
+            callback = callback || function() {
+                performTransition(element, null, pageRefresh);
+            };
+
+            confirm
+                .on('ok', callback)
+                .on('cancel', resetInProgress)
+                .open();
         };
 
         if (element.data('_in-progress')) {
