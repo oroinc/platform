@@ -4,6 +4,9 @@ namespace Oro\Component\Layout\Extension\Theme\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+/**
+ * Stores all configuration values which may be configured in `theme.yml`.
+ */
 class Theme
 {
     /** @var string */
@@ -17,6 +20,9 @@ class Theme
 
     /** @var string */
     protected $icon;
+
+    /** @var array */
+    protected $imagePlaceholders = [];
 
     /** @var string */
     protected $logo;
@@ -107,6 +113,22 @@ class Theme
     public function setIcon($icon)
     {
         $this->icon = $icon;
+    }
+
+    /**
+     * @return array
+     */
+    public function getImagePlaceholders(): array
+    {
+        return $this->imagePlaceholders;
+    }
+
+    /**
+     * @param array $imagePlaceholders
+     */
+    public function setImagePlaceholders(array $imagePlaceholders): void
+    {
+        $this->imagePlaceholders = $imagePlaceholders;
     }
 
     /**
