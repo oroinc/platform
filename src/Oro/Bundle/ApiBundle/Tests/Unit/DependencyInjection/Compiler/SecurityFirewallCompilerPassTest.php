@@ -9,6 +9,7 @@ use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -19,12 +20,6 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
 
     /** @var ContainerBuilder */
     private $container;
-
-    private static $defaultServiceIds = [
-        'service_container',
-        \Psr\Container\ContainerInterface::class,
-        \Symfony\Component\DependencyInjection\ContainerInterface::class
-    ];
 
     protected function setUp()
     {
@@ -37,7 +32,6 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->container->prependExtensionConfig('security', []);
 
         $this->compiler->process($this->container);
-        self::assertEquals(static::$defaultServiceIds, $this->container->getServiceIds());
     }
 
     public function testProcessOnEmptySecurityFirewallsConfig()
@@ -45,7 +39,6 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->container->prependExtensionConfig('security', ['firewalls' => []]);
 
         $this->compiler->process($this->container);
-        self::assertEquals(static::$defaultServiceIds, $this->container->getServiceIds());
     }
 
     public function testProcessOnNonStatelessFirewall()
@@ -54,10 +47,8 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
             'security',
             ['firewalls' => ['testFirewall' => ['stateless' => false, 'context' => 'main']]]
         );
-        $this->container->setParameter('session.storage.options', ['name' => 'test']);
 
         $this->compiler->process($this->container);
-        self::assertEquals(static::$defaultServiceIds, $this->container->getServiceIds());
     }
 
     public function testProcessOnStatelessButWithoutContextFirewall()
@@ -66,10 +57,8 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
             'security',
             ['firewalls' => ['testFirewall' => ['stateless' => true]]]
         );
-        $this->container->setParameter('session.storage.options', ['name' => 'test']);
 
         $this->compiler->process($this->container);
-        self::assertEquals(static::$defaultServiceIds, $this->container->getServiceIds());
     }
 
     public function testProcessOnStatelessButWithoutMapContext()
@@ -78,10 +67,8 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
             'security',
             ['firewalls' => ['testFirewall' => ['stateless' => true, 'context' => 'main']]]
         );
-        $this->container->setParameter('session.storage.options', ['name' => 'test']);
 
         $this->compiler->process($this->container);
-        self::assertEquals(static::$defaultServiceIds, $this->container->getServiceIds());
     }
 
     public function testProcess()
@@ -99,11 +86,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         $contextFirewallContext = new Definition(
             FirewallContext::class,
             [
-                new IteratorArgument(
-                    [
-                        new Reference('security.access_listener')
-                    ]
-                ),
+                new IteratorArgument([new Reference('security.access_listener')]),
                 $exceptionListener
             ]
         );
@@ -112,7 +95,6 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
             'security.firewall.map.context.testFirewall',
             $contextFirewallContext
         );
-        $this->container->setParameter('session.storage.options', ['name' => 'test']);
 
         $this->compiler->process($this->container);
 
@@ -121,7 +103,14 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('main', $contextListener->getArgument(2));
         $contextFirewallListener = $this->container->getDefinition('oro_security.context_listener.main.testFirewall');
         self::assertEquals(SecurityFirewallContextListener::class, $contextFirewallListener->getClass());
-        self::assertEquals('oro_security.context_listener.main', (string)$contextFirewallListener->getArgument(0));
+        self::assertEquals(
+            [
+                new Reference('oro_security.context_listener.main'),
+                new Reference('security.token_storage'),
+                new Reference('session', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
+            ],
+            $contextFirewallListener->getArguments()
+        );
         self::assertEquals(SecurityFirewallExceptionListener::class, $exceptionListenerDefinition->getClass());
 
         $listeners = $contextFirewallContext->getArgument(0);

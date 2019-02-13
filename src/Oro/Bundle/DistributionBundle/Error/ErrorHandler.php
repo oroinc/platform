@@ -62,7 +62,7 @@ class ErrorHandler extends BaseErrorHandler
         switch ($code) {
             case E_WARNING:
             case E_USER_WARNING:
-                return $this->handleWarning($code, $message);
+                return $this->handleWarning($message);
                 break;
             case E_ERROR:
             case E_USER_ERROR:
@@ -77,19 +77,12 @@ class ErrorHandler extends BaseErrorHandler
     }
 
     /**
-     * @param int $number
-     * @param string $string
-     * @deprecated since 1.7 it will be protected after 1.9
-     *
+     * @param $string
      * @return bool
      */
-    public function handleWarning($number, $string)
+    protected function handleWarning(string $string): bool
     {
-        // silence warning from php_network_getaddresses due to https://magecore.atlassian.net/browse/BAP-3979
-        if (strpos($string, 'php_network_getaddresses') !== false) {
-            return true;
-        }
-
-        return false;
+        // silence warning from php_network_getaddresses due to BAP-3979
+        return strpos($string, 'php_network_getaddresses') !== false;
     }
 }

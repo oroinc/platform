@@ -23,6 +23,9 @@ use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * Provides activity list filter by creating query builder based on values passed to filter form fields.
+ */
 class ActivityListFilter extends EntityFilter
 {
     const TYPE_HAS_ACTIVITY = 'hasActivity';
@@ -324,7 +327,7 @@ class ActivityListFilter extends EntityFilter
      */
     protected function getRelatedActivityClass(array $data)
     {
-        return $this->entityRoutingHelper->decodeClassName($data['activityType']['value'][0]);
+        return $this->entityRoutingHelper->resolveEntityClass($data['activityType']['value'][0]);
     }
 
     /**

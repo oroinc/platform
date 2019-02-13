@@ -301,3 +301,9 @@ $select2-drop-mask-position: absolute !default;
 $select2-drop-mask-left: 0 !default;
 $select2-drop-mask-top: 0 !default;
 $select2-drop-mask-z-index: 9998 !default;
+
+$select2-tree-autocomplete-choice-item-color: $body-color !default;
+$select2-tree-autocomplete-choice-item-font-size: $base-font-size !default;
+$select2-tree-autocomplete-choice-item-line-height: $line-height-base !default;
+$select2-tree-autocomplete-choice-item-close-icon: $fa-var-trash-o !default;
+$select2-tree-autocomplete-choice-item-close-font-size: $base-font-size--m !default;

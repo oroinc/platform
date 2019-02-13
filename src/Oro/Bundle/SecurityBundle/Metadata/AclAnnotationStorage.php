@@ -5,6 +5,9 @@ namespace Oro\Bundle\SecurityBundle\Metadata;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor as AclAnnotationAncestor;
 
+/**
+ * Storage of ACL annotations and bindings.
+ */
 class AclAnnotationStorage implements \Serializable
 {
     /**
@@ -172,6 +175,49 @@ class AclAnnotationStorage implements \Serializable
     {
         if ($class !== null) {
             $this->addBinding($ancestor->getId(), $class, $method);
+        }
+    }
+
+    /**
+     * Gets bindings for class.
+     *
+     * @param string $class
+     *
+     * @return array [method name => annotation, ...]
+     */
+    public function getBindings(string $class): array
+    {
+        return isset($this->classes[$class]) ? $this->classes[$class] : [];
+    }
+
+    /**
+     * Removes bindings for class.
+     *
+     * @param string $class
+     */
+    public function removeBindings(string $class): void
+    {
+        unset($this->classes[$class]);
+    }
+
+    /**
+     * Removes an annotation binding.
+     *
+     * @param string      $class
+     * @param string|null $method
+     */
+    public function removeBinding(string $class, string $method = null): void
+    {
+        if (empty($class)) {
+            throw new \InvalidArgumentException('$class must not be empty.');
+        }
+
+        if (empty($method)) {
+            $method = '!';
+        }
+
+        if (isset($this->classes[$class][$method])) {
+            unset($this->classes[$class][$method]);
         }
     }
 

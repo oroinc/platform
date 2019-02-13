@@ -66,7 +66,8 @@ define(function(require) {
             if (!$element.data('button-manager')) {
                 var options = $element.data('options') || {};
 
-                $element.data('button-manager', new ButtonManager(options));
+                this.buttonManager = new ButtonManager(options);
+                $element.data('button-manager', this.buttonManager);
             }
 
             return $element.data('button-manager');
@@ -78,6 +79,11 @@ define(function(require) {
             }
 
             this.$button.off();
+
+            if (this.buttonManager && _.isFunction(this.buttonManager.dispose)) {
+                this.buttonManager.dispose();
+                delete this.buttonManager;
+            }
 
             ButtonComponent.__super__.dispose.call(this);
         }

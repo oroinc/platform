@@ -419,7 +419,7 @@ services:
                     - integer
                     -
                         - Regex:
-                            pattern: '/^[\d+]*$/'
+                            pattern: '/^\-{0,1}[\d+]*$/'
                             message: "This value should contain only numbers."
             -
                 - addConstraints
@@ -427,7 +427,7 @@ services:
                     - smallint
                     -
                         - Regex:
-                              pattern: '/^[\d+]*$/'
+                              pattern: '/^\-{0,1}[\d+]*$/'
                               message: "This value should contain only numbers."
             -
                 - addConstraints
@@ -435,7 +435,7 @@ services:
                     - bigint
                     -
                         - Regex:
-                              pattern: '/^[\d+]*$/'
+                              pattern: '/^\-{0,1}[\d+]*$/'
                               message: "This value should contain only numbers."
             - [addConstraints, ['float', [{ Type: {type: 'numeric'} }]]]
             - [addConstraints, ['decimal', [{ Type: {type: 'numeric'} }]]]

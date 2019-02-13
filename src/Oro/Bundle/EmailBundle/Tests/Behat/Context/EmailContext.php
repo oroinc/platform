@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Behat\Context;
 
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
@@ -9,6 +10,7 @@ use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EmailBundle\Tests\Behat\Mock\Mailer\DirectMailerDecorator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -19,6 +21,22 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
 
     /** @var DirectMailerDecorator */
     private $mailer;
+
+    /**
+     * @var OroMainContext
+     */
+    private $oroMainContext;
+
+    /**
+     * @BeforeScenario
+     *
+     * @param BeforeScenarioScope $scope
+     */
+    public function gatherContexts(BeforeScenarioScope $scope)
+    {
+        $environment = $scope->getEnvironment();
+        $this->oroMainContext = $environment->getContext(OroMainContext::class);
+    }
 
     /**
      * @BeforeScenario
@@ -381,5 +399,19 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
 
         $url = htmlspecialchars_decode($matches[1]);
         $this->visitPath($url);
+    }
+
+    /**
+     * Example: Then I follow "Confirm" link from the email without wait for ajax
+     *
+     * @Given /^(?:|I )follow "(?P<linkCaption>[^"]+)" link from the email without wait for ajax$/
+     *
+     * @param string $linkCaption
+     */
+    public function followLinkFromEmailWithoutWaitForAjax(string $linkCaption)
+    {
+        $this->followLinkFromEmail($linkCaption);
+
+        $this->oroMainContext->applySkipWait();
     }
 }

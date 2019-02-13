@@ -6,7 +6,14 @@ placeholders:
                     order: 5
                 filter_embedded_templates:
                     order: 6
+        requirejs_config_extend:
+            items:
+                filter_requirejs_config:
+                    order: 100
 
     items:
-       filter_embedded_templates:
+        filter_embedded_templates:
             template: OroFilterBundle:Js:embedded_templates.js.twig
+        filter_requirejs_config:
+            template: OroFilterBundle::requirejs.config.js.twig
+            applicable: "@oro_layout.helper->isTemplateRequest()"

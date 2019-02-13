@@ -272,9 +272,11 @@ oro:
             serialized_data.label:    Serialized data
             transition_records.label: Transition records
             workflow_name.label:      Workflow name
-
-            related_entity.label:       Workflow Item
-            related_entity.description: Related field for Workflow Item
+            related_entity:
+                label:                Workflow Item
+                description:          Related field for Workflow Item
+            restriction_identities:
+                label:                Restriction identities
 
         workflowstep:
             entity_label:         Workflow Step
@@ -286,10 +288,10 @@ oro:
             label.label:          Name # this translation has been chosen because it doesn't confuse users
             name.label:           Code # this translation has been chosen because it doesn't confuse users
             step_order.label:     Step order
-
-            related_entity.label:       Workflow Step
-            related_entity.description: Related field for Workflow Step
-            grid.label:                 Step
+            related_entity:
+                label:            Workflow Step
+                description:      Related field for Workflow Step
+            grid.label:           Step
 
         basetransitiontrigger:
             entity_label:              Base Transition Trigger

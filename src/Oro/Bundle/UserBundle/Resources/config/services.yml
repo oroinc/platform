@@ -519,6 +519,8 @@ services:
 
     oro_user.provider.user_logging_info_provider:
         class: Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider
+        arguments:
+            - '@request_stack'
 
     oro_user.imap_configuration.subscriber:
         class: '%oro_user.imap_configuration.subscriber.class%'

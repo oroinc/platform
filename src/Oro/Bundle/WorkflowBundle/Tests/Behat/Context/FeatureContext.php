@@ -5,10 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Behat\Context;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
+use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm;
+use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
@@ -187,6 +189,42 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
 
         $this->getContainer()->get('oro_workflow.registry.workflow_manager')->getManager()
             ->activateWorkflow($workflowDefinition->getName());
+    }
+
+    /**
+     * @When scheduled cron processes are executed
+     */
+    public function processScheduledCronTriggers()
+    {
+        $commandRunner = $this->getContainer()->get('oro_cron.async.command_runner');
+        $repository = $this->getContainer()->get('oro_entity.doctrine_helper')
+            ->getEntityRepositoryForClass(Schedule::class);
+
+        $schedules = $repository->findBy(['command' => HandleProcessTriggerCommand::NAME]);
+
+        /** @var Schedule $schedule */
+        foreach ($schedules as $schedule) {
+            $commandRunner->run($schedule->getCommand(), $this->resolveCommandOptions($schedule->getArguments()));
+        }
+    }
+
+    /**
+     * @param array $commandOptions
+     * @return array
+     */
+    private function resolveCommandOptions(array $commandOptions)
+    {
+        $options = [];
+        foreach ($commandOptions as $key => $option) {
+            $params = explode('=', $option, 2);
+            if (is_array($params) && count($params) === 2) {
+                $options[$params[0]] = $params[1];
+            } else {
+                $options[$key] = $option;
+            }
+        }
+
+        return $options;
     }
 
     /**

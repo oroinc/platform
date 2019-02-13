@@ -44,20 +44,6 @@ class EntityRoutingHelper
     }
 
     /**
-     * Decodes the given string into the class name
-     *
-     * @param string $className The encoded class name
-     *
-     * @return string The class name
-     *
-     * @deprecated since 1.8, use resolveEntityClass
-     */
-    public function decodeClassName($className)
-    {
-        return $this->entityClassNameHelper->resolveEntityClass($className, true);
-    }
-
-    /**
      * Converts the class name to a form that can be safely used in URL
      *
      * @param string $className The class name

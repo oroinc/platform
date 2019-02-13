@@ -66,13 +66,21 @@ define(function(require) {
             }
 
             options.collection = this.collection;
-            if (_.result(this.metadata.options.toolbarOptions, 'hide') === true) {
+
+            if (!this.enableToggleFilters || _.result(this.metadata.options.toolbarOptions, 'hide') === true) {
                 options.viewMode = FiltersManager.MANAGE_VIEW_MODE;
             } else {
                 var storedMode = persistentStorage.getItem(FiltersManager.STORAGE_KEY);
+
                 options.viewMode = storedMode !== null ? Number(storedMode) : FiltersManager.STATE_VIEW_MODE;
-                if (this.enableToggleFilters) {
-                    options.filtersStateElement = this.filtersStateElement || $('<div/>').prependTo($filterContainer);
+
+                if (this.filtersStateElement) {
+                    options.filtersStateElement = this.filtersStateElement;
+                } else {
+                    var $container = this.$el.closest('body, .ui-dialog').find(options.filtersStateElement).first();
+
+                    options.filtersStateElement = $container.length
+                        ? $container : $('<div/>').prependTo($filterContainer);
                 }
             }
 
@@ -209,8 +217,13 @@ define(function(require) {
             if (_.result(config, 'enableToggleFilters') === false) {
                 options.enableToggleFilters = false;
             }
+
             if (options.enableToggleFilters) {
                 options.metadata.plugins.push(FiltersTogglePlugin);
+            }
+
+            if (_.isFunction(FiltersTogglePlugin.isApplicable) && FiltersTogglePlugin.isApplicable(options) === false) {
+                options.enableToggleFilters = false;
             }
             deferred.resolve();
         }

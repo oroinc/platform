@@ -11,9 +11,11 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Component\DependencyInjection\ServiceLink;
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * The filter for AuditField entity
+ */
 class AuditFilter extends EntityFilter
 {
     const TYPE_CHANGED = 'changed';
@@ -130,7 +132,6 @@ class AuditFilter extends EntityFilter
 
         $dql = $auditQb->getQuery()->getDQL();
 
-        QueryBuilderUtil::checkParameter($dql);
         $this->applyFilterToClause($ds, $ds->expr()->exists($dql));
 
         foreach ($auditQb->getParameters() as $parameter) {
