@@ -75,7 +75,8 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'assets' => [],
                         'extra_config' => ['label' => 'Sample label'],
                     ],
-                    'groups' => []
+                    'groups' => [],
+                    'image_placeholders' => [],
                 ]
             ],
             'debug' => '%kernel.debug%'

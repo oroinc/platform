@@ -46,6 +46,16 @@ class ThemeProvider
 
     /**
      * @param string $themeName
+     *
+     * @return array
+     */
+    public function getImagePlaceholders($themeName): array
+    {
+        return $this->getTheme($themeName)->getImagePlaceholders();
+    }
+
+    /**
+     * @param string $themeName
      * @param string $sectionName
      *
      * @return string|null

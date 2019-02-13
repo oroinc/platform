@@ -10,6 +10,9 @@ use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Provides twig filters and functions for working with layout blocks.
+ */
 class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRuntimeInterface
 {
     const RENDER_BLOCK_NODE_CLASS = 'Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode';
