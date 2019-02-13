@@ -22,6 +22,7 @@ Theme folder(name) must match [a-zA-Z][a-zA-Z0-9_\-:]* expression.
 | `directory` | Directory name where to look for layout updates. By default, equals to the theme identifier | no |
 | `parent` | Parent theme identifier | no |
 | `groups` | Group name or names for which it's applicable. By default, theme is available in the `main` group and applicable to the platform  | no |
+| `image_placeholders` | The images which will be displayed while no image | no |
 
 The `active theme` could be set on the application level in `configs/config.yml` under the `oro_layout.active_theme` node.
 You can find additional information if you execute the `bin/console config:dump-reference OroLayoutBundle` shell command.
