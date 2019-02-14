@@ -10,6 +10,7 @@ use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
+use Oro\Bundle\EmailBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -285,6 +286,18 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
             ],
             $this->emailActivityListProvider->getData($activityList)
         );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Argument must be instance of "Oro\Bundle\EmailBundle\Entity\Email", "Oro\Bundle\ActivityListBundle\Entity\ActivityList" given
+     */
+    // @codingStandardsIgnoreEnd
+    public function testGetGroupedEntitiesWithWrongEntityPassed()
+    {
+        $entity = new ActivityList();
+        $this->emailActivityListProvider->getGroupedEntities($entity, EmailAddress::class, 1);
     }
 
     /**
