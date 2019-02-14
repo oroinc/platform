@@ -15,6 +15,7 @@ use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -113,6 +114,30 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->activityListManager->getItem(12));
     }
 
+    public function testGetEntityViewModelWhenActivityIsAbsent()
+    {
+        $activityList = $this->createMock(ActivityList::class);
+        $activityList->expects(self::any())
+            ->method('getRelatedActivityClass');
+        $activityList->expects(self::once())
+            ->method('getRelatedActivityId');
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntity')
+            ->willReturn(null);
+        $entityProvider = $this->createMock(FeatureToggleableInterface::class);
+        $entityProvider->expects(self::once())
+            ->method('isFeaturesEnabled')
+            ->willReturn(true);
+
+        $this->provider->expects(self::once())
+            ->method('getProviderForEntity')
+            ->willReturn($entityProvider);
+
+        $result = $this->activityListManager->getEntityViewModel($activityList);
+
+        self::assertNull($result);
+    }
+
     public function testGetItem()
     {
         $testItem = new TestActivityList();
@@ -148,6 +173,7 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
         $repo = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
             ->disableOriginalConstructor()->getMock();
         $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
+        $this->doctrineHelper->expects(self::once())->method('getEntity')->willReturn($testItem);
         $repo->expects($this->once())->method('find')->with(105)->willReturn($testItem);
 
         $this->authorizationChecker->expects($this->any())->method('isGranted')->willReturn(true);
