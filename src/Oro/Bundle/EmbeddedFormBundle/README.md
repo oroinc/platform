@@ -38,8 +38,7 @@ services:
     acme_demo.form.embedded_form:
         class: %acme_demo.form.embedded_form.class%
         tags:
-            - { name: oro_embedded_form, label: 'Embedded Form Type Label Here' }
-            - { name: form.type, alias: acme_demo_some_form_type }
+            - { name: oro_embedded_form, label: 'Embedded Form Type Label Here', type: %acme_demo.form.embedded_form.class% }
 ```
 
 The `label` option is a translatable text used in the select box when creating/updating an embedded form. If omitted, the service id will be used instead.
@@ -98,10 +97,7 @@ layout:
             siblingId: embedded_form_firstName
             prepend:   true                     # place moved block before sibling
 
-    conditions:
-        @eq:
-            - $context.embedded_form_type
-            - 'acme_demo.form.embedded_form' # form type name in container
+    conditions: 'context["embedded_form_type"]=="Acme\\Bundle\\DemoBundle\\Form\\Type\\SomeFormType"'
 ```
 
 We need to specify layout update conditions since all embedded forms are using the same route.
