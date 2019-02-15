@@ -30,9 +30,6 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
     /** @var BlockViewCache|\PHPUnit\Framework\MockObject\MockObject */
     private $blockViewCache;
 
-    /** @var array */
-    private $excludedPaths = [];
-
     /**
      * {@inheritdoc}
      */
@@ -50,8 +47,21 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
             $this->lastModificationDateProvider,
             $this->loader,
             $this->blockViewCache,
-            $this->excludedPaths
+            [
+                '#Resources/views/layouts/[\w\-]+/theme.yml$#',
+                '#Resources/views/layouts/[\w\-]+/config/[^/]+.yml$#'
+            ]
         );
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    private function getPath($path)
+    {
+        return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 
     public function testFindApplicableResources()
@@ -77,8 +87,8 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             [
-                str_replace('/', DIRECTORY_SEPARATOR, $resourcePath . '/oro-default/resource1.yml'),
-                str_replace('/', DIRECTORY_SEPARATOR, $resourcePath . '/oro-default/page/resource2.yml')
+                $this->getPath($resourcePath . '/oro-default/resource1.yml'),
+                $this->getPath($resourcePath . '/oro-default/page/resource2.yml')
             ],
             $this->provider->findApplicableResources($paths)
         );
@@ -108,9 +118,9 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
         $resourcePath = $appRootDir . $bundleDir . '/Resources/views/layouts/oro-default';
         $result = [
             'oro-default' => [
-                str_replace('/', DIRECTORY_SEPARATOR, $resourcePath . '/resource1.yml'),
+                $this->getPath($resourcePath . '/resource1.yml'),
                 'page' => [
-                    str_replace('/', DIRECTORY_SEPARATOR, $resourcePath . '/page/resource2.yml')
+                    $this->getPath($resourcePath . '/page/resource2.yml')
                 ]
             ]
         ];

@@ -1,6 +1,14 @@
 services:
     Oro\Bundle\LayoutBundle\Command\DebugCommand:
-        public: false
         class: Oro\Bundle\LayoutBundle\Command\DebugCommand
+        public: false
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\LayoutBundle\Command\DumpConfigReferenceCommand:
+        class: Oro\Bundle\LayoutBundle\Command\DumpConfigReferenceCommand
+        public: false
+        arguments:
+            - '@oro_layout.theme_extension.configuration'
         tags:
             - { name: console.command }

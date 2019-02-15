@@ -26,6 +26,16 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param string $path
+     *
+     * @return string
+     */
+    private function getPath($path)
+    {
+        return str_replace('/', DIRECTORY_SEPARATOR, $path);
+    }
+
+    /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage $name must not be empty.
      */
@@ -94,11 +104,11 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         );
         $expectedResource->addFound(
             $bundle1Class,
-            str_replace('/', DIRECTORY_SEPARATOR, $bundle1Dir . '/Resources/config/test.yml')
+            $this->getPath($bundle1Dir . '/Resources/config/test.yml')
         );
         $expectedResource->addFound(
             $bundle1Class,
-            str_replace('/', DIRECTORY_SEPARATOR, $bundle1Dir . '/Resources/config/foo/test.yml')
+            $this->getPath($bundle1Dir . '/Resources/config/foo/test.yml')
         );
 
         $this->assertCount(1, $resourcesContainer->getResources());
@@ -129,11 +139,11 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         );
         $expectedResource->addFound(
             $bundle1Class,
-            str_replace('/', DIRECTORY_SEPARATOR, $bundle1Dir . '/Resources/config/test.yml')
+            $this->getPath($bundle1Dir . '/Resources/config/test.yml')
         );
         $expectedResource->addFound(
             $bundle1Class,
-            str_replace('/', DIRECTORY_SEPARATOR, $bundle1Dir . '/Resources/config/foo/test.yml')
+            $this->getPath($bundle1Dir . '/Resources/config/foo/test.yml')
         );
 
         $this->assertEquals($expectedResource, $resource);
@@ -159,7 +169,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
                 new CumulativeResourceInfo(
                     get_class($bundle),
                     'test',
-                    str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/' . $resourceRelativePath),
+                    $this->getPath($bundleDir . '/' . $resourceRelativePath),
                     ['test' => 123]
                 )
             ],
@@ -172,7 +182,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         );
         $expectedResource->addFound(
             get_class($bundle),
-            str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/' . $resourceRelativePath)
+            $this->getPath($bundleDir . '/' . $resourceRelativePath)
         );
         $this->assertCount(1, $resourcesContainer->getResources());
         $this->assertEquals($expectedResource, $resourcesContainer->getResources()[0]);
@@ -233,7 +243,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
                 new CumulativeResourceInfo(
                     get_class($bundle),
                     'test',
-                    str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/' . $resourceRelativePath),
+                    $this->getPath($bundleDir . '/' . $resourceRelativePath),
                     ['test' => 123]
                 )
             ],

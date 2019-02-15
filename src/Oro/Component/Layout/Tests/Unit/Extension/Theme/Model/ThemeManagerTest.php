@@ -4,6 +4,8 @@ namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
+use Oro\Component\Layout\Extension\Theme\Model\Theme;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactoryInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
@@ -11,17 +13,34 @@ use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 class ThemeManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ThemeFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $factory;
+    private $factory;
 
     protected function setUp()
     {
-        $this->factory = $this->createMock('Oro\Component\Layout\Extension\Theme\Model\ThemeFactoryInterface');
+        $this->factory = $this->createMock(ThemeFactoryInterface::class);
     }
 
-    protected function tearDown()
+    /**
+     * @param array                      $definitions
+     * @param ThemeFactoryInterface|null $factory
+     *
+     * @return ThemeManager
+     */
+    private function createManager(array $definitions = [], ThemeFactoryInterface $factory = null)
     {
-        unset($this->factory);
+        $themeDefinitionBag = $this->createMock(ThemeDefinitionBagInterface::class);
+        $themeDefinitionBag->expects($this->any())
+            ->method('getThemeNames')
+            ->willReturn(array_keys($definitions));
+        $themeDefinitionBag->expects($this->any())
+            ->method('getThemeDefinition')
+            ->willReturnCallback(function ($themeName) use ($definitions) {
+                return $definitions[$themeName] ?? null;
+            });
+
+        return new ThemeManager($factory ?? $this->factory, $themeDefinitionBag);
     }
+
 
     public function testManagerWorkWithoutKnownThemes()
     {
@@ -51,7 +70,7 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
     {
         $manager = $this->createManager(['base' => ['label' => 'Oro Base theme']]);
 
-        $themeMock = $this->createMock('Oro\Component\Layout\Extension\Theme\Model\Theme');
+        $themeMock = $this->createMock(Theme::class);
 
         $this->factory->expects($this->once())->method('create')
             ->with($this->equalTo('base'), $this->equalTo(['label' => 'Oro Base theme']))
@@ -91,8 +110,8 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
     {
         $manager = $this->createManager(['base' => [], 'oro-black' => []]);
 
-        $theme1Mock = $this->createMock('Oro\Component\Layout\Extension\Theme\Model\Theme');
-        $theme2Mock = $this->createMock('Oro\Component\Layout\Extension\Theme\Model\Theme');
+        $theme1Mock = $this->createMock(Theme::class);
+        $theme2Mock = $this->createMock(Theme::class);
 
         $this->factory->expects($this->exactly(2))->method('create')
             ->willReturnOnConsecutiveCalls($theme1Mock, $theme2Mock);
@@ -104,9 +123,9 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
     {
         $manager = $this->createManager(['base' => [], 'oro-black' => []]);
 
-        $theme1Mock = $this->createMock('Oro\Component\Layout\Extension\Theme\Model\Theme');
+        $theme1Mock = $this->createMock(Theme::class);
         $theme1Mock->expects($this->any())->method('getGroups')->willReturn(['base', 'frontend']);
-        $theme2Mock = $this->createMock('Oro\Component\Layout\Extension\Theme\Model\Theme');
+        $theme2Mock = $this->createMock(Theme::class);
         $theme2Mock->expects($this->any())->method('getGroups')->willReturn(['frontend']);
 
         $this->factory->expects($this->exactly(2))->method('create')
@@ -117,16 +136,6 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(2, $manager->getAllThemes('frontend'));
         $this->assertCount(1, $manager->getAllThemes(['base', 'embedded']));
         $this->assertCount(2, $manager->getAllThemes(['base', 'frontend']));
-    }
-
-    /**
-     * @param array $definitions
-     *
-     * @return ThemeManager
-     */
-    protected function createManager(array $definitions = [])
-    {
-        return new ThemeManager($this->factory, $definitions);
     }
 
     /**
@@ -143,7 +152,7 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         $expectedResult,
         $expectedTitlesResult
     ) {
-        $manager = new ThemeManager(new ThemeFactory(), $themesDefinitions);
+        $manager = $this->createManager($themesDefinitions, new ThemeFactory());
         $theme = $manager->getTheme($childThemeKey);
 
         $this->assertEquals($expectedResult, $theme->getPageTemplates());

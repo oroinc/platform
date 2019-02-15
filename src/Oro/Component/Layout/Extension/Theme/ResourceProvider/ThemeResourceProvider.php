@@ -4,9 +4,9 @@ namespace Oro\Component\Layout\Extension\Theme\ResourceProvider;
 
 use Oro\Component\Config\Cache\PhpArrayConfigProvider;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
 use Oro\Component\Config\ResourcesContainerInterface;
 use Oro\Component\Layout\BlockViewCache;
-use Oro\Component\Layout\Config\Loader\LayoutUpdateCumulativeResourceLoader;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 
@@ -22,11 +22,11 @@ class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourcePr
     /** @var LayoutUpdateLoaderInterface */
     private $loader;
 
-    /** @var array */
-    private $excludedPaths;
-
     /** @var BlockViewCache */
     private $blockViewCache;
+
+    /** @var string[] */
+    private $excludeFilePathPatterns;
 
     /**
      * @param string                      $cacheFile
@@ -34,7 +34,7 @@ class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourcePr
      * @param LastModificationDateProvider $lastModificationDateProvider
      * @param LayoutUpdateLoaderInterface $loader
      * @param BlockViewCache              $blockViewCache
-     * @param string[]                    $excludedPaths
+     * @param string[]                    $excludeFilePathPatterns
      */
     public function __construct(
         string $cacheFile,
@@ -42,13 +42,13 @@ class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourcePr
         LastModificationDateProvider $lastModificationDateProvider,
         LayoutUpdateLoaderInterface $loader,
         BlockViewCache $blockViewCache,
-        array $excludedPaths = []
+        array $excludeFilePathPatterns = []
     ) {
         parent::__construct($cacheFile, $configCacheFactory);
         $this->lastModificationDateProvider = $lastModificationDateProvider;
         $this->loader = $loader;
-        $this->excludedPaths = $excludedPaths;
         $this->blockViewCache = $blockViewCache;
+        $this->excludeFilePathPatterns = $excludeFilePathPatterns;
     }
 
     /**
@@ -113,57 +113,23 @@ class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourcePr
         $themeLayoutUpdates = [];
         $configLoader = new CumulativeConfigLoader(
             'oro_layout_updates_list',
-            new LayoutUpdateCumulativeResourceLoader(
+            new FolderContentCumulativeLoader(
                 'Resources/views/layouts/',
                 -1,
                 false,
-                $this->loader->getUpdateFileNamePatterns()
+                new LayoutUpdateFileMatcher(
+                    $this->loader->getUpdateFileNamePatterns(),
+                    $this->excludeFilePathPatterns
+                )
             )
         );
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
-            /**
-             * $resource->data contains data in following format
-             * [
-             *    'directory-where-updates-found' => [
-             *       'found update absolute filename',
-             *       ...
-             *    ]
-             * ]
-             */
-            $resourceThemeLayoutUpdates = $this->filterThemeLayoutUpdates($this->excludedPaths, $resource->data);
-            $resourceThemeLayoutUpdates = $this->sortThemeLayoutUpdates($resourceThemeLayoutUpdates);
-
-            $themeLayoutUpdates = \array_merge_recursive($themeLayoutUpdates, $resourceThemeLayoutUpdates);
+            $themeLayoutUpdates[] = $this->sortThemeLayoutUpdates($resource->data);
         }
 
-        return $themeLayoutUpdates;
+        return \array_merge_recursive(...$themeLayoutUpdates);
     }
-
-    /**
-     * @param array $existThemePaths
-     * @param array $themes
-     *
-     * @return array
-     */
-    private function filterThemeLayoutUpdates(array $existThemePaths, array $themes)
-    {
-        foreach ($themes as $theme => $themePaths) {
-            foreach ($themePaths as $pathIndex => $path) {
-                if (\is_string($path) && isset($existThemePaths[$path])) {
-                    unset($themePaths[$pathIndex]);
-                }
-            }
-            if (empty($themePaths)) {
-                unset($themes[$theme]);
-            } else {
-                $themes[$theme] = $themePaths;
-            }
-        }
-
-        return $themes;
-    }
-
 
     /**
      * @param array $updates

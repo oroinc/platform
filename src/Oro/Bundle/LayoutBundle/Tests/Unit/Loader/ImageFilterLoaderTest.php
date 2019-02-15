@@ -4,7 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Loader;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
+use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration;
 use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 use Oro\Bundle\LayoutBundle\Provider\CustomImageFilterProviderInterface;
@@ -61,7 +61,7 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
         $productGalleryMain = new ThemeImageTypeDimension(
             self::PRODUCT_GALLERY_MAIN,
             self::SMALL_SIZE,
-            Configuration::AUTO
+            ThemeConfiguration::AUTO
         );
 
         $customFilterProvider1 = $this->prophesize(CustomImageFilterProviderInterface::class);
@@ -91,7 +91,7 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
         $this->filterConfig
             ->set(self::PRODUCT_GALLERY_MAIN, $this->prepareFilterDataForResizeWithAuto(
                 self::SMALL_SIZE,
-                Configuration::AUTO
+                ThemeConfiguration::AUTO
             ))->shouldBeCalledTimes(1);
 
         $this->imageFilterLoader->load();
@@ -129,8 +129,8 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
         $resizeFiltersData = [
             'scale' => [
                 'dim' => [
-                    Configuration::AUTO === $width ? null : $width,
-                    Configuration::AUTO === $height? null : $height
+                    ThemeConfiguration::AUTO === $width ? null : $width,
+                    ThemeConfiguration::AUTO === $height ? null : $height
                 ]
             ]
         ];

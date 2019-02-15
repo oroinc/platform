@@ -8,6 +8,7 @@ use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
@@ -79,17 +80,29 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
         CumulativeResourceManager::getInstance()
             ->setBundles([$bundle->getName() => get_class($bundle)]);
 
+        $definitions = [
+            'base' => [
+                'label' => 'base'
+            ],
+            $theme => [
+                'parent' => 'base',
+                'label' => $theme
+            ]
+        ];
+
+        $themeDefinitionBag = $this->createMock(ThemeDefinitionBagInterface::class);
+        $themeDefinitionBag->expects($this->any())
+            ->method('getThemeNames')
+            ->willReturn(array_keys($definitions));
+        $themeDefinitionBag->expects($this->any())
+            ->method('getThemeDefinition')
+            ->willReturnCallback(function ($themeName) use ($definitions) {
+                return $definitions[$themeName] ?? null;
+            });
+
         $themeManager = new ThemeManager(
             new ThemeFactory(),
-            [
-                'base' => [
-                    'label' => 'base'
-                ],
-                $theme => [
-                    'parent' => 'base',
-                    'label' => $theme
-                ]
-            ]
+            $themeDefinitionBag
         );
         $this->getContainer()->set('oro_layout.theme_manager', $themeManager);
 

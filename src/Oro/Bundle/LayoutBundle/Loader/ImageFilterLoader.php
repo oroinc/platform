@@ -5,7 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Loader;
 use Imagine\Image\ImageInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
+use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 use Oro\Bundle\LayoutBundle\Provider\CustomImageFilterProviderInterface;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
@@ -108,12 +108,12 @@ class ImageFilterLoader
      */
     private function prepareResizeFilterSettings($width, $height)
     {
-        if (Configuration::AUTO === $width || Configuration::AUTO === $height) {
+        if (ThemeConfiguration::AUTO === $width || ThemeConfiguration::AUTO === $height) {
             return [
                 'scale' => [
                     'dim' => [
-                        Configuration::AUTO === $width ? null : $width,
-                        Configuration::AUTO === $height ? null : $height,
+                        ThemeConfiguration::AUTO === $width ? null : $width,
+                        ThemeConfiguration::AUTO === $height ? null : $height,
                     ]
                 ]
             ];

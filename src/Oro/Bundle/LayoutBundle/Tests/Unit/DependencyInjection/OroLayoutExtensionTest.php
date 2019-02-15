@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension;
 use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
 use Oro\Bundle\LayoutBundle\EventListener\ThemeListener;
@@ -20,6 +19,20 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
 
         $extension = new OroLayoutExtension();
         $extension->load($extensionConfig, $container);
+
+        $this->assertEquals(
+            [
+                [
+                    'settings' => [
+                        'resolved'                             => true,
+                        'development_settings_feature_enabled' => ['value' => '%kernel.debug%', 'scope' => 'app'],
+                        'debug_block_info'                     => ['value' => false, 'scope' => 'app'],
+                        'debug_developer_toolbar'              => ['value' => true, 'scope' => 'app']
+                    ]
+                ]
+            ],
+            $container->getExtensionConfig($extension->getAlias())
+        );
 
         // view annotations
         $this->assertEquals(
@@ -46,7 +59,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
             'Failed asserting that PHP resources parameter is registered'
         );
         $this->assertEquals(
-            [Configuration::DEFAULT_LAYOUT_PHP_RESOURCE],
+            ['OroLayoutBundle:Layout/php'],
             $container->getParameter('oro_layout.php.resources')
         );
         // twig renderer
@@ -55,18 +68,28 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
             'Failed asserting that TWIG resources parameter is registered'
         );
         $this->assertEquals(
-            [Configuration::DEFAULT_LAYOUT_TWIG_RESOURCE],
+            ['OroLayoutBundle:Layout:div_layout.html.twig'],
             $container->getParameter('oro_layout.twig.resources')
         );
         $this->assertTrue(
             $container->has('oro_layout.twig.extension.layout'),
             'Failed asserting that TWIG extension service is registered'
         );
-        // theme services
-        $this->assertTrue(
-            $container->has(OroLayoutExtension::THEME_MANAGER_SERVICE_ID),
-            'Failed asserting that theme manager is registered'
+        // layout theme
+        $this->assertNull($container->getParameter('oro_layout.default_active_theme'));
+        $this->assertEquals(
+            [
+                '#Resources/views/layouts/[a-zA-Z][a-zA-Z0-9_\-:]*/theme\.yml$#',
+                '#Resources/views/layouts/[a-zA-Z][a-zA-Z0-9_\-:]*/config/[^/]+\.yml$#'
+            ],
+            $container->getDefinition('oro_layout.theme_extension.resource_provider.theme')->getArgument(5)
         );
+        $this->assertEquals(
+            '[a-zA-Z][a-zA-Z0-9_\-:]*',
+            $container->getDefinition('oro_layout.theme_extension.configuration.provider')->getArgument(3)
+        );
+        // debug option
+        $this->assertEquals('%kernel.debug%', $container->getParameter('oro_layout.debug'));
     }
 
     public function testLoadWithTemplatingAppConfig()
@@ -106,7 +129,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
             'Failed asserting that PHP resources parameter is registered'
         );
         $this->assertEquals(
-            [Configuration::DEFAULT_LAYOUT_PHP_RESOURCE, 'MyBundle:Layout/php'],
+            ['OroLayoutBundle:Layout/php', 'MyBundle:Layout/php'],
             $container->getParameter('oro_layout.php.resources')
         );
         // twig renderer
@@ -115,7 +138,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
             'Failed asserting that TWIG resources parameter is registered'
         );
         $this->assertEquals(
-            [Configuration::DEFAULT_LAYOUT_TWIG_RESOURCE, 'MyBundle:Layout:blocks.html.twig'],
+            ['OroLayoutBundle:Layout:div_layout.html.twig', 'MyBundle:Layout:blocks.html.twig'],
             $container->getParameter('oro_layout.twig.resources')
         );
         $this->assertTrue(
@@ -166,57 +189,43 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadWithThemesAppConfig()
+    public function testLoadWithActiveTheme()
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
 
         $extensionConfig = [
             [
-                'themes'       => [
-                    'gold' => [
-                        'label'  => 'Gold theme',
-                        'icon'   => 'gold.ico',
-                        'groups' => ['main', 'another']
-                    ]
-                ],
-                'active_theme' => 'gold'
+                'active_theme' => 'test'
             ]
         ];
 
         $extension = new OroLayoutExtension();
         $extension->load($extensionConfig, $container);
 
-        $manager = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID);
-        $result  = $manager->getTheme('gold');
+        $this->assertEquals('test', $container->getParameter('oro_layout.default_active_theme'));
+    }
 
-        $this->assertNull($result->getParentTheme());
-        $this->assertSame('Gold theme', $result->getLabel());
-        $this->assertSame('gold.ico', $result->getIcon());
-        $this->assertSame('gold', $result->getDirectory());
-        $this->assertEquals(['main', 'another'], $result->getGroups());
+    public function testLoadWithDebugOption()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
+        $extensionConfig = [
+            [
+                'debug' => true
+            ]
+        ];
+
+        $extension = new OroLayoutExtension();
+        $extension->load($extensionConfig, $container);
+
+        $this->assertTrue($container->getParameter('oro_layout.debug'));
     }
 
     public function testGetAlias()
     {
         $extension = new OroLayoutExtension();
         $this->assertEquals('oro_layout', $extension->getAlias());
-    }
-
-    protected function normalizeResources(array &$resources)
-    {
-        ksort($resources);
-        array_walk(
-            $resources,
-            function (&$resource) {
-                ksort($resource);
-                array_walk(
-                    $resource,
-                    function (&$subResource) {
-                        sort($subResource);
-                    }
-                );
-            }
-        );
     }
 }

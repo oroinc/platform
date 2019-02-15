@@ -2,25 +2,30 @@
 
 namespace Oro\Component\Layout\Extension\Theme\Model;
 
+/**
+ * The main entry point for layout themes.
+ */
 class ThemeManager
 {
     /** @var ThemeFactoryInterface */
-    protected $themeFactory;
+    private $themeFactory;
 
-    /** @var array */
-    protected $themeDefinitions;
+    /** @var ThemeDefinitionBagInterface */
+    private $themeDefinitionBag;
 
     /** @var Theme[] */
-    protected $instances = [];
+    private $instances = [];
 
     /**
-     * @param ThemeFactoryInterface $themeFactory
-     * @param array                 $themeDefinitions
+     * @param ThemeFactoryInterface       $themeFactory
+     * @param ThemeDefinitionBagInterface $themeDefinitionBag
      */
-    public function __construct(ThemeFactoryInterface $themeFactory, array $themeDefinitions)
-    {
-        $this->themeFactory     = $themeFactory;
-        $this->themeDefinitions = $themeDefinitions;
+    public function __construct(
+        ThemeFactoryInterface $themeFactory,
+        ThemeDefinitionBagInterface $themeDefinitionBag
+    ) {
+        $this->themeFactory = $themeFactory;
+        $this->themeDefinitionBag = $themeDefinitionBag;
     }
 
     /**
@@ -30,7 +35,7 @@ class ThemeManager
      */
     public function getThemeNames()
     {
-        return array_keys($this->themeDefinitions);
+        return $this->themeDefinitionBag->getThemeNames();
     }
 
     /**
@@ -42,7 +47,7 @@ class ThemeManager
      */
     public function hasTheme($themeName)
     {
-        return isset($this->themeDefinitions[$themeName]);
+        return null !== $this->themeDefinitionBag->getThemeDefinition($themeName);
     }
 
     /**
@@ -56,12 +61,16 @@ class ThemeManager
     {
         if (empty($themeName)) {
             throw new \InvalidArgumentException('The theme name must not be empty.');
-        } elseif (!$this->hasTheme($themeName)) {
+        }
+        if (!$this->hasTheme($themeName)) {
             throw new \LogicException(sprintf('Unable to retrieve definition for theme "%s".', $themeName));
         }
 
         if (!isset($this->instances[$themeName])) {
-            $theme = $this->themeFactory->create($themeName, $this->themeDefinitions[$themeName]);
+            $theme = $this->themeFactory->create(
+                $themeName,
+                $this->themeDefinitionBag->getThemeDefinition($themeName)
+            );
             $this->instances[$themeName] = $this->mergePageTemplates($theme);
         }
 
