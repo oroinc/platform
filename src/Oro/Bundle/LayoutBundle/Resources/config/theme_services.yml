@@ -12,6 +12,8 @@ services:
 
     oro_layout.theme_factory:
         class: Oro\Component\Layout\Extension\Theme\Model\ThemeFactory
+        arguments:
+            - '@property_accessor'
         public: false
 
     oro_layout.theme_manager:

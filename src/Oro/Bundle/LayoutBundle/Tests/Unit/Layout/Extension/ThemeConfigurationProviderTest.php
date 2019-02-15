@@ -63,8 +63,9 @@ class ThemeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals(
             [
-                'label'  => 'Base theme',
-                'groups' => []
+                'label'              => 'Base theme',
+                'groups'             => [],
+                'image_placeholders' => []
             ],
             $this->configurationProvider->getThemeDefinition('base')
         );
@@ -73,11 +74,12 @@ class ThemeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetThemeDefinition()
     {
         $expected = [
-            'label'       => 'Oro Black theme',
-            'description' => 'Oro Black theme description',
-            'groups'      => ['another'],
-            'icon'        => 'oro-black.ico',
-            'config'      => [
+            'label'              => 'Oro Black theme',
+            'description'        => 'Oro Black theme description',
+            'groups'             => ['another'],
+            'icon'               => 'oro-black.ico',
+            'image_placeholders' => [],
+            'config'             => [
                 'assets'         => [
                     'css' => [
                         'inputs'  => ['bundles/test/css/scss/main.scss'],

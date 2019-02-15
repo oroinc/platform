@@ -16,9 +16,8 @@ class ThemeProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->themeManager = $this->getMockBuilder('Oro\Component\Layout\Extension\Theme\Model\ThemeManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->themeManager = $this->createMock(ThemeManager::class);
+
         $this->provider = new ThemeProvider($this->themeManager);
     }
 
@@ -34,6 +33,22 @@ class ThemeProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($theme);
 
         $this->assertSame('path/to/icon', $this->provider->getIcon($themeName));
+    }
+
+    public function testGetImagePlaceholders()
+    {
+        $themeName = 'test';
+        $data = ['test_placeholder' => '/path/to/image.png'];
+
+        $theme = new Theme($themeName);
+        $theme->setImagePlaceholders($data);
+
+        $this->themeManager->expects($this->once())
+            ->method('getTheme')
+            ->with($themeName)
+            ->willReturn($theme);
+
+        $this->assertSame($data, $this->provider->getImagePlaceholders($themeName));
     }
 
     public function testGetStylesOutput()

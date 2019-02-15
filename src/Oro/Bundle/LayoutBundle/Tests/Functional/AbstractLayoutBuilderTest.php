@@ -14,6 +14,7 @@ use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 abstract class AbstractLayoutBuilderTest extends WebTestCase
 {
@@ -101,7 +102,7 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
             });
 
         $themeManager = new ThemeManager(
-            new ThemeFactory(),
+            new ThemeFactory(PropertyAccess::createPropertyAccessor()),
             $themeDefinitionBag
         );
         $this->getContainer()->set('oro_layout.theme_manager', $themeManager);

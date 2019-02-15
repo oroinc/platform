@@ -3,7 +3,6 @@
 namespace Oro\Bundle\AttachmentBundle\Manager;
 
 use Gaufrette\Adapter\MetadataSupporter;
-use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Exception\ProtocolNotSupportedException;
 use Oro\Bundle\AttachmentBundle\Manager\File\TemporaryFile;
@@ -23,13 +22,12 @@ class FileManager extends GaufretteFileManager
     private $protocolValidator;
 
     /**
-     * @param FilesystemMap              $filesystemMap
      * @param ProtocolValidatorInterface $protocolValidator
+     * @param string $filesystemName
      */
-    public function __construct(FilesystemMap $filesystemMap, ProtocolValidatorInterface $protocolValidator)
+    public function __construct(string $filesystemName, ProtocolValidatorInterface $protocolValidator)
     {
-        parent::__construct('attachments');
-        $this->setFilesystemMap($filesystemMap);
+        parent::__construct($filesystemName);
         $this->protocolValidator = $protocolValidator;
     }
 

@@ -17,6 +17,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
+use Oro\Bundle\EmailBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -35,7 +36,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  * For the Email activity in the case when EmailAddress does not have owner(User|Organization),
  * we are trying to extract Organization from the current logged user.
  *
- * @todo Should be refactored in the BAP-8520
+ * Will be refactored in the BAP-8520
  * @see EmailActivityListProvider::isApplicable
  * @see EmailActivityListProvider::getOrganization
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -347,6 +348,19 @@ class EmailActivityListProvider implements
     public function getGroupedEntities($entity, $associatedEntityClass = null, $associatedEntityId = null): array
     {
         /** @var Email $entity */
+        if (!$entity instanceof Email) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Argument must be instance of "%s", "%s" given',
+                    Email::class,
+                    is_object($entity) ? ClassUtils::getClass($entity) : gettype($entity)
+                )
+            );
+        }
+
+        if (null === $entity->getThread()) {
+            return [];
+        }
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->doctrineRegistryLink->getService()
@@ -358,12 +372,10 @@ class EmailActivityListProvider implements
                 'WITH',
                 'a.relatedActivityId = e.id and a.relatedActivityClass = :class'
             )
-            ->setParameter('class', self::ACTIVITY_CLASS);
-        if (null !== $entity->getThread()) {
-            $queryBuilder
-                ->andWhere('e.thread = :thread')
-                ->setParameter('thread', $entity->getThread());
-        }
+            ->andWhere('e.thread = :thread')
+            ->setParameter('class', self::ACTIVITY_CLASS)
+            ->setParameter('thread', $entity->getThread());
+
         if ($associatedEntityClass && $associatedEntityId) {
             $associationName = ExtendHelper::buildAssociationName(
                 $associatedEntityClass,

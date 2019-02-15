@@ -37,7 +37,8 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->protocolValidator = $this->createMock(ProtocolValidatorInterface::class);
 
-        $this->fileManager = new FileManager($filesystemMap, $this->protocolValidator);
+        $this->fileManager = new FileManager('attachments', $this->protocolValidator);
+        $this->fileManager->setFilesystemMap($filesystemMap);
     }
 
     /**

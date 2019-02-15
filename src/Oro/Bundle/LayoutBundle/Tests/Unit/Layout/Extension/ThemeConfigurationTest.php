@@ -28,14 +28,15 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
     public function testProcessBaseConfiguration()
     {
         $themeConfig = [
-            'label'       => 'test label',
-            'description' => 'test description',
-            'parent'      => 'test_parent',
-            'directory'   => 'test_directory',
-            'groups'      => ['test group'],
-            'icon'        => 'test.ico',
-            'logo'        => 'test_logo.jpg',
-            'screenshot'  => 'test_screenshot.jpg',
+            'label'              => 'test label',
+            'description'        => 'test description',
+            'parent'             => 'test_parent',
+            'directory'          => 'test_directory',
+            'groups'             => ['test group'],
+            'icon'               => 'test.ico',
+            'image_placeholders' => ['placeholder' => '/path/to/test.img'],
+            'logo'               => 'test_logo.jpg',
+            'screenshot'         => 'test_screenshot.jpg'
         ];
         $result = $this->processConfiguration(['test_theme' => $themeConfig]);
         $this->assertSame($themeConfig, $result['test_theme']);

@@ -9,6 +9,7 @@ use Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactoryInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ThemeManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -152,7 +153,10 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         $expectedResult,
         $expectedTitlesResult
     ) {
-        $manager = $this->createManager($themesDefinitions, new ThemeFactory());
+        $manager = $this->createManager(
+            $themesDefinitions,
+            new ThemeFactory(PropertyAccess::createPropertyAccessor())
+        );
         $theme = $manager->getTheme($childThemeKey);
 
         $this->assertEquals($expectedResult, $theme->getPageTemplates());

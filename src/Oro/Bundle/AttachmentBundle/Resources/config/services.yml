@@ -26,6 +26,7 @@ parameters:
 
     oro_attachment.attachments_dir:                              attachment
     oro_attachment.media_cache_dir:                              media/cache
+    oro_attachment.filesystem_name:                              attachments
 
     liip_imagine.meta_data.reader.class:                         Imagine\Image\Metadata\DefaultMetadataReader
 
@@ -45,9 +46,10 @@ services:
 
     oro_attachment.file_manager:
         class: Oro\Bundle\AttachmentBundle\Manager\FileManager
+        parent: oro_gaufrette.file_manager
         arguments:
-          - '@knp_gaufrette.filesystem_map'
-          - '@oro_attachment.protocol_validator'
+            - '%oro_attachment.filesystem_name%'
+            - '@oro_attachment.protocol_validator'
         lazy: true
 
     oro_attachment.protocol_validator:

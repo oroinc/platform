@@ -30,8 +30,7 @@ class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp()
     {
-        $this->translator = $this->getMockBuilder(TranslatorInterface::class)
-            ->getMock();
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())
             ->method('trans')
             ->willReturnCallback(
@@ -40,9 +39,7 @@ class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->environment = $this->getMockBuilder('\Twig_Environment')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->environment = $this->createMock(\Twig_Environment::class);
 
         $this->listener = new AttributeFamilyFormViewListener($this->translator);
     }
@@ -82,15 +79,16 @@ class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnEdit($templateData, array $expectedScrollData)
     {
+        $formView = new FormView();
         $this->environment->expects($this->once())
             ->method('render')
             ->with(
                 'OroEntityConfigBundle:AttributeFamily:familyField.html.twig',
-                ['form' => new FormView()]
+                ['form' => $formView]
             )
             ->willReturn($templateData);
 
-        $event = new BeforeListRenderEvent($this->environment, new ScrollData(), new \stdClass(), new FormView());
+        $event = new BeforeListRenderEvent($this->environment, new ScrollData(), new \stdClass(), $formView);
         $this->listener->onEdit($event);
 
         $this->assertEquals($expectedScrollData, $event->getScrollData()->getData());

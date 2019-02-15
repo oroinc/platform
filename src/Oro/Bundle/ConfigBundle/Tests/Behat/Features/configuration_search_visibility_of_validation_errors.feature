@@ -53,10 +53,10 @@ Feature: Configuration search visibility of validation errors
     And click "Configuration" on row "Default" in grid
 
     When I follow "System Configuration/Websites/Routing" on configuration sidebar
-    Then I should see "Use System" for "URL" field
-    And I should see "Use System" for "Secure URL" field
+    Then I should see "Use Organization" for "URL" field
+    And I should see "Use Organization" for "Secure URL" field
 
-    When uncheck "Use System" for "Secure URL" field
+    When uncheck "Use Organization" for "Secure URL" field
     And I type "" in "Secure URL"
     And I click on empty space
     Then I should see "This value should not be blank"
