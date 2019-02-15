@@ -9,6 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRegistryInterface;
+use Symfony\Component\Form\FormTypeInterface;
 
 /**
  * Handles logic for creating and manipulation with embedded forms
@@ -30,7 +31,7 @@ class EmbeddedFormManager
      */
     public function __construct(FormRegistryInterface $formRegistry, FormFactoryInterface $formFactory)
     {
-        $this->formRegistry   = $formRegistry;
+        $this->formRegistry = $formRegistry;
         $this->formFactory = $formFactory;
     }
 
@@ -150,14 +151,17 @@ class EmbeddedFormManager
     }
 
     /**
-     * Gets FormType instance by its name from  Form Registry
-     * if name is passed
-     * @param string|null $type
+     * Gets FormType instance by its name from Form Registry if name is passed
      *
-     * @return EmbeddedFormInterface|AbstractType|null
+     * @param string|null $type
+     * @return FormTypeInterface|AbstractType|null
      */
     public function getTypeInstance($type)
     {
-        return ($type ? $this->formRegistry->getType($type) : $type);
+        if (!$type) {
+            return null;
+        }
+        $resolvedFormType = $this->formRegistry->getType($type);
+        return $resolvedFormType ? $resolvedFormType->getInnerType() : null;
     }
 }
