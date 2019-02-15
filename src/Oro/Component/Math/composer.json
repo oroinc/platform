@@ -6,7 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "7.1.*",
-        "brick/math": "0.5.*"
+        "brick/math": "0.8.*"
     },
     "autoload": {
         "psr-4": { "Oro\\Component\\Math\\": "" }
