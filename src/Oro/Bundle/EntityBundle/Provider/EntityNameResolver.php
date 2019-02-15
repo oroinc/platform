@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+use Oro\Bundle\EntityBundle\DependencyInjection\EntityConfiguration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
@@ -13,8 +14,8 @@ class EntityNameResolver
     /** @var string */
     private $defaultFormat;
 
-    /** @var array */
-    private $config;
+    /** @var EntityConfigurationProvider */
+    private $configProvider;
 
     /** @var array */
     private $normalizedConfig;
@@ -23,26 +24,22 @@ class EntityNameResolver
     private $providers;
 
     /**
-     * @param iterable|EntityNameProviderInterface[] $providers     The entity name providers
-     * @param string                                 $defaultFormat The default representation format
-     * @param array                                  $config        The configuration of representation formats
-     *
-     * @throws \InvalidArgumentException if default format is not specified or does not exist
+     * @param iterable|EntityNameProviderInterface[] $providers      The entity name providers
+     * @param string                                 $defaultFormat  The default representation format
+     * @param EntityConfigurationProvider            $configProvider The provider of representation formats
      */
-    public function __construct(iterable $providers, string $defaultFormat, array $config)
-    {
+    public function __construct(
+        iterable $providers,
+        string $defaultFormat,
+        EntityConfigurationProvider $configProvider
+    ) {
         if (!$defaultFormat) {
             throw new \InvalidArgumentException('The default representation format must be specified.');
-        }
-        if (!isset($config[$defaultFormat])) {
-            throw new \InvalidArgumentException(
-                sprintf('The unknown default representation format "%s".', $defaultFormat)
-            );
         }
 
         $this->providers = $providers;
         $this->defaultFormat = $defaultFormat;
-        $this->config = $config;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -142,7 +139,9 @@ class EntityNameResolver
     protected function getFormatConfig($format)
     {
         if (null === $this->normalizedConfig) {
-            $this->normalizedConfig = $this->normalizeConfig($this->config);
+            $this->normalizedConfig = $this->normalizeConfig(
+                $this->configProvider->getConfiguration(EntityConfiguration::ENTITY_NAME_FORMATS)
+            );
         }
         if (!isset($this->normalizedConfig[$format])) {
             throw new \InvalidArgumentException(sprintf('The unknown representation format "%s".', $format));

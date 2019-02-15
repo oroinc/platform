@@ -2,16 +2,36 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+use Oro\Bundle\EntityBundle\DependencyInjection\EntityConfiguration;
+
+/**
+ * The provider for virtual fields defined in "Resources/config/oro/entity.yml" files.
+ */
 class ConfigVirtualFieldProvider extends AbstractConfigVirtualProvider implements VirtualFieldProviderInterface
 {
+    /** @var EntityConfigurationProvider */
+    private $configProvider;
+
+    /**
+     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
+     * @param EntityConfigurationProvider      $configProvider
+     */
+    public function __construct(
+        EntityHierarchyProviderInterface $entityHierarchyProvider,
+        EntityConfigurationProvider $configProvider
+    ) {
+        parent::__construct($entityHierarchyProvider);
+        $this->configProvider = $configProvider;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function isVirtualField($className, $fieldName)
     {
-        $this->ensureVirtualFieldsInitialized();
+        $items = $this->getItems();
 
-        return isset($this->items[$className][$fieldName]);
+        return isset($items[$className][$fieldName]);
     }
 
     /**
@@ -19,9 +39,9 @@ class ConfigVirtualFieldProvider extends AbstractConfigVirtualProvider implement
      */
     public function getVirtualFieldQuery($className, $fieldName)
     {
-        $this->ensureVirtualFieldsInitialized();
+        $items = $this->getItems();
 
-        return $this->items[$className][$fieldName]['query'];
+        return $items[$className][$fieldName]['query'];
     }
 
     /**
@@ -29,8 +49,16 @@ class ConfigVirtualFieldProvider extends AbstractConfigVirtualProvider implement
      */
     public function getVirtualFields($className)
     {
-        $this->ensureVirtualFieldsInitialized();
+        $items = $this->getItems();
 
-        return isset($this->items[$className]) ? array_keys($this->items[$className]) : [];
+        return isset($items[$className]) ? array_keys($items[$className]) : [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getConfiguration()
+    {
+        return $this->configProvider->getConfiguration(EntityConfiguration::VIRTUAL_FIELDS);
     }
 }

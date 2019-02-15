@@ -2,33 +2,42 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EntityBundle\DependencyInjection\EntityConfiguration;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityConfigurationProvider;
 
 class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityAliasConfigBag */
-    protected $entityAliasConfigBag;
-
     /** @var EntityAliasProvider */
-    protected $entityAliasProvider;
+    private $entityAliasProvider;
 
     protected function setUp()
     {
-        $this->entityAliasConfigBag = new EntityAliasConfigBag(
-            [
-                'Test\EntityWithCustomAlias' => [
-                    'alias'        => 'my_alias',
-                    'plural_alias' => 'my_plural_alias'
+        $configProvider = $this->createMock(EntityConfigurationProvider::class);
+        $configProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturnMap([
+                [
+                    EntityConfiguration::ENTITY_ALIASES,
+                    [
+                        'Test\EntityWithCustomAlias' => [
+                            'alias'        => 'my_alias',
+                            'plural_alias' => 'my_plural_alias'
+                        ]
+                    ]
+                ],
+                [
+                    EntityConfiguration::ENTITY_ALIAS_EXCLUSIONS,
+                    [
+                        'Test\ExcludedEntity'
+                    ]
                 ]
-            ],
-            [
-                'Test\ExcludedEntity'
-            ]
-        );
+            ]);
+
         $this->entityAliasProvider  = new EntityAliasProvider(
-            $this->entityAliasConfigBag
+            new EntityAliasConfigBag($configProvider)
         );
     }
 
@@ -113,7 +122,7 @@ class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function assertEntityAlias($expected, $actual)
+    private function assertEntityAlias($expected, $actual)
     {
         if ($expected instanceof EntityAlias) {
             $this->assertEquals($expected, $actual);

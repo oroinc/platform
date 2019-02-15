@@ -19,7 +19,7 @@ The generation rules are the following:
 It is possible, however, to define custom rules for entity aliases in the `Resources/config/oro/entity.yml` configuration file.
 This can help to avoid naming conflicts or make the entity aliases more readable or more user-friendly.
 
-You can explicitly define aliases for a specific entity in the `entity_aliases` section of `entity.yml`:
+You can explicitly define aliases for a specific entity in the `entity_aliases` section of `Resources/config/oro/entity.yml`:
 
 ```yml
 oro_entity:
@@ -40,7 +40,7 @@ oro_entity:
 
 **Entity alias provider**
 
-There can be situations when you need more complicated rules for creating entity aliases that can not be simply configured via `entity.yml` file.
+There can be situations when you need more complicated rules for creating entity aliases that can not be simply configured via `Resources/config/oro/entity.yml` file.
 In this case you'll need to create an entity alias provider.
 
 For this you need to implement the [EntityAliasProviderInterface](./../../Provider/EntityAliasProviderInterface.php) interface in your provider class:

@@ -36,7 +36,6 @@ parameters:
     oro_entity_extend.importexport.normalizer.enum.class:     Oro\Bundle\EntityExtendBundle\ImportExport\Serializer\EnumNormalizer
     oro_entity_extend.listener.before_map_object_search_listener.class: Oro\Bundle\EntityExtendBundle\EventListener\BeforeMapObjectSearchListener
     oro_entity_extend.association_manager.class:              Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager
-    oro_entity_extend.entity_alias_provider.class:            Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityAliasProvider
     oro_entity_extend.entity_class_name_provider.enum.class:  Oro\Bundle\EntityExtendBundle\Provider\EnumEntityClassNameProvider
     oro_entity_extend.enum_value_provider.class:              Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider
     oro_entity_extend.dictionary_value_list_provider.enum.class: Oro\Bundle\EntityExtendBundle\Provider\EnumValueListProvider
@@ -511,7 +510,7 @@ services:
             - { name: oro_entity.exclusion_provider.api, priority: -50 }
 
     oro_entity_extend.entity_alias_provider:
-        class: '%oro_entity_extend.entity_alias_provider.class%'
+        class: Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityAliasProvider
         public: false
         arguments:
             - "@oro_entity.entity_alias_config_bag"

@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EntityBundle\DependencyInjection\EntityConfiguration;
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\DuplicateEntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag;
+use Oro\Bundle\EntityBundle\Provider\EntityConfigurationProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -14,9 +16,6 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityAliasConfigBag */
-    private $entityAliasConfigBag;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     private $configManager;
 
@@ -28,27 +27,37 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->configManager = $this->createMock(ConfigManager::class);
-        $this->entityAliasConfigBag = new EntityAliasConfigBag(
-            [
-                'Test\EntityWithCustomAlias'                             => [
-                    'alias'        => 'my_alias',
-                    'plural_alias' => 'my_plural_alias'
+        $configProvider = $this->createMock(EntityConfigurationProvider::class);
+        $configProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturnMap([
+                [
+                    EntityConfiguration::ENTITY_ALIASES,
+                    [
+                        'Test\EntityWithCustomAlias'                             => [
+                            'alias'        => 'my_alias',
+                            'plural_alias' => 'my_plural_alias'
+                        ],
+                        ExtendHelper::ENTITY_NAMESPACE . 'EntityWithCustomAlias' => [
+                            'alias'        => 'my_alias_custom_entity',
+                            'plural_alias' => 'my_plural_alias_custom_entity'
+                        ]
+                    ]
                 ],
-                ExtendHelper::ENTITY_NAMESPACE . 'EntityWithCustomAlias' => [
-                    'alias'        => 'my_alias_custom_entity',
-                    'plural_alias' => 'my_plural_alias_custom_entity'
+                [
+                    EntityConfiguration::ENTITY_ALIAS_EXCLUSIONS,
+                    [
+                        'Test\ExcludedEntity',
+                        ExtendHelper::ENTITY_NAMESPACE . 'ExcludedEntity'
+                    ]
                 ]
-            ],
-            [
-                'Test\ExcludedEntity',
-                ExtendHelper::ENTITY_NAMESPACE . 'ExcludedEntity'
-            ]
-        );
+            ]);
+
+        $this->configManager = $this->createMock(ConfigManager::class);
         $this->duplicateResolver = $this->createMock(DuplicateEntityAliasResolver::class);
 
         $this->entityAliasProvider = new ExtendEntityAliasProvider(
-            $this->entityAliasConfigBag,
+            new EntityAliasConfigBag($configProvider),
             $this->configManager,
             $this->duplicateResolver
         );
