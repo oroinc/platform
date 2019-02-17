@@ -7,6 +7,7 @@ use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Provider\CurrencyListProviderStub;
 use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
+use Oro\Bundle\LocaleBundle\Configuration\LocaleConfigurationProvider;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactory;
@@ -14,17 +15,13 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements ViewTypeProviderInterface
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $viewType;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|NumberFormatter
-     */
-    protected $formatter;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|NumberFormatter */
+    private $formatter;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->formatter = $this->createMock(NumberFormatter::class);
     }
@@ -135,7 +132,15 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
             ->with(42)
             ->willReturn(['id' => 42, 'formattingCode' => $localeCode]);
 
-        return new LocaleSettings($configManager, $calendarFactory, $localizationManager);
+        /** @var LocaleConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject $localeConfigProvider */
+        $localeConfigProvider = $this->createMock(LocaleConfigurationProvider::class);
+
+        return new LocaleSettings(
+            $configManager,
+            $calendarFactory,
+            $localizationManager,
+            $localeConfigProvider
+        );
     }
 
     /**

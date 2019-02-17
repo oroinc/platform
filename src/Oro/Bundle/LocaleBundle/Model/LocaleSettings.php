@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Model;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfig;
+use Oro\Bundle\LocaleBundle\Configuration\LocaleConfigurationProvider;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Symfony\Component\Intl\Intl;
@@ -21,34 +22,22 @@ class LocaleSettings
     const CURRENCY_CODE_KEY   = 'currency_code';
     const CURRENCY_SYMBOL_KEY = 'symbol';
 
-    /**
-     * @var string[]
-     */
-    protected static $locales;
+    /** @var string[] */
+    private static $locales;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $locale;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $language;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $country;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $currency;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $timeZone;
 
     /**
@@ -67,7 +56,7 @@ class LocaleSettings
      *
      * @var array
      */
-    protected $nameFormats = [];
+    private $nameFormats;
 
     /**
      * Format placeholders (lowercase and uppercase):
@@ -95,7 +84,7 @@ class LocaleSettings
      *
      * @var array
      */
-    protected $addressFormats = [];
+    private $addressFormats;
 
     /**
      * Array format:
@@ -109,36 +98,36 @@ class LocaleSettings
      *
      * @var array
      */
-    protected $localeData = [];
+    private $localeData;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var CalendarFactoryInterface
-     */
+    /** @var CalendarFactoryInterface */
     protected $calendarFactory;
 
-    /**
-     * @var LocalizationManager
-     */
+    /** @var LocalizationManager */
     protected $localizationManager;
+
+    /** @var LocaleConfigurationProvider */
+    private $localeConfigProvider;
 
     /**
      * @param ConfigManager $configManager
      * @param CalendarFactoryInterface $calendarFactory
      * @param LocalizationManager $localizationManager
+     * @param LocaleConfigurationProvider $localeConfigProvider
      */
     public function __construct(
         ConfigManager $configManager,
         CalendarFactoryInterface $calendarFactory,
-        LocalizationManager $localizationManager
+        LocalizationManager $localizationManager,
+        LocaleConfigurationProvider $localeConfigProvider
     ) {
         $this->configManager = $configManager;
         $this->calendarFactory = $calendarFactory;
         $this->localizationManager = $localizationManager;
+        $this->localeConfigProvider = $localeConfigProvider;
     }
 
     /**
@@ -148,7 +137,7 @@ class LocaleSettings
      */
     public function addNameFormats(array $formats)
     {
-        $this->nameFormats = array_merge($this->nameFormats, $formats);
+        $this->nameFormats = array_merge($this->getNameFormats(), $formats);
     }
 
     /**
@@ -158,6 +147,10 @@ class LocaleSettings
      */
     public function getNameFormats()
     {
+        if (null === $this->nameFormats) {
+            $this->nameFormats = $this->localeConfigProvider->getNameFormats();
+        }
+
         return $this->nameFormats;
     }
 
@@ -168,7 +161,7 @@ class LocaleSettings
      */
     public function addAddressFormats(array $formats)
     {
-        $this->addressFormats = array_merge($this->addressFormats, $formats);
+        $this->addressFormats = array_merge($this->getAddressFormats(), $formats);
     }
 
     /**
@@ -178,6 +171,10 @@ class LocaleSettings
      */
     public function getAddressFormats()
     {
+        if (null === $this->addressFormats) {
+            $this->addressFormats = $this->localeConfigProvider->getAddressFormats();
+        }
+
         return $this->addressFormats;
     }
 
@@ -188,7 +185,7 @@ class LocaleSettings
      */
     public function addLocaleData(array $data)
     {
-        $this->localeData = array_merge($this->localeData, $data);
+        $this->localeData = array_merge($this->getLocaleData(), $data);
     }
 
     /**
@@ -198,6 +195,10 @@ class LocaleSettings
      */
     public function getLocaleData()
     {
+        if (null === $this->localeData) {
+            $this->localeData = $this->localeConfigProvider->getLocaleData();
+        }
+
         return $this->localeData;
     }
 
@@ -217,10 +218,9 @@ class LocaleSettings
      */
     public function getLocaleByCountry($country)
     {
-        if (isset($this->localeData[$country][self::DEFAULT_LOCALE_KEY])) {
-            return $this->localeData[$country][self::DEFAULT_LOCALE_KEY];
-        }
-        return $this->getLocale();
+        $localeData = $this->getLocaleData();
+
+        return $localeData[$country][self::DEFAULT_LOCALE_KEY] ?? $this->getLocale();
     }
 
     /**

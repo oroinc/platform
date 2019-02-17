@@ -34,10 +34,66 @@ services:
             - '@oro_config.manager'
             - '@oro_locale.calendar_factory'
             - '@oro_locale.manager.localization'
-        calls:
-            - [addNameFormats, ['%oro_locale.format.name%']]
-            - [addAddressFormats, ['%oro_locale.format.address%']]
-            - [addLocaleData, ['%oro_locale.locale_data%']]
+            - '@oro_locale.configuration_provider'
+
+    oro_locale.configuration_provider:
+        class: Oro\Bundle\LocaleBundle\Configuration\LocaleConfigurationProvider
+        public: false
+        arguments:
+            - '@oro_locale.name_format_configuration.provider'
+            - '@oro_locale.address_format_configuration.provider'
+            - '@oro_locale.locale_data_configuration.provider'
+
+    oro_locale.name_format_configuration.provider:
+        class: Oro\Bundle\LocaleBundle\Configuration\NameFormatConfigurationProvider
+        public: false
+        arguments:
+            - '%kernel.cache_dir%/oro/locale_name_format.php'
+            - '@oro_cache.config_cache_factory'
+
+    oro_locale.name_format_configuration.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        public: false
+        arguments:
+            - '@oro_locale.name_format_configuration.provider'
+        tags:
+            # add the warmer for this System cache at the begin of the warmers chain
+            # to prevent double warmup in case some Application cache depends on this cache
+            - { name: kernel.cache_warmer, priority: 200 }
+
+    oro_locale.address_format_configuration.provider:
+        class: Oro\Bundle\LocaleBundle\Configuration\AddressFormatConfigurationProvider
+        public: false
+        arguments:
+            - '%kernel.cache_dir%/oro/locale_address_format.php'
+            - '@oro_cache.config_cache_factory'
+
+    oro_locale.address_format_configuration.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        public: false
+        arguments:
+            - '@oro_locale.address_format_configuration.provider'
+        tags:
+            # add the warmer for this System cache at the begin of the warmers chain
+            # to prevent double warmup in case some Application cache depends on this cache
+            - { name: kernel.cache_warmer, priority: 200 }
+
+    oro_locale.locale_data_configuration.provider:
+        class: Oro\Bundle\LocaleBundle\Configuration\LocaleDataConfigurationProvider
+        public: false
+        arguments:
+            - '%kernel.cache_dir%/oro/locale_data.php'
+            - '@oro_cache.config_cache_factory'
+
+    oro_locale.locale_data_configuration.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        public: false
+        arguments:
+            - '@oro_locale.locale_data_configuration.provider'
+        tags:
+            # add the warmer for this System cache at the begin of the warmers chain
+            # to prevent double warmup in case some Application cache depends on this cache
+            - { name: kernel.cache_warmer, priority: 200 }
 
     oro_locale.helper.localization:
         class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationHelper'

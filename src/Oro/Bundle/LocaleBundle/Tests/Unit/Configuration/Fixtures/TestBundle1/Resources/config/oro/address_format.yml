@@ -1,0 +1,5 @@
+US:
+    format: '%name%\n%organization%\n%street%'
+    require: [street, city, region, postal_code]
+    zip_name_type: zip
+    region_name_type: region

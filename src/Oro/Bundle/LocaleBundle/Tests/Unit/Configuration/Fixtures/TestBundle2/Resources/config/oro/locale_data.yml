@@ -1,0 +1,4 @@
+RU:
+    currency_code: RUB
+    phone_prefix: '7'
+    default_locale: ru_RU
