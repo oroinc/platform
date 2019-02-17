@@ -97,11 +97,15 @@ class OroApiBundle extends Bundle
         // Warms up API caches here to detect misconfiguration (e.g. duplicated entity aliases) as early as possible
         // to avoid ORM metadata exceptions like "The target entity Extend\Entity\... cannot be found in ...".
         // Do it only if extended entity proxies are ready.
+        // Skip for "cache:clear" and "cache:warmup" commands to avoid premature warming up caches;
+        // in this case caches are warmed up by cache warmers
         // Skip for "oro:install" and "oro:platform:update" commands to avoid
         // "Class Extend\Entity\... does not exist" exceptions for case when custom entities are created
         // via migrations and has some configuration in "Resources/config/oro/api.yml"
         if ($this->kernel->isDebug()
             && ExtendClassLoadingUtils::aliasesExist($this->kernel->getCacheDir())
+            && !CommandExecutor::isCurrentCommand('cache:clear')
+            && !CommandExecutor::isCurrentCommand('cache:warmup')
             && !CommandExecutor::isCurrentCommand('oro:install')
             && !CommandExecutor::isCurrentCommand('oro:platform:update')
         ) {
