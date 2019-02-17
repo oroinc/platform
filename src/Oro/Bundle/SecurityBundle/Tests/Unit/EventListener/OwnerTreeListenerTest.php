@@ -3,28 +3,31 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestBusinessUnit;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestUser;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
+use Oro\Component\TestUtils\ORM\Mocks\StatementMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class OwnerTreeListenerTest extends OrmTestCase
 {
-    const ENTITY_NAMESPACE = 'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity';
+    private const ENTITY_NAMESPACE = 'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity';
 
     /** @var EntityManagerMock */
-    protected $em;
+    private $em;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $conn;
+    private $conn;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $treeProvider;
+    private $treeProvider;
 
     /** @var OwnerTreeListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp()
     {
@@ -35,27 +38,25 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
         $this->em->getConfiguration()->setEntityNamespaces(['Test' => self::ENTITY_NAMESPACE]);
 
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->will($this->returnValue($this->em));
 
         $this->conn = $this->getDriverConnectionMock($this->em);
 
-        $this->treeProvider = $this->createMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $this->treeProvider = $this->createMock(OwnerTreeProviderInterface::class);
 
         $this->listener = new OwnerTreeListener($this->treeProvider);
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestOrganization');
         $this->em->getEventManager()->addEventListener('onFlush', $this->listener);
     }
 
-    protected function setInsertQueryExpectation()
+    private function setInsertQueryExpectation()
     {
         $this->conn->expects($this->once())
             ->method('prepare')
-            ->will($this->returnValue($this->createMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock')));
+            ->will($this->returnValue($this->createMock(StatementMock::class)));
     }
 
     /**
@@ -65,7 +66,7 @@ class OwnerTreeListenerTest extends OrmTestCase
      *
      * @return TestUser
      */
-    protected function findUser($userId, $userName, $ownerId)
+    private function findUser($userId, $userName, $ownerId)
     {
         $this->setQueryExpectationAt(
             $this->conn,
@@ -84,7 +85,7 @@ class OwnerTreeListenerTest extends OrmTestCase
      * @param int      $userId
      * @param int|null $businessUnitId
      */
-    protected function setLoadUserBusinessUnitsExpectation($userId, $businessUnitId)
+    private function setLoadUserBusinessUnitsExpectation($userId, $businessUnitId)
     {
         $rows = [];
         if (null !== $businessUnitId) {
@@ -108,7 +109,7 @@ class OwnerTreeListenerTest extends OrmTestCase
      *
      * @return TestBusinessUnit
      */
-    protected function getBusinessUnitReference($businessUnitId)
+    private function getBusinessUnitReference($businessUnitId)
     {
         return $this->em->getReference(self::ENTITY_NAMESPACE . '\TestBusinessUnit', $businessUnitId);
     }
@@ -118,7 +119,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
         $this->treeProvider->expects($this->once())
-            ->method('clear');
+            ->method('clearCache');
 
         $this->setInsertQueryExpectation();
 
@@ -130,7 +131,7 @@ class OwnerTreeListenerTest extends OrmTestCase
     public function testNotMonitoredEntityIsCreated()
     {
         $this->treeProvider->expects($this->never())
-            ->method('clear');
+            ->method('clearCache');
 
         $this->setInsertQueryExpectation();
 
@@ -144,7 +145,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
         $this->treeProvider->expects($this->once())
-            ->method('clear');
+            ->method('clearCache');
 
         $user = $this->findUser(1, 'test', 10);
         $this->em->remove($user);
@@ -154,7 +155,7 @@ class OwnerTreeListenerTest extends OrmTestCase
     public function testNotMonitoredEntityIsDeleted()
     {
         $this->treeProvider->expects($this->never())
-            ->method('clear');
+            ->method('clearCache');
 
         $user = $this->findUser(1, 'test', 10);
         $this->em->remove($user);
@@ -166,7 +167,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
         $this->treeProvider->expects($this->once())
-            ->method('clear');
+            ->method('clearCache');
 
         $user = $this->findUser(1, 'test', 10);
         $user->setOwner($this->getBusinessUnitReference(20));
@@ -176,7 +177,7 @@ class OwnerTreeListenerTest extends OrmTestCase
     public function testNotMonitoredToOneAssociationIsChanged()
     {
         $this->treeProvider->expects($this->never())
-            ->method('clear');
+            ->method('clearCache');
 
         $user = $this->findUser(1, 'test', 10);
         $user->setOwner($this->getBusinessUnitReference(20));
@@ -188,7 +189,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', [], ['businessUnits']);
 
         $this->treeProvider->expects($this->never())
-            ->method('clear');
+            ->method('clearCache');
 
         $user = $this->findUser(1, 'test', 10);
         $user->setOwner($this->getBusinessUnitReference(20));
@@ -200,7 +201,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
         $this->treeProvider->expects($this->once())
-            ->method('clear');
+            ->method('clearCache');
 
         $user = $this->findUser(1, 'test', null);
         $user->setOwner($this->getBusinessUnitReference(10));
@@ -210,7 +211,7 @@ class OwnerTreeListenerTest extends OrmTestCase
     public function testNotMonitoredToOneAssociationIsSet()
     {
         $this->treeProvider->expects($this->never())
-            ->method('clear');
+            ->method('clearCache');
 
         $user = $this->findUser(1, 'test', null);
         $user->setOwner($this->getBusinessUnitReference(10));
@@ -222,7 +223,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
         $this->treeProvider->expects($this->once())
-            ->method('clear');
+            ->method('clearCache');
 
         $user = $this->findUser(1, 'test', 10);
         $user->setOwner(null);
@@ -232,7 +233,7 @@ class OwnerTreeListenerTest extends OrmTestCase
     public function testNotMonitoredToOneAssociationIsUnset()
     {
         $this->treeProvider->expects($this->never())
-            ->method('clear');
+            ->method('clearCache');
 
         $user = $this->findUser(1, 'test', 10);
         $user->setOwner(null);
@@ -244,7 +245,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
         $this->treeProvider->expects($this->once())
-            ->method('clear');
+            ->method('clearCache');
 
         $this->setLoadUserBusinessUnitsExpectation(1, 10);
 
@@ -256,7 +257,7 @@ class OwnerTreeListenerTest extends OrmTestCase
     public function testNewItemIsAddedToNotMonitoredToManyAssociation()
     {
         $this->treeProvider->expects($this->never())
-            ->method('clear');
+            ->method('clearCache');
 
         $this->setLoadUserBusinessUnitsExpectation(1, 10);
 
@@ -270,7 +271,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['organizations']);
 
         $this->treeProvider->expects($this->never())
-            ->method('clear');
+            ->method('clearCache');
 
         $this->setLoadUserBusinessUnitsExpectation(1, 10);
 
@@ -284,7 +285,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
         $this->treeProvider->expects($this->once())
-            ->method('clear');
+            ->method('clearCache');
 
         $this->setLoadUserBusinessUnitsExpectation(1, 10);
 
@@ -296,7 +297,7 @@ class OwnerTreeListenerTest extends OrmTestCase
     public function testItemRemovedFromNotMonitoredToManyAssociation()
     {
         $this->treeProvider->expects($this->never())
-            ->method('clear');
+            ->method('clearCache');
 
         $this->setLoadUserBusinessUnitsExpectation(1, 10);
 
@@ -310,7 +311,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
         $this->treeProvider->expects($this->never())
-            ->method('clear');
+            ->method('clearCache');
 
         $user = $this->findUser(1, 'test', 10);
         $user->setUsername('new');

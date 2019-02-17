@@ -8,11 +8,13 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
+use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
+use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
 
 /**
  * Provides localization entities by passed ids.
  */
-class LocalizationManager
+class LocalizationManager implements WarmableConfigCacheInterface, ClearableConfigCacheInterface
 {
     private const ENTITIES_CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
     private const SIMPLE_CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA_SIMPLE';
@@ -160,14 +162,17 @@ class LocalizationManager
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
      */
-    public function clearCache()
+    public function clearCache(): void
     {
-        return $this->cacheProvider->deleteAll();
+        $this->cacheProvider->deleteAll();
     }
 
-    public function warmUpCache()
+    /**
+     * {@inheritdoc}
+     */
+    public function warmUpCache(): void
     {
         $this->clearCache();
         $this->getLocalizations();

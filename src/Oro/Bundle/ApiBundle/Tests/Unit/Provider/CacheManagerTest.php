@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\ApiDoc\Extractor\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Provider\CacheManager;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheFactory;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer;
-use Oro\Bundle\ApiBundle\Provider\EntityAliasCacheWarmer;
+use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCacheWarmer;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\Config\ConfigCacheInterface;
@@ -20,8 +20,8 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheWarmer */
     private $configCacheWarmer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasCacheWarmer */
-    private $entityAliasCacheWarmer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasResolverRegistry */
+    private $entityAliasResolverRegistry;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesCacheWarmer */
     private $resourcesCacheWarmer;
@@ -30,7 +30,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->configCacheFactory = $this->createMock(ConfigCacheFactory::class);
         $this->configCacheWarmer = $this->createMock(ConfigCacheWarmer::class);
-        $this->entityAliasCacheWarmer = $this->createMock(EntityAliasCacheWarmer::class);
+        $this->entityAliasResolverRegistry = $this->createMock(EntityAliasResolverRegistry::class);
         $this->resourcesCacheWarmer = $this->createMock(ResourcesCacheWarmer::class);
     }
 
@@ -49,7 +49,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
             new RequestExpressionMatcher(),
             $this->configCacheFactory,
             $this->configCacheWarmer,
-            $this->entityAliasCacheWarmer,
+            $this->entityAliasResolverRegistry,
             $this->resourcesCacheWarmer,
             $apiDocExtractor
         );
@@ -61,7 +61,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->configCacheWarmer->expects(self::once())
             ->method('warmUp');
-        $this->entityAliasCacheWarmer->expects(self::once())
+        $this->entityAliasResolverRegistry->expects(self::once())
             ->method('clearCache');
         $this->resourcesCacheWarmer->expects(self::once())
             ->method('clearCache');
@@ -75,7 +75,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->configCacheWarmer->expects(self::once())
             ->method('warmUp');
-        $this->entityAliasCacheWarmer->expects(self::once())
+        $this->entityAliasResolverRegistry->expects(self::once())
             ->method('warmUpCache');
         $this->resourcesCacheWarmer->expects(self::once())
             ->method('warmUpCache');
@@ -124,7 +124,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->configCacheWarmer->expects(self::never())
             ->method('warmUp');
-        $this->entityAliasCacheWarmer->expects(self::never())
+        $this->entityAliasResolverRegistry->expects(self::never())
             ->method('warmUpCache');
         $this->resourcesCacheWarmer->expects(self::never())
             ->method('warmUpCache');
@@ -177,7 +177,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         $this->configCacheWarmer->expects(self::once())
             ->method('warmUp')
             ->with($dirtyConfigKey);
-        $this->entityAliasCacheWarmer->expects(self::once())
+        $this->entityAliasResolverRegistry->expects(self::once())
             ->method('warmUpCache');
         $this->resourcesCacheWarmer->expects(self::once())
             ->method('warmUpCache');
@@ -243,7 +243,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         $this->configCacheWarmer->expects(self::exactly(3))
             ->method('warmUp')
             ->withConsecutive(['api1'], ['api2'], ['api3']);
-        $this->entityAliasCacheWarmer->expects(self::once())
+        $this->entityAliasResolverRegistry->expects(self::once())
             ->method('warmUpCache');
         $this->resourcesCacheWarmer->expects(self::once())
             ->method('warmUpCache');

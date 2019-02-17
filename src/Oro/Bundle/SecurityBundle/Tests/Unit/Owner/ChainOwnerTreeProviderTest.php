@@ -94,18 +94,18 @@ class ChainOwnerTreeProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->getTree();
     }
 
-    public function testClear()
+    public function testClearCache()
     {
         $provider = $this->getProviderMock();
-        $provider->expects($this->once())->method('clear');
+        $provider->expects($this->once())->method('clearCache');
 
         $default = $this->getProviderMock();
-        $default->expects($this->once())->method('clear');
+        $default->expects($this->once())->method('clearCache');
 
         $this->provider->addProvider($provider);
         $this->provider->setDefaultProvider($default);
 
-        $this->provider->clear();
+        $this->provider->clearCache();
     }
 
     public function testWarmUpCache()

@@ -275,7 +275,7 @@ services:
             - { name: oro_migration.extension, extension_name: change_type }
 
     oro_entity.entity_alias.cache.warmer:
-        class: Oro\Bundle\EntityBundle\Cache\EntityAliasCacheWarmer
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
         public: false
         arguments:
             - '@oro_entity.entity_alias_resolver'

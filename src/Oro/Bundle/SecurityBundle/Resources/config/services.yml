@@ -41,8 +41,6 @@ parameters:
     oro_security.search.acl_helper.class:                      Oro\Bundle\SecurityBundle\Search\AclHelper
     oro_security.orm.ownership_sql_walker_builder.class:       Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder
     oro_security.ownership_tree_provider.class:                Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider
-    oro_security.ownership_tree_provider.chain.class:          Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider
-    oro_security.ownership_tree_subscriber.class:              Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener
     oro-security.authentication.listener.basic.class:          Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationBasicAuthenticationListener
     oro_security.authentication.provider.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
     oro_security.authentication.provider.organization_rememberme.class: Oro\Bundle\SecurityBundle\Authentication\Provider\OrganizationRememberMeAuthenticationProvider
@@ -435,7 +433,7 @@ services:
             - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
 
     oro_security.ownership_tree_provider.chain:
-        class: '%oro_security.ownership_tree_provider.chain.class%'
+        class: Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider
         calls:
             - [setDefaultProvider, ['@oro_security.ownership_tree_provider']]
 
@@ -468,7 +466,7 @@ services:
             - [ setNamespace, [ 'oro_acl_owner_tree' ] ]
 
     oro_security.ownership_tree.cache.warmer:
-        class: Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheWarmer
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
         public: false
         arguments:
             - '@oro_security.ownership_tree_provider.chain'
@@ -476,7 +474,7 @@ services:
             - { name: kernel.cache_warmer }
 
     oro_security.ownership_tree_subscriber:
-        class: '%oro_security.ownership_tree_subscriber.class%'
+        class: Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener
         arguments:
             - '@oro_security.ownership_tree_provider.chain'
         calls:

@@ -2,27 +2,25 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
-interface OwnerTreeProviderInterface
+use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
+use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
+
+/**
+ * The interface for owner tree providers.
+ */
+interface OwnerTreeProviderInterface extends WarmableConfigCacheInterface, ClearableConfigCacheInterface
 {
     /**
+     * Checks if this provider is suitable in the current security context.
+     *
      * @return bool
      */
-    public function supports();
+    public function supports(): bool;
 
     /**
-     * Gets the owner tree
+     * Gets the owner tree.
      *
      * @return OwnerTreeInterface
      */
-    public function getTree();
-
-    /**
-     * Clears the owner tree cache
-     */
-    public function clear();
-
-    /**
-     * Warmups the owner tree cache
-     */
-    public function warmUpCache();
+    public function getTree(): OwnerTreeInterface;
 }

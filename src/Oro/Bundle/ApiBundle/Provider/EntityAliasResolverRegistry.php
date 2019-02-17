@@ -5,12 +5,14 @@ namespace Oro\Bundle\ApiBundle\Provider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
+use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The registry that allows to get the entity alias resolver for a specific request type.
  */
-class EntityAliasResolverRegistry
+class EntityAliasResolverRegistry implements WarmableConfigCacheInterface, ClearableConfigCacheInterface
 {
     /** @var array [[resolver service id, request type expression], ...] */
     private $entityAliasResolvers;

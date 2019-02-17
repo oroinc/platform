@@ -60,7 +60,7 @@ class OwnerTreeListener
             || $this->checkToManyRelations($uow->getScheduledCollectionDeletions());
 
         if ($this->isCacheOutdated) {
-            $this->treeProvider->clear();
+            $this->treeProvider->clearCache();
 
             // Clear doctrine query cache to be sure that queries will process hints
             // again with updated security information.
