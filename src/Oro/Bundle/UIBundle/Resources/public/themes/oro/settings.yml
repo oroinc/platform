@@ -5,4 +5,5 @@ styles:
     css:
         inputs:
             - bundles/oroui/themes/oro/css/style.css
+        output: css/themes/oro/oro.css
 

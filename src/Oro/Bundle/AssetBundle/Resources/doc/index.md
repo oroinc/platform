@@ -8,6 +8,7 @@
     - [Default entry points and output file names](#default-entry-points-and-output-file-names)
 - [Commands](#commands)
   - [`oro:assets:build` command](#oroassetsbuild-command)
+- [Configuration Reference](#configuration-reference)
 - [Troubleshooting](#troubleshooting)
 
 # Architecture
@@ -67,7 +68,7 @@ checkout:                                               # Another entry point na
     <tr>
         <th>Management Console</th>
         <td><code>css</code></td>
-        <td><code>css/oro.css</code></td>
+        <td><code>css/themes/oro/oro.css</code></td>
     </tr>
     <tr>
         <th>Store Front</th>
@@ -110,6 +111,40 @@ webpack continues to watch the changes in any of the resolved files.
 #### `--npm-install|-i`
 
 Reinstall npm dependencies to `vendor/oro/platform/build` folder, to be used by webpack. Required when `node_modules` folder is absent or corrupted.
+
+# Configuration reference
+AssetBundle defines configuration for NodeJs and NPM executable.
+
+All these options are configured under the `oro_asset` key in your application configuration.
+
+```yaml
+# displays the default config values defined by Oro
+ php bin/console config:dump-reference oro_asset
+# displays the actual config values used by your application
+ php bin/console debug:config oro_asset
+```
+
+## Configuration
+
+### nodejs_path
+**type: `string` required, default: found dynamically**
+
+Path to NodeJs executable.
+
+### npm_path
+**type: `string` required, default: found dynamically**
+
+Path to NPM executable.
+
+### build_timeout
+**type: `integer` required, default: `300`**
+
+Assets build timeout in seconds, null to disable timeout.
+
+### npm_install_timeout
+**type: `integer` required, default: `900`**
+
+Npm installation timeout in seconds, null to disable timeout.
 
 # Troubleshooting
 

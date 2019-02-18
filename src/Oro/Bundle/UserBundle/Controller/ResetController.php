@@ -35,6 +35,11 @@ class ResetController extends Controller
      */
     public function sendEmailAction(Request $request)
     {
+        if (!$this->isCsrfTokenValid('oro-user-password-reset-request', $request->get('_csrf_token'))) {
+            $this->get('session')->getFlashBag()
+                ->add('warn', 'The CSRF token is invalid. Please try to resubmit the form.');
+            return $this->redirect($this->generateUrl('oro_user_reset_request'));
+        }
         $email = $request->request->get('username');
 
         $userManager = $this->getUserManager();
