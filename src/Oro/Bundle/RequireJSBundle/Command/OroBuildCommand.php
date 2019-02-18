@@ -131,14 +131,14 @@ class OroBuildCommand extends Command
     protected function process(string $configPath): void
     {
         $path = dirname($configPath) . DIRECTORY_SEPARATOR . basename($configPath);
-        $command = self::OPTIMIZER_FILE_PATH . ' -o ' . $path . ' 1>&2';
+        $command = [self::OPTIMIZER_FILE_PATH, '-o', $path];
 
         $process = $this->nodeProcessFactory->createProcess($command, $this->webRoot, $this->timeout);
 
         $process->run();
 
         if (!$process->isSuccessful()) {
-            throw new \RuntimeException($process->getErrorOutput());
+            throw new \RuntimeException($process->getOutput() . "\n" . $process->getErrorOutput());
         }
     }
 
