@@ -67,7 +67,7 @@ checkout:                                               # Another entry point na
     <tr>
         <th>Management Console</th>
         <td><code>css</code></td>
-        <td><code>css/oro.css</code></td>
+        <td><code>css/themes/oro/oro.css</code></td>
     </tr>
     <tr>
         <th>Store Front</th>

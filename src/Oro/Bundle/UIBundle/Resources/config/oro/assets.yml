@@ -27,4 +27,4 @@ css:
         # custom styles
         - 'bundles/oroui/css/scss/main.scss'
         - 'bundles/oroui/css/all.css'
-    output: css/oro.css
+    output: css/themes/oro/oro.css

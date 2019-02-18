@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AssetBundle\Cache;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -27,7 +26,6 @@ class AssetConfigCache implements WarmableInterface
     public function warmUp($cacheDir)
     {
         $config['paths'] = $this->getBundlesPath();
-        $config['applicationUrl'] = $this->getApplicationUrl();
 
         @file_put_contents($this->getFilePath($cacheDir), \json_encode($config));
     }
@@ -61,22 +59,5 @@ class AssetConfigCache implements WarmableInterface
         }
 
         return $paths;
-    }
-
-    /**
-     * @return string
-     */
-    private function getApplicationUrl(): string
-    {
-        /** @var ConfigManager $configManager */
-        $configManager = $this->kernel->getContainer()->get('oro_config.global');
-        try {
-            $applicationUrl = $configManager->get('oro_ui.application_url');
-        } catch (\Exception $exception) {
-            /** We should not use configuration settings when an application is not installed */
-            $applicationUrl = '/';
-        }
-
-        return $applicationUrl;
     }
 }
