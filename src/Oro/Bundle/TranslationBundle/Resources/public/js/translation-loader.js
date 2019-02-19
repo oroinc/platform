@@ -3,7 +3,9 @@ define(function(require) {
 
     var Translator = require('translator');
 
-    Translator.fromJSON(require('text!oro/translations'));
+    try {
+        Translator.fromJSON(require('text!oro/translations'));
+    } catch (e) {}
 
     return require('orotranslation/js/translator');
 });
