@@ -15,10 +15,10 @@ class ConfigurationTest extends TestCase
         $result = $processor->processConfiguration(new Configuration(), []);
 
         $this->assertArrayHasKey('build_timeout', $result);
-        $this->assertEquals(120, $result['build_timeout']);
+        $this->assertEquals(300, $result['build_timeout']);
 
         $this->assertArrayHasKey('npm_install_timeout', $result);
-        $this->assertEquals(600, $result['npm_install_timeout']);
+        $this->assertEquals(900, $result['npm_install_timeout']);
 
         $this->assertArrayHasKey('nodejs_path', $result);
         $this->assertInternalType('string', $result['nodejs_path']);
@@ -56,8 +56,8 @@ class ConfigurationTest extends TestCase
                 'expects' => [
                     'nodejs_path' => 'nodejs',
                     'npm_path' => 'npm',
-                    'build_timeout' => 120,
-                    'npm_install_timeout' => 600,
+                    'build_timeout' => 300,
+                    'npm_install_timeout' => 900,
                 ],
             ],
             [
