@@ -5,12 +5,6 @@ services:
         tags:
             - { name: console.command }
 
-    Oro\Bundle\WorkflowBundle\Command\DefinitionUpgrade20Command:
-        public: false
-        class: Oro\Bundle\WorkflowBundle\Command\DefinitionUpgrade20Command
-        tags:
-            - { name: console.command }
-
     Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand:
         public: false
         class: Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand
