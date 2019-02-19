@@ -287,20 +287,6 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     }
 
     /**
-     * Set id
-     *
-     * @param int $id
-     * @return $this
-     * @deprecated since 1.10, to be removed in 2.0
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
      * Set label
      *
      * @param string $label
@@ -467,9 +453,8 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     {
         if (!empty($this->regionText)) {
             return $this->regionText;
-        } else {
-            return $this->region;
         }
+        return $this->region;
     }
 
     /**

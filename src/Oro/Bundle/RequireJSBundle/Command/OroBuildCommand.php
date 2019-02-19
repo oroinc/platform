@@ -133,7 +133,7 @@ class OroBuildCommand extends Command
         $path = dirname($configPath) . DIRECTORY_SEPARATOR . basename($configPath);
         $command = [self::OPTIMIZER_FILE_PATH, '-o', $path];
 
-        $process = $this->nodeProcessFactory->createProcess($command, $this->webRoot, $this->timeout);
+        $process = $this->nodeProcessFactory->create($command, $this->webRoot, $this->timeout);
 
         $process->run();
 

@@ -9,6 +9,9 @@ use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Exception\IOException;
 
+/**
+ * Dump js translations to appropriate files
+ */
 class JsTranslationDumper implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
@@ -73,11 +76,8 @@ class JsTranslationDumper implements LoggerAwareInterface
             $locales = array_keys($this->languageProvider->getAvailableLanguages());
         }
 
-        $targetPattern = realpath($this->kernelProjectDir . '/public')
-            . $this->router->getRouteCollection()->get($this->jsTranslationRoute)->getPath();
-
         foreach ($locales as $locale) {
-            $target = strtr($targetPattern, array('{_locale}' => $locale));
+            $target = $this->getTranslationFilePath($locale);
 
             $this->logger->info(
                 sprintf(
@@ -100,5 +100,28 @@ class JsTranslationDumper implements LoggerAwareInterface
         }
 
         return true;
+    }
+
+    /**
+     * @param string $locale
+     * @return bool
+     */
+    public function isTranslationFileExist(string $locale): bool
+    {
+        $translationFilePath = $this->getTranslationFilePath($locale);
+
+        return file_exists($translationFilePath);
+    }
+
+    /**
+     * @param string $locale
+     * @return string
+     */
+    private function getTranslationFilePath(string $locale): string
+    {
+        $targetPattern = realpath($this->kernelProjectDir . '/public')
+            . $this->router->getRouteCollection()->get($this->jsTranslationRoute)->getPath();
+
+        return strtr($targetPattern, ['{_locale}' => $locale]);
     }
 }
