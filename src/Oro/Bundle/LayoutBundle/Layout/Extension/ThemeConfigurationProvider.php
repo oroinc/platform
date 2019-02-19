@@ -10,7 +10,6 @@ use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\ResourcesContainerInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface;
-use Symfony\Component\Config\ConfigCacheFactoryInterface;
 
 /**
  * The provider for layout theme configuration that are loaded from the following files:
@@ -28,18 +27,18 @@ class ThemeConfigurationProvider extends PhpArrayConfigProvider implements Theme
     private $folderPattern;
 
     /**
-     * @param string                      $cacheFile
-     * @param ConfigCacheFactoryInterface $configCacheFactory
-     * @param ThemeConfiguration          $configuration
-     * @param string                      $folderPattern
+     * @param string             $cacheFile
+     * @param bool               $debug
+     * @param ThemeConfiguration $configuration
+     * @param string             $folderPattern
      */
     public function __construct(
         string $cacheFile,
-        ConfigCacheFactoryInterface $configCacheFactory,
+        bool $debug,
         ThemeConfiguration $configuration,
         string $folderPattern
     ) {
-        parent::__construct($cacheFile, $configCacheFactory);
+        parent::__construct($cacheFile, $debug);
         $this->configuration = $configuration;
         $this->folderPattern = $folderPattern;
     }

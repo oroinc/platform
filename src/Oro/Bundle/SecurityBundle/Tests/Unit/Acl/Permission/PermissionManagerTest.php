@@ -16,7 +16,6 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -61,7 +60,7 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->configurationProvider = new PermissionConfigurationProvider(
             $this->getTempFile('PermissionManager'),
-            new ConfigCacheFactory(false),
+            false,
             CumulativeResourceManager::getInstance()->getBundles()
         );
 

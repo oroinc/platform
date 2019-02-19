@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  * as a process that sent the message.
  * Also the "security_agnostic_processors" option can be used to disable changing the security context
  * for some processors.
- * For details see "Resources/doc/secutity_context.md".
+ * For details see "Resources/doc/security_context.md".
  */
 class SecurityAwareConsumptionExtension extends AbstractExtension
 {

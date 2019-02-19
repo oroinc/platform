@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Provider;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
+use Oro\Component\Config\Cache\ConfigCache;
 use Oro\Component\Config\Cache\PhpConfigCacheAccessor;
 use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
@@ -11,7 +12,6 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\ResourcesContainer;
 use Oro\Component\Config\ResourcesContainerInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
-use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\ResourceCheckerConfigCache;
 use Symfony\Component\Filesystem\Filesystem;
@@ -30,16 +30,16 @@ class ConfigurationProvider implements ConfigurationProviderInterface, WarmableC
     /** @var string */
     private $cacheDir;
 
-    /** @var ConfigCacheFactoryInterface */
-    private $configCacheFactory;
+    /** @var bool */
+    private $debug;
 
     /** @var SystemAwareResolver */
     private $resolver;
 
-    /** @var PhpConfigCacheAccessor */
+    /** @var PhpConfigCacheAccessor|null */
     private $rootCacheAccessor;
 
-    /** @var PhpConfigCacheAccessor */
+    /** @var PhpConfigCacheAccessor|null */
     private $gridCacheAccessor;
 
     /** @var bool */
@@ -55,17 +55,17 @@ class ConfigurationProvider implements ConfigurationProviderInterface, WarmableC
     private $cacheDirLength;
 
     /**
-     * @param string                      $cacheDir
-     * @param ConfigCacheFactoryInterface $configCacheFactory
-     * @param SystemAwareResolver         $resolver
+     * @param string              $cacheDir
+     * @param bool                $debug
+     * @param SystemAwareResolver $resolver
      */
     public function __construct(
         string $cacheDir,
-        ConfigCacheFactoryInterface $configCacheFactory,
+        bool $debug,
         SystemAwareResolver $resolver
     ) {
         $this->cacheDir = $cacheDir;
-        $this->configCacheFactory = $configCacheFactory;
+        $this->debug = $debug;
         $this->resolver = $resolver;
         $this->cacheDirLength = \strlen($this->cacheDir);
     }
@@ -131,18 +131,18 @@ class ConfigurationProvider implements ConfigurationProviderInterface, WarmableC
     private function ensureCacheWarmedUp(): void
     {
         if (!$this->hasCache) {
-            $rootCacheFile = $this->cacheDir . '/datagrids.php';
-            $cache = $this->configCacheFactory->cache($rootCacheFile, function (ConfigCacheInterface $cache) {
+            $rootCache = new ConfigCache($this->cacheDir . '/datagrids.php', $this->debug);
+            if (!$rootCache->isFresh()) {
                 $resourcesContainer = new ResourcesContainer();
                 $gridCacheAccessor = $this->getGridCacheAccessor();
                 $aggregatedConfigs = $this->loadConfiguration($resourcesContainer);
                 foreach ($aggregatedConfigs as $gridName => $gridConfigs) {
                     $gridCacheAccessor->save($this->getGridConfigCache($gridName), $gridConfigs);
                 }
-                $this->getRootCacheAccessor()->save($cache, true, $resourcesContainer->getResources());
-            });
+                $this->getRootCacheAccessor()->save($rootCache, true, $resourcesContainer->getResources());
+            }
 
-            $this->hasCache = $this->getRootCacheAccessor()->load($cache);
+            $this->hasCache = $this->getRootCacheAccessor()->load($rootCache);
         }
     }
 

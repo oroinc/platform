@@ -7,7 +7,6 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Configuration\Fixtures\TestBundle1\TestBu
 use Oro\Bundle\LocaleBundle\Tests\Unit\Configuration\Fixtures\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\ConfigCacheFactory;
 
 class AddressFormatConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -35,10 +34,7 @@ class AddressFormatConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 $bundle2->getName() => get_class($bundle2)
             ]);
 
-        $this->configurationProvider = new AddressFormatConfigurationProvider(
-            $this->cacheFile,
-            new ConfigCacheFactory(false)
-        );
+        $this->configurationProvider = new AddressFormatConfigurationProvider($this->cacheFile, false);
     }
 
     public function testGetConfiguration()

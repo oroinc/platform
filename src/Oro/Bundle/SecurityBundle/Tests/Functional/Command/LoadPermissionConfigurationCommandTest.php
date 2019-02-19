@@ -22,7 +22,8 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->provider = $this->getContainer()->get('oro_security.configuration.provider.permission_configuration');
+        $this->provider = $this->getContainer()
+            ->get('oro_security.configuration.provider.permission_configuration');
     }
 
     protected function tearDown()

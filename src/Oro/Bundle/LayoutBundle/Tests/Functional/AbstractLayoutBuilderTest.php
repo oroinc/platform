@@ -34,11 +34,11 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
     {
         $this->initClient();
 
-        // prepare test envinroment
+        // prepare test environment
         $container = $this->getContainer();
         $this->initialBundles = CumulativeResourceManager::getInstance()->getBundles();
         $this->initialThemeManager = $container->get('oro_layout.theme_manager');
-        $this->resourcesProvider = $container->get('oro_layout.theme_extension.resource_provider.theme');
+        $this->resourcesProvider = $container->get('oro_layout.tests.theme_extension.resource_provider.theme');
     }
 
     /**

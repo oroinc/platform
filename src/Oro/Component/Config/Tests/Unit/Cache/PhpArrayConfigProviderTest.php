@@ -5,8 +5,6 @@ namespace Oro\Component\Config\Tests\Unit\Cache;
 use Oro\Component\Config\ResourcesContainerInterface;
 use Oro\Component\Config\Tests\Unit\Fixtures\PhpArrayConfigProviderStub;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\ConfigCacheFactory;
-use Symfony\Component\Config\ConfigCacheFactoryInterface;
 
 class PhpArrayConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -15,13 +13,9 @@ class PhpArrayConfigProviderTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $cacheFile;
 
-    /** @var ConfigCacheFactoryInterface */
-    private $cacheFactory;
-
     protected function setUp()
     {
         $this->cacheFile = $this->getTempFile('PhpConfigCacheAccessor');
-        $this->cacheFactory = new ConfigCacheFactory(false);
         self::assertFileNotExists($this->cacheFile);
     }
 
@@ -34,11 +28,33 @@ class PhpArrayConfigProviderTest extends \PHPUnit\Framework\TestCase
     {
         return new PhpArrayConfigProviderStub(
             $this->cacheFile,
-            $this->cacheFactory,
+            false,
             function (ResourcesContainerInterface $resourcesContainer) use ($config) {
                 return $config;
             }
         );
+    }
+
+    public function testIsCacheFreshWhenNoCachedData()
+    {
+        $config = ['test'];
+
+        $provider = $this->getProvider($config);
+
+        $timestamp = time() - 1;
+        self::assertFalse($provider->isCacheFresh($timestamp));
+    }
+
+    public function testIsCacheFreshWhenCachedDataExist()
+    {
+        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
+
+        $provider = $this->getProvider(['initial']);
+
+        $cacheTimestamp = filemtime($this->cacheFile);
+        self::assertTrue($provider->isCacheFresh($cacheTimestamp));
+        self::assertTrue($provider->isCacheFresh($cacheTimestamp + 1));
+        self::assertFalse($provider->isCacheFresh($cacheTimestamp - 1));
     }
 
     public function testGetConfigWhenNoCachedData()

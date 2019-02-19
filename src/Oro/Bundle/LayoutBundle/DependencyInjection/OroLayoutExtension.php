@@ -64,6 +64,10 @@ class OroLayoutExtension extends Extension
         $container->getDefinition('oro_layout.theme_extension.configuration.provider')
             ->replaceArgument(3, self::RESOURCES_FOLDER_PATTERN);
 
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
+
         $this->addClassesToCompile([
             'Oro\Bundle\LayoutBundle\EventListener\ThemeListener',
             'Oro\Bundle\LayoutBundle\Request\LayoutHelper'

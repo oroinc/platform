@@ -10,7 +10,6 @@ use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle3\TestB
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle4\TestBundle4;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
@@ -104,7 +103,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
         return new ConfigurationProvider(
             $this->cacheFile,
-            new ConfigCacheFactory(false),
+            false,
             $bundles,
             new FeatureToggleConfiguration()
         );

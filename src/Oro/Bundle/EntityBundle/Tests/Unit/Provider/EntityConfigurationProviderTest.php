@@ -8,7 +8,6 @@ use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\ConfigCacheFactory;
 
 class EntityConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,10 +26,7 @@ class EntityConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->cacheFile = $this->getTempFile('ConfigurationProvider');
 
-        $this->configurationProvider = new EntityConfigurationProvider(
-            $this->cacheFile,
-            new ConfigCacheFactory(false)
-        );
+        $this->configurationProvider = new EntityConfigurationProvider($this->cacheFile, false);
     }
 
     /**

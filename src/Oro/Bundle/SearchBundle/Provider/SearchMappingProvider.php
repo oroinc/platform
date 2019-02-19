@@ -50,14 +50,21 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
     public function getMappingConfig()
     {
         if (null === $this->configuration) {
-            $cachedConfig = $this->cache->fetch(self::CACHE_KEY);
-            if (false !== $cachedConfig) {
-                $this->configuration = $cachedConfig;
-            } else {
+            $cachedData = $this->cache->fetch(self::CACHE_KEY);
+            if (false !== $cachedData) {
+                list($timestamp, $config) = $cachedData;
+                if ($this->mappingConfigProvider->isCacheFresh($timestamp)) {
+                    $this->configuration = $config;
+                }
+            }
+            if (null === $this->configuration) {
                 $event = new SearchMappingCollectEvent($this->mappingConfigProvider->getConfiguration());
                 $this->dispatcher->dispatch(SearchMappingCollectEvent::EVENT_NAME, $event);
                 $this->configuration = $event->getMappingConfig();
-                $this->cache->save(self::CACHE_KEY, $this->configuration);
+                $this->cache->save(
+                    self::CACHE_KEY,
+                    [$this->mappingConfigProvider->getCacheTimestamp(), $this->configuration]
+                );
             }
         }
 

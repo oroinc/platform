@@ -8,23 +8,23 @@ use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * The provider for action (another name is a capability) related secutity metadata.
+ * The provider for action (another name is a capability) related security metadata.
  */
 class ActionMetadataProvider implements WarmableConfigCacheInterface, ClearableConfigCacheInterface
 {
     private const CACHE_KEY = 'data';
 
     /** @var AclAnnotationProvider */
-    protected $annotationProvider;
+    private $annotationProvider;
 
     /** @var TranslatorInterface */
-    protected $translator;
+    private $translator;
 
     /** @var CacheProvider */
-    protected $cache;
+    private $cache;
 
     /** @var array [action name => ActionMetadata, ...] */
-    protected $localCache;
+    private $localCache;
 
     /**
      * @param AclAnnotationProvider $annotationProvider
@@ -71,7 +71,11 @@ class ActionMetadataProvider implements WarmableConfigCacheInterface, ClearableC
      */
     public function warmUpCache(): void
     {
-        $this->loadMetadata();
+        $this->localCache = $this->loadMetadata();
+        $this->cache->save(
+            self::CACHE_KEY,
+            [$this->annotationProvider->getCacheTimestamp(), $this->localCache]
+        );
     }
 
     /**
@@ -86,31 +90,45 @@ class ActionMetadataProvider implements WarmableConfigCacheInterface, ClearableC
     /**
      * Makes sure that metadata are loaded and cached
      */
-    protected function ensureMetadataLoaded()
+    private function ensureMetadataLoaded()
     {
-        if (null === $this->localCache) {
-            $data = $this->cache->fetch(self::CACHE_KEY);
-            if (false !== $data) {
+        if (null !== $this->localCache) {
+            return;
+        }
+
+        $cachedData = $this->cache->fetch(self::CACHE_KEY);
+        if (false !== $cachedData) {
+            list($timestamp, $data) = $cachedData;
+            if ($this->annotationProvider->isCacheFresh($timestamp)) {
                 $this->localCache = $data;
-            } else {
-                $this->loadMetadata();
             }
+        }
+        if (null === $this->localCache) {
+            $this->localCache = $this->loadMetadata();
+            $this->cache->save(
+                self::CACHE_KEY,
+                [$this->annotationProvider->getCacheTimestamp(), $this->localCache]
+            );
         }
     }
 
     /**
      * Loads metadata and save them in cache
+     *
+     * @return array
      */
-    protected function loadMetadata()
+    private function loadMetadata()
     {
         $data = [];
-        foreach ($this->annotationProvider->getAnnotations('action') as $annotation) {
+        $annotations = $this->annotationProvider->getAnnotations('action');
+        foreach ($annotations as $annotation) {
             $description = $annotation->getDescription();
             if ($description) {
                 $description = $this->translator->trans($description);
             }
-            $data[$annotation->getId()] = new ActionMetadata(
-                $annotation->getId(),
+            $annotationId = $annotation->getId();
+            $data[$annotationId] = new ActionMetadata(
+                $annotationId,
                 $annotation->getGroup(),
                 $this->translator->trans($annotation->getLabel()),
                 $description,
@@ -118,8 +136,6 @@ class ActionMetadataProvider implements WarmableConfigCacheInterface, ClearableC
             );
         }
 
-        $this->cache->save(self::CACHE_KEY, $data);
-
-        $this->localCache = $data;
+        return $data;
     }
 }

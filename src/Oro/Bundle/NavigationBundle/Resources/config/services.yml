@@ -513,19 +513,11 @@ services:
 
     oro_navigation.configuration.provider:
         class: Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider
+        public: false
+        parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/navigation.php'
-            - '@oro_cache.config_cache_factory'
-
-    oro_navigation.configuration.warmer:
-        class: Oro\Component\Config\Cache\ConfigCacheWarmer
-        public: false
-        arguments:
-            - '@oro_navigation.configuration.provider'
-        tags:
-            # add the warmer for this System cache at the begin of the warmers chain
-            # to prevent double warmup in case some Application cache depends on this cache
-            - { name: kernel.cache_warmer, priority: 200 }
+            - '%kernel.debug%'
 
     oro_navigation.event_listener.scope_grid_listener:
         class: Oro\Bundle\NavigationBundle\EventListener\MenuGridListener

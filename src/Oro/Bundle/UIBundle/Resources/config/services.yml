@@ -40,19 +40,10 @@ services:
     oro_ui.placeholder.configuration.provider:
         class: Oro\Bundle\UIBundle\Placeholder\PlaceholderConfigurationProvider
         public: false
+        parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/placeholders.php'
-            - '@oro_cache.config_cache_factory'
-
-    oro_ui.placeholder.configuration.warmer:
-        class: Oro\Component\Config\Cache\ConfigCacheWarmer
-        public: false
-        arguments:
-            - '@oro_ui.placeholder.configuration.provider'
-        tags:
-            # add the warmer for this System cache at the begin of the warmers chain
-            # to prevent double warmup in case some Application cache depends on this cache
-            - { name: kernel.cache_warmer, priority: 200 }
+            - '%kernel.debug%'
 
     # Other services
     oro_ui.router:

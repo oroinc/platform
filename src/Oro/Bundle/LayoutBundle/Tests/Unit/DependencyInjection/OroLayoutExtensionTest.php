@@ -13,6 +13,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoadDefaultConfig()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.debug', false);
 
         $extensionConfig = [];
@@ -95,6 +96,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoadWithTemplatingAppConfig()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.debug', false);
 
         $extensionConfig = [
@@ -150,6 +152,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoadWithDisabledTwigRenderer()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.debug', false);
 
         $extensionConfig = [
@@ -192,6 +195,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoadWithActiveTheme()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.debug', false);
 
         $extensionConfig = [
@@ -209,6 +213,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoadWithDebugOption()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.debug', false);
 
         $extensionConfig = [

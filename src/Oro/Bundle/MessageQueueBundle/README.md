@@ -20,7 +20,7 @@ OroMessageQueueBundle incorporates the OroMessageQueue component into OroPlatfor
  - [Stale Jobs](#stale-jobs)
  - [Consumer heartbeat](#consumer-heartbeat)
  - [Resetting Symfony Container in consumer](Resources/doc/container_in_consumer.md)
- - [Security Context in consumer](Resources/doc/secutity_context.md)
+ - [Security Context in consumer](Resources/doc/security_context.md)
  - [Buffering Messages](Resources/doc/buffering_messages.md)
 * [Logging, Error Handling and Debugging](./Resources/doc/logging.md)
 

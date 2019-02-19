@@ -15,21 +15,12 @@ services:
 
     oro_featuretoggle.configuration.provider:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider'
+        parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/features.php'
-            - '@oro_cache.config_cache_factory'
+            - '%kernel.debug%'
             - '%kernel.bundles%'
             - '@oro_featuretoggle.configuration'
-
-    oro_featuretoggle.configuration.warmer:
-        class: 'Oro\Component\Config\Cache\ConfigCacheWarmer'
-        public: false
-        arguments:
-            - '@oro_featuretoggle.configuration.provider'
-        tags:
-            # add the warmer for this System cache at the begin of the warmers chain
-            # to prevent double warmup in case some Application cache depends on this cache
-            - { name: kernel.cache_warmer, priority: 200 }
 
     oro_featuretoggle.configuration.manager:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager'

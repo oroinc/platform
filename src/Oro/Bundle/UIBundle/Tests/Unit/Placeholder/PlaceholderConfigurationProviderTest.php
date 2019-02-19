@@ -8,7 +8,6 @@ use Oro\Bundle\UIBundle\Tests\Unit\Fixture\BazBundle\BazBundle;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\FooBundle\FooBundle;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\ConfigCacheFactory;
 
 class PlaceholderConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,10 +26,7 @@ class PlaceholderConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->cacheFile = $this->getTempFile('PlaceholderConfigurationProvider');
 
-        $this->configurationProvider = new PlaceholderConfigurationProvider(
-            $this->cacheFile,
-            new ConfigCacheFactory(false)
-        );
+        $this->configurationProvider = new PlaceholderConfigurationProvider($this->cacheFile, false);
     }
 
     /**

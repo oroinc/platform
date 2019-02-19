@@ -8,7 +8,6 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\ConfigCacheFactory;
 
 class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -73,7 +72,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->provider = new PermissionConfigurationProvider(
             $this->cacheFile,
-            new ConfigCacheFactory(false),
+            false,
             CumulativeResourceManager::getInstance()->getBundles()
         );
     }

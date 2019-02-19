@@ -7,7 +7,6 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundl
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\ConfigCacheFactory;
 
 class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -26,10 +25,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->cacheFile = $this->getTempFile('ConfigurationProvider');
 
-        $this->configurationProvider = new ConfigurationProvider(
-            $this->cacheFile,
-            new ConfigCacheFactory(false)
-        );
+        $this->configurationProvider = new ConfigurationProvider($this->cacheFile, false);
     }
 
     /**

@@ -2,21 +2,12 @@ services:
     oro_action.configuration.provider:
         class: Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider
         public: false
+        parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/actions.php'
-            - '@oro_cache.config_cache_factory'
+            - '%kernel.debug%'
             - '@service_container'
             - '%kernel.bundles%'
-
-    oro_action.configuration.cache.warmer.action_groups:
-        class: Oro\Component\Config\Cache\ConfigCacheWarmer
-        public: false
-        arguments:
-            - '@oro_action.configuration.provider'
-        tags:
-            # add the warmer for this System cache at the begin of the warmers chain
-            # to prevent double warmup in case some Application cache depends on this cache
-            - { name: kernel.cache_warmer, priority: 200 }
 
     oro_action.configuration.validator.action_group:
         class: Oro\Bundle\ActionBundle\Configuration\ActionGroupConfigurationValidator

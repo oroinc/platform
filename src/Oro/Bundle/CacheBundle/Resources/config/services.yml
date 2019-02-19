@@ -64,11 +64,8 @@ services:
         public: false
         class: 'Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToCronFormatTransformer'
 
-    oro_cache.config_cache_factory:
-        class: Oro\Component\Config\Cache\ConfigCacheFactory
-        public: false
-        arguments:
-            - '%kernel.debug%'
+    oro.static_config_provider.abstract:
+        abstract: true
 
     oro.cache.memory_cache_chain:
         public: false

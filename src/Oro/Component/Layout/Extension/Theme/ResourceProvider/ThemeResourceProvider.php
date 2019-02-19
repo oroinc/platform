@@ -8,7 +8,6 @@ use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
 use Oro\Component\Config\ResourcesContainerInterface;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
-use Symfony\Component\Config\ConfigCacheFactoryInterface;
 
 /**
  * The provider for layout theme resources
@@ -29,22 +28,22 @@ class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourcePr
     private $excludeFilePathPatterns;
 
     /**
-     * @param string                      $cacheFile
-     * @param ConfigCacheFactoryInterface $configCacheFactory
+     * @param string                       $cacheFile
+     * @param bool                         $debug
      * @param LastModificationDateProvider $lastModificationDateProvider
-     * @param LayoutUpdateLoaderInterface $loader
-     * @param BlockViewCache              $blockViewCache
-     * @param string[]                    $excludeFilePathPatterns
+     * @param LayoutUpdateLoaderInterface  $loader
+     * @param BlockViewCache               $blockViewCache
+     * @param string[]                     $excludeFilePathPatterns
      */
     public function __construct(
         string $cacheFile,
-        ConfigCacheFactoryInterface $configCacheFactory,
+        bool $debug,
         LastModificationDateProvider $lastModificationDateProvider,
         LayoutUpdateLoaderInterface $loader,
         BlockViewCache $blockViewCache,
         array $excludeFilePathPatterns = []
     ) {
-        parent::__construct($cacheFile, $configCacheFactory);
+        parent::__construct($cacheFile, $debug);
         $this->lastModificationDateProvider = $lastModificationDateProvider;
         $this->loader = $loader;
         $this->blockViewCache = $blockViewCache;

@@ -9,7 +9,6 @@ use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\ConfigCacheFactory;
 
 class ThemeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -39,7 +38,7 @@ class ThemeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->configurationProvider = new ThemeConfigurationProvider(
             $this->cacheFile,
-            new ConfigCacheFactory(false),
+            false,
             new ThemeConfiguration(),
             '[a-zA-Z][a-zA-Z0-9_\-:]*'
         );

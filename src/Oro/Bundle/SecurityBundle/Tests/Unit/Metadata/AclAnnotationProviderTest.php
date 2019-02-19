@@ -8,7 +8,6 @@ use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoaderInterface;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\ConfigCacheFactory;
 
 class AclAnnotationProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -35,7 +34,7 @@ class AclAnnotationProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->provider = new AclAnnotationProvider(
             $this->cacheFile,
-            new ConfigCacheFactory(false),
+            false,
             $this->entityClassResolver
         );
         $this->provider->addLoader($this->loader);

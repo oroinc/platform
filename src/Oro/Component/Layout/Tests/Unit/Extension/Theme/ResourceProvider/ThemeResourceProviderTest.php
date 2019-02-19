@@ -9,7 +9,6 @@ use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Bundle\TestBundle\TestBundle;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\ConfigCacheFactory;
 
 class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -43,7 +42,7 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->provider = new ThemeResourceProvider(
             $this->cacheFile,
-            new ConfigCacheFactory(false),
+            false,
             $this->lastModificationDateProvider,
             $this->loader,
             $this->blockViewCache,

@@ -8,10 +8,9 @@ use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Merger\ConfigurationMerger;
 use Oro\Component\Config\ResourcesContainerInterface;
-use Symfony\Component\Config\ConfigCacheFactoryInterface;
 
 /**
- * The provider for configurable secutity permissions configuration
+ * The provider for configurable security permissions configuration
  * that is loaded from "Resources/config/oro/configurable_permissions.yml" files.
  */
 class ConfigurablePermissionConfigurationProvider extends PhpArrayConfigProvider
@@ -22,13 +21,13 @@ class ConfigurablePermissionConfigurationProvider extends PhpArrayConfigProvider
     private $bundles;
 
     /**
-     * @param string                      $cacheFile
-     * @param ConfigCacheFactoryInterface $configCacheFactory
-     * @param string[]                    $bundles
+     * @param string   $cacheFile
+     * @param bool     $debug
+     * @param string[] $bundles
      */
-    public function __construct(string $cacheFile, ConfigCacheFactoryInterface $configCacheFactory, array $bundles)
+    public function __construct(string $cacheFile, bool $debug, array $bundles)
     {
-        parent::__construct($cacheFile, $configCacheFactory);
+        parent::__construct($cacheFile, $debug);
         $this->bundles = $bundles;
     }
 

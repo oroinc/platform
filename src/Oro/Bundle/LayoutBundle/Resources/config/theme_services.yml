@@ -77,41 +77,44 @@ services:
 
     oro_layout.theme_extension.resource_provider.theme:
         class: Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider
+        public: false
+        parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/layout_resources.php'
-            - '@oro_cache.config_cache_factory'
+            - '%kernel.debug%'
             - '@oro_layout.theme_extension.resource_provider.last_modification_date'
             - '@oro_layout.loader'
             - '@oro_layout.cache.block_view_cache'
             - [] # exclude patterns; they are set by Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension
 
-    oro_layout.theme_extension.resource_provider.last_modification_date:
-        class: Oro\Component\Layout\Extension\Theme\ResourceProvider\LastModificationDateProvider
-        public: false
-        arguments:
-            - '%kernel.cache_dir%/oro/layout_last_modification_date.php'
-            - '@oro_cache.config_cache_factory'
-
-    oro_layout.theme_extension.configuration.provider:
-        class: Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfigurationProvider
-        public: false
-        arguments:
-            - '%kernel.cache_dir%/oro/layout_themes.php'
-            - '@oro_cache.config_cache_factory'
-            - '@oro_layout.theme_extension.configuration'
-            - '' # folder pattern; it is set by Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension
-
-    oro_layout.theme_extension.configuration:
-        class: Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration
-        public: false
-
-    oro_layout.theme_extension.resource_warmer.theme:
+    oro_layout.theme_extension.resource_provider.theme.warmer:
         class: Oro\Component\Config\Cache\ConfigCacheWarmer
         public: false
         arguments:
             - '@oro_layout.theme_extension.resource_provider.theme'
         tags:
             - { name: kernel.cache_warmer }
+
+    oro_layout.theme_extension.resource_provider.last_modification_date:
+        class: Oro\Component\Layout\Extension\Theme\ResourceProvider\LastModificationDateProvider
+        public: false
+        arguments:
+            - '%kernel.cache_dir%/oro/layout_last_modification_date.php'
+            - '%kernel.debug%'
+
+    oro_layout.theme_extension.configuration.provider:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfigurationProvider
+        public: false
+        parent: oro.static_config_provider.abstract
+        arguments:
+            - '%kernel.cache_dir%/oro/layout_themes.php'
+            - '%kernel.debug%'
+            - '@oro_layout.theme_extension.configuration'
+            - '' # folder pattern; it is set by Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension
+
+    oro_layout.theme_extension.configuration:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration
+        public: false
 
     oro_layout.theme_extension.visitor.import:
         class: Oro\Component\Layout\Extension\Theme\Visitor\ImportVisitor

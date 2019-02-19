@@ -178,9 +178,10 @@ services:
     oro_search.mapping_configuration.provider:
         class: Oro\Bundle\SearchBundle\Provider\MappingConfigurationProvider
         public: false
+        parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/search_mapping.php'
-            - '@oro_cache.config_cache_factory'
+            - '%kernel.debug%'
 
     oro_search.cache.mapping_configuration:
         public: false
@@ -194,16 +195,6 @@ services:
             - '@event_dispatcher'
             - '@oro_search.mapping_configuration.provider'
             - '@oro_search.cache.mapping_configuration'
-
-    oro_search.mapping_configuration.warmer:
-        class: Oro\Component\Config\Cache\ConfigCacheWarmer
-        public: false
-        arguments:
-            - '@oro_search.mapping_configuration.provider'
-        tags:
-            # add the warmer for this System cache at the begin of the warmers chain
-            # to prevent double warmup in case some Application cache depends on this cache
-            - { name: kernel.cache_warmer, priority: 200 }
 
     oro_search.cache.search_mapping.warmer:
         class: Oro\Component\Config\Cache\ConfigCacheWarmer

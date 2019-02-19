@@ -8,7 +8,6 @@ use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Merger\ConfigurationMerger;
 use Oro\Component\Config\ResourcesContainerInterface;
-use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
@@ -26,18 +25,14 @@ class ConfigurationProvider extends PhpArrayConfigProvider implements Configurat
     private $bundles;
 
     /**
-     * @param string                      $cacheFile
-     * @param ConfigCacheFactoryInterface $configCacheFactory
-     * @param Container                   $container
-     * @param string[]                    $bundles
+     * @param string    $cacheFile
+     * @param bool      $debug
+     * @param Container $container
+     * @param string[]  $bundles
      */
-    public function __construct(
-        string $cacheFile,
-        ConfigCacheFactoryInterface $configCacheFactory,
-        Container $container,
-        array $bundles
-    ) {
-        parent::__construct($cacheFile, $configCacheFactory);
+    public function __construct(string $cacheFile, bool $debug, Container $container, array $bundles)
+    {
+        parent::__construct($cacheFile, $debug);
         $this->container = $container;
         $this->bundles = $bundles;
     }

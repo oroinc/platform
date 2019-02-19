@@ -8,7 +8,6 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoaderInterface;
 use Oro\Component\Config\Cache\PhpConfigProvider;
 use Oro\Component\Config\ResourcesContainerInterface;
-use Symfony\Component\Config\ConfigCacheFactoryInterface;
 
 /**
  * The provider for ACL annotations configuration
@@ -23,16 +22,13 @@ class AclAnnotationProvider extends PhpConfigProvider
     private $entityClassResolver;
 
     /**
-     * @param string                      $cacheFile
-     * @param ConfigCacheFactoryInterface $configCacheFactory
-     * @param EntityClassResolver         $entityClassResolver
+     * @param string              $cacheFile
+     * @param bool                $debug
+     * @param EntityClassResolver $entityClassResolver
      */
-    public function __construct(
-        string $cacheFile,
-        ConfigCacheFactoryInterface $configCacheFactory,
-        EntityClassResolver $entityClassResolver
-    ) {
-        parent::__construct($cacheFile, $configCacheFactory);
+    public function __construct(string $cacheFile, bool $debug, EntityClassResolver $entityClassResolver)
+    {
+        parent::__construct($cacheFile, $debug);
         $this->entityClassResolver = $entityClassResolver;
     }
 

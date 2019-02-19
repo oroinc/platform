@@ -45,26 +45,26 @@ Read more about the [caching policy and default implementation](Resources/doc/ca
 
 ## Caching Static Configuration
 
-A static configuration is a configuration that is defined in configuration files and not depended on the application data.
-Usually such configuration are loaded from configuration files located in different bundles, e.g. from
+A static configuration is defined in the configuration files and does not depend on the application data.
+Usually such configuration is loaded from configuration files located in different bundles, e.g. from
 `Resources/config/oro/my_config.yml` files that can be located in any bundle.
-There are several possible ways where the collected configuration can be stored to avoid loading and merging it
+There are several possible ways to store the collected configuration to avoid loading and merging it
 on each request:
 
 1. As a parameter in the dependency injection container.
    The disadvantage of this approach is not very good DX (Developer Experience) because each time when
    the configuration is changed the whole container should be rebuilt.
 2. As a data file in the system cache.
-   With this approach DX is better because only this file should be rebuilt after the configuration is changed.
-   But the disadvantage of this approach is that the data should be deserialized each time it is requested.
+   This approach has better DX as this is the only file that needs rebuilding after the configuration is changed.
+   However, the disadvantage is that data should be deserialized every time it is requested.
 3. As a PHP file in the system cache.
-   This approach has the same DX as the previous one. But in additional it has two important advantages:
+   It has the same DX as the previous approach but with two important additional advantages:
    the deserialization of the data is not needed and the loaded data is cached by
    [OPcache](http://php.net/manual/en/intro.opcache.php).
 
-To implement 3rd approach for your configuration, you need to do the following steps:
+To implement 3rd approach for your configuration, you need to take the following steps:
 
-1. Create PHP class that will define the schema of your configuration and validation and merging rules for it. E.g.:
+1. Create PHP class that defines the schema of your configuration and validation and merging rules for it. E.g.:
 
 ```php
 <?php
@@ -107,6 +107,7 @@ use Oro\Component\Config\ResourcesContainerInterface;
 
 class MyConfigurationProvider extends PhpArrayConfigProvider
 {
+    private const CONFIG_TYPE = 'my_config';
     private const CONFIG_FILE = 'Resources/config/oro/my_config.yml';
 
     /**
@@ -115,6 +116,14 @@ class MyConfigurationProvider extends PhpArrayConfigProvider
     public function getConfiguration(): array
     {
         return $this->doGetConfig();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getConfigType(): string
+    {
+        return self::CONFIG_TYPE;
     }
 
     /**
@@ -140,32 +149,65 @@ class MyConfigurationProvider extends PhpArrayConfigProvider
     }
 }
 ```
-
-3. Register the created configuration provider as a service. E.g.:
+3. Register the created configuration provider as a service using `oro.static_config_provider.abstract` service
+   as the parent one. E.g.:
 
 ```yaml
 services:
     acme.my_configuration_provider:
         class: Acme\Bundle\AcmeBundle\Provider\MyConfigurationProvider
         public: false
+        parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/my_config.php'
-            - '@oro_cache.config_cache_factory'
+            - '%kernel.debug%'
 ```
 
-4. Register the cache warmer service. E.g.:
+The cache warmer is registered automatically with the priority `200`. This priority adds the warmer at the begin
+of the warmers chain that prevents double warmup in case some Application cache depends on the static config cache.
+The warmer service ID is the configuration provider service ID prefixed with `.warmer`. If you want to change
+the priority or use your own warmer, you can register the service following these naming conventions.
+In this case a default warmer will not be registered for your configuration provider.
+
+An example of a custom warmer:
 
 ```yaml
 services:
-    acme.my_configuration_warmer:
+    acme.my_configuration_provider.warmer:
         class: Oro\Component\Config\Cache\ConfigCacheWarmer
         public: false
         arguments:
             - '@acme.my_configuration_provider'
         tags:
-            # add the warmer for this System cache at the begin of the warmers chain
-            # to prevent double warmup in case some Application cache depends on this cache
-            - { name: kernel.cache_warmer, priority: 200 }
+            - { name: kernel.cache_warmer }
+```
+
+If your Application cache depends on your configuration, use the `isCacheFresh($timestamp)` and `getCacheTimestamp()`
+methods of the configuration provider to check if the Application cache needs to be rebuilt.
+Here is an example how to use these methods:
+
+```php
+    private function ensureDataLoaded()
+    {
+        if (null !== $this->data) {
+            return;
+        }
+
+        $cachedData = $this->cache->fetch(self::CACHE_KEY);
+        if (false !== $cachedData) {
+            list($timestamp, $data) = $cachedData;
+            if ($this->configurationProvider->isCacheFresh($timestamp)) {
+                $this->data = $data;
+            }
+        }
+        if (null === $this->data) {
+            $this->data = $this->loadData();
+            $this->cache->save(
+                self::CACHE_KEY,
+                [$this->configurationProvider->getCacheTimestamp(), $this->data]
+            );
+        }
+    }
 ```
 
 ## Caching of Symfony Validation rules

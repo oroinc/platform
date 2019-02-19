@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * The provider for entity related secutity metadata.
+ * The provider for entity related security metadata.
  */
 class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, ClearableConfigCacheInterface
 {

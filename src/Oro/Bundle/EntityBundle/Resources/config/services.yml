@@ -53,19 +53,10 @@ services:
     oro_entity.entity_configuration.provider:
         class: Oro\Bundle\EntityBundle\Provider\EntityConfigurationProvider
         public: false
+        parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/entity.php'
-            - '@oro_cache.config_cache_factory'
-
-    oro_entity.entity_configuration.warmer:
-        class: Oro\Component\Config\Cache\ConfigCacheWarmer
-        public: false
-        arguments:
-            - '@oro_entity.entity_configuration.provider'
-        tags:
-            # add the warmer for this System cache at the begin of the warmers chain
-            # to prevent double warmup in case some Application cache depends on this cache
-            - { name: kernel.cache_warmer, priority: 200 }
+            - '%kernel.debug%'
 
     oro_entity.listener.navigation_listener:
         class: '%oro_entity.listener.navigation_listener.class%'

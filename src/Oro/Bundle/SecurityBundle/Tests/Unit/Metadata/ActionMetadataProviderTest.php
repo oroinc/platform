@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Bundle\SecurityBundle\Metadata\ActionMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -23,21 +25,10 @@ class ActionMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->cache = $this->getMockForAbstractClass(
-            'Doctrine\Common\Cache\CacheProvider',
-            array(),
-            '',
-            false,
-            true,
-            true,
-            array('fetch', 'save', 'delete', 'deleteAll')
-        );
-
-        $this->annotationProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->cache = $this->createMock(CacheProvider::class);
+        $this->annotationProvider = $this->createMock(AclAnnotationProvider::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
+
         $this->translator->expects(self::any())
             ->method('trans')
             ->willReturnCallback(function ($value) {
@@ -53,36 +44,42 @@ class ActionMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testIsKnownAction()
     {
-        $this->cache->expects($this->any())
+        $cacheTimestamp = 10;
+        $this->cache->expects($this->once())
             ->method('fetch')
             ->with('data')
-            ->will($this->returnValue(array('SomeAction' => new ActionMetadata())));
+            ->willReturn([$cacheTimestamp, ['SomeAction' => new ActionMetadata()]]);
+        $this->annotationProvider->expects($this->once())
+            ->method('isCacheFresh')
+            ->with($cacheTimestamp)
+            ->willReturn(true);
 
         $this->assertTrue($this->provider->isKnownAction('SomeAction'));
         $this->assertFalse($this->provider->isKnownAction('UnknownAction'));
     }
 
-    public function testGetActions()
+    public function testGetActionsWhenNoCache()
     {
+        $configTimestamp = 20;
+
+        $this->annotationProvider->expects($this->never())
+            ->method('isCacheFresh');
+        $this->annotationProvider->expects($this->once())
+            ->method('getCacheTimestamp')
+            ->willReturn($configTimestamp);
         $this->annotationProvider->expects($this->once())
             ->method('getAnnotations')
-            ->with($this->equalTo('action'))
-            ->will(
-                $this->returnValue(
-                    array(
-                        new AclAnnotation(
-                            array(
-                                'id' => 'test',
-                                'type' => 'action',
-                                'group_name' => 'TestGroup',
-                                'label' => 'TestLabel',
-                                'description' => 'TestDescription',
-                                'category' => 'TestCategory',
-                            )
-                        )
-                    )
-                )
-            );
+            ->with('action')
+            ->willReturn([
+                new AclAnnotation([
+                    'id' => 'test',
+                    'type' => 'action',
+                    'group_name' => 'TestGroup',
+                    'label' => 'TestLabel',
+                    'description' => 'TestDescription',
+                    'category' => 'TestCategory',
+                ])
+            ]);
 
         $action = new ActionMetadata(
             'test',
@@ -92,17 +89,51 @@ class ActionMetadataProviderTest extends \PHPUnit\Framework\TestCase
             'TestCategory'
         );
 
-        $this->cache->expects($this->at(0))
+        $this->cache->expects($this->once())
             ->method('fetch')
             ->with('data')
-            ->will($this->returnValue(false));
-        $this->cache->expects($this->at(2))
-            ->method('fetch')
-            ->with('data')
-            ->will($this->returnValue(array('test' => $action)));
+            ->willReturn(false);
         $this->cache->expects($this->once())
             ->method('save')
-            ->with('data', array('test' => $action));
+            ->with('data', [$configTimestamp, ['test' => $action]]);
+
+        $actions = $this->provider->getActions();
+        $this->assertCount(1, $actions);
+        $this->assertEquals($action, $actions[0]);
+
+        // call with local cache
+        $actions = $this->provider->getActions();
+        $this->assertCount(1, $actions);
+        $this->assertEquals($action, $actions[0]);
+    }
+
+    public function testGetActionsWhenHasCache()
+    {
+        $cacheTimestamp = 10;
+
+        $this->annotationProvider->expects($this->once())
+            ->method('isCacheFresh')
+            ->with($cacheTimestamp)
+            ->willReturn(true);
+        $this->annotationProvider->expects($this->never())
+            ->method('getCacheTimestamp');
+        $this->annotationProvider->expects($this->never())
+            ->method('getAnnotations');
+
+        $action = new ActionMetadata(
+            'test',
+            'TestGroup',
+            'translated: TestLabel',
+            'translated: TestDescription',
+            'TestCategory'
+        );
+
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with('data')
+            ->willReturn([$cacheTimestamp, ['test' => $action]]);
+        $this->cache->expects($this->never())
+            ->method('save');
 
         // call without cache
         $actions = $this->provider->getActions();
@@ -113,46 +144,90 @@ class ActionMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $actions = $this->provider->getActions();
         $this->assertCount(1, $actions);
         $this->assertEquals($action, $actions[0]);
+    }
 
-        // call with cache
-        $provider = new ActionMetadataProvider($this->annotationProvider, $this->translator, $this->cache);
-        $actions = $provider->getActions();
+    public function testGetActionsWhenHasCacheButConfigurationWasChanged()
+    {
+        $cacheTimestamp = 10;
+        $configTimestamp = 20;
+
+        $this->annotationProvider->expects($this->once())
+            ->method('isCacheFresh')
+            ->with($cacheTimestamp)
+            ->willReturn(false);
+        $this->annotationProvider->expects($this->once())
+            ->method('getCacheTimestamp')
+            ->willReturn($configTimestamp);
+        $this->annotationProvider->expects($this->once())
+            ->method('getAnnotations')
+            ->with('action')
+            ->willReturn([
+                new AclAnnotation([
+                    'id' => 'test',
+                    'type' => 'action',
+                    'group_name' => 'TestGroup',
+                    'label' => 'TestLabel',
+                    'description' => 'TestDescription',
+                    'category' => 'TestCategory',
+                ])
+            ]);
+
+        $action = new ActionMetadata(
+            'test',
+            'TestGroup',
+            'translated: TestLabel',
+            'translated: TestDescription',
+            'TestCategory'
+        );
+
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with('data')
+            ->willReturn([$cacheTimestamp, ['test' => $action]]);
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with('data', [$configTimestamp, ['test' => $action]]);
+
+        $actions = $this->provider->getActions();
+        $this->assertCount(1, $actions);
+        $this->assertEquals($action, $actions[0]);
+
+        // call with local cache
+        $actions = $this->provider->getActions();
         $this->assertCount(1, $actions);
         $this->assertEquals($action, $actions[0]);
     }
 
-    public function testCache()
+    public function testCacheClear()
     {
-        // Called when: warmUpCache, isKnownAction, warmUpCache
-        $this->annotationProvider->expects($this->exactly(3))
-            ->method('getAnnotations')
-            ->with($this->equalTo('action'))
-            ->will($this->returnValue(array()));
-        // First warmUpCache
-        $this->cache->expects($this->at(0))
-            ->method('save')
-            ->with('data');
-        // clearCache
-        $this->cache->expects($this->at(1))
+        $this->cache->expects($this->once(1))
             ->method('delete')
             ->with('data');
-        // First isKnownAction
-        $this->cache->expects($this->at(2))
-            ->method('fetch')
-            ->with('data')
-            ->willReturn(false);
-        $this->cache->expects($this->at(3))
+
+        $this->provider->clearCache();
+    }
+
+    public function testWarmUpCache()
+    {
+        $configTimestamp = 10;
+
+        $this->annotationProvider->expects($this->any())
+            ->method('getCacheTimestamp')
+            ->willReturn($configTimestamp);
+
+        $this->annotationProvider->expects($this->once())
+            ->method('getAnnotations')
+            ->with('action')
+            ->willReturn([]);
+        $this->cache->expects($this->once())
             ->method('save')
-            ->with('data');
-        // Second warmUpCache
-        $this->cache->expects($this->at(4))
-            ->method('save')
-            ->with('data');
+            ->with('data', [$configTimestamp, []]);
+
+        $this->cache->expects($this->never())
+            ->method('fetch');
+        $this->cache->expects($this->never())
+            ->method('delete');
 
         $this->provider->warmUpCache();
-        $this->provider->clearCache();
-        $this->assertFalse($this->provider->isKnownAction('unknown'));
-        $this->provider->warmUpCache();
-        $this->assertFalse($this->provider->isKnownAction('unknown'));
     }
 }

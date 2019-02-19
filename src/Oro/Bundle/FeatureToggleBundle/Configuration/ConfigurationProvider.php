@@ -9,7 +9,6 @@ use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Merger\ConfigurationMerger;
 use Oro\Component\Config\ResourcesContainerInterface;
-use Symfony\Component\Config\ConfigCacheFactoryInterface;
 
 /**
  * The provider for features configuration
@@ -33,18 +32,18 @@ class ConfigurationProvider extends PhpArrayConfigProvider
     private $configuration;
 
     /**
-     * @param string                      $cacheFile
-     * @param ConfigCacheFactoryInterface $configCacheFactory
-     * @param string[]                    $bundles
-     * @param FeatureToggleConfiguration  $configuration
+     * @param string                     $cacheFile
+     * @param bool                       $debug
+     * @param string[]                   $bundles
+     * @param FeatureToggleConfiguration $configuration
      */
     public function __construct(
         string $cacheFile,
-        ConfigCacheFactoryInterface $configCacheFactory,
+        bool $debug,
         array $bundles,
         FeatureToggleConfiguration $configuration
     ) {
-        parent::__construct($cacheFile, $configCacheFactory);
+        parent::__construct($cacheFile, $debug);
         $this->bundles = $bundles;
         $this->configuration = $configuration;
     }

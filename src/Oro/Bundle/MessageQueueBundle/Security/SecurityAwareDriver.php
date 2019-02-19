@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * This class can be used to wrap a specific driver in order to add the current security token to a message.
- * For details see "Resources/doc/secutity_context.md".
+ * For details see "Resources/doc/security_context.md".
  */
 class SecurityAwareDriver implements DriverInterface
 {

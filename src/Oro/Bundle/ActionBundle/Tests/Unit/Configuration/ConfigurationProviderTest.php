@@ -8,7 +8,6 @@ use Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle3\TestBundle3;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
@@ -83,7 +82,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->configurationProvider = new ConfigurationProvider(
             $this->cacheFile,
-            new ConfigCacheFactory(false),
+            false,
             $this->container,
             CumulativeResourceManager::getInstance()->getBundles()
         );

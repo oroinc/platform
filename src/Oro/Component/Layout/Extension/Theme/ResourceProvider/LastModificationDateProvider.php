@@ -2,8 +2,8 @@
 
 namespace Oro\Component\Layout\Extension\Theme\ResourceProvider;
 
+use Oro\Component\Config\Cache\ConfigCache;
 use Oro\Component\Config\Cache\PhpConfigCacheAccessor;
-use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheInterface;
 
 /**
@@ -14,8 +14,8 @@ class LastModificationDateProvider
     /** @var string */
     private $cacheFile;
 
-    /** @var ConfigCacheFactoryInterface */
-    private $configCacheFactory;
+    /** @var bool */
+    private $debug;
 
     /** @var ConfigCacheInterface */
     private $cache;
@@ -24,13 +24,13 @@ class LastModificationDateProvider
     private $cacheAccessor;
 
     /**
-     * @param string                      $cacheFile
-     * @param ConfigCacheFactoryInterface $configCacheFactory
+     * @param string $cacheFile
+     * @param bool   $debug
      */
-    public function __construct(string $cacheFile, ConfigCacheFactoryInterface $configCacheFactory)
+    public function __construct(string $cacheFile, bool $debug)
     {
         $this->cacheFile = $cacheFile;
-        $this->configCacheFactory = $configCacheFactory;
+        $this->debug = $debug;
     }
 
     /**
@@ -57,9 +57,10 @@ class LastModificationDateProvider
     private function getCache(): ConfigCacheInterface
     {
         if (null === $this->cache) {
-            $this->cache = $this->configCacheFactory->cache($this->cacheFile, function (ConfigCacheInterface $cache) {
-                $this->getCacheAccessor()->save($cache, false);
-            });
+            $this->cache = new ConfigCache($this->cacheFile, $this->debug);
+            if (!$this->cache->isFresh()) {
+                $this->getCacheAccessor()->save($this->cache, false);
+            }
         }
 
         return $this->cache;

@@ -4,7 +4,6 @@ namespace Oro\Component\Config\Tests\Unit\Fixtures;
 
 use Oro\Component\Config\Cache\PhpArrayConfigProvider;
 use Oro\Component\Config\ResourcesContainerInterface;
-use Symfony\Component\Config\ConfigCacheFactoryInterface;
 
 class PhpArrayConfigProviderStub extends PhpArrayConfigProvider
 {
@@ -12,16 +11,13 @@ class PhpArrayConfigProviderStub extends PhpArrayConfigProvider
     private $loadConfigCallback;
 
     /**
-     * @param string                      $cacheFile
-     * @param ConfigCacheFactoryInterface $configCacheFactory
-     * @param callable                    $loadConfigCallback
+     * @param string   $cacheFile
+     * @param bool     $debug
+     * @param callable $loadConfigCallback
      */
-    public function __construct(
-        string $cacheFile,
-        ConfigCacheFactoryInterface $configCacheFactory,
-        callable $loadConfigCallback
-    ) {
-        parent::__construct($cacheFile, $configCacheFactory);
+    public function __construct(string $cacheFile, bool $debug, callable $loadConfigCallback)
+    {
+        parent::__construct($cacheFile, $debug);
         $this->loadConfigCallback = $loadConfigCallback;
     }
 
