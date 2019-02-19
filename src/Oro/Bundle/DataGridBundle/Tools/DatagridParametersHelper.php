@@ -66,6 +66,23 @@ class DatagridParametersHelper
     }
 
     /**
+     * @param ParameterBag $dataGridParameters
+     */
+    public function resetFilters(ParameterBag $dataGridParameters): void
+    {
+        $filters = $dataGridParameters->get(AbstractFilterExtension::FILTER_ROOT_PARAM);
+        if ($filters) {
+            $dataGridParameters->set(AbstractFilterExtension::FILTER_ROOT_PARAM, []);
+        }
+
+        $minifiedFilters = $dataGridParameters->get(ParameterBag::MINIFIED_PARAMETERS);
+        if ($minifiedFilters) {
+            $minifiedFilters[AbstractFilterExtension::MINIFIED_FILTER_PARAM] = [];
+            $dataGridParameters->set(ParameterBag::MINIFIED_PARAMETERS, $minifiedFilters);
+        }
+    }
+
+    /**
      * @param ParameterBag $parameterBag
      * @param boolean $value
      */

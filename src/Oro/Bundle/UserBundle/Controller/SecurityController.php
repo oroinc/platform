@@ -7,6 +7,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Main security authentication controller
+ */
 class SecurityController extends Controller
 {
     /**
@@ -42,6 +45,10 @@ class SecurityController extends Controller
      */
     public function checkAction()
     {
+        if ($this->getUser()) {
+            return $this->redirect($this->generateUrl('oro_default'));
+        }
+
         throw new \RuntimeException(
             'You must configure the check path to be handled by the firewall ' .
             'using form_login in your security firewall configuration.'

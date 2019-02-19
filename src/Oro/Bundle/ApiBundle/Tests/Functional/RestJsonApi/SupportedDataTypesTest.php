@@ -494,6 +494,44 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     }
 
     /**
+     * @dataProvider validIntegerValueDataProvider
+     */
+    public function testValidValuesForIntegerField($submittedValue, $expectedValue)
+    {
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+
+        $data = [
+            'data' => [
+                'type'       => $entityType,
+                'id'         => '<toString(@TestItem1->id)>',
+                'attributes' => [
+                    'fieldInt' => $submittedValue
+                ]
+            ]
+        ];
+
+        $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data);
+
+        $expectedResponseData = $data;
+        $expectedResponseData['data']['attributes']['fieldInt'] = $expectedValue;
+        $this->assertResponseContains($expectedResponseData, $response);
+
+        $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getResourceId($response));
+        self::assertSame($expectedValue, $entity->fieldInt);
+    }
+
+    /**
+     * @return array
+     */
+    public function validIntegerValueDataProvider()
+    {
+        return [
+            '1'  => [1, 1],
+            '-1' => [-1, -1],
+        ];
+    }
+
+    /**
      * @dataProvider validDateTimeValueDataProvider
      */
     public function testValidValuesForDateTimeField($submittedValue, $responseValue, $entityValue)

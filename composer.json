@@ -108,7 +108,7 @@
         "robloach/component-installer": "0.2.*",
         "jms/cg": "1.2.*",
         "oro/redis-config": "~3.1.1",
-        "brick/math": "0.5.*",
+        "brick/math": "0.8.*",
         "bower-asset/fuse": "3.2.*"
     },
     "require-dev": {

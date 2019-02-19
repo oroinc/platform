@@ -12,9 +12,35 @@
 }
 
 .app-header {
+    ~ * .sticky,
+    ~ * .floatThead.floatThead-fixed .grid-header:first-child,
+    &.sticky {
+        transition: margin-top 500ms;
+    }
+
+    @at-root .disable-touch-scrolling#{&} {
+        position: fixed;
+    }
+}
+
+:not(.disable-touch-scrolling) &,
+&:not(.disable-touch-scrolling) {
+    &.scrolled-down,
+    &.input-focused {
+        .app-header.sticky-out-of-viewport {
+            ~ * .sticky-pinned,
+            ~ * .floatThead.floatThead-fixed .grid-header:first-child,
+            &.sticky-pinned {
+                margin-top: -$app-header-height;
+            }
+        }
+    }
+}
+
+.app-header {
     background-color: $app-header-bg-color;
     color: $app-header-text-color;
-    position: fixed;
+    position: absolute;
     z-index: $mobile-app-header-z-index;
     width: 100%;
     height: $app-header-height;

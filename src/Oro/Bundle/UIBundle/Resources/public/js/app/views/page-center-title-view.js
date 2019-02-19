@@ -2,14 +2,14 @@ define(function(require) {
     'use strict';
 
     var PageCenterTitleView;
-    var _ = require('underscore');
-    var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
 
     PageCenterTitleView = BaseView.extend({
         leftBlock: null,
 
         rightBlock: null,
+
+        currentClass: '',
 
         listen: {
             'layout:reposition mediator': 'onLayoutReposition'
@@ -24,26 +24,40 @@ define(function(require) {
 
         initialize: function(options) {
             PageCenterTitleView.__super__.initialize.apply(this, arguments);
-            this.$el.siblings().each(_.bind(function(index, el) {
-                if ($(el).css('float') === 'left' && !this.leftBlock) {
-                    this.leftBlock = el;
-                } else if ($(el).css('float') === 'right' && !this.rightBlock) {
-                    this.rightBlock = el;
-                }
-            }, this));
+
+            this.leftBlock = this.$el.siblings('.pull-left-extra')[0];
+            this.rightBlock = this.$el.siblings('.title-buttons-container')[0];
+            this.container = this.el.parentNode;
         },
 
         onLayoutReposition: function() {
             if (!this.leftBlock || !this.rightBlock) {
                 return;
             }
-            var leftBlockRect = this.leftBlock.getBoundingClientRect();
-            var rightBlockRect = this.rightBlock.getBoundingClientRect();
-            if (leftBlockRect.bottom <= rightBlockRect.top && leftBlockRect.width > rightBlockRect.width) {
-                this.$el.addClass('under-left-block');
-            } else {
-                this.$el.removeClass('under-left-block');
+
+            if (this.currentClass) {
+                this.container.classList.remove(this.currentClass);
+                this.currentClass = '';
             }
+
+            if (this.el.style.display === 'none') {
+                return;
+            }
+
+            if (this.inFewRows()) {
+                var storedDisplay = this.el.style.display;
+                this.el.style.display = 'none';
+                this.currentClass = this.inFewRows() ? 'center-under-left' : 'center-under-both';
+                this.container.classList.add(this.currentClass);
+                this.el.style.display = storedDisplay;
+            }
+        },
+
+        inFewRows: function() {
+            var leftRect = this.leftBlock.getBoundingClientRect();
+            var rightRect = this.rightBlock.getBoundingClientRect();
+
+            return leftRect.bottom <= rightRect.top || rightRect.bottom <= leftRect.top;
         }
     });
 

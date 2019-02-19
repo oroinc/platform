@@ -330,9 +330,9 @@ class EntityFieldProvider
                 continue;
             }
 
-            $query      = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
+            $query = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
 
-            if (isset($query['select']['translatable'])) {
+            if ($translate && isset($query['select']['translatable'])) {
                 $translate = (bool) $query['select']['translatable'];
             }
 

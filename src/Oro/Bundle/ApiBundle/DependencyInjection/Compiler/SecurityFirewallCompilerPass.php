@@ -69,14 +69,17 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
 
         $contextDef = $container->getDefinition($contextId);
         $contextKey = $firewallConfig['context'];
-        $sessionName = $this->getSessionName($container);
 
         // add the context listener
         $listenerId = $this->createContextListener($container, $contextKey);
         $apiContextListenerId = $listenerId . '.' . $firewallName;
         $container
             ->register($apiContextListenerId, SecurityFirewallContextListener::class)
-            ->setArguments([new Reference($listenerId), $sessionName, new Reference('security.token_storage')]);
+            ->setArguments([
+                new Reference($listenerId),
+                '%session.storage.options%',
+                new Reference('security.token_storage')
+            ]);
         $contextListeners = [];
         /** @var IteratorArgument $listeners */
         $listeners = $contextDef->getArgument(0);
@@ -93,7 +96,7 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
         // replace the exception listener class
         $exceptionListenerDef = $container->getDefinition($contextDef->getArgument(1));
         $exceptionListenerDef->setClass(SecurityFirewallExceptionListener::class);
-        $exceptionListenerDef->addMethodCall('setSessionName', [$sessionName]);
+        $exceptionListenerDef->addMethodCall('setSessionOptions', ['%session.storage.options%']);
     }
 
     /**
@@ -116,17 +119,5 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
         $this->contextListeners[$contextKey] = $listenerId;
 
         return $listenerId;
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return string
-     */
-    private function getSessionName(ContainerBuilder $container): string
-    {
-        $sessionOptions = $container->getParameter('session.storage.options');
-
-        return $sessionOptions['name'];
     }
 }
