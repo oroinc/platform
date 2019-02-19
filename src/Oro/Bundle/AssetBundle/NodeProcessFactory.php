@@ -23,17 +23,17 @@ class NodeProcessFactory
     }
 
     /**
-     * @param string         $command The command line to run
+     * @param array         $command The command line to run
      * @param string         $cwd The working directory or null to use the working dir of the current PHP process
      * @param int|float|null $timeout The timeout in seconds or null to disable
      * @return Process
      */
-    public function createProcess(string $command, string $cwd, $timeout = 60): Process
+    public function create(array $command, string $cwd, $timeout = 60): Process
     {
         if (!$this->jsEngine) {
             throw new \RuntimeException('JS engine not found');
         }
-        $process = new Process($this->jsEngine.' '.$command, $cwd);
+        $process = new Process(array_merge([$this->jsEngine], $command), $cwd);
         $process->setTimeout($timeout);
 
         // some workaround when this command is launched from web

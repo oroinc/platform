@@ -140,7 +140,7 @@ services:
     oro_translation.resource.cache:
         public: false
         class: Doctrine\Common\Cache\ArrayCache
-        
+
     oro_translation.cache.translation_cache_warmer:
         class: 'Oro\Bundle\TranslationBundle\Cache\TranslationCacheWarmer'
         public: false
@@ -367,3 +367,12 @@ services:
     oro_translation.strategy.provider_link:
         tags:
             - { name: oro_service_link, service: oro_translation.strategy.provider }
+
+    oro_translation.migration.demo_data_fixtures_listener.js_translation_dump:
+        class: Oro\Bundle\TranslationBundle\EventListener\JsTranslationDumpDemoDataListener
+        arguments:
+            - '@oro_translation.js_dumper'
+            - '@oro_translation.provider.language'
+            - '%installed%'
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad, priority: -100 }

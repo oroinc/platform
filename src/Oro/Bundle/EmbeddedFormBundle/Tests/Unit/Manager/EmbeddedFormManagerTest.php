@@ -3,9 +3,15 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormRegistryInterface;
+use Symfony\Component\Form\ResolvedFormTypeInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -176,6 +182,16 @@ class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$typeLabel1 => $type1, $typeLabel2 => $type2], $manager->getAllChoices());
     }
 
+    public function testGetTypeInstance()
+    {
+        $manager = new EmbeddedFormManager(
+            $this->createFormRegistryMock(IntegerType::class),
+            $this->createFormFactoryMock()
+        );
+        $this->assertEquals(null, $manager->getTypeInstance(null));
+        $this->assertEquals(IntegerType::class, $manager->getTypeInstance(AbstractType::class));
+    }
+
     /**
      * @return FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
@@ -193,9 +209,13 @@ class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
         $fromRegistry = $this->createMock(FormRegistryInterface::class);
 
         if ($typeInstance) {
+            $resolvedFormType = $this->createMock(ResolvedFormTypeInterface::class);
+            $resolvedFormType->expects($this->once())
+                ->method('getInnerType')
+                ->willReturn($typeInstance);
             $fromRegistry->expects($this->once())
                 ->method('getType')
-                ->willReturn($typeInstance);
+                ->willReturn($resolvedFormType);
         }
 
         return $fromRegistry;
