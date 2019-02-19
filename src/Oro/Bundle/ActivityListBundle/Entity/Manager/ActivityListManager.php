@@ -8,6 +8,7 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Event\ActivityListPreQueryBuildEvent;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListIdProvider;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
@@ -197,10 +198,14 @@ class ActivityListManager
             return null;
         }
 
-        $activity       = $this->doctrineHelper->getEntity(
+        $activity = $this->doctrineHelper->getEntity(
             $entity->getRelatedActivityClass(),
             $entity->getRelatedActivityId()
         );
+
+        if (!$activity) {
+            return null;
+        }
 
         $ownerName = '';
         $ownerId   = '';
@@ -222,7 +227,7 @@ class ActivityListManager
             }
         }
 
-        $relatedActivityEntities = $this->getRelatedActivityEntities($entity, $entityProvider);
+        $relatedActivityEntities = $this->getRelatedActivityEntities($entity, $entityProvider, $activity);
         $numberOfComments = $this->commentManager->getCommentCount(
             $entity->getRelatedActivityClass(),
             $relatedActivityEntities
@@ -401,25 +406,23 @@ class ActivityListManager
 
     /**
      * @param ActivityList $entity
-     * @param object       $entityProvider
+     * @param ActivityListProviderInterface $entityProvider
+     * @param object $activity
      *
      * @return array
      */
-    protected function getRelatedActivityEntities(ActivityList $entity, $entityProvider)
-    {
-        $relatedActivityEntities = [$entity];
-        if ($entityProvider instanceof ActivityListGroupProviderInterface) {
-            $relationEntity = $this->doctrineHelper->getEntity(
-                $entity->getRelatedActivityClass(),
-                $entity->getRelatedActivityId()
-            );
-            $relatedActivityEntities = $entityProvider->getGroupedEntities($relationEntity);
-            if (count($relatedActivityEntities) === 0) {
-                $relatedActivityEntities = [$entity];
-            }
+    protected function getRelatedActivityEntities(
+        ActivityList $entity,
+        ActivityListProviderInterface $entityProvider,
+        $activity
+    ) {
+        if (!$entityProvider instanceof ActivityListGroupProviderInterface) {
+            return [$entity];
         }
 
-        return $relatedActivityEntities;
+        $relatedActivityEntities = $entityProvider->getGroupedEntities($activity);
+
+        return count($relatedActivityEntities) > 0 ? $relatedActivityEntities : [$entity];
     }
 
     /**

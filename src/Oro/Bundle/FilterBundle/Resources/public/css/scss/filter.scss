@@ -427,7 +427,6 @@
 
     .fa-filter {
         margin-right: $filters-state-icon-offset-right;
-        vertical-align: $filters-state-icon-vertical-align;
 
         &:before {
             color: $filters-state-icon-color;
@@ -436,16 +435,23 @@
     }
 
     .page-title-center & {
+        position: absolute;
+        width: 100%;
         text-align: $filters-state-page-title-center-text-align;
-        padding-left: $filters-state-page-title-center-inner-offset-left;
-        padding-right: $filters-state-page-title-center-inner-offset-right;
         height: $filters-state-page-title-center-height;
+        padding: side-values(0 0 0 10px);
     }
 
-    .under-left-block & {
-        padding-left: $filters-state-under-left-block-inner-offset-left;
-        text-align: $filters-state-under-left-block-text-align;
+    .center-under-left & {
+        width: auto;
+        max-width: 100%;
+        padding-#{$start}: 0;
     }
+}
+
+.filters-state-view-container {
+    position: absolute;
+    width: 100%
 }
 
 .filters-state-popover {

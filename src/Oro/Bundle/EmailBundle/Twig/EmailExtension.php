@@ -5,10 +5,8 @@ namespace Oro\Bundle\EmailBundle\Twig;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
-use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAttachmentRepository;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
@@ -104,6 +102,7 @@ class EmailExtension extends \Twig_Extension
     }
 
     /**
+     * @param string $entityClass
      * @return EntityRepository
      */
     protected function getRepository($entityClass)
@@ -114,13 +113,12 @@ class EmailExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new \Twig_SimpleFunction('oro_get_email', [$this, 'getEmail']),
             new \Twig_SimpleFunction('oro_get_email_address_name', [$this, 'getEmailAddressName']),
             new \Twig_SimpleFunction('oro_get_email_address', [$this, 'getEmailAddress']),
-            new \Twig_SimpleFunction('oro_get_email_thread_recipients', [$this, 'getEmailThreadRecipients']),
             new \Twig_SimpleFunction('oro_get_email_thread_attachments', [$this, 'getEmailThreadAttachments']),
             new \Twig_SimpleFunction('oro_can_attache', [$this, 'canReAttach']),
             new \Twig_SimpleFunction('oro_get_mailbox_process_label', [$this, 'getMailboxProcessLabel']),
@@ -145,21 +143,6 @@ class EmailExtension extends \Twig_Extension
         }
 
         return $result ?: '';
-    }
-
-    /**
-     * Gets the recipients of the given thread
-     *
-     * @param EmailThread $thread
-     * @return EmailRecipient[]
-     * @deprecated since 2.3. Use EmailGridResultHelper::addEmailRecipients instead
-     */
-    public function getEmailThreadRecipients($thread)
-    {
-        /** @var EmailRecipientRepository $repo */
-        $repo = $this->getRepository('OroEmailBundle:EmailRecipient');
-
-        return $repo->getThreadUniqueRecipients($thread);
     }
 
     /**

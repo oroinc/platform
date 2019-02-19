@@ -108,7 +108,7 @@
         "robloach/component-installer": "0.2.*",
         "jms/cg": "1.2.*",
         "oro/redis-config": "3.1.*",
-        "brick/math": "0.5.*",
+        "brick/math": "0.8.*",
         "bower-asset/fuse": "3.2.*"
     },
     "require-dev": {
@@ -118,10 +118,16 @@
         "behat/mink-selenium2-driver": "1.*",
         "behat/symfony2-extension": "2.1.*",
         "nelmio/alice": "2.3.*",
-        "johnkary/phpunit-speedtrap": "1.0.*",
-        "mybuilder/phpunit-accelerator": "1.2.*",
+        "phpunit/phpunit": "6.5.*",
+        "johnkary/phpunit-speedtrap": "2.0.*",
+        "mybuilder/phpunit-accelerator": "2.0.*",
         "squizlabs/php_codesniffer": "3.3.*",
-        "phpmd/phpmd": "2.6.*"
+        "phpmd/phpmd": "2.6.*",
+        "sebastian/phpcpd": "3.0.*",
+        "phpunit/phpcov": "4.0.*",
+        "symfony/phpunit-bridge": "3.4.*",
+        "friendsofphp/php-cs-fixer": "2.12.*",
+        "oro/twig-inspector": "1.0.*"
     },
     "repositories": {
         "oro": {

@@ -4,7 +4,34 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
+    var mediator = require('oroui/js/mediator');
+    var module = require('module');
     require('jquery-ui');
+
+    var config = module.config();
+    config = _.extend({
+        scrollableContainerSelector: 'html'
+    }, config);
+
+    var _scrollTimer;
+
+    var getScrollY = (function(scroller) {
+        if (window.pageYOffset !== undefined) {
+            return function() {
+                return window.pageYOffset;
+            };
+        }
+
+        if (window.scrollTop !== undefined) {
+            return function() {
+                return window.scrollTop;
+            };
+        }
+
+        return function() {
+            return scroller.scrollTop;
+        };
+    })(document.documentElement || document.body.parentNode || document.body);
 
     var scrollHelper = {
         /**
@@ -25,12 +52,22 @@ define(function(require) {
         /**
          * Select global scrollable container
          */
-        _scrollableContainerSelector: '#container',
+        _scrollableContainerSelector: config.scrollableContainerSelector,
 
         /**
          * Store scroll position
          */
         _scrollState: null,
+
+        /**
+         * Timeout (ms) for stop scrolling
+         */
+        _scrollTimeout: 50,
+
+        /**
+         * Store scroll direction (1 - down, -1 - up, 0 - no scrolling)
+         */
+        _scrollDirection: null,
 
         /**
          * Disable/Enable scroll state
@@ -46,7 +83,7 @@ define(function(require) {
                 return false;
             }
 
-            this._scrollState = window.scrollY;
+            this._scrollState = this.getScrollY();
 
             $(this._scrollableContainerSelector)
                 .addClass('disable-touch-scrolling')
@@ -355,6 +392,30 @@ define(function(require) {
             });
 
             return scrolls;
+        },
+
+        getScrollY: getScrollY,
+
+        _setScrollDirection: function() {
+            if (this._isBodyTouchScrollDisabled) {
+                return;
+            }
+
+            clearTimeout(_scrollTimer);
+
+            var scrollY = this.getScrollY();
+            var direction = Math.sign(scrollY - this._scrollState);
+
+            if (direction && direction !== this._scrollDirection) {
+                mediator.trigger('scroll:direction:change', direction);
+            }
+
+            this._scrollDirection = direction;
+            this._scrollState = scrollY;
+
+            _scrollTimer = setTimeout(function() {
+                mediator.trigger('scroll:direction:change', 0);
+            }, this._scrollTimeout);
         }
     };
 
@@ -362,6 +423,8 @@ define(function(require) {
     $(window).bindFirst('resize', function() {
         scrollHelper._documentHeight = -1;
     });
+
+    $(window).on('scroll', _.bind(scrollHelper._setScrollDirection, scrollHelper));
 
     return scrollHelper;
 });

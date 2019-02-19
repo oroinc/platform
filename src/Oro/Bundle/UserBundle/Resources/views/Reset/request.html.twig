@@ -26,6 +26,7 @@
                         <a href="{{ path('oro_user_security_login') }}">&laquo; {{ returnToLoginLabel }}</a>
                     </div>
                 </fieldset>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('oro-user-password-reset-request') }}"/>
             </form>
         </div>
         <div class="login-copyright">{{ 'oro.auth.copy'|trans }}</div>

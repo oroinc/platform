@@ -150,7 +150,7 @@ class ConfigBuilder {
                             options: {
                                 limit: 1,
                                 emitFile: false,
-                                publicPath: this._configuration.applicationUrl,
+                                publicPath: '../../../',
                                 name: '[path][name].[ext]?[hash]'
                             }
                         }

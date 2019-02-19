@@ -59,6 +59,13 @@ class ThemeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('logo.png', $this->theme->getLogo());
     }
 
+    public function testImagePlaceholdersMethods()
+    {
+        $this->assertEmpty($this->theme->getImagePlaceholders());
+        $this->theme->setImagePlaceholders(['test' => '/test/url.png']);
+        $this->assertEquals(['test' => '/test/url.png'], $this->theme->getImagePlaceholders());
+    }
+
     public function testScreenshotMethods()
     {
         $this->assertNull($this->theme->getScreenshot());

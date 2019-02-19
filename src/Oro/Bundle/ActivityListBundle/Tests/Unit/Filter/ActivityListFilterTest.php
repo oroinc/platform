@@ -53,7 +53,7 @@ class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->entityRouterHelper->expects($this->any())
-            ->method('decodeClassName')
+            ->method('resolveEntityClass')
             ->will($this->returnCallback(function ($className) {
                 return $className;
             }));

@@ -84,23 +84,19 @@ $filter-box-disable-line-height: 29px !default;
 $filter-box-disable-padding: 29px !default;
 $filter-box-disable-vertical-align: top !default;
 
-$filters-state-color: #aaa !default;
+$filters-state-color: $primary-550 !default;
 $filters-state-font-size: 13px !default;
 $filters-state-inner-offset: 0 20px !default;
 $filters-state-line-height: 31px !default;
-$filters-state-min-width: 160px !default;
+$filters-state-min-width: 150px !default;
 $filters-state-white-space: nowrap !default;
 $filters-state-overflow: hidden !default;
 $filters-state-text-overflow: ellipsis !default;
 $filters-state-cursor: pointer !default;
 
 $filters-state-icon-offset-right: 8px !default;
-$filters-state-icon-vertical-align: text-bottom !default;
 $filters-state-icon-color: #aaa !default;
 $filters-state-icon-font-size: 13px !default;
-
-$filters-state-under-left-block-inner-offset-left: 20px !default;
-$filters-state-under-left-block-text-align: left !default;
 
 $filter-criteria-hint-max-width: 250px !default;
 $filter-criteria-hint-display: inline-block !default;
@@ -124,8 +120,6 @@ $choice-tree-filter-buttons-span-active-color: rgb(68, 68, 68) !default;
 $choice-tree-filter-buttons-span-active-cursor: default !default;
 
 $filters-state-page-title-center-text-align: center !default;
-$filters-state-page-title-center-inner-offset-left: 50px !default;
-$filters-state-page-title-center-inner-offset-right: 50px !default;
 $filters-state-page-title-center-height: 31px !default;
 
 $filter-multiselect-font-weight: bold !default;

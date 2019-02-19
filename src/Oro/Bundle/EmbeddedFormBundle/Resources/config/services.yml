@@ -57,9 +57,7 @@ services:
             - '@oro_embedded_form.csrf_token_storage.decorator.inner'
             - '@oro_embedded_form.csrf_token_storage'
             - '@request_stack'
-            - '%session.storage.options%'
             - 'oro_embedded_form_submit'
-            - '%oro_embedded_form.session_id_field_name%'
 
     oro_embedded_form.csrf_token_storage:
         class: Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorage

@@ -252,6 +252,7 @@ services:
         arguments:
             - '@oro_ui.dynamic_asset_version_manager'
             - '%kernel.project_dir%'
+            - '%oro_navigation.js_routing_filename_prefix%'
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
 

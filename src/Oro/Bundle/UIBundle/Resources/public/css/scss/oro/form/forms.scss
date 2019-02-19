@@ -127,7 +127,7 @@
 
         &.control-group-choice {
             .choice-widget-expanded {
-                padding-top: 6px;
+                padding-top: $control-group-choice-choice-widget-offset-top;
             }
 
             .select2 {
