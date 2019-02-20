@@ -60,9 +60,11 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 new EmptyConstraint(),
                 new StickLeftLocationDirective())
         );
-        this.buildCornerAxises();
+        // turned off building corner axises to simplify graph
+        // this.buildCornerAxises();
         this.buildCenterAxises();
         this.buildCenterLinesBetweenNodes();
+        this.mergeExtraCenterAxises();
         this.createAxises();
         this.buildMergeRequests();
         this.mergeAxises();
@@ -377,10 +379,12 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 var closestRectCrossPoint = this.findClosestRectCross(def.vector, rect);
                 var axis = new BaseAxis(def.vector.start, closestRectCrossPoint, this, 1, def.leftConstraint,
                     def.rightConstraint, def.locationDirective);
-                var secondaryAxis = new BaseAxis(def.vector.start, def.vector.start, this, 1, new EmptyConstraint(),
-                    new EmptyConstraint(), new CenterLocationDirective());
-                secondaryAxis.isVertical = !axis.isVertical;
-                this.baseAxises.push(axis, secondaryAxis);
+                // removed "one-pixel axis"
+                // var secondaryAxis = new BaseAxis(def.vector.start, def.vector.start, this, 1, new EmptyConstraint(),
+                //     new EmptyConstraint(), new CenterLocationDirective());
+                // secondaryAxis.isVertical = !axis.isVertical;
+                // this.baseAxises.push(axis, secondaryAxis);
+                this.baseAxises.push(axis);
             }
         }
     };
@@ -390,7 +394,7 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * @param {Function} fn
      */
     Graph.prototype.eachRectanglePair = function(fn) {
-        for (var i = this.rectangles.length - 1; i >= 0; i--) {
+        for (var i = this.rectangles.length - 1; i > 0; i--) {
             var rect1 = this.rectangles[i];
             for (var j = i - 1; j >= 0; j--) {
                 fn(rect1, this.rectangles[j]);
@@ -416,6 +420,100 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 this.buildSingleCenterLine(a, b, (b.left + a.right) / 2, b.leftSide, a.rightSide, b.left, a.right);
             }
         }.bind(this));
+    };
+
+    /**
+     * Groups central axises within same area and replaces them with single axis
+     */
+    Graph.prototype.mergeExtraCenterAxises = function() {
+        var maxDelta = this.centerLineMinimalRequiredWidth;
+
+        this.baseAxises
+            .filter(function(axis) {
+                // filter only axises that are build between nodes
+                return axis.leftConstraint instanceof LeftSimpleConstraint &&
+                    axis.rightConstraint instanceof RightSimpleConstraint &&
+                    axis.locationDirective instanceof CenterLocationDirective;
+            })
+            .reduce(function(groups, axis, i, axises) {
+                // groups compatible central axises
+                var group;
+                var compatibleAxis;
+                var even = axis.isVertical ? 'y' : 'x';
+                var varying = axis.isVertical ? 'x' : 'y';
+
+                // looks for compatible axis
+                for (var j = axises.length - 1; j > i && !compatibleAxis; j--) {
+                    if (
+                        axises[j].a[even] === axis.a[even] &&
+                        axises[j].b[even] === axis.b[even] &&
+                        (
+                            Math.max(axises[j].a[varying], axis.a[varying]) -
+                            Math.min(axises[j].a[varying], axis.a[varying])
+                        ) <= maxDelta
+                    ) {
+                        compatibleAxis = axises[j];
+                    }
+                }
+
+                if (compatibleAxis) {
+                    // check if group already exists
+                    for (var n = 0; n < groups.length; n++) {
+                        if (groups[n].indexOf(compatibleAxis) !== -1) {
+                            group = groups[n];
+                            break;
+                        }
+                    }
+
+                    if (group) {
+                        // add the axis to existing group
+                        group.push(axis);
+                    } else {
+                        // create new group
+                        groups.push([axis, compatibleAxis]);
+                    }
+                }
+
+                return groups;
+            }, [])
+            .forEach(function(group) {
+                var axis = group[0];
+                // defines limits for common constraint
+                var constraint = group.slice(1).reduce(function(constraint, axis) {
+                    return {
+                        left: Math.min(axis.leftConstraint.recomendedStart, constraint.left),
+                        right: Math.max(axis.rightConstraint.recomendedStart, constraint.right)
+                    };
+                }, {
+                    left: axis.leftConstraint.recomendedStart,
+                    right: axis.rightConstraint.recomendedStart
+                });
+
+                // removes axises of group
+                group.forEach(function(axis) {
+                    this.baseAxises.splice(this.baseAxises.indexOf(axis), 1);
+                }.bind(this));
+
+                // create replacement axis
+                var pointA = {};
+                var pointB = {};
+                var even = axis.isVertical ? 'y' : 'x';
+                var varying = axis.isVertical ? 'x' : 'y';
+
+                pointA[even] = axis.a[even];
+                pointB[even] = axis.b[even];
+                pointA[varying] = pointB[varying] = constraint.left + (constraint.right - constraint.left) / 2;
+
+                this.baseAxises.push(new BaseAxis(
+                    new Point2d(pointA.x, pointA.y),
+                    new Point2d(pointB.x, pointB.y),
+                    this,
+                    settings.centerAxisCostMultiplier,
+                    new LeftSimpleConstraint(constraint.left),
+                    new RightSimpleConstraint(constraint.right),
+                    new CenterLocationDirective()
+                ));
+            }.bind(this));
     };
 
     /**
