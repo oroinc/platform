@@ -208,3 +208,7 @@ services:
         arguments:
             - '@form.factory'
             - '@router'
+
+    oro_layout.method_phpdoc_extractor:
+        class: Oro\Bundle\LayoutBundle\Command\Util\MethodPhpDocExtractor
+        public: false
