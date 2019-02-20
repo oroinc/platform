@@ -1,10 +1,21 @@
-define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
+define(function(require) {
     'use strict';
 
-    var SERVICE_AREA = 60; // extra area for some kind of sidebars, etc.
-    var SCREEN_SMALL = 1280 - SERVICE_AREA; // WXGA 16:9 1280x720
-    var SCREEN_MEDIUM = 1360 - SERVICE_AREA; // HD ~16:9 1360x768
-    var SCREEN_LARGE = 1600 - SERVICE_AREA; // HD+ 16:9 1600x900
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var scrollHelper = require('oroui/js/tools/scroll-helper');
+    var tools = require('oroui/js/tools');
+
+    var SCROLLBAR_WIDTH = scrollHelper.scrollbarWidth() || 17;
+    var DESKTOP_SERVICE_AREA = 80 + 32 + 24 * 2 + SCROLLBAR_WIDTH; // menu, sidebar, content paddings, scollbar widths;
+    var MOBILE_SERVICE_AREA = 16 * 2; // content paddings;
+    var SERVICE_AREA = tools.isMobile() ? MOBILE_SERVICE_AREA : DESKTOP_SERVICE_AREA;
+
+    var SCREEN_SMALL = 1366 - SERVICE_AREA; // HD ~16:9 1366x768
+    var SCREEN_MEDIUM = 1440 - SERVICE_AREA; // WXGA+ 16:10 1440x900
+    var SCREEN_LARGE = 1680 - SERVICE_AREA; // WSXGA+ 16:10 1680x1050
+
+    require('jquery-ui');
 
     /**
      * Widget makes layout responive
@@ -37,24 +48,24 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
                 modifierClassName: 'responsive-small',
                 width: {
                     from: 0,
-                    to: SCREEN_SMALL
+                    to: SCREEN_SMALL - 1
                 }
             }, {
                 modifierClassName: 'responsive-medium',
                 width: {
-                    from: SCREEN_SMALL + 1,
-                    to: SCREEN_MEDIUM
+                    from: SCREEN_SMALL,
+                    to: SCREEN_MEDIUM - 1
                 }
             }, {
                 modifierClassName: 'responsive-big',
                 width: {
-                    from: SCREEN_MEDIUM + 1,
-                    to: SCREEN_LARGE
+                    from: SCREEN_MEDIUM,
+                    to: SCREEN_LARGE - 1
                 }
             }, {
                 modifierClassName: '',
                 width: {
-                    from: SCREEN_LARGE + 1,
+                    from: SCREEN_LARGE,
                     to: null // to infinity
                 }
             }]
