@@ -116,8 +116,8 @@ When you are making changes to theme's CSS don't forget to run next commands:
 
 ```
 bin/console cache:clear # if you have changed some theme's setting, including adding/removing CSS/SCSS styles files.
-bin/console assets:install --symlink # if you have changed themes files, you can use --symlink parameter, in this case you should install it only once
-bin/console oro:assets:build # if you are not using oro_assetic.css_debug: [theme] or oro_assetic.css_debug_all: true options
+bin/console assets:install # if you have changed themes files, you can use --symlink parameter, in this case you should install it only once
+bin/console oro:assets:build
 ```
 
 ## Getting list of all available themes
