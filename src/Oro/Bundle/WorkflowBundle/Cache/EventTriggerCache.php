@@ -81,6 +81,12 @@ class EventTriggerCache
         return $data;
     }
 
+    public function invalidateCache()
+    {
+        $this->provider->delete(self::DATA);
+        $this->provider->delete(self::BUILT);
+    }
+
     /**
      * @param string $entityClass
      * @param string $event
