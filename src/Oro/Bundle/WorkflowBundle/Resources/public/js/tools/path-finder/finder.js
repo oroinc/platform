@@ -107,7 +107,7 @@ define(['./settings', './path', './directions'], function(settings, Path, direct
             if (result) {
                 break;
             }
-            if (operationsCount > 50000) {
+            if (operationsCount > 80000) {
                 throw new Error('Maximum iterations limit reached. heu=' + current.heuristic);
             }
             operationsCount++;
