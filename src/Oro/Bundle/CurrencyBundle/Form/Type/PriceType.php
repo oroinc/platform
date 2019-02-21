@@ -63,6 +63,7 @@ class PriceType extends AbstractType
                 'value',
                 NumberType::class,
                 [
+                    'grouping' => true,
                     'required' => $isRequiredPrice,
                     'scale' => Price::MAX_VALUE_SCALE,
                     'attr' => [
