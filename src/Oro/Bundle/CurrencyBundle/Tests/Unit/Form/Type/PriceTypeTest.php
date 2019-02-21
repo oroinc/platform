@@ -55,6 +55,36 @@ class PriceTypeTest extends FormIntegrationTestCase
         ];
     }
 
+    public function testValueWhenDefaultEnglishLocale()
+    {
+        $form = $this->factory->create(PriceType::class, (new Price())->setValue(1234567.89));
+        $view = $form->createView();
+
+        self::assertEquals('1,234,567.8900', $view->children['value']->vars['value']);
+
+        $form->submit(['value' => '2,432,765.9800', 'currency' => 'USD']);
+
+        self::assertEquals(2432765.98, $form->getData()->getValue());
+    }
+
+    public function testValueWhenDeutchLocale()
+    {
+        $previousLocale = \Locale::getDefault();
+        try {
+            \Locale::setDefault('de_DE');
+            $form = $this->factory->create(PriceType::class, (new Price())->setValue(1234567.89));
+            $view = $form->createView();
+
+            self::assertEquals('1.234.567,8900', $view->children['value']->vars['value']);
+
+            $form->submit(['value' => '2.432.765,9800', 'currency' => 'USD']);
+
+            self::assertEquals(2432765.98, $form->getData()->getValue());
+        } finally {
+            \Locale::setDefault($previousLocale);
+        }
+    }
+
     /**
      * @param bool $isValid
      * @param mixed $defaultData
