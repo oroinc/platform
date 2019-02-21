@@ -6,6 +6,9 @@ use Oro\Bundle\EntityBundle\Tools\CheckDatabaseStateManager;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
+/**
+ * Clears the state of all database checkers
+ */
 class ConsoleCommandListener
 {
     /** @var CheckDatabaseStateManager */
@@ -24,9 +27,7 @@ class ConsoleCommandListener
      */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
-        if (CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
-            || CommandExecutor::isCurrentCommand('oro:platform:upgrade20', true)
-        ) {
+        if (CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)) {
             $this->checkDatabaseStateManager->clearState();
         }
     }
