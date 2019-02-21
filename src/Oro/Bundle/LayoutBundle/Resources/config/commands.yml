@@ -2,8 +2,13 @@ services:
     Oro\Bundle\LayoutBundle\Command\DebugCommand:
         class: Oro\Bundle\LayoutBundle\Command\DebugCommand
         public: false
+        arguments:
+            - '@oro_layout.layout_manager'
+            - '@oro_layout.method_phpdoc_extractor'
+            - [] # block types
+            - [] # data providers
         tags:
-            - { name: console.command }
+            - { name: console.command, command: 'oro:debug:layout' }
 
     Oro\Bundle\LayoutBundle\Command\DumpConfigReferenceCommand:
         class: Oro\Bundle\LayoutBundle\Command\DumpConfigReferenceCommand

@@ -16,9 +16,15 @@
         margin-#{$start}: $attribute-item-description-offset-start;
         text-align: $attribute-item-description-text-align;
         flex-grow: 1;
+        width: 100%;
 
         .list-inline {
             margin-bottom: 0;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
         }
     }
 }

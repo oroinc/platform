@@ -10,7 +10,6 @@ define(function(require) {
     var Popover = require('bootstrap-popover');
 
     require('jquery-ui');
-    require('oroui/js/responsive-jquery-widget');
 
     var document = window.document;
     var console = window.console;
@@ -239,15 +238,6 @@ define(function(require) {
             });
 
             pageRenderedCbPool = [];
-        },
-
-        /**
-         * Update modificators of responsive elements according to their containers size
-         */
-        updateResponsiveLayout: function() {
-            _.defer(function() {
-                $(document).responsive();
-            });
         },
 
         /**

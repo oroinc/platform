@@ -7,7 +7,7 @@
         {% set status_color = collector.data.not_applied_actions_count ? 'yellow' : '' %}
         {% set icon %}
             <span class="icon">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAcCAYAAACOGPReAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAbElEQVRIx2NgGAXUBowMDAwMaWlp/6ll4KxZsxhZYJy0tDRqGMjAwMDAwEQL77OgCxSXlJBsSG9PDwqfJi6lj/fRvTJ4XYocUTBXE4q8oRtRRBnKwsw8RFw6fA0lKkd1dnYOIpfCCthRMIIAAI0IFu9Hxh7ZAAAAAElFTkSuQmCC"/>
+                {{ include('@WebProfiler/Icon/twig.svg') }}
             </span>
             {% if collector.data.not_applied_actions_count %}
                 <span class="sf-toolbar-value">
@@ -17,8 +17,9 @@
         {% endset %}
 
         {% set text %}
+        <div class="sf-toolbar-info-group" id="collector-content" style="width: 480px;">
             <div class="sf-toolbar-info-piece">
-                <b>Number of views</b>
+                <b>Number of blocks</b>
                 <span class="sf-toolbar-status">{{ collector.data.count }}</span>
             </div>
             {% if collector.data.not_applied_actions_count %}
@@ -33,11 +34,18 @@
                 <div class="sf-toolbar-info-piece">
                     <b class="oro-layout-toolbar-info-piece-title">{{ key }}</b>
                     <span class="sf-toolbar-info-class oro-layout-toolbar-info-piece-value">
-                       {{ convert_value_to_string(value) }}
+                       {{ profiler_dump(value) }}
                     </span>
                 </div>
             {% endfor %}
+        </div>
         {% endset %}
+        <style>
+            .oro-layout-toolbar-info-piece-value pre.sf-dump {
+                background-color: transparent;
+                padding: 0;
+            }
+        </style>
 
         {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
     {% endif %}
@@ -69,7 +77,7 @@
         }
 
         #tree-menu {
-            width: calc(100% - 570px);
+            width: calc(100% - 770px);
             position: relative;
         }
 
@@ -89,10 +97,10 @@
         }
 
         #tree-details-container {
-            margin-left: calc(100% - 550px);
+            margin-left: calc(100% - 750px);
             padding: 0;
             border: none;
-            width: 550px;
+            width: 750px;
         }
 
         #tree-details-container.fixed {
@@ -151,17 +159,51 @@
                 max-height: inherit;
             }
         }
+
+        .tree-details {
+            overflow: auto;
+        }
+        .block-option-value code {
+            background: lightyellow;
+            padding: 3px 8px 4px;
+            border: 1px solid lightgray;
+        }
+        .dumped-string {
+            color: #629755;
+        }
     </style>
 {% endblock %}
 
 {% block panel %}
     <h2>Layouts</h2>
-
+    {% if collector.data.context.items.theme is defined %}
+        <h4>Layout updates in the
+            <strong>{{ collector.data.context.items.theme }}</strong> theme can be added to:</h4>
+        <table>
+            {% set widgetContainer = collector.data.context.items.widget_container.getValue()|default('page') %}
+            <tr>
+                <td><span>Resources/views/layouts/{{ collector.data.context.items.theme }}/<b>{{ collector.data.context.items.route_name }}</b></span></td>
+                <td>for the <b>Current Route</b></td> {#All widget containers(pages, dialogs, etc).#}
+            </tr>
+            {% if widgetContainer != 'page' %}
+                <tr>
+                    <td>
+                        <span>Resources/views/layouts/{{ collector.data.context.items.theme }}/<b>{{ collector.data.context.items.route_name }}</b>/{{ widgetContainer }}</span>
+                    </td>
+                    <td>for the <b>Current {{ widgetContainer|humanize }}</b></td>
+                </tr>
+            {% endif %}
+            <tr>
+                <td><span>Resources/views/layouts/{{ collector.data.context.items.theme }}/{{ widgetContainer }}</span></td>
+                <td>for <b>All {{ widgetContainer|humanize|pluralize }}</b></td>
+            </tr>
+        </table>
+    {% endif %}
     <div id="layout-profiler" class="sf-tabs">
         <div class="tab">
             <h3 class="tab-title">
                 Layout Tree
-                <span class="badge">{{ collector.data.count }}</span>
+                <span class="badge">{{ collector.data.count }} blocks</span>
             </h3>
             <div class="tab-content">
                 {% if collector.data.views|length %}
@@ -459,7 +501,7 @@
             function fitDetailsContainer() {
                 var container = document.getElementById('tree-details-container');
 
-                if (window.scrollY > 240) {
+                if (window.scrollY > 375) {
                     Sfjs.addClass(document.getElementById('tree-details-container'), 'fixed');
                     container.style.maxHeight = window.innerHeight - container.offsetTop + 'px';
                 } else {
@@ -484,7 +526,7 @@
                 <div class="toggle-icon empty"></div>
             {% endif %}
 
-            {{ name|default('(no name)') }} {% if data.type_class is defined and data.type is defined %}[<abbr title="{{ data.type_class }}">{{ data.type|split('\\')|last }}</abbr>]{% endif %}
+            {{ name|default('(no name)') }} {% if data.type is defined %}[<abbr title="Block Type">{{ data.type|split('\\')|last }}</abbr>]{% endif %}
         </div>
 
         {% if data.children is not empty %}
@@ -503,17 +545,25 @@
         <h2>
             {{ name|default('(no name)') }}
             {% if data.type_class is defined and data.type is defined %}
-                <span class="form-type">[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]</span>
+                <span class="form-type">[<abbr title="Block Type">{{ data.type }}</abbr>]</span>
             {% endif %}
         </h2>
 
-        {% if data.build_block_options is defined %}
-            {{ tree.view_block_details(data.id ~ '-build-block', 'Build Block', {'Options': data.build_block_options}, true) }}
-        {% endif %}
-
-        {% if data.build_view_options is defined %}
-            {{ tree.view_block_details(data.id ~ '-build-view', 'Build View', {'Options': data.build_view_options}, true) }}
-        {% endif %}
+        <h3>Customize the following blocks in twig templates:</h3>
+        <div>
+                    <table>
+            {% for blockPrefix in data.block_prefixes|reverse %}
+                            <tr>
+                                <td>
+                                    {{ loop.index }}
+                                </td>
+                                <td>
+                                    {% verbatim %}{% block {% endverbatim %} <strong>{{ blockPrefix }}_widget</strong> {% verbatim %} %}{% endverbatim %}
+                                </td>
+                            </tr>
+            {% endfor %}
+                    </table>
+        </div>
 
         {% if data.view_vars is defined %}
             {{ tree.view_block_details(data.id ~ '-vars', 'Variables', {'Variables': data.view_vars}) }}
@@ -543,10 +593,16 @@
                     </thead>
                     <tbody>
                     {% for option, value in options %}
-                        <tr>
+                        <tr class="block-option-value">
                             <th scope="row">{{ option }}</th>
                             <td>
-                                {{ convert_value_to_string(value) }}
+                                {% if value is string %}
+                                    <span class="dumped-string">"{{ value }}"</span>
+                                {% elseif value is expression %}
+                                    <span title="Layout Expression">{{ highlight_string(value) }}</span>
+                                {% else %}
+                                    {{ profiler_dump(value) }}
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
@@ -577,7 +633,7 @@
                         {% for argName, argValue in action.args %}
                             <div>
                                 <strong>{{ argName }}:</strong>
-                                {{ convert_value_to_string(argValue) }}
+                                {{ profiler_dump(argValue) }}
                             </div>
                         {% endfor %}
                     </td>

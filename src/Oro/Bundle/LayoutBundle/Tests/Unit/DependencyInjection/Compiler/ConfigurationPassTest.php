@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\LayoutBundle\Command\DebugCommand;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -30,6 +31,13 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
                 [],
                 [],
                 [],
+                [],
+                []
+            ]);
+        $container->register(DebugCommand::class)
+            ->setArguments([
+                new Reference('oro_layout.layout_manager'),
+                new Reference('oro_layout.method_phpdoc_extractor'),
                 [],
                 []
             ]);
@@ -139,6 +147,16 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
                 'test_data_provider_name2' => 'dataProvider2'
             ],
             $extensionDef->getArgument(5)
+        );
+
+        $debugCommandDef = $container->getDefinition(DebugCommand::class);
+        self::assertEquals(
+            ['test_block_name1', 'test_block_name2'],
+            $debugCommandDef->getArgument(2)
+        );
+        self::assertEquals(
+            ['test_data_provider_name1', 'test_data_provider_name2'],
+            $debugCommandDef->getArgument(3)
         );
     }
 

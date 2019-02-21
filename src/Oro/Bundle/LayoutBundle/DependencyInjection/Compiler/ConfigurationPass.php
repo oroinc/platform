@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\LayoutBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\LayoutBundle\Command\DebugCommand;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Configures layout theme configuration extensions, layout DIC extension and layout renderers.
+ * Registers twig and php renderers for layouts, registers all block types, block type extensions, layout updates,
+ * context configurators and data providers in a layout extensions and console command.
  */
 class ConfigurationPass implements CompilerPassInterface
 {
@@ -72,12 +74,19 @@ class ConfigurationPass implements CompilerPassInterface
      */
     private function configureLayoutExtension(ContainerBuilder $container)
     {
+        $blockTypes = $this->getBlockTypes($container);
+        $dataProviders = $this->getDataProviders($container);
+
         $extensionDef = $container->getDefinition(self::LAYOUT_EXTENSION_SERVICE);
-        $extensionDef->replaceArgument(1, $this->getBlockTypes($container));
+        $extensionDef->replaceArgument(1, $blockTypes);
         $extensionDef->replaceArgument(2, $this->getBlockTypeExtensions($container));
         $extensionDef->replaceArgument(3, $this->getLayoutUpdates($container));
         $extensionDef->replaceArgument(4, $this->getContextConfigurators($container));
-        $extensionDef->replaceArgument(5, $this->getDataProviders($container));
+        $extensionDef->replaceArgument(5, $dataProviders);
+
+        $commandDef = $container->getDefinition(DebugCommand::class);
+        $commandDef->replaceArgument(2, array_keys($blockTypes));
+        $commandDef->replaceArgument(3, array_keys($dataProviders));
     }
 
     /**
