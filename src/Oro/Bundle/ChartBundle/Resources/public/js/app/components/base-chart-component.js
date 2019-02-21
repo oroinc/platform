@@ -17,10 +17,18 @@ define(function(require) {
 
         aspectRatio: 0.4,
 
+        updateDelay: 40,
+
+        listen: {
+            'layout:reposition mediator': 'debouncedUpdate'
+        },
+
         /**
          * @inheritDoc
          */
         constructor: function BaseChartComponent() {
+            this.debouncedUpdate = _.debounce(this.update, this.updateDelay);
+
             BaseChartComponent.__super__.constructor.apply(this, arguments);
         },
 
@@ -30,6 +38,7 @@ define(function(require) {
          */
         initialize: function(options) {
             var updateHandler;
+
             this.data = options.data;
             this.options = options.options;
             this.config = options.config;
@@ -39,12 +48,9 @@ define(function(require) {
 
             this.renderBaseLayout();
 
-            updateHandler = _.bind(this.update, this);
+            updateHandler = this.update.bind(this);
 
             this.$chart.bind('update.' + this.cid, updateHandler);
-            // updates the chart on resize once per frame (1000/25)
-            $(window).bind('resize.' + this.cid, _.throttle(updateHandler, 40, {leading: false}));
-            $(window).bind('responsive-reflow.' + this.cid, updateHandler);
 
             _.defer(updateHandler);
         },
@@ -56,11 +62,11 @@ define(function(require) {
          */
         dispose: function() {
             this.$chart.unbind('.' + this.cid);
-            $(window).unbind('.' + this.cid);
             delete this.$el;
             delete this.$chart;
             delete this.$legend;
             delete this.$container;
+
             BaseChartComponent.__super__.dispose.call(this);
         },
 

@@ -158,7 +158,7 @@ DESCRIPTION
         $command[] = '--env.symfony='.$input->getOption('env');
 
 
-        $process = $this->nodeProcessFactory->createProcess(
+        $process = $this->nodeProcessFactory->create(
             $command,
             $this->getKernel()->getProjectDir(),
             $this->buildTimeout

@@ -21,11 +21,6 @@ services:
         arguments:
             - '@kernel'
 
-    oro_installer.namespace_migration:
-        class: 'Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigration'
-        arguments:
-            - '@doctrine'
-
     oro_installer.assets_install_command_listener:
         class: Oro\Bundle\InstallerBundle\EventListener\AssetsInstallCommandListener
         arguments:

@@ -114,7 +114,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
 
         if (tools.isMobile()) {
             adjustHeight = function() {
-                layout.updateResponsiveLayout();
+                mediator.execute({name: 'responsive-layout:update', silent: true});
                 mediator.trigger('layout:reposition');
             };
         } else {
@@ -138,7 +138,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                     initializeContent();
                 }
 
-                layout.updateResponsiveLayout();
+                mediator.execute({name: 'responsive-layout:update', silent: true});
 
                 var sfToolbar = $('.sf-toolbarreset');
                 var debugBarHeight = sfToolbar.is(':visible') ? sfToolbar.outerHeight() : 0;

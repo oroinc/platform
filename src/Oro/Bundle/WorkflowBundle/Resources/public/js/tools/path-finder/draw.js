@@ -4,7 +4,7 @@ define(function() {
     function draw(html, dimensions) {
         var board = document.getElementById('drawing-overlay');
         if (!board) {
-            document.querySelector('.workflow-flowchart-editor')
+            document.querySelector('.workflow-flowchart-editor, .workflow-flowchart')
                 .insertAdjacentHTML('beforeEnd',
                     '<div style="position: absolute; width: 100%; height: 100%; top: 0; z-index: 100000;" ' +
                     'id="drawing-overlay"></div>');

@@ -6,6 +6,7 @@ OroEmailBundle enables system and user mailboxes in the application and provides
 
  - [Emails](./Resources/doc/emails.md)
  - [Email templates](./Resources/doc/email_templates.md)
+ - [Email templates migrations](./Resources/doc/email_templates_migrations.md)
  - [Workflow Transition Actions](./Resources/doc/reference/workflow/workflow-entities/transition-actions.md)
  - [Email ownership](./Resources/doc/reference/security/ownership.md)
  - [System Mailboxes](./Resources/doc/reference/mailboxes.md)

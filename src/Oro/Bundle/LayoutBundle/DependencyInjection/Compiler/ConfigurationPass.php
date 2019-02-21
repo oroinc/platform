@@ -2,11 +2,17 @@
 
 namespace Oro\Bundle\LayoutBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\LayoutBundle\Command\DebugCommand;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers twig and php renderers for layouts, registers all block types, block type extensions, layout updates,
+ * context configurators and data providers in a layout extensions and console command.
+ */
 class ConfigurationPass implements CompilerPassInterface
 {
     const LAYOUT_FACTORY_BUILDER_SERVICE = 'oro_layout.layout_factory_builder';
@@ -43,20 +49,22 @@ class ConfigurationPass implements CompilerPassInterface
         // register block types, block type extensions and layout updates
         if ($container->hasDefinition(self::LAYOUT_EXTENSION_SERVICE)) {
             $extensionDef = $container->getDefinition(self::LAYOUT_EXTENSION_SERVICE);
-            $extensionDef->replaceArgument(1, $this->getBlockTypes($container));
+            $commandDef = $container->getDefinition(DebugCommand::class);
+            $extensionDef->replaceArgument(1, $this->processBlockTypes($container, $commandDef));
             $extensionDef->replaceArgument(2, $this->getBlockTypeExtensions($container));
             $extensionDef->replaceArgument(3, $this->getLayoutUpdates($container));
             $extensionDef->replaceArgument(4, $this->getContextConfigurators($container));
-            $extensionDef->replaceArgument(5, $this->getDataProviders($container));
+            $extensionDef->replaceArgument(5, $this->processDataProviders($container, $commandDef));
         }
     }
 
     /**
      * @param ContainerBuilder $container
      *
+     * @param Definition       $commandDef
      * @return array
      */
-    protected function getBlockTypes(ContainerBuilder $container)
+    protected function processBlockTypes(ContainerBuilder $container, Definition $commandDef)
     {
         $types = [];
         foreach ($container->findTaggedServiceIds(self::BLOCK_TYPE_TAG_NAME) as $serviceId => $tag) {
@@ -69,6 +77,8 @@ class ConfigurationPass implements CompilerPassInterface
             $alias         = $tag[0]['alias'];
             $types[$alias] = $serviceId;
         }
+
+        $commandDef->replaceArgument(2, array_keys($types));
 
         return $types;
     }
@@ -153,9 +163,10 @@ class ConfigurationPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      *
+     * @param Definition       $commandDef
      * @return array
      */
-    protected function getDataProviders(ContainerBuilder $container)
+    protected function processDataProviders(ContainerBuilder $container, Definition $commandDef)
     {
         $dataProviders = [];
         foreach ($container->findTaggedServiceIds(self::DATA_PROVIDER_TAG_NAME) as $serviceId => $tag) {
@@ -168,6 +179,8 @@ class ConfigurationPass implements CompilerPassInterface
             $alias                 = $tag[0]['alias'];
             $dataProviders[$alias] = $serviceId;
         }
+
+        $commandDef->replaceArgument(3, array_keys($dataProviders));
 
         return $dataProviders;
     }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscriber;
+use Oro\Bundle\AddressBundle\Form\EventListener\AddressIdentifierSubscriber;
 use Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -22,13 +23,21 @@ class AddressType extends AbstractType
      * @var AddressCountryAndRegionSubscriber
      */
     private $countryAndRegionSubscriber;
+    /**
+     * @var AddressIdentifierSubscriber
+     */
+    private $addressIdentifierSubscriber;
 
     /**
      * @param AddressCountryAndRegionSubscriber $eventListener
+     * @param AddressIdentifierSubscriber $addressIdentifierSubscriber
      */
-    public function __construct(AddressCountryAndRegionSubscriber $eventListener)
-    {
+    public function __construct(
+        AddressCountryAndRegionSubscriber $eventListener,
+        AddressIdentifierSubscriber $addressIdentifierSubscriber
+    ) {
         $this->countryAndRegionSubscriber = $eventListener;
+        $this->addressIdentifierSubscriber = $addressIdentifierSubscriber;
     }
 
     /**
@@ -37,8 +46,11 @@ class AddressType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this->countryAndRegionSubscriber);
+        $builder->addEventSubscriber($this->addressIdentifierSubscriber);
         $builder
-            ->add('id', HiddenType::class)
+            ->add('id', HiddenType::class, [
+                'mapped' => false
+            ])
             ->add('label', TextType::class, array(
                 'required' => false,
                 'label' => 'oro.address.label.label',

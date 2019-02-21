@@ -86,6 +86,12 @@ class WorkflowAwareCache implements EventSubscriberInterface
         return array_flip($this->definitionRepository->getAllRelatedEntityClasses($activeWorkflowsOnly));
     }
 
+    public function build(): void
+    {
+        $this->cache->save(self::ACTIVE_WORKFLOW_RELATED_CLASSES_KEY, $this->fetchClasses(true));
+        $this->cache->save(self::WORKFLOW_RELATED_CLASSES_KEY, $this->fetchClasses(false));
+    }
+
     public function invalidateRelated()
     {
         $this->cache->delete(self::WORKFLOW_RELATED_CLASSES_KEY);
