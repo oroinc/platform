@@ -266,44 +266,31 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 30)
     {
-        $actualFlashMessages = [];
-        /** @var Element|null $flashMessage */
-        $flashMessage = $this->spin(
-            function (OroMainContext $context) use ($title, &$actualFlashMessages, $flashMessageElement) {
-                $flashMessages = $context->findAllElements($flashMessageElement);
-
-                foreach ($flashMessages as $flashMessage) {
-                    if ($flashMessage->isValid() && $flashMessage->isVisible()) {
-                        $actualFlashMessageText = $flashMessage->getText();
-                        $actualFlashMessages[$actualFlashMessageText] = $flashMessage;
-
-                        if (false !== stripos($actualFlashMessageText, $title)) {
-                            return $flashMessage;
-                        }
-                    }
-                }
-
-                return null;
-            },
-            $timeLimit
-        );
-
-        self::assertNotCount(0, $actualFlashMessages, 'No flash messages founded on page');
+        $flashMessage = $this->getFlashMessage($title, $flashMessageElement, $timeLimit);
         self::assertNotNull($flashMessage, sprintf(
-            'Expected "%s" message but got "%s" messages',
-            $title,
-            implode(',', array_keys($actualFlashMessages))
+            'Expected "%s" message didn\'t appear',
+            $title
         ));
+    }
 
-        try {
-            /** @var NodeElement $closeButton */
-            $closeButton = $flashMessage->find('css', 'button.close');
-            $closeButton->press();
-        } catch (\Throwable $e) {
-            //No worries, flash message can disappeared till time next call
-        } catch (\Exception $e) {
-            //No worries, flash message can disappeared till time next call
-        }
+    /**
+     * Example: Then I should not see "Attachment created successfully" flash message
+     * Example: Then I should not see "The email was sent" flash message
+     *
+     * @Then /^(?:|I )should not see "(?P<title>[^"]+)" flash message$/
+     * @Then /^(?:|I )should not see '(?P<title>[^']+)' flash message$/
+     *
+     * @param string $title
+     * @param string $flashMessageElement
+     * @param int $timeLimit
+     */
+    public function iShouldNotSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 30)
+    {
+        $flashMessage = $this->getFlashMessage($title, $flashMessageElement, $timeLimit);
+        self::assertNull($flashMessage, sprintf(
+            'Expected that message "%s" won\'t appear',
+            $title
+        ));
     }
 
     /**
@@ -2008,5 +1995,30 @@ JS;
     {
         $element = $this->createElement($elementName);
         self::assertFalse($element->isChecked());
+    }
+
+    /**
+     * @param string $title
+     * @param string $flashMessageElement
+     * @param int $timeLimit
+     * @return Element|null
+     */
+    protected function getFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 30)
+    {
+        return $this->spin(
+            function (OroMainContext $context) use ($title, $flashMessageElement) {
+                $flashMessages = $context->findAllElements($flashMessageElement);
+                foreach ($flashMessages as $flashMessage) {
+                    if ($flashMessage->isValid() && $flashMessage->isVisible()) {
+                        $text = $flashMessage->getText();
+                        if (false !== stripos($text, $title) || false !== stripos($text, stripslashes($title))) {
+                            return $flashMessage;
+                        }
+                    }
+                }
+                return null;
+            },
+            $timeLimit
+        );
     }
 }
