@@ -1,11 +1,13 @@
 define([
     'underscore',
     'chaplin',
+    'jquery',
     'orosync/js/sync',
     'oroui/js/mediator',
     'oroui/js/messenger',
-    'orotranslation/js/translator'
-], function(_, Chaplin, sync, mediator, messenger, __) {
+    'orotranslation/js/translator',
+    'oroui/js/tools'
+], function(_, Chaplin, $, sync, mediator, messenger, __, tools) {
     'use strict';
 
     /**
@@ -452,6 +454,108 @@ define([
             }
 
             return fetchPath(refPath) === fetchPath(url);
+        },
+
+        /**
+         * Normalizes and then compares given URL`s
+         *
+         * @param {string} url1
+         * @param {string=} url2 In case second URL is not set - current URL is used
+         * @param {object=} options
+         * @returns {boolean}
+         */
+        compareNormalizedUrl: function(url1, url2, options) {
+            if (_.isObject(url2)) {
+                options = url2;
+                url2 = undefined;
+            }
+
+            url1 = this.normalizeUrl(url1, options);
+
+            if (_.isUndefined(url2)) {
+                url2 = this.currentUrl();
+            }
+
+            url2 = this.normalizeUrl(url2, options);
+
+            return url1 === url2;
+        },
+
+        /**
+         * Normalizes given url
+         *
+         * @param {string} urlString
+         * @param {object=} options
+         * @returns {string}
+         */
+        normalizeUrl: function(urlString, options) {
+            urlString = urlString.trim();
+
+            var hasRelativeProtocol = urlString.indexOf('//') === 0;
+            var isRelativeUrl = !hasRelativeProtocol && /^\.*\//.test(urlString);
+
+            // Prepend protocol
+            if (!isRelativeUrl) {
+                urlString = urlString.replace(/^(?!(?:\w+:)?\/\/)|^\/\//, 'http:');
+            }
+
+            var urlObj = document.createElement('a');
+            urlObj.href = urlString;
+
+            // Remove auth
+            urlObj.username = '';
+            urlObj.password = '';
+
+            // Remove duplicate slashes if not preceded by a protocol
+            if (urlObj.pathname) {
+                urlObj.pathname = urlObj.pathname.replace(/((?!:).|^)\/{2,}/g, function(_, p1) {
+                    if (/^(?!\/)/g.test(p1)) {
+                        return p1 + '/';
+                    }
+                    return '/';
+                });
+            }
+
+            // Decode URI octets
+            if (urlObj.pathname) {
+                urlObj.pathname = decodeURI(urlObj.pathname);
+            }
+
+            urlObj.search = this.normalizeQuery(urlObj.search, options);
+
+            // Remove trailing slash
+            urlObj.pathname = urlObj.pathname.replace(/\/$/, '');
+
+            urlString = mediator.execute('combineRouteUrl', urlObj.pathname, urlObj.search.substr(1));
+
+            // Remove ending `/`
+            if (urlObj.pathname === '/' && urlObj.hash === '') {
+                urlString = urlString.replace(/\/$/, '');
+            }
+
+            return urlString;
+        },
+
+        /**
+         * Normalizes query
+         *
+         * @param {string} query
+         * @param {object=} options
+         * @returns {boolean}
+         */
+        normalizeQuery: function(query, options) {
+            options = _.extend({ignoreGetParameters: []}, options || {});
+
+            var queryObj = tools.unpackFromQueryString(query);
+            queryObj = _.pick(queryObj, _.difference(_.keys(queryObj), options.ignoreGetParameters));
+
+            if (queryObj['grid']) {
+                queryObj['grid'] = _.mapObject(queryObj['grid'], function(state) {
+                    var stateUnpacked = tools.unpackFromQueryString(state);
+                    return tools.packToQuerySortedString(stateUnpacked);
+                });
+            }
+            return tools.packToQuerySortedString(queryObj);
         },
 
         /**

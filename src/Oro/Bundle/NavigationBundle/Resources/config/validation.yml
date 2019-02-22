@@ -20,3 +20,16 @@ Oro\Bundle\NavigationBundle\Entity\MenuUpdate:
         uri:
             - NotBlank:
                 groups: [UserDefined]
+
+Oro\Bundle\NavigationBundle\Entity\PinbarTab:
+    constraints:
+        - Oro\Bundle\NavigationBundle\Validator\Constraints\UniquePinbarTabUrl: ~
+    properties:
+        item:
+            - NotBlank: ~
+        title:
+            - Length:
+                  max: 255
+        titleShort:
+            - Length:
+                  max: 255

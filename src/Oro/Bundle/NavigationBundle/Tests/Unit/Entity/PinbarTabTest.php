@@ -3,9 +3,12 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
+use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class PinbarTabTest extends \PHPUnit\Framework\TestCase
 {
+    use EntityTestCaseTrait;
+
     public function testSetMaximizedNotEmpty()
     {
         $item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationItem');
@@ -32,10 +35,14 @@ class PinbarTabTest extends \PHPUnit\Framework\TestCase
     {
         $item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationItem');
 
-        $pinbarTab = new PinbarTab();
-        $pinbarTab->setItem($item);
-
-        $this->assertSame($item, $pinbarTab->getItem());
+        $this->assertPropertyAccessors(
+            new PinbarTab(),
+            [
+                ['item', $item, null],
+                ['title', 'sample-title', null],
+                ['titleShort', 'sample-title-short', null],
+            ]
+        );
     }
 
     public function testDoPrePersist()

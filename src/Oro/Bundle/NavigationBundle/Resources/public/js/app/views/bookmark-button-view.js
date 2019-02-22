@@ -25,7 +25,9 @@ define(function(require) {
         listen: {
             'add collection': 'updateState',
             'remove collection': 'updateState',
-            'reset collection': 'updateState'
+            'reset collection': 'updateState',
+            'page:afterChange mediator': 'updateState',
+            'route:change mediator': 'updateState'
         },
 
         /**
@@ -52,9 +54,6 @@ define(function(require) {
         },
 
         render: function() {
-            var titleSerialized;
-            var titleShort;
-
             this.updateState();
 
             var data = this.getTemplateData();
@@ -64,16 +63,19 @@ define(function(require) {
             }
 
             if (data.navigationElements[this.navigationElementType]) {
-                titleShort = data.titleShort;
                 this.$el.show();
+                if (data.titleShort) {
+                    this.$el.data('title-rendered-short', data.titleShort);
+                }
                 /**
                  * Setting serialized titles for pinbar button
                  */
                 if (data.titleSerialized) {
-                    titleSerialized = JSON.parse(data.titleSerialized);
-                    this.$el.data('title', titleSerialized);
+                    var titleSerialized = JSON.parse(data.titleSerialized);
+                    if (titleSerialized.template) {
+                        this.$el.data('title', titleSerialized);
+                    }
                 }
-                this.$el.data('title-rendered-short', titleShort);
             } else {
                 this.$el.hide();
             }
