@@ -29,9 +29,6 @@ parameters:
     oro_security.type.oro_acl_permission_collection.class:     Oro\Bundle\SecurityBundle\Form\Type\PermissionCollectionType
     oro_security.type.oro_acl_privilege.class:                 Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeType
 
-    oro_security.entity_security_metadata_provider.class:      Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider
-    oro_security.action_metadata_provider.class:               Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider
-
     oro_security.listener.controller.class:                    Oro\Bundle\SecurityBundle\EventListener\ControllerListener
 
     oro_security.token.factory.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
@@ -106,6 +103,7 @@ services:
         class: '%oro_security.acl.privilege_repository.class%'
         arguments:
             - '@oro_security.acl.manager'
+            - '@translator'
 
     oro_security.acl.sid_manager:
         class: '%oro_security.acl.sid_manager.class%'
@@ -296,13 +294,10 @@ services:
 
     oro_security.entity_security_metadata_provider:
         public: false
-        class: '%oro_security.entity_security_metadata_provider.class%'
+        class: Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider
         arguments:
-            - '@oro_entity_config.provider.security'
-            - '@oro_entity_config.provider.entity'
-            - '@oro_entity_config.provider.extend'
+            - '@oro_entity_config.config_manager'
             - '@doctrine'
-            - '@translator'
             - '@oro_security.entity_security_metadata_provider.cache'
             - '@event_dispatcher'
             - '@oro_security.acl.group_provider.chain'
@@ -314,17 +309,10 @@ services:
             - [ setNamespace, [ 'oro_acl_entities' ] ]
 
     oro_security.action_metadata_provider:
-        class: '%oro_security.action_metadata_provider.class%'
+        class: Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadataProvider
+        public: false
         arguments:
             - '@oro_security.acl.annotation_provider'
-            - '@translator'
-            - '@oro_security.action_metadata_provider.cache'
-
-    oro_security.action_metadata_provider.cache:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_acl_actions' ] ]
 
     oro_security.acl.annotation_provider:
         class: Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider
@@ -355,14 +343,6 @@ services:
             - '@oro_security.entity_security_metadata_provider'
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
-
-    oro_security.action_metadata_provider.cache.warmer:
-        class: Oro\Component\Config\Cache\ConfigCacheWarmer
-        public: false
-        arguments:
-            - '@oro_security.action_metadata_provider'
-        tags:
-            - { name: kernel.cache_warmer }
 
     oro_security.entity_security_metadata_provider.cache.warmer:
         class: Oro\Component\Config\Cache\ConfigCacheWarmer

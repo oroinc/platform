@@ -5,10 +5,10 @@ namespace Oro\Bundle\UserBundle\Entity\Manager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Metadata\ClassSecurityMetadata;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
@@ -17,6 +17,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * The API manager for user permissions.
+ */
 class UserPermissionApiEntityManager extends ApiEntityManager
 {
     /** @var AuthorizationCheckerInterface */
@@ -61,10 +64,10 @@ class UserPermissionApiEntityManager extends ApiEntityManager
         $entityAclExtension = $this->aclSelector->select($user);
 
         $resources = array_map(
-            function (AclClassInfo $class) use ($entityAclExtension) {
+            function (ClassSecurityMetadata $classMetadata) use ($entityAclExtension) {
                 return [
                     'type'     => $entityAclExtension->getExtensionKey(),
-                    'resource' => $class->getClassName()
+                    'resource' => $classMetadata->getClassName()
                 ];
             },
             $entityAclExtension->getClasses()

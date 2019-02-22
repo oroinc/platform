@@ -57,7 +57,7 @@ class TestHelper
         $idAccessor = new ObjectIdAccessor($doctrineHelper);
         $selector = new AclExtensionSelector($idAccessor);
         $actionMetadataProvider =
-            $this->testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider')
+            $this->testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadataProvider')
                 ->disableOriginalConstructor()
                 ->getMock();
         $actionMetadataProvider->expects($this->testCase->any())

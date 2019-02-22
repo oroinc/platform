@@ -8,48 +8,38 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
-use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * The provider for workflow related security metadata.
+ */
 class WorkflowAclMetadataProvider
 {
-    const STEPS               = 'steps';
-    const TRANSITIONS         = 'transitions';
-    const ALLOWED_TRANSITIONS = 'allowed_transitions';
-    const LABEL               = 'label';
-    const ORDER               = 'order';
-    const STEP_TO             = 'step_to';
-    const IS_START            = 'is_start';
-    const IS_START_STEP       = '_is_start';
-
-    /** transition name (from step -> to step) */
-    const TRANSITION_LABEL_TEMPLATE = "%s (%s \u{2192} %s)";
+    private const STEPS               = 'steps';
+    private const TRANSITIONS         = 'transitions';
+    private const ALLOWED_TRANSITIONS = 'allowed_transitions';
+    private const LABEL               = 'label';
+    private const ORDER               = 'order';
+    private const STEP_TO             = 'step_to';
+    private const IS_START            = 'is_start';
+    private const IS_START_STEP       = '_is_start';
 
     /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var TranslatorInterface */
-    protected $translator;
+    private $doctrine;
 
     /** @var FeatureChecker */
-    protected $featureChecker;
+    private $featureChecker;
 
     /** @var array|null */
-    protected $localCache;
+    private $localCache;
 
     /**
-     * @param ManagerRegistry     $doctrine
-     * @param TranslatorInterface $translator
-     * @param FeatureChecker      $featureChecker
+     * @param ManagerRegistry $doctrine
+     * @param FeatureChecker  $featureChecker
      */
-    public function __construct(
-        ManagerRegistry $doctrine,
-        TranslatorInterface $translator,
-        FeatureChecker $featureChecker
-    ) {
+    public function __construct(ManagerRegistry $doctrine, FeatureChecker $featureChecker)
+    {
         $this->doctrine = $doctrine;
-        $this->translator = $translator;
         $this->featureChecker = $featureChecker;
     }
 
@@ -63,7 +53,7 @@ class WorkflowAclMetadataProvider
         return $this->localCache;
     }
 
-    protected function ensureMetadataLoaded()
+    private function ensureMetadataLoaded()
     {
         if (null === $this->localCache) {
             $this->localCache = $this->loadMetadata();
@@ -73,7 +63,7 @@ class WorkflowAclMetadataProvider
     /**
      * @return WorkflowAclMetadata[]
      */
-    protected function loadMetadata()
+    private function loadMetadata()
     {
         $workflowRows = $this->getWorkflowEntityManager()
             ->getRepository(WorkflowDefinition::class)
@@ -88,8 +78,8 @@ class WorkflowAclMetadataProvider
             if ($this->isWorkflowAccessible($workflowName)) {
                 $workflows[] = new WorkflowAclMetadata(
                     $workflowRow['name'],
-                    $this->transLabel($workflowRow['label']),
-                    '',
+                    new WorkflowLabel($workflowRow['label']),
+                    null,
                     $this->loadWorkflowTransitions($workflowRow['configuration'])
                 );
             }
@@ -103,7 +93,7 @@ class WorkflowAclMetadataProvider
      *
      * @return array
      */
-    protected function loadWorkflowTransitions(array $workflowConfig)
+    private function loadWorkflowTransitions(array $workflowConfig)
     {
         $result = [];
         $steps = $this->getSteps($workflowConfig);
@@ -144,7 +134,7 @@ class WorkflowAclMetadataProvider
         }
         if (!empty($result)) {
             ksort($result);
-            $result = call_user_func_array('array_merge', $result);
+            $result = array_merge(...$result);
         }
 
         return $result;
@@ -157,7 +147,7 @@ class WorkflowAclMetadataProvider
      *
      * @return string
      */
-    protected function getTransitionIdentifier($transitionName, $fromStep, $toStep)
+    private function getTransitionIdentifier($transitionName, $fromStep, $toStep)
     {
         return sprintf('%s|%s|%s', $transitionName, $fromStep, $toStep);
     }
@@ -168,15 +158,14 @@ class WorkflowAclMetadataProvider
      * @param string $fromStep
      * @param string $toStep
      *
-     * @return string
+     * @return TransitionLabel
      */
-    protected function getTransitionLabel(array $workflowConfig, $transitionName, $fromStep, $toStep)
+    private function getTransitionLabel(array $workflowConfig, $transitionName, $fromStep, $toStep)
     {
-        return sprintf(
-            self::TRANSITION_LABEL_TEMPLATE,
+        return new TransitionLabel(
             $this->getTransitionDefinitionLabel($workflowConfig, $transitionName),
-            $this->getStepLabel($workflowConfig, $fromStep),
-            $this->getStepLabel($workflowConfig, $toStep)
+            $this->getStepLabel($workflowConfig, $toStep),
+            $this->getStepLabel($workflowConfig, $fromStep)
         );
     }
 
@@ -185,14 +174,12 @@ class WorkflowAclMetadataProvider
      * @param string $transitionName
      * @param string $toStep
      *
-     * @return string
+     * @return TransitionLabel
      */
-    protected function getStartTransitionLabel(array $workflowConfig, $transitionName, $toStep)
+    private function getStartTransitionLabel(array $workflowConfig, $transitionName, $toStep)
     {
-        return sprintf(
-            self::TRANSITION_LABEL_TEMPLATE,
+        return new TransitionLabel(
             $this->getTransitionDefinitionLabel($workflowConfig, $transitionName),
-            $this->translator->trans('(Start)', [], 'jsmessages'),
             $this->getStepLabel($workflowConfig, $toStep)
         );
     }
@@ -204,7 +191,7 @@ class WorkflowAclMetadataProvider
      *
      * @return mixed
      */
-    protected function getAttribute(array $data, $attributeName, $defaultValue = null)
+    private function getAttribute(array $data, $attributeName, $defaultValue = null)
     {
         $result = $defaultValue;
         if (!empty($data[$attributeName])) {
@@ -219,7 +206,7 @@ class WorkflowAclMetadataProvider
      *
      * @return array
      */
-    protected function getSteps(array $workflowConfig)
+    private function getSteps(array $workflowConfig)
     {
         if (isset($workflowConfig[self::STEPS]) && is_array($workflowConfig[self::STEPS])) {
             return $workflowConfig[self::STEPS];
@@ -233,7 +220,7 @@ class WorkflowAclMetadataProvider
      *
      * @return array
      */
-    protected function getTransitions(array $workflowConfig)
+    private function getTransitions(array $workflowConfig)
     {
         if (isset($workflowConfig[self::TRANSITIONS]) && is_array($workflowConfig[self::TRANSITIONS])) {
             return $workflowConfig[self::TRANSITIONS];
@@ -246,15 +233,11 @@ class WorkflowAclMetadataProvider
      * @param array  $workflowConfig
      * @param string $transitionName
      *
-     * @return string|null
+     * @return string
      */
-    protected function getTransitionDefinitionLabel(array $workflowConfig, $transitionName)
+    private function getTransitionDefinitionLabel(array $workflowConfig, $transitionName)
     {
-        if (!empty($workflowConfig[self::TRANSITIONS][$transitionName])) {
-            return $this->transLabel($workflowConfig[self::TRANSITIONS][$transitionName][self::LABEL]);
-        }
-
-        return null;
+        return $workflowConfig[self::TRANSITIONS][$transitionName][self::LABEL];
     }
 
     /**
@@ -263,10 +246,10 @@ class WorkflowAclMetadataProvider
      *
      * @return string|null
      */
-    protected function getStepLabel(array $workflowConfig, $stepName)
+    private function getStepLabel(array $workflowConfig, $stepName)
     {
         if (!empty($workflowConfig[self::STEPS][$stepName])) {
-            return $this->transLabel($workflowConfig[self::STEPS][$stepName][self::LABEL]);
+            return $workflowConfig[self::STEPS][$stepName][self::LABEL];
         }
 
         return null;
@@ -275,7 +258,7 @@ class WorkflowAclMetadataProvider
     /**
      * @return EntityManager
      */
-    protected function getWorkflowEntityManager()
+    private function getWorkflowEntityManager()
     {
         return $this->doctrine->getManagerForClass(WorkflowDefinition::class);
     }
@@ -285,21 +268,11 @@ class WorkflowAclMetadataProvider
      *
      * @return bool
      */
-    protected function isWorkflowAccessible($workflowName)
+    private function isWorkflowAccessible($workflowName)
     {
         return $this->featureChecker->isResourceEnabled(
             $workflowName,
             FeatureConfigurationExtension::WORKFLOWS_NODE_NAME
         );
-    }
-
-    /**
-     * @param string $label
-     *
-     * @return string
-     */
-    protected function transLabel($label)
-    {
-        return $this->translator->trans($label, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
     }
 }

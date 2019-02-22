@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
+use Oro\Bundle\SecurityBundle\Metadata\ClassSecurityMetadata;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -203,7 +204,7 @@ interface AclExtensionInterface
     /**
      * Gets all types of domain objects or resources supported by this ACL extension.
      *
-     * @return AclClassInfo[]
+     * @return ClassSecurityMetadata[]
      */
     public function getClasses();
 

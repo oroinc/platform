@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
-use Oro\Bundle\SecurityBundle\Metadata\ActionMetadata;
+use Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadata;
 
-class ActionMetadataTest extends \PHPUnit\Framework\TestCase
+class ActionSecurityMetadataTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ActionMetadata */
+    /** @var ActionSecurityMetadata */
     protected $metadata;
 
     protected function setUp()
     {
-        $this->metadata = new ActionMetadata(
+        $this->metadata = new ActionSecurityMetadata(
             'SomeName',
             'SomeGroup',
             'SomeLabel',
