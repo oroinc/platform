@@ -27,3 +27,13 @@ Oro\Bundle\EmailBundle\Entity\EmailTemplate:
     type: 'txt'
     subject: 'System Email Template'
     content: 'System Email Template Content'
+
+  non_entity_related_template:
+    organization: '@organization'
+    owner: '@admin'
+    is_system: 1
+    name: 'non_entity_related'
+    entity_name: ''
+    type: 'txt'
+    subject: 'Non-entity Related Template'
+    content: 'Non-entity Related Template Content'
