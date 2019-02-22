@@ -7,6 +7,9 @@ use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\Util\MenuManipulator;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
+/**
+ * Builds menu from navigation history items.
+ */
 class NavigationHistoryBuilder extends NavigationItemBuilder
 {
     /** @var Matcher */
@@ -78,6 +81,14 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
         $this->matcher = $matcher;
 
         return $this;
+    }
+
+    /**
+     * @param MenuManipulator $manipulator
+     */
+    public function setManipulator(MenuManipulator $manipulator): void
+    {
+        $this->manipulator = $manipulator;
     }
 
     /**

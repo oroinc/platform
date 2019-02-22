@@ -11,6 +11,13 @@ define(function(require) {
 
         template: require('tpl!oronavigation/templates/pin-item.html'),
 
+        listen: {
+            'change:url model': 'render',
+            'change:title_rendered_short model': 'render',
+            'page:afterChange mediator': 'onPageUpdated',
+            'route:change mediator': 'onPageUpdated'
+        },
+
         /**
          * @inheritDoc
          */
@@ -60,6 +67,24 @@ define(function(require) {
             this.$el
                 .removeClass('outdated')
                 .tooltip('destroy');
+        },
+
+        /**
+         * @inheritDoc
+         */
+        checkCurrentUrl: function() {
+            var url;
+            url = this.model.get('url');
+            return mediator.execute('compareNormalizedUrl', url, {ignoreGetParameters: ['restore']});
+        },
+
+        /**
+         * @inheritDoc
+         */
+        setActiveItem: function() {
+            var isUrlSame = this.checkCurrentUrl();
+            this.$el.toggleClass('active', isUrlSame);
+            this.$el.find('a').data('options', {forceStartup: !isUrlSame});
         }
     });
 

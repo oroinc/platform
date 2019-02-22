@@ -4,28 +4,35 @@ define(function(require) {
     var PinComponent;
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
+    var routing = require('routing');
     var PageStateView = require('oronavigation/js/app/views/page-state-view');
     var ButtonView = require('oronavigation/js/app/views/bookmark-button-view');
     var PinBarView = require('oronavigation/js/app/views/pin-bar-view');
     var DropdownView = require('oronavigation/js/app/views/pin-dropdown-view');
     var ItemView = require('oronavigation/js/app/views/pin-item-view');
     var BaseBookmarkComponent = require('oronavigation/js/app/components/base/bookmark-component');
+    var PinbarCollection = require('oronavigation/js/app/models/pinbar-collection');
 
     PinComponent = BaseBookmarkComponent.extend({
         typeName: 'pinbar',
 
         listen: {
-            'add collection': 'onAdd',
-            'remove collection': 'onRemove',
-            'pagestate:change mediator': 'onPageStateChange',
-            'page:afterChange mediator': 'onPageAfterChange'
+            'page:request mediator': 'refreshPinbar'
         },
+
+        collectionModel: PinbarCollection,
 
         /**
          * @inheritDoc
          */
         constructor: function PinComponent() {
             PinComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        initialize: function(options) {
+            PinComponent.__super__.initialize.call(this, options);
+
+            this.refreshPinbar();
         },
 
         _createSubViews: function() {
@@ -121,45 +128,95 @@ define(function(require) {
             model.set('position', 0);
         },
 
-        onAdd: function(model) {
-            mediator.execute({name: 'pageCache:add', silent: true});
-            if (model.get('url') !== mediator.execute('currentUrl')) {
-                // if URL was changed on server, applies this changes for current page
-                mediator.execute('changeUrl', model.get('url'), {replace: true});
-            }
-        },
+        /**
+         * @inheritDoc
+         */
+        toRemove: function(model) {
+            var self = this;
 
-        onRemove: function(model) {
-            var url;
-            url = model.get('url');
-            mediator.execute({name: 'pageCache:remove', silent: true}, url);
-            if (mediator.execute('compareUrl', model.get('url'))) {
-                // remove 'restore' param from URL, if pin was removed for current page
-                mediator.execute('changeUrlParam', 'restore', null);
-            }
-        },
+            model.destroy({
+                wait: true,
+                errorHandlerMessage: function(event, xhr) {
+                    // Suppress error if it's 404 response
+                    return xhr.status !== 404;
+                },
+                error: function(model, xhr) {
+                    if (xhr.status === 404 && !mediator.execute('retrieveOption', 'debug')) {
+                        // Suppress error if it's 404 response and not debug mode
+                        model.unset('id').destroy();
+                    }
+                },
+                complete: function() {
+                    if (mediator.execute('compareUrl', model.get('url'))) {
+                        // remove 'restore' param from URL, if pin was removed for current page
+                        mediator.execute('changeUrlParam', 'restore', null);
+                    }
 
-        onPageStateChange: function() {
-            var url;
-            var model = this.collection.getCurrentModel();
-            if (model) {
-                url = mediator.execute('currentUrl');
-                if (model.get('url') !== url) {
-                    model.set('url', url);
-                    model.save();
+                    self.refreshPinbar();
                 }
-            }
+            });
         },
 
-        onPageAfterChange: function() {
-            var model = this.collection.getCurrentModel();
-            if (model) {
-                model.set(this.button.getItemAttrs());
-                // if title changed (template and/or it's parameters) -- update it
-                if (model.hasChanged('title')) {
-                    model.save();
+        /**
+         * @inheritDoc
+         */
+        toAdd: function(model) {
+            var self = this;
+            this.actualizeAttributes(model);
+            model.save(null, {
+                success: function() {
+                    if (model.get('url') !== mediator.execute('currentUrl')) {
+                        // if URL was changed on server, applies this changes for current page
+                        mediator.execute('changeUrl', model.get('url'), {replace: true});
+                    }
+                },
+                errorHandlerMessage: function(event, xhr) {
+                    var item;
+
+                    if (xhr.status === 422) {
+                        item = self.collection.find(function(item) {
+                            return item.get('url') === model.get('url');
+                        });
+
+                        // Makes error show if a validation error occurs, but item with matching URL not found.
+                        if (item) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                },
+                error: function(data, xhr) {
+                    if (xhr.status === 422) {
+                        // Suppress error if it's 422 response
+                        model.unset('id').destroy();
+                    }
+                },
+                complete: function() {
+                    self.refreshPinbar({
+                        complete: function() {
+                            var newModel = self.collection.find(function(item) {
+                                return item.get('url') === model.get('url');
+                            });
+
+                            // Triggers "add" event on pinbars collection if the newly added pin was found.
+                            if (newModel) {
+                                self.collection.trigger('add', newModel, self.collection, {});
+                            }
+                        }
+                    });
                 }
-            }
+            });
+        },
+
+        /**
+         * @param {Object=} options
+         * @returns {jqXHR}
+         */
+        refreshPinbar: function(options) {
+            options = _.extend({url: routing.generate(this.route, {type: this.typeName}), reset: true}, options);
+
+            return this.collection.fetch(options);
         }
     });
 

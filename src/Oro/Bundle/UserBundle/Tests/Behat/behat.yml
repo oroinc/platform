@@ -64,6 +64,10 @@ oro_behat_extension:
     Username or Email:
       selector: '.oro-forgot-password input[name="username"]'
 
+    Users Grid:
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
+      selector: 'div[data-page-component-name="users-grid"]'
+
   pages:
     Login:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\Login

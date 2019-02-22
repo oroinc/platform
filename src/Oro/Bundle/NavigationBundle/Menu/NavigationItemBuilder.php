@@ -10,9 +10,13 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface;
 use Oro\Bundle\NavigationBundle\Entity\Repository\NavigationRepositoryInterface;
+use Oro\Bundle\NavigationBundle\Provider\NavigationItemsProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Builds menu from navigation history items.
+ */
 class NavigationItemBuilder implements BuilderInterface, FeatureToggleableInterface
 {
     use FeatureCheckerHolderTrait;
@@ -29,11 +33,14 @@ class NavigationItemBuilder implements BuilderInterface, FeatureToggleableInterf
     /** @var RouterInterface */
     private $router;
 
+    /** @var NavigationItemsProviderInterface */
+    private $navigationItemsProvider;
+
     /**
      * @param TokenAccessorInterface $tokenAccessor
-     * @param EntityManager          $em
-     * @param ItemFactory            $factory
-     * @param RouterInterface        $router
+     * @param EntityManager $em
+     * @param ItemFactory $factory
+     * @param RouterInterface $router
      */
     public function __construct(
         TokenAccessorInterface $tokenAccessor,
@@ -48,30 +55,41 @@ class NavigationItemBuilder implements BuilderInterface, FeatureToggleableInterf
     }
 
     /**
+     * @param NavigationItemsProviderInterface $navigationItemsProvider
+     */
+    public function setNavigationItemsProvider(NavigationItemsProviderInterface $navigationItemsProvider): void
+    {
+        $this->navigationItemsProvider = $navigationItemsProvider;
+    }
+
+    /**
      * Modify menu by adding, removing or editing items.
      *
      * @param \Knp\Menu\ItemInterface $menu
-     * @param array                   $options
-     * @param string|null             $alias
+     * @param array $options
+     * @param string|null $alias
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
         $user = $this->tokenAccessor->getUser();
         $menu->setExtra('type', $alias);
-        if (is_object($user)) {
+        if (\is_object($user)) {
             $currentOrganization = $this->tokenAccessor->getOrganization();
-            /** @var $entity NavigationItemInterface */
-            $entity = $this->factory->createItem($alias, []);
 
-            /** @var $repo NavigationRepositoryInterface */
-            $repo = $this->em->getRepository(ClassUtils::getClass($entity));
-            $items = $repo->getNavigationItems($user->getId(), $currentOrganization, $alias, $options);
+            if ($this->navigationItemsProvider) {
+                $items = $this->navigationItemsProvider
+                    ->getNavigationItems($user, $currentOrganization, $alias, $options);
+            } else {
+                /** @var $entity NavigationItemInterface */
+                $entity = $this->factory->createItem($alias, []);
+
+                /** @var $repo NavigationRepositoryInterface */
+                $repo = $this->em->getRepository(ClassUtils::getClass($entity));
+                $items = $repo->getNavigationItems($user->getId(), $currentOrganization, $alias, $options);
+                $items = array_filter($items, [$this, 'isEnabled']);
+            }
+
             foreach ($items as $item) {
-                $route = $this->getMatchedRoute($item);
-                if (!$route || !$this->featureChecker->isResourceEnabled($route, 'routes')) {
-                    continue;
-                }
-
                 $menu->addChild(
                     $alias . '_item_' . $item['id'],
                     [
@@ -105,5 +123,17 @@ class NavigationItemBuilder implements BuilderInterface, FeatureToggleableInterf
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * @param array $item
+     *
+     * @return bool
+     */
+    private function isEnabled(array $item): bool
+    {
+        $route = $this->getMatchedRoute($item);
+
+        return $route && $this->featureChecker->isResourceEnabled($route, 'routes');
     }
 }
