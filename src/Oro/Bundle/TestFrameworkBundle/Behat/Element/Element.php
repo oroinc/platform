@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Session;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\SpinTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 
 /**
@@ -14,7 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
  */
 class Element extends NodeElement
 {
-    use AssertTrait;
+    use AssertTrait, SpinTrait;
 
     /**
      * @var OroElementFactory
@@ -95,6 +96,19 @@ class Element extends NodeElement
         $message = sprintf('"%s" method is not available on the %s', $name, $this->getName());
 
         throw new \BadMethodCallException($message);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function find($selector, $locator)
+    {
+        return $this->spin(
+            function () use ($selector, $locator) {
+                return parent::find($selector, $locator);
+            },
+            3
+        );
     }
 
     /**
@@ -207,32 +221,5 @@ class Element extends NodeElement
     protected function getName()
     {
         return preg_replace('/^.*\\\(.*?)$/', '$1', get_class($this));
-    }
-
-    /**
-     * @param \Closure $lambda
-     * @param int $timeLimit
-     * @return null|mixed Return null if closure throw error or return not true value.
-     *                     Return value that return closure
-     */
-    protected function spin(\Closure $lambda, $timeLimit = 60)
-    {
-        $time = $timeLimit;
-
-        while ($time > 0) {
-            $start = microtime(true);
-            try {
-                if ($result = $lambda($this)) {
-                    return $result;
-                }
-            } catch (\Exception $e) {
-                // do nothing
-            } catch (\Throwable $e) {
-                // do nothing
-            }
-            usleep(50000);
-            $time -= microtime(true) - $start;
-        }
-        return null;
     }
 }

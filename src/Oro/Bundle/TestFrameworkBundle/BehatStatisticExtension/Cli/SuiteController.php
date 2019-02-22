@@ -104,7 +104,7 @@ class SuiteController implements Controller
             $output->writeln(sprintf('<info>Feature "%s" already tested and skipped.</info>', array_pop($parts)));
         }
 
-        $this->disableIsolators($input);
+        return $this->exitIfNoAvailableFeatures($input);
     }
 
     /**
@@ -140,8 +140,9 @@ class SuiteController implements Controller
 
     /**
      * @param InputInterface $input
+     * @return int|null
      */
-    private function disableIsolators(InputInterface $input)
+    private function exitIfNoAvailableFeatures(InputInterface $input)
     {
         // disable all isolators and other preparation logic if no suites to test
         $suites = $this->behatSuiteRegistry->getSuites();
@@ -154,7 +155,9 @@ class SuiteController implements Controller
         }
 
         if (!$suites) {
-            $input->setOption('dry-run', true);
+            return 0;
         }
+
+        return null;
     }
 }
