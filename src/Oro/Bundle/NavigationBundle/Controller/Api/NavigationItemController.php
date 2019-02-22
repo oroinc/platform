@@ -3,19 +3,22 @@
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
 use Doctrine\Common\Persistence\ObjectRepository;
-use Doctrine\Common\Util\ClassUtils;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
-use Oro\Bundle\NavigationBundle\Entity\Repository\NavigationRepositoryInterface;
+use Oro\Bundle\NavigationBundle\Provider\NavigationItemsProvider;
+use Oro\Bundle\NavigationBundle\Utils\PinbarTabUrlNormalizer;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
+ * Provides API actions for managing navigation items.
+ *
  * @RouteResource("navigationitems")
  * @NamePrefix("oro_api_")
  */
@@ -34,16 +37,14 @@ class NavigationItemController extends FOSRestController
      */
     public function getAction($type)
     {
-        /** @var $entity \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
-        $entity = $this->getFactory()->createItem($type, array());
-
-        /** @var $repo NavigationRepositoryInterface */
-        $repo = $this->getDoctrine()->getRepository(ClassUtils::getClass($entity));
+        /** @var NavigationItemsProvider $navigationItemsProvider */
+        $navigationItemsProvider = $this->container->get('oro_navigation.provider.navigation_items');
         $organization = $this->container->get('security.token_storage')->getToken()->getOrganizationContext();
-        $items = $repo->getNavigationItems($this->getUser(), $organization, $type);
+
+        $items = $navigationItemsProvider->getNavigationItems($this->getUser(), $organization, $type);
 
         return $this->handleView(
-            $this->view($items, is_array($items) ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND)
+            $this->view($items, \is_array($items) ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND)
         );
     }
 
@@ -73,7 +74,7 @@ class NavigationItemController extends FOSRestController
         }
 
         $params['user'] = $this->getUser();
-        $params['url']  = $this->getStateUrl($params['url']);
+        $params['url']  = $this->normalizeUrl($params['url'], $params['type']);
         $params['organization'] = $this->container->get('security.token_storage')->getToken()->getOrganizationContext();
 
         /** @var $entity \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
@@ -83,14 +84,37 @@ class NavigationItemController extends FOSRestController
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
         }
 
+        $errors = $this->validate($entity);
+        if ($errors) {
+            return $this->handleView(
+                $this->view(['message' => implode(PHP_EOL, $errors)], Codes::HTTP_UNPROCESSABLE_ENTITY)
+            );
+        }
+
         $em = $this->getManager();
 
         $em->persist($entity);
         $em->flush();
 
         return $this->handleView(
-            $this->view(array('id' => $entity->getId(), 'url' => $params['url']), Codes::HTTP_CREATED)
+            $this->view(['id' => $entity->getId(), 'url' => $params['url']], Codes::HTTP_CREATED)
         );
+    }
+
+    /**
+     * @param mixed $entity
+     *
+     * @return array
+     */
+    private function validate($entity): array
+    {
+        $constraintViolationList = $this->get('validator')->validate($entity);
+        /** @var ConstraintViolationInterface $constraintViolation */
+        foreach ($constraintViolationList as $constraintViolation) {
+            $errors[] = $constraintViolation->getMessage();
+        }
+
+        return $errors ?? [];
     }
 
     /**
@@ -207,18 +231,30 @@ class NavigationItemController extends FOSRestController
     }
 
     /**
-     * Check if navigation item has corresponding page state and return modified URL
+     * Normalizes URL.
      *
-     * @param  string $url Original URL
-     * @return string Modified URL
+     * @param string $url Original URL
+     * @param string $type Navigation item type
+     * @return string Normalized URL
      */
-    protected function getStateUrl($url)
+    private function normalizeUrl(string $url, string $type): string
     {
-        $state = $this->getPageStateRepository()->findOneByPageId(base64_encode($url));
+        /** @var PinbarTabUrlNormalizer $normalizer */
+        $normalizer = $this->container->get('oro_navigation.utils.pinbar_tab_url_normalizer');
 
-        return is_null($state)
-            ? $url
-            : $url . (strpos($url, '?') ? '&restore=1' : '?restore=1');
+        // Adds "restore" GET parameter to URL if we are dealing with pinbar. Page state for pinned page is restored
+        // only if this parameter is specified.
+        if ($type === 'pinbar') {
+            $urlInfo = parse_url($url);
+            parse_str($urlInfo['query'] ?? '', $query);
+
+            if (!isset($query['restore'])) {
+                $query['restore'] = 1;
+                $url = sprintf('%s?%s', $urlInfo['path'] ?? '', http_build_query($query));
+            }
+        }
+
+        return $normalizer->getNormalizedUrl($url);
     }
 
     /**

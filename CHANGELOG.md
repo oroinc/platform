@@ -15,6 +15,16 @@ The current file describes significant changes in the code that may affect the u
 #### SecurityBundle
 * Twig function `resource_granted` has been removed. Use `is_granted` from Symfony instead.
 
+## 3.1.4 
+
+### Removed
+#### InstallerBundle
+* Commands `oro:platform:upgrade20:db-configs` and `oro:platform:upgrade20` were removed because they are no longer used in version 3.x. Related logic was also removed. Use `oro:platform:update` instead.
+* Service `oro_installer.namespace_migration` and the logic that used it were removed.
+
+#### WorkflowBundle
+* Command `oro:workflow:definitions:upgrade20` was removed because it was used for 2.x version update only.
+
 ## 3.1.0
 
 ### Added

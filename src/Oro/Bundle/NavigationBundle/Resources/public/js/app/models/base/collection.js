@@ -17,10 +17,9 @@ define(function(require) {
         },
 
         getCurrentModel: function() {
-            var model = this.find(function(model) {
+            return this.find(function(model) {
                 return mediator.execute('compareUrl', model.get('url'));
             });
-            return model;
         }
     });
 

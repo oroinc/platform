@@ -7,7 +7,6 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     var GridViewsView = require('orodatagrid/js/datagrid/grid-views/view');
     var GridViewsCollection = require('orodatagrid/js/datagrid/grid-views/collection');
-    var gridContentManager = require('orodatagrid/js/content-manager');
     var gridGridViewsSelector = '.page-title > .navbar-extra .pull-left-extra > .pull-left';
 
     var config = require('module').config();
@@ -119,18 +118,10 @@ define(function(require) {
          */
         combineGridViewsOptions: function() {
             var options = this.metadata.gridViews;
-            // check is grid views collection is stored in content manager
-            var collection = gridContentManager.getViewsCollection(options.gridName);
+            var collection;
 
-            if (!collection) {
-                gridViewsBuilder.normalizeGridViewModelsData(options.views, this.metadata.initialState);
-                collection = new GridViewsCollection(options.views, {gridName: options.gridName});
-            }
-
-            if (this.metadata.options.routerEnabled !== false) {
-                // trace grid views collection changes
-                gridContentManager.traceViewsCollection(collection);
-            }
+            gridViewsBuilder.normalizeGridViewModelsData(options.views, this.metadata.initialState);
+            collection = new GridViewsCollection(options.views, {gridName: options.gridName});
 
             options.viewsCollection = collection;
             options.appearances = this.metadata.options.appearances;

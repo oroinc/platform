@@ -24,6 +24,10 @@ oro_behat_extension:
       selector: '#pinbar div.list-bar .pin-holder a'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    PinPageButton:
+      selector: 'button[title="Pin/unpin the page"]'
+      class: Oro\Bundle\NavigationBundle\Tests\Behat\Element\PinPageButton
+
     AddToFavoritesButton:
       selector: 'button.favorite-button'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

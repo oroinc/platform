@@ -22,7 +22,7 @@ class RestApiTest extends WebTestCase
      *
      * @return array
      */
-    public static function navagationItemsProvider()
+    public static function navigationItemsProvider()
     {
         return array(
             array('pinbar'),
@@ -33,7 +33,7 @@ class RestApiTest extends WebTestCase
     /**
      * Test POST
      *
-     * @dataProvider navagationItemsProvider
+     * @dataProvider navigationItemsProvider
      */
     public function testPost($itemType)
     {
@@ -66,10 +66,36 @@ class RestApiTest extends WebTestCase
     }
 
     /**
+     * Test POST when pin already exists.
+     *
+     * @depends testPost
+     */
+    public function testPostPinbarWhenAlreadyExists()
+    {
+        $this->client->request(
+            'POST',
+            $this->getUrl('oro_api_post_navigationitems', ['type' => 'pinbar']),
+            self::$entities['pinbar'],
+            [],
+            $this->generateWsseAuthHeader()
+        );
+
+        /** @var $result Response */
+        $result = $this->client->getResponse();
+
+        $this->assertJsonResponseStatusCodeEquals($result, 422);
+
+        $resultJson = json_decode($result->getContent(), true);
+
+        $this->assertArrayHasKey('message', $resultJson);
+        $this->assertEquals('This pin already exists', $resultJson['message']);
+    }
+
+    /**
      * Test PUT
      *
      * @depends testPost
-     * @dataProvider navagationItemsProvider
+     * @dataProvider navigationItemsProvider
      */
     public function testPut($itemType)
     {
@@ -104,7 +130,7 @@ class RestApiTest extends WebTestCase
      * Test GET
      *
      * @depends testPut
-     * @dataProvider navagationItemsProvider
+     * @dataProvider navigationItemsProvider
      */
     public function testGet($itemType)
     {
@@ -128,10 +154,38 @@ class RestApiTest extends WebTestCase
     }
 
     /**
+     * Test GET pinbar
+     *
+     * @depends testPut
+     */
+    public function testGetPinbar()
+    {
+        $this->assertNotEmpty(self::$entities['pinbar']);
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_navigationitems', ['type' => 'pinbar']),
+            [],
+            [],
+            $this->generateWsseAuthHeader()
+        );
+
+        /** @var $result Response */
+        $result = $this->client->getResponse();
+
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
+        $resultJson = json_decode($result->getContent(), true);
+        $this->assertNotEmpty($resultJson);
+        $this->assertArrayHasKey('id', $resultJson[0]);
+        $this->assertArrayHasKey('title_rendered', $resultJson[0]);
+        $this->assertArrayHasKey('title_rendered_short', $resultJson[0]);
+    }
+
+    /**
      * Test DELETE
      *
      * @depends testPut
-     * @dataProvider navagationItemsProvider
+     * @dataProvider navigationItemsProvider
      */
     public function testDelete($itemType)
     {
@@ -158,7 +212,7 @@ class RestApiTest extends WebTestCase
      * Test 404
      *
      * @depends testDelete
-     * @dataProvider navagationItemsProvider
+     * @dataProvider navigationItemsProvider
      */
     public function testNotFound($itemType)
     {
@@ -200,7 +254,7 @@ class RestApiTest extends WebTestCase
      * Test Unauthorized
      *
      * @depends testNotFound
-     * @dataProvider navagationItemsProvider
+     * @dataProvider navigationItemsProvider
      */
     public function testUnauthorized($itemType)
     {
@@ -241,7 +295,7 @@ class RestApiTest extends WebTestCase
      * Test Empty Body error
      *
      * @depends testNotFound
-     * @dataProvider navagationItemsProvider
+     * @dataProvider navigationItemsProvider
      */
     public function testEmptyBody($itemType)
     {
