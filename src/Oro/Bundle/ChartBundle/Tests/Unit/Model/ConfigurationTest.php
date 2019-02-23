@@ -1,20 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ChartBundle\Tests\Unit\DependencyInjection;
+namespace Oro\Bundle\ChartBundle\Tests\Unit\Model;
 
-use Oro\Bundle\ChartBundle\DependencyInjection\Configuration;
+use Oro\Bundle\ChartBundle\Model\Configuration;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetConfigTreeBuilder()
-    {
-        $configuration = new Configuration();
-        $builder = $configuration->getConfigTreeBuilder();
-
-        $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\TreeBuilder', $builder);
-    }
-
     /**
      * @dataProvider processConfigurationDataProvider
      */

@@ -1,5 +1,4 @@
 parameters:
-    oro_chart.config_provider.class:               Oro\Bundle\ChartBundle\Model\ConfigProvider
     oro_chart.view_builder.class:                  Oro\Bundle\ChartBundle\Model\ChartViewBuilder
     oro_chart.options_builder.class:               Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder
     oro_chart.data_transformer.factory.class:      Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory
@@ -11,9 +10,11 @@ parameters:
 
 services:
     oro_chart.config_provider:
-        class: '%oro_chart.config_provider.class%'
+        class: Oro\Bundle\ChartBundle\Model\ConfigProvider
+        parent: oro.static_config_provider.abstract
         arguments:
-            - []
+            - '%kernel.cache_dir%/oro/charts.php'
+            - '%kernel.debug%'
 
     oro_chart.view_builder:
         class: '%oro_chart.view_builder.class%'

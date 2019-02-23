@@ -5,24 +5,55 @@ The current file describes significant changes in the code that may affect the u
 ## 3.2.0-beta
 
 ### Changed
+
+#### CacheBundle
+* The approach based on `Oro\Bundle\CacheBundle\Loader\ConfigurationLoader` and `Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper` has been replaced with the approach based on `Oro\Component\Config\Cache\PhpConfigProvider`.
+
 #### UserBundle
 * API processor `oro_user.api.create.save_entity` was renamed to `oro_user.api.create.save_user`.
 
 ### Removed
+
+#### ChartBundle
+* The possibility to define charts via ChartBundle configuration has been removed. Use `Resources/config/oro/charts.yml` instead.
+* Methods `getConfigs()` and `getChartConfigs()` have been removed from `Oro\Bundle\ChartBundle\Model\ConfigProvider`. Use `getChartNames()` and `getChartConfig($chartName)` methods instead.
+
+#### ConfigBundle
+* Not used tag `oro_config.configuration_provider` has been removed.
+
 #### EmbeddedFormBundle
 * Layout context parameter `embedded_form_custom_layout` has been removed. Use layout updates instead.
 
+#### EntityBundle
+* The `exclusions`, `entity_aliases`, `entity_alias_exclusions`, `virtual_fields`, `virtual_relations` and `entity_name_formats` sections have been removed from EntityBundle configuration. Use `Resources/config/oro/entity.yml` instead.
+
 #### FilterBundle
 * The `datasource` attribute for `oro_filter.extension.orm_filter.filter` tag has been removed as it is redundant.
+
+#### LayoutBundle
+* The `themes` section has been removed from LayoutBundle configuration. Use `Resources/views/layouts/{folder}/theme.yml` instead.
+
+#### LocaleBundle
+* The `name_format` section has been removed from LocaleBundle configuration. Use `Resources/config/oro/name_format.yml` instead.
+* The `address_format` section has been removed from LocaleBundle configuration. Use `Resources/config/oro/address_format.yml` instead.
+* The `locale_data` section has been removed from LocaleBundle configuration. Use `Resources/config/oro/locale_data.yml` instead.
 
 #### QueryDesignerBundle
 * The `oro_query_designer.query_designer.manager.link` service has been removed. Use `oro_query_designer.query_designer.manager` service instead.
 
 #### SearchBundle
 * The `datasource` attribute for `oro_search.extension.search_filter.filter` tag has been removed as it is redundant.
+* The `entities_config` section has been removed from SearchBundle configuration. Use `Resources/config/oro/search.yml` instead.
+* Not used event `Oro\Bundle\SearchBundle\Event\BeforeMapObjectEvent` has been removed.
+* Deprecated DIC parameter `oro_search.entities_config` has been removed. Use `oro_search.provider.search_mapping` service instead of it.
 
 #### SecurityBundle
 * Twig function `resource_granted` has been removed. Use `is_granted` from Symfony instead.
+* The command `security:configurable-permission:load` has been removed.
+
+#### UIBundle
+* The `placeholders` and `placeholder_items` sections have been removed from UIBundle configuration. Use `Resources/config/oro/placeholders.yml` instead.
+* Deprecated option `show_pin_button_on_start_page` has been removed from UIBundle configuration.
 
 ## 3.1.0
 

@@ -1,13 +1,17 @@
 <?php
 
-namespace Oro\Bundle\ChartBundle\DependencyInjection;
+namespace Oro\Bundle\ChartBundle\Model;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Provides schema for configuration that is loaded from "Resources/config/oro/charts.yml" files.
+ */
 class Configuration implements ConfigurationInterface
 {
-    const CONFIG_ROOT_NODE = 'oro_chart';
+    public const ROOT_NODE_NAME = 'charts';
+
     /**
      * {@inheritdoc}
      *
@@ -16,7 +20,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $treeBuilder->root(self::CONFIG_ROOT_NODE)
+        $treeBuilder->root(self::ROOT_NODE_NAME)
             ->info('Configuration of charts')
             ->useAttributeAsKey('name')
             ->prototype('array')

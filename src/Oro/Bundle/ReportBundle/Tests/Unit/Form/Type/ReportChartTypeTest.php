@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ChartBundle\Form\EventListener\ChartTypeEventListener;
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsCollectionType;
 use Oro\Bundle\ChartBundle\Form\Type\ChartType;
+use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 use Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaCollectionType;
 use Oro\Bundle\ReportBundle\Form\Type\ReportChartType;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
@@ -12,11 +14,6 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ReportChartTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configProvider;
-
     public function testBuildForm()
     {
         $form = $this->factory->create(ReportChartType::class, null, []);
@@ -29,19 +26,14 @@ class ReportChartTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $configProvider = $this
-            ->getMockBuilder('\Oro\Bundle\ChartBundle\Model\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $configProvider->expects($this->any())
+            ->method('getChartNames')
+            ->willReturn([]);
+        $configProvider->expects($this->never())
+            ->method('getChartConfig');
 
-        $configProvider
-            ->expects($this->atLeastOnce())
-            ->method('getChartConfigs')
-            ->will($this->returnValue([]));
-
-        $mock = $this
-            ->getMockBuilder('Oro\Bundle\ChartBundle\Form\EventListener\ChartTypeEventListener')
-            ->getMock();
+        $mock = $this->createMock(ChartTypeEventListener::class);
 
         $eventListener = new MutableFormEventSubscriber($mock);
 
