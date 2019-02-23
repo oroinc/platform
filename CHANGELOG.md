@@ -12,6 +12,15 @@ The current file describes significant changes in the code that may affect the u
 #### EmbeddedFormBundle
 * Layout context parameter `embedded_form_custom_layout` has been removed. Use layout updates instead.
 
+#### FilterBundle
+* The `datasource` attribute for `oro_filter.extension.orm_filter.filter` tag has been removed as it is redundant.
+
+#### QueryDesignerBundle
+* The `oro_query_designer.query_designer.manager.link` service has been removed. Use `oro_query_designer.query_designer.manager` service instead.
+
+#### SearchBundle
+* The `datasource` attribute for `oro_search.extension.search_filter.filter` tag has been removed as it is redundant.
+
 #### SecurityBundle
 * Twig function `resource_granted` has been removed. Use `is_granted` from Symfony instead.
 

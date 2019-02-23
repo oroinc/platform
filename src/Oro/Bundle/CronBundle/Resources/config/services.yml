@@ -35,6 +35,7 @@ services:
 
     oro_cron.command_with_args_string_filter:
         class: Oro\Bundle\CronBundle\Filter\CommandWithArgsFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'

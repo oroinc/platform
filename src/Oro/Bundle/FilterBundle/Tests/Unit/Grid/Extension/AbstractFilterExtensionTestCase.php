@@ -13,6 +13,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration;
+use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\FilterBagStub;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -26,6 +27,9 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
 
     /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $configurationProvider;
+
+    /** @var FilterBagStub */
+    protected $filterBag;
 
     /** @var DatagridStateProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $filtersStateProvider;
@@ -42,6 +46,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
     protected function setUp()
     {
         $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
+        $this->filterBag = new FilterBagStub();
         $this->filtersStateProvider = $this->createMock(DatagridStateProviderInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->datagridParameters = $this->createMock(ParameterBag::class);
@@ -60,7 +65,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
             ],
         ]);
 
-        $this->extension->addFilter('sampleFilterType1', $this->createMock(FilterInterface::class));
+        $this->filterBag->addFilter('sampleFilterType1', $this->createMock(FilterInterface::class));
         $this->extension->processConfigs($datagridConfiguration);
 
         $filtersNormalized = [
@@ -118,7 +123,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
             ->expects(self::never())
             ->method('init');
 
-        $this->extension->addFilter(self::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitMetadata($datagridConfig, $metadata = $this->createMetadataObject([]));
     }
@@ -146,7 +151,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
             ->method('getMetadata')
             ->willReturn([]);
 
-        $this->extension->addFilter(self::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitMetadata($datagridConfig, $this->createMetadataObject([]));
     }
@@ -263,7 +268,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
             ->method('getMetadata')
             ->willReturn([]);
 
-        $this->extension->addFilter(self::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitMetadata($datagridConfig, $metadata);
 
@@ -348,7 +353,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
             ->method('getMetadata')
             ->willReturn([]);
 
-        $this->extension->addFilter(self::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitMetadata($datagridConfig, $metadata = $this->createMetadataObject([]));
 
@@ -396,7 +401,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
             ->method('getMetadata')
             ->willReturn([]);
 
-        $this->extension->addFilter(self::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitMetadata($datagridConfig, $metadata = $this->createMetadataObject([]));
 
@@ -485,7 +490,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
 
         $this->mockStateProviders([], []);
 
-        $this->extension->addFilter(self::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitMetadata($datagridConfig, $metadata = $this->createMetadataObject([]));
 

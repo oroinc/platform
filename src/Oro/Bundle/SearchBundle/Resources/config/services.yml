@@ -288,10 +288,16 @@ services:
         class: '%oro_search.extension.search_filter.class%'
         arguments:
             - '@oro_datagrid.configuration.provider'
+            - '@oro_search.extension.search_filter_bag'
             - '@oro_filter.provider.state.filters'
             - '@translator'
         tags:
             - { name: oro_datagrid.extension }
+
+    # this service is initialized by Oro\Bundle\FilterBundle\DependencyInjection\Compiler\FilterTypesPass
+    oro_search.extension.search_filter_bag:
+        class: Oro\Bundle\FilterBundle\Filter\FilterBag
+        public: true
 
     oro_search.extension.search_sorter:
         class: '%oro_search.extension.search_sorter.class%'

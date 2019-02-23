@@ -3,115 +3,69 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\FilterBundle\DependencyInjection\Compiler\FilterTypesPass;
+use Oro\Bundle\FilterBundle\Filter\FilterBag;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class FilterTypesPassTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_TAG_ATTRIBUTE_TYPE = 'TEST_TAG_ATTRIBUTE_TYPE';
-    const TEST_SERVICE_ID = 'TEST_SERVICE_ID';
+    private const FILTER_BAG_SERVICE_ID = 'test_filter_bag';
+    private const FILTER_TAG            = 'test_filter';
 
-    /**
-     * @var FilterTypesPass
-     */
-    protected $filterTypePass;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder
-     */
-    protected $containerMock;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Definition
-     */
-    protected $definitionMock;
+    /** @var FilterTypesPass */
+    private $compiler;
 
     public function setUp()
     {
-        $this->filterTypePass = new FilterTypesPass();
-
-        $this->definitionMock = $this->getMockBuilder(Definition::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->containerMock = $this->getMockBuilder(ContainerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->compiler = new FilterTypesPass(self::FILTER_BAG_SERVICE_ID, self::FILTER_TAG);
     }
 
-    public function testProcessOrm()
+    public function testProcess()
     {
-        $this->containerMock
-            ->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with(FilterTypesPass::TAG_NAME)
-            ->willReturn([
-                self::TEST_SERVICE_ID => [ [
-                    'datasource' => 'orm',
-                    'type'       =>  self::TEST_TAG_ATTRIBUTE_TYPE,
-                ] ]
-            ]);
+        $container = new ContainerBuilder();
+        $filterBagDef = $container->register(self::FILTER_BAG_SERVICE_ID, FilterBag::class);
+        $filter1Def = $container->register('filter1_service')
+            ->setPublic(false)
+            ->addTag(self::FILTER_TAG, ['type' => 'filter1']);
+        $filter2Def = $container->register('filter2_service')
+            ->addTag(self::FILTER_TAG, ['type' => 'filter2']);
 
-        $this->containerMock
-            ->expects($this->once())
-            ->method('hasDefinition')
-            ->with(self::TEST_SERVICE_ID)
-            ->willReturn(true);
+        $this->compiler->process($container);
 
-        $this->containerMock
-            ->expects($this->at(0))
-            ->method('getDefinition')
-            ->with(FilterTypesPass::FILTER_EXTENSION_ID)
-            ->willReturn($this->definitionMock);
+        self::assertEquals(
+            ['filter1', 'filter2'],
+            $filterBagDef->getArgument(0)
+        );
 
-        $definitionMock2 = $this->getMockBuilder(Definition::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $definitionMock2
-            ->expects($this->once())
-            ->method('setPublic')
-            ->with(false);
+        $filterBagServiceLocatorReference = $filterBagDef->getArgument(1);
+        self::assertInstanceOf(Reference::class, $filterBagServiceLocatorReference);
+        $filterBagServiceLocatorDef = $container->getDefinition((string)$filterBagServiceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $filterBagServiceLocatorDef->getClass());
+        self::assertEquals(
+            [
+                'filter1' => new ServiceClosureArgument(new Reference('filter1_service')),
+                'filter2' => new ServiceClosureArgument(new Reference('filter2_service'))
+            ],
+            $filterBagServiceLocatorDef->getArgument(0)
+        );
 
-        $this->containerMock
-            ->expects($this->at(3))
-            ->method('getDefinition')
-            ->with(self::TEST_SERVICE_ID)
-            ->willReturn($definitionMock2);
-
-        $this->definitionMock
-            ->expects($this->once())
-            ->method('addMethodCall');
-
-        $this->filterTypePass->process($this->containerMock);
+        self::assertFalse($filter1Def->isPublic());
+        self::assertFalse($filter2Def->isPublic());
     }
 
-    public function testProcessNonOrm()
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The tag attribute "type" is required for service "filter1_service".
+     */
+    public function testProcessFilterWithoutTypeAttribute()
     {
-        $this->containerMock
-            ->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with(FilterTypesPass::TAG_NAME)
-            ->willReturn([
-                self::TEST_SERVICE_ID => [ [
-                    'datasource' => 'non_orm',
-                    'type'       =>  self::TEST_TAG_ATTRIBUTE_TYPE,
-                ] ]
-            ]);
+        $container = new ContainerBuilder();
+        $container->register(self::FILTER_BAG_SERVICE_ID, FilterBag::class);
+        $container->register('filter1_service')
+            ->addTag(self::FILTER_TAG);
 
-        $this->containerMock
-            ->expects($this->never())
-            ->method('hasDefinition');
-
-        $this->containerMock
-            ->expects($this->at(0))
-            ->method('getDefinition')
-            ->with(FilterTypesPass::FILTER_EXTENSION_ID)
-            ->willReturn($this->definitionMock);
-
-        $this->definitionMock
-            ->expects($this->never())
-            ->method('addMethodCall');
-
-        $this->filterTypePass->process($this->containerMock);
+        $this->compiler->process($container);
     }
 }

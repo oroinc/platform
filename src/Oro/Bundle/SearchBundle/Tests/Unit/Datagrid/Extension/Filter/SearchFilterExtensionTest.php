@@ -24,6 +24,7 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
 
         $this->extension = new SearchFilterExtension(
             $this->configurationProvider,
+            $this->filterBag,
             $this->filtersStateProvider,
             $this->translator
         );
@@ -123,7 +124,7 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
             ->expects(self::never())
             ->method('apply');
 
-        $this->extension->addFilter(static::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(static::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
@@ -147,7 +148,7 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
             ->expects(self::never())
             ->method('apply');
 
-        $this->extension->addFilter(static::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(static::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
@@ -177,7 +178,7 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
             ->method('apply')
             ->with(self::isInstanceOf(SearchFilterDatasourceAdapter::class), $formData);
 
-        $this->extension->addFilter(static::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(static::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }

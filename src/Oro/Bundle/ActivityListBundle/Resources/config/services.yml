@@ -20,12 +20,7 @@ parameters:
     oro_activity_list.placeholder.filter.class: Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter
 
     oro_activity_list.filter.helper.class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper
-
-    oro_activity_list.filter.activity_list.class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter
     oro_activity_list.filter.datagrid_helper.class: Oro\Bundle\ActivityListBundle\Filter\DatagridHelper
-
-    # helper
-    oro_activity_list.helper.acl_criteria.class: Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper
     oro_activity_list.helper.activity_inheritance_targets.class: Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper
 
     # Strategies
@@ -160,7 +155,8 @@ services:
             - { name: oro_service_link,  service: oro_datagrid.datagrid.builder }
 
     oro_activity_list.filter.activity_list:
-        class: '%oro_activity_list.filter.activity_list.class%'
+        class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter
+        public: false
         arguments:
             - "@form.factory"
             - "@oro_filter.filter_utility"
@@ -168,7 +164,7 @@ services:
             - "@oro_activity_list.provider.chain"
             - "@oro_activity_list.filter.helper"
             - "@oro_entity.routing_helper"
-            - "@oro_query_designer.query_designer.manager.link"
+            - "@oro_query_designer.query_designer.manager"
             - "@oro_activity_list.filter.datagrid_helper.link"
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: activityList }

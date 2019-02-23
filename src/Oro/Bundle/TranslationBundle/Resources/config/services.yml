@@ -328,9 +328,10 @@ services:
 
     oro_translation.filter.language:
         class: 'Oro\Bundle\TranslationBundle\Filter\LanguageFilter'
+        public: false
         parent: oro_filter.entity_filter
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: language, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: language }
 
     oro_translation.helper.translation_route:
         class: 'Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper'
