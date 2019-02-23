@@ -330,4 +330,51 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
         self::assertSame($entityType, $result['included'][0]['relationships']['users']['data'][0]['type']);
         self::assertSame($userId, $result['included'][0]['relationships']['users']['data'][0]['id']);
     }
+
+    public function testTryToCreateIncludedEntityWhenCreateActionForItIsDisabled()
+    {
+        $this->appendEntityConfig(
+            TestProductType::class,
+            [
+                'actions' => [
+                    'create' => false
+                ]
+            ],
+            true
+        );
+
+        $data = [
+            'data'     => [
+                'type'          => 'testproducts',
+                'attributes'    => [
+                    'name' => 'Test Product 2'
+                ],
+                'relationships' => [
+                    'productType' => [
+                        'data' => ['type' => 'testproducttypes', 'id' => 'TEST_PRODUCT_TYPE_2']
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type'       => 'testproducttypes',
+                    'id'         => 'TEST_PRODUCT_TYPE_2',
+                    'attributes' => [
+                        'label' => 'Test Product Type 2'
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->post(['entity' => 'testproducts'], $data, [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'action not allowed exception',
+                'detail' => 'The action is not allowed.',
+                'source' => ['pointer' => '/included/0']
+            ],
+            $response
+        );
+    }
 }

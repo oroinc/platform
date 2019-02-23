@@ -9,14 +9,18 @@ use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
+use Oro\Bundle\ApiBundle\Request\ErrorStatusCodesWithoutContentTrait;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Validates and fill included entities.
  */
 class ProcessIncludedEntities implements ProcessorInterface
 {
+    use ErrorStatusCodesWithoutContentTrait;
+
     /** @var ActionProcessorBagInterface */
     protected $processorBag;
 
@@ -120,6 +124,10 @@ class ProcessIncludedEntities implements ProcessorInterface
             foreach ($errors as $error) {
                 $errorCompleter->complete($error, $requestType, $actionMetadata);
                 $this->fixIncludedEntityErrorPath($error, $entityData->getPath());
+                $errorStatusCode = $error->getStatusCode();
+                if (null !== $errorStatusCode && $this->isErrorResponseWithoutContent($errorStatusCode)) {
+                    $error->setStatusCode(Response::HTTP_BAD_REQUEST);
+                }
                 $context->addError($error);
             }
         } else {
