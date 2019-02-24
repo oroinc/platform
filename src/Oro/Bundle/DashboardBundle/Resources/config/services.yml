@@ -6,7 +6,6 @@ parameters:
     oro_dashboard.manager.class:                 Oro\Bundle\DashboardBundle\Model\Manager
     oro_dashboard.widget_configs.class:          Oro\Bundle\DashboardBundle\Model\WidgetConfigs
     oro_dashboard.factory.class:                 Oro\Bundle\DashboardBundle\Model\Factory
-    oro_dashboard.config_provider.class:         Oro\Bundle\DashboardBundle\Model\ConfigProvider
     oro_dashboard.dashboard_entity.class:        Oro\Bundle\DashboardBundle\Entity\Dashboard
     oro_dashboard.dashboard_widget_entity.class: Oro\Bundle\DashboardBundle\Entity\Widget
     oro_dashboard.navigation_listener.class:     Oro\Bundle\DashboardBundle\EventListener\NavigationListener
@@ -94,9 +93,11 @@ services:
             - '@oro_security.token_accessor'
 
     oro_dashboard.config_provider:
-        class: '%oro_dashboard.config_provider.class%'
+        class: Oro\Bundle\DashboardBundle\Model\ConfigProvider
+        parent: oro.static_config_provider.abstract
         arguments:
-            - []
+            - '%kernel.cache_dir%/oro/dashboards.php'
+            - '%kernel.debug%'
             - '@event_dispatcher'
 
     oro_dashboard.navigation_listener:

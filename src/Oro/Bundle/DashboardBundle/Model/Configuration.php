@@ -1,12 +1,17 @@
 <?php
 
-namespace Oro\Bundle\DashboardBundle\DependencyInjection;
+namespace Oro\Bundle\DashboardBundle\Model;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Provides schema for configuration that is loaded from "Resources/config/oro/dashboards.yml" files.
+ */
 class Configuration implements ConfigurationInterface
 {
+    public const ROOT_NODE_NAME = 'dashboards';
+
     /**
      * {@inheritDoc}
      *
@@ -15,7 +20,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('oro_dashboard')
+        $treeBuilder->root(self::ROOT_NODE_NAME)
             ->children()
                 ->arrayNode('widgets_configuration')
                     ->info('Form fields used for widget configuration that will be added to each widget')

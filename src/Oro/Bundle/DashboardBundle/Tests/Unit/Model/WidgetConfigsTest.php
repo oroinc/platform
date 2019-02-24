@@ -2,11 +2,19 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter;
+use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
+use Oro\Component\Config\Resolver\ResolverInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
 {
@@ -36,17 +44,13 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $resolver = $this->createMock('Oro\Component\Config\Resolver\ResolverInterface');
-
-        $this->em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
-
-        $this->valueProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $resolver = $this->createMock(ResolverInterface::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->valueProvider = $this->createMock(ConfigValueProvider::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $widgetConfigVisibilityFilter = $this->createMock(WidgetConfigVisibilityFilter::class);
 
         $this->valueProvider->expects($this->any())
             ->method('getConvertedValue')
@@ -56,16 +60,6 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-
-        $widgetConfigVisibilityFilter = $this
-            ->getMockBuilder('Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter')
-            ->disableOriginalConstructor()
-            ->getMock();
         $widgetConfigVisibilityFilter->expects($this->any())
             ->method('filterConfigs')
             ->will($this->returnArgument(0));
@@ -82,12 +76,8 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
             $this->requestStack
         );
 
-        $this->widgetRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->em
-            ->expects($this->any())
+        $this->widgetRepository = $this->createMock(EntityRepository::class);
+        $this->em->expects($this->any())
             ->method('getRepository')
             ->with('OroDashboardBundle:Widget')
             ->will($this->returnValue($this->widgetRepository));
@@ -114,6 +104,7 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
         $this->requestStack->push($request);
 
         $widget = new Widget();
+        $widget->setName('test');
         $this->widgetRepository
             ->expects($this->once())
             ->method('find')
@@ -145,6 +136,7 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
         $this->requestStack->push($request);
 
         $widget = new Widget();
+        $widget->setName('test');
         $this->widgetRepository
             ->expects($this->once())
             ->method('find')

@@ -21,6 +21,10 @@ The current file describes significant changes in the code that may affect the u
 #### ConfigBundle
 * Not used tag `oro_config.configuration_provider` has been removed.
 
+#### DashboardBundle
+* The `dashboards`, `widgets` and `widgets_configuration` sections have been removed from DashboardBundle configuration has been removed. Use `Resources/config/oro/dashboards.yml` instead.
+* Methods `getConfigs()`, `getConfig($key)` and `hasConfig($key)` have been removed from `Oro\Bundle\DashboardBundle\Model\ConfigProvider`.
+
 #### EmbeddedFormBundle
 * Layout context parameter `embedded_form_custom_layout` has been removed. Use layout updates instead.
 
