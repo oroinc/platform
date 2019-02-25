@@ -1,0 +1,7 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    safe_methods:
+        Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper:
+            getSingleIdentifierFieldName: true
+            getEntityIdentifierValue: true
+            getEntityIds: true

@@ -1,0 +1,9 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\TranslationBundle\Translation\DatabasePersister:
+            executeBatchTranslationInsert:
+                sqlData: true
+        Oro\Bundle\TranslationBundle\Entity\Repository\AbstractTranslationRepository:
+            doUpdateTranslations:
+                sql: true

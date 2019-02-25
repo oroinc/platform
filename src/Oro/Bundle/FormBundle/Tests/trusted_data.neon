@@ -1,0 +1,9 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    properties:
+        Oro\Bundle\FormBundle\Autocomplete\SearchHandler:
+            getEntitiesByIds:
+                idFieldName: true
+        Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer:
+            loadEntitiesByIds:
+                propertyPath: true
