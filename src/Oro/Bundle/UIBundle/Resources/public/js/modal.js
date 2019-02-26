@@ -400,6 +400,7 @@ define(function(require) {
             }
 
             delete this.$content;
+
             this.$el.modal('dispose');
 
             ModalView.__super__.dispose.call(this);

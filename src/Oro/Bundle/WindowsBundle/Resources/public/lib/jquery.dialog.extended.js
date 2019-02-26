@@ -363,6 +363,19 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             return this;
         },
 
+        _position: function() {
+            // Need to show the dialog to get the actual offset in the position plugin
+            var isVisible = this.uiDialog.is(":visible");
+            var initialDisplay = this.uiDialog[0].style.display;
+            if (!isVisible) {
+                this.uiDialog.show();
+            }
+            this.uiDialog.position(this.options.position);
+            if (!isVisible) {
+                this.uiDialog.css('display', initialDisplay);
+            }
+        },
+
         _getTitleBarHeight: function() {
             return this.uiDialogTitlebar.height() + 15;
         },
