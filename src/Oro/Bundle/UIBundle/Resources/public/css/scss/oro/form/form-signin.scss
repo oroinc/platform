@@ -19,6 +19,7 @@
 }
 
 .form-wrapper {
+    width: 515px;
     max-width: 515px;
     min-height: 100vh;
     background: rgba(255, 255, 255, .8);
@@ -41,7 +42,7 @@
 }
 
 .form-signin {
-    width: 100%;
+    margin: 0 auto;
 
     &__footer {
         display: flex;
@@ -49,10 +50,6 @@
 
         &--forgot {
             padding-#{$end}: 0;
-        }
-
-        &--reset {
-            padding-#{$end}: 155px;
         }
     }
 
@@ -126,7 +123,9 @@
     }
 
     .oro-hint {
-        margin: 0 0 14px;
+        margin: 0 0 $form-container-control-row-space;
+
+        opacity: 0.9;
     }
 
     .add-on {
@@ -160,7 +159,7 @@
         margin: side-values(9px 10px 0 0);
     }
 
-    .oro-forgot-password {
+    &__fieldset {
         max-width: 270px;
         min-width: 270px;
 
@@ -192,10 +191,6 @@
         margin: 0 0 25px;
     }
 
-    span.validation-failed {
-        margin: side-values(0 0 14px 14px);
-    }
-
     .form-row {
         margin-#{$start}: 0;
         margin-#{$end}: 0;
@@ -208,7 +203,6 @@
     }
 
     &.form-row-layout {
-        .form-signin__footer--login,
         .oro-remember-me {
             padding-#{$start}: 91px;
         }
@@ -272,20 +266,34 @@
             margin-bottom: 18px;
         }
     }
-}
 
-.form-reset {
-    .form-buttons {
-        margin-top: 10px;
+    &--reset {
+        .title-box {
+            margin-bottom: $form-container-control-row-space;
+        }
+
+        .form-buttons {
+            margin-top: 10px;
+        }
+
+        .add-on {
+            width: 155px;
+
+            & + input[type="text"],
+            & + input[type="password"],
+            & + select {
+                width: calc(100% - 178px);
+            }
+        }
+
+        .form-signin__footer {
+            margin-top: $form-container-control-row-space / 2;
+        }
     }
 
-    .add-on {
-        width: 155px;
-
-        & + input[type="text"],
-        & + input[type="password"],
-        & + select {
-            width: calc(100% - 178px);
+    &--login.form-row-layout {
+        .form-signin__footer {
+            padding-#{$start}: 91px;
         }
     }
 }
