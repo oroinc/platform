@@ -7,7 +7,7 @@
         {% set status_color = collector.data.not_applied_actions_count ? 'yellow' : '' %}
         {% set icon %}
             <span class="icon">
-                {{ include('@WebProfiler/Icon/twig.svg') }}
+                {{ include('@OroLayout/Collector/layout-icon.svg') }}
             </span>
             {% if collector.data.not_applied_actions_count %}
                 <span class="sf-toolbar-value">
@@ -17,30 +17,33 @@
         {% endset %}
 
         {% set text %}
-        <div class="sf-toolbar-info-group" id="collector-content" style="width: 480px;">
-            <div class="sf-toolbar-info-piece">
-                <b>Number of blocks</b>
-                <span class="sf-toolbar-status">{{ collector.data.count }}</span>
-            </div>
-            {% if collector.data.not_applied_actions_count %}
+            <div class="sf-toolbar-info-group" id="collector-content" style="width: 480px;">
                 <div class="sf-toolbar-info-piece">
-                    <b>Not applied actions</b>
-                    <span class="sf-toolbar-status sf-toolbar-status-yellow">
+                    <b>Number of blocks</b>
+                    <span class="sf-toolbar-status">{{ collector.data.count }}</span>
+                </div>
+                {% if collector.data.not_applied_actions_count %}
+                    <div class="sf-toolbar-info-piece">
+                        <b>Not applied actions</b>
+                        <span class="sf-toolbar-status sf-toolbar-status-yellow">
                         {{ collector.data.not_applied_actions_count }}
                     </span>
-                </div>
-            {% endif %}
-            {% for key, value in collector.data.context.items %}
-                <div class="sf-toolbar-info-piece">
-                    <b class="oro-layout-toolbar-info-piece-title">{{ key }}</b>
-                    <span class="sf-toolbar-info-class oro-layout-toolbar-info-piece-value">
-                       {{ profiler_dump(value) }}
+                    </div>
+                {% endif %}
+                {% for key, value in collector.data.context.items %}
+                    <div class="sf-toolbar-info-piece">
+                        <b class="oro-layout-toolbar-info-piece-title">{{ key }}</b>
+                        <span class="sf-toolbar-info-class oro-layout-toolbar-info-piece-value">
+                            {% if value is string %}"{{ value }}"{% else %}{{ profiler_dump(value) }}{% endif %}
                     </span>
-                </div>
-            {% endfor %}
-        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% endset %}
         <style>
+            #oro-layout-icon {
+                top: 8px;
+            }
             .oro-layout-toolbar-info-piece-value pre.sf-dump {
                 background-color: transparent;
                 padding: 0;
@@ -57,7 +60,7 @@
                 {{ collector.data.views is empty ? 'disabled' }}"
     >
         <span class="icon">
-            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAgCAYAAAABtRhCAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAbklEQVRIx2NgGAVDHTDCGGlpaf9pZcmsWbPg9rAgS6SlpdHCMhQ+E72DlAWbYHFJCcUG9/b0YBWnuw9HLaRPosEV4cPHh9iyBczXxGaZ0WxBfBwwM4/mw1ELRy0c4MK7s7NzCPsQvYU1CkYBNgAAV5UW+fU+ZL4AAAAASUVORK5CYII="/>
+            {{ include('@OroLayout/Collector/layout-icon.svg') }}
         </span>
         <strong>Layouts</strong>
         {% if collector.data.not_applied_actions_count %}
@@ -89,7 +92,7 @@
             width: 30px;
             min-height: 100%;
             height: 100%;
-            background: linear-gradient(to left, rgba(249,249,249,1) 0%,rgba(249,249,249,0) 100%);
+            background: linear-gradient(to left, rgba(249, 249, 249, 1) 0%, rgba(249, 249, 249, 0) 100%);
         }
 
         .tree-menu-wrapper {
@@ -163,11 +166,13 @@
         .tree-details {
             overflow: auto;
         }
+
         .block-option-value code {
             background: lightyellow;
             padding: 3px 8px 4px;
             border: 1px solid lightgray;
         }
+
         .dumped-string {
             color: #629755;
         }
@@ -182,7 +187,9 @@
         <table>
             {% set widgetContainer = collector.data.context.items.widget_container.getValue()|default('page') %}
             <tr>
-                <td><span>Resources/views/layouts/{{ collector.data.context.items.theme }}/<b>{{ collector.data.context.items.route_name }}</b></span></td>
+                <td>
+                    <span>Resources/views/layouts/{{ collector.data.context.items.theme }}/<b>{{ collector.data.context.items.route_name }}</b></span>
+                </td>
                 <td>for the <b>Current Route</b></td> {#All widget containers(pages, dialogs, etc).#}
             </tr>
             {% if widgetContainer != 'page' %}
@@ -194,7 +201,8 @@
                 </tr>
             {% endif %}
             <tr>
-                <td><span>Resources/views/layouts/{{ collector.data.context.items.theme }}/{{ widgetContainer }}</span></td>
+                <td><span>Resources/views/layouts/{{ collector.data.context.items.theme }}/{{ widgetContainer }}</span>
+                </td>
                 <td>for <b>All {{ widgetContainer|humanize|pluralize }}</b></td>
             </tr>
         </table>
@@ -259,7 +267,7 @@
     </div>
 
     <script type="text/javascript">
-        (function(){
+        (function () {
             function Toggler(storage) {
                 "use strict";
 
@@ -375,7 +383,7 @@
                     if (null !== data) {
                         try {
                             return JSON.parse(data);
-                        } catch(e) {
+                        } catch (e) {
                         }
                     }
 
@@ -466,26 +474,26 @@
             tabTarget.initTabs(document.querySelectorAll('.tree .tree-inner'));
             toggler.initButtons(document.querySelectorAll('a.toggle-button'));
 
-            (function() {
+            (function () {
                 var STORAGE_KEY = 'sf_toggle_all_data';
                 var buttons = document.querySelectorAll('.tree-inner a.toggle-button');
                 var target = document.getElementById('expand-all');
                 var isExpanded = storage.getItem(STORAGE_KEY, false);
 
-                var changeTitle = function(target) {
+                var changeTitle = function (target) {
                     var title = target.getAttribute('data-collapsed-title');
                     target.setAttribute('data-collapsed-title', target.text);
                     target.text = title;
                 };
 
-                if(isExpanded) {
+                if (isExpanded) {
                     changeTitle(target);
                 }
 
-                var toggleAll = function() {
+                var toggleAll = function () {
                     var isExpanded = storage.getItem(STORAGE_KEY, false);
                     for (var i = 0; i < buttons.length; i++) {
-                        if(isExpanded) {
+                        if (isExpanded) {
                             toggler.collapse(buttons[i]);
                         } else {
                             toggler.expand(buttons[i]);
@@ -519,14 +527,17 @@
 {% macro view_tree_entry(name, data, expanded) %}
     {% import _self as tree %}
     <li>
-        <div class="tree-inner{% if data.visible == false %} underline{% endif %}" data-tab-target-id="{{ data.id }}-details">
+        <div class="tree-inner{% if data.visible == false %} underline{% endif %}"
+             data-tab-target-id="{{ data.id }}-details">
             {% if data.children is not empty %}
-                <a class="toggle-button" data-toggle-target-id="{{ data.id }}-children" href="#"><span class="toggle-icon"></span></a>
+                <a class="toggle-button" data-toggle-target-id="{{ data.id }}-children" href="#"><span
+                            class="toggle-icon"></span></a>
             {% else %}
                 <div class="toggle-icon empty"></div>
             {% endif %}
 
-            {{ name|default('(no name)') }} {% if data.type is defined %}[<abbr title="Block Type">{{ data.type|split('\\')|last }}</abbr>]{% endif %}
+            {{ name|default('(no name)') }} {% if data.type is defined %}[<abbr
+                    title="Block Type">{{ data.type|split('\\')|last }}</abbr>]{% endif %}
         </div>
 
         {% if data.children is not empty %}
@@ -551,18 +562,19 @@
 
         <h3>Customize the following blocks in twig templates:</h3>
         <div>
-                    <table>
-            {% for blockPrefix in data.block_prefixes|reverse %}
-                            <tr>
-                                <td>
-                                    {{ loop.index }}
-                                </td>
-                                <td>
-                                    {% verbatim %}{% block {% endverbatim %} <strong>{{ blockPrefix }}_widget</strong> {% verbatim %} %}{% endverbatim %}
-                                </td>
-                            </tr>
-            {% endfor %}
-                    </table>
+            <table>
+                {% for blockPrefix in data.block_prefixes|reverse %}
+                    <tr>
+                        <td>
+                            {{ loop.index }}
+                        </td>
+                        <td>
+                            {% verbatim %}{% block {% endverbatim %} <strong>{{ blockPrefix }}
+                                _widget</strong> {% verbatim %} %}{% endverbatim %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
         </div>
 
         {% if data.view_vars is defined %}
@@ -622,23 +634,23 @@
         </tr>
         </thead>
         <tbody>
-            {% for action in actions %}
-                <tr>
-                    <td>
-                        <strong>
-                            @{{ action.name }}
-                        </strong>
-                    </td>
-                    <td>
-                        {% for argName, argValue in action.args %}
-                            <div>
-                                <strong>{{ argName }}:</strong>
-                                {{ profiler_dump(argValue) }}
-                            </div>
-                        {% endfor %}
-                    </td>
-                </tr>
-            {% endfor %}
+        {% for action in actions %}
+            <tr>
+                <td>
+                    <strong>
+                        @{{ action.name }}
+                    </strong>
+                </td>
+                <td>
+                    {% for argName, argValue in action.args %}
+                        <div>
+                            <strong>{{ argName }}:</strong>
+                            {{ profiler_dump(argValue) }}
+                        </div>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
         </tbody>
     </table>
 {% endmacro %}

@@ -234,7 +234,7 @@ class LayoutDataCollector extends DataCollector
                 $value = sprintf('(%s) %s::%s', gettype($value), $className, $value->toString());
             }
 
-            $this->data['context']['items'][$key] = $this->cloneVar($value);
+            $this->data['context']['items'][$key] = is_string($value) ? $value : $this->cloneVar($value);
         }
     }
 
