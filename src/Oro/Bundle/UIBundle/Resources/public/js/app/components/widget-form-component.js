@@ -24,7 +24,7 @@ define(
                     }
 
                     if (options.reloadLayout) {
-                        mediator.trigger('layout:adjustReloaded');
+                        mediator.trigger('layout:adjustHeight');
                     }
 
                     if (!options.preventRemove && !widget.disposed) {
