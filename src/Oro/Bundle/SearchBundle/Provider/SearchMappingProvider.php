@@ -30,9 +30,9 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
     private $configuration;
 
     /**
-     * @param EventDispatcherInterface $dispatcher
+     * @param EventDispatcherInterface     $dispatcher
      * @param MappingConfigurationProvider $mappingConfigProvider
-     * @param Cache $cache
+     * @param Cache                        $cache
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
@@ -50,22 +50,12 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
     public function getMappingConfig()
     {
         if (null === $this->configuration) {
-            $cachedData = $this->cache->fetch(self::CACHE_KEY);
-            if (false !== $cachedData) {
-                list($timestamp, $config) = $cachedData;
-                if ($this->mappingConfigProvider->isCacheFresh($timestamp)) {
-                    $this->configuration = $config;
-                }
+            $config = $this->fetchMappingConfigFromCache();
+            if (null === $config) {
+                $config = $this->loadMappingConfig();
+                $this->saveMappingConfigToCache($config);
             }
-            if (null === $this->configuration) {
-                $event = new SearchMappingCollectEvent($this->mappingConfigProvider->getConfiguration());
-                $this->dispatcher->dispatch(SearchMappingCollectEvent::EVENT_NAME, $event);
-                $this->configuration = $event->getMappingConfig();
-                $this->cache->save(
-                    self::CACHE_KEY,
-                    [$this->mappingConfigProvider->getCacheTimestamp(), $this->configuration]
-                );
-            }
+            $this->configuration = $config;
         }
 
         return $this->configuration;
@@ -88,5 +78,49 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
         $this->configuration = null;
         $this->cache->delete(self::CACHE_KEY);
         $this->getMappingConfig();
+    }
+
+    /**
+     * @return array|null
+     */
+    private function fetchMappingConfigFromCache(): ?array
+    {
+        $config = null;
+        $cachedData = $this->cache->fetch(self::CACHE_KEY);
+        if (false !== $cachedData) {
+            if ($this->mappingConfigProvider->isCacheChangeable()) {
+                list($timestamp, $value) = $cachedData;
+                if ($this->mappingConfigProvider->isCacheFresh($timestamp)) {
+                    $config = $value;
+                }
+            } else {
+                $config = $cachedData;
+            }
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param array $config
+     */
+    private function saveMappingConfigToCache(array $config): void
+    {
+        $data = $config;
+        if ($this->mappingConfigProvider->isCacheChangeable()) {
+            $data = [$this->mappingConfigProvider->getCacheTimestamp(), $data];
+        }
+        $this->cache->save(self::CACHE_KEY, $data);
+    }
+
+    /**
+     * @return array
+     */
+    private function loadMappingConfig(): array
+    {
+        $event = new SearchMappingCollectEvent($this->mappingConfigProvider->getConfiguration());
+        $this->dispatcher->dispatch(SearchMappingCollectEvent::EVENT_NAME, $event);
+
+        return $event->getMappingConfig();
     }
 }

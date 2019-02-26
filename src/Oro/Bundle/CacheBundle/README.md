@@ -182,31 +182,68 @@ services:
             - { name: kernel.cache_warmer }
 ```
 
-If your Application cache depends on your configuration, use the `isCacheFresh($timestamp)` and `getCacheTimestamp()`
-methods of the configuration provider to check if the Application cache needs to be rebuilt.
+If your Application cache depends on your configuration, use `isCacheChangeable()`, `isCacheFresh($timestamp)`
+and `getCacheTimestamp()` methods of the configuration provider to check if the Application cache needs to be rebuilt.
 Here is an example how to use these methods:
 
 ```php
-    private function ensureDataLoaded()
+    private function ensureConfigLoaded()
     {
-        if (null !== $this->data) {
+        if (null !== $this->configuration) {
             return;
         }
 
+        $config = $this->fetchConfigFromCache();
+        if (null === $config) {
+            $config = $this->loadConfig();
+            $this->saveConfigToCache($config);
+        }
+        $this->configuration = $config;
+    }
+
+    /**
+     * @return array|null
+     */
+    private function fetchConfigFromCache(): ?array
+    {
+        $config = null;
         $cachedData = $this->cache->fetch(self::CACHE_KEY);
         if (false !== $cachedData) {
-            list($timestamp, $data) = $cachedData;
-            if ($this->configurationProvider->isCacheFresh($timestamp)) {
-                $this->data = $data;
+            if ($this->configProvider->isCacheChangeable()) {
+                list($timestamp, $value) = $cachedData;
+                if ($this->configProvider->isCacheFresh($timestamp)) {
+                    $config = $value;
+                }
+            } else {
+                $config = $cachedData;
             }
         }
-        if (null === $this->data) {
-            $this->data = $this->loadData();
-            $this->cache->save(
-                self::CACHE_KEY,
-                [$this->configurationProvider->getCacheTimestamp(), $this->data]
-            );
+
+        return $config;
+    }
+
+    /**
+     * @param array $config
+     */
+    private function saveConfigToCache(array $config): void
+    {
+        $data = $config;
+        if ($this->configProvider->isCacheChangeable()) {
+            $data = [$this->configProvider->getCacheTimestamp(), $data];
         }
+        $this->cache->save(self::CACHE_KEY, $data);
+    }
+
+    /**
+     * @return array
+     */
+    private function loadConfig(): array
+    {
+        $config = $this->configProvider->getConfiguration();
+
+        // add some additional processing of the configuration here
+
+        return $config;
     }
 ```
 

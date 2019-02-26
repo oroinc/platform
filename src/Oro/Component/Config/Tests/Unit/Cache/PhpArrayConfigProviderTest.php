@@ -5,6 +5,7 @@ namespace Oro\Component\Config\Tests\Unit\Cache;
 use Oro\Component\Config\ResourcesContainerInterface;
 use Oro\Component\Config\Tests\Unit\Fixtures\PhpArrayConfigProviderStub;
 use Oro\Component\Testing\TempDirExtension;
+use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
 class PhpArrayConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,18 +22,33 @@ class PhpArrayConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param mixed $config
+     * @param bool  $debug
      *
      * @return PhpArrayConfigProviderStub
      */
-    private function getProvider($config): PhpArrayConfigProviderStub
+    private function getProvider($config, $debug = false): PhpArrayConfigProviderStub
     {
         return new PhpArrayConfigProviderStub(
             $this->cacheFile,
-            false,
+            $debug,
             function (ResourcesContainerInterface $resourcesContainer) use ($config) {
                 return $config;
             }
         );
+    }
+
+    public function testIsCacheChangeableForProductionMode()
+    {
+        $provider = $this->getProvider(['test']);
+
+        self::assertFalse($provider->isCacheChangeable());
+    }
+
+    public function testIsCacheChangeableForDevelopmentMode()
+    {
+        $provider = $this->getProvider(['test'], true);
+
+        self::assertTrue($provider->isCacheChangeable());
     }
 
     public function testIsCacheFreshWhenNoCachedData()
@@ -119,6 +135,37 @@ class PhpArrayConfigProviderTest extends \PHPUnit\Framework\TestCase
 
         $provider->ensureCacheWarmedUp();
         self::assertEquals($cachedConfig, $provider->getConfig());
+    }
+
+    public function testEnsureCacheWarmedUpWhenCachedDataExistForDevelopmentModeWhenCacheIsFresh()
+    {
+        $cachedConfig = ['test'];
+        $initialConfig = ['initial'];
+
+        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export($cachedConfig, true)));
+        $resource = new ResourceStub();
+        file_put_contents($this->cacheFile . '.meta', serialize([$resource]));
+
+        $provider = $this->getProvider($initialConfig, true);
+
+        $provider->ensureCacheWarmedUp();
+        self::assertEquals($cachedConfig, $provider->getConfig());
+    }
+
+    public function testEnsureCacheWarmedUpWhenCachedDataExistForDevelopmentModeWhenCacheIsDirty()
+    {
+        $cachedConfig = ['test'];
+        $initialConfig = ['initial'];
+
+        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export($cachedConfig, true)));
+        $resource = new ResourceStub();
+        $resource->setFresh(false);
+        file_put_contents($this->cacheFile . '.meta', serialize([$resource]));
+
+        $provider = $this->getProvider($initialConfig, true);
+
+        $provider->ensureCacheWarmedUp();
+        self::assertEquals($initialConfig, $provider->getConfig());
     }
 
     public function testInvalidInitialConfig()
