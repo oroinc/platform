@@ -20,7 +20,7 @@ $dialog-titlebar-inner-offset: side-values(10px 18px 10px 18px) !default;
 $dialog-titlebar-width: 100% !default;
 $dialog-titlebar-cursor: move !default;
 $dialog-titlebar-start: 1px !default;
-$dialog-titlebar-top: 1px !default;
+$dialog-titlebar-top: 0 !default;
 $dialog-titlebar-flex-shrink: 0 !default;
 $dialog-titlebar-falign-items: center !default;
 $dialog-titlebar-display: flex !default;
@@ -43,7 +43,7 @@ $dialog-minimized-outer-offset: 0 4px !default;
 $dialog-minimized-box-shadow: none !default;
 
 $dialog-minimized-titlebar-inner-offset: side-values(3px 11px 3px 12px) !default;
-$dialog-minimized-titlebar-outer-bottom-offset: -2px !default;
+$dialog-minimized-titlebar-outer-bottom-offset: 0 !default;
 
 $dialog-title-font-weight: bold !default;
 $dialog-title-display: block !default;
