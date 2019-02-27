@@ -23,7 +23,7 @@ parameters:
     search_engine_name: orm
     search_engine_host: 127.0.0.1
     search_engine_port: null
-    search_engine_index_name: oro_search
+    search_engine_index_prefix: oro_search
     search_engine_username: null
     search_engine_password: null
     search_engine_ssl_verification: null
@@ -31,7 +31,7 @@ parameters:
     search_engine_ssl_cert_password: null
     search_engine_ssl_key: null
     search_engine_ssl_key_password: null
-    website_search_engine_index_name: oro_website_search
+    website_search_engine_index_prefix: oro_website_search
     web_backend_prefix: /admin
     session_handler: null
     locale: en
