@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
+use Oro\Bundle\ApiBundle\Provider\ResourcesCacheAccessor;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
@@ -19,7 +20,9 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
     {
         $this->cache = $this->createMock(CacheProvider::class);
 
-        $this->resourcesCache = new ResourcesCache($this->cache);
+        $this->resourcesCache = new ResourcesCache(
+            new ResourcesCacheAccessor($this->cache)
+        );
     }
 
     public function testGetAccessibleResourcesNoCache()

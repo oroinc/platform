@@ -11,7 +11,10 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * The base class for configuration that should be stored in a PHP file.
  */
-abstract class PhpConfigProvider implements WarmableConfigCacheInterface, ClearableConfigCacheInterface
+abstract class PhpConfigProvider implements
+    ConfigCacheStateInterface,
+    WarmableConfigCacheInterface,
+    ClearableConfigCacheInterface
 {
     /** @var string */
     private $cacheFile;
@@ -47,9 +50,7 @@ abstract class PhpConfigProvider implements WarmableConfigCacheInterface, Cleara
     }
 
     /**
-     * Indicates whether the configuration cache can be changed during the application lifetime.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isCacheChangeable(): bool
     {
@@ -57,11 +58,7 @@ abstract class PhpConfigProvider implements WarmableConfigCacheInterface, Cleara
     }
 
     /**
-     * Checks if the configuration cache has not been changed since the given timestamp.
-     *
-     * @param int $timestamp The time to compare with the last time the cache was built
-     *
-     * @return bool TRUE if the the cache has not been changed; otherwise, FALSE
+     * {@inheritdoc}
      */
     public function isCacheFresh(int $timestamp): bool
     {
@@ -69,13 +66,12 @@ abstract class PhpConfigProvider implements WarmableConfigCacheInterface, Cleara
 
         return
             null !== $cacheTimestamp
-            && $cacheTimestamp <= $timestamp;
+            && $cacheTimestamp <= $timestamp
+            && $this->getConfigCache()->isFresh();
     }
 
     /**
-     * Gets timestamp when the configuration cache has been built.
-     *
-     * @return int|null The last time the cache was built or NULL if the cache is not built yet
+     * {@inheritdoc}
      */
     public function getCacheTimestamp(): ?int
     {

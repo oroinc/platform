@@ -7,7 +7,7 @@ use Oro\Component\Config\Tests\Unit\Fixtures\PhpArrayConfigProviderStub;
 use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
-class PhpArrayConfigProviderTest extends \PHPUnit\Framework\TestCase
+class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
@@ -16,7 +16,7 @@ class PhpArrayConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->cacheFile = $this->getTempFile('PhpConfigCacheAccessor');
+        $this->cacheFile = $this->getTempFile('PhpConfigProvider');
         self::assertFileNotExists($this->cacheFile);
     }
 
@@ -71,6 +71,51 @@ class PhpArrayConfigProviderTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($provider->isCacheFresh($cacheTimestamp));
         self::assertTrue($provider->isCacheFresh($cacheTimestamp + 1));
         self::assertFalse($provider->isCacheFresh($cacheTimestamp - 1));
+    }
+
+    public function testIsCacheFreshWhenCachedDataExistForDevelopmentModeWhenCacheIsFresh()
+    {
+        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
+        $resource = new ResourceStub();
+        file_put_contents($this->cacheFile . '.meta', serialize([$resource]));
+
+        $provider = $this->getProvider(['initial'], true);
+
+        $cacheTimestamp = filemtime($this->cacheFile);
+        self::assertTrue($provider->isCacheFresh($cacheTimestamp));
+        self::assertTrue($provider->isCacheFresh($cacheTimestamp + 1));
+        self::assertFalse($provider->isCacheFresh($cacheTimestamp - 1));
+    }
+
+    public function testIsCacheFreshWhenCachedDataExistForDevelopmentModeWhenCacheIsDirty()
+    {
+        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
+        $resource = new ResourceStub();
+        $resource->setFresh(false);
+        file_put_contents($this->cacheFile . '.meta', serialize([$resource]));
+
+        $provider = $this->getProvider(['initial'], true);
+
+        $cacheTimestamp = filemtime($this->cacheFile);
+        self::assertFalse($provider->isCacheFresh($cacheTimestamp));
+        self::assertFalse($provider->isCacheFresh($cacheTimestamp + 1));
+        self::assertFalse($provider->isCacheFresh($cacheTimestamp - 1));
+    }
+
+    public function testGetCacheTimestampWhenNoCachedData()
+    {
+        $provider = $this->getProvider(['initial']);
+
+        self::assertNull($provider->getCacheTimestamp());
+    }
+
+    public function testGetCacheTimestampWhenCachedDataExist()
+    {
+        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
+
+        $provider = $this->getProvider(['initial']);
+
+        self::assertEquals(filemtime($this->cacheFile), $provider->getCacheTimestamp());
     }
 
     public function testGetConfigWhenNoCachedData()

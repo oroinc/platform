@@ -45,10 +45,20 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
      */
     private static function assertServiceExists(ContainerBuilder $container, $serviceId)
     {
-        self::assertNotNull(
-            $container->getDefinition($serviceId),
-            sprintf('Expected "%s" service', $serviceId)
-        );
+        if (!$container->hasDefinition($serviceId)) {
+            self::fail(sprintf('Service "%s" should be defined', $serviceId));
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string           $serviceId
+     */
+    private static function assertServiceNotExists(ContainerBuilder $container, $serviceId)
+    {
+        if ($container->hasDefinition($serviceId)) {
+            self::fail(sprintf('Service "%s" should not be defined', $serviceId));
+        }
     }
 
     /**
@@ -63,17 +73,52 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         return $configExtensionRegistry;
     }
 
-    public function testLoadApiConfiguration()
+    /**
+     * @param bool $devMode
+     *
+     * @return ContainerBuilder
+     */
+    private function getContainer(bool $devMode = false)
     {
         $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.environment', 'prod');
+        $container->setParameter('kernel.debug', $devMode);
+        $container->setParameter('kernel.environment', $devMode ? 'dev' : 'prod');
+        $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
+
+        return $container;
+    }
+
+    /**
+     * @return array
+     */
+    public static function environmentDataProvider()
+    {
+        return [
+            'prod mode' => [false],
+            'dev mode'  => [true]
+        ];
+    }
+
+    /**
+     * @dataProvider environmentDataProvider
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testLoadApiConfiguration(bool $devMode)
+    {
+        $container = $this->getContainer($devMode);
         $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
 
         $extension = new OroApiExtension();
         $extension->load([], $container);
 
         self::assertServiceExists($container, 'oro_api.config_bag_registry');
+        if ($devMode) {
+            self::assertServiceExists($container, 'oro_api.config_cache_state_registry');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.default');
+        } else {
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state_registry');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.default');
+        }
         self::assertServiceExists($container, 'oro_api.entity_exclusion_provider_registry');
         self::assertServiceExists($container, 'oro_api.entity_alias_resolver_registry');
         self::assertServiceExists($container, 'oro_api.entity_override_provider_registry');
@@ -93,6 +138,14 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             ],
             $container->getDefinition('oro_api.config_bag_registry')->getArgument(0)
         );
+        if ($devMode) {
+            self::assertEquals(
+                [
+                    [new Reference('oro_api.config_cache_state.default'), '']
+                ],
+                $container->getDefinition('oro_api.config_cache_state_registry')->getArgument(0)
+            );
+        }
         self::assertEquals(
             [
                 ['oro_api.chain_entity_exclusion_provider.default', '']
@@ -103,6 +156,17 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             ['api.yml'],
             $container->getDefinition('oro_api.entity_alias_resolver.default')->getArgument(4)
         );
+        if ($devMode) {
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.default')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.default')->getMethodCalls()
+            );
+        } else {
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.default')->getMethodCalls()
+            );
+        }
         self::assertEquals(
             [
                 ['oro_api.entity_alias_resolver.default', '']
@@ -114,6 +178,16 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.entity_override_provider.default', '']
             ],
             $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument(0)
+        );
+
+        self::assertEquals(
+            [
+                'default',
+                '%kernel.debug%',
+                new Reference('oro_api.config_cache_factory'),
+                new Reference('oro_api.config_cache_warmer')
+            ],
+            $container->getDefinition('oro_api.config_cache.default')->getArguments()
         );
 
         self::assertEquals(
@@ -157,13 +231,12 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @dataProvider environmentDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testLoadApiConfigurationWithSeveralTypesOfConfigFilesInAdditionalToDefaultConfigFile()
+    public function testLoadApiConfigurationWithSeveralTypesOfConfigFilesInAdditionalToDefaultConfigFile(bool $devMode)
     {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.environment', 'prod');
+        $container = $this->getContainer($devMode);
         $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
 
         $config1 = [
@@ -187,6 +260,17 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load([$config1, $config2], $container);
 
         self::assertServiceExists($container, 'oro_api.config_bag_registry');
+        if ($devMode) {
+            self::assertServiceExists($container, 'oro_api.config_cache_state_registry');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.default');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.first');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.second');
+        } else {
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state_registry');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.default');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.first');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.second');
+        }
         self::assertServiceExists($container, 'oro_api.entity_exclusion_provider_registry');
         self::assertServiceExists($container, 'oro_api.entity_alias_resolver_registry');
         self::assertServiceExists($container, 'oro_api.entity_override_provider_registry');
@@ -226,6 +310,16 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             ],
             $container->getDefinition('oro_api.config_bag_registry')->getArgument(0)
         );
+        if ($devMode) {
+            self::assertEquals(
+                [
+                    [new Reference('oro_api.config_cache_state.first'), 'first'],
+                    [new Reference('oro_api.config_cache_state.second'), 'second'],
+                    [new Reference('oro_api.config_cache_state.default'), '']
+                ],
+                $container->getDefinition('oro_api.config_cache_state_registry')->getArgument(0)
+            );
+        }
         self::assertEquals(
             [
                 ['oro_api.chain_entity_exclusion_provider.first', 'first'],
@@ -246,6 +340,33 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             ['api.yml'],
             $container->getDefinition('oro_api.entity_alias_resolver.default')->getArgument(4)
         );
+        if ($devMode) {
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.first')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.first')->getMethodCalls()
+            );
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.second')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.second')->getMethodCalls()
+            );
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.default')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.default')->getMethodCalls()
+            );
+        } else {
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.first')->getMethodCalls()
+            );
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.second')->getMethodCalls()
+            );
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.default')->getMethodCalls()
+            );
+        }
         self::assertEquals(
             [
                 ['oro_api.entity_alias_resolver.first', 'first'],
@@ -261,6 +382,34 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.entity_override_provider.default', '']
             ],
             $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument(0)
+        );
+
+        self::assertEquals(
+            [
+                'default',
+                '%kernel.debug%',
+                new Reference('oro_api.config_cache_factory'),
+                new Reference('oro_api.config_cache_warmer')
+            ],
+            $container->getDefinition('oro_api.config_cache.default')->getArguments()
+        );
+        self::assertEquals(
+            [
+                'first',
+                '%kernel.debug%',
+                new Reference('oro_api.config_cache_factory'),
+                new Reference('oro_api.config_cache_warmer')
+            ],
+            $container->getDefinition('oro_api.config_cache.first')->getArguments()
+        );
+        self::assertEquals(
+            [
+                'second',
+                '%kernel.debug%',
+                new Reference('oro_api.config_cache_factory'),
+                new Reference('oro_api.config_cache_warmer')
+            ],
+            $container->getDefinition('oro_api.config_cache.second')->getArguments()
         );
 
         self::assertEquals(
@@ -377,11 +526,13 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadApiConfigurationShouldBeSortedByRequestType()
+    /**
+     * @dataProvider environmentDataProvider
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testLoadApiConfigurationShouldBeSortedByRequestType(bool $devMode)
     {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.environment', 'prod');
+        $container = $this->getContainer($devMode);
         $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
 
         $config = [
@@ -408,6 +559,19 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load([$config], $container);
 
         self::assertServiceExists($container, 'oro_api.config_bag_registry');
+        if ($devMode) {
+            self::assertServiceExists($container, 'oro_api.config_cache_state_registry');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.default');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.test');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.another');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.several_request_types');
+        } else {
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state_registry');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.default');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.test');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.another');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.several_request_types');
+        }
         self::assertServiceExists($container, 'oro_api.entity_exclusion_provider_registry');
         self::assertServiceExists($container, 'oro_api.entity_alias_resolver_registry');
         self::assertServiceExists($container, 'oro_api.entity_override_provider_registry');
@@ -421,6 +585,17 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             ],
             $container->getDefinition('oro_api.config_bag_registry')->getArgument(0)
         );
+        if ($devMode) {
+            self::assertEquals(
+                [
+                    [new Reference('oro_api.config_cache_state.several_request_types'), 'test1&test2'],
+                    [new Reference('oro_api.config_cache_state.test'), 'test'],
+                    [new Reference('oro_api.config_cache_state.another'), 'another'],
+                    [new Reference('oro_api.config_cache_state.default'), '']
+                ],
+                $container->getDefinition('oro_api.config_cache_state_registry')->getArgument(0)
+            );
+        }
         self::assertEquals(
             [
                 ['oro_api.chain_entity_exclusion_provider.several_request_types', 'test1&test2'],
@@ -446,6 +621,41 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             ['api.yml'],
             $container->getDefinition('oro_api.entity_alias_resolver.default')->getArgument(4)
         );
+        if ($devMode) {
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.several_request_types')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.several_request_types')->getMethodCalls()
+            );
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.test')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.test')->getMethodCalls()
+            );
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.another')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.another')->getMethodCalls()
+            );
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.default')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.default')->getMethodCalls()
+            );
+        } else {
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.several_request_types')->getMethodCalls()
+            );
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.test')->getMethodCalls()
+            );
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.another')->getMethodCalls()
+            );
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.default')->getMethodCalls()
+            );
+        }
         self::assertEquals(
             [
                 ['oro_api.entity_alias_resolver.several_request_types', 'test1&test2'],
@@ -467,13 +677,12 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @dataProvider environmentDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testLoadApiConfigurationForConfigWithSeveralConfigFiles()
+    public function testLoadApiConfigurationForConfigWithSeveralConfigFiles(bool $devMode)
     {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.environment', 'prod');
+        $container = $this->getContainer($devMode);
         $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
 
         $config1 = [
@@ -497,6 +706,17 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load([$config1, $config2], $container);
 
         self::assertServiceExists($container, 'oro_api.config_bag_registry');
+        if ($devMode) {
+            self::assertServiceExists($container, 'oro_api.config_cache_state_registry');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.default');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.first');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.second');
+        } else {
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state_registry');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.default');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.first');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.second');
+        }
         self::assertServiceExists($container, 'oro_api.entity_exclusion_provider_registry');
         self::assertServiceExists($container, 'oro_api.entity_alias_resolver_registry');
         self::assertServiceExists($container, 'oro_api.entity_override_provider_registry');
@@ -537,6 +757,16 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             ],
             $container->getDefinition('oro_api.config_bag_registry')->getArgument(0)
         );
+        if ($devMode) {
+            self::assertEquals(
+                [
+                    [new Reference('oro_api.config_cache_state.first'), 'first'],
+                    [new Reference('oro_api.config_cache_state.second'), 'second'],
+                    [new Reference('oro_api.config_cache_state.default'), '']
+                ],
+                $container->getDefinition('oro_api.config_cache_state_registry')->getArgument(0)
+            );
+        }
         self::assertEquals(
             [
                 ['oro_api.chain_entity_exclusion_provider.first', 'first'],
@@ -557,6 +787,33 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             ['api.yml'],
             $container->getDefinition('oro_api.entity_alias_resolver.default')->getArgument(4)
         );
+        if ($devMode) {
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.first')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.first')->getMethodCalls()
+            );
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.second')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.second')->getMethodCalls()
+            );
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.default')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.default')->getMethodCalls()
+            );
+        } else {
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.first')->getMethodCalls()
+            );
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.second')->getMethodCalls()
+            );
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.default')->getMethodCalls()
+            );
+        }
         self::assertEquals(
             [
                 ['oro_api.entity_alias_resolver.first', 'first'],
@@ -572,6 +829,34 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.entity_override_provider.default', '']
             ],
             $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument(0)
+        );
+
+        self::assertEquals(
+            [
+                'default',
+                '%kernel.debug%',
+                new Reference('oro_api.config_cache_factory'),
+                new Reference('oro_api.config_cache_warmer')
+            ],
+            $container->getDefinition('oro_api.config_cache.default')->getArguments()
+        );
+        self::assertEquals(
+            [
+                'first',
+                '%kernel.debug%',
+                new Reference('oro_api.config_cache_factory'),
+                new Reference('oro_api.config_cache_warmer')
+            ],
+            $container->getDefinition('oro_api.config_cache.first')->getArguments()
+        );
+        self::assertEquals(
+            [
+                'second',
+                '%kernel.debug%',
+                new Reference('oro_api.config_cache_factory'),
+                new Reference('oro_api.config_cache_warmer')
+            ],
+            $container->getDefinition('oro_api.config_cache.second')->getArguments()
         );
 
         self::assertEquals(
@@ -711,10 +996,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreEnd
     public function testLoadApiConfigurationShouldThrowExceptionIfExistSeveralConfigurationsWithSameRequestType()
     {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.environment', 'prod');
-        $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
+        $container = $this->getContainer();
 
         $config = [
             'config_files' => [
@@ -741,10 +1023,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreEnd
     public function testLoadApiConfigurationShouldThrowExceptionIfExistConfigurationsWithSameRequestTypeAsDefaultOne()
     {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.environment', 'prod');
-        $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
+        $container = $this->getContainer();
 
         $config = [
             'config_files' => [
@@ -765,10 +1044,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testRegisterConfigParameters()
     {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.environment', 'prod');
-        $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
+        $container = $this->getContainer();
 
         $config = [
             'config_max_nesting_level' => 2,
@@ -842,10 +1118,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testConfigurationForEmptyCors()
     {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.environment', false);
-        $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
+        $container = $this->getContainer();
 
         $config = [];
 
@@ -880,10 +1153,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testConfigurationForCors()
     {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.environment', false);
-        $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
+        $container = $this->getContainer();
 
         $config = [
             'cors' => [
@@ -926,10 +1196,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testConfigurationForApiDocViews()
     {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-        $container->setParameter('kernel.environment', false);
-        $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
+        $container = $this->getContainer();
 
         $config = [
             'documentation_path' => 'http://test.com/default_api_docs',

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection;
 use Oro\Bundle\ApiBundle\Provider\CombinedConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigCache;
+use Oro\Bundle\ApiBundle\Provider\ConfigCacheStateRegistry;
 use Oro\Bundle\ApiBundle\Provider\ConfigExclusionProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasProvider;
@@ -13,6 +14,7 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProvider;
 use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass as CacheConfiguration;
 use Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider;
+use Oro\Component\Config\Cache\ChainConfigCacheState;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -29,6 +31,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class ConfigurationLoader
 {
     private const CONFIG_BAG_REGISTRY_SERVICE_ID                = 'oro_api.config_bag_registry';
+    private const CONFIG_CACHE_STATE_REGISTRY_SERVICE_ID        = 'oro_api.config_cache_state_registry';
     private const ENTITY_ALIAS_RESOLVER_REGISTRY_SERVICE_ID     = 'oro_api.entity_alias_resolver_registry';
     private const ENTITY_EXCLUSION_PROVIDER_REGISTRY_SERVICE_ID = 'oro_api.entity_exclusion_provider_registry';
     private const SHARED_ENTITY_EXCLUSION_PROVIDER_SERVICE_ID   = 'oro_api.entity_exclusion_provider.shared';
@@ -50,16 +53,25 @@ class ConfigurationLoader
      */
     public function load(array $config)
     {
+        if ($this->container->getParameter('kernel.debug')) {
+            $this->container
+                ->register(self::CONFIG_CACHE_STATE_REGISTRY_SERVICE_ID, ConfigCacheStateRegistry::class)
+                ->setPublic(false)
+                ->setArguments([[], new Reference('oro_api.request_expression_matcher')]);
+        }
+
         $configBagsConfig = [];
         $exclusionProvidersConfig = [];
         $entityAliasResolversConfig = [];
         $entityOverrideProvidersConfig = [];
+        $configCacheStatesConfig = [];
         foreach ($config['config_files'] as $configKey => $fileConfig) {
             list(
                 $configBagServiceId,
                 $entityAliasResolverServiceId,
                 $exclusionProviderServiceId,
-                $entityOverrideProviderServiceId
+                $entityOverrideProviderServiceId,
+                $configCacheStateServiceId
                 ) = $this->configureApi($configKey, $fileConfig['file_name']);
             $requestTypeExpression = $this->getRequestTypeExpression($fileConfig);
 
@@ -67,6 +79,9 @@ class ConfigurationLoader
             $entityAliasResolversConfig[] = [$entityAliasResolverServiceId, $requestTypeExpression];
             $exclusionProvidersConfig[] = [$exclusionProviderServiceId, $requestTypeExpression];
             $entityOverrideProvidersConfig[] = [$entityOverrideProviderServiceId, $requestTypeExpression];
+            if ($configCacheStateServiceId) {
+                $configCacheStatesConfig[] = [new Reference($configCacheStateServiceId), $requestTypeExpression];
+            }
         }
         $this->container->getDefinition(self::CONFIG_BAG_REGISTRY_SERVICE_ID)
             ->replaceArgument(0, $this->sortByRequestTypeExpression($configBagsConfig));
@@ -76,6 +91,15 @@ class ConfigurationLoader
             ->replaceArgument(0, $this->sortByRequestTypeExpression($exclusionProvidersConfig));
         $this->container->getDefinition(self::ENTITY_OVERRIDE_PROVIDER_REGISTRY_SERVICE_ID)
             ->replaceArgument(0, $this->sortByRequestTypeExpression($entityOverrideProvidersConfig));
+        if ($this->container->hasDefinition(self::CONFIG_CACHE_STATE_REGISTRY_SERVICE_ID)) {
+            $this->container->getDefinition(self::CONFIG_CACHE_STATE_REGISTRY_SERVICE_ID)
+                ->replaceArgument(0, $this->sortByRequestTypeExpression($configCacheStatesConfig));
+            $this->container->getDefinition('oro_api.resources_cache_accessor')
+                ->addMethodCall(
+                    'setConfigCacheStateRegistry',
+                    [new Reference(self::CONFIG_CACHE_STATE_REGISTRY_SERVICE_ID)]
+                );
+        }
     }
 
     /**
@@ -98,7 +122,7 @@ class ConfigurationLoader
      * @param string[] $fileNames
      *
      * @return string[] [config bag service id, entity alias resolver service id, exclusion provider service id,
-     *                  entity override provider service id]
+     *                  entity override provider service id, config cache state service id]
      */
     private function configureApi(string $configKey, array $fileNames): array
     {
@@ -112,11 +136,12 @@ class ConfigurationLoader
      * @param string $fileName
      *
      * @return string[] [config bag service id, entity alias resolver service id, exclusion provider service id,
-     *                  entity override provider service id]
+     *                  entity override provider service id, config cache state service id]
      */
     private function configureSingleFileApi(string $configKey, string $fileName): array
     {
         $configCacheServiceId = $this->configureConfigCache($configKey);
+        $configCacheStateServiceId = $this->configureConfigCacheState($configKey, $configCacheServiceId);
         $configBagServiceId = $this->configureConfigBag(
             $configKey,
             $fileName,
@@ -130,7 +155,8 @@ class ConfigurationLoader
             $configKey,
             $configCacheServiceId,
             $entityOverrideProviderServiceId,
-            [$fileName]
+            [$fileName],
+            $configCacheStateServiceId
         );
         $exclusionProviderServiceId = $this->configureExclusionProvider(
             $configKey,
@@ -142,7 +168,8 @@ class ConfigurationLoader
             $configBagServiceId,
             $entityAliasResolverServiceId,
             $exclusionProviderServiceId,
-            $entityOverrideProviderServiceId
+            $entityOverrideProviderServiceId,
+            $configCacheStateServiceId
         ];
     }
 
@@ -151,11 +178,12 @@ class ConfigurationLoader
      * @param string[] $fileNames
      *
      * @return string[] [config bag service id, entity alias resolver service id, exclusion provider service id,
-     *                  entity override provider service id]
+     *                  entity override provider service id, config cache state service id]
      */
     private function configureMultiFileApi(string $configKey, array $fileNames): array
     {
         $configCacheServiceId = $this->configureConfigCache($configKey);
+        $configCacheStateServiceId = $this->configureConfigCacheState($configKey, $configCacheServiceId);
 
         $allConfigBags = [];
         foreach ($fileNames as $key => $fileName) {
@@ -180,7 +208,8 @@ class ConfigurationLoader
             $configKey,
             $configCacheServiceId,
             $entityOverrideProviderServiceId,
-            $fileNames
+            $fileNames,
+            $configCacheStateServiceId
         );
         $exclusionProviderServiceId = $this->configureExclusionProvider(
             $configKey,
@@ -192,7 +221,8 @@ class ConfigurationLoader
             $configBagServiceId,
             $entityAliasResolverServiceId,
             $exclusionProviderServiceId,
-            $entityOverrideProviderServiceId
+            $entityOverrideProviderServiceId,
+            $configCacheStateServiceId
         ];
     }
 
@@ -208,12 +238,39 @@ class ConfigurationLoader
             ->register($configCacheServiceId, ConfigCache::class)
             ->setArguments([
                 $configKey,
+                '%kernel.debug%',
                 new Reference('oro_api.config_cache_factory'),
                 new Reference('oro_api.config_cache_warmer')
             ])
             ->setPublic(true);
 
         return $configCacheServiceId;
+    }
+
+    /**
+     * @param string $configKey
+     * @param string $configCacheServiceId
+     *
+     * @return string|null config cache state service id
+     */
+    private function configureConfigCacheState(string $configKey, string $configCacheServiceId): ?string
+    {
+        if (!$this->container->hasDefinition(self::CONFIG_CACHE_STATE_REGISTRY_SERVICE_ID)) {
+            return null;
+        }
+
+        $configCacheStateServiceId = 'oro_api.config_cache_state.' . $configKey;
+        $this->container
+            ->register($configCacheStateServiceId, ChainConfigCacheState::class)
+            ->setArguments([
+                [
+                    new Reference($configCacheServiceId),
+                    new Reference('oro_entity.entity_alias_config_cache_state')
+                ]
+            ])
+            ->setPublic(false);
+
+        return $configCacheStateServiceId;
     }
 
     /**
@@ -256,10 +313,11 @@ class ConfigurationLoader
     }
 
     /**
-     * @param string   $configKey
-     * @param string   $configCacheServiceId
-     * @param string   $entityOverrideProviderServiceId
-     * @param string[] $configFiles
+     * @param string      $configKey
+     * @param string      $configCacheServiceId
+     * @param string      $entityOverrideProviderServiceId
+     * @param string[]    $configFiles
+     * @param string|null $configCacheStateServiceId
      *
      * @return string entity alias resolver service id
      */
@@ -267,7 +325,8 @@ class ConfigurationLoader
         string $configKey,
         string $configCacheServiceId,
         string $entityOverrideProviderServiceId,
-        array $configFiles
+        array $configFiles,
+        ?string $configCacheStateServiceId
     ): string {
         $cacheServiceId = 'oro_api.entity_alias_cache.' . $configKey;
         $this->container
@@ -290,7 +349,7 @@ class ConfigurationLoader
             ->addMethodCall('addEntityClassProvider', [new Reference($providerServiceId)]);
 
         $entityAliasResolverServiceId = 'oro_api.entity_alias_resolver.' . $configKey;
-        $this->container
+        $entityAliasResolverDef = $this->container
             ->register($entityAliasResolverServiceId, EntityAliasResolver::class)
             ->setArguments([
                 new Reference($loaderServiceId),
@@ -301,6 +360,12 @@ class ConfigurationLoader
             ])
             ->setPublic(true)
             ->addTag('monolog.logger', ['channel' => 'api']);
+        if ($configCacheStateServiceId) {
+            $entityAliasResolverDef->addMethodCall(
+                'setConfigCacheState',
+                [new Reference($configCacheStateServiceId)]
+            );
+        }
 
         return $entityAliasResolverServiceId;
     }

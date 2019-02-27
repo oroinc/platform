@@ -5,10 +5,15 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 use Oro\Bundle\ApiBundle\Provider\ConfigCache;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheFactory;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer;
+use Oro\Component\Testing\TempDirExtension;
+use Symfony\Component\Config\ConfigCache as SymfonyConfigCache;
 use Symfony\Component\Config\ConfigCacheInterface;
+use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
 class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var string */
     private $configKey;
 
@@ -18,17 +23,23 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheWarmer */
     private $configCacheWarmer;
 
-    /** @var ConfigCache */
-    private $configCache;
-
     protected function setUp()
     {
         $this->configKey = 'test';
         $this->configCacheFactory = $this->createMock(ConfigCacheFactory::class);
         $this->configCacheWarmer = $this->createMock(ConfigCacheWarmer::class);
+    }
 
-        $this->configCache = new ConfigCache(
+    /**
+     * @param bool $debug
+     *
+     * @return ConfigCache
+     */
+    public function getConfigCache(bool $debug = false): ConfigCache
+    {
+        return new ConfigCache(
             $this->configKey,
+            $debug,
             $this->configCacheFactory,
             $this->configCacheWarmer
         );
@@ -67,9 +78,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
             ->method('warmUp')
             ->with($this->configKey);
 
-        self::assertEquals($expectedConfig, $this->configCache->getConfig($configFile));
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedConfig, $configCache->getConfig($configFile));
         // test that data is cached in memory
-        self::assertEquals($expectedConfig, $this->configCache->getConfig($configFile));
+        self::assertEquals($expectedConfig, $configCache->getConfig($configFile));
     }
 
     public function testGetConfigWhenCacheIsFresh()
@@ -104,7 +117,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCacheWarmer->expects(self::never())
             ->method('warmUp');
 
-        self::assertEquals($expectedConfig, $this->configCache->getConfig($configFile));
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedConfig, $configCache->getConfig($configFile));
     }
 
     public function testGetConfigWhenCacheDataIsInvalid()
@@ -116,7 +131,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
-        $cache->expects(self::exactly(2))
+        $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
 
@@ -130,7 +145,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The "%s" must return an array.', $cachePath));
 
-        $this->configCache->getConfig($configFile);
+        $configCache = $this->getConfigCache();
+
+        $configCache->getConfig($configFile);
     }
 
     public function testGetConfigWhenCacheDoesNotHaveConfigForGivenConfigFile()
@@ -156,7 +173,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Unknown config "%s".', $configFile));
 
-        $this->configCache->getConfig($configFile);
+        $configCache = $this->getConfigCache();
+
+        $configCache->getConfig($configFile);
     }
 
     public function testGetAliases()
@@ -185,9 +204,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
             ->method('warmUp')
             ->with($this->configKey);
 
-        self::assertEquals($expectedAliases, $this->configCache->getAliases());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedAliases, $configCache->getAliases());
         // test that data is cached in memory
-        self::assertEquals($expectedAliases, $this->configCache->getAliases());
+        self::assertEquals($expectedAliases, $configCache->getAliases());
     }
 
     public function testGetAliasesWhenCacheIsFresh()
@@ -215,7 +236,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCacheWarmer->expects(self::never())
             ->method('warmUp');
 
-        self::assertEquals($expectedAliases, $this->configCache->getAliases());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedAliases, $configCache->getAliases());
     }
 
     public function testGetAliasesWhenCacheDataIsInvalid()
@@ -226,7 +249,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
-        $cache->expects(self::exactly(2))
+        $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
 
@@ -240,7 +263,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The "%s" must return an array.', $cachePath));
 
-        $this->configCache->getAliases();
+        $configCache = $this->getConfigCache();
+
+        $configCache->getAliases();
     }
 
     public function testGetExcludedEntities()
@@ -266,9 +291,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
             ->method('warmUp')
             ->with($this->configKey);
 
-        self::assertEquals($expectedExcludedEntities, $this->configCache->getExcludedEntities());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedExcludedEntities, $configCache->getExcludedEntities());
         // test that data is cached in memory
-        self::assertEquals($expectedExcludedEntities, $this->configCache->getExcludedEntities());
+        self::assertEquals($expectedExcludedEntities, $configCache->getExcludedEntities());
     }
 
     public function testGetExcludedEntitiesWhenCacheIsFresh()
@@ -293,7 +320,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCacheWarmer->expects(self::never())
             ->method('warmUp');
 
-        self::assertEquals($expectedExcludedEntities, $this->configCache->getExcludedEntities());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedExcludedEntities, $configCache->getExcludedEntities());
     }
 
     public function testGetExcludedEntitiesWhenCacheDataIsInvalid()
@@ -304,7 +333,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
-        $cache->expects(self::exactly(2))
+        $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
 
@@ -318,7 +347,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The "%s" must return an array.', $cachePath));
 
-        $this->configCache->getExcludedEntities();
+        $configCache = $this->getConfigCache();
+
+        $configCache->getExcludedEntities();
     }
 
     public function testGetSubstitutions()
@@ -345,9 +376,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
             ->method('warmUp')
             ->with($this->configKey);
 
-        self::assertEquals($expectedSubstitutions, $this->configCache->getSubstitutions());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedSubstitutions, $configCache->getSubstitutions());
         // test that data is cached in memory
-        self::assertEquals($expectedSubstitutions, $this->configCache->getSubstitutions());
+        self::assertEquals($expectedSubstitutions, $configCache->getSubstitutions());
     }
 
     public function testGetSubstitutionsWhenCacheIsFresh()
@@ -373,7 +406,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCacheWarmer->expects(self::never())
             ->method('warmUp');
 
-        self::assertEquals($expectedSubstitutions, $this->configCache->getSubstitutions());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedSubstitutions, $configCache->getSubstitutions());
     }
 
     public function testGetSubstitutionsWhenCacheDataIsInvalid()
@@ -384,7 +419,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
-        $cache->expects(self::exactly(2))
+        $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
 
@@ -398,7 +433,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The "%s" must return an array.', $cachePath));
 
-        $this->configCache->getSubstitutions();
+        $configCache = $this->getConfigCache();
+
+        $configCache->getSubstitutions();
     }
 
     public function testGetExclusions()
@@ -427,9 +464,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
             ->method('warmUp')
             ->with($this->configKey);
 
-        self::assertEquals($expectedExclusions, $this->configCache->getExclusions());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedExclusions, $configCache->getExclusions());
         // test that data is cached in memory
-        self::assertEquals($expectedExclusions, $this->configCache->getExclusions());
+        self::assertEquals($expectedExclusions, $configCache->getExclusions());
     }
 
     public function testGetExclusionsWhenCacheIsFresh()
@@ -457,7 +496,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCacheWarmer->expects(self::never())
             ->method('warmUp');
 
-        self::assertEquals($expectedExclusions, $this->configCache->getExclusions());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedExclusions, $configCache->getExclusions());
     }
 
     public function testGetExclusionsWhenCacheDataIsInvalid()
@@ -468,7 +509,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
-        $cache->expects(self::exactly(2))
+        $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
 
@@ -482,7 +523,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The "%s" must return an array.', $cachePath));
 
-        $this->configCache->getExclusions();
+        $configCache = $this->getConfigCache();
+
+        $configCache->getExclusions();
     }
 
     public function testGetInclusions()
@@ -511,9 +554,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
             ->method('warmUp')
             ->with($this->configKey);
 
-        self::assertEquals($expectedInclusions, $this->configCache->getInclusions());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedInclusions, $configCache->getInclusions());
         // test that data is cached in memory
-        self::assertEquals($expectedInclusions, $this->configCache->getInclusions());
+        self::assertEquals($expectedInclusions, $configCache->getInclusions());
     }
 
     public function testGetInclusionsWhenCacheIsFresh()
@@ -541,7 +586,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCacheWarmer->expects(self::never())
             ->method('warmUp');
 
-        self::assertEquals($expectedInclusions, $this->configCache->getInclusions());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedInclusions, $configCache->getInclusions());
     }
 
     public function testGetInclusionsWhenCacheDataIsInvalid()
@@ -552,7 +599,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
-        $cache->expects(self::exactly(2))
+        $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
 
@@ -566,6 +613,129 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The "%s" must return an array.', $cachePath));
 
-        $this->configCache->getInclusions();
+        $configCache = $this->getConfigCache();
+
+        $configCache->getInclusions();
+    }
+
+    public function testIsCacheChangeableForProductionMode()
+    {
+        $configCache = $this->getConfigCache();
+
+        self::assertFalse($configCache->isCacheChangeable());
+    }
+
+    public function testIsCacheChangeableForDevelopmentMode()
+    {
+        $configCache = $this->getConfigCache(true);
+
+        self::assertTrue($configCache->isCacheChangeable());
+    }
+
+    public function testIsCacheFreshWhenNoCachedData()
+    {
+        $cacheFile = $this->getTempFile('ApiConfigCache');
+
+        $this->configCacheFactory->expects(self::once())
+            ->method('getCache')
+            ->with($this->configKey)
+            ->willReturn(new SymfonyConfigCache($cacheFile, false));
+
+        $configCache = $this->getConfigCache();
+
+        $timestamp = time() - 1;
+        self::assertFalse($configCache->isCacheFresh($timestamp));
+    }
+
+    public function testIsCacheFreshWhenCachedDataExist()
+    {
+        $cacheFile = $this->getTempFile('ApiConfigCache');
+
+        file_put_contents($cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
+
+        $this->configCacheFactory->expects(self::once())
+            ->method('getCache')
+            ->with($this->configKey)
+            ->willReturn(new SymfonyConfigCache($cacheFile, false));
+
+        $configCache = $this->getConfigCache();
+
+        $cacheTimestamp = filemtime($cacheFile);
+        self::assertTrue($configCache->isCacheFresh($cacheTimestamp));
+        self::assertTrue($configCache->isCacheFresh($cacheTimestamp + 1));
+        self::assertFalse($configCache->isCacheFresh($cacheTimestamp - 1));
+    }
+
+    public function testIsCacheFreshWhenCachedDataExistForDevelopmentModeWhenCacheIsFresh()
+    {
+        $cacheFile = $this->getTempFile('ApiConfigCache');
+
+        file_put_contents($cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
+        $resource = new ResourceStub();
+        file_put_contents($cacheFile . '.meta', serialize([$resource]));
+
+        $this->configCacheFactory->expects(self::once())
+            ->method('getCache')
+            ->with($this->configKey)
+            ->willReturn(new SymfonyConfigCache($cacheFile, true));
+
+        $configCache = $this->getConfigCache();
+
+        $cacheTimestamp = filemtime($cacheFile);
+        self::assertTrue($configCache->isCacheFresh($cacheTimestamp));
+        self::assertTrue($configCache->isCacheFresh($cacheTimestamp + 1));
+        self::assertFalse($configCache->isCacheFresh($cacheTimestamp - 1));
+    }
+
+    public function testIsCacheFreshWhenCachedDataExistForDevelopmentModeWhenCacheIsDirty()
+    {
+        $cacheFile = $this->getTempFile('ApiConfigCache');
+
+        file_put_contents($cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
+        $resource = new ResourceStub();
+        $resource->setFresh(false);
+        file_put_contents($cacheFile . '.meta', serialize([$resource]));
+
+        $this->configCacheFactory->expects(self::once())
+            ->method('getCache')
+            ->with($this->configKey)
+            ->willReturn(new SymfonyConfigCache($cacheFile, true));
+
+        $configCache = $this->getConfigCache();
+
+        $cacheTimestamp = filemtime($cacheFile);
+        self::assertFalse($configCache->isCacheFresh($cacheTimestamp));
+        self::assertFalse($configCache->isCacheFresh($cacheTimestamp + 1));
+        self::assertFalse($configCache->isCacheFresh($cacheTimestamp - 1));
+    }
+
+    public function testGetCacheTimestampWhenNoCachedData()
+    {
+        $cacheFile = $this->getTempFile('ApiConfigCache');
+
+        $this->configCacheFactory->expects(self::once())
+            ->method('getCache')
+            ->with($this->configKey)
+            ->willReturn(new SymfonyConfigCache($cacheFile, false));
+
+        $configCache = $this->getConfigCache();
+
+        self::assertNull($configCache->getCacheTimestamp());
+    }
+
+    public function testGetCacheTimestampWhenCachedDataExist()
+    {
+        $cacheFile = $this->getTempFile('ApiConfigCache');
+
+        file_put_contents($cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
+
+        $this->configCacheFactory->expects(self::once())
+            ->method('getCache')
+            ->with($this->configKey)
+            ->willReturn(new SymfonyConfigCache($cacheFile, false));
+
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals(filemtime($cacheFile), $configCache->getCacheTimestamp());
     }
 }

@@ -42,10 +42,10 @@ class CombinedConfigBag implements ConfigBagInterface
     {
         $result = [];
         foreach ($this->configBags as $configBag) {
-            $result = array_merge($result, $configBag->getClassNames($version));
+            $result[] = $configBag->getClassNames($version);
         }
 
-        return array_unique($result);
+        return \array_unique(\array_merge(...$result));
     }
 
     /**
@@ -60,7 +60,7 @@ class CombinedConfigBag implements ConfigBagInterface
                 $configs[] = $config;
             }
         }
-        $count = count($configs);
+        $count = \count($configs);
         if (0 === $count) {
             return null;
         }
@@ -68,7 +68,7 @@ class CombinedConfigBag implements ConfigBagInterface
             return $configs[0];
         }
 
-        $index = count($configs) - 1;
+        $index = \count($configs) - 1;
         $result = $configs[$index];
         while ($index > 0) {
             $index--;
@@ -90,7 +90,7 @@ class CombinedConfigBag implements ConfigBagInterface
                 $configs[] = $config;
             }
         }
-        $count = count($configs);
+        $count = \count($configs);
         if (0 === $count) {
             return null;
         }
@@ -98,7 +98,7 @@ class CombinedConfigBag implements ConfigBagInterface
             return $configs[0];
         }
 
-        $index = count($configs) - 1;
+        $index = \count($configs) - 1;
         $result = $configs[$index];
         while ($index > 0) {
             $index--;
