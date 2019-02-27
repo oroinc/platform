@@ -156,6 +156,7 @@ DESCRIPTION
             $command .= ' --watch';
         }
         $command .= ' --env.symfony='.$input->getOption('env');
+        $command .= ' --colors';
 
 
         $process = $this->nodeProcessFactory->createProcess(
@@ -164,7 +165,6 @@ DESCRIPTION
             $this->buildTimeout
         );
         $output->writeln($process->getCommandLine());
-        $this->enableTty($process);
 
         if ($input->getOption('watch')) {
             $process->setTimeout(null);

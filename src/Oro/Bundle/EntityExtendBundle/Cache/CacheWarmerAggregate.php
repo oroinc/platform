@@ -9,7 +9,8 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate as CacheWarmer
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
- * @TODO CacheWarmerAggregate extends CacheWarmer only for compatibility with CacheWarmupCommand in Symfony 3.4
+ * This class provide possibility do only required warmups for commands
+ * CacheWarmerAggregate extends CacheWarmer only for compatibility with CacheWarmupCommand in Symfony 3.4
  */
 class CacheWarmerAggregate extends CacheWarmer implements CacheWarmerInterface
 {
@@ -64,6 +65,7 @@ class CacheWarmerAggregate extends CacheWarmer implements CacheWarmerInterface
         if (CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
             || CommandExecutor::isCurrentCommand('oro:install', true)
             || CommandExecutor::isCurrentCommand('oro:platform:upgrade20', true)
+            || CommandExecutor::isCurrentCommand('oro:assets:install', true)
         ) {
             $cacheWarmerLink = $this->extendCacheWarmerLink;
         }
