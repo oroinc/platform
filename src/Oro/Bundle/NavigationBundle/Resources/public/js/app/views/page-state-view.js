@@ -8,6 +8,7 @@ define(function(require) {
     var routing = require('routing');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
+    var tools = require('oroui/js/tools');
     var Modal = require('oroui/js/modal');
     var PageStateModel = require('oronavigation/js/app/models/page-state-model');
     var BaseView = require('oroui/js/app/views/base/view');
@@ -416,9 +417,7 @@ define(function(require) {
          * @protected
          */
         _combinePageId: function() {
-            var route;
-            route = this._parseCurrentURL();
-            return base64.encode(route.path);
+            return base64.encode(this._getCurrentURL());
         },
 
         /**
@@ -426,14 +425,11 @@ define(function(require) {
          * @returns {Object}
          * @protected
          */
-        _parseCurrentURL: function() {
-            var route = mediator.execute('currentUrl');
-            var _ref = route.split('?');
-            route = {
-                path: _ref[0],
-                query: _ref[1] || ''
-            };
-            return route;
+        _getCurrentURL: function() {
+            var url = mediator.execute('currentUrl');
+            url = mediator.execute('normalizeUrl', url);
+
+            return url;
         },
 
         /**
@@ -441,7 +437,11 @@ define(function(require) {
          * @protected
          */
         _isStateTraceRequired: function() {
-            return Boolean(this.collection.getCurrentModel());
+            var urlObj = document.createElement('a');
+            urlObj.href = this._getCurrentURL();
+            var queryObj = tools.unpackFromQueryString(urlObj.search);
+
+            return !!this.collection.getCurrentModel() && queryObj['restore'];
         },
 
         /**

@@ -13,7 +13,7 @@ class OroNavigationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_8';
+        return 'v1_9';
     }
 
     /**
@@ -99,6 +99,8 @@ class OroNavigationBundleInstaller implements Installation
         $table = $schema->createTable('oro_navigation_item_pinbar');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('item_id', 'integer', []);
+        $table->addColumn('title', 'string', ['length' => 255, 'notnull' => true]);
+        $table->addColumn('title_short', 'string', ['length' => 255, 'notnull' => true]);
         $table->addColumn('maximized', 'datetime', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['item_id'], 'UNIQ_54973433126F525E');

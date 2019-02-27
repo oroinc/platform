@@ -44,7 +44,9 @@ Feature: Create notification rule for entity with biderectional extend relation
     And click "Create Notification Rule"
     And fill form with:
       | Entity Name | Order                    |
+    And fill form with:
       | Event Name  | Entity create            |
+    And fill form with:
       | Template    | order_confirmation_email |
       | Groups      | Administrators           |
     When I save and close form

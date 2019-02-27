@@ -73,9 +73,14 @@ class Table extends Element
      */
     public function getRowByContentElement($content, $elementName)
     {
-        /** @var TableRow $row */
-        $row = $this->findElementContains($elementName, $content);
-        self::assertTrue($row->isIsset(), sprintf(static::ERROR_NO_ROW_CONTENT, $content));
+        /** @var TableRow|bool $row */
+        $row = $this->spin(function () use ($elementName, $content) {
+            $element = $this->findElementContains($elementName, $content);
+
+            return $element->isIsset() ? $element : false;
+        }, 2);
+
+        self::assertNotFalse($row, sprintf(static::ERROR_NO_ROW_CONTENT, $content));
         $row->setOwner($this);
 
         return $row;

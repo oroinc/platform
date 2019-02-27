@@ -307,7 +307,7 @@ define(function(require) {
                             this.selectDropdownOpened = false;
                         }
                     }, this),
-                    appendTo: this.$el,
+                    appendTo: this._appendToContainer(),
                     refreshNotOpened: this.templateTheme !== ''
                 }, this.widgetOptions),
                 contextSearch: this.contextSearch
@@ -338,11 +338,11 @@ define(function(require) {
         },
 
         /**
-         * Set container for dropdown
+         * Append multiselect widget to container
          * @return {jQuery}
          */
-        _setDropdownContainer: function() {
-            return this.dropdownContainer;
+        _appendToContainer: function() {
+            return this.$el;
         },
 
         /**

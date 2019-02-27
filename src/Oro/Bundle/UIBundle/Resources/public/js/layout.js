@@ -37,44 +37,10 @@ define(function(require) {
         minimalHeightForFullScreenLayout: 300,
 
         /**
-         * Keeps calculated devToolbarHeight. Please use getDevToolbarHeight() to retrieve it
-         */
-        devToolbarHeight: undefined,
-
-        /**
          * List of elements with disabled scroll. Used to reset theirs state
          * @private
          */
         _scrollDisabledElements: null,
-
-        /**
-         * @returns {number} development toolbar height in dev mode, 0 in production mode
-         */
-        getDevToolbarHeight: function() {
-            if (!mediator.execute('retrieveOption', 'debug')) {
-                return 0;
-            }
-            if (!this.devToolbarHeightListenersAttached) {
-                this.devToolbarHeightListenersAttached = true;
-                $(window).on('resize', function() {
-                    delete layout.devToolbarHeight;
-                });
-                mediator.on('debugToolbar:afterUpdateView', function() {
-                    delete layout.devToolbarHeight;
-                });
-            }
-            if (this.devToolbarHeight === void 0) {
-                var devToolbarComposition = mediator.execute('composer:retrieve', 'debugToolbar', true);
-                if (devToolbarComposition &&
-                    devToolbarComposition.view &&
-                    devToolbarComposition.view.$('.sf-toolbarreset').is(':visible')) {
-                    this.devToolbarHeight = devToolbarComposition.view.$('.sf-toolbarreset').outerHeight();
-                } else {
-                    this.devToolbarHeight = 0;
-                }
-            }
-            return this.devToolbarHeight;
-        },
 
         /**
          * Initializes form widgets, scrollspy, and triggers `initLayout` event

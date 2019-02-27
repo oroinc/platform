@@ -237,7 +237,7 @@ class ControllersResetTest extends WebTestCase
 
         // @codingStandardsIgnoreStart
         $errorDiv = $crawler->filterXPath(
-            "//*/form[contains(@class, 'form-reset')]/*/div[contains(@class, 'input-prepend')][2][contains(@class, 'error')]"
+            "//*/form[contains(@class, 'form-signin--reset')]/*/div[contains(@class, 'control-group')][2][contains(@class, 'error')]"
         );
         // @codingStandardsIgnoreEnd
 
@@ -297,7 +297,7 @@ class ControllersResetTest extends WebTestCase
 
         // @codingStandardsIgnoreStarts
         $errorDiv = $crawler->filterXPath(
-            "//*/form[contains(@class, 'form-reset')]/*/div[contains(@class, 'input-prepend')][2][contains(@class, 'error')]"
+            "//*/form[contains(@class, 'form-signin--reset')]/*/div[contains(@class, 'control-group')][2][contains(@class, 'error')]"
         );
         // @codingStandardsIgnoreEnd
 

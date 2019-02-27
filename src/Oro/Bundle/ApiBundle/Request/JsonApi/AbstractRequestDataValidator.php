@@ -57,6 +57,50 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
 
     /**
      * @param array  $data
+     * @param string $pointer
+     *
+     * @return bool
+     */
+    protected function validateResourceObjectStructure(array $data, string $pointer): bool
+    {
+        $isValid = true;
+
+        if (!\array_key_exists(0, $data)) {
+            $invalidProperties = \array_diff(\array_keys($data), $this->getResourceObjectProperties());
+            if (!empty($invalidProperties)) {
+                foreach ($invalidProperties as $invalidProperty) {
+                    $this->addError(
+                        $pointer,
+                        \sprintf('The \'%s\' property is not allowed for a resource object', $invalidProperty)
+                    );
+                }
+                $isValid = false;
+            }
+        }
+
+        return $isValid;
+    }
+
+    /**
+     * Returns allowed properties for a resource object.
+     * @link https://jsonapi.org/format/#document-resource-objects
+     *
+     * @return string[]
+     */
+    protected function getResourceObjectProperties(): array
+    {
+        return [
+            JsonApiDoc::TYPE,
+            JsonApiDoc::ID,
+            JsonApiDoc::META,
+            JsonApiDoc::ATTRIBUTES,
+            JsonApiDoc::RELATIONSHIPS,
+            JsonApiDoc::LINKS
+        ];
+    }
+
+    /**
+     * @param array  $data
      * @param string $rootSection
      *
      * @return bool
@@ -160,6 +204,7 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
             foreach ($data[JsonApiDoc::INCLUDED] as $key => $item) {
                 $pointer = $this->buildPointer($includedPointer, $key);
                 if (\is_array($item)) {
+                    $this->validateResourceObjectStructure($item, $pointer);
                     $this->validateTypeAndIdAreRequiredNotBlankString($item, $pointer);
                 } else {
                     $this->addError($pointer, 'The related resource should be an object');

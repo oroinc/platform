@@ -27,6 +27,53 @@ define(function(require) {
         },
 
         /**
+         * Pack object to string with query parameters sorted
+         *
+         * Object {foo: 'x', 'bar': 'y'} will be converted to string "foo=x&bar=y".
+         *
+         * @param {Object} object
+         * @return {String}
+         */
+        packToQuerySortedString: function(object) {
+            var self = this;
+            var result = [];
+            var add = function(key, value) {
+                result[result.length] = encodeURIComponent(key) + '=' +
+                    encodeURIComponent(value === null ? '' : value);
+            };
+
+            var buildParams = function(pref, obj) {
+                if (self.isArrayLikeObject(obj)) {
+                    obj = _.toArray(obj);
+                }
+
+                if (_.isArray(obj)) {
+                    obj.sort();
+                    _.each(obj, function(value, key) {
+                        buildParams(pref + '[' + (typeof value === 'object' ? key : '') + ']', value);
+                    });
+                } else if (typeof obj === 'object') {
+                    var keys = _.keys(obj);
+                    keys.sort();
+                    for (var i = 0; i < keys.length; i++) {
+                        var name = keys[i];
+                        buildParams(pref + '[' + name + ']', obj[name]);
+                    }
+                } else {
+                    add(pref, obj);
+                }
+            };
+
+            var keys = _.keys(object);
+            keys.sort();
+            for (var i = 0; i < keys.length; i++) {
+                var prefix = keys[i];
+                buildParams(prefix, object[prefix]);
+            }
+            return result.join('&');
+        },
+
+        /**
          * Unpack string to object. Reverse from packToQueryString.
          *
          * @param {String} query
@@ -322,6 +369,26 @@ define(function(require) {
          */
         ensureArray: function(value) {
             return _.isArray(value) ? value : [value];
+        },
+
+        /**
+         * Check is this object can be represented as an array
+         *
+         * @param {Object} object
+         * @returns {boolean}
+         */
+        isArrayLikeObject: function(object) {
+            if (typeof object !== 'object') {
+                return false;
+            }
+            var keys = _.keys(object);
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+                if (String(key) !== String(i)) {
+                    return false;
+                }
+            }
+            return true;
         },
 
         /**

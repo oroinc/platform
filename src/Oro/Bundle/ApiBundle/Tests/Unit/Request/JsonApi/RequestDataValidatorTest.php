@@ -242,6 +242,11 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
             [['data' => []], 'The primary data object should not be empty', '/data'],
             [['data' => ['test']], 'The \'type\' property is required', '/data/type'],
             [
+                ['data' => ['type' => 'products', 'included' => []]],
+                'The \'included\' property is not allowed for a resource object',
+                '/data'
+            ],
+            [
                 ['data' => ['id' => null, 'type' => 'products', 'attributes' => ['test' => null]]],
                 'The \'id\' property should not be null',
                 '/data/id'
@@ -404,6 +409,16 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
                 [
                     'data'     => ['type' => 'products'],
                     'included' => [
+                        ['type' => 'products', 'id' => '10', 'test' => '1']
+                    ]
+                ],
+                'The \'test\' property is not allowed for a resource object',
+                '/included/0'
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
                         'test'
                     ]
                 ],
@@ -543,7 +558,17 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
             [['data' => null], 'The primary data object collection should not be empty', '/data'],
             [['data' => []], 'The primary data object collection should not be empty', '/data'],
             [['data' => 'test'], 'The primary data object collection should be an array', '/data'],
-            [['data' => ['key' => 'value']], 'The primary data object collection should be an array', '/data'],
+            [
+                ['data' => ['key' => 'value']],
+                'The primary data object collection should be an array',
+                '/data'
+            ],
+            [
+                ['data' => [['type' => 'products', 'key' => 'value']]],
+                'The \'key\' property is not allowed for a resource object',
+                '/data/0'
+
+            ],
             [['data' => [null]], 'The primary resource object should be an object', '/data/0'],
             [['data' => ['test']], 'The primary resource object should be an object', '/data/0'],
             [['data' => [[]]], 'The \'type\' property is required', '/data/0/type'],
@@ -719,6 +744,16 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
                 ['data' => [['type' => 'products']], 'included' => []],
                 'The \'included\' property should not be empty',
                 '/included'
+            ],
+            [
+                [
+                    'data'     => [['type' => 'products']],
+                    'included' => [
+                        ['type' => 'products', 'id' => '10', 'test' => '1']
+                    ]
+                ],
+                'The \'test\' property is not allowed for a resource object',
+                '/included/0'
             ],
             [
                 [
