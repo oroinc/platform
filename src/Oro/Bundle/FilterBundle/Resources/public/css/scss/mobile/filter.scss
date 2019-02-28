@@ -292,11 +292,6 @@
         .reset-filter {
             position: absolute;
             #{$end}: $mobile-reset-filter-end;
-
-            [class^="fa-"],
-            [class*=" fa-"] {
-                margin-top: 4px;
-            }
         }
     }
 
