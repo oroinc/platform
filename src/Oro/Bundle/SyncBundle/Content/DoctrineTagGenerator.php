@@ -8,19 +8,28 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Generates tags for content.
+ */
 class DoctrineTagGenerator implements TagGeneratorInterface
 {
     /** @var ManagerRegistry */
     protected $doctrine;
 
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
+
     /**
      * @param ManagerRegistry $doctrine
+     * @param EntityClassResolver $entityClassResolver
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, EntityClassResolver $entityClassResolver)
     {
         $this->doctrine = $doctrine;
+        $this->entityClassResolver = $entityClassResolver;
     }
 
     /**
@@ -89,7 +98,7 @@ class DoctrineTagGenerator implements TagGeneratorInterface
                 }
             }
         } else {
-            $class = ClassUtils::getRealClass($data);
+            $class = $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($data));
         }
 
         if ($includeCollectionTag) {
