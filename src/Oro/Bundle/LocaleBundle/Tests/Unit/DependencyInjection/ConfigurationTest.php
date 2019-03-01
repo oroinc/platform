@@ -85,7 +85,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'name_format' => [],
                     'address_format' => [],
                     'locale_data' => [],
-                    'currency_data' => [],
                 ]
             ]
         ];

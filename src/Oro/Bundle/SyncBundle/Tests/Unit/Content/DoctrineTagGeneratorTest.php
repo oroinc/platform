@@ -3,10 +3,13 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\EntityStub;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\NewEntityStub;
@@ -14,6 +17,7 @@ use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\NewEntityStub;
 class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_ENTITY_NAME = 'Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\EntityStub';
+    const TEST_ENTITY_ALIAS = 'OroSyncBundle:EntityStub';
     const TEST_NEW_ENTITY_NAME = 'Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\NewEntityStub';
     const TEST_ASSOCIATION_FIELD = 'testField';
 
@@ -37,20 +41,32 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
             ->method('getUnitOfWork')
             ->will($this->returnValue($this->uow));
 
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine */
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->willReturnCallback(
                 function ($class) {
-                    return in_array($class, [self::TEST_ENTITY_NAME, self::TEST_NEW_ENTITY_NAME], true)
-                        ? $this->em
-                        : null;
+                    $allowedClassNames = [self::TEST_ENTITY_NAME, self::TEST_ENTITY_ALIAS, self::TEST_NEW_ENTITY_NAME];
+                    if (in_array($class, $allowedClassNames, true)) {
+                        return $this->em;
+                    }
+
+                    return null;
                 }
             );
 
-        $this->generator = new DoctrineTagGenerator($doctrine);
+        /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject $entityClassResolver */
+        $entityClassResolver = $this->createMock(EntityClassResolver::class);
+        $entityClassResolver->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturnMap([
+                [self::TEST_ENTITY_ALIAS, self::TEST_ENTITY_NAME],
+                [self::TEST_ENTITY_NAME, self::TEST_ENTITY_NAME],
+                [self::TEST_NEW_ENTITY_NAME, self::TEST_NEW_ENTITY_NAME],
+            ]);
+
+        $this->generator = new DoctrineTagGenerator($doctrine, $entityClassResolver);
     }
 
     protected function tearDown()
@@ -163,6 +179,43 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
                 true,
                 1,
                 false
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider generateFromAliasDataProvider
+     *
+     * @param string $data
+     * @param array $expectedResult
+     */
+    public function testGenerateFromAlias($data, $expectedResult)
+    {
+        $configurationMock = $this->createMock(Configuration::class);
+        $configurationMock->method('getEntityNamespace')
+            ->with('OroSyncBundle')
+            ->willReturn('Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub');
+
+        $this->em->method('getConfiguration')
+            ->willReturn($configurationMock);
+
+        $result = $this->generator->generate($data, true);
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function generateFromAliasDataProvider()
+    {
+        return [
+            'generate tag from fqcn' => [
+                self::TEST_ENTITY_NAME,
+                ['Oro_Bundle_SyncBundle_Tests_Unit_Content_Stub_EntityStub_type_collection'],
+            ],
+            'should generate same tag as for fqcn' => [
+                self::TEST_ENTITY_ALIAS,
+                ['Oro_Bundle_SyncBundle_Tests_Unit_Content_Stub_EntityStub_type_collection'],
             ],
         ];
     }

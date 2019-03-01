@@ -18,10 +18,10 @@ Locale Settings
 Overview
 --------
 
-Locale Settings is a service of Oro\Bundle\LocaleBundle\Model\LocaleSettings class. Id of the service is
-"oro_locale.settings". This service can be used to get locale specific settings of the application such as:
-* locale
-* language
+Locale Settings is a service of the Oro\Bundle\LocaleBundle\Model\LocaleSettings class with the "oro_locale.settings" ID.
+This service can be used to get locale specific settings of the application, such as:
+* locale based on localization
+* language based on localization
 * location
 * calendar
 * time zone
@@ -34,8 +34,9 @@ Locale Settings is a service of Oro\Bundle\LocaleBundle\Model\LocaleSettings cla
 Locale
 ------
 
-Locale settings can provide default application locale. This setting is based on system configuration and can be
-different per user. Locale is used by all formatters, such as for names, addresses, numbers, date and times.
+Locale settings can provide the default application locale. This setting is based on the system
+configuration (oro_locale.default_localization) and can be different per user. Locale is used by all formatters,
+such as for names, addresses, numbers, date and times.
 
 Example of getting current locale:
 
@@ -76,9 +77,11 @@ Gets country by locale. If could not find result than returns default country.
 Language
 --------
 
-Locale settings provides application language configuration. Application language affects translations and representation
-of date times. For example you could have en_US locale but french language, in this case date/times will be localized
-using en_US locale formats but with french language. To get current language there is a corresponding method:
+Locale settings provide the application language configuration. This setting is based on the system
+configuration (oro_locale.default_localization) and can be different per user. The application language affects
+translations and representation of date times. For example, if you set the locale to en_US and set the language
+to French, the date/times will be localized using the en_US locale formats but with the French language.
+To get the current language, use the following method:
 
 ```php
 $localeSettings = $this->get('oro_locale.settings');

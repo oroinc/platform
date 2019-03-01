@@ -2,26 +2,35 @@
 
 namespace Oro\Component\DoctrineUtils\ORM;
 
-use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Query;
 
+/**
+ * Represents a native SQL query.
+ */
 class SqlQuery extends AbstractQuery
 {
-    /** @var DbalQueryBuilder */
+    /** @var SqlQueryBuilder */
     protected $qb;
 
     /**
-     * @param DbalQueryBuilder $qb
+     * @param SqlQueryBuilder $qb
      */
-    public function setQueryBuilder(DbalQueryBuilder $qb)
+    public function setSqlQueryBuilder(SqlQueryBuilder $qb)
     {
         $this->qb = $qb;
+        $parameters = $qb->getParameters();
+        if ($parameters) {
+            foreach ($qb->getParameters() as $key => $value) {
+                $this->setParameter($key, $value, $this->qb->getParameterType($key));
+            }
+        }
     }
 
     /**
      * Returns the query builder used for build this query.
      *
-     * @return DbalQueryBuilder
+     * @return SqlQueryBuilder
      */
     public function getQueryBuilder()
     {
@@ -42,7 +51,35 @@ class SqlQuery extends AbstractQuery
     // @codingStandardsIgnoreStart
     protected function _doExecute()
     {
-        return $this->qb->execute();
+        $parameters = [];
+        $types = [];
+
+        /** @var Query\Parameter $parameter */
+        foreach ($this->getParameters() as $parameter) {
+            $name = $parameter->getName();
+            $value = $this->processParameterValue($parameter->getValue());
+            $type = ($parameter->getValue() === $value)
+                ? $parameter->getType()
+                : Query\ParameterTypeInferer::inferType($value);
+
+            $parameters[$name] = $value;
+            $types[$name] = $type;
+        }
+
+        if ($parameters && is_int(key($parameters))) {
+            ksort($parameters);
+            ksort($types);
+
+            $parameters = array_values($parameters);
+            $types = array_values($types);
+        }
+
+        $sql = $this->qb->getSQL();
+        if (preg_match('/\s*(UPDATE|DELETE|INSERT)\s+/i', $sql)) {
+            return $this->_em->getConnection()->executeUpdate($sql, $parameters, $types);
+        }
+
+        return $this->_em->getConnection()->executeQuery($sql, $parameters, $types, $this->_queryCacheProfile);
     }
     // @codingStandardsIgnoreEnd
 
