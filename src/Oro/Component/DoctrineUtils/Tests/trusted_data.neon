@@ -8,6 +8,14 @@ trusted_data:
         Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder:
             setMaxResults: true
             setFirstResult: true
+            setParameter: true
+            setParameters: true
+            getMaxResults: true
+            getFirstResult: true
+            getParameter: true
+            getParameterType: true
+            getParameterTypes: true
+            getQuery: true
         Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder:
             getSQL: true
             setParameter: true

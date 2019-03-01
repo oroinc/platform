@@ -2,10 +2,28 @@
 
 namespace Oro\Component\DoctrineUtils\ORM;
 
+use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\DBAL\Query\QueryException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\ResultSetMapping;
 
+/**
+ * QueryBuilder class is responsible for dynamically creating SQL queries.
+ *
+ * Important: Verify that every feature you use will work with your database vendor.
+ * SQL Query Builder does not attempt to validate the generated SQL at all.
+ *
+ * The query builder does no validation whatsoever if certain features even work with the
+ * underlying database vendor. Limit queries are NOT applied to UPDATE and DELETE statements.
+ * Joins are NOT applied to DELETE statements. Joins are applied to UPDATE statements on MySQL and PostgreSQL platforms.
+ *
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class SqlQueryBuilder
 {
     /** @var EntityManager */
@@ -17,6 +35,9 @@ class SqlQueryBuilder
     /** @var ResultSetMapping */
     protected $rsm;
 
+    /** @var \Doctrine\DBAL\Connection */
+    protected $connection;
+
     /**
      * @param EntityManager    $em
      * @param ResultSetMapping $rsm
@@ -24,8 +45,34 @@ class SqlQueryBuilder
     public function __construct(EntityManager $em, ResultSetMapping $rsm)
     {
         $this->em  = $em;
-        $this->qb  = $em->getConnection()->createQueryBuilder();
+        $this->connection = $em->getConnection();
+        $this->qb  = $this->connection->createQueryBuilder();
         $this->rsm = $rsm;
+    }
+
+    /**
+     * Executes this query using the bound parameters and their types.
+     *
+     * Uses {@see Connection::executeQuery} for select statements and {@see Connection::executeUpdate}
+     * for insert, update and delete statements.
+     *
+     * @return \Doctrine\DBAL\Driver\Statement|int
+     */
+    public function execute()
+    {
+        if ($this->getType() === DbalQueryBuilder::SELECT) {
+            return $this->connection->executeQuery(
+                $this->getSQL(),
+                $this->getParameters(),
+                $this->getParameterTypes()
+            );
+        }
+
+        return $this->connection->executeUpdate(
+            $this->getSQL(),
+            $this->getParameters(),
+            $this->getParameterTypes()
+        );
     }
 
     /**
@@ -37,7 +84,7 @@ class SqlQueryBuilder
     {
         $query = new SqlQuery($this->em);
 
-        $query->setQueryBuilder($this->qb);
+        $query->setSqlQueryBuilder($this);
         $query->setResultSetMapping($this->rsm);
 
         return $query;
@@ -91,7 +138,13 @@ class SqlQueryBuilder
      */
     public function getSQL()
     {
-        return $this->qb->getSQL();
+        switch ($this->qb->getType()) {
+            case DbalQueryBuilder::UPDATE:
+                return $this->getUpdateSQL();
+
+            default:
+                return $this->qb->getSQL();
+        }
     }
 
     /**
@@ -133,6 +186,28 @@ class SqlQueryBuilder
     public function getParameters()
     {
         return $this->qb->getParameters();
+    }
+
+    /**
+     * Gets all defined query parameter types for the query being constructed indexed by parameter index or name.
+     *
+     * @return array The currently defined query parameter types indexed by parameter index or name.
+     */
+    public function getParameterTypes()
+    {
+        return $this->qb->getParameterTypes();
+    }
+
+    /**
+     * Gets a (previously set) query parameter type of the query being constructed.
+     *
+     * @param mixed $key The key (index or name) of the bound parameter type.
+     *
+     * @return mixed The value of the bound parameter type.
+     */
+    public function getParameterType($key)
+    {
+        return $this->qb->getParameterType($key);
     }
 
     /**
@@ -305,6 +380,31 @@ class SqlQueryBuilder
     }
 
     /**
+     * Turns the query being built into an insert query that inserts into
+     * a certain table
+     *
+     * <code>
+     *     $qb->insert('users')
+     *         ->values(
+     *             array(
+     *                 'name' => '?',
+     *                 'password' => '?'
+     *             )
+     *         );
+     * </code>
+     *
+     * @param string $insert The table into which the rows should be inserted.
+     *
+     * @return $this This QueryBuilder instance.
+     */
+    public function insert($insert = null)
+    {
+        $this->qb->insert($insert);
+
+        return $this;
+    }
+
+    /**
      * Creates and adds a query root corresponding to the table identified by the
      * given alias, forming a cartesian product with any existing query roots.
      *
@@ -401,6 +501,54 @@ class SqlQueryBuilder
         $this->qb->set($key, $value);
 
         return $this;
+    }
+
+    /**
+     * Sets a value for a column in an insert query.
+     *
+     * <code>
+     *     $qb->insert('users')
+     *         ->values(
+     *             array(
+     *                 'name' => '?'
+     *             )
+     *         )
+     *         ->setValue('password', '?');
+     * </code>
+     *
+     * @param string $column The column into which the value should be inserted.
+     * @param string $value  The value that should be inserted into the column.
+     *
+     * @return $this This QueryBuilder instance.
+     */
+    public function setValue($column, $value)
+    {
+        $this->qb->setValue($column, $value);
+
+        return $this;
+    }
+
+    /**
+     * Specifies values for an insert query indexed by column names.
+     * Replaces any previous values, if any.
+     *
+     * <code>
+     *     $qb->insert('users')
+     *         ->values(
+     *             array(
+     *                 'name' => '?',
+     *                 'password' => '?'
+     *             )
+     *         );
+     * </code>
+     *
+     * @param array $values The values to specify for the insert query indexed by column names.
+     *
+     * @return $this This QueryBuilder instance.
+     */
+    public function values(array $values)
+    {
+        return $this->add('values', $values);
     }
 
     /**
@@ -627,5 +775,137 @@ class SqlQueryBuilder
     public function __toString()
     {
         return $this->getSQL();
+    }
+
+    /**
+     * Gets the complete Update SQL string formed by the current specifications of this QueryBuilder.
+     *
+     * @return string
+     * @throws QueryException
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    protected function getUpdateSQL(): string
+    {
+        $from = $this->getQueryPart('from');
+        $table = $from['table'] . ($from['alias'] ? ' ' . $from['alias'] : '');
+        $parts = ['UPDATE ' . $table];
+
+        $setPart = 'SET ' . implode(', ', $this->getQueryPart('set'));
+        $where = $this->getQueryPart('where');
+
+        $knownAliases = [$from['alias']];
+        $platform = $this->getConnection()->getDatabasePlatform();
+        if ($platform instanceof PostgreSqlPlatform) {
+            // Apply JOINs for PostgreSQL https://www.postgresql.org/docs/current/sql-update.html
+            $parts[] = $setPart;
+
+            $joinParts = $this->getQueryPart('join');
+            if ($joinParts) {
+                // When updated table is referenced in join only once
+                // JOIN with FROM and add join condition to WHERE. Process all other joins if any as regular joins
+                // Example:
+                // One JOIN
+                // UPDATE table1 t1 SET fld = 1
+                // FROM table2 t2
+                // WHERE t1.ref_id = t2.id
+                //
+                // More than one JOIN, only one to base table
+                // UPDATE table1 t1 SET fld = 1
+                // FROM table2 t2
+                // INNER JOIN table3 t3 ON t2.refId = t3.id
+                // WHERE t1.refId = t2.id
+                if (count($joinParts[$from['alias']]) === 1) {
+                    $joinFrom = array_shift($joinParts[$from['alias']]);
+                    unset($joinParts[$from['alias']]);
+                    $parts[] = 'FROM ' . $joinFrom['joinTable'] . ' ' . $joinFrom['joinAlias'];
+                    $where = $this->expr()->andX(
+                        $joinFrom['joinCondition'],
+                        $where
+                    );
+
+                    if (count($joinParts)) {
+                        $knownKeys = array_keys($joinParts);
+                        $firstKey = reset($knownKeys);
+                        $parts[] = $this->getSQLForUpdateJoins($firstKey, $knownAliases, $this->getQueryPart('join'));
+                    }
+                } else {
+                    // If updated table is referenced in join more than once - self-JOIN updated table with __orig__
+                    // alias and connect it with table under update by Primary Keys added to where.
+                    // Re-point all other JOINS to __orig__ alias
+                    // Example:
+                    // UPDATE table1 t1 SET fld = 1
+                    // FROM table1 __orig__
+                    // INNER JOIN table2 t2 ON __orig__.ref2Id = t2.id
+                    // INNER JOIN table3 t3 ON __orig__.ref3Id = t3.id
+                    // WHERE t1.id = __orig__.id
+                    $rejoinAlias = '__orig__';
+                    $parts[] = 'FROM ' . $from['table'] . ' ' . $rejoinAlias;
+                    $parts[] = str_replace(
+                        ' ' . $from['alias'] . '.',
+                        ' ' . $rejoinAlias . '.',
+                        $this->getSQLForUpdateJoins($from['alias'], $knownAliases, $joinParts)
+                    );
+
+                    $pks = $this->getConnection()
+                        ->getSchemaManager()
+                        ->listTableDetails($from['table'])
+                        ->getPrimaryKeyColumns();
+                    $pkExpr = $this->expr()->andX();
+                    foreach ($pks as $pk) {
+                        $pkExpr->add(
+                            $this->expr()->eq(
+                                QueryBuilderUtil::getField($from['alias'], $pk),
+                                QueryBuilderUtil::getField($rejoinAlias, $pk)
+                            )
+                        );
+                    }
+                    $where = $this->expr()->andX(
+                        $pkExpr,
+                        $where
+                    );
+                }
+            }
+        } elseif ($platform instanceof MySqlPlatform) {
+            // Apply JOINs for MySQL https://dev.mysql.com/doc/refman/5.7/en/update.html
+            $parts[] = $this->getSQLForUpdateJoins($from['alias'], $knownAliases, $this->getQueryPart('join'));
+            $parts[] = $setPart;
+        } else {
+            $parts[] = $setPart;
+        }
+
+        $parts[] = $where !== null ? 'WHERE ' . ((string)$where) : '';
+
+        return implode(' ', $parts);
+    }
+
+    /**
+     * @param string $fromAlias
+     * @param array $knownAliases
+     * @param array $joinParts
+     * @return string
+     *
+     * @throws QueryException
+     */
+    protected function getSQLForUpdateJoins($fromAlias, array &$knownAliases, array $joinParts)
+    {
+        $sql = '';
+
+        if (isset($joinParts[$fromAlias])) {
+            foreach ($joinParts[$fromAlias] as $join) {
+                if (array_key_exists($join['joinAlias'], $knownAliases)) {
+                    throw QueryException::nonUniqueAlias($join['joinAlias'], array_keys($knownAliases));
+                }
+
+                $sql .= ' ' . strtoupper($join['joinType']) . ' JOIN ';
+                $sql .= $join['joinTable'] . ' ' . $join['joinAlias'] . ' ON ' . ((string) $join['joinCondition']);
+                $knownAliases[$join['joinAlias']] = true;
+            }
+
+            foreach ($joinParts[$fromAlias] as $join) {
+                $sql .= $this->getSQLForUpdateJoins($join['joinAlias'], $knownAliases, $joinParts);
+            }
+        }
+
+        return $sql;
     }
 }
