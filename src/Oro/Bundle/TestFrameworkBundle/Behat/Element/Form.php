@@ -43,6 +43,7 @@ class Form extends Element
             $field = $this->wrapField($label, $field);
             $field->setValue($value);
             $field->blur();
+            $this->getDriver()->waitForAjax();
         }
         if ($isEmbeddedForm) {
             $this->getDriver()->switchToWindow();

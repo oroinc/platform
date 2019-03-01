@@ -12,7 +12,8 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
-use Oro\Bundle\EntityBundle\ORM\SqlQuery;
+use Oro\Component\DoctrineUtils\ORM\SqlQuery;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
 class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
 {
@@ -143,32 +144,27 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
         /** @var $statement Statement|\PHPUnit\Framework\MockObject\MockObject */
         list($entityManager, , $statement) = $this->prepareMocks();
 
-        $dbalQb = $this->createMock(
-            'Doctrine\DBAL\Query\QueryBuilder',
-            ['getSQL', 'resetQueryParts', 'select', 'from', 'execute'],
-            [],
-            '',
-            false
-        );
+        /** @var SqlQueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
+        $qb = $this->createMock(SqlQueryBuilder::class);
 
         $query = new SqlQuery($entityManager);
-        $query->setQueryBuilder($dbalQb);
+        $query->setSqlQueryBuilder($qb);
 
-        $dbalQb->expects($this->once())
+        $qb->expects($this->once())
             ->method('getSQL')
             ->will($this->returnValue($sql));
-        $dbalQb->expects($this->once())
+        $qb->expects($this->once())
             ->method('resetQueryParts')
             ->will($this->returnSelf());
-        $dbalQb->expects($this->once())
+        $qb->expects($this->once())
             ->method('select')
             ->with('COUNT(*)')
             ->will($this->returnSelf());
-        $dbalQb->expects($this->once())
+        $qb->expects($this->once())
             ->method('from')
             ->with('(' . $sql . ')', 'count_query')
             ->will($this->returnSelf());
-        $dbalQb->expects($this->once())
+        $qb->expects($this->once())
             ->method('execute')
             ->will($this->returnValue($statement));
 
