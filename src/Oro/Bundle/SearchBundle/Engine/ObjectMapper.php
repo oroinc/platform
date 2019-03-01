@@ -128,7 +128,9 @@ class ObjectMapper extends AbstractMapper
                 $this->getEntityConfig($objectClass)
             );
             $this->dispatcher->dispatch(PrepareEntityMapEvent::EVENT_NAME, $event);
-            $objectData = $event->getData();
+
+            // Generate "all_text" field from all text fields.
+            $objectData = $this->generateAllTextField($event->getData());
         }
 
         return $objectData;
