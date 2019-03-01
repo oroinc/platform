@@ -21,7 +21,5 @@ define([
         }
     });
 
-    var app = new Application(options);
-
-    return app;
+    return new Application(options);
 });
