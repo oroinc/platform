@@ -9,11 +9,11 @@
             <span class="icon">
                 {{ include('@OroLayout/Collector/layout-icon.svg') }}
             </span>
-            {% if collector.data.not_applied_actions_count %}
-                <span class="sf-toolbar-value">
-                    {{ collector.data.not_applied_actions_count }}
-                </span>
-            {% endif %}
+            <span class="sf-toolbar-value">
+            {%- if collector.data.not_applied_actions_count %}
+                {{- collector.data.not_applied_actions_count -}}
+            {% endif -%}
+            </span>
         {% endset %}
 
         {% set text %}
@@ -41,9 +41,6 @@
             </div>
         {% endset %}
         <style>
-            #oro-layout-icon {
-                top: 8px;
-            }
             .oro-layout-toolbar-info-piece-value pre.sf-dump {
                 background-color: transparent;
                 padding: 0;
@@ -569,8 +566,9 @@
                             {{ loop.index }}
                         </td>
                         <td>
-                            {% verbatim %}{% block {% endverbatim %} <strong>{{ blockPrefix }}
-                                _widget</strong> {% verbatim %} %}{% endverbatim %}
+                            {% verbatim %}{% block {% endverbatim %}
+                            <strong>{{ blockPrefix }}_widget</strong>
+                            {% verbatim %} %}{% endverbatim %}
                         </td>
                     </tr>
                 {% endfor %}
