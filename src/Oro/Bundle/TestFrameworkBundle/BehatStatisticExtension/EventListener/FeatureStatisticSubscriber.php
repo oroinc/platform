@@ -96,6 +96,8 @@ final class FeatureStatisticSubscriber implements EventListener
     {
         try {
             $this->statisticManager->saveStatistics();
+
+            $this->output->writeln('<info>Statistics was recorded successfully.</info>');
         } catch (\Exception $e) {
             // We should pass the tests even if we are unavailable record the statistics
             if ($this->output) {

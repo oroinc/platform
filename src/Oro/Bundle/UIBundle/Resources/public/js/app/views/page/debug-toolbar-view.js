@@ -7,11 +7,6 @@ define([
 ], function($, _, mediator, routing, PageRegionView) {
     'use strict';
 
-    var sendUpdateMessages = _.debounce(function() {
-        mediator.trigger('debugToolbar:afterUpdateView');
-        mediator.trigger('layout:adjustHeight');
-    }, 0);
-
     /* globals Sfjs */
     // Sfjs is global object that provides access to Symfony Debug Toolbar
     // Sfjs is patched to update layout on Debug Toolbar changes
@@ -19,7 +14,6 @@ define([
         var originalRenderAjaxRequests = Sfjs.renderAjaxRequests;
         Sfjs.renderAjaxRequests = function() {
             originalRenderAjaxRequests.call(Sfjs, arguments);
-            sendUpdateMessages();
         };
     }
 
@@ -30,16 +24,10 @@ define([
             'page:error mediator': 'onPageUpdate'
         },
 
-        events: {
-            'click .hide-button': sendUpdateMessages,
-            'click .sf-minitoolbar': sendUpdateMessages
-        },
-
         /**
          * @inheritDoc
          */
         constructor: function DebugToolbarView(options) {
-            mediator.setHandler('updateDebugToolbar', this.updateToolbar, this);
             DebugToolbarView.__super__.constructor.apply(this, arguments);
         },
 
@@ -55,12 +43,10 @@ define([
          */
         onPageUpdate: function(data, actionArgs, xhr) {
             if (!actionArgs.route.previous) {
-                sendUpdateMessages();
                 // nothing to do, the page just loaded
                 return;
             } else if (!xhr) {
                 this.$el.empty();
-                mediator.trigger('layout:adjustHeight');
                 return;
             }
             this.updateToolbar(xhr);

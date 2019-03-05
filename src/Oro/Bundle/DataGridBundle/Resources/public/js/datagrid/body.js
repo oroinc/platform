@@ -82,7 +82,8 @@ define([
                     autoRender: false,
                     model: model,
                     collection: this.filteredColumns,
-                    columns: this.columns
+                    columns: this.columns,
+                    className: this.rowClassName
                 };
                 this.columns.trigger('configureInitializeOptions', Row, rowOptions);
                 return new Row(rowOptions);
@@ -132,9 +133,6 @@ define([
         render: function() {
             this._deferredRender();
             Body.__super__.render.apply(this, arguments);
-            if (this.rowClassName) {
-                this.$('> *').addClass(this.rowClassName);
-            }
             this._resolveDeferredRender();
             return this;
         }

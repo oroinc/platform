@@ -9,6 +9,7 @@ use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
 /**
  * Calculates total count of query records.
@@ -71,6 +72,8 @@ class QueryCountCalculator
                 $statement = $this->executeOrmCountQuery($query);
             } elseif ($query instanceof SqlQuery) {
                 $statement = $this->executeDbalCountQuery($query->getQueryBuilder());
+            } elseif ($query instanceof SqlQueryBuilder) {
+                $statement = $this->executeDbalCountQuery($query);
             } elseif ($query instanceof DbalQueryBuilder) {
                 $statement = $this->executeDbalCountQuery($query);
             } else {
@@ -108,11 +111,11 @@ class QueryCountCalculator
     }
 
     /**
-     * @param DbalQueryBuilder $query
+     * @param DbalQueryBuilder|SqlQueryBuilder $query
      *
      * @return Statement
      */
-    private function executeDbalCountQuery(DbalQueryBuilder $query)
+    private function executeDbalCountQuery($query)
     {
         $countQuery = clone $query;
 

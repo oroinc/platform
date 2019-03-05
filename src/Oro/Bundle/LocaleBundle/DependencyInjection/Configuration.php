@@ -96,15 +96,6 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('currency_data')
-                    ->prototype('array')
-                        ->children()
-                            ->scalarNode('symbol')
-                                ->cannotBeEmpty()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
             ->end();
 
         // null values set as default for country because

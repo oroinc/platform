@@ -1,0 +1,4 @@
+oro:
+    navigation:
+        validator:
+            unique_pinbar_tab_url.error: 'This pin already exists'

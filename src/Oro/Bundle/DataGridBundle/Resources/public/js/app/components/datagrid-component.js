@@ -13,7 +13,6 @@ define(function(require) {
     var GridView = require('orodatagrid/js/datagrid/grid');
     var mapActionModuleName = require('orodatagrid/js/map-action-module-name');
     var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
-    var gridContentManager = require('orodatagrid/js/content-manager');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
@@ -257,9 +256,7 @@ define(function(require) {
             var collectionModels;
             var collectionOptions;
             var grid;
-
-            var collectionName = this.gridName;
-            var collection = gridContentManager.get(collectionName);
+            var collection;
 
             var Grid = modules.GridView || GridView;
             var Collection = modules.PageableCollection || PageableCollection;
@@ -274,10 +271,7 @@ define(function(require) {
                 _.extend(collectionOptions, this.data.options);
             }
 
-            if (!collection) {
-                // otherwise, create collection from metadata
-                collection = new Collection(collectionModels, collectionOptions);
-            }
+            collection = new Collection(collectionModels, collectionOptions);
 
             // create grid
             var options = this.combineGridOptions();
@@ -301,12 +295,11 @@ define(function(require) {
             }
             mediator.trigger('datagrid:rendered', grid);
 
-            if (options.routerEnabled !== false) {
-                // trace collection changes
-                gridContentManager.trace(collection);
-            }
-
             this.collection = collection;
+
+            if (options.routerEnabled !== false) {
+                this.traceChanges();
+            }
 
             var deferredBuilt = this.built;
             if (grid.deferredRender) {
@@ -544,6 +537,34 @@ define(function(require) {
                 delete this.subComponents;
             }
             DataGridComponent.__super__.dispose.call(this);
+        },
+
+        /**
+         * Enables tracing of collection changes to reflect datagrid state in URL.
+         */
+        traceChanges: function() {
+            var self = this;
+
+            this.updateStateInUrl();
+
+            this.listenTo(this.collection, {
+                updateState: this.updateStateInUrl,
+                reset: this.updateStateInUrl
+            });
+
+            mediator.once('page:beforeChange', function() {
+                self.stopListening(self.collection);
+            });
+        },
+
+        /**
+         * Reflects datagrid state in URL.
+         */
+        updateStateInUrl: function() {
+            var key = this.collection.stateHashKey();
+            var hash = this.collection.stateHashValue(true);
+
+            mediator.execute('changeUrlParam', key, hash);
         }
     });
 
