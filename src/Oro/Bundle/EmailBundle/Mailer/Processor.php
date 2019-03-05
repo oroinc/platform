@@ -21,7 +21,6 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
@@ -45,6 +44,9 @@ class Processor
 
     /** @var EmailAddressHelper */
     protected $emailAddressHelper;
+
+    /** @var EmailEntityBuilder */
+    protected $emailEntityBuilder;
 
     /** @var  EmailActivityManager */
     protected $emailActivityManager;
@@ -323,25 +325,6 @@ class Processor
             $email->getEmailBody()->addAttachment($attachment);
             $attachment->setEmailBody($email->getEmailBody());
         }
-    }
-
-    /**
-     * @deprecated since 1.9. Use {@see Oro\Bundle\EmailBundle\Tools\EmailOriginHelper} instead
-     *
-     * @param string                $email
-     * @param OrganizationInterface $organization
-     * @param string                $originName
-     * @param boolean               $enableUseUserEmailOrigin
-     *
-     * @return EmailOrigin
-     */
-    public function getEmailOrigin(
-        $email,
-        OrganizationInterface $organization = null,
-        $originName = InternalEmailOrigin::BAP,
-        $enableUseUserEmailOrigin = true
-    ) {
-        return $this->emailOriginHelper->getEmailOrigin($email, $organization, $originName, $enableUseUserEmailOrigin);
     }
 
     /**
