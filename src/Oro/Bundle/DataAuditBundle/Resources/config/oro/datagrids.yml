@@ -123,6 +123,7 @@ datagrids:
                 select:
                     id: a.id
                     author: a.ownerDescription as author
+                    objectClass: a.objectClass
                     loggedAt: a.loggedAt
                 from:
                     - { table: OroDataAuditBundle:AbstractAudit, alias: a }

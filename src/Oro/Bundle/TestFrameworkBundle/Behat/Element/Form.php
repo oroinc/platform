@@ -405,6 +405,18 @@ class Form extends Element
             );
         }
 
+        if (!$errorSpan) {
+            // Get the validation error a level higher than the input
+            $errorSpan = $this->find(
+                'xpath',
+                sprintf(
+                    '%s%s',
+                    $field->getXpath(),
+                    '/ancestor::div[contains(@class, "validation-error")]/span[@class="validation-failed"]'
+                )
+            );
+        }
+
         self::assertNotNull($errorSpan, "Field $fieldName has no validation errors");
 
         return $errorSpan->getText();
