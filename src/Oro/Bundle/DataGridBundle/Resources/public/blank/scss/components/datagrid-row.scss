@@ -6,4 +6,8 @@
             background: $datagrid-row-hover-background;
         }
     }
+
+    &.row-click-action {
+        cursor: pointer;
+    }
 }

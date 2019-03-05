@@ -328,7 +328,7 @@ define(function(require) {
             }
 
             if (this.templateTheme === '') {
-                config.width = 'resolve';
+                config.width = 'off';
             }
 
             return config;

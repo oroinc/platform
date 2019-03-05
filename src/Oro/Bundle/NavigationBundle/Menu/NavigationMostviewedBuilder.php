@@ -6,6 +6,9 @@ use Knp\Menu\ItemInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 
+/**
+ * Build menu from most viewed navigation items.
+ */
 class NavigationMostviewedBuilder extends NavigationItemBuilder
 {
     /** @var ConfigManager */
@@ -23,8 +26,8 @@ class NavigationMostviewedBuilder extends NavigationItemBuilder
      * Modify menu by adding, removing or editing items.
      *
      * @param \Knp\Menu\ItemInterface $menu
-     * @param array                   $options
-     * @param string|null             $alias
+     * @param array $options
+     * @param string|null $alias
      */
     public function build(ItemInterface $menu, array $options = array(), $alias = null)
     {

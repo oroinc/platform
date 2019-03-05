@@ -61,6 +61,10 @@
         }
     }
 
+    &__fieldset {
+        max-width: none;
+    }
+
     &__footer {
         padding-left: 0;
     }
@@ -103,7 +107,7 @@
     }
 
     .oro-remember-me {
-        padding-left: 0;
+        padding-#{$start}: 0;
     }
 
     span.validation-failed {
@@ -118,19 +122,25 @@
     .input-prepend {
         display: block;
     }
-}
 
-.form-reset {
-    max-width: 320px !important;
+    &--reset {
+        max-width: 320px !important;
 
-    .add-on {
-        width: 120px;
-        font-size: 12px;
+        .add-on {
+            width: 120px;
+            font-size: 12px;
 
-        & + input[type="text"],
-        & + input[type="email"],
-        & + input[type="password"] {
-            width: 138px;
+            & + input[type="text"],
+            & + input[type="email"],
+            & + input[type="password"] {
+                width: 138px;
+            }
+        }
+    }
+
+    &--login.form-row-layout {
+        .form-signin__footer {
+            padding-#{$start}: 0;
         }
     }
 }

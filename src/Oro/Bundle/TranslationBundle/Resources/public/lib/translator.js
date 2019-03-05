@@ -232,7 +232,13 @@
             var _r = new RegExp(_prefix + _i + _suffix, 'g');
 
             if (_r.test(message)) {
-                message = message.replace(_r, placeholders[_i]);
+                var placeholder = placeholders[_i];
+
+                if (typeof placeholder === 'string' && placeholder.indexOf('$') !== -1) {
+                    placeholder = placeholder.replace(/\$/g, '$$$');
+                }
+
+                message = message.replace(_r, placeholder);
             }
         }
 

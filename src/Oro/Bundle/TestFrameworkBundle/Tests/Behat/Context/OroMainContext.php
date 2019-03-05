@@ -1038,7 +1038,7 @@ class OroMainContext extends MinkContext implements
                         return true;
                     }
                     return false;
-                }, 1);
+                }, 3);
 
                 if ($clickLink) {
                     break;
@@ -1052,6 +1052,33 @@ class OroMainContext extends MinkContext implements
                 throw $e;
             } catch (StaleElementReference $e) {
             }
+        }
+    }
+
+    /**
+     * Force click on cancel button in discount popup
+     * Example: Given force click on cancel button in discount popup
+     * Example: When I force click on cancel button in discount popup
+     *
+     * @When /^(?:|I )force click on cancel button in discount popup$/
+     */
+    public function discountPopupForceCancel()
+    {
+        $button = 'Discount Popup Cancel Button';
+        try {
+            $this->elementFactory->createElement($button)->clickForce();
+        } catch (\InvalidArgumentException|NoSuchElement $e) {
+            $this->spin(function () use ($button) {
+                if ($this->elementFactory->hasElement($button)) {
+                    $this->elementFactory->createElement($button)->clickForce();
+
+                    return true;
+                }
+
+                return false;
+            }, 3);
+
+            throw $e;
         }
     }
 

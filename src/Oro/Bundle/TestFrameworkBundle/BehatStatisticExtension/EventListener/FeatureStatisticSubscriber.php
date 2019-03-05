@@ -15,6 +15,9 @@ use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\Feature
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 
+/**
+ * Collects statistic information and stores it to DB.
+ */
 final class FeatureStatisticSubscriber implements EventListener
 {
     /**
@@ -134,6 +137,8 @@ final class FeatureStatisticSubscriber implements EventListener
     {
         try {
             $this->featureRepository->flush();
+
+            $this->output->writeln('<info>Statistics was recorded successfully.</info>');
         } catch (\Exception $e) {
             // We should pass the tests even if we are unavailable record the statistics
             if ($this->output) {

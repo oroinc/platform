@@ -22,16 +22,20 @@ Feature: Pin page
     And I filter Last name as contains "Sheen"
     And there is one record in grid
     And Users link must not be in pin holder
+    And I should see that "Pin/unpin the page" Button is not highlighted
     When I pin page
     Then Users link must be in pin holder
+    And I should see that "Pin/unpin the page" Button is highlighted
+    And I should see that "Users" pin is active
 
   Scenario: Follow pinned link
-# @todo Remove or uncomment. BAP-11782
-#    Given I reset First name filter
-#    And reset Last name filter
-#    And there are 7 records in grid
-    And go to Dashboards/Dashboard
-    When follow Users link in pin holder
+    Given I reset First name filter
+    And reset Last name filter
+    Then Users link must be in pin holder
+    And I should see that "Users" pin is inactive
+    And there are 7 records in grid
+    When go to Dashboards/Dashboard
+    And follow Users link in pin holder
     Then I should be on User Index page
     And there is one record in grid
     And I should see Charlie Sheen in grid with following data:
@@ -48,13 +52,73 @@ Feature: Pin page
     And I sort grid by First name
     And Beatrice Walker must be first record
     When I pin page
-# @todo Remove or uncomment. BAP-11782
-#    And go to Dashboards/Dashboard
-#    And I go to System/User Management/Users
-#    Then John Doe must be first record
+    And go to Dashboards/Dashboard
+    And I go to System/User Management/Users
+    Then John Doe must be first record
     And I go to Dashboards/Dashboard
     And I follow Users link in pin holder
     And Beatrice Walker must be first record
+    When I unpin page
+    Then Users link must not be in pin holder
+
+  Scenario: Matching pin should be highlighted:
+    Given I filter First name as contains "Charlie"
+    And I filter Last name as contains "Sheen"
+    Then I should see that "Pin/unpin the page" Button is not highlighted
+    When I pin page
+    Then I should see that "Users" pin is active
+    And I should see that "Pin/unpin the page" Button is highlighted
+    When I filter First name as contains "John"
+    And I filter Last name as contains "Doe"
+    Then I should see that "Users" pin is inactive
+    And I should see that "Pin/unpin the page" Button is not highlighted
+    When I filter First name as contains "Charlie"
+    Then I should see that "Users" pin is inactive
+    And I should see that "Pin/unpin the page" Button is not highlighted
+    When I filter Last name as contains "Sheen"
+    Then I should see that "Users" pin is active
+    And I should see that "Pin/unpin the page" Button is highlighted
+
+  Scenario: Pins must keep function during grid reset
+    Given I reset "Users Grid" grid
+    Then I should see that "Users" pin is inactive
+    And I should see that "Pin/unpin the page" Button is not highlighted
+    And there are 7 records in grid
+    When I follow Users link in pin holder
+    Then I should see that "Users" pin is active
+    And I should see that "Pin/unpin the page" Button is highlighted
+    And there are 1 records in grid
+    When I reset "Users Grid" grid
+    Then I should see that "Users" pin is inactive
+    And I should see that "Pin/unpin the page" Button is not highlighted
+    And there are 7 records in grid
+    When I follow Users link in pin holder
+    Then I should see that "Users" pin is active
+    And I should see that "Pin/unpin the page" Button is highlighted
+    And there are 1 records in grid
+    And I unpin page
+
+  Scenario: Several pins can be created for the same page with different names
+    Given I reset First name filter
+    And reset Last name filter
+    When I filter First name as contains "Charlie"
+    And I filter Last name as contains "Test1"
+    And I pin page
+    Then Users link must be in pin holder
+    When I filter Last name as contains "Test2"
+    And I pin page
+    Then Users (2) link must be in pin holder
+    When I filter Last name as contains "Sheen"
+    And I pin page
+    Then Users (3) link must be in pin holder
+    When I go to Dashboards/Dashboard
+    And I follow Users (3) link in pin holder
+    Then I should be on User Index page
+    And there is one record in grid
+    And I should see Charlie Sheen in grid with following data:
+      | Primary Email | charlie@sheen.com |
+      | Username      | charlie           |
+    And I should see that "Users (3)" pin is active
 
   Scenario: Pin filled form
     Given go to Dashboards/Dashboard
@@ -107,15 +171,32 @@ Feature: Pin page
     And I should be on User Create page
     And I should see "This value is already used."
 
-# @todo Remove or uncomment. BAP-11782
-#  Scenario: View blank form
-#    Given I go to System/User Management/Users
-#    When press Create User button
-#    Then  "User Form" must contains values:
-#      | Username          |    |
-#      | Password          |    |
-#      | Re-Enter Password |    |
-#      | First Name        |    |
-#      | Last Name         |    |
-#      | Primary Email     |    |
-#      | Roles             | [] |
+  Scenario: View blank form
+    Given I go to System/User Management/Users
+    When press Create User button
+    Then  "User Form" must contains values:
+      | Username          |    |
+      | Password          |    |
+      | Re-Enter Password |    |
+      | First Name        |    |
+      | Last Name         |    |
+      | Primary Email     |    |
+      | Roles             | [] |
+
+  Scenario: Pin multi-step form
+    Given I go to Products/Products
+    And click "Create Product"
+    And click "Continue"
+    And fill "Create Product Form" with:
+      |SKU             |sku_for_pin_testing     |
+      |Name            |name_for_pin_testing    |
+    When I pin page
+    Then I should see that "Create Product" pin is active
+    When I go to Dashboards/Dashboard
+    Then I should see that "Create Product" pin is inactive
+    When I follow Create Product link in pin holder
+    And click "Continue"
+    Then I should see that "Create Product" pin is active
+    And "Create Product Form" must contains values:
+      |SKU             |sku_for_pin_testing     |
+      |Name            |name_for_pin_testing    |

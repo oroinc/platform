@@ -1,16 +1,36 @@
 /* @theme: admin.oro; */
 
+body.desktop-version.dev-mode {
+    display: flex;
+    flex-direction: column;
+
+    &.loading {
+        .sf-toolbar {
+            display: none;
+        }
+    }
+}
+
 /* footer bar */
-.sf-toolbar {
-    position: absolute;
-    bottom: 0;
+.sf-toolbar,
+.sf-toolbar.sf-error-toolbar {
+    .sf-toolbar-clearer {
+        height: auto;
+    }
 
     .sf-toolbarreset {
-
+        height: auto;
+        position: relative;
         /* something close to max possible z-index (assume it is stored in 32 bit signed int) */
         z-index: 2000000000;
         background-color: #313a45;
         border-top: 1px solid #1a1a1a;
+
+        &:after {
+            content: '';
+            display: block;
+            clear: both;
+        }
 
         & > .sf-toolbar-block {
             border-right: 1px solid #13161a;

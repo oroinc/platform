@@ -191,13 +191,10 @@
             margin-left: $filter-box-reset-offset-left;
             display: $filter-box-reset-display;
             width: $filter-box-reset-width;
-            line-height: $filter-box-reset-line-height;
-            vertical-align: $filter-box-reset-vertical-align;
 
             [class^="fa-"],
             [class*=" fa-"] {
                 vertical-align: $filter-box-reset-icon-vertical-align;
-                margin-top: $filter-box-reset-icon-offset-top;
             }
 
             &:hover {

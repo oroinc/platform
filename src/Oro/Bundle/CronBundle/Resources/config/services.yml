@@ -57,6 +57,8 @@ services:
             - '@oro_message_queue.job.runner'
             - '@logger'
             - '@oro_message_queue.client.message_producer'
+        calls:
+            - [setCommandRunner, ['@oro_cron.engine.command_runner']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 

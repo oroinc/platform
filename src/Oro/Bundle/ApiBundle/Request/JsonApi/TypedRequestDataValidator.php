@@ -55,7 +55,6 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
                 $data = $requestData[JsonApiDoc::DATA];
                 $pointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::DATA);
                 $this->validatePrimaryDataObject($data, $primaryResourceClass, $primaryResourceId, $pointer);
-                $this->validateAttributesAndRelationships($data, $pointer);
                 if ($allowIncludedResources) {
                     $this->validateIncludedResources($requestData);
                 } else {
@@ -97,6 +96,7 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
                     foreach ($data as $key => $item) {
                         $itemPointer = $this->buildPointer($pointer, $key);
                         if (\is_array($item)) {
+                            $this->validateResourceObjectStructure($item, $itemPointer);
                             if ($this->validateRequiredNotBlankString($item, JsonApiDoc::TYPE, $itemPointer)) {
                                 $this->validatePrimaryDataObjectType($item, $primaryResourceClass, $itemPointer);
                             }
@@ -134,6 +134,7 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
         $primaryResourceId,
         string $pointer
     ): void {
+        $this->validateResourceObjectStructure($data, $pointer);
         if (null === $primaryResourceId) {
             if ($this->validateRequiredNotBlankString($data, JsonApiDoc::TYPE, $pointer)) {
                 $this->validatePrimaryDataObjectType($data, $primaryResourceClass, $pointer);
@@ -143,6 +144,7 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
             $this->validatePrimaryDataObjectType($data, $primaryResourceClass, $pointer);
             $this->validatePrimaryDataObjectId($data, $primaryResourceId, $pointer);
         }
+        $this->validateAttributesAndRelationships($data, $pointer);
     }
 
     /**
