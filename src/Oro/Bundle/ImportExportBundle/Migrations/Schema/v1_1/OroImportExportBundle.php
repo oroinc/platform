@@ -1,21 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\Migrations\Schema;
+namespace Oro\Bundle\ImportExportBundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroImportExportBundleInstaller implements Installation
+class OroImportExportBundle implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getMigrationVersion()
-    {
-        return 'v1_1';
-    }
-
     /**
      * {@inheritdoc}
      */

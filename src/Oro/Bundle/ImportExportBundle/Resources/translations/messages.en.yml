@@ -1,5 +1,17 @@
 oro:
     importexport:
+        importexportresult:
+            entity_label: Import/Export result
+            entity_plural_label: Import/Export result
+            organization.label: Organization
+            id.label: ID
+            expired.label: Expired
+            filename.label: Filename
+            job_code.label: Job code
+            job_id.label: Job ID
+            owner.label: Owner
+            type.label: Type
+
         action:
             export:  "Export entity records"
             import:  "Import entity records"
