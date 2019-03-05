@@ -43,6 +43,7 @@ class Form extends Element
             $field = $this->wrapField($label, $field);
             $field->setValue($value);
             $field->blur();
+            $this->getDriver()->waitForAjax();
         }
         if ($isEmbeddedForm) {
             $this->getDriver()->switchToWindow();
@@ -299,15 +300,8 @@ class Form extends Element
         $value = trim($value);
 
         if (0 === strpos($value, '[')) {
-            return self::normalizeValue(
-                array_map(
-                    'trim',
-                    explode(
-                        ',',
-                        trim($value, '[]')
-                    )
-                )
-            );
+            $value = trim($value, '[]');
+            return self::normalizeValue($value ? explode(',', $value) : []);
         }
 
         if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($value))) {

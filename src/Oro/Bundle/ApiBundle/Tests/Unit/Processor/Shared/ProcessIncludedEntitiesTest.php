@@ -15,6 +15,7 @@ use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 {
@@ -182,6 +183,72 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $this->context->getRequestHeaders()->set('header1', 'value1');
         $this->processor->process($this->context);
         self::assertEquals([$error], $actionContext->getErrors());
+        self::assertNull($includedEntityData->getMetadata());
+    }
+
+    public function testProcessForNewIncludedEntityWhenCreateActionFailedWithErrorStatusCodeWithoutResponseContent()
+    {
+        $includedData = [
+            ['data' => ['type' => 'testType', 'id' => 'testId']]
+        ];
+        $includedEntity = new \stdClass();
+
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntityData = new IncludedEntityData('/included/0', 0);
+        $includedEntities->add($includedEntity, 'Test\Class', 'id', $includedEntityData);
+
+        $error = Error::createValidationError('action not allowed')
+            ->setStatusCode(Response::HTTP_METHOD_NOT_ALLOWED);
+        $expectedError = clone $error;
+        $expectedError->setStatusCode(Response::HTTP_BAD_REQUEST);
+
+        $expectedContext = new CreateContext($this->configProvider, $this->metadataProvider);
+        $expectedContext->setVersion($this->context->getVersion());
+        $expectedContext->getRequestType()->set($this->context->getRequestType());
+        $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedContext->setIncludedEntities($includedEntities);
+        $expectedContext->setClassName('Test\Class');
+        $expectedContext->setId('id');
+        $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
+        $expectedContext->setResult($includedEntity);
+        $expectedContext->skipFormValidation(true);
+        $expectedContext->setLastGroup('transform_data');
+        $expectedContext->setSoftErrorsHandling(true);
+
+        $actionMetadata = new EntityMetadata();
+
+        $actionContext = new CreateContext($this->configProvider, $this->metadataProvider);
+        $actionProcessor = $this->createMock(ActionProcessorInterface::class);
+        $this->processorBag->expects(self::once())
+            ->method('getProcessor')
+            ->with(ApiActions::CREATE)
+            ->willReturn($actionProcessor);
+        $actionProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn($actionContext);
+        $actionProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CreateContext $context) use ($expectedContext, $error, $actionMetadata) {
+                    self::assertEquals($expectedContext, $context);
+
+                    $context->setMetadata($actionMetadata);
+                    $context->addError($error);
+                }
+            );
+        $this->errorCompleter->expects(self::once())
+            ->method('complete')
+            ->with(
+                self::identicalTo($error),
+                $expectedContext->getRequestType(),
+                self::identicalTo($actionMetadata)
+            );
+
+        $this->context->setIncludedData($includedData);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->context->getRequestHeaders()->set('header1', 'value1');
+        $this->processor->process($this->context);
+        self::assertEquals([$expectedError], $actionContext->getErrors());
         self::assertNull($includedEntityData->getMetadata());
     }
 

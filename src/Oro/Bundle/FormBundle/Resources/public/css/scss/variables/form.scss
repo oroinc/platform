@@ -126,13 +126,15 @@ $control-group-collapsible-collapse-action-icon-collapsed-content: '+' !default;
 $control-group-collapsible-controls-overflow: hidden !default;
 $control-group-collapsible-collapsed-content: '+' !default;
 
-$oro-hint-background-color: #fcf8e3 !default;
-$oro-hint-border-radius: 4px !default;
-$oro-hint-border: 1px solid #fbeed5 !default;
-$oro-hint-color: #c09853 !default;
+$oro-hint-background-color: $extra-300 !default;
+$oro-hint-border-radius: 2px !default;
+$oro-hint-border: 0 none !default;
+$oro-hint-color: $warning-darken !default;
+$oro-hint-font-size: $base-font-size--sm !default;
+$oro-hint-line-height: 1.23 !default;
 $oro-hint-offset: 10px 0 0 0 !default;
-$oro-hint-inner-offset: 8px 14px 8px 14px !default;
-$oro-hint-text-shadow: 0 1px 0 rgba(255, 255, 255, .5) !default;
+$oro-hint-inner-offset: 4px 8px !default;
+$oro-hint-text-shadow: none !default;
 $oro-hint-control-group-max-width: 465px !default;
 $oro-hint-controls-width: 294px !default;
 

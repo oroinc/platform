@@ -1013,7 +1013,7 @@ class OroMainContext extends MinkContext implements
                         return true;
                     }
                     return false;
-                }, 1);
+                }, 3);
 
                 if ($clickLink) {
                     break;

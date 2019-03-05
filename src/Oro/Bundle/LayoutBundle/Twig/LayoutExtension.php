@@ -2,14 +2,20 @@
 
 namespace Oro\Bundle\LayoutBundle\Twig;
 
+use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormView;
+use Twig\TwigFilter;
 
+/**
+ * Extends TWIG with functions and filters to work with layout blocks, string manipulations and "is expression" test.
+ */
 class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRuntimeInterface
 {
     const RENDER_BLOCK_NODE_CLASS = 'Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode';
@@ -51,7 +57,7 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
     public function getTokenParsers()
     {
         return [
-            new BlockThemeTokenParser()
+            new BlockThemeTokenParser(),
         ];
     }
 
@@ -92,7 +98,12 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
             new \Twig_SimpleFunction(
                 'convert_value_to_string',
                 [$this, 'convertValueToString']
-            )
+            ),
+            new \Twig_SimpleFunction(
+                'highlight_string',
+                [$this, 'highlightString'],
+                ['is_safe' => ['html']]
+            ),
         ];
     }
 
@@ -106,6 +117,18 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
             new \Twig_SimpleFilter('block_text', [$this, 'processText']),
             // Merge additional context to BlockView
             new \Twig_SimpleFilter('merge_context', [$this, 'mergeContext']),
+            new TwigFilter('pluralize', [Inflector::class, 'pluralize']),
+        ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTests()
+    {
+        return [
+            new \Twig_SimpleTest('expression', [$this, 'isExpression']),
+            new \Twig_SimpleTest('string', [$this, 'isString']),
         ];
     }
 
@@ -126,7 +149,7 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
 
     /**
      * @param BlockView $view
-     * @param array $context
+     * @param array     $context
      * @return BlockView
      */
     public function mergeContext(BlockView $view, array $context)
@@ -168,7 +191,7 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
 
     /**
      * @param FormView $formView
-     * @param $classPrefix
+     * @param          $classPrefix
      */
     public function setClassPrefixToForm(FormView $formView, $classPrefix)
     {
@@ -208,5 +231,35 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
         }
 
         return $value;
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function highlightString($value)
+    {
+        $highlightString = @highlight_string('<?php '.$value, true);
+        $highlightString = str_replace('&lt;?php&nbsp;', '', $highlightString);
+
+        return $highlightString;
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function isExpression($value)
+    {
+        return $value instanceof Expression;
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function isString($value)
+    {
+        return is_string($value);
     }
 }

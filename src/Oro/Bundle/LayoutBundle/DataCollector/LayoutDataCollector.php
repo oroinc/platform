@@ -10,6 +10,7 @@ use Oro\Component\Layout\ContextDataCollection;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextItemInterface;
 use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -44,7 +45,7 @@ class LayoutDataCollector extends DataCollector
         'block',
         'blocks',
         'block_type',
-        'attr'
+        'attr',
     ];
 
     /** @var bool */
@@ -52,8 +53,8 @@ class LayoutDataCollector extends DataCollector
 
     /**
      * @param LayoutContextHolder $contextHolder
-     * @param ConfigManager $configManager
-     * @param bool $isDebug
+     * @param ConfigManager       $configManager
+     * @param bool                $isDebug
      */
     public function __construct(LayoutContextHolder $contextHolder, ConfigManager $configManager, $isDebug = false)
     {
@@ -64,9 +65,9 @@ class LayoutDataCollector extends DataCollector
         $this->data = [
             'context' => [
                 'items' => [],
-                'data' => []
+                'data' => [],
             ],
-            'views' => []
+            'views' => [],
         ];
     }
 
@@ -105,53 +106,25 @@ class LayoutDataCollector extends DataCollector
     }
 
     /**
-     * Collect options for BlockView-s when buildBlock method is triggered
-     *
-     * @param string $blockId
-     * @param string $blockType
-     * @param array $options
-     */
-    public function collectBuildBlockOptions($blockId, $blockType, array $options)
-    {
-        if ($this->isDebug && $this->isDebugDeveloperToolbar()) {
-            $this->dataByBlock[$blockId] = [
-                'id' => $blockId,
-                'type' => $blockType,
-                'build_block_options' => $this->prepareOptions($options)
-            ];
-        }
-    }
-
-    /**
-     * Collect options for BlockView-s when buildView method is triggered
-     *
-     * @param BlockInterface $block
-     * @param string $blockTypeClass
-     * @param array $options
-     */
-    public function collectBuildViewOptions(BlockInterface $block, $blockTypeClass, array $options)
-    {
-        if ($this->isDebug && $this->isDebugDeveloperToolbar()) {
-            $this->dataByBlock[$block->getId()]['type_class'] = $blockTypeClass;
-            $this->dataByBlock[$block->getId()]['build_view_options'] = $this->prepareOptions($options);
-        }
-    }
-
-    /**
      * Collect view vars for BlockView-s, save root BlockView, check if block is visible
      *
      * @param BlockInterface $block
-     * @param BlockView $view
+     * @param BlockView      $view
      */
-    public function collectBlockTree(BlockInterface $block, BlockView $view)
+    public function collectBlockView(BlockInterface $block, BlockView $view)
     {
         if ($this->isDebug && $this->isDebugDeveloperToolbar()) {
             if (!$this->rootBlockView) {
                 $this->rootBlockView = $view;
             }
 
-            $this->dataByBlock[$block->getId()]['visible'] = $view->vars['visible'];
-            $this->dataByBlock[$block->getId()]['view_vars'] = $this->prepareOptions($view->vars);
+            $this->dataByBlock[$block->getId()] = [
+                'id' => $block->getId(),
+                'type' => $block->getTypeName(),
+                'visible' => $view->vars['visible'],
+                'view_vars' => $this->prepareOptions($view->vars),
+                'block_prefixes' => $view->vars['block_prefixes'],
+            ];
         }
     }
 
@@ -166,7 +139,7 @@ class LayoutDataCollector extends DataCollector
     {
         $result = [];
         foreach ($options as $key => $value) {
-            if (in_array($key, $this->excludedOptions)) {
+            if (in_array($key, $this->excludedOptions, true)) {
                 continue;
             }
 
@@ -183,27 +156,14 @@ class LayoutDataCollector extends DataCollector
      */
     private function prepareOptionValue($optionValue)
     {
-        if (is_array($optionValue)) {
-            foreach ($optionValue as $key => $value) {
-                $optionValue[$key] = $this->prepareOptionValue($value);
-            }
-
-            return json_encode($optionValue);
+        if ($optionValue instanceof ParsedExpression) {
+            return $optionValue;
         }
-
-        if (is_object($optionValue) && !method_exists($optionValue, '__toString')) {
-            return get_class($optionValue);
-        }
-
-        if (is_scalar($optionValue)) {
+        if (is_string($optionValue)) {
             return $optionValue;
         }
 
-        if ($optionValue === null) {
-            return 'null';
-        }
-
-        return (string) $optionValue;
+        return $this->cloneVar($optionValue);
     }
 
     /**
@@ -224,7 +184,7 @@ class LayoutDataCollector extends DataCollector
      * Add child BlockView-s with options and vars to parent BlockView recursively
      *
      * @param BlockView $blockView
-     * @param $output
+     * @param           $output
      */
     private function recursiveBuildFinalBlockTree(BlockView $blockView, &$output)
     {
@@ -274,7 +234,7 @@ class LayoutDataCollector extends DataCollector
                 $value = sprintf('(%s) %s::%s', gettype($value), $className, $value->toString());
             }
 
-            $this->data['context']['items'][$key] =  $value;
+            $this->data['context']['items'][$key] = is_string($value) ? $value : $this->cloneVar($value);
         }
     }
 
@@ -291,7 +251,7 @@ class LayoutDataCollector extends DataCollector
             if (is_object($value)) {
                 $value = get_class($value);
             }
-            $this->data['context']['data'][$key] =  $value;
+            $this->data['context']['data'][$key] = $this->cloneVar($value);
         }
     }
 
@@ -316,5 +276,10 @@ class LayoutDataCollector extends DataCollector
         $this->notAppliedActions = $notAppliedActions;
 
         return $this;
+    }
+
+    public function reset()
+    {
+        $this->data = [];
     }
 }

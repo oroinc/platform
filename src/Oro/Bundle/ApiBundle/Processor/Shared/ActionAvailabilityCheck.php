@@ -9,8 +9,8 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Validates whether the requested action of entity specified
- * in the "class" property of the context is not excluded.
+ * Validates whether an access to the requested action for the entity
+ * specified in the "class" property of the context is granted.
  */
 class ActionAvailabilityCheck implements ProcessorInterface
 {

@@ -64,7 +64,6 @@ class CacheWarmerAggregate extends CacheWarmer implements CacheWarmerInterface
         $cacheWarmerLink = $this->cacheWarmerLink;
         if (CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
             || CommandExecutor::isCurrentCommand('oro:install', true)
-            || CommandExecutor::isCurrentCommand('oro:platform:upgrade20', true)
             || CommandExecutor::isCurrentCommand('oro:assets:install', true)
         ) {
             $cacheWarmerLink = $this->extendCacheWarmerLink;

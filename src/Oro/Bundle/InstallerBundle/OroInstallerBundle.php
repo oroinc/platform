@@ -2,19 +2,12 @@
 
 namespace Oro\Bundle\InstallerBundle;
 
-use Oro\Bundle\InstallerBundle\DependencyInjection\CompilerPass\NamespaceMigrationProviderPass;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * OroInstallerBundle enables developers to install Oro applications in a prepared environment using the CLI
+ * and to define activities for the installation process on a bundle level.
+ */
 class OroInstallerBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function build(ContainerBuilder $container)
-    {
-        parent::build($container);
-
-        $container->addCompilerPass(new NamespaceMigrationProviderPass());
-    }
 }

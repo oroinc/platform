@@ -21,3 +21,10 @@ services:
         class: "%oro_importexport.form.type.export_template.class%"
         tags:
             - { name: form.type, alias: oro_importexport_export_template }
+
+    oro_importexport.form.type.identity_config_choice:
+        class: Oro\Bundle\ImportExportBundle\Form\Type\IdentityConfigChoiceType
+        arguments:
+            - '@oro_entity_extend.association_type_helper'
+        tags:
+            - { name: form.type, alias: oro_importexport_identity_config_choice }

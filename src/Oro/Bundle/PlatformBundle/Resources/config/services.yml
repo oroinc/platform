@@ -10,6 +10,8 @@ parameters:
     oro_platform.optional_listeners.manager.class: Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager
     jms_serializer.twig_extension.class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
 
+    oro_platform.collector.template: '@@OroPlatform/Collector/platform.html.twig'
+
 services:
     jms_serializer.twig_extension.serializer:
         class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
@@ -112,3 +114,8 @@ services:
         arguments:
             - '%kernel.project_dir%/bin/console'
             - '%kernel.environment%'
+
+    oro_platform.collector:
+        class: Oro\Bundle\PlatformBundle\Collector\PlatformCollector
+        tags:
+            - { name: data_collector, template: "%oro_platform.collector.template%", id: oro_platform, priority: -260 }

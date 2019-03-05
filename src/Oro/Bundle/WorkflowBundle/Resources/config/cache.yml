@@ -45,3 +45,37 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_workflow.changes.subscriber }
+
+    oro_workflow.cache_clearer.event_trigger_cache:
+        class: 'Oro\Bundle\WorkflowBundle\Cache\EventTriggerCacheClearer'
+        public: false
+        calls:
+            - [addEventTriggerCache, ['@oro_workflow.cache.process_trigger']]
+            - [addEventTriggerCache, ['@oro_workflow.cache.transition_trigger_event']]
+        tags:
+            - { name: kernel.cache_clearer }
+
+    oro_workflow.cache_warmer.event_trigger_cache:
+        class: 'Oro\Bundle\WorkflowBundle\Cache\EventTriggerCacheWarmer'
+        public: false
+        calls:
+            - [addEventTriggerCache, ['@oro_workflow.cache.process_trigger']]
+            - [addEventTriggerCache, ['@oro_workflow.cache.transition_trigger_event']]
+        tags:
+            - { name: kernel.cache_warmer }
+
+    oro_workflow.cache_clearer.workflow_aware_cache:
+        class: 'Oro\Bundle\WorkflowBundle\Cache\WorkflowAwareCacheClearer'
+        public: false
+        arguments:
+            - '@oro_workflow.cache.entity_aware'
+        tags:
+            - { name: kernel.cache_clearer }
+
+    oro_workflow.cache_warmer.workflow_aware_cache:
+        class: 'Oro\Bundle\WorkflowBundle\Cache\WorkflowAwareCacheWarmer'
+        public: false
+        arguments:
+            - '@oro_workflow.cache.entity_aware'
+        tags:
+            - { name: kernel.cache_warmer }

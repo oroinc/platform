@@ -7,6 +7,8 @@ use Behat\Mink\Session;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SpinTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
+use WebDriver\Exception\ElementNotVisible;
+use WebDriver\Exception\NoSuchElement;
 
 /**
  * Base page element node.
@@ -180,6 +182,28 @@ class Element extends NodeElement
     public function findElementContains($name, $text)
     {
         return $this->elementFactory->findElementContains($name, $text, $this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function click()
+    {
+        try {
+            parent::click();
+        } catch (NoSuchElement | ElementNotVisible $e) {
+            $isClicked = $this->spin(function () {
+                if ($this->isVisible()) {
+                    parent::click();
+                    return true;
+                }
+                return false;
+            }, 3);
+
+            if (!$isClicked) {
+                throw $e;
+            }
+        }
     }
 
     /**

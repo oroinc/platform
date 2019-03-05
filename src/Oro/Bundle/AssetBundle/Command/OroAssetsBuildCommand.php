@@ -144,22 +144,21 @@ DESCRIPTION
      */
     protected function buildAssets(InputInterface $input, OutputInterface $output): void
     {
-        $command = 'vendor/oro/platform/build/node_modules/.bin/webpack';
+        $command = ['vendor/oro/platform/build/node_modules/webpack/bin/webpack.js'];
 
         if ($input->getArgument('theme')) {
-            $command .= ' --env.theme='.$input->getArgument('theme');
+            $command[] = '--env.theme='.$input->getArgument('theme');
         }
         if (true === $input->getOption('no-debug') || 'prod' === $input->getOption('env')) {
-            $command .= ' --mode=production';
+            $command[] = '--mode=production';
         }
         if ($input->getOption('watch')) {
-            $command .= ' --watch';
+            $command[] = '--watch';
         }
-        $command .= ' --env.symfony='.$input->getOption('env');
-        $command .= ' --colors';
+        $command[] = '--env.symfony='.$input->getOption('env');
+        $command[] = '--colors';
 
-
-        $process = $this->nodeProcessFactory->createProcess(
+        $process = $this->nodeProcessFactory->create(
             $command,
             $this->getKernel()->getProjectDir(),
             $this->buildTimeout
@@ -186,7 +185,7 @@ DESCRIPTION
      */
     protected function npmInstall(OutputInterface $output): void
     {
-        $command = $this->npmPath.' --no-audit install';
+        $command = [$this->npmPath,'--no-audit', 'install'];
         $output->writeln($command);
         $path = $this->getKernel()->getProjectDir().self::BUILD_DIR;
         $process = new Process($command, $path);

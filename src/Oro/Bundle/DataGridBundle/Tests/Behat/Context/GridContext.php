@@ -823,11 +823,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And filter Name as is equal to "User"
      *
      * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|is empty|is not empty))$/
-     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)"$/
-     * @When /^(?:|I )filter "(?P<filterName>.+)" as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)"$/
-     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)"$/
-     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid$/
-     * @When /^(?:|I )filter (?P<filterName>.+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid ?(?P<strictly>strictly)$/
+     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )filter "(?P<filterName>.+)" as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid$/
+     * @When /^(?:|I )filter (?P<filterName>.+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid ?(?P<strictly>strictly)$/
      *
      * @param string $filterName
      * @param string $type
@@ -843,6 +843,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterGridName = 'Grid',
         string $strictly = ''
     ) {
+        $value = $this->fixStepArgument($value);
+
         /** @var GridFilterStringItem $filterItem */
         $filterItem = $this
             ->getGridFilters($filterGridName)

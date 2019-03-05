@@ -49,8 +49,31 @@ class ControllersResetTest extends WebTestCase
 
         $this->assertNotNull($user->getPasswordChangedAt());
         $newPassword = $user->getPassword();
-        
+
         $this->assertNotEquals($oldPassword, $newPassword);
+    }
+
+    public function testRequestAction()
+    {
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_user_reset_request', ['_widgetContainer' => 'dialog'])
+        );
+        $result = $this->client->getResponse();
+        $this->assertResponseStatusCodeEquals($result, 200);
+        $content = $result->getContent();
+
+        $this->assertContains('username', $content);
+        $this->assertContains('_token', $content);
+
+        $form = $crawler->selectButton('Request')->form();
+        $form['username'] = LoadUserData::SIMPLE_USER_EMAIL;
+
+        $this->client->submit($form);
+        $result = $this->client->getResponse();
+
+        $this->assertResponseStatusCodeEquals($result, 200);
+        $this->assertContains('If there is a user account associated with ...@example.com', $result->getContent());
     }
 
     public function testSendEmailAction()
@@ -60,7 +83,10 @@ class ControllersResetTest extends WebTestCase
             $this->getUrl('oro_user_reset_send_email'),
             [
                 'username' => self::USER_NAME,
-                'frontend' => 1
+                'frontend' => 1,
+                '_csrf_token' => $this->client->getContainer()
+                    ->get('security.csrf.token_manager')
+                    ->getToken('oro-user-password-reset-request'),
             ],
             [],
             $this->generateNoHashNavigationHeader()
@@ -74,6 +100,30 @@ class ControllersResetTest extends WebTestCase
             ['username' => self::USER_NAME]
         );
         $this->assertNotNull($user->getPasswordRequestedAt());
+    }
+
+    public function testSendEmailWithWrongCsrfToken()
+    {
+        $this->client->request(
+            'POST',
+            $this->getUrl('oro_user_reset_send_email'),
+            [
+                'username' => self::USER_NAME,
+                'frontend' => 1,
+                '_csrf_token' => 'some_wrong_token',
+            ],
+            [],
+            $this->generateNoHashNavigationHeader()
+        );
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertContains('The CSRF token is invalid. Please try to resubmit the form.', $result->getContent());
+
+        /** @var User $user */
+        $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->findOneBy(
+            ['username' => self::USER_NAME]
+        );
+        $this->assertNull($user->getPasswordRequestedAt());
     }
 
     public function testSendForcedResetEmailAction()
@@ -187,7 +237,7 @@ class ControllersResetTest extends WebTestCase
 
         // @codingStandardsIgnoreStart
         $errorDiv = $crawler->filterXPath(
-            "//*/form[contains(@class, 'form-reset')]/*/div[contains(@class, 'input-prepend')][2][contains(@class, 'error')]"
+            "//*/form[contains(@class, 'form-signin--reset')]/*/div[contains(@class, 'control-group')][2][contains(@class, 'error')]"
         );
         // @codingStandardsIgnoreEnd
 
@@ -247,7 +297,7 @@ class ControllersResetTest extends WebTestCase
 
         // @codingStandardsIgnoreStarts
         $errorDiv = $crawler->filterXPath(
-            "//*/form[contains(@class, 'form-reset')]/*/div[contains(@class, 'input-prepend')][2][contains(@class, 'error')]"
+            "//*/form[contains(@class, 'form-signin--reset')]/*/div[contains(@class, 'control-group')][2][contains(@class, 'error')]"
         );
         // @codingStandardsIgnoreEnd
 

@@ -13,6 +13,7 @@ Feature: Forgot your password
       | Username or Email | nonexisting@example.com |
     When I confirm reset password
     Then I should see "If there is a user account associated with ...@example.com you will receive an email with a link to reset your password."
+    And email with Subject "Reset password" was not sent
 
   Scenario: Verify not existing username
     Given I am on Login page
@@ -21,6 +22,7 @@ Feature: Forgot your password
       | Username or Email | nonexisting |
     When I confirm reset password
     Then I should see "If there is a user account associated with nonexisting you will receive an email with a link to reset your password."
+    And email with Subject "Reset password" was not sent
 
   Scenario: Verify recovery message by email address
     Given I am on Login page
@@ -29,6 +31,9 @@ Feature: Forgot your password
       | Username or Email | admin@example.com |
     When I confirm reset password
     Then I should see "If there is a user account associated with ...@example.com you will receive an email with a link to reset your password."
+    And email with Subject "Reset password" containing the following was sent:
+      | To   | admin@example.com                                                     |
+      | Body | We've received a request to reset the password for your user account. |
 
   Scenario: Verify recovery message by username
     Given I am on Login page
@@ -37,3 +42,6 @@ Feature: Forgot your password
       | Username or Email | charlie |
     When I confirm reset password
     Then I should see "If there is a user account associated with ...@example.com you will receive an email with a link to reset your password."
+    And email with Subject "Reset password" containing the following was sent:
+      | To   | charlie@example.com                                                   |
+      | Body | We've received a request to reset the password for your user account. |

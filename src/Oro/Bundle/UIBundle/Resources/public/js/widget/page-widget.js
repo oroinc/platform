@@ -55,7 +55,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
             if (!latestShownPageWidget.length) {
                 this.$replacementEl.show();
             }
-            mediator.trigger('layout:adjustReloaded');
+            mediator.trigger('layout:adjustHeight');
         },
 
         _show: function() {
@@ -69,7 +69,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
             BlockWidget.prototype._show.apply(this);
             this.getActionsElement().find('button').wrap('<div class="btn-group"/>');
 
-            mediator.trigger('layout:adjustReloaded');
+            mediator.trigger('layout:adjustHeight');
         }
     });
 });

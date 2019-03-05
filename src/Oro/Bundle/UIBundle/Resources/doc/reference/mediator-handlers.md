@@ -59,9 +59,3 @@ Handler Name | Description
 ------------ | -----------
 `layout:init` | initializes proper widgets and plugins in the container
 `layout:dispose` | removes some plugins and widgets from child elements of the container
-
-## DebugToolbarView
-
-Handler Name | Description
------------- | -----------
-`updateDebugToolbar` | accepts XHR object, retrieves data and updates debug bar

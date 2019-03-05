@@ -9,29 +9,34 @@ use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface;
 use Oro\Bundle\NavigationBundle\Entity\Repository\NavigationItemRepository;
 use Oro\Bundle\NavigationBundle\Menu\NavigationItemBuilder;
+use Oro\Bundle\NavigationBundle\Provider\NavigationItemsProviderInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Routing\RouterInterface;
 
 class NavigationItemBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    const ITEM_TYPE = 'favorite';
+    private const ITEM_TYPE = 'favorite';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
     protected $router;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $featureChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ItemFactory|\PHPUnit\Framework\MockObject\MockObject */
     protected $factory;
+
+    /** @var NavigationItemsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $navigationItemsProvider;
 
     /** @var NavigationItemBuilder */
     protected $builder;
@@ -46,33 +51,92 @@ class NavigationItemBuilderTest extends \PHPUnit\Framework\TestCase
         $this->factory = $this->createMock(ItemFactory::class);
         $this->router = $this->createMock(RouterInterface::class);
         $this->featureChecker = $this->createMock(FeatureChecker::class);
+        $this->navigationItemsProvider = $this->createMock(NavigationItemsProviderInterface::class);
 
-        $this->builder = new NavigationItemBuilder(
-            $this->tokenAccessor,
-            $this->em,
-            $this->factory,
-            $this->router
-        );
+        $this->builder = new NavigationItemBuilder($this->tokenAccessor, $this->em, $this->factory, $this->router);
         $this->builder->setFeatureChecker($this->featureChecker);
         $this->builder->addFeature('email');
+
         $this->menu = $this->createMock(KnpItemInterface::class);
     }
 
-    public function testBuildAnonUser()
+    public function testBuildAnonUser(): void
     {
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor
+            ->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue(null));
-        $this->tokenAccessor->expects($this->never())
+            ->willReturn(null);
+
+        $this->tokenAccessor
+            ->expects($this->never())
             ->method('getOrganization');
 
-        $this->menu->expects($this->never())
+        $this->menu
+            ->expects($this->never())
             ->method('addChild');
-        $this->menu->expects($this->once())
+
+        $this->menu
+            ->expects($this->once())
             ->method('setExtra')
             ->with('type', 'pinbar');
 
         $this->builder->build($this->menu, [], 'pinbar');
+    }
+
+    public function testBuild(): void
+    {
+        $this->builder->setNavigationItemsProvider($this->navigationItemsProvider);
+
+        $organization = new Organization();
+        $user = $this->createMock(User::class);
+
+        $this->tokenAccessor
+            ->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->tokenAccessor
+            ->expects($this->once())
+            ->method('getOrganization')
+            ->willReturn($organization);
+
+        $this->navigationItemsProvider
+            ->expects(self::once())
+            ->method('getNavigationItems')
+            ->with($user, $organization, self::ITEM_TYPE)
+            ->willReturn($items = [
+                ['id' => 1, 'title' => 'sample-title-1', 'url' => 'sample-url-1', 'type' => self::ITEM_TYPE],
+                ['id' => 2, 'title' => 'sample-title-2', 'url' => 'sample-url-2', 'type' => self::ITEM_TYPE],
+            ]);
+
+        $this->menu
+            ->expects($this->once())
+            ->method('setExtra')
+            ->with('type', self::ITEM_TYPE);
+
+        $this->menu
+            ->expects($this->exactly(2))
+            ->method('addChild')
+            ->withConsecutive(
+                [
+                    self::ITEM_TYPE . '_item_1',
+                    [
+                        'extras' => $items[0],
+                        'uri' => 'sample-url-1',
+                        'label' => 'sample-title-1',
+                    ],
+                ],
+                [
+                    self::ITEM_TYPE . '_item_2',
+                    [
+                        'extras' => $items[1],
+                        'uri' => 'sample-url-2',
+                        'label' => 'sample-title-2',
+                    ],
+                ]
+            );
+
+        $this->builder->build($this->menu, [], self::ITEM_TYPE);
     }
 
     /**
@@ -81,7 +145,7 @@ class NavigationItemBuilderTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider itemsDataProvider
      */
-    public function testBuild(array $item, $expected)
+    public function testBuildWhenNoNavigationItemsProvider(array $item, $expected)
     {
         $this->configure([$item]);
 

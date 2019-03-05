@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\LayoutBundle\Command\DebugCommand;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigurationPass;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -17,6 +18,8 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $factoryBuilderDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->getMock();
         $extensionDef      = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->getMock();
+        $commandDef      = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->getMock();
 
         $blockTypeServiceIds           = [
@@ -81,13 +84,14 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
                     ]
                 )
             );
-        $container->expects($this->exactly(2))
+        $container->expects($this->exactly(3))
             ->method('getDefinition')
             ->will(
                 $this->returnValueMap(
                     [
                         [ConfigurationPass::LAYOUT_FACTORY_BUILDER_SERVICE, $factoryBuilderDef],
-                        [ConfigurationPass::LAYOUT_EXTENSION_SERVICE, $extensionDef]
+                        [ConfigurationPass::LAYOUT_EXTENSION_SERVICE, $extensionDef],
+                        [DebugCommand::class, $commandDef],
                     ]
                 )
             );
@@ -180,6 +184,8 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $extensionDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->getMock();
+        $commandDef      = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->getMock();
 
         $serviceIds = [
             'block1' => [['class' => 'Test\Class1']]
@@ -195,11 +201,17 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
                     ]
                 )
             );
-        $container->expects($this->once())
-            ->method('getDefinition')
-            ->with(ConfigurationPass::LAYOUT_EXTENSION_SERVICE)
-            ->will($this->returnValue($extensionDef));
 
+        $container->expects($this->exactly(2))
+            ->method('getDefinition')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [ConfigurationPass::LAYOUT_EXTENSION_SERVICE, $extensionDef],
+                        [DebugCommand::class, $commandDef],
+                    ]
+                )
+            );
         $container->expects($this->once())
             ->method('findTaggedServiceIds')
             ->with(ConfigurationPass::BLOCK_TYPE_TAG_NAME)
@@ -219,6 +231,8 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $extensionDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->getMock();
+        $commandDef      = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->getMock();
 
         $serviceIds = [
             'extension1' => [['class' => 'Test\Class1']]
@@ -234,10 +248,16 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
                     ]
                 )
             );
-        $container->expects($this->once())
+        $container->expects($this->exactly(2))
             ->method('getDefinition')
-            ->with(ConfigurationPass::LAYOUT_EXTENSION_SERVICE)
-            ->will($this->returnValue($extensionDef));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [ConfigurationPass::LAYOUT_EXTENSION_SERVICE, $extensionDef],
+                        [DebugCommand::class, $commandDef],
+                    ]
+                )
+            );
 
         $container->expects($this->exactly(2))
             ->method('findTaggedServiceIds')
@@ -264,6 +284,8 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $extensionDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->getMock();
+        $commandDef      = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->getMock();
 
         $serviceIds = [
             'update1' => [['class' => 'Test\Class1']]
@@ -279,10 +301,16 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
                     ]
                 )
             );
-        $container->expects($this->once())
+        $container->expects($this->exactly(2))
             ->method('getDefinition')
-            ->with(ConfigurationPass::LAYOUT_EXTENSION_SERVICE)
-            ->will($this->returnValue($extensionDef));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [ConfigurationPass::LAYOUT_EXTENSION_SERVICE, $extensionDef],
+                        [DebugCommand::class, $commandDef],
+                    ]
+                )
+            );
 
         $container->expects($this->exactly(3))
             ->method('findTaggedServiceIds')
@@ -310,6 +338,8 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $extensionDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->getMock();
+        $commandDef      = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->getMock();
 
         $serviceIds = [
             'dataProvider1' => [['class' => 'Test\DataProvider1']]
@@ -325,10 +355,16 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
                     ]
                 )
             );
-        $container->expects($this->once())
+        $container->expects($this->exactly(2))
             ->method('getDefinition')
-            ->with(ConfigurationPass::LAYOUT_EXTENSION_SERVICE)
-            ->will($this->returnValue($extensionDef));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [ConfigurationPass::LAYOUT_EXTENSION_SERVICE, $extensionDef],
+                        [DebugCommand::class, $commandDef],
+                    ]
+                )
+            );
 
         $container->expects($this->exactly(5))
             ->method('findTaggedServiceIds')

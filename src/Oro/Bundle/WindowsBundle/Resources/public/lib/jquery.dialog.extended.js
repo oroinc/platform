@@ -363,6 +363,19 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             return this;
         },
 
+        _position: function() {
+            // Need to show the dialog to get the actual offset in the position plugin
+            var isVisible = this.uiDialog.is(":visible");
+            var initialDisplay = this.uiDialog[0].style.display;
+            if (!isVisible) {
+                this.uiDialog.show();
+            }
+            this.uiDialog.position(this.options.position);
+            if (!isVisible) {
+                this.uiDialog.css('display', initialDisplay);
+            }
+        },
+
         _getTitleBarHeight: function() {
             return this.uiDialogTitlebar.height() + 15;
         },
@@ -739,6 +752,18 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             checkOption('titlebar', ['transparent']);
 
             return this;
+        },
+
+        /**
+         * Overrides parent implementation to make it possible to use HTML code and entities in title.
+         * Avoids double escaping when backend escapes characters, and frontend shows them as HTML entities in popup
+         * title instead of showing underlying characters.
+         *
+         * @param {String} title
+         * @private
+         */
+        _title: function (title) {
+            title.html(this.options.title);
         }
     });
 });
