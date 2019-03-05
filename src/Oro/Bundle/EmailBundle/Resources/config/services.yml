@@ -633,6 +633,7 @@ services:
             - '@oro_email.mailer.processor'
             - '@oro_email.email.address.helper'
             - '@oro_entity.entity_name_resolver'
+            - '@oro_email.tools.email_origin_helper'
         calls:
             - [setLogger, ['@logger']]
         tags:
@@ -648,6 +649,7 @@ services:
             - '@oro_email.email_renderer'
             - '@doctrine.orm.entity_manager'
             - '@validator'
+            - '@oro_email.tools.email_origin_helper'
         calls:
             - [setLogger, ['@logger']]
             - [setPreferredLanguageProvider, ['@oro_locale.provider.chain_preferred_language_provider']]

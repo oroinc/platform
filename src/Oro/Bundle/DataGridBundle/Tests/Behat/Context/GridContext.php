@@ -2021,9 +2021,9 @@ TEXT;
 
         static::assertInstanceOf(Table::class, $table, sprintf('Element should be of type %s', Table::class));
 
-        $rows = $table->getRows();
         $expectedRows = $expectedTableNode->getRows();
         $headers = array_shift($expectedRows);
+        $rows = $table->getRows();
 
         foreach ($expectedRows as $rowKey => $expectedRow) {
             self::assertEquals($expectedRow, $rows[$rowKey]->getCellValues($headers));
