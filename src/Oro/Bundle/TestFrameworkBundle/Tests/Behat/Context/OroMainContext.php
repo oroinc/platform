@@ -1056,6 +1056,33 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Force click on cancel button in discount popup
+     * Example: Given force click on cancel button in discount popup
+     * Example: When I force click on cancel button in discount popup
+     *
+     * @When /^(?:|I )force click on cancel button in discount popup$/
+     */
+    public function discountPopupForceCancel()
+    {
+        $button = 'Discount Popup Cancel Button';
+        try {
+            $this->elementFactory->createElement($button)->clickForce();
+        } catch (\InvalidArgumentException|NoSuchElement $e) {
+            $this->spin(function () use ($button) {
+                if ($this->elementFactory->hasElement($button)) {
+                    $this->elementFactory->createElement($button)->clickForce();
+
+                    return true;
+                }
+
+                return false;
+            }, 3);
+
+            throw $e;
+        }
+    }
+
+    /**
      * Example: Given I wait 1 second
      * Example: Given I wait 2 seconds
      *
