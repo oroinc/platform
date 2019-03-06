@@ -2,6 +2,12 @@ services:
     Oro\Bundle\ImportExportBundle\Command\ImportCommand:
         public: false
         class: Oro\Bundle\ImportExportBundle\Command\ImportCommand
+        arguments:
+            - '@oro_importexport.processor.registry',
+            - '@akeneo_batch.connectors'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_importexport.file.file_manager'
+            - '@oro_user.manager'
         tags:
             - { name: console.command }
 

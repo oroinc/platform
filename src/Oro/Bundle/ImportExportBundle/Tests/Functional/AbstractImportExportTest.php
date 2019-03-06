@@ -102,21 +102,21 @@ abstract class AbstractImportExportTest extends WebTestCase
     ) {
         $this->assertPreImportActionExecuted($configuration, $importFilePath);
 
-        $preImportMessageData = $this->getOneSentMessageWithTopic(Topics::PRE_HTTP_IMPORT);
+        $preImportMessageData = $this->getOneSentMessageWithTopic(Topics::PRE_IMPORT);
         $this->clearMessageCollector();
 
         $this->assertMessageProcessorExecuted(
-            'oro_importexport.async.pre_http_import',
+            'oro_importexport.async.pre_import',
             $preImportMessageData
         );
 
-        static::assertMessageSent(Topics::HTTP_IMPORT);
+        static::assertMessageSent(Topics::IMPORT);
 
-        $importMessageData = $this->getOneSentMessageWithTopic(Topics::HTTP_IMPORT);
+        $importMessageData = $this->getOneSentMessageWithTopic(Topics::IMPORT);
         $this->clearMessageCollector();
 
         $this->assertMessageProcessorExecuted(
-            'oro_importexport.async.http_import',
+            'oro_importexport.async.import',
             $importMessageData
         );
 
@@ -138,20 +138,20 @@ abstract class AbstractImportExportTest extends WebTestCase
 
         $this->assertPreImportValidationActionExecuted($configuration, $importCsvFilePath);
 
-        $preImportValidateMessageData = $this->getOneSentMessageWithTopic(Topics::PRE_HTTP_IMPORT);
+        $preImportValidateMessageData = $this->getOneSentMessageWithTopic(Topics::PRE_IMPORT);
         $this->clearMessageCollector();
 
         $this->assertMessageProcessorExecuted(
-            'oro_importexport.async.pre_http_import',
+            'oro_importexport.async.pre_import',
             $preImportValidateMessageData
         );
 
-        $importValidateMessageData = $this->getOneSentMessageWithTopic(Topics::HTTP_IMPORT);
+        $importValidateMessageData = $this->getOneSentMessageWithTopic(Topics::IMPORT);
         $jobId = $importValidateMessageData['jobId'];
         $this->clearMessageCollector();
 
         static::getContainer()
-            ->get('oro_importexport.async.http_import')
+            ->get('oro_importexport.async.import')
             ->process(
                 $this->createNullMessage($importValidateMessageData),
                 $this->createSessionInterfaceMock()
@@ -288,7 +288,7 @@ abstract class AbstractImportExportTest extends WebTestCase
         $response = static::getJsonResponseContent($this->client->getResponse(), 200);
         static::assertTrue($response['success']);
 
-        static::assertMessageSent(Topics::PRE_HTTP_IMPORT, [
+        static::assertMessageSent(Topics::PRE_IMPORT, [
             'fileName' => $fileName,
             'process' => ProcessorRegistry::TYPE_IMPORT,
             'userId' => $this->getCurrentUser()->getId(),
@@ -326,7 +326,7 @@ abstract class AbstractImportExportTest extends WebTestCase
         $response = static::getJsonResponseContent($this->client->getResponse(), 200);
         static::assertTrue($response['success']);
 
-        static::assertMessageSent(Topics::PRE_HTTP_IMPORT, [
+        static::assertMessageSent(Topics::PRE_IMPORT, [
             'fileName' => $fileName,
             'process' => ProcessorRegistry::TYPE_IMPORT_VALIDATION,
             'userId' => $this->getCurrentUser()->getId(),

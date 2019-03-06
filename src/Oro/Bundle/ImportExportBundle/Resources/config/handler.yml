@@ -1,8 +1,5 @@
 parameters:
     oro_importexport.handler.abstract.class:           Oro\Bundle\ImportExportBundle\Handler\AbstractHandler
-    oro_importexport.handler.import.abstract.class:    Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler
-    oro_importexport.handler.import.http.class:        Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler
-    oro_importexport.handler.import.cli.class:         Oro\Bundle\ImportExportBundle\Handler\CliImportHandler
     oro_importexport.handler.export.class:             Oro\Bundle\ImportExportBundle\Handler\ExportHandler
     oro_importexport.handler.csv.file.class:           Oro\Bundle\ImportExportBundle\Handler\CsvFileHandler
 
@@ -20,16 +17,11 @@ services:
             - ~
             - '@oro_importexport.file.file_manager'
 
-    oro_importexport.handler.import.abstract:
-        class: '%oro_importexport.handler.import.abstract.class%'
-        abstract: true
+    oro_importexport.handler.import:
+        class: Oro\Bundle\ImportExportBundle\Handler\ImportHandler
         parent: oro_importexport.handler.abstract
         arguments:
             index_6: '@oro_importexport.file.batch_file_manager.import'
-
-    oro_importexport.handler.import.http:
-        class: '%oro_importexport.handler.import.http.class%'
-        parent: oro_importexport.handler.import.abstract
         lazy: true
 
     oro_importexport.handler.export:
@@ -39,11 +31,6 @@ services:
             index_6: '@oro_importexport.file.batch_file_manager.export'
         calls:
             - [setMimeTypeGuesser, ['@oro_importexport.file.mime_type_guesser']]
-        lazy: true
-
-    oro_importexport.handler.import.cli:
-        class: '%oro_importexport.handler.import.cli.class%'
-        parent: oro_importexport.handler.import.abstract
         lazy: true
 
     oro_importexport.handler.csv.file:

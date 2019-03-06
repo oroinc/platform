@@ -13,7 +13,7 @@ use Oro\Bundle\ImportExportBundle\Form\Type\ExportType;
 use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
 use Oro\Bundle\ImportExportBundle\Handler\CsvFileHandler;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
-use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
+use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
@@ -32,6 +32,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
+ * Controller for import/export actions
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
@@ -235,7 +236,7 @@ class ImportExportController extends Controller
         $originFileName = $request->get('originFileName', null);
 
         $this->getMessageProducer()->send(
-            Topics::PRE_HTTP_IMPORT,
+            Topics::PRE_IMPORT,
             [
                 'fileName' => $fileName,
                 'process' => ProcessorRegistry::TYPE_IMPORT_VALIDATION,
@@ -269,7 +270,7 @@ class ImportExportController extends Controller
         $originFileName = $request->get('originFileName', null);
 
         $this->getMessageProducer()->send(
-            Topics::PRE_HTTP_IMPORT,
+            Topics::PRE_IMPORT,
             [
                 'fileName' => $fileName,
                 'process' => ProcessorRegistry::TYPE_IMPORT,
@@ -478,11 +479,11 @@ class ImportExportController extends Controller
     }
 
     /**
-     * @return HttpImportHandler
+     * @return ImportHandler
      */
     protected function getImportHandler()
     {
-        return $this->get('oro_importexport.handler.import.http');
+        return $this->get('oro_importexport.handler.import');
     }
 
     /**

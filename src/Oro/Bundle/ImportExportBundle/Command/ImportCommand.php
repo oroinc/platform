@@ -6,6 +6,8 @@ use Akeneo\Bundle\BatchBundle\Connector\ConnectorRegistry;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -14,15 +16,70 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
+/**
+ * This command provides possibility to import entities via command line
+ */
 class ImportCommand extends ContainerAwareCommand
 {
+    /**
+     * @var string
+     */
+    protected static $defaultName = 'oro:import:file';
+
+    /**
+     * @var ProcessorRegistry
+     */
+    private $processorRegistry;
+
+    /**
+     * @var ConnectorRegistry
+     */
+    private $connectorRegistry;
+
+    /**
+     * @var MessageProducerInterface
+     */
+    private $messageProducer;
+
+    /**
+     * @var FileManager
+     */
+    private $fileManager;
+
+    /**
+     * @var UserManager
+     */
+    private $userManger;
+
+    /**
+     * @param ProcessorRegistry $processorRegistry
+     * @param ConnectorRegistry $connectorRegistry
+     * @param MessageProducerInterface $messageProducer
+     * @param FileManager $fileManager
+     * @param UserManager $userManger
+     */
+    public function __construct(
+        ProcessorRegistry $processorRegistry,
+        ConnectorRegistry $connectorRegistry,
+        MessageProducerInterface $messageProducer,
+        FileManager $fileManager,
+        UserManager $userManger
+    ) {
+        $this->processorRegistry = $processorRegistry;
+        $this->connectorRegistry = $connectorRegistry;
+        $this->messageProducer = $messageProducer;
+        $this->fileManager = $fileManager;
+        $this->userManger = $userManger;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('oro:import:file')
             ->setDescription(
                 'Import data from specified file for specified entity. The import log is sent to the provided email.'
             )
@@ -66,9 +123,20 @@ class ImportCommand extends ContainerAwareCommand
             throw new \InvalidArgumentException(sprintf('File not found: %s', $sourceFile));
         }
 
+        $email = $input->getOption('email');
+
+        if ($email === null) {
+            throw new \InvalidArgumentException('The --email option is required.');
+        }
+
+        $importOwner = $this->getContainer()->get('oro_user.manager')->findUserByEmail((string) $email);
+        if (!$importOwner instanceof User) {
+            throw new \InvalidArgumentException(sprintf('Invalid email. There is no user with %s email!', $email));
+        }
+
         $originFileName = basename($sourceFile);
         $fileName = FileManager::generateUniqueFileName(pathinfo($sourceFile, PATHINFO_EXTENSION));
-        $this->getFileManager()->writeFileToStorage($sourceFile, $fileName);
+        $this->fileManager->writeFileToStorage($sourceFile, $fileName);
 
         $processor = $input->getOption('validation') ?
             ProcessorRegistry::TYPE_IMPORT_VALIDATION :
@@ -81,21 +149,16 @@ class ImportCommand extends ContainerAwareCommand
         );
 
         $jobName = $this->handleJobName($input, $output, $processor);
-        $email = $input->getOption('email');
 
-        if ($input->getOption('validation') && ! $email) {
-            throw new \InvalidArgumentException('Email is required for the validation!');
-        }
-
-        $this->getMessageProducer()->send(Topics::PRE_CLI_IMPORT, [
+        $this->messageProducer->send(Topics::PRE_IMPORT, [
             'fileName' => $fileName,
             'originFileName' => $originFileName,
-            'notifyEmail' => $email,
+            'userId' => $importOwner->getId(),
             'jobName' =>  $jobName,
             'processorAlias' => $processorAlias,
             'process' => $processor,
         ]);
-        
+
         if ($email) {
             $output->writeln('Scheduled successfully. The result will be sent to the email');
         } else {
@@ -120,12 +183,12 @@ class ImportCommand extends ContainerAwareCommand
         $label = ucwords(str_replace('-', ' ', $option));
 
         if ($input->getOption($option) &&
-            $this->getProcessorRegistry()->hasProcessor($type, $input->getOption($option))
+            $this->processorRegistry->hasProcessor($type, $input->getOption($option))
         ) {
             return $input->getOption($option);
         }
 
-        $processors = $this->getProcessorRegistry()->getProcessorsByType($type);
+        $processors = $this->processorRegistry->getProcessorsByType($type);
 
         if (!$processors) {
             throw new \InvalidArgumentException('No configured processors');
@@ -154,7 +217,7 @@ class ImportCommand extends ContainerAwareCommand
         $type = ProcessorRegistry::TYPE_IMPORT
     ) {
         $jobName = $input->getOption('jobName');
-        $jobNames = array_keys($this->getConnectorRegistry()->getJobs($type)['oro_importexport']);
+        $jobNames = array_keys($this->connectorRegistry->getJobs($type)['oro_importexport']);
         if ($jobName && in_array($jobName, $jobNames)) {
             return $jobName;
         }
@@ -166,36 +229,5 @@ class ImportCommand extends ContainerAwareCommand
         }
 
         throw new \InvalidArgumentException('Missing "jobName" option.');
-    }
-
-    /**
-     * @return ProcessorRegistry
-     */
-    private function getProcessorRegistry()
-    {
-        return $this->getContainer()->get('oro_importexport.processor.registry');
-    }
-    /**
-     * @return ConnectorRegistry
-     */
-    private function getConnectorRegistry()
-    {
-        return $this->getContainer()->get('akeneo_batch.connectors');
-    }
-
-    /**
-     * @return MessageProducerInterface
-     */
-    private function getMessageProducer()
-    {
-        return $this->getContainer()->get('oro_message_queue.client.message_producer');
-    }
-
-    /**
-     * @return FileManager
-     */
-    protected function getFileManager()
-    {
-        return $this->getContainer()->get('oro_importexport.file.file_manager');
     }
 }

@@ -3,11 +3,10 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import;
 
 use Gaufrette\Filesystem;
-use Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Import\ImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
-use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
+use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -22,11 +21,11 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class HttpImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testImportProcessCanBeConstructedWithRequiredAttributes()
     {
-        $chunkHttpImportMessageProcessor = new HttpImportMessageProcessor(
+        $chunkImportMessageProcessor = new ImportMessageProcessor(
             $this->createJobRunnerMock(),
             $this->createImportExportResultSummarizerMock(),
             $this->createJobStorageMock(),
@@ -35,8 +34,8 @@ class HttpImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createHttpImportHandlerMock(),
             $this->createMock(PostponedRowsHandler::class)
         );
-        $this->assertInstanceOf(MessageProcessorInterface::class, $chunkHttpImportMessageProcessor);
-        $this->assertInstanceOf(ImportMessageProcessor::class, $chunkHttpImportMessageProcessor);
+        $this->assertInstanceOf(MessageProcessorInterface::class, $chunkImportMessageProcessor);
+        $this->assertInstanceOf(ImportMessageProcessor::class, $chunkImportMessageProcessor);
     }
 
     public function testShouldLogErrorAndRejectMessageIfMessageWasInvalid()
@@ -47,7 +46,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical')
             ->with('Got invalid message');
 
-        $processor = new HttpImportMessageProcessor(
+        $processor = new ImportMessageProcessor(
             $this->createJobRunnerMock(),
             $this->createImportExportResultSummarizerMock(),
             $this->createJobStorageMock(),
@@ -176,7 +175,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('getFileSystem')
             ->willReturn($filesystem);
 
-        $processor = new HttpImportMessageProcessor(
+        $processor = new ImportMessageProcessor(
             $jobRunner,
             $importExportResultSummarizer,
             $jobStorage,
@@ -204,11 +203,11 @@ class HttpImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|HttpImportHandler
+     * @return \PHPUnit\Framework\MockObject\MockObject|ImportHandler
      */
     protected function createHttpImportHandlerMock()
     {
-        return $this->createMock(HttpImportHandler::class);
+        return $this->createMock(ImportHandler::class);
     }
 
     /**

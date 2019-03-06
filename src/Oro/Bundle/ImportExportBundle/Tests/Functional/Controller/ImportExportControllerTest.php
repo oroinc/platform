@@ -136,7 +136,7 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertJsonResponseSuccess();
 
         $this->assertMessageSent(
-            Topics::PRE_HTTP_IMPORT,
+            Topics::PRE_IMPORT,
             [
                 'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
                 'process' => 'import',
@@ -172,7 +172,7 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertJsonResponseSuccess();
 
         $this->assertMessageSent(
-            Topics::PRE_HTTP_IMPORT,
+            Topics::PRE_IMPORT,
             [
                 'jobName' => JobExecutor::JOB_IMPORT_VALIDATION_FROM_CSV,
                 'processorAlias' => 'oro_account',
