@@ -62,9 +62,9 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
             $this->router,
             $this->readerRegistry,
             $this->translator,
-            new ServiceLink($this->titleService),
-            $this->cache
+            new ServiceLink($this->titleService)
         );
+        $this->formType->setCache($this->cache);
 
         parent::setUp();
     }

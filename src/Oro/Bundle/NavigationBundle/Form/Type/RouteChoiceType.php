@@ -57,19 +57,24 @@ class RouteChoiceType extends AbstractType
      * @param TitleReaderRegistry $readerRegistry
      * @param TitleTranslator $titleTranslator
      * @param ServiceLink $titleServiceLink
-     * @param Cache $cache
      */
     public function __construct(
         RouterInterface $router,
         TitleReaderRegistry $readerRegistry,
         TitleTranslator $titleTranslator,
-        ServiceLink $titleServiceLink,
-        Cache $cache
+        ServiceLink $titleServiceLink
     ) {
         $this->router = $router;
         $this->readerRegistry = $readerRegistry;
         $this->titleTranslator = $titleTranslator;
         $this->titleServiceLink = $titleServiceLink;
+    }
+
+    /**
+     * @param Cache $cache
+     */
+    public function setCache(Cache $cache)
+    {
         $this->cache = $cache;
     }
 

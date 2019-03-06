@@ -355,7 +355,8 @@ services:
             - '@oro_navigation.title_reader.registry'
             - '@oro_navigation.title_translator'
             - '@oro_navigation.title_service.link'
-            - '@oro_navigation.route_collection.cache'
+        calls:
+            - ['setCache', ['@oro_navigation.route_collection.cache']]
         tags:
             - { name: form.type, alias: oro_route_choice }
 
