@@ -61,7 +61,7 @@ class FeatureStatisticManagerTest extends \PHPUnit\Framework\TestCase
 
         $expected = new FeatureStatistic();
         $expected->setPath('/relative/path/to/file')
-            ->setTime(142)
+            ->setDuration(142)
             ->setGitBranch(self::GIT_BRANCH)
             ->setGitTarget(self::GIT_TARGET)
             ->setBuildId(self::BUILD_ID);
@@ -116,5 +116,25 @@ class FeatureStatisticManagerTest extends \PHPUnit\Framework\TestCase
             ->method('flush');
 
         $this->manager->saveStatistics();
+    }
+
+    public function testCleanOldStatisticsForMasterBranch(): void
+    {
+        $this->featureRepository->expects($this->once())
+            ->method('removeOldStatistics')
+            ->with(2592000);
+
+        $this->criteria->set('branch_name', null);
+
+        $manager = new FeatureStatisticManager($this->featureRepository, $this->featurePathLocator, $this->criteria);
+        $manager->cleanOldStatistics();
+    }
+
+    public function testCleanOldStatistics(): void
+    {
+        $this->featureRepository->expects($this->never())
+            ->method('removeOldStatistics');
+
+        $this->manager->cleanOldStatistics();
     }
 }

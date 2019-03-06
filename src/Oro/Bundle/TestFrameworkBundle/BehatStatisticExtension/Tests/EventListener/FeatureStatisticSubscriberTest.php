@@ -150,8 +150,9 @@ class FeatureStatisticSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->statisticManager->expects($this->once())
             ->method('saveStatistics');
 
-        $this->output->expects($this->never())
-            ->method('writeln');
+        $this->output->expects($this->once())
+            ->method('writeln')
+            ->with('<info>Statistics was recorded successfully.</info>');
 
         $this->subscriber->saveStats();
     }
