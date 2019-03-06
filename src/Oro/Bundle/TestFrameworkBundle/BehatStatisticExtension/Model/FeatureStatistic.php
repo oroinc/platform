@@ -4,6 +4,9 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model;
 
 use Doctrine\DBAL\Schema\Schema;
 
+/**
+ * Implementation of Statistic model.
+ */
 class FeatureStatistic implements StatisticModelInterface
 {
     /**
@@ -45,6 +48,14 @@ class FeatureStatistic implements StatisticModelInterface
         $this->path = $path;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
     }
 
     /**
@@ -151,20 +162,21 @@ class FeatureStatistic implements StatisticModelInterface
     public static function declareSchema(Schema $schema)
     {
         $table = $schema->createTable(self::getName());
-        $id = $table->addColumn("id", "integer", ["unsigned" => true]);
+        $id = $table->addColumn('id', 'integer', ['unsigned' => true]);
         $id->setAutoincrement(true);
 
-        $table->addColumn("path", "string");
-        $table->addColumn("time", "integer");
+        $table->addColumn('path', 'string');
+        $table->addColumn('time', 'integer');
         $table->addColumn('git_branch', 'string', ['notnull' => false]);
         $table->addColumn('git_target', 'string', ['notnull' => false]);
         $table->addColumn('build_id', 'integer', ['notnull' => false]);
 
-        $table->setPrimaryKey(["id"]);
+        $table->setPrimaryKey(['id']);
         $table->addIndex(['path']);
         $table->addIndex(['git_branch']);
         $table->addIndex(['git_target']);
         $table->addIndex(['build_id']);
+        $table->addIndex(['build_id', 'git_target', 'git_branch']);
     }
 
     /**

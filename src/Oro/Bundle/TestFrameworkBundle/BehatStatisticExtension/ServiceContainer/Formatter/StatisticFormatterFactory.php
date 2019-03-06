@@ -7,11 +7,15 @@ use Behat\Testwork\Output\NodeEventListeningFormatter;
 use Behat\Testwork\Output\ServiceContainer\Formatter\FormatterFactory;
 use Behat\Testwork\Output\ServiceContainer\OutputExtension;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\EventListener\FeatureStatisticSubscriber;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Output\Printer\NullOutputPrinter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Builds container services.
+ */
 final class StatisticFormatterFactory implements FormatterFactory
 {
     /**
@@ -33,8 +37,8 @@ final class StatisticFormatterFactory implements FormatterFactory
      */
     public function processFormatter(ContainerBuilder $container)
     {
-        $subsriber = $container->getDefinition('behat_statistic.listener.feature_statistic_subscriber');
-        $subsriber->addMethodCall('setOutput', [$container->get('cli.output')]);
+        $subscriber = $container->getDefinition('behat_statistic.listener.feature_statistic_subscriber');
+        $subscriber->addMethodCall('setOutput', [$container->get('cli.output')]);
     }
 
     /**
@@ -45,7 +49,7 @@ final class StatisticFormatterFactory implements FormatterFactory
         $container->setParameter(
             'oro_behat_statistic.models',
             [
-                'Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic',
+                FeatureStatistic::class
             ]
         );
     }
@@ -80,9 +84,7 @@ final class StatisticFormatterFactory implements FormatterFactory
         $featureStatisticSubscriber = new Definition(
             FeatureStatisticSubscriber::class,
             [
-                new Reference('oro_behat_statistic.feature_repository'),
-                new Reference('oro_behat_statistic.specification.feature_path_locator'),
-                new Reference('oro_behat_statistic.criteria_array_collection'),
+                new Reference('oro_behat_statistic.manager'),
             ]
         );
 

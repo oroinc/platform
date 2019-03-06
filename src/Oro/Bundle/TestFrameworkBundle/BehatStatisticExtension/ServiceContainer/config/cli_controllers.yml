@@ -36,6 +36,7 @@ services:
         arguments:
             - '@oro_behat_statistic.suite.suite_configuration_registry'
             - '@suite.registry'
+            - '@oro_behat_statistic.manager'
         tags:
             - { name: cli.controller, priority: 580 }
 

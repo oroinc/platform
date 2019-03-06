@@ -20,6 +20,7 @@ use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareTrait;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\SpinTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
@@ -56,7 +57,7 @@ class OroMainContext extends MinkContext implements
         '^(?:|I )should see Schema updated flash message$'.
     '/';
 
-    use AssertTrait, KernelDictionary, PageObjectDictionary, SessionAliasProviderAwareTrait;
+    use AssertTrait, KernelDictionary, PageObjectDictionary, SessionAliasProviderAwareTrait, SpinTrait;
 
     /** @var Stopwatch */
     private $stopwatch;
@@ -343,7 +344,7 @@ class OroMainContext extends MinkContext implements
     {
         $flashMessages = $this->spin(function (OroMainContext $context) use ($flashMessageElement) {
             return $context->findAllElements($flashMessageElement);
-        }, $timeLimit);
+        }, $timeLimit, true);
 
         static::assertEmpty($flashMessages);
     }
@@ -453,6 +454,23 @@ class OroMainContext extends MinkContext implements
         self::assertTrue(
             $result,
             sprintf('The text "%s" was not found anywhere in the text of the current page.', $text)
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertPageNotContainsText($text)
+    {
+        $result = $this->spin(function (OroMainContext $context) use ($text) {
+            $context->assertSession()->pageTextNotContains($this->fixStepArgument($text));
+
+            return true;
+        }, 5);
+
+        self::assertTrue(
+            $result,
+            sprintf('The text "%s" was found in the text of the current page.', $text)
         );
     }
 
@@ -592,32 +610,6 @@ class OroMainContext extends MinkContext implements
         $this->assertPageNotContainsText('<Script>');
         $this->assertPageNotContainsText('&lt;script&gt;');
         $this->assertPageNotContainsText('&lt;Script&gt;');
-    }
-
-    /**
-     * @param \Closure $lambda
-     * @param int $timeLimit in seconds
-     * @return null|mixed Return null if closure throw error or return not true value.
-     *                     Return value that return closure
-     */
-    public function spin(\Closure $lambda, $timeLimit = 60)
-    {
-        $time = $timeLimit;
-
-        while ($time > 0) {
-            try {
-                if ($result = $lambda($this)) {
-                    return $result;
-                }
-            } catch (\Exception $e) {
-                // do nothing
-            }
-
-            usleep(250000);
-            $time -= 0.25;
-        }
-
-        return null;
     }
 
     /**
@@ -1476,13 +1468,13 @@ JS;
     public function assertElementNotOnPage($element)
     {
         $elementOnPage = $this->createElement($element);
-        $result = $this->spin(function (OroMainContext $context) use ($elementOnPage, $element) {
+        $result = $this->spin(function () use ($elementOnPage) {
             try {
                 return !$elementOnPage->isVisible();
             } catch (NoSuchElement $e) {
                 return true;
             }
-        }, 3);
+        }, 3, true);
 
         self::assertTrue(
             $result,
