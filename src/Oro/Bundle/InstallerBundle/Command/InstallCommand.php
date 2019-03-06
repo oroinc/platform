@@ -23,6 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Process\Process;
 
 /**
  * Command installs application with all schema and data migrations, prepares assets and application cache
@@ -32,6 +33,9 @@ use Symfony\Component\Intl\Intl;
 class InstallCommand extends AbstractCommand implements InstallCommandInterface
 {
     public const NAME = 'oro:install';
+
+    /** @var Process */
+    private $assetsCommandProcess;
 
     /** @var InputOptionProvider */
     protected $inputOptionProvider;
@@ -100,8 +104,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -115,24 +117,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $commandExecutor = $this->getCommandExecutor($input, $output);
 
         if ($this->isInstalled()) {
-            $output->writeln('<comment>ATTENTION</comment>: Oro Application already installed.');
-            $output->writeln(
-                'To proceed with install: '
-            );
-            $output->writeln(' - set parameter <info>installed: false</info> in config/parameters.yml.');
-            $output->writeln(' - remove caches in var/cache folder manually');
-            $output->writeln(' - drop database manually or reinstall over existing database.');
-            $output->writeln(
-                'To reinstall over existing database - run command with <info>--drop-database</info> option:'
-            );
-            $output->writeln(sprintf('    <info>%s --drop-database</info>', $this->getName()));
-            $output->writeln(
-                '<comment>ATTENTION</comment>: All data will be lost. ' .
-                'Database backup is highly recommended before executing this command.'
-            );
-            $output->writeln('');
-
-            return 0;
+            $this->alreadyInstalledMessageShow($output);
         }
 
         $output->writeln('<info>Installing Oro Application.</info>');
@@ -150,16 +135,59 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $this->prepareStep($input, $output);
 
             $eventDispatcher->dispatch(InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION, $event);
+
+            if (!$skipAssets) {
+                $this->startBuildAssetsProcess($input);
+            }
+
             $this->loadDataStep($commandExecutor, $output);
             $eventDispatcher->dispatch(InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION, $event);
 
             $this->finalStep($commandExecutor, $output, $input, $skipAssets);
+
+            if (!$skipAssets) {
+                $buildAssetsProcessExitCode = $this->getBuildAssetsProcessExitCode($output);
+            }
         } catch (\Exception $exception) {
             $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
 
             return $commandExecutor->getLastCommandExitCode();
         }
 
+        $this->successfullyInstalledMessageShow($input, $output);
+
+        return $buildAssetsProcessExitCode ?? 0;
+    }
+
+    /**
+     * @param OutputInterface $output
+     */
+    private function alreadyInstalledMessageShow(OutputInterface $output): void
+    {
+        $output->writeln('<comment>ATTENTION</comment>: Oro Application already installed.');
+        $output->writeln(
+            'To proceed with install: '
+        );
+        $output->writeln(' - set parameter <info>installed: false</info> in config/parameters.yml.');
+        $output->writeln(' - remove caches in var/cache folder manually');
+        $output->writeln(' - drop database manually or reinstall over existing database.');
+        $output->writeln(
+            'To reinstall over existing database - run command with <info>--drop-database</info> option:'
+        );
+        $output->writeln(sprintf('    <info>%s --drop-database</info>', $this->getName()));
+        $output->writeln(
+            '<comment>ATTENTION</comment>: All data will be lost. ' .
+            'Database backup is highly recommended before executing this command.'
+        );
+        $output->writeln('');
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
+    private function successfullyInstalledMessageShow(InputInterface $input, OutputInterface $output): void
+    {
         $output->writeln('');
         $output->writeln(
             sprintf(
@@ -188,8 +216,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             '</comment> ' .
             'for more information.</info>'
         );
-
-        return 0;
     }
 
     /**
@@ -524,27 +550,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
 
         $this->processTranslations($input, $commandExecutor);
 
-        if (!$skipAssets) {
-            $commandExecutor->runCommand(
-                'fos:js-routing:dump',
-                [
-                    '--process-isolation' => true,
-                ]
-            )
-                ->runCommand('oro:localization:dump')
-                ->runCommand(
-                    'assets:install',
-                    $assetsOptions
-                )
-                ->runCommand('oro:assets:build', ['--npm-install'=> true])
-                ->runCommand(
-                    'oro:requirejs:build',
-                    [
-                        '--ignore-errors' => true,
-                        '--process-isolation' => true,
-                    ]
-                );
-        }
         // run installer scripts
         $this->processInstallerScripts($output, $commandExecutor);
 
@@ -797,5 +802,60 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         asort($alternatives);
 
         return implode(', ', array_keys($alternatives));
+    }
+
+    /**
+     * @param InputInterface $input
+     */
+    private function startBuildAssetsProcess(InputInterface $input): void
+    {
+        $phpBinaryPath = CommandExecutor::getPhpExecutable();
+
+        $command = [
+            $phpBinaryPath,
+            'bin/console',
+            'oro:assets:install'
+        ];
+
+        if ($input->hasOption('symlink') && $input->getOption('symlink')) {
+            $command[] = '--symlink';
+        }
+
+        if ($input->getOption('env')) {
+            $command[] = sprintf('--env=%s', $input->getOption('env'));
+        }
+
+        $this->assetsCommandProcess = new Process(
+            $command,
+            realpath($this->getContainer()->getParameter('kernel.project_dir'))
+        );
+        $this->assetsCommandProcess->setTimeout(null);
+        $this->assetsCommandProcess->start();
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return int||null
+     */
+    private function getBuildAssetsProcessExitCode(OutputInterface $output): ?int
+    {
+        if (!$this->assetsCommandProcess) {
+            return 0;
+        }
+
+        if (!$this->assetsCommandProcess->isTerminated()) {
+            $this->assetsCommandProcess->wait();
+        }
+
+        if ($this->assetsCommandProcess->isSuccessful()) {
+            $output->writeln('Assets has been installed successfully');
+            $output->writeln($this->assetsCommandProcess->getOutput());
+        } else {
+            $output->writeln('Assets has not been installed! Please run "php bin/console oro:assets:install".');
+            $output->writeln('Error during install assets:');
+            $output->writeln($this->assetsCommandProcess->getErrorOutput());
+        }
+
+        return $this->assetsCommandProcess->getExitCode();
     }
 }

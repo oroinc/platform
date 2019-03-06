@@ -7,12 +7,15 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Mink;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Testwork\Suite\Suite;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\SpinTrait;
 
 /**
  * Provide a set of methods to manipulate Elements
  */
 class OroElementFactory implements SuiteAwareInterface
 {
+    use SpinTrait;
+
     /**
      * @var Mink
      */
@@ -271,14 +274,18 @@ class OroElementFactory implements SuiteAwareInterface
             }
         }
 
-        $elements = $this->mink->getSession()->getPage()->findAll(
-            $elementSelector['type'],
-            $elementSelector['locator']
+        $elements = $this->spin(
+            function () use ($elementSelector) {
+                return $this->mink->getSession()
+                    ->getPage()
+                    ->findAll($elementSelector['type'], $elementSelector['locator']);
+            },
+            3
         );
 
         return array_map(function (NodeElement $element) use ($configName) {
             return $this->wrapElement($configName, $element);
-        }, $elements);
+        }, $elements ?: []);
     }
 
     /**

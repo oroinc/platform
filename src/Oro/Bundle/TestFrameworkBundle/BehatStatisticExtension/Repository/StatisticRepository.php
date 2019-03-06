@@ -9,6 +9,9 @@ use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\StatisticModelI
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\AvgStrategy\AvgStrategyAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\AvgStrategy\AvgStrategyInterface;
 
+/**
+ * Doctrine repository for working with Statistic model.
+ */
 class StatisticRepository implements BatchRepositoryInterface, ObjectRepository, AvgStrategyAwareInterface
 {
     const MAX_LIMIT = 10000;
@@ -50,10 +53,15 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         $this->collection[] = $model;
     }
 
+    /**
+     * @param int $numberOfBuilds
+     * @param array $criteria
+     * @return array
+     */
     public function getLastBuildIds($numberOfBuilds, array $criteria)
     {
         $buildIdsQueryBuilder = $this->connection->createQueryBuilder()
-            ->select("build_id")
+            ->select('build_id')
             ->from($this->className::getName())
             ->groupBy('build_id')
             ->orderBy('build_id', 'DESC')
@@ -118,6 +126,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         }
 
         $this->connection->close();
+        $this->collection = [];
     }
 
     /**
