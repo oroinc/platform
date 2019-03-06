@@ -342,6 +342,12 @@ services:
         tags:
             - { name: form.type, alias: pagestate }
 
+    oro_navigation.route_collection.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_navigation_route_collection' ] ]
+
     oro_navigation.form.type.route_select:
         class: Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType
         arguments:
@@ -349,6 +355,7 @@ services:
             - '@oro_navigation.title_reader.registry'
             - '@oro_navigation.title_translator'
             - '@oro_navigation.title_service.link'
+            - '@oro_navigation.route_collection.cache'
         tags:
             - { name: form.type, alias: oro_route_choice }
 

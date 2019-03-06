@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Form\Type;
 
+use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
@@ -37,6 +38,11 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
     private $titleService;
 
     /**
+     * @var Cache|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $cache;
+
+    /**
      * @var RouteChoiceType
      */
     private $formType;
@@ -50,12 +56,14 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
         $this->readerRegistry = $this->createMock(TitleReaderRegistry::class);
         $this->translator = $this->createMock(TitleTranslator::class);
         $this->titleService = $this->createMock(TitleService::class);
+        $this->cache = $this->createMock(Cache::class);
 
         $this->formType = new RouteChoiceType(
             $this->router,
             $this->readerRegistry,
             $this->translator,
-            new ServiceLink($this->titleService)
+            new ServiceLink($this->titleService),
+            $this->cache
         );
 
         parent::setUp();
@@ -64,100 +72,6 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
     public function testGetParent()
     {
         $this->assertEquals(Select2ChoiceType::class, $this->formType->getParent());
-    }
-
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
-    {
-        return [
-            'default options' => [
-                [],
-                [
-                    'oro_route_get_simple',
-                    'oro_route_get',
-                    'oro_route_get_post',
-                    'oro_route_with_option',
-                    'oro_route_get_simple_no_title'
-                ],
-                [
-                    'oro_route_get_simple' => 'Oro Route Get Simple (Get Simple)',
-                    'oro_route_get' => 'Oro Route Get (Get)',
-                    'oro_route_get_post' => 'Oro Route Get Post (Get Post)',
-                    'oro_route_with_option' => 'Oro Route With Option (With Option)'
-                ]
-            ],
-            'filtered path' => [
-                [
-                    'path_filter' => '/^\/get/'
-                ],
-                [
-                    'oro_route_get',
-                    'oro_route_get_post',
-                    'oro_route_get_simple_no_title'
-                ],
-                [
-                    'oro_route_get' => 'Oro Route Get (Get)',
-                    'oro_route_get_post' => 'Oro Route Get Post (Get Post)',
-                ]
-            ],
-            'filtered name' => [
-                [
-                    'name_filter' => '/^oro_route_get/'
-                ],
-                [
-                    'oro_route_get_simple',
-                    'oro_route_get',
-                    'oro_route_get_post',
-                    'oro_route_get_simple_no_title'
-                ],
-                [
-                    'oro_route_get_simple' => 'Oro Route Get Simple (Get Simple)',
-                    'oro_route_get' => 'Oro Route Get (Get)',
-                    'oro_route_get_post' => 'Oro Route Get Post (Get Post)',
-                ]
-            ],
-            'include with parameters' => [
-                [
-                    'without_parameters_only' => false
-                ],
-                [
-                    'oro_route_get_simple',
-                    'oro_route_get',
-                    'oro_route_get_post',
-                    'oro_route_with_parameters',
-                    'oro_route_with_option',
-                    'oro_route_get_simple_no_title'
-                ],
-                [
-                    'oro_route_get_simple' => 'Oro Route Get Simple (Get Simple)',
-                    'oro_route_get' => 'Oro Route Get (Get)',
-                    'oro_route_get_post' => 'Oro Route Get Post (Get Post)',
-                    'oro_route_with_parameters' => 'Oro Route With Parameters (With Parameters)',
-                    'oro_route_with_option' => 'Oro Route With Option (With Option)'
-                ]
-            ],
-            'include without titles' => [
-                [
-                    'with_titles_only' => false
-                ],
-                [
-                    'oro_route_get_simple',
-                    'oro_route_get',
-                    'oro_route_get_post',
-                    'oro_route_with_option',
-                    'oro_route_get_simple_no_title'
-                ],
-                [
-                    'oro_route_get_simple' => 'Oro Route Get Simple (Get Simple)',
-                    'oro_route_get' => 'Oro Route Get (Get)',
-                    'oro_route_get_post' => 'Oro Route Get Post (Get Post)',
-                    'oro_route_with_option' => 'Oro Route With Option (With Option)',
-                    'oro_route_get_simple_no_title' => 'Oro Route Get Simple No Title'
-                ]
-            ],
-        ];
     }
 
     public function testConfigureOptionsDoNotAddTitles()
@@ -171,6 +85,67 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
         $this->readerRegistry
             ->expects($this->never())
             ->method($this->anything());
+
+        $this->cache->expects($this->once())
+            ->method('contains')
+            ->willReturn(false);
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with(
+                $this->isType('string'),
+                [
+                    'oro_route_get_simple',
+                    'oro_route_get',
+                    'oro_route_get_post',
+                    'oro_route_with_option',
+                    'oro_route_get_simple_no_title'
+                ]
+            );
+
+        $options = ['add_titles' => false, 'menu_name' => 'menu'];
+
+        $resolver = new OptionsResolver();
+        $this->formType->configureOptions($resolver);
+        $resolvedOptions = $resolver->resolve($options);
+
+        $expectedChoices = [
+            'Oro Route Get Simple' => 'oro_route_get_simple',
+            'Oro Route Get' => 'oro_route_get',
+            'Oro Route Get Post' => 'oro_route_get_post',
+            'Oro Route With Option' => 'oro_route_with_option',
+            'Oro Route Get Simple No Title' => 'oro_route_get_simple_no_title',
+        ];
+
+        $this->assertArrayHasKey('choices', $resolvedOptions);
+        $this->assertEquals($expectedChoices, $resolvedOptions['choices']);
+    }
+
+    public function testConfigureWithFetchFromCache()
+    {
+        $this->router->expects($this->never())
+            ->method('getRouteCollection');
+
+        $this->readerRegistry
+            ->expects($this->never())
+            ->method($this->anything());
+
+        $this->cache->expects($this->once())
+            ->method('contains')
+            ->willReturn(true);
+        $this->cache->expects($this->never())
+            ->method('save');
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with($this->isType('string'))
+            ->willReturn(
+                [
+                    'oro_route_get_simple',
+                    'oro_route_get',
+                    'oro_route_get_post',
+                    'oro_route_with_option',
+                    'oro_route_get_simple_no_title'
+                ]
+            );
 
         $options = ['add_titles' => false, 'menu_name' => 'menu'];
 
