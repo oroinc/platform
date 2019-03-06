@@ -458,6 +458,23 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function assertPageNotContainsText($text)
+    {
+        $result = $this->spin(function (OroMainContext $context) use ($text) {
+            $context->assertSession()->pageTextNotContains($this->fixStepArgument($text));
+
+            return true;
+        }, 5);
+
+        self::assertTrue(
+            $result,
+            sprintf('The text "%s" was found in the text of the current page.', $text)
+        );
+    }
+
+    /**
      * Checks, that page contains element specified number of times
      * Example: Then I should see 1 element "TextElement"
      * Example: And I should see 3 elements "BlockElement"
