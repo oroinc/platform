@@ -46,7 +46,7 @@ class FeatureStatisticManager
 
         $stat = new FeatureStatistic();
         $stat->setPath($featurePath)
-            ->setTime($time)
+            ->setDuration($time)
             ->setGitBranch($this->getGitBranch())
             ->setGitTarget($this->getGitTarget())
             ->setBuildId($this->getBuildId());
@@ -81,6 +81,13 @@ class FeatureStatisticManager
         $this->featureRepository->flush();
     }
 
+    public function cleanOldStatistics()
+    {
+        if ($this->getGitTarget() === 'master' && $this->getGitBranch() === null) {
+            $this->featureRepository->removeOldStatistics($this->getStatisticsLifetime());
+        }
+    }
+
     /**
      * @return null|string
      */
@@ -103,5 +110,15 @@ class FeatureStatisticManager
     private function getGitTarget(): ?string
     {
         return $this->criteria->get('target_branch');
+    }
+
+    /**
+     * @return int
+     */
+    private function getStatisticsLifetime(): int
+    {
+        $lifetime = $this->criteria->get('lifetime') ?: 30;
+
+        return $lifetime * 86400; //one month by default
     }
 }

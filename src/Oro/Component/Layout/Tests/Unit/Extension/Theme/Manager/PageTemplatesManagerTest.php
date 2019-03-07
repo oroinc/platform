@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Manager;
 
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Layout\Extension\Theme\Manager\PageTemplatesManager;
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
@@ -15,13 +16,15 @@ class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
     /** @var PageTemplatesManager */
     private $pageTemplatesManager;
 
+    /** @var Translator */
+    private $translatorMock;
+
     protected function setUp()
     {
-        $this->themeManagerMock = $this->getMockBuilder(ThemeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->themeManagerMock = $this->createMock(ThemeManager::class);
+        $this->translatorMock = $this->createMock(Translator::class);
 
-        $this->pageTemplatesManager = new PageTemplatesManager($this->themeManagerMock);
+        $this->pageTemplatesManager = new PageTemplatesManager($this->themeManagerMock, $this->translatorMock);
     }
 
     /**
@@ -36,24 +39,28 @@ class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getAllThemes')
             ->willReturn($themes);
 
+        $this->translatorMock->expects($this->exactly(2))
+            ->method('trans')
+            ->willReturnArgument(0);
+
         $this->assertEquals($expected, $this->pageTemplatesManager->getRoutePageTemplates());
     }
 
     /**
      * @return array
      */
-    public function routePageTemplatesDataProvider()
+    public function routePageTemplatesDataProvider(): array
     {
         return [
             'with title' => [
                 'themes' => [
                     $this->getTheme('Theme1', [
-                        new PageTemplate('Page Template 1', 'some_key1_1', 'route_name_1'),
+                        $this->getPageTemplate('Page Template 1', 'some_key1_1', 'route_name_1', 'description_1'),
                     ], [
                         'route_name_1' => 'Route Title 1',
                     ]),
                     $this->getTheme('Theme2', [
-                        new PageTemplate('Page Template 2', 'some_key2_1', 'route_name_2'),
+                        $this->getPageTemplate('Page Template 2', 'some_key2_1', 'route_name_2', 'description_2'),
                     ], [
                         'route_name_2' => 'Route Title 2',
                     ]),
@@ -61,14 +68,20 @@ class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'route_name_1' => [
                         'label' => 'Route Title 1',
+                        'descriptions' => [
+                            'some_key1_1' => 'description_1',
+                        ],
                         'choices' => [
-                            'Page Template 1' => 'some_key1_1',
+                            'some_key1_1' => 'Page Template 1',
                         ]
                     ],
                     'route_name_2' => [
                         'label' => 'Route Title 2',
+                        'descriptions' => [
+                            'some_key2_1' => 'description_2',
+                        ],
                         'choices' => [
-                            'Page Template 2' => 'some_key2_1',
+                            'some_key2_1' => 'Page Template 2',
                         ]
                     ],
                 ]
@@ -76,12 +89,12 @@ class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
             'with title overriding' => [
                 'themes' => [
                     $this->getTheme('Theme1', [
-                        new PageTemplate('Page Template 1', 'some_key1_1', 'route_name_1'),
+                        $this->getPageTemplate('Page Template 1', 'some_key1_1', 'route_name_1', 'description_1'),
                     ], [
                         'route_name_1' => 'Route Title 1',
                     ]),
                     $this->getTheme('Theme2', [
-                        new PageTemplate('Page Template 2', 'some_key2_1', 'route_name_1'),
+                        $this->getPageTemplate('Page Template 2', 'some_key2_1', 'route_name_1', 'description_2'),
                     ], [
                         'route_name_1' => 'New Route Title 1',
                     ]),
@@ -89,29 +102,56 @@ class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'route_name_1' => [
                         'label' => 'New Route Title 1',
+                        'descriptions' => [
+                            'some_key1_1' => 'description_1',
+                            'some_key2_1' => 'description_2',
+                        ],
                         'choices' => [
-                            'Page Template 1' => 'some_key1_1',
-                            'Page Template 2' => 'some_key2_1',
+                            'some_key1_1' => 'Page Template 1',
+                            'some_key2_1' => 'Page Template 2',
                         ]
                     ],
                 ]
             ],
-            'without title' => [
+            'without title and with description' => [
                 'themes' => [
                     $this->getTheme('Theme1', [
-                        new PageTemplate('Page Template 1', 'some_key1_1', 'route_name_1'),
-                    ])
+                        $this->getPageTemplate('Page Template 1', 'some_key1_1', 'route_name_1', 'description_1'),
+                    ]),
+                    $this->getTheme('Theme2', [
+                        $this->getPageTemplate('Page Template 2', 'some_key2_1', 'route_name_1', 'description_2'),
+                    ]),
                 ],
                 'expected' => [
                     'route_name_1' => [
                         'label' => 'route_name_1',
+                        'descriptions' => [
+                            'some_key1_1' => 'description_1',
+                            'some_key2_1' => 'description_2',
+                        ],
                         'choices' => [
-                            'Page Template 1' => 'some_key1_1',
+                            'some_key1_1' => 'Page Template 1',
+                            'some_key2_1' => 'Page Template 2',
                         ]
                     ]
                 ]
             ],
         ];
+    }
+
+    /**
+     * @param string $label
+     * @param string $key
+     * @param string $routeName
+     * @param string|null $description
+     * @return PageTemplate
+     */
+    private function getPageTemplate(string $label, string $key, string $routeName, ?string $description): PageTemplate
+    {
+        $pageTemplate = new PageTemplate($label, $key, $routeName);
+        $pageTemplate->setDescription($description);
+
+        return $pageTemplate;
     }
 
     /**
@@ -121,7 +161,7 @@ class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
      *
      * @return Theme
      */
-    private function getTheme($themeName, array $pageTemplates, array $pageTemplateTitles = [])
+    private function getTheme(string $themeName, array $pageTemplates, array $pageTemplateTitles = []): Theme
     {
         $theme = new Theme($themeName);
 

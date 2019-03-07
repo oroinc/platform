@@ -344,7 +344,7 @@ class OroMainContext extends MinkContext implements
     {
         $flashMessages = $this->spin(function (OroMainContext $context) use ($flashMessageElement) {
             return $context->findAllElements($flashMessageElement);
-        }, $timeLimit, true);
+        }, $timeLimit);
 
         static::assertEmpty($flashMessages);
     }
@@ -1096,6 +1096,8 @@ class OroMainContext extends MinkContext implements
         self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
 
         $actual = $elementObject->getText();
+        $text = $this->fixStepArgument($text);
+
         $regex = '/'.preg_quote($text, '/').'/ui';
 
         $message = sprintf('Failed asserting that "%s" contains "%s"', $text, $actual);
@@ -1112,6 +1114,8 @@ class OroMainContext extends MinkContext implements
         self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
 
         $actual = $elementObject->getText();
+        $text = $this->fixStepArgument($text);
+
         $regex = '/'.preg_quote($text, '/').'/ui';
 
         $message = sprintf('Failed asserting that "%s" does not contain "%s"', $text, $actual);
@@ -1474,7 +1478,7 @@ JS;
             } catch (NoSuchElement $e) {
                 return true;
             }
-        }, 3, true);
+        }, 3);
 
         self::assertTrue(
             $result,

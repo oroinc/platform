@@ -15,6 +15,7 @@ define(function(require) {
     var persistentStorage = require('oroui/js/persistent-storage');
     var FilterDialogWidget = require('orofilter/js/app/views/filter-dialog-widget');
     var config = require('module').config();
+    var DEFAULT_STORAGE_KEY = 'filters-state';
 
     /**
      * View that represents all grid filters
@@ -125,6 +126,13 @@ define(function(require) {
          */
         hidePreviousOpenFilters: true,
 
+        /**
+         * Key that's used to fetch data about filters state view mode from persistent storage
+         *
+         * @property
+         */
+        storageKey: null,
+
         /** @property */
         events: {
             'change [data-action=add-filter-select]': '_onChangeFilterSelect',
@@ -156,14 +164,22 @@ define(function(require) {
          * @param {String} [options.addButtonHint]
          */
         initialize: function(options) {
-            var prop = ['addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement', 'viewMode'];
+            _.extend(this, _.pick(options, 'addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement'));
+
             this.template = this.getTemplateFunction();
-            this.filters = {};
+            this.filters = _.extend({}, options.filters);
+            this.storageKey = options.filtersStateStorageKey || config.filtersStateStorageKey || DEFAULT_STORAGE_KEY;
 
-            _.extend(this, _.pick(options, prop));
+            if (options.forcedViewMode) {
+                this.viewMode = options.forceViewMode;
+            } else if (this.renderMode === 'toggle-mode') {
+                this.viewMode = FiltersManager.STATE_VIEW_MODE;
+            } else {
+                this.viewMode = persistentStorage.getItem(this.storageKey);
 
-            if (options.filters) {
-                _.extend(this.filters, options.filters);
+                if (this.viewMode === null) {
+                    this.viewMode = options.defaultFiltersViewMode || FiltersManager.STATE_VIEW_MODE;
+                }
             }
 
             var filterListeners = {
@@ -189,7 +205,8 @@ define(function(require) {
             if (this.isFiltersStateViewNeeded(options)) {
                 var filtersStateView = new FiltersStateView({
                     el: options.filtersStateElement,
-                    filters: options.filters
+                    filters: options.filters,
+                    useAnimationOnInit: options.useFiltersStateAnimationOnInit
                 });
 
                 this.subview('filters-state', filtersStateView);
@@ -199,6 +216,10 @@ define(function(require) {
             }
 
             FiltersManager.__super__.initialize.apply(this, arguments);
+        },
+
+        hasFilters: function() {
+            return !_.isEmpty(this.filters);
         },
 
         /**
@@ -253,7 +274,7 @@ define(function(require) {
          * @returns {boolean}
          */
         isFiltersStateViewNeeded: function(options) {
-            return 'filtersStateElement' in options && config.useFilterStateView;
+            return 'filtersStateElement' in options;
         },
 
         /**
@@ -531,6 +552,14 @@ define(function(require) {
             return this;
         },
 
+        show: function() {
+            this.$el.show();
+        },
+
+        hide: function() {
+            this.$el.hide();
+        },
+
         /**
          * @param {Number} [count]
          * @private
@@ -803,23 +832,16 @@ define(function(require) {
         },
 
         setViewMode: function(mode) {
-            if (this.viewMode === mode) {
+            var modes = [FiltersManager.STATE_VIEW_MODE, FiltersManager.MANAGE_VIEW_MODE];
+
+            if (this.viewMode === mode || !_.contains(modes, mode)) {
                 return;
             }
-            if (mode === FiltersManager.STATE_VIEW_MODE) {
-                this.$el.hide();
-                _.result(this.subview('filters-state'), 'show');
-            } else if (mode === FiltersManager.MANAGE_VIEW_MODE) {
-                if (!_.isEmpty(this.filters)) {
-                    this.$el.show();
-                }
-                _.result(this.subview('filters-state'), 'hide');
-            } else {
-                return;
-            }
-            this.viewMode = mode;
-            persistentStorage.setItem(FiltersManager.STORAGE_KEY, mode);
+
             this.trigger('changeViewMode', mode);
+            _.result(this.subview('filters-state'), mode === FiltersManager.STATE_VIEW_MODE ? 'show' : 'hide');
+            this.viewMode = mode;
+            persistentStorage.setItem(this.storageKey, mode);
         },
 
         getChangedFilters: function() {
@@ -833,9 +855,8 @@ define(function(require) {
     });
 
     _.extend(FiltersManager, {
-        MANAGE_VIEW_MODE: 0,
-        STATE_VIEW_MODE: 1,
-        STORAGE_KEY: 'filter-view-mode-state'
+        MANAGE_VIEW_MODE: 'expanded',
+        STATE_VIEW_MODE: 'collapsed'
     });
 
     return FiltersManager;

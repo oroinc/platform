@@ -166,7 +166,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
 
         $models = array_map(function (array $data) {
             $model = $this->className::fromArray($data);
-            $this->collection[$model->getId()] = $model;
+            $this->collection[$model->getPath()] = $model;
 
             return $model;
         }, $result);
@@ -198,9 +198,31 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         }
 
         $model = $this->className::fromArray($result);
-        $this->collection[$model->getId()] = $model;
+        $this->collection[$model->getPath()] = $model;
 
         return $model;
+    }
+
+    /**
+     * @param int $lifetime
+     * @return int
+     */
+    public function removeOldStatistics(int $lifetime)
+    {
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
+        $date->modify(sprintf('-%d seconds', $lifetime));
+
+        $qb = $this->connection->createQueryBuilder();
+        $qb->delete($this->className::getName())
+            ->where(
+                $qb->expr()->orX(
+                    $qb->expr()->lt('created_at', '?'),
+                    $qb->expr()->isNull('created_at')
+                )
+            )
+            ->setParameter(0, $date->format('Y-m-d H:i:s'));
+
+        return $qb->execute();
     }
 
     /**

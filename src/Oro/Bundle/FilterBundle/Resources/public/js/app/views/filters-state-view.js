@@ -4,6 +4,7 @@ define(function(require) {
     var FiltersStateView;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var ANIMATED_INIT_CLASS = 'animated-init';
 
     FiltersStateView = BaseView.extend({
         POPOVER_DELAY: 300,
@@ -34,6 +35,10 @@ define(function(require) {
                 this.listenTo(filter, 'update updateCriteriaLabels', this.render);
             }, this);
 
+            if (options.useAnimationOnInit) {
+                this.$el.addClass(ANIMATED_INIT_CLASS);
+            }
+
             FiltersStateView.__super__.initialize.apply(this, arguments);
         },
 
@@ -41,7 +46,7 @@ define(function(require) {
             var data = FiltersStateView.__super__.getTemplateData.apply(this, arguments);
             data.filters = [];
             _.each(this.filters, function(filter) {
-                if (!filter.isEmpty()) {
+                if (!filter.isEmptyValue()) {
                     data.filters.push(filter.getState());
                 }
             }, this);
@@ -69,7 +74,7 @@ define(function(require) {
         },
 
         hide: function() {
-            this.$el.hide();
+            this.$el.removeClass(ANIMATED_INIT_CLASS).hide();
         },
 
         onMouseEnter: function(e) {
