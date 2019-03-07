@@ -23,7 +23,12 @@ class UpdatePinbarTabTitle implements Migration, OrderedMigrationInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_navigation_item_pinbar');
-        $table->changeColumn('title', ['length' => 255, 'notnull' => true]);
-        $table->changeColumn('title_short', ['length' => 255, 'notnull' => true]);
+
+        if ($table->hasColumn('title') && !$table->getColumn('title')->getNotnull()) {
+            $table->getColumn('title')->setNotnull(true);
+        }
+        if ($table->hasColumn('title_short') && !$table->getColumn('title_short')->getNotnull()) {
+            $table->getColumn('title_short')->setNotnull(true);
+        }
     }
 }

@@ -103,8 +103,15 @@ class Form extends Element
             $field = $this->wrapField($label, $field);
 
             $expectedValue = self::normalizeValue($value);
-            $fieldValue = self::normalizeValue($field->getValue());
-            self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $label));
+
+            $result = $this->spin(function () use ($field, $expectedValue) {
+                $fieldValue = self::normalizeValue($field->getValue());
+
+                // Comparison operator is not strict intentionally.
+                return $expectedValue == $fieldValue;
+            }, 3);
+
+            self::assertTrue($result, sprintf('Field "%s" value is not as expected', $label));
         }
     }
 
