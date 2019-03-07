@@ -98,6 +98,11 @@
     .description-container {
         margin-top: $content-padding-small;
     }
+
+    .description-container {
+        min-width: $field-width;
+        max-width: $field-width;
+    }
 }
 
 .system-configuration-content-inner {
