@@ -344,7 +344,7 @@ class OroMainContext extends MinkContext implements
     {
         $flashMessages = $this->spin(function (OroMainContext $context) use ($flashMessageElement) {
             return $context->findAllElements($flashMessageElement);
-        }, $timeLimit, true);
+        }, $timeLimit);
 
         static::assertEmpty($flashMessages);
     }
@@ -1474,7 +1474,7 @@ JS;
             } catch (NoSuchElement $e) {
                 return true;
             }
-        }, 3, true);
+        }, 3);
 
         self::assertTrue(
             $result,
