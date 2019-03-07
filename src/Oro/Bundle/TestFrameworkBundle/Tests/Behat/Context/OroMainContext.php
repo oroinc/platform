@@ -1096,6 +1096,8 @@ class OroMainContext extends MinkContext implements
         self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
 
         $actual = $elementObject->getText();
+        $text = $this->fixStepArgument($text);
+
         $regex = '/'.preg_quote($text, '/').'/ui';
 
         $message = sprintf('Failed asserting that "%s" contains "%s"', $text, $actual);
@@ -1112,6 +1114,8 @@ class OroMainContext extends MinkContext implements
         self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
 
         $actual = $elementObject->getText();
+        $text = $this->fixStepArgument($text);
+
         $regex = '/'.preg_quote($text, '/').'/ui';
 
         $message = sprintf('Failed asserting that "%s" does not contain "%s"', $text, $actual);
