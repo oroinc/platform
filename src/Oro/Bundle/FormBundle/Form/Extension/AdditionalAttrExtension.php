@@ -28,7 +28,7 @@ class AdditionalAttrExtension extends AbstractTypeExtension
         if (!empty($options['random_id']) && isset($view->vars['id'])) {
             $view->vars['attr'] = isset($view->vars['attr']) ? $view->vars['attr'] : [];
             $view->vars['attr']['data-ftid'] = $view->vars['id'];
-            $view->vars['id'] .= uniqid('-uid-');
+            $view->vars['id'] .= uniqid('-uid-', true);
         }
         if (isset($view->vars['name'])) {
             $fieldPrefix = $view->parent ? 'field__' : 'form__';
