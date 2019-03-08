@@ -34,7 +34,6 @@ class EntityAliasCacheWarmer implements CacheWarmerInterface
      */
     public function isOptional()
     {
-        // this warmer is mandatory because we want to detect duplicated entity aliases as early as possible
-        return false;
+        return true;
     }
 }

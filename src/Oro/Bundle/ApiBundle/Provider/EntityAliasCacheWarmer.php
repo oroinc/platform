@@ -33,7 +33,7 @@ class EntityAliasCacheWarmer implements CacheWarmerInterface
      */
     public function isOptional()
     {
-        return false;
+        return true;
     }
 
     /**
