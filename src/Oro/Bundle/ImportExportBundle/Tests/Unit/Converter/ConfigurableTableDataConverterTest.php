@@ -6,6 +6,7 @@ use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Provider\EntityExtendConfigurationProvider;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Converter\RelationCalculator;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
@@ -239,7 +240,11 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
     {
         $configProvider = $this->createMock(ConfigProvider::class);
         $fieldProvider = $this->createMock(EntityFieldProvider::class);
-        $fieldTypeHelper = new FieldTypeHelper([]);
+        $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
+        $entityExtendConfigurationProvider->expects(self::any())
+            ->method('getUnderlyingTypes')
+            ->willReturn([]);
+        $fieldTypeHelper = new FieldTypeHelper($entityExtendConfigurationProvider);
 
         $this->fieldHelper = $this->getMockBuilder(FieldHelper::class)
             ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])

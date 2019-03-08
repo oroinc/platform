@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Field;
 
 use Oro\Bundle\EntityBundle\Tests\Unit\Provider\EntityFieldProviderTest;
-use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\WorkflowBundle\Field\FieldProvider;
 
 class FieldProviderTest extends EntityFieldProviderTest
@@ -16,7 +15,7 @@ class FieldProviderTest extends EntityFieldProviderTest
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->entityClassResolver,
-            new FieldTypeHelper([]),
+            $this->fieldTypeHelper,
             $this->doctrine,
             $this->translator,
             []

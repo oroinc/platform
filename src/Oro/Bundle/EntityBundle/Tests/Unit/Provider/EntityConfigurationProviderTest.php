@@ -24,7 +24,7 @@ class EntityConfigurationProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $this->cacheFile = $this->getTempFile('ConfigurationProvider');
+        $this->cacheFile = $this->getTempFile('EntityConfigurationProvider');
 
         $this->configurationProvider = new EntityConfigurationProvider($this->cacheFile, false);
     }

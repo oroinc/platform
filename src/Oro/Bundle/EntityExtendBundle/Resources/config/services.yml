@@ -11,7 +11,6 @@ parameters:
     oro_entity_extend.entity_config_dumper.extension.enum.class:      Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\EnumEntityConfigDumperExtension
     oro_entity_extend.extend.entity_processor.class:          Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor
     oro_entity_extend.extend.entity_proxy_generator.class:    Oro\Bundle\EntityExtendBundle\Extend\EntityProxyGenerator
-    oro_entity_extend.extend.field_type_helper.class:         Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper
     oro_entity_extend.validator.not_sql_keyword.class:        Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeywordValidator
     oro_entity_extend.validator.unique_keys.class:            Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeysValidator
     oro_entity_extend.validator.unique_enum_name.class:       Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumNameValidator
@@ -265,9 +264,17 @@ services:
             - '%kernel.cache_dir%'
 
     oro_entity_extend.extend.field_type_helper:
-        class: '%oro_entity_extend.extend.field_type_helper.class%'
+        class: Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper
         arguments:
-            - []
+            - '@oro_entity_extend.configuration_provider'
+
+    oro_entity_extend.configuration_provider:
+        class: Oro\Bundle\EntityExtendBundle\Provider\EntityExtendConfigurationProvider
+        public: false
+        parent: oro.static_config_provider.abstract
+        arguments:
+            - '%kernel.cache_dir%/oro/entity_extend.php'
+            - '%kernel.debug%'
 
     oro_entity_extend.extend.field_name_validation_helper:
         class: Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper

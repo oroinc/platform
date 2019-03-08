@@ -8,12 +8,17 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
+use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
+use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendTable;
+use Oro\Bundle\EntityExtendBundle\Provider\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
 class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
@@ -32,10 +37,7 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->entityMetadataHelper =
-            $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
         $this->entityMetadataHelper->expects($this->any())
             ->method('getEntityClassesByTableName')
             ->will(
@@ -46,18 +48,24 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
                 )
             );
         $this->extendOptionsManager = new ExtendOptionsManager();
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+
+        $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())
             ->method('hasConfig')
             ->will($this->returnValue(true));
+
+        $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
+        $entityExtendConfigurationProvider->expects(self::any())
+            ->method('getUnderlyingTypes')
+            ->willReturn(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']);
+
         $this->extendOptionsParser  = new ExtendOptionsParser(
             $this->entityMetadataHelper,
-            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']),
+            new FieldTypeHelper($entityExtendConfigurationProvider),
             $configManager
         );
-        $this->nameGenerator        = new ExtendDbIdentifierNameGenerator();
+
+        $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
     }
 
     public function testEmptySchema()
@@ -240,12 +248,12 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
     {
         foreach ($schema->getTables() as $table) {
             $this->assertInstanceOf(
-                'Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendTable',
+                ExtendTable::class,
                 $table
             );
             foreach ($table->getColumns() as $column) {
                 $this->assertInstanceOf(
-                    'Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn',
+                    ExtendColumn::class,
                     $column
                 );
             }

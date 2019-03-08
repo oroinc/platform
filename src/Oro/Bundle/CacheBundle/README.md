@@ -107,7 +107,6 @@ use Oro\Component\Config\ResourcesContainerInterface;
 
 class MyConfigurationProvider extends PhpArrayConfigProvider
 {
-    private const CONFIG_TYPE = 'my_config';
     private const CONFIG_FILE = 'Resources/config/oro/my_config.yml';
 
     /**
@@ -116,14 +115,6 @@ class MyConfigurationProvider extends PhpArrayConfigProvider
     public function getConfiguration(): array
     {
         return $this->doGetConfig();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getConfigType(): string
-    {
-        return self::CONFIG_TYPE;
     }
 
     /**

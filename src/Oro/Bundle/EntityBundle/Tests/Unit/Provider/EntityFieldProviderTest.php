@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
@@ -10,9 +13,11 @@ use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Provider\EntityExtendConfigurationProvider;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
@@ -38,6 +43,9 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|VirtualRelationProviderInterface */
     protected $virtualRelationProvider;
 
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
+
     /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     protected $doctrine;
 
@@ -58,15 +66,11 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $configManager = $this->createMock(ConfigManager::class);
         $this->entityConfigProvider = new ConfigProviderMock($configManager, 'entity');
         $this->extendConfigProvider = new ConfigProviderMock($configManager, 'extend');
-        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+
+        $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
         $this->entityClassResolver->expects($this->any())
             ->method('getEntityClass')
             ->will(
@@ -77,16 +81,9 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                 )
             );
 
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->exclusionProvider = $this->createMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
-
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->setMethods(['isResourceEnabled'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translator = $this->createMock(Translator::class);
+        $this->exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->entityProvider = new EntityProvider(
             $this->entityConfigProvider,
@@ -97,21 +94,21 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
         $this->entityProvider->setExclusionProvider($this->exclusionProvider);
 
-        $this->doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
+        $entityExtendConfigurationProvider->expects(self::any())
+            ->method('getUnderlyingTypes')
+            ->willReturn([]);
+        $this->fieldTypeHelper = new FieldTypeHelper($entityExtendConfigurationProvider);
 
-        $this->virtualFieldProvider = $this
-            ->createMock('Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface');
-
-        $this->virtualRelationProvider =
-            $this->createMock('Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface');
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->virtualFieldProvider = $this->createMock(VirtualFieldProviderInterface::class);
+        $this->virtualRelationProvider = $this->createMock(VirtualRelationProviderInterface::class);
 
         $this->provider = new EntityFieldProvider(
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->entityClassResolver,
-            new FieldTypeHelper([]),
+            $this->fieldTypeHelper,
             $this->doctrine,
             $this->translator,
             []
@@ -127,9 +124,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
         $entityName = 'Acme:Test';
         $entityClassName = 'Acme\Entity\Test';
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
 
         $this->doctrine->expects($this->any())
             ->method('getManagerForClass')
@@ -687,9 +682,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
         $metadata = [];
         $fieldConfigs = [];
         foreach ($config as $entityClassName => $entityData) {
-            $entityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-                ->disableOriginalConstructor()
-                ->getMock();
+            $entityMetadata = $this->createMock(ClassMetadata::class);
             $entityMetadata->expects($this->any())
                 ->method('getName')
                 ->will($this->returnValue($entityClassName));
@@ -781,11 +774,9 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                 ->will($this->returnValueMap($fieldTypes));
         }
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
 
-        $metadataFactory = $this->createMock('Doctrine\ORM\Mapping\ClassMetadataFactory');
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
         $em->expects($this->any())
             ->method('getMetadataFactory')
             ->will($this->returnValue($metadataFactory));

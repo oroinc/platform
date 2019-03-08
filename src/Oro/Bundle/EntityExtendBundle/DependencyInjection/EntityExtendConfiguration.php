@@ -6,13 +6,14 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
- * This is the class that validates and merges configuration from entity_extend.yml
+ * Provides schema for configuration that is loaded from "Resources/config/oro/entity_extend.yml" files.
  */
 class EntityExtendConfiguration implements ConfigurationInterface
 {
-    const ROOT_NODE = 'oro_entity_extend';
+    public const ROOT_NODE = 'entity_extend';
+
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
     {
