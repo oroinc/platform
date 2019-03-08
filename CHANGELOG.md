@@ -22,7 +22,7 @@ The current file describes significant changes in the code that may affect the u
 * Not used tag `oro_config.configuration_provider` has been removed.
 
 #### DashboardBundle
-* The `dashboards`, `widgets` and `widgets_configuration` sections have been removed from DashboardBundle configuration has been removed. Use `Resources/config/oro/dashboards.yml` instead.
+* The `dashboards`, `widgets` and `widgets_configuration` sections have been removed from DashboardBundle configuration. Use `Resources/config/oro/dashboards.yml` instead.
 * Methods `getConfigs()`, `getConfig($key)` and `hasConfig($key)` have been removed from `Oro\Bundle\DashboardBundle\Model\ConfigProvider`.
 
 #### EmbeddedFormBundle
@@ -54,6 +54,11 @@ The current file describes significant changes in the code that may affect the u
 #### SecurityBundle
 * Twig function `resource_granted` has been removed. Use `is_granted` from Symfony instead.
 * The command `security:configurable-permission:load` has been removed.
+
+#### SidebarBundle
+* The `sidebar_widgets` section has been removed from SidebarBundle configuration. Use `Resources/public/sidebar_widgets/{folder}/widget.yml` instead.
+* The class `Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry` has been renamed to `Oro\Bundle\SidebarBundle\Configuration\WidgetDefinitionProvider`.
+* The service `oro_sidebar.widget_definition.registry` has been renamed to `oro_sidebar.widget_definition_provider`.
 
 #### UIBundle
 * The `placeholders` and `placeholder_items` sections have been removed from UIBundle configuration. Use `Resources/config/oro/placeholders.yml` instead.

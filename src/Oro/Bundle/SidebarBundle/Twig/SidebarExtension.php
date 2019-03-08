@@ -4,11 +4,14 @@ namespace Oro\Bundle\SidebarBundle\Twig;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
-use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
+use Oro\Bundle\SidebarBundle\Configuration\WidgetDefinitionProvider;
 use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Twig extension that provides sidebar widgets information.
+ */
 class SidebarExtension extends \Twig_Extension implements FeatureToggleableInterface
 {
     use FeatureCheckerHolderTrait;
@@ -27,11 +30,11 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
     }
 
     /**
-     * @return WidgetDefinitionRegistry
+     * @return WidgetDefinitionProvider
      */
-    protected function getWidgetDefinitionRegistry()
+    protected function getWidgetDefinitionProvider()
     {
-        return $this->container->get('oro_sidebar.widget_definition.registry');
+        return $this->container->get('oro_sidebar.widget_definition_provider');
     }
 
     /**
@@ -61,14 +64,14 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
     }
 
     /**
-     * Get available widgets for placement.
+     * Gets available widgets for the given placement.
      *
      * @param string $placement
      * @return array
      */
     public function getWidgetDefinitions($placement)
     {
-        $definitions = $this->getWidgetDefinitionRegistry()
+        $definitions = $this->getWidgetDefinitionProvider()
             ->getWidgetDefinitionsByPlacement($placement);
         $translator = $this->getTranslator();
         $assetHelper = $this->getAssetHelper();

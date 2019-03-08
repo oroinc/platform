@@ -1,6 +1,11 @@
 title: Foo
+description: foo.description
 icon: foo.ico
+dialogIcon: foo-dialog.png
+cssClass: foo-css-class
 module: widget/foo
 placement: left
+showRefreshButton: false
 settings:
     test: Hello
+isNew: true
