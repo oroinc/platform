@@ -29,57 +29,41 @@ class ChainConfigCacheStateTest extends \PHPUnit\Framework\TestCase
 
     public function testAddConfigCacheState()
     {
+        $timestamp = 123;
+
         $configCacheState3 = $this->createMock(ConfigCacheStateInterface::class);
 
         $this->configCacheState1->expects(self::exactly(2))
-            ->method('isCacheChangeable')
-            ->willReturn(false);
-        $this->configCacheState2->expects(self::exactly(2))
-            ->method('isCacheChangeable')
-            ->willReturn(false);
-        $configCacheState3->expects(self::once())
-            ->method('isCacheChangeable')
+            ->method('isCacheFresh')
+            ->with($timestamp)
             ->willReturn(true);
+        $this->configCacheState2->expects(self::exactly(2))
+            ->method('isCacheFresh')
+            ->with($timestamp)
+            ->willReturn(true);
+        $configCacheState3->expects(self::once())
+            ->method('isCacheFresh')
+            ->with($timestamp)
+            ->willReturn(false);
 
-        self::assertFalse($this->chainConfigCacheState->isCacheChangeable());
+        self::assertTrue($this->chainConfigCacheState->isCacheFresh($timestamp));
 
         $this->chainConfigCacheState->addConfigCacheState($configCacheState3);
-        self::assertTrue($this->chainConfigCacheState->isCacheChangeable());
+        self::assertFalse($this->chainConfigCacheState->isCacheFresh($timestamp));
     }
 
-    public function testIsCacheChangeableWhenAllChildrenAreNotChangeable()
+    public function testIsCacheFreshForNullTimestamp()
     {
         $this->configCacheState1->expects(self::once())
-            ->method('isCacheChangeable')
-            ->willReturn(false);
-        $this->configCacheState2->expects(self::once())
-            ->method('isCacheChangeable')
-            ->willReturn(false);
-
-        self::assertFalse($this->chainConfigCacheState->isCacheChangeable());
-    }
-
-    public function testIsCacheChangeableWhenFirstChildIsChangeable()
-    {
-        $this->configCacheState1->expects(self::once())
-            ->method('isCacheChangeable')
+            ->method('isCacheFresh')
+            ->with(null)
             ->willReturn(true);
-        $this->configCacheState2->expects(self::never())
-            ->method('isCacheChangeable');
-
-        self::assertTrue($this->chainConfigCacheState->isCacheChangeable());
-    }
-
-    public function testIsCacheChangeableWhenSecondChildIsChangeable()
-    {
-        $this->configCacheState1->expects(self::once())
-            ->method('isCacheChangeable')
-            ->willReturn(false);
         $this->configCacheState2->expects(self::once())
-            ->method('isCacheChangeable')
+            ->method('isCacheFresh')
+            ->with(null)
             ->willReturn(true);
 
-        self::assertTrue($this->chainConfigCacheState->isCacheChangeable());
+        self::assertTrue($this->chainConfigCacheState->isCacheFresh(null));
     }
 
     public function testIsCacheFreshWhenAllChildrenAreFresh()

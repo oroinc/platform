@@ -201,45 +201,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
         $this->cache->expects(self::once())
             ->method('save')
-            ->with('entity_aliases', $loadedStorage);
-
-        $this->loader->expects(self::once())
-            ->method('load')
-            ->willReturnCallback(function (EntityAliasStorage $storage) {
-                $storage->addEntityAlias(
-                    'Test\Entity1',
-                    new EntityAlias('entity1_alias', 'entity1_plural_alias')
-                );
-            });
-
-        self::assertEquals(
-            ['Test\Entity1' => new EntityAlias('entity1_alias', 'entity1_plural_alias')],
-            $this->entityAliasResolver->getAll()
-        );
-    }
-
-    public function testLoadWithConfigCacheStateWhenConfigCacheIsNotChangeable()
-    {
-        $this->entityAliasResolver->setConfigCacheState($this->configCacheState);
-
-        $loadedStorage = new EntityAliasStorage();
-        $loadedStorage->addEntityAlias('Test\Entity1', new EntityAlias('entity1_alias', 'entity1_plural_alias'));
-
-        $this->cache->expects(self::once())
-            ->method('fetch')
-            ->with('entity_aliases')
-            ->willReturn(false);
-        $this->cache->expects(self::once())
-            ->method('save')
-            ->with('entity_aliases', $loadedStorage);
-
-        $this->configCacheState->expects(self::once())
-            ->method('isCacheChangeable')
-            ->willReturn(false);
-        $this->configCacheState->expects(self::never())
-            ->method('isCacheFresh');
-        $this->configCacheState->expects(self::never())
-            ->method('getCacheTimestamp');
+            ->with('entity_aliases', [null, $loadedStorage]);
 
         $this->loader->expects(self::once())
             ->method('load')
@@ -264,7 +226,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects(self::once())
             ->method('fetch')
             ->with('entity_aliases')
-            ->willReturn($storage);
+            ->willReturn([null, $storage]);
 
         $this->loader->expects(self::never())
             ->method('load');
@@ -275,7 +237,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadFromCacheWithConfigCacheStateWhenConfigCacheIsNotChangeable()
+    public function testLoadFromCacheWithConfigCacheStateWhenConfigCacheTimestampIsNull()
     {
         $this->entityAliasResolver->setConfigCacheState($this->configCacheState);
 
@@ -285,11 +247,12 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects(self::once())
             ->method('fetch')
             ->with('entity_aliases')
-            ->willReturn($storage);
+            ->willReturn([null, $storage]);
 
         $this->configCacheState->expects(self::once())
-            ->method('isCacheChangeable')
-            ->willReturn(false);
+            ->method('isCacheFresh')
+            ->with(self::isNull())
+            ->willReturn(true);
 
         $this->loader->expects(self::never())
             ->method('load');
@@ -300,7 +263,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadFromCacheWithConfigCacheStateWhenConfigCacheIsChangeableAndFresh()
+    public function testLoadFromCacheWithConfigCacheStateWhenConfigCacheIsFresh()
     {
         $this->entityAliasResolver->setConfigCacheState($this->configCacheState);
 
@@ -315,9 +278,6 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$timestamp, $storage]);
 
         $this->configCacheState->expects(self::once())
-            ->method('isCacheChangeable')
-            ->willReturn(true);
-        $this->configCacheState->expects(self::once())
             ->method('isCacheFresh')
             ->with($timestamp)
             ->willReturn(true);
@@ -331,7 +291,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadFromCacheWithConfigCacheStateWhenConfigCacheIsChangeableAndDirty()
+    public function testLoadFromCacheWithConfigCacheStateWhenConfigCacheIsDirty()
     {
         $this->entityAliasResolver->setConfigCacheState($this->configCacheState);
 
@@ -352,9 +312,6 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
             ->method('save')
             ->with('entity_aliases', [$newTimestamp, $loadedStorage]);
 
-        $this->configCacheState->expects(self::exactly(2))
-            ->method('isCacheChangeable')
-            ->willReturn(true);
         $this->configCacheState->expects(self::once())
             ->method('isCacheFresh')
             ->with($previousTimestamp)

@@ -618,18 +618,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configCache->getInclusions();
     }
 
-    public function testIsCacheChangeableForProductionMode()
+    public function testIsCacheFreshForNullTimestamp()
     {
+        $this->configCacheFactory->expects(self::never())
+            ->method('getCache');
+
         $configCache = $this->getConfigCache();
 
-        self::assertFalse($configCache->isCacheChangeable());
-    }
-
-    public function testIsCacheChangeableForDevelopmentMode()
-    {
-        $configCache = $this->getConfigCache(true);
-
-        self::assertTrue($configCache->isCacheChangeable());
+        self::assertTrue($configCache->isCacheFresh(null));
     }
 
     public function testIsCacheFreshWhenNoCachedData()

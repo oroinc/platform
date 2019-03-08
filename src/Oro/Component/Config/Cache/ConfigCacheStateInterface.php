@@ -8,20 +8,13 @@ namespace Oro\Component\Config\Cache;
 interface ConfigCacheStateInterface
 {
     /**
-     * Indicates whether the configuration cache can be changed during the application lifetime.
-     *
-     * @return bool
-     */
-    public function isCacheChangeable(): bool;
-
-    /**
      * Checks if the configuration cache has not been changed since the given timestamp.
      *
-     * @param int $timestamp The time to compare with the last time the cache was built
+     * @param int|null $timestamp The time to compare with the last time the cache was built
      *
      * @return bool TRUE if the the cache has not been changed; otherwise, FALSE
      */
-    public function isCacheFresh(int $timestamp): bool;
+    public function isCacheFresh(?int $timestamp): bool;
 
     /**
      * Gets timestamp when the configuration cache has been built.

@@ -162,46 +162,10 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->testMapping, $this->getProvider()->getMappingConfig());
     }
 
-    public function testGetMappingConfigForNotChangeableConfigurationCache()
-    {
-        $this->configProvider->expects($this->once())
-            ->method('isCacheChangeable')
-            ->willReturn(false);
-        $this->configProvider->expects($this->never())
-            ->method('isCacheFresh');
-        $this->configProvider->expects($this->never())
-            ->method('getCacheTimestamp');
-
-        $this->cache->expects($this->once())
-            ->method('fetch')
-            ->with('oro_search.mapping_config')
-            ->willReturn(false);
-
-        $this->eventDispatcher->expects($this->once())
-            ->method('dispatch')
-            ->willReturnCallback(function ($eventName, SearchMappingCollectEvent $event) {
-                $this->assertEquals(SearchMappingCollectEvent::EVENT_NAME, $eventName);
-                $this->assertEquals($this->testMapping, $event->getMappingConfig());
-
-                $event->setMappingConfig([]);
-            });
-
-        $this->cache->expects($this->once())
-            ->method('save')
-            ->with('oro_search.mapping_config', []);
-
-        $provider = $this->getProvider(false);
-        $this->assertEquals([], $provider->getMappingConfig());
-        $this->assertEquals([], $provider->getMappingConfig());
-    }
-
-    public function testGetMappingConfigForChangeableConfigurationCache()
+    public function testGetMappingConfigWhenConfigurationNotLoaded()
     {
         $configTimestamp = 20;
 
-        $this->configProvider->expects($this->once())
-            ->method('isCacheChangeable')
-            ->willReturn(true);
         $this->configProvider->expects($this->never())
             ->method('isCacheFresh');
         $this->configProvider->expects($this->once())
@@ -236,9 +200,6 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         $cacheTimestamp = 10;
         $configTimestamp = 20;
 
-        $this->configProvider->expects($this->exactly(2))
-            ->method('isCacheChangeable')
-            ->willReturn(true);
         $this->configProvider->expects($this->once())
             ->method('isCacheFresh')
             ->with($cacheTimestamp)
@@ -270,6 +231,33 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $provider->getMappingConfig());
     }
 
+    public function testGetMappingConfigWhenConfigurationNotChanged()
+    {
+        $cacheTimestamp = 10;
+
+        $this->configProvider->expects($this->once())
+            ->method('isCacheFresh')
+            ->with($cacheTimestamp)
+            ->willReturn(true);
+        $this->configProvider->expects($this->never())
+            ->method('getCacheTimestamp');
+
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with('oro_search.mapping_config')
+            ->willReturn([$cacheTimestamp, []]);
+
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
+
+        $this->cache->expects($this->never())
+            ->method('save');
+
+        $provider = $this->getProvider(false);
+        $this->assertEquals([], $provider->getMappingConfig());
+        $this->assertEquals([], $provider->getMappingConfig());
+    }
+
     public function testClearCache()
     {
         $this->cache->expects($this->once())
@@ -289,43 +277,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         self::assertAttributeSame(null, 'configuration', $provider);
     }
 
-    public function testWarmUpCacheForNotChangeableConfigurationCache()
-    {
-        $config = [
-            'Oro\TestBundle\Entity\TestEntity' => [
-                'alias'  => 'test_entity',
-                'fields' => [
-                    ['name' => 'firstname', 'target_type' => 'text']
-                ]
-            ]
-        ];
-
-        $this->configProvider->expects($this->once())
-            ->method('isCacheChangeable')
-            ->willReturn(false);
-        $this->configProvider->expects($this->never())
-            ->method('isCacheFresh');
-
-        $this->cache->expects($this->once())
-            ->method('delete')
-            ->with('oro_search.mapping_config');
-        $this->cache->expects($this->once())
-            ->method('fetch')
-            ->with('oro_search.mapping_config')
-            ->willReturn($config);
-
-        $this->configProvider->expects($this->never())
-            ->method('clearCache');
-        $this->configProvider->expects($this->never())
-            ->method('warmUpCache');
-
-        $provider = $this->getProvider(false);
-        $provider->warmUpCache();
-
-        self::assertAttributeEquals($config, 'configuration', $provider);
-    }
-
-    public function testWarmUpCacheForChangeableConfigurationCache()
+    public function testWarmUpCache()
     {
         $cacheTimestamp = 10;
         $config = [
@@ -337,9 +289,6 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->configProvider->expects($this->once())
-            ->method('isCacheChangeable')
-            ->willReturn(true);
         $this->configProvider->expects($this->once())
             ->method('isCacheFresh')
             ->with($cacheTimestamp)
@@ -378,12 +327,13 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         );
         if ($mockFetch) {
             $this->configProvider->expects($this->once())
-                ->method('isCacheChangeable')
-                ->willReturn(false);
+                ->method('isCacheFresh')
+                ->with(self::isNull())
+                ->willReturn(true);
             $this->cache->expects($this->once())
                 ->method('fetch')
                 ->with('oro_search.mapping_config')
-                ->willReturn($this->testMapping);
+                ->willReturn([null, $this->testMapping]);
         }
 
         return $provider;

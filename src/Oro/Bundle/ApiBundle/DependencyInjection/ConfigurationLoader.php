@@ -264,8 +264,7 @@ class ConfigurationLoader
             ->register($configCacheStateServiceId, ChainConfigCacheState::class)
             ->setArguments([
                 [
-                    new Reference($configCacheServiceId),
-                    new Reference('oro_entity.entity_alias_config_cache_state')
+                    new Reference($configCacheServiceId)
                 ]
             ])
             ->setPublic(false);

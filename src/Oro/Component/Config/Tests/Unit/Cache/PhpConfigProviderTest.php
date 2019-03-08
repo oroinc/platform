@@ -37,25 +37,16 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsCacheChangeableForProductionMode()
+    public function testIsCacheFreshForNullTimestamp()
     {
         $provider = $this->getProvider(['test']);
 
-        self::assertFalse($provider->isCacheChangeable());
-    }
-
-    public function testIsCacheChangeableForDevelopmentMode()
-    {
-        $provider = $this->getProvider(['test'], true);
-
-        self::assertTrue($provider->isCacheChangeable());
+        self::assertTrue($provider->isCacheFresh(null));
     }
 
     public function testIsCacheFreshWhenNoCachedData()
     {
-        $config = ['test'];
-
-        $provider = $this->getProvider($config);
+        $provider = $this->getProvider(['test']);
 
         $timestamp = time() - 1;
         self::assertFalse($provider->isCacheFresh($timestamp));

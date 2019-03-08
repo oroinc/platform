@@ -78,7 +78,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects(self::once())
             ->method('fetch')
             ->with('test1.2rest')
-            ->willReturn($data);
+            ->willReturn([null, $data]);
 
         $cacheAccessor = $this->getCacheAccessor(true);
 
@@ -88,7 +88,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFetchWhenConfigCacheIsNotChangeable()
+    public function testFetchWhenConfigCacheTimestampIsNull()
     {
         $version = '1.2';
         $requestType = new RequestType([RequestType::REST]);
@@ -98,7 +98,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects(self::once())
             ->method('fetch')
             ->with('test1.2rest')
-            ->willReturn($data);
+            ->willReturn([null, $data]);
 
         $configCacheState = $this->createMock(ConfigCacheStateInterface::class);
         $this->configCacheStateRegistry->expects(self::once())
@@ -106,10 +106,9 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($requestType))
             ->willReturn($configCacheState);
         $configCacheState->expects(self::once())
-            ->method('isCacheChangeable')
-            ->willReturn(false);
-        $configCacheState->expects(self::never())
-            ->method('isCacheFresh');
+            ->method('isCacheFresh')
+            ->with(self::isNull())
+            ->willReturn(true);
 
         $cacheAccessor = $this->getCacheAccessor();
 
@@ -119,7 +118,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFetchWhenConfigCacheIsChangeableAndFresh()
+    public function testFetchWhenConfigCacheIsFresh()
     {
         $version = '1.2';
         $requestType = new RequestType([RequestType::REST]);
@@ -137,9 +136,6 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
             ->method('getConfigCacheState')
             ->with(self::identicalTo($requestType))
             ->willReturn($configCacheState);
-        $configCacheState->expects(self::once())
-            ->method('isCacheChangeable')
-            ->willReturn(true);
         $configCacheState->expects(self::once())
             ->method('isCacheFresh')
             ->with($timestamp)
@@ -153,7 +149,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFetchWhenConfigCacheIsChangeableAndDirty()
+    public function testFetchWhenConfigCacheIsDirty()
     {
         $version = '1.2';
         $requestType = new RequestType([RequestType::REST]);
@@ -171,9 +167,6 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
             ->method('getConfigCacheState')
             ->with(self::identicalTo($requestType))
             ->willReturn($configCacheState);
-        $configCacheState->expects(self::once())
-            ->method('isCacheChangeable')
-            ->willReturn(true);
         $configCacheState->expects(self::once())
             ->method('isCacheFresh')
             ->with($timestamp)
@@ -195,41 +188,14 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
 
         $this->cache->expects(self::once())
             ->method('save')
-            ->with('test1.2rest', $data);
+            ->with('test1.2rest', [null, $data]);
 
         $cacheAccessor = $this->getCacheAccessor(true);
 
         $cacheAccessor->save($version, $requestType, $id, $data);
     }
 
-    public function testSaveWhenConfigCacheIsNotChangeable()
-    {
-        $version = '1.2';
-        $requestType = new RequestType([RequestType::REST]);
-        $id = 'test';
-        $data = ['key' => 'value'];
-
-        $this->cache->expects(self::once())
-            ->method('save')
-            ->with('test1.2rest', $data);
-
-        $configCacheState = $this->createMock(ConfigCacheStateInterface::class);
-        $this->configCacheStateRegistry->expects(self::once())
-            ->method('getConfigCacheState')
-            ->with(self::identicalTo($requestType))
-            ->willReturn($configCacheState);
-        $configCacheState->expects(self::once())
-            ->method('isCacheChangeable')
-            ->willReturn(false);
-        $configCacheState->expects(self::never())
-            ->method('getCacheTimestamp');
-
-        $cacheAccessor = $this->getCacheAccessor();
-
-        $cacheAccessor->save($version, $requestType, $id, $data);
-    }
-
-    public function testSaveWhenConfigCacheIsChangeable()
+    public function testSave()
     {
         $version = '1.2';
         $requestType = new RequestType([RequestType::REST]);
@@ -246,9 +212,6 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
             ->method('getConfigCacheState')
             ->with(self::identicalTo($requestType))
             ->willReturn($configCacheState);
-        $configCacheState->expects(self::once())
-            ->method('isCacheChangeable')
-            ->willReturn(true);
         $configCacheState->expects(self::once())
             ->method('getCacheTimestamp')
             ->willReturn($timestamp);

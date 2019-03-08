@@ -88,13 +88,9 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
         $config = null;
         $cachedData = $this->cache->fetch(self::CACHE_KEY);
         if (false !== $cachedData) {
-            if ($this->mappingConfigProvider->isCacheChangeable()) {
-                list($timestamp, $value) = $cachedData;
-                if ($this->mappingConfigProvider->isCacheFresh($timestamp)) {
-                    $config = $value;
-                }
-            } else {
-                $config = $cachedData;
+            list($timestamp, $value) = $cachedData;
+            if ($this->mappingConfigProvider->isCacheFresh($timestamp)) {
+                $config = $value;
             }
         }
 
@@ -106,11 +102,7 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
      */
     private function saveMappingConfigToCache(array $config): void
     {
-        $data = $config;
-        if ($this->mappingConfigProvider->isCacheChangeable()) {
-            $data = [$this->mappingConfigProvider->getCacheTimestamp(), $data];
-        }
-        $this->cache->save(self::CACHE_KEY, $data);
+        $this->cache->save(self::CACHE_KEY, [$this->mappingConfigProvider->getCacheTimestamp(), $config]);
     }
 
     /**

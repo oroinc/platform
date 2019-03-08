@@ -182,8 +182,8 @@ services:
             - { name: kernel.cache_warmer }
 ```
 
-If your Application cache depends on your configuration, use `isCacheChangeable()`, `isCacheFresh($timestamp)`
-and `getCacheTimestamp()` methods of the configuration provider to check if the Application cache needs to be rebuilt.
+If your Application cache depends on your configuration, use `isCacheFresh($timestamp)` and `getCacheTimestamp()`
+methods of the configuration provider to check if the Application cache needs to be rebuilt.
 Here is an example how to use these methods:
 
 ```php
@@ -209,13 +209,9 @@ Here is an example how to use these methods:
         $config = null;
         $cachedData = $this->cache->fetch(self::CACHE_KEY);
         if (false !== $cachedData) {
-            if ($this->configProvider->isCacheChangeable()) {
-                list($timestamp, $value) = $cachedData;
-                if ($this->configProvider->isCacheFresh($timestamp)) {
-                    $config = $value;
-                }
-            } else {
-                $config = $cachedData;
+            list($timestamp, $value) = $cachedData;
+            if ($this->configProvider->isCacheFresh($timestamp)) {
+                $config = $value;
             }
         }
 
@@ -227,11 +223,7 @@ Here is an example how to use these methods:
      */
     private function saveConfigToCache(array $config): void
     {
-        $data = $config;
-        if ($this->configProvider->isCacheChangeable()) {
-            $data = [$this->configProvider->getCacheTimestamp(), $data];
-        }
-        $this->cache->save(self::CACHE_KEY, $data);
+        $this->cache->save(self::CACHE_KEY, [$this->configProvider->getCacheTimestamp(), $config]);
     }
 
     /**

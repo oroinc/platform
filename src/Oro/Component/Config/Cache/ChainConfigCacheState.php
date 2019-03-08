@@ -29,21 +29,7 @@ class ChainConfigCacheState implements ConfigCacheStateInterface
     /**
      * {@inheritdoc}
      */
-    public function isCacheChangeable(): bool
-    {
-        foreach ($this->states as $state) {
-            if ($state->isCacheChangeable()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCacheFresh(int $timestamp): bool
+    public function isCacheFresh(?int $timestamp): bool
     {
         foreach ($this->states as $state) {
             if (!$state->isCacheFresh($timestamp)) {

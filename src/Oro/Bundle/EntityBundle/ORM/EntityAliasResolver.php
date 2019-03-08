@@ -229,13 +229,9 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
         $storage = null;
         $cachedData = $this->cache->fetch(self::CACHE_KEY);
         if (false !== $cachedData) {
-            if (null !== $this->configCacheState && $this->configCacheState->isCacheChangeable()) {
-                list($timestamp, $value) = $cachedData;
-                if ($this->configCacheState->isCacheFresh($timestamp)) {
-                    $storage = $value;
-                }
-            } else {
-                $storage = $cachedData;
+            list($timestamp, $value) = $cachedData;
+            if (null === $this->configCacheState || $this->configCacheState->isCacheFresh($timestamp)) {
+                $storage = $value;
             }
         }
 
@@ -247,11 +243,10 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
      */
     private function saveAliasesToCache(EntityAliasStorage $storage): void
     {
-        $data = $storage;
-        if (null !== $this->configCacheState && $this->configCacheState->isCacheChangeable()) {
-            $data = [$this->configCacheState->getCacheTimestamp(), $data];
-        }
-        $this->cache->save(self::CACHE_KEY, $data);
+        $timestamp = null === $this->configCacheState
+            ? null
+            : $this->configCacheState->getCacheTimestamp();
+        $this->cache->save(self::CACHE_KEY, [$timestamp, $storage]);
     }
 
     /**

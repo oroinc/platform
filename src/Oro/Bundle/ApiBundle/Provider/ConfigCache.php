@@ -113,16 +113,12 @@ class ConfigCache implements ConfigCacheStateInterface
     /**
      * {@inheritdoc}
      */
-    public function isCacheChangeable(): bool
+    public function isCacheFresh(?int $timestamp): bool
     {
-        return $this->debug;
-    }
+        if (null === $timestamp) {
+            return true;
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isCacheFresh(int $timestamp): bool
-    {
         $cacheTimestamp = $this->getCacheTimestamp();
 
         return

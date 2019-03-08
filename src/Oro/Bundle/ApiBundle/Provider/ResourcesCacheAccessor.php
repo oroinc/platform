@@ -51,16 +51,14 @@ class ResourcesCacheAccessor
      */
     public function fetch(string $version, RequestType $requestType, string $id)
     {
-        $data = $this->cache->fetch($this->getCacheKey($version, $requestType, $id));
-        if (false !== $data && null !== $this->configCacheStateRegistry) {
-            $configCacheState = $this->configCacheStateRegistry->getConfigCacheState($requestType);
-            if ($configCacheState->isCacheChangeable()) {
-                list($timestamp, $value) = $data;
-                if ($configCacheState->isCacheFresh($timestamp)) {
-                    $data = $value;
-                } else {
-                    $data = false;
-                }
+        $data = false;
+        $cachedData = $this->cache->fetch($this->getCacheKey($version, $requestType, $id));
+        if (false !== $cachedData) {
+            list($timestamp, $value) = $cachedData;
+            if (null === $this->configCacheStateRegistry
+                || $this->configCacheStateRegistry->getConfigCacheState($requestType)->isCacheFresh($timestamp)
+            ) {
+                $data = $value;
             }
         }
 
@@ -78,13 +76,10 @@ class ResourcesCacheAccessor
      */
     public function save(string $version, RequestType $requestType, string $id, $data): void
     {
-        if (null !== $this->configCacheStateRegistry) {
-            $configCacheState = $this->configCacheStateRegistry->getConfigCacheState($requestType);
-            if ($configCacheState->isCacheChangeable()) {
-                $data = [$configCacheState->getCacheTimestamp(), $data];
-            }
-        }
-        $this->cache->save($this->getCacheKey($version, $requestType, $id), $data);
+        $timestamp = null === $this->configCacheStateRegistry
+            ? null
+            : $this->configCacheStateRegistry->getConfigCacheState($requestType)->getCacheTimestamp();
+        $this->cache->save($this->getCacheKey($version, $requestType, $id), [$timestamp, $data]);
     }
 
     /**
