@@ -43,6 +43,7 @@ class Form extends Element
             $field = $this->wrapField($label, $field);
             $field->setValue($value);
             $field->blur();
+            $this->getDriver()->waitForAjax();
         }
         if ($isEmbeddedForm) {
             $this->getDriver()->switchToWindow();
@@ -102,8 +103,15 @@ class Form extends Element
             $field = $this->wrapField($label, $field);
 
             $expectedValue = self::normalizeValue($value);
-            $fieldValue = self::normalizeValue($field->getValue());
-            self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $label));
+
+            $result = $this->spin(function () use ($field, $expectedValue) {
+                $fieldValue = self::normalizeValue($field->getValue());
+
+                // Comparison operator is not strict intentionally.
+                return $expectedValue == $fieldValue;
+            }, 3);
+
+            self::assertTrue($result, sprintf('Field "%s" value is not as expected', $label));
         }
     }
 
@@ -400,6 +408,18 @@ class Form extends Element
                     '%s%s',
                     $field->getXpath(),
                     '/following-sibling::span[@class="validation-failed"]'
+                )
+            );
+        }
+
+        if (!$errorSpan) {
+            // Get the validation error a level higher than the input
+            $errorSpan = $this->find(
+                'xpath',
+                sprintf(
+                    '%s%s',
+                    $field->getXpath(),
+                    '/ancestor::div[contains(@class, "validation-error")]/span[@class="validation-failed"]'
                 )
             );
         }

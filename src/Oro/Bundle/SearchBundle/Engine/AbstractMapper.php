@@ -135,16 +135,6 @@ abstract class AbstractMapper
                     $objectData[$fieldConfig['target_type']][$targetField] .= sprintf(' %s ', $value);
                 }
 
-                $textAllDataField = '';
-                if (isset($objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD])) {
-                    $textAllDataField = $objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD];
-                }
-
-                $objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD] = $this->buildAllDataField(
-                    $textAllDataField,
-                    $value
-                );
-
                 $objectData[$fieldConfig['target_type']] = array_map('trim', $objectData[$fieldConfig['target_type']]);
             }
         }
@@ -180,6 +170,35 @@ abstract class AbstractMapper
             )
         );
 
-        return $original;
+        return trim($original);
+    }
+
+    /**
+     * Fills "all_text" virtual field with data.
+     *
+     * @param array $objectData
+     *
+     * @return array
+     */
+    protected function generateAllTextField(array $objectData): array
+    {
+        if (empty($objectData[Query::TYPE_TEXT])) {
+            return $objectData;
+        }
+
+        // "all_text" field might already exist if added by 'oro_search.prepare_entity_map' listeners.
+        $textAllDataField = $objectData[Query::TYPE_TEXT][Indexer::TEXT_ALL_DATA_FIELD] ?? '';
+
+        foreach ($objectData[Query::TYPE_TEXT] as $fieldName => $value) {
+            if ($fieldName === Indexer::TEXT_ALL_DATA_FIELD) {
+                continue;
+            }
+
+            $textAllDataField = $this->buildAllDataField($textAllDataField, $value);
+        }
+
+        $objectData[Query::TYPE_TEXT][Indexer::TEXT_ALL_DATA_FIELD] = $textAllDataField;
+
+        return $objectData;
     }
 }

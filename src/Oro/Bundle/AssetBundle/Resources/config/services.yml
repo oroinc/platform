@@ -24,6 +24,10 @@ services:
         tags:
             - { name: console.command, command: 'oro:assets:build' }
 
+    Oro\Bundle\AssetBundle\Command\OroAssetsInstallCommand:
+        tags:
+            - { name: console.command, command: 'oro:assets:install' }
+
     oro_asset.node_process_factory:
         class: Oro\Bundle\AssetBundle\NodeProcessFactory
         arguments:

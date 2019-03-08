@@ -6,10 +6,14 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
+/**
+ * Workflow action that sends email
+ */
 class SendEmail extends AbstractSendEmail
 {
     /**
@@ -18,18 +22,27 @@ class SendEmail extends AbstractSendEmail
     protected $options;
 
     /**
+     * @var EmailOriginHelper
+     */
+    private $emailOriginHelper;
+
+    /**
      * @param ContextAccessor    $contextAccessor
      * @param Processor          $emailProcessor
      * @param EmailAddressHelper $emailAddressHelper
      * @param EntityNameResolver $entityNameResolver
+     * @param EmailOriginHelper  $emailOriginHelper
      */
     public function __construct(
         ContextAccessor $contextAccessor,
         Processor $emailProcessor,
         EmailAddressHelper $emailAddressHelper,
-        EntityNameResolver $entityNameResolver
+        EntityNameResolver $entityNameResolver,
+        EmailOriginHelper $emailOriginHelper
     ) {
         parent::__construct($contextAccessor, $emailProcessor, $emailAddressHelper, $entityNameResolver);
+
+        $this->emailOriginHelper = $emailOriginHelper;
     }
 
     /**
@@ -95,10 +108,10 @@ class SendEmail extends AbstractSendEmail
 
         $emailUser = null;
         try {
-            $emailUser = $this->emailProcessor->process(
-                $emailModel,
-                $this->emailProcessor->getEmailOrigin($emailModel->getFrom(), $emailModel->getOrganization())
-            );
+            $emailOrigin = $this->emailOriginHelper
+                ->getEmailOrigin($emailModel->getFrom(), $emailModel->getOrganization());
+
+            $emailUser = $this->emailProcessor->process($emailModel, $emailOrigin);
         } catch (\Swift_SwiftException $exception) {
             if (null !== $this->logger) {
                 $this->logger->error('Workflow send email action.', ['exception' => $exception]);

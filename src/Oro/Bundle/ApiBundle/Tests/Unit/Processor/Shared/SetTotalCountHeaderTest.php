@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -213,14 +212,16 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $config = new EntityDefinitionConfig();
         $totalCount = 123;
 
-        $qb = new DbalQueryBuilder($this->em->getConnection());
+        /** @var Query\ResultSetMapping $rsm */
+        $rsm = $this->createMock(Query\ResultSetMapping::class);
+        $qb = new SqlQueryBuilder($this->em, $rsm);
         $qb
             ->select('e.id AS id, e.name AS name')
-            ->from('group_table e')
+            ->from('group_table', 'e')
             ->setFirstResult(20)
             ->setMaxResults(10);
         $query = new SqlQuery($this->em);
-        $query->setQueryBuilder($qb);
+        $query->setSqlQueryBuilder($qb);
 
         $this->queryResolver->expects(self::never())
             ->method('resolveQuery');

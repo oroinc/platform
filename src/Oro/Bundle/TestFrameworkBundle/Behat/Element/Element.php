@@ -5,7 +5,10 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Session;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\SpinTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
+use WebDriver\Exception\ElementNotVisible;
+use WebDriver\Exception\NoSuchElement;
 
 /**
  * Base page element node.
@@ -14,7 +17,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
  */
 class Element extends NodeElement
 {
-    use AssertTrait;
+    use AssertTrait, SpinTrait;
 
     /**
      * @var OroElementFactory
@@ -169,6 +172,28 @@ class Element extends NodeElement
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function click()
+    {
+        try {
+            parent::click();
+        } catch (NoSuchElement | ElementNotVisible $e) {
+            $isClicked = $this->spin(function () {
+                if ($this->isVisible()) {
+                    parent::click();
+                    return true;
+                }
+                return false;
+            }, 3);
+
+            if (!$isClicked) {
+                throw $e;
+            }
+        }
+    }
+
+    /**
      * Click on button or link
      *
      * @param string $button
@@ -207,32 +232,5 @@ class Element extends NodeElement
     protected function getName()
     {
         return preg_replace('/^.*\\\(.*?)$/', '$1', get_class($this));
-    }
-
-    /**
-     * @param \Closure $lambda
-     * @param int $timeLimit
-     * @return null|mixed Return null if closure throw error or return not true value.
-     *                     Return value that return closure
-     */
-    protected function spin(\Closure $lambda, $timeLimit = 60)
-    {
-        $time = $timeLimit;
-
-        while ($time > 0) {
-            $start = microtime(true);
-            try {
-                if ($result = $lambda($this)) {
-                    return $result;
-                }
-            } catch (\Exception $e) {
-                // do nothing
-            } catch (\Throwable $e) {
-                // do nothing
-            }
-            usleep(50000);
-            $time -= microtime(true) - $start;
-        }
-        return null;
     }
 }

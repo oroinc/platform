@@ -12,15 +12,15 @@ This bundle provides the next localization tools:
 
 ## Locale Settings
 
-Provides such locale settings of application as:
-
-* locale
-* language
+Locale Settings is a service of the Oro\Bundle\LocaleBundle\Model\LocaleSettings class with the "oro_locale.settings" ID.
+This service can be used to get locale specific settings of the application, such as:
+* locale based on localization
+* language based on localization
 * location
-* time zone
 * calendar
-* person names formats
-* addresses formats
+* time zone
+* list of person names formats
+* list of addresses formats
 * currency specific data
   * currency symbols based on currency codes
   * currency code, phone prefix, default locale based on country

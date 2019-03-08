@@ -24,9 +24,13 @@ class AddPinbarTabTitle implements Migration, OrderedMigrationInterface
     {
         $table = $schema->getTable('oro_navigation_item_pinbar');
 
-        $table->addColumn('title', 'string', ['length' => 255, 'notnull' => false]);
-        $table->addColumn('title_short', 'string', ['length' => 255, 'notnull' => false]);
-
-        $queries->addPostQuery("UPDATE oro_navigation_item_pinbar SET title = '', title_short = ''");
+        if (!$table->hasColumn('title')) {
+            $table->addColumn('title', 'string', ['length' => 255, 'notnull' => false]);
+            $queries->addPostQuery("UPDATE oro_navigation_item_pinbar SET title = ''");
+        }
+        if (!$table->hasColumn('title_short')) {
+            $table->addColumn('title_short', 'string', ['length' => 255, 'notnull' => false]);
+            $queries->addPostQuery("UPDATE oro_navigation_item_pinbar SET title_short = ''");
+        }
     }
 }

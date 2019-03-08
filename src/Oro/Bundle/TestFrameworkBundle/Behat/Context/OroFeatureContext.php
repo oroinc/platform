@@ -5,33 +5,13 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Context;
 use Behat\MinkExtension\Context\RawMinkContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 
+/**
+ * Basic feature context which may be used as parent class for other contexts.
+ * Provides assert and spin functions.
+ */
 class OroFeatureContext extends RawMinkContext
 {
-    use AssertTrait;
-
-    /**
-     * @param \Closure $lambda
-     * @param int $timeLimit in seconds
-     * @return null|mixed Return null if closure throw error or return not true value.
-     *                     Return value that return closure
-     */
-    public function spin(\Closure $lambda, $timeLimit = 60)
-    {
-        $time = $timeLimit;
-
-        while ($time > 0) {
-            try {
-                if ($result = $lambda($this)) {
-                    return $result;
-                }
-            } catch (\Exception $e) {
-                // do nothing
-            }
-            usleep(250000);
-            $time -= 0.25;
-        }
-        return null;
-    }
+    use AssertTrait, SpinTrait;
 
     public function waitForAjax()
     {

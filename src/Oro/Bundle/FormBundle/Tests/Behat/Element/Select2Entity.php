@@ -6,6 +6,7 @@ use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\FormBundle\Tests\Behat\Context\ClearableInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\UiDialog;
+use WebDriver\Exception\StaleElementReference;
 use WebDriver\Key;
 
 class Select2Entity extends Element implements ClearableInterface
@@ -25,6 +26,14 @@ class Select2Entity extends Element implements ClearableInterface
      */
     public function setValue($value)
     {
+        if (empty($value)) {
+            if (!$this->isEmptyValue()) {
+                $this->clear();
+            }
+
+            return;
+        }
+
         $this->fillSearchField($value);
         $results = $this->getSuggestions();
 
@@ -163,24 +172,43 @@ class Select2Entity extends Element implements ClearableInterface
 
     public function open()
     {
-        if (!$this->isOpen()) {
-            $openArrow = $this->getParent()->find('css', '.select2-arrow');
-            if ($openArrow) {
-                $this->focus();
-                // Although ajax is already loaded element need some extra time to appear by js animation
-                $openArrow->waitFor(60, function (NodeElement $element) {
-                    return $element->isVisible();
-                });
-                if ($openArrow->isVisible()) {
-                    try {
-                        $openArrow->click();
-                    } catch (\Exception $e) {
-                        // Some elements on the page may be covered by sticky panel.
-                        // We should scroll up to the page logo. I will allow to click on the element.
-                        $this->getPage()->find('css', '.logo')->mouseOver();
-                        $openArrow->click();
+        $this->openElement();
+    }
+
+    /**
+     * @param bool $retryOnStaleElement
+     * @throws StaleElementReference
+     */
+    protected function openElement($retryOnStaleElement = true)
+    {
+        try {
+            if (!$this->isOpen()) {
+                $openArrow = $this->getParent()->find('css', '.select2-arrow');
+                if ($openArrow) {
+                    $this->focus();
+                    // Although ajax is already loaded element need some extra time to appear by js animation
+                    $openArrow->waitFor(60, function (NodeElement $element) {
+                        return $element->isVisible();
+                    });
+                    if ($openArrow->isVisible()) {
+                        try {
+                            $openArrow->click();
+                        } catch (\Exception $e) {
+                            // Some elements on the page may be covered by sticky panel.
+                            // We should scroll up to the page logo. I will allow to click on the element.
+                            $this->getPage()->find('css', '.logo')->mouseOver();
+                            $openArrow->click();
+                        }
                     }
                 }
+            }
+        } catch (StaleElementReference $e) {
+            if ($retryOnStaleElement) {
+                $this->spin(function () {
+                    return $this->openElement(false);
+                }, 5);
+            } else {
+                throw $e;
             }
         }
     }
@@ -199,14 +227,14 @@ class Select2Entity extends Element implements ClearableInterface
      */
     public function isOpen()
     {
-        return $this->spin(function () {
-            return 0 !== count(array_filter(
+        return 0 !== count(
+            array_filter(
                 $this->getPage()->findAll('css', '.select2-search'),
                 function (NodeElement $element) {
                     return $element->isVisible();
                 }
-            ));
-        }, 5);
+            )
+        );
     }
 
     /**
@@ -250,7 +278,10 @@ class Select2Entity extends Element implements ClearableInterface
 
     public function clear()
     {
-        $this->getParent()->find('css', '.select2-search-choice-close')->click();
+        $close = $this->getParent()->find('css', '.select2-search-choice-close');
+        if ($close && $close->isVisible()) {
+            $close->click();
+        }
     }
 
     /**
@@ -261,6 +292,18 @@ class Select2Entity extends Element implements ClearableInterface
         $span = $this->getParent()->find('css', 'span.select2-chosen');
 
         return $span ? $span->getText() : null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmptyValue()
+    {
+        return !$this->getParent()->find(
+            'xpath',
+            '//a[contains(@class, "select2-choice") and not(contains(@class, "select2-default"))]'
+            . '//span[@class="select2-chosen"]'
+        );
     }
 
     /**
