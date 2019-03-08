@@ -26,6 +26,16 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $this->bundleDir = $tmpDir . DIRECTORY_SEPARATOR . 'Bundle' . DIRECTORY_SEPARATOR . 'TestBundle1';
     }
 
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    private function getPath($path)
+    {
+        return str_replace('/', DIRECTORY_SEPARATOR, $path);
+    }
+
     public function testLoad()
     {
         $bundleClass = TestBundle1::class;
@@ -47,15 +57,15 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
             }
         );
         self::assertEquals(
-            str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/config/another non word/test.yml'),
+            $this->getPath($bundleDir . '/Resources/config/another non word/test.yml'),
             $result[0]->path
         );
         self::assertEquals(
-            str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/config/bar/test.yml'),
+            $this->getPath($bundleDir . '/Resources/config/bar/test.yml'),
             $result[1]->path
         );
         self::assertEquals(
-            str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/config/foo/test.yml'),
+            $this->getPath($bundleDir . '/Resources/config/foo/test.yml'),
             $result[2]->path
         );
     }
@@ -74,9 +84,9 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         sort($found);
         self::assertEquals(
             [
-                str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/config/another non word/test.yml'),
-                str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/config/bar/test.yml'),
-                str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/config/foo/test.yml')
+                $this->getPath($bundleDir . '/Resources/config/another non word/test.yml'),
+                $this->getPath($bundleDir . '/Resources/config/bar/test.yml'),
+                $this->getPath($bundleDir . '/Resources/config/foo/test.yml')
             ],
             $found
         );

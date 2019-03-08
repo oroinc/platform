@@ -8,6 +8,7 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
+use Oro\Component\Config\Cache\ConfigCacheStateInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -27,6 +28,9 @@ class EntityAliasResolver
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var ConfigCacheStateInterface */
+    private $configCacheState;
+
     /** @var EntityAliasStorage|null */
     private $storage;
 
@@ -40,6 +44,16 @@ class EntityAliasResolver
         $this->loader = $loader;
         $this->cache = $cache;
         $this->logger = $logger;
+    }
+
+    /**
+     * Sets an object that should be used to check if entity alias cache is fresh or should be rebuilt.
+     *
+     * @param ConfigCacheStateInterface $configCacheState
+     */
+    public function setConfigCacheState(ConfigCacheStateInterface $configCacheState): void
+    {
+        $this->configCacheState = $configCacheState;
     }
 
     /**
@@ -194,24 +208,60 @@ class EntityAliasResolver
     private function ensureAllAliasesLoaded()
     {
         if (null === $this->storage) {
-            $cachedData = $this->cache->fetch(self::CACHE_KEY);
-            if (false !== $cachedData) {
-                $this->storage = $cachedData;
-            } else {
-                $storage = $this->createStorage();
-                try {
-                    $this->loader->load($storage);
-                } catch (InvalidEntityAliasException $e) {
-                    throw $e;
-                } catch (\Exception $e) {
-                    $storage = null;
-                    $this->logger->error('Loading of entity aliases failed', ['exception' => $e]);
-                }
+            $storage = $this->fetchAliasesFromCache();
+            if (null === $storage) {
+                $storage = $this->loadAliases();
                 if (null !== $storage) {
-                    $this->cache->save(self::CACHE_KEY, $storage);
-                    $this->storage = $storage;
+                    $this->saveAliasesToCache($storage);
                 }
             }
+            $this->storage = $storage;
         }
+    }
+
+    /**
+     * @return EntityAliasStorage|null
+     */
+    private function fetchAliasesFromCache(): ?EntityAliasStorage
+    {
+        $storage = null;
+        $cachedData = $this->cache->fetch(self::CACHE_KEY);
+        if (false !== $cachedData) {
+            list($timestamp, $value) = $cachedData;
+            if (null === $this->configCacheState || $this->configCacheState->isCacheFresh($timestamp)) {
+                $storage = $value;
+            }
+        }
+
+        return $storage;
+    }
+
+    /**
+     * @param EntityAliasStorage $storage
+     */
+    private function saveAliasesToCache(EntityAliasStorage $storage): void
+    {
+        $timestamp = null === $this->configCacheState
+            ? null
+            : $this->configCacheState->getCacheTimestamp();
+        $this->cache->save(self::CACHE_KEY, [$timestamp, $storage]);
+    }
+
+    /**
+     * @return EntityAliasStorage
+     */
+    private function loadAliases(): ?EntityAliasStorage
+    {
+        $storage = $this->createStorage();
+        try {
+            $this->loader->load($storage);
+        } catch (InvalidEntityAliasException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            $storage = null;
+            $this->logger->error('Loading of entity aliases failed', ['exception' => $e]);
+        }
+
+        return $storage;
     }
 }
