@@ -236,8 +236,6 @@ api:
                     fieldDuration: ~
                     fieldMoneyValue: ~
                     fieldCurrency: ~
-        Extend\Entity\TestApiE1: ~
-        Extend\Entity\TestApiE2: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier:
             fields:
@@ -290,6 +288,7 @@ api:
                         update_subresource: true
                         add_subresource: true
                         delete_subresource: true
+        Extend\Entity\TestApiE2: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestActivity:

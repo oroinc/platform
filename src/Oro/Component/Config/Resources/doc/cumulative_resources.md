@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
@@ -30,7 +31,7 @@ class AcmeSomeExtension extends Extension
             'acme_config',
             new YamlCumulativeFileLoader('Resources/config/acme.yml')
         );
-        $resources    = $configLoader->load($container);
+        $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {
             $acmeConfig = array_merge($acmeConfig, $resource->data);
         }
@@ -110,7 +111,7 @@ class AcmeSomeExtension extends Extension
                 new MyXmlCumulativeFileLoader('Resources/config/acme.xml')
             ]
         );
-        $resources    = $configLoader->load($container);
+        $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {
             $acmeConfig = array_merge($acmeConfig, $resource->data);
         }
@@ -138,7 +139,7 @@ class AcmeSomeExtension extends Extension
                 new YamlCumulativeFileLoader('Resources/config/bar.yml')
             ]
         );
-        $resources    = $configLoader->load($container);
+        $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {
             $acmeConfig[$resource->name] = array_merge($acmeConfig[$resource->name], $resource->data);
         }
@@ -164,7 +165,7 @@ class AcmeSomeExtension extends Extension
                 new YamlCumulativeFileLoader('Resources/config/widgets/{folder}/widget.yml')
             )
         );
-        $resources    = $configLoader->load($container);
+        $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {
             $folderName = basename(dirname($resource->path)); 
             $acmeConfig[$folderName] = $resource->data;

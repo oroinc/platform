@@ -25,6 +25,16 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $this->bundleDir = $tmpDir . DIRECTORY_SEPARATOR . 'Bundle' . DIRECTORY_SEPARATOR . 'TestBundle1';
     }
 
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    private function getPath($path)
+    {
+        return str_replace('/', DIRECTORY_SEPARATOR, $path);
+    }
+
     public function testLoader()
     {
         $relativeFilePath = 'Resources/config/test.yml';
@@ -34,7 +44,7 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $data             = ['test' => 123];
         $bundleDir        = $this->bundleDir;
         $expectedFilePath = $bundleDir . '/' . $relativeFilePath;
-        $expectedFilePath = str_replace('/', DIRECTORY_SEPARATOR, $expectedFilePath);
+        $expectedFilePath = $this->getPath($expectedFilePath);
 
         $expectedResource = new CumulativeResourceInfo(
             TestBundle1::class,
@@ -80,7 +90,7 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $expectedResource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $expectedResource->addFound(
             $bundleClass,
-            str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/' . $relativeFilePath)
+            $this->getPath($bundleDir . '/' . $relativeFilePath)
         );
         $this->assertEquals($expectedResource, $resource);
     }
@@ -177,37 +187,37 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 'Resources/config/test.yml',
-                str_replace('/', DIRECTORY_SEPARATOR, '/Resources/config/test.yml'),
+                $this->getPath('/Resources/config/test.yml'),
                 'Resources/config/test.yml'
             ],
             [
                 '/Resources/config/test.yml',
-                str_replace('/', DIRECTORY_SEPARATOR, '/Resources/config/test.yml'),
+                $this->getPath('/Resources/config/test.yml'),
                 'Resources/config/test.yml'
             ],
             [
                 'Resources\config\test.yml',
-                str_replace('/', DIRECTORY_SEPARATOR, '/Resources/config/test.yml'),
+                $this->getPath('/Resources/config/test.yml'),
                 'Resources/config/test.yml'
             ],
             [
                 '\Resources\config\test.yml',
-                str_replace('/', DIRECTORY_SEPARATOR, '/Resources/config/test.yml'),
+                $this->getPath('/Resources/config/test.yml'),
                 'Resources/config/test.yml'
             ],
             [
                 'test.yml',
-                str_replace('/', DIRECTORY_SEPARATOR, '/test.yml'),
+                $this->getPath('/test.yml'),
                 'test.yml'
             ],
             [
                 '/test.yml',
-                str_replace('/', DIRECTORY_SEPARATOR, '/test.yml'),
+                $this->getPath('/test.yml'),
                 'test.yml'
             ],
             [
                 '\test.yml',
-                str_replace('/', DIRECTORY_SEPARATOR, '/test.yml'),
+                $this->getPath('/test.yml'),
                 'test.yml'
             ],
         ];

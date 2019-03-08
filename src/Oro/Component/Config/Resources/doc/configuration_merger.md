@@ -50,6 +50,7 @@ namespace Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
@@ -63,7 +64,7 @@ class ConfigurationPass implements CompilerPassInterface
             new YamlCumulativeFileLoader('Resources/config/acme.yml')
         );
 
-        $resources = $configLoader->load($container);
+        $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         $configs = [];
 
         foreach ($resources as $resource) {
