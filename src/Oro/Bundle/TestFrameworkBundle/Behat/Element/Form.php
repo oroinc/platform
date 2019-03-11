@@ -236,6 +236,10 @@ class Form extends Element
             return $field;
         }
 
+        if (!$field && is_array($locator)) {
+            self::fail(sprintf('Cannot find element by %s locator "%s"', $locator['type'], $locator['locator']));
+        }
+
         if ($field = $this->findFieldByLabel($locator)) {
             return $field;
         }
