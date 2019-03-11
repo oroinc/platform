@@ -21,3 +21,4 @@ oro:
         enum:
             options_error.message: Invalid enum options provided
         change_type_not_allowed.message: Changing type of existing field {{ field }} is not allowed.
+        attribute_field.message: Existing field "{{ field }}" is not an attribute.

@@ -12,6 +12,9 @@ use Oro\Bundle\ImportExportBundle\Strategy\Import\AbstractImportStrategy;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
+/**
+ * Import strategy for FieldConfigModel entity.
+ */
 class EntityFieldImportStrategy extends AbstractImportStrategy
 {
     /** @var TranslatorInterface */
@@ -102,11 +105,16 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
      */
     protected function validateAndUpdateContext(FieldConfigModel $entity)
     {
+        $groups = ['FieldConfigModel', 'Sql', 'ChangeTypeField'];
+        if ($this->context->getOption('check_attributes')) {
+            $groups[] = 'AttributeField';
+        }
+
         $errors = array_merge(
             (array)$this->strategyHelper->validateEntity(
                 $entity,
                 null,
-                new GroupSequence(['FieldConfigModel', 'Sql', 'ChangeTypeField'])
+                new GroupSequence($groups)
             ),
             $this->validateEntityFields($entity)
         );
