@@ -1,0 +1,169 @@
+<?php
+
+namespace Oro\Bundle\ImportExportBundle\Async;
+
+use Oro\Bundle\ImportExportBundle\Manager\ImportExportResultManager;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+/**
+ * Responsible for processing the results of import or export before they are stored
+ */
+class SaveImportExportResultProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+{
+    /**
+     * @var ImportExportResultManager
+     */
+    protected $importExportResultManager;
+
+    /**
+     * @var UserManager
+     */
+    protected $userManager;
+
+    /**
+     * @var JobStorage
+     */
+    protected $jobStorage;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @param ImportExportResultManager $importExportResultManager
+     * @param UserManager $userManager
+     * @param JobStorage $jobStorage
+     * @param LoggerInterface $logger
+     */
+    public function __construct(
+        ImportExportResultManager $importExportResultManager,
+        UserManager $userManager,
+        JobStorage $jobStorage,
+        LoggerInterface $logger
+    ) {
+        $this->importExportResultManager = $importExportResultManager;
+        $this->userManager = $userManager;
+        $this->jobStorage = $jobStorage;
+        $this->logger = $logger;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function process(MessageInterface $message, SessionInterface $session)
+    {
+        $body = JSON::decode($message->getBody());
+        try {
+            $options = $this->configureOption($body);
+        } catch (MissingOptionsException $e) {
+            $this->logger->critical(
+                sprintf('Error occurred during save result: %s', $e->getMessage()),
+                ['exception' => $e]
+            );
+            return self::REJECT;
+        } catch (UndefinedOptionsException $e) {
+            $this->logger->critical(
+                sprintf('Error occurred during save result: %s', $e->getMessage()),
+                ['exception' => $e]
+            );
+            return self::REJECT;
+        } catch (InvalidOptionsException $e) {
+            $this->logger->critical(
+                sprintf('Not enough required parameters: %s', $e->getMessage()),
+                ['exception' => $e]
+            );
+            return self::REJECT;
+        }
+
+        $job = $this->jobStorage->findJobById($options['jobId']);
+        $job = $job->isRoot() ? $job : $job->getRootJob();
+
+        try {
+            $this->saveJobResult($job, $options);
+        } catch (\Exception $e) {
+            $this->logger->critical(
+                sprintf('Unhandled error save result: %s', $e->getMessage()),
+                ['exception' => $e]
+            );
+            return self::REJECT;
+        }
+
+        return self::ACK;
+    }
+
+    /**
+     * @param array $parameters
+     *
+     * @return array
+     */
+    private function configureOption($parameters = []): array
+    {
+        $optionResolver = new OptionsResolver();
+        $optionResolver->setRequired('jobId');
+        $optionResolver->setRequired('type')->setAllowedValues('type', [
+            ProcessorRegistry::TYPE_EXPORT,
+            ProcessorRegistry::TYPE_IMPORT,
+            ProcessorRegistry::TYPE_IMPORT_VALIDATION,
+        ]);
+        $optionResolver->setDefined('userId')->setDefault('userId', null);
+
+        $optionResolver->setDefined('owner')->setDefault('owner', function (Options $options) {
+            return $this->findOwnerById($options['userId']);
+        });
+
+        return $optionResolver->resolve($parameters);
+    }
+
+
+    /**
+     * @param $ownerId
+     *
+     * @return User
+     */
+    private function findOwnerById($ownerId = null): ?User
+    {
+        return $ownerId ? $this->userManager->findUserBy(['id' => $ownerId]) : null;
+    }
+
+    /**
+     * @param Job $job
+     * @param array $parameters
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    protected function saveJobResult(Job $job, array $parameters): void
+    {
+        $jobData = $job->getData();
+        $this->importExportResultManager->saveResult(
+            $job->getId(),
+            $parameters['type'],
+            $parameters['owner'],
+            $jobData['file'] ?? null
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public static function getSubscribedTopics(): array
+    {
+        return [Topics::SAVE_IMPORT_EXPORT_RESULT];
+    }
+}

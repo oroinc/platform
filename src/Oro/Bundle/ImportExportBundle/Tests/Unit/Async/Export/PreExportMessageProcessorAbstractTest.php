@@ -428,13 +428,19 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $dependentJobContext = $this->createDependentJobContextMock();
         $dependentJobContext
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('addDependentJob')
-            ->with(
-                Topics::POST_EXPORT,
-                $this->callback(function ($message) {
-                    return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
-                })
+            ->withConsecutive(
+                [
+                    Topics::POST_EXPORT,
+                    $this->callback(function ($message) {
+                        return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
+                    }),
+                ],
+                [
+                    Topics::SAVE_IMPORT_EXPORT_RESULT,
+                    ['jobId' => $job->getId(), 'type' => 'export_type']
+                ]
             )
         ;
 
@@ -559,13 +565,19 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $dependentJobContext = $this->createDependentJobContextMock();
         $dependentJobContext
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('addDependentJob')
-            ->with(
-                Topics::POST_EXPORT,
-                $this->callback(function ($message) {
-                    return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
-                })
+            ->withConsecutive(
+                [
+                    Topics::POST_EXPORT,
+                    $this->callback(function ($message) {
+                        return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
+                    })
+                ],
+                [
+                    Topics::SAVE_IMPORT_EXPORT_RESULT,
+                    ['jobId' => $job->getId(), 'type' => 'export_type']
+                ]
             )
         ;
 

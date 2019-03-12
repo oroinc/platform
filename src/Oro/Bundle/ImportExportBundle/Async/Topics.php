@@ -13,6 +13,7 @@ class Topics
     const EXPORT = 'oro.importexport.export';
     const POST_EXPORT = 'oro.importexport.post_export';
     const SEND_IMPORT_NOTIFICATION = 'oro.importexport.send_import_notification';
+    const SAVE_IMPORT_EXPORT_RESULT = 'oro.importexport.save_import_export_result';
 
     /**
      * @deprecated since 3.1, will be removed in 4.0, please use PRE_IMPORT topic

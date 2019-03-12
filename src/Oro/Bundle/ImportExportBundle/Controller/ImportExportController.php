@@ -4,6 +4,8 @@ namespace Oro\Bundle\ImportExportBundle\Controller;
 
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
+use Oro\Bundle\ImportExportBundle\Exception\ImportExportExpiredException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
@@ -19,6 +21,7 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -35,6 +38,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  * Controller for import/export actions
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ *
+ * Responsible for the import and export
  */
 class ImportExportController extends Controller
 {
@@ -407,70 +412,52 @@ class ImportExportController extends Controller
             $this->getOptionsFromRequest($request)
         );
 
-        return $this->redirectToRoute('oro_importexport_export_download', ['fileName' => $result['file']]);
+        return $this->getExportHandler()->handleDownloadExportResult($result['file']);
     }
 
     /**
-     * @Route("/export/download/{fileName}", name="oro_importexport_export_download")
+     * @Route("/export/download/{jobId}", name="oro_importexport_export_download")
+     * @ParamConverter("result", options={"mapping": {"jobId": "jobId"}})
      *
-     * @param string $fileName
+     * @param ImportExportResult $result
      *
      * @return Response
      */
-    public function downloadExportResultAction($fileName)
+    public function downloadExportResultAction(ImportExportResult $result)
     {
-        if (!$this->isGranted('oro_importexport_import')
-            && !$this->isGranted('oro_importexport_export')
-        ) {
+        if (!$this->isGranted('VIEW', $result)) {
             throw new AccessDeniedException('Insufficient permission');
         }
 
-        return $this->getExportHandler()->handleDownloadExportResult($fileName);
-    }
-
-    /**
-     * @Route("/import_export/error/{jobCode}.log", name="oro_importexport_error_log")
-     *
-     * @param string $jobCode
-     * @return Response
-     * @throws AccessDeniedException
-     */
-    public function errorLogAction($jobCode)
-    {
-        if (!$this->isGranted('oro_importexport_import')
-            && !$this->isGranted('oro_importexport_export')
-        ) {
-            throw new AccessDeniedException('Insufficient permission');
+        if ($result->isExpired()) {
+            throw new ImportExportExpiredException();
         }
 
-        $jobExecutor = $this->getJobExecutor();
-        $errors      = array_merge(
-            $jobExecutor->getJobFailureExceptions($jobCode),
-            $jobExecutor->getJobErrors($jobCode)
-        );
-        $content     = implode("\r\n", $errors);
-
-        return new Response($content, 200, ['Content-Type' => 'text/x-log']);
+        return $this->getExportHandler()->handleDownloadExportResult($result->getFilename());
     }
 
     /**
      * @Route("/import_export/job-error-log/{jobId}.log", name="oro_importexport_job_error_log")
+     * @ParamConverter("result", options={"mapping": {"jobId": "jobId"}})
      *
-     * @param $jobId
+     * @param ImportExportResult $result
      * @return Response
      */
-    public function importExportJobErrorLogAction($jobId)
+    public function importExportJobErrorLogAction(ImportExportResult $result)
     {
-        if (!$this->isGranted('oro_importexport_import')
-            && !$this->isGranted('oro_importexport_export')
-        ) {
+        if (!$this->isGranted('VIEW', $result)) {
             throw new AccessDeniedException('Insufficient permission');
         }
 
-        $job = $this->getDoctrine()->getManagerForClass(Job::class)->getRepository(Job::class)->find($jobId);
+        if ($result->isExpired()) {
+            throw new ImportExportExpiredException();
+        }
+
+        $jobRepository = $this->getDoctrine()->getManagerForClass(Job::class)->getRepository(Job::class);
+        $job = $jobRepository->find($result->getJobId());
 
         if (!$job) {
-            throw new NotFoundHttpException(sprintf('Job %s not found', $jobId));
+            throw new NotFoundHttpException(sprintf('Job %s not found', $result->getJobId()));
         }
 
         $content = $this->getImportExportResultSummarizer()->getErrorLog($job);

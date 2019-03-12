@@ -12,6 +12,7 @@ class LoadImportExportResultData extends AbstractFixture
     use UserUtilityTrait;
 
     public const EXPIRED_IMPORT_EXPORT_RESULT = 'expiredImportExportResult';
+    public const NOT_EXPIRED_IMPORT_EXPORT_RESULT = 'notExpiredImportExportResult';
 
     /**
      * @var array
@@ -20,6 +21,10 @@ class LoadImportExportResultData extends AbstractFixture
         self::EXPIRED_IMPORT_EXPORT_RESULT => [
             'jobId' =>  42,
             'expired' => true
+        ],
+        self::NOT_EXPIRED_IMPORT_EXPORT_RESULT => [
+            'jobId' =>  123,
+            'expired' => false
         ]
     ];
 

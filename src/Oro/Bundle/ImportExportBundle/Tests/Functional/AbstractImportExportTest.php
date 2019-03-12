@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional;
 
+use Gaufrette\File;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
@@ -38,6 +39,7 @@ abstract class AbstractImportExportTest extends WebTestCase
         string $expectedCsvFilePath,
         array $skippedColumns = []
     ) {
+        $from = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->client->request(
             'GET',
             $this->getUrl('oro_importexport_export_template', [
@@ -46,13 +48,22 @@ abstract class AbstractImportExportTest extends WebTestCase
             ])
         );
 
-        $this->client->followRedirect();
+        $actualExportContent = $this->client->getResponse()->getContent();
+        $exportFileContent = $this->getFileContent($expectedCsvFilePath);
 
-        $this->assertExportFileData(
-            $expectedCsvFilePath,
-            $this->client->getRequest()->attributes->get('fileName'),
-            $skippedColumns
-        );
+        $expectedData = $this->getParsedDataFromCSVContent($actualExportContent);
+        $exportedData = $this->getParsedDataFromCSVContent($exportFileContent);
+
+        if ($skippedColumns) {
+            $this->removedIgnoredColumnsFromData(
+                $expectedData,
+                $skippedColumns
+            );
+        }
+        static::assertEquals($expectedData, $exportedData);
+
+        $to = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->deleteImportExportFileByPeriod($from, $to);
     }
 
     /**
@@ -86,10 +97,27 @@ abstract class AbstractImportExportTest extends WebTestCase
             $exportMessageData
         );
 
-        $job = $this->findJob($jobId);
-        $exportedFilename = $job->getData()['file'];
+        $this->assertMessageProcessorExecuted(
+            'oro_importexport.async.post_export',
+            array_merge($exportMessageData, ['email' => 'acme@example.com'])
+        );
 
-        $this->assertExportFileData($expectedCsvFilePath, $exportedFilename, $skippedColumns);
+        $job = $this->findJob($jobId);
+        $job = $job->isRoot() ? $job : $job->getRootJob();
+
+        $saveResultMessageData = $this->getOneSentMessageWithTopic(Topics::SAVE_IMPORT_EXPORT_RESULT);
+        $this->clearMessageCollector();
+
+        $this->assertMessageProcessorExecuted(
+            'oro_importexport.async.save_import_export_result_processor',
+            array_merge(
+                $saveResultMessageData,
+                ['jobId' => $job->getId(), 'type' => ProcessorRegistry::TYPE_EXPORT]
+            )
+        );
+
+        $exportedFilename = $job->getData()['file'];
+        $this->assertExportFileData($job->getId(), $expectedCsvFilePath, $exportedFilename, $skippedColumns);
     }
 
     /**
@@ -168,7 +196,7 @@ abstract class AbstractImportExportTest extends WebTestCase
 
         static::assertSame(
             json_decode($this->getFileContent($errorsFilePath)),
-            json_decode($this->getImportExportFileContent($jobData['errorLogFile']))
+            json_decode($this->getImportExportFileContent($jobId))
         );
 
         $this->deleteTmpFile($preImportValidateMessageData['fileName']);
@@ -354,6 +382,37 @@ abstract class AbstractImportExportTest extends WebTestCase
     }
 
     /**
+     * @param int $jobId
+     * @param string $expectedCsvFilePath
+     * @param string $exportedFilename
+     * @param array $skippedColumns
+     */
+    protected function assertExportFileData(int $jobId, $expectedCsvFilePath, $exportedFilename, array $skippedColumns)
+    {
+        $exportFileContent = $this->getImportExportFileContent($jobId);
+        $this->deleteImportExportFile($exportedFilename);
+
+        if (empty($skippedColumns)) {
+            static::assertContains(
+                $this->getFileContent($expectedCsvFilePath),
+                $exportFileContent
+            );
+        } else {
+            $expectedData = $this->getParsedDataFromCSVFile($expectedCsvFilePath);
+            $exportedData = $this->getParsedDataFromCSVContent($exportFileContent);
+            $this->removedIgnoredColumnsFromData(
+                $exportedData,
+                $skippedColumns
+            );
+
+            static::assertEquals(
+                $expectedData,
+                $exportedData
+            );
+        }
+    }
+
+    /**
      * @return UsernamePasswordOrganizationToken
      */
     protected function getSecurityToken(): UsernamePasswordOrganizationToken
@@ -394,15 +453,15 @@ abstract class AbstractImportExportTest extends WebTestCase
     }
 
     /**
-     * @param string $filename
+     * @param int $jobId
      *
      * @return string
      */
-    protected function getImportExportFileContent(string $filename): string
+    protected function getImportExportFileContent(int $jobId): string
     {
         $this->client->request(
             'GET',
-            $this->getUrl('oro_importexport_export_download', ['fileName' => $filename])
+            $this->getUrl('oro_importexport_export_download', ['jobId' => $jobId])
         );
 
         return $this->client->getResponse()->getContent();
@@ -466,40 +525,25 @@ abstract class AbstractImportExportTest extends WebTestCase
     }
 
     /**
+     * @param \DateTime $from
+     * @param \DateTime $to
+     */
+    protected function deleteImportExportFileByPeriod(\DateTime $from, \DateTime $to)
+    {
+        /** @var FileManager $fileManager */
+        $fileManager = static::getContainer()->get('oro_importexport.file.file_manager');
+        $files = $fileManager->getFilesByPeriod($from, $to);
+        /** @var File $file */
+        foreach ($files as $file) {
+            $fileManager->deleteFile($file);
+        }
+    }
+
+    /**
      * @param string $filename
      */
     protected function deleteTmpFile(string $filename)
     {
         unlink(FileManager::generateTmpFilePath($filename));
-    }
-
-    /**
-     * @param string $expectedCsvFilePath
-     * @param string $exportedFilename
-     * @param array $skippedColumns
-     */
-    protected function assertExportFileData($expectedCsvFilePath, $exportedFilename, array $skippedColumns)
-    {
-        $exportFileContent = $this->getImportExportFileContent($exportedFilename);
-        $this->deleteImportExportFile($exportedFilename);
-
-        if (empty($skippedColumns)) {
-            static::assertContains(
-                $this->getFileContent($expectedCsvFilePath),
-                $exportFileContent
-            );
-        } else {
-            $expectedData = $this->getParsedDataFromCSVFile($expectedCsvFilePath);
-            $exportedData = $this->getParsedDataFromCSVContent($exportFileContent);
-            $this->removedIgnoredColumnsFromData(
-                $exportedData,
-                $skippedColumns
-            );
-
-            static::assertEquals(
-                $expectedData,
-                $exportedData
-            );
-        }
     }
 }

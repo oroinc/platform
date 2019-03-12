@@ -83,36 +83,15 @@ class ImportExportControllerTest extends WebTestCase
         ]);
     }
 
-    public function testDownloadFileSuccess()
-    {
-        $this->client->followRedirects(true);
-
-        $importFileName = tempnam($this->getImportDir(), 'download.txt');
-        $parts = explode('/', $importFileName);
-        $fileName = array_pop($parts);
-
-        try {
-            $this->client->request(
-                'GET',
-                $this->getUrl('oro_importexport_export_download', [
-                    'fileName' => $fileName
-                ])
-            );
-
-            $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 200);
-        } finally {
-            unlink($importFileName);
-        }
-    }
-
     public function testDownloadFileReturns404IfFileDoesntExist()
     {
+        $undefinedJobId = 123;
         $this->client->followRedirects(true);
 
         $this->client->request(
             'GET',
             $this->getUrl('oro_importexport_export_download', [
-                'fileName' => 'non_existing_file.txt'
+                'jobId' => $undefinedJobId
             ])
         );
 

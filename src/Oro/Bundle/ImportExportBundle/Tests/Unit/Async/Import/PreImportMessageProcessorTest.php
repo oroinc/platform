@@ -488,9 +488,9 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $dependentContext = $this->createMock(DependentJobContext::class);
         $dependentContext
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('addDependentJob')
-            ->with(Topics::SEND_IMPORT_NOTIFICATION);
+            ->withConsecutive([Topics::SEND_IMPORT_NOTIFICATION], [Topics::SAVE_IMPORT_EXPORT_RESULT]);
 
         $this->dependentJob
             ->expects($this->once())

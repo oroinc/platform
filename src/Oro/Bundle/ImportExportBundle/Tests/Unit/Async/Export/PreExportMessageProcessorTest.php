@@ -108,7 +108,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $dependentJobContext = $this->createDependentJobContextMock();
         $dependentJobContext
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('addDependentJob');
 
         $dependentJob = $this->createDependentJobMock();

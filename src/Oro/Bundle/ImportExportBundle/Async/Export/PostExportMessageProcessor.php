@@ -124,12 +124,13 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         }
 
         if ($fileName !== null) {
+            $job->setData(array_merge($job->getData(), ['file' => $fileName]));
+            $this->jobStorage->saveJob($job);
+
             $summary = $this->importExportResultSummarizer->processSummaryExportResultForNotification($job, $fileName);
 
             $this->recipientUserId = $body['recipientUserId'] ?? null;
             $this->sendEmailNotification($body['email'], $summary, $body['notificationTemplate'] ?? null);
-
-            $this->logger->info('Sent notification email.');
         }
 
         return self::ACK;
@@ -169,5 +170,7 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
             NotificationTopics::SEND_NOTIFICATION_EMAIL,
             $message
         );
+
+        $this->logger->info('Sent notification email.');
     }
 }

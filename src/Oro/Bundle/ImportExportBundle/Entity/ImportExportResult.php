@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ImportExportBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\MagentoBundle\Entity\CreatedAtAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Ownership\OrganizationAwareTrait;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -13,7 +13,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * Entity holds information about import/export operations
  *
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\ImportExportBundle\Entity\Repository\ImportExportResultRepository")
  * @ORM\Table(name="oro_import_export_result")
  * @Config(
  *     defaultValues={
@@ -79,9 +79,9 @@ class ImportExportResult implements CreatedAtAwareInterface
     /**
      * @var string|null
      *
-     * @ORM\Column(type="string", length=255, name="job_code", nullable=true)
+     * @ORM\Column(type="string", length=255, name="type", unique=false, nullable=false)
      */
-    protected $jobCode;
+    protected $type;
 
     /**
      * @var boolean
@@ -159,26 +159,6 @@ class ImportExportResult implements CreatedAtAwareInterface
     }
 
     /**
-     * @return string|null
-     */
-    public function getJobCode(): ?string
-    {
-        return $this->jobCode;
-    }
-
-    /**
-     * @param string $jobCode
-     *
-     * @return $this
-     */
-    public function setJobCode(string $jobCode = null): ImportExportResult
-    {
-        $this->jobCode = $jobCode;
-
-        return $this;
-    }
-
-    /**
      * @return bool
      */
     public function isExpired(): ?bool
@@ -194,6 +174,26 @@ class ImportExportResult implements CreatedAtAwareInterface
     public function setExpired(bool $expired): ImportExportResult
     {
         $this->expired = $expired;
+
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return ImportExportResult
+     */
+    public function setType(string $type): ImportExportResult
+    {
+        $this->type = $type;
 
         return $this;
     }

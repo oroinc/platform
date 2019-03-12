@@ -20,7 +20,7 @@ class ImportExportResultTest extends \PHPUnit\Framework\TestCase
             ['createdAt', new \DateTime('now'), false],
             ['fileName', "/ACME", false],
             ['jobId', 1, false],
-            ['jobCode', 'CODE-1', false],
+            ['type', 'import_or_export', false],
             ['expired', false, true],
         ];
 

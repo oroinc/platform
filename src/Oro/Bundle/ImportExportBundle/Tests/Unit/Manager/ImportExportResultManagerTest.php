@@ -4,54 +4,139 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
+use Oro\Bundle\ImportExportBundle\Entity\Repository\ImportExportResultRepository;
 use Oro\Bundle\ImportExportBundle\Manager\ImportExportResultManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private $managerRegistry;
 
     /** @var ImportExportResultManager */
-    private $resultManager;
+    private $importExportResultManager;
 
     protected function setUp(): void
     {
-        $this->registry = self::createMock(ManagerRegistry::class);
-        $this->resultManager = new ImportExportResultManager($this->registry);
+        $this->managerRegistry = self::createMock(ManagerRegistry::class);
+        $this->importExportResultManager = new ImportExportResultManager($this->managerRegistry);
     }
 
-    public function testSaveResult(): void
+    /**
+     * @param $actual
+     * @param $expected
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     *
+     * @dataProvider saveResultProvider
+     */
+    public function testSaveResult($actual, $expected): void
     {
-        $jobId = 1;
-        $jobCode = 'JobCode-1';
-        $fileName = 'ACME';
-
         $importExportResult = new ImportExportResult();
         $importExportResult
-            ->setJobId($jobId)
-            ->setJobCode($jobCode)
-            ->setFilename($fileName);
+            ->setJobId($expected['jobId'])
+            ->setType($expected['type'])
+            ->setFilename($expected['filename']);
 
         /** @var \PHPUnit\Framework\MockObject\MockObject */
         $entityManager = self::createMock(EntityManager::class);
-        $this->registry
-            ->expects(self::once())
-            ->method('getManagerForClass')
-            ->willReturn($entityManager);
         $entityManager
             ->expects(self::once())
             ->method('persist')
             ->with($importExportResult);
+        $entityManager
+            ->expects(self::once())
+            ->method('flush');
+
+        $this->managerRegistry
+            ->expects(self::once())
+            ->method('getManagerForClass')
+            ->willReturn($entityManager);
+
+        $importExportResult = $this->importExportResultManager->saveResult(
+            $actual['jobId'],
+            $actual['type'],
+            $actual['owner'],
+            $actual['filename']
+        );
+
+        self::assertAttributeEquals($expected['jobId'], 'jobId', $importExportResult);
+        self::assertAttributeEquals($expected['type'], 'type', $importExportResult);
+        self::assertAttributeEquals($expected['filename'], 'filename', $importExportResult);
+        self::assertAttributeEquals($expected['owner'], 'owner', $importExportResult);
+    }
+
+    /**
+     * @return array
+     */
+    public function saveResultProvider(): array
+    {
+        $user = new User();
+        $organization = new Organization();
+        $user->setOrganization($organization);
+
+        return [
+            'without owner' => [
+                'actual' => [
+                    'jobId' => 123,
+                    'owner' => null,
+                    'type' => 'import_or_export',
+                    'filename' => 'file.csv',
+                ],
+                'expected' => [
+                    'jobId' => 123,
+                    'owner' => null,
+                    'type' => 'import_or_export',
+                    'filename' => 'file.csv',
+                ],
+            ],
+            'with owner' => [
+                'actual' => [
+                    'jobId' => 123,
+                    'owner' => $user,
+                    'type' => 'import_or_export',
+                    'filename' => 'file.csv',
+                ],
+                'expected' => [
+                    'jobId' => 123,
+                    'owner' => $user,
+                    'type' => 'import_or_export',
+                    'filename' => 'file.csv',
+                ],
+            ],
+        ];
+    }
+
+    public function testMarkResultsAsExpired(): void
+    {
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        $importExportRepository = self::createMock(ImportExportResultRepository::class);
+        $importExportRepository
+            ->expects(self::once())
+            ->method('updateExpiredRecords')
+            ->with($date, $date);
+
+        /** @var \PHPUnit\Framework\MockObject\MockObject */
+        $entityManager = self::createMock(EntityManager::class);
+        $entityManager
+            ->expects(self::once())
+            ->method('getRepository')
+            ->with(ImportExportResult::class)
+            ->willReturn($importExportRepository);
 
         $entityManager
             ->expects(self::once())
             ->method('flush');
 
-        $importExportResult = $this->resultManager->saveResult($jobId, $jobCode, $fileName);
+        $this->managerRegistry
+            ->expects(self::once())
+            ->method('getManagerForClass')
+            ->willReturn($entityManager);
 
-        self::assertAttributeEquals($fileName, 'filename', $importExportResult);
-        self::assertAttributeEquals($jobId, 'jobId', $importExportResult);
-        self::assertAttributeEquals($jobCode, 'jobCode', $importExportResult);
+        $this->importExportResultManager->markResultsAsExpired($date, $date);
     }
 }

@@ -199,6 +199,11 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
                         'process' => $body['process'],
                     ]
                 );
+                $context->addDependentJob(Topics::SAVE_IMPORT_EXPORT_RESULT, [
+                    'jobId' => $job->getRootJob()->getId(),
+                    'userId' => $body['userId'],
+                    'type' => $body['process']
+                ]);
                 $this->dependentJob->saveDependentJob($context);
 
                 return true;
