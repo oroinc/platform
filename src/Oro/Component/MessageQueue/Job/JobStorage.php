@@ -5,13 +5,15 @@ namespace Oro\Component\MessageQueue\Job;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\UnitOfWork;
 
+/**
+ * Jobs database layer, load and save jobs responsibility
+ */
 class JobStorage
 {
     /** @var ManagerRegistry */
@@ -20,19 +22,19 @@ class JobStorage
     /** @var string */
     private $entityClass;
 
-    /** @var string */
-    private $uniqueTableName;
+    /** @var UniqueJobHandler */
+    private $uniqueJobHandler;
 
     /**
-     * @param ManagerRegistry $doctrine
-     * @param string          $entityClass
-     * @param string          $uniqueTableName
+     * @param ManagerRegistry  $doctrine
+     * @param string           $entityClass
+     * @param UniqueJobHandler $uniqueJobHandler
      */
-    public function __construct(ManagerRegistry $doctrine, $entityClass, $uniqueTableName)
+    public function __construct(ManagerRegistry $doctrine, $entityClass, UniqueJobHandler $uniqueJobHandler)
     {
         $this->doctrine = $doctrine;
         $this->entityClass = $entityClass;
-        $this->uniqueTableName = $uniqueTableName;
+        $this->uniqueJobHandler = $uniqueJobHandler;
     }
 
     /**
@@ -215,10 +217,7 @@ class JobStorage
                 $em->flush($job);
 
                 if ($job->getStoppedAt()) {
-                    $connection->delete($this->uniqueTableName, ['name' => $job->getOwnerId()]);
-                    if ($job->isUnique()) {
-                        $connection->delete($this->uniqueTableName, ['name' => $job->getName()]);
-                    }
+                    $this->uniqueJobHandler->delete($connection, $job);
                 }
             });
         } else {
@@ -227,21 +226,12 @@ class JobStorage
                 // exception occurs but UniqueConstraintViolationException is expected here
                 // and we should keep EntityManager in open state.
                 $em = $this->getEntityManager(true);
-                $em->getConnection()->transactional(function (Connection $connection) use ($job, $em) {
-                    try {
-                        $connection->insert($this->uniqueTableName, ['name' => $job->getOwnerId()]);
-                        if ($job->isUnique()) {
-                            $connection->insert($this->uniqueTableName, ['name' => $job->getName()]);
-                        }
-                    } catch (UniqueConstraintViolationException $e) {
-                        throw new DuplicateJobException(sprintf(
-                            'Duplicate job. ownerId:"%s", name:"%s"',
-                            $job->getOwnerId(),
-                            $job->getName()
-                        ));
+                $em->getConnection()->transactional(
+                    function (Connection $connection) use ($job, $em) {
+                        $this->uniqueJobHandler->insert($connection, $job);
+                        $this->flushJob($em, $job);
                     }
-                    $this->flushJob($em, $job);
-                });
+                );
             } else {
                 $this->flushJob($this->getEntityManager(true), $job);
             }
