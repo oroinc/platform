@@ -25,13 +25,7 @@ class FileManagerTest extends TestCase
     public function setUp()
     {
         $this->filesystem = $this->createMock(Filesystem::class);
-        $filesystemMap = $this->createMock(FilesystemMap::class);
-        $filesystemMap->expects($this->once())
-            ->method('get')
-            ->with('importexport')
-            ->willReturn($this->filesystem);
-
-        $this->fileManager = new FileManager($filesystemMap);
+        $this->fileManager = new FileManager(new FilesystemMap(['importexport' => $this->filesystem]));
     }
 
     public function testGetMimeTypeFromString(): void
@@ -155,6 +149,120 @@ class FileManagerTest extends TestCase
             [$bomBytes . 'Col1,Col2,Col3\nVal1Val2Val3', 'Col1,Col2,Col3\nVal1Val2Val3'],
             [$bomBytes . ' some Test Content ', ' some Test Content '],
             ['Test content ' . $bomBytes, 'Test content ' . $bomBytes],
+        ];
+    }
+
+    public function testGetFilesByPeriodWithDirectory()
+    {
+        $this->filesystem
+            ->expects(self::once())
+            ->method('keys')
+            ->willReturn(['firstDirectory']);
+
+        $this->filesystem
+            ->expects(self::once())
+            ->method('has')
+            ->with('firstDirectory')
+            ->willReturn(false);
+
+        self::assertEquals([], $this->fileManager->getFilesByPeriod());
+    }
+
+    public function testGetFilesByPeriodWithFile()
+    {
+        $this->filesystem
+            ->expects(self::once())
+            ->method('keys')
+            ->willReturn(['someFile']);
+
+        $this->filesystem
+            ->expects(self::once())
+            ->method('has')
+            ->with('someFile')
+            ->willReturn(true);
+
+        $someFile = new File('someFile', $this->filesystem);
+
+        $this->filesystem
+            ->expects(self::once())
+            ->method('get')
+            ->willReturn($someFile);
+
+        $this->filesystem
+            ->expects(self::once())
+            ->method('mtime')
+            ->with('someFile')
+            ->willReturn(mktime(0, 0, 0, 12, 31, 2010));
+
+        self::assertEquals(['someFile' => $someFile], $this->fileManager->getFilesByPeriod());
+    }
+
+    /**
+     * @dataProvider getFilesByPeriodDataProvider
+     * @param \DateTime|null $from
+     * @param \DateTime|null $to
+     */
+    public function testGetFilesByPeriod(?\DateTime $from, ?\DateTime $to, array $expectedFiles)
+    {
+        $this->filesystem
+            ->expects(self::once())
+            ->method('keys')
+            ->willReturn(['firstFile', 'secondFile']);
+
+        $this->filesystem
+            ->expects(self::exactly(2))
+            ->method('has')
+            ->withConsecutive(['firstFile'], ['secondFile'])
+            ->willReturn(true);
+
+        $firstFile = new File('firstFile', $this->filesystem);
+        $secondFile = new File('secondFile', $this->filesystem);
+
+        $this->filesystem
+            ->expects(self::exactly(2))
+            ->method('get')
+            ->willReturnMap([
+               ['firstFile', false, $firstFile],
+               ['secondFile', false, $secondFile]
+            ]);
+
+        $this->filesystem
+            ->expects(self::exactly(2))
+            ->method('mtime')
+            ->willReturnMap([
+                ['firstFile', mktime(0, 0, 0, 12, 31, 2010)],
+                ['secondFile', mktime(0, 0, 0, 12, 31, 2011)]
+            ]);
+
+        self::assertEquals($expectedFiles, array_keys($this->fileManager->getFilesByPeriod($from, $to)));
+    }
+
+    /**
+     * @return array
+     */
+    public function getFilesByPeriodDataProvider(): array
+    {
+        return [
+            'no limits' => [
+                'from' => null,
+                'to' => null,
+                'expectedFiles' => ['firstFile', 'secondFile']
+            ],
+            'from limit applied' => [
+                'from' => new \DateTime('2011-01-01'),
+                'to' => null,
+                'expectedFiles' => ['secondFile']
+            ],
+            'to limit applied' => [
+                'from' => null,
+                'to' => new \DateTime('2011-01-01'),
+                'expectedFiles' => ['firstFile']
+            ],
+            'from and to limit applied' => [
+                'from' => new \DateTime('2011-12-31'),
+                'to' => new \DateTime('2012-01-01'),
+                'expectedFiles' => ['secondFile']
+            ],
         ];
     }
 }
