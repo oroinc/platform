@@ -3,7 +3,9 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
+use Oro\Bundle\ImportExportBundle\Tests\Functional\DataFixtures\LoadImportExportResultData;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -20,6 +22,10 @@ class ImportExportControllerTest extends WebTestCase
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
+
+        $this->loadFixtures([
+            LoadImportExportResultData::class
+        ]);
     }
 
     public function testShouldSendExportMessageOnInstantExportActionWithDefaultParameters()
@@ -288,6 +294,38 @@ class ImportExportControllerTest extends WebTestCase
         static::assertContains('Validate', $response->getContent());
         static::assertContains('Import file', $response->getContent());
     }
+
+
+    public function testDownloadExportResultActionExpiredResult()
+    {
+        /** @var ImportExportResult $expiredImportExportResult */
+        $expiredImportExportResult = $this->getReference('expiredImportExportResult');
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_export_download', [
+                'jobId' => $expiredImportExportResult->getJobId()
+            ])
+        );
+
+        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 410);
+    }
+
+    public function testImportExportJobErrorLogActionExpiredResult()
+    {
+        /** @var ImportExportResult $expiredImportExportResult */
+        $expiredImportExportResult = $this->getReference('expiredImportExportResult');
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_job_error_log', [
+                'jobId' => $expiredImportExportResult->getJobId()
+            ])
+        );
+
+        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 410);
+    }
+
 
     /**
      * @return string
