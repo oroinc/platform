@@ -20,6 +20,7 @@ use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareTrait;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\SpinTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
@@ -56,7 +57,7 @@ class OroMainContext extends MinkContext implements
         '^(?:|I )should see Schema updated flash message$'.
     '/';
 
-    use AssertTrait, KernelDictionary, PageObjectDictionary, SessionAliasProviderAwareTrait;
+    use AssertTrait, KernelDictionary, PageObjectDictionary, SessionAliasProviderAwareTrait, SpinTrait;
 
     /** @var Stopwatch */
     private $stopwatch;
@@ -457,6 +458,23 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function assertPageNotContainsText($text)
+    {
+        $result = $this->spin(function (OroMainContext $context) use ($text) {
+            $context->assertSession()->pageTextNotContains($this->fixStepArgument($text));
+
+            return true;
+        }, 5);
+
+        self::assertTrue(
+            $result,
+            sprintf('The text "%s" was found in the text of the current page.', $text)
+        );
+    }
+
+    /**
      * Checks, that page contains element specified number of times
      * Example: Then I should see 1 element "TextElement"
      * Example: And I should see 3 elements "BlockElement"
@@ -592,32 +610,6 @@ class OroMainContext extends MinkContext implements
         $this->assertPageNotContainsText('<Script>');
         $this->assertPageNotContainsText('&lt;script&gt;');
         $this->assertPageNotContainsText('&lt;Script&gt;');
-    }
-
-    /**
-     * @param \Closure $lambda
-     * @param int $timeLimit in seconds
-     * @return null|mixed Return null if closure throw error or return not true value.
-     *                     Return value that return closure
-     */
-    public function spin(\Closure $lambda, $timeLimit = 60)
-    {
-        $time = $timeLimit;
-
-        while ($time > 0) {
-            try {
-                if ($result = $lambda($this)) {
-                    return $result;
-                }
-            } catch (\Exception $e) {
-                // do nothing
-            }
-
-            usleep(250000);
-            $time -= 0.25;
-        }
-
-        return null;
     }
 
     /**
@@ -1056,6 +1048,33 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Force click on cancel button in discount popup
+     * Example: Given force click on cancel button in discount popup
+     * Example: When I force click on cancel button in discount popup
+     *
+     * @When /^(?:|I )force click on cancel button in discount popup$/
+     */
+    public function discountPopupForceCancel()
+    {
+        $button = 'Discount Popup Cancel Button';
+        try {
+            $this->elementFactory->createElement($button)->clickForce();
+        } catch (\InvalidArgumentException|NoSuchElement $e) {
+            $this->spin(function () use ($button) {
+                if ($this->elementFactory->hasElement($button)) {
+                    $this->elementFactory->createElement($button)->clickForce();
+
+                    return true;
+                }
+
+                return false;
+            }, 3);
+
+            throw $e;
+        }
+    }
+
+    /**
      * Example: Given I wait 1 second
      * Example: Given I wait 2 seconds
      *
@@ -1077,6 +1096,8 @@ class OroMainContext extends MinkContext implements
         self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
 
         $actual = $elementObject->getText();
+        $text = $this->fixStepArgument($text);
+
         $regex = '/'.preg_quote($text, '/').'/ui';
 
         $message = sprintf('Failed asserting that "%s" contains "%s"', $text, $actual);
@@ -1093,6 +1114,8 @@ class OroMainContext extends MinkContext implements
         self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
 
         $actual = $elementObject->getText();
+        $text = $this->fixStepArgument($text);
+
         $regex = '/'.preg_quote($text, '/').'/ui';
 
         $message = sprintf('Failed asserting that "%s" does not contain "%s"', $text, $actual);
@@ -1449,7 +1472,7 @@ JS;
     public function assertElementNotOnPage($element)
     {
         $elementOnPage = $this->createElement($element);
-        $result = $this->spin(function (OroMainContext $context) use ($elementOnPage, $element) {
+        $result = $this->spin(function () use ($elementOnPage) {
             try {
                 return !$elementOnPage->isVisible();
             } catch (NoSuchElement $e) {

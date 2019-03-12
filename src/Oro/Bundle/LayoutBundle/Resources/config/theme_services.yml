@@ -168,3 +168,4 @@ services:
         public: false
         arguments:
             - '@oro_layout.theme_manager'
+            - '@translator'

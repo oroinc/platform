@@ -12,6 +12,7 @@ use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Provider\PreferredLanguageProviderInterface;
@@ -41,6 +42,9 @@ class SendEmailTemplate extends AbstractSendEmail
     /** @var PreferredLanguageProviderInterface */
     private $languageProvider;
 
+    /** @var EmailOriginHelper */
+    private $emailOriginHelper;
+
     /**
      * @param ContextAccessor    $contextAccessor
      * @param Processor          $emailProcessor
@@ -49,6 +53,7 @@ class SendEmailTemplate extends AbstractSendEmail
      * @param EmailRenderer      $renderer
      * @param ObjectManager      $objectManager
      * @param ValidatorInterface $validator
+     * @param EmailOriginHelper  $emailOriginHelper
      */
     public function __construct(
         ContextAccessor $contextAccessor,
@@ -57,13 +62,15 @@ class SendEmailTemplate extends AbstractSendEmail
         EntityNameResolver $entityNameResolver,
         EmailRenderer $renderer,
         ObjectManager $objectManager,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        EmailOriginHelper $emailOriginHelper
     ) {
         parent::__construct($contextAccessor, $emailProcessor, $emailAddressHelper, $entityNameResolver);
 
         $this->renderer = $renderer;
         $this->objectManager = $objectManager;
         $this->validator = $validator;
+        $this->emailOriginHelper = $emailOriginHelper;
     }
 
     /**
@@ -139,10 +146,10 @@ class SendEmailTemplate extends AbstractSendEmail
             $emailModel->setType($emailTemplate->getType());
 
             try {
-                $emailUsers[] = $this->emailProcessor->process(
-                    $emailModel,
-                    $this->emailProcessor->getEmailOrigin($emailModel->getFrom(), $emailModel->getOrganization())
-                );
+                $emailOrigin = $this->emailOriginHelper
+                    ->getEmailOrigin($emailModel->getFrom(), $emailModel->getOrganization());
+
+                $emailUsers[] = $this->emailProcessor->process($emailModel, $emailOrigin);
             } catch (\Swift_SwiftException $exception) {
                 $this->logger->error('Workflow send email template action.', ['exception' => $exception]);
             }

@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
@@ -25,7 +26,8 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
             $this->entityNameResolver,
             $this->renderer,
             $this->objectManager,
-            $this->validator
+            $this->validator,
+            $this->emailOriginHelper
         );
 
         $this->action->setLogger($this->logger);
@@ -285,9 +287,8 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
             ->method('compileMessage')
             ->willReturn([$options['subject'], $options['body']]);
 
-        $emailEntity = $this->getMockBuilder('\Oro\Bundle\EmailBundle\Entity\Email')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailEntity = new EmailEntity();
+
         $this->emailProcessor->expects($this->never())
             ->method('process');
         if (array_key_exists('attribute', $options)) {
@@ -401,9 +402,15 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
             ->method('compileMessage')
             ->willReturn(['test', 'test']);
 
+        $emailOrigin = new TestEmailOrigin();
+        $this->emailOriginHelper->expects($this->once())
+            ->method('getEmailOrigin')
+            ->with($options['from'], null)
+            ->willReturn($emailOrigin);
+
         $this->emailProcessor->expects($this->once())
             ->method('process')
-            ->with($this->isInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email'))
+            ->with($this->isInstanceOf(Email::class), $emailOrigin)
             ->willThrowException(new \Swift_SwiftException('The email was not delivered.'));
 
         $this->logger->expects($this->once())
@@ -459,17 +466,19 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
             ->willReturn([$expected['subject'], $expected['body']]);
 
         $self = $this;
-        $emailUserEntity = $this->getMockBuilder('\Oro\Bundle\EmailBundle\Entity\EmailUser')
-            ->disableOriginalConstructor()
-            ->setMethods(['getEmail'])
-            ->getMock();
-        $emailEntity = $this->createMock('\Oro\Bundle\EmailBundle\Entity\Email');
-        $emailUserEntity->expects($this->any())
-            ->method('getEmail')
-            ->willReturn($emailEntity);
+        $emailEntity = new EmailEntity();
+        $emailUserEntity = new EmailUser();
+        $emailUserEntity->setEmail($emailEntity);
+
+        $emailOrigin = new TestEmailOrigin();
+        $this->emailOriginHelper->expects($this->once())
+            ->method('getEmailOrigin')
+            ->with($expected['from'], null)
+            ->willReturn($emailOrigin);
+
         $this->emailProcessor->expects($this->once())
             ->method('process')
-            ->with($this->isInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email'))
+            ->with($this->isInstanceOf(Email::class), $emailOrigin)
             ->will(
                 $this->returnCallback(
                     function (Email $model) use ($emailUserEntity, $expected, $self) {
@@ -684,9 +693,16 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
                 $messages['fr']
             );
 
+        $emailOrigin = new TestEmailOrigin();
+        $this->emailOriginHelper->expects($this->exactly(3))
+            ->method('getEmailOrigin')
+            ->with($options['from'], null)
+            ->willReturn($emailOrigin);
+
         $email = new EmailEntity();
-        $this->emailProcessor->expects($this->at(1))
+        $this->emailProcessor->expects($this->at(0))
             ->method('process')
+            ->with($this->isInstanceOf(Email::class), $emailOrigin)
             ->willReturnCallback(
                 function (Email $model) use ($messages, $toEmail2, $email) {
                     $this->assertEquals($messages['en'][0], $model->getSubject());
@@ -699,8 +715,9 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
                     return $emailUser;
                 }
             );
-        $this->emailProcessor->expects($this->at(3))
+        $this->emailProcessor->expects($this->at(1))
             ->method('process')
+            ->with($this->isInstanceOf(Email::class), $emailOrigin)
             ->willReturnCallback(
                 function (Email $model) use ($messages, $toEmail1, $recipientEmail1) {
                     $this->assertEquals($messages['de'][0], $model->getSubject());
@@ -711,8 +728,9 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
                     return new EmailUser();
                 }
             );
-        $this->emailProcessor->expects($this->at(5))
+        $this->emailProcessor->expects($this->at(2))
             ->method('process')
+            ->with($this->isInstanceOf(Email::class), $emailOrigin)
             ->willReturnCallback(
                 function (Email $model) use ($messages, $recipientEmail2) {
                     $this->assertEquals($messages['fr'][0], $model->getSubject());

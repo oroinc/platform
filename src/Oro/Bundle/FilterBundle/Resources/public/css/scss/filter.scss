@@ -422,6 +422,12 @@
     text-overflow: $filters-state-text-overflow;
     cursor: $filters-state-cursor;
 
+    // Added to avoid showing Safari's hint for elements with ellipsis
+    &:before {
+        content: '';
+        display: block;
+    }
+
     .fa-filter {
         margin-right: $filters-state-icon-offset-right;
 

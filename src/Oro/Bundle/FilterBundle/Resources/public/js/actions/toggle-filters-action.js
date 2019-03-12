@@ -29,10 +29,25 @@ define(function(require) {
             this.datagrid.filterManager.setViewMode(newMode);
         },
 
+        toggleFilters: function(mode) {
+            if (mode === FiltersManager.STATE_VIEW_MODE && this.datagrid.filterManager.$el.is(':visible')) {
+                this.datagrid.filterManager.hide();
+            } else if (mode === FiltersManager.MANAGE_VIEW_MODE && this.datagrid.filterManager.hasFilters() &&
+                !this.datagrid.filterManager.$el.is(':visible')
+            ) {
+                this.datagrid.filterManager.show();
+            }
+        },
+
         onFilterManagerModeChange: function(mode) {
+            if (this.datagrid.filterManager.getViewMode() !== mode) {
+                this.toggleFilters(mode);
+            }
+
             if (this.launcherInstanse) {
                 this.launcherInstanse.$el.toggleClass('pressed', mode === FiltersManager.MANAGE_VIEW_MODE);
             }
+
             mediator.trigger('layout:adjustHeight');
         }
     });

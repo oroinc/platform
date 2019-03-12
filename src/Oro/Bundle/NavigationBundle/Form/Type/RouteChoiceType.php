@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Form\Type;
 
+use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
 use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
@@ -14,6 +15,9 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Choice form type to choose route from route collection.
+ */
 class RouteChoiceType extends AbstractType
 {
     const NAME = 'oro_route_choice';
@@ -44,21 +48,29 @@ class RouteChoiceType extends AbstractType
     private $routeCollection;
 
     /**
+     * @var Cache
+     */
+    private $cache;
+
+    /**
      * @param RouterInterface $router
      * @param TitleReaderRegistry $readerRegistry
      * @param TitleTranslator $titleTranslator
      * @param ServiceLink $titleServiceLink
+     * @param Cache $cache
      */
     public function __construct(
         RouterInterface $router,
         TitleReaderRegistry $readerRegistry,
         TitleTranslator $titleTranslator,
-        ServiceLink $titleServiceLink
+        ServiceLink $titleServiceLink,
+        Cache $cache
     ) {
         $this->router = $router;
         $this->readerRegistry = $readerRegistry;
         $this->titleTranslator = $titleTranslator;
         $this->titleServiceLink = $titleServiceLink;
+        $this->cache = $cache;
     }
 
     /**
@@ -115,17 +127,46 @@ class RouteChoiceType extends AbstractType
 
     /**
      * @param bool $withoutParametersOnly
-     * @param null|string $optionsFilter
+     * @param null|array $optionsFilter
      * @param null|string $nameFilter
      * @param null|string $pathFilter
      * @return array
      */
     private function getFilteredRoutes(
         $withoutParametersOnly = true,
-        $optionsFilter = null,
+        array $optionsFilter = null,
         $nameFilter = null,
         $pathFilter = null
     ) {
+        $cacheKey = md5(json_encode(func_get_args()));
+        if ($this->cache->contains($cacheKey)) {
+            $filteredRoutes = $this->cache->fetch($cacheKey);
+        } else {
+            $filteredRoutes = $this->filterRouteCollection(
+                $withoutParametersOnly,
+                $optionsFilter,
+                $nameFilter,
+                $pathFilter
+            );
+            $this->cache->save($cacheKey, $filteredRoutes);
+        }
+
+        return $filteredRoutes;
+    }
+
+    /**
+     * @param bool $withoutParametersOnly
+     * @param null|array $optionsFilter
+     * @param null|string $nameFilter
+     * @param null|string $pathFilter
+     * @return array
+     */
+    private function filterRouteCollection(
+        $withoutParametersOnly = true,
+        array $optionsFilter = null,
+        $nameFilter = null,
+        $pathFilter = null
+    ): array {
         $filteredRoutes = [];
         foreach ($this->getRouteCollection() as $routeName => $route) {
             $required = $this->isGetMethodAllowed($route)
@@ -201,7 +242,7 @@ class RouteChoiceType extends AbstractType
     }
 
     /**
-     * @param array  $routes
+     * @param array $routes
      * @param string $menuName
      * @return array
      */

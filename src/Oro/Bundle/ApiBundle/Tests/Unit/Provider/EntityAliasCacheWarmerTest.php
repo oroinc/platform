@@ -30,7 +30,7 @@ class EntityAliasCacheWarmerTest extends \PHPUnit\Framework\TestCase
 
     public function testIsOptional()
     {
-        self::assertFalse($this->cacheWarmer->isOptional());
+        self::assertTrue($this->cacheWarmer->isOptional());
     }
 
     public function testWarmUpCache()

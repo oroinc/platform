@@ -45,17 +45,19 @@ class AbstractConfigVirtualProvider
             $items = $this->configuration;
 
             $hierarchy = $this->entityHierarchyProvider->getHierarchy();
-            foreach ($hierarchy as $hierarchyClassName => $hierarchyParents) {
-                foreach ($items as $className => $fields) {
-                    if (in_array($className, $hierarchyParents, true)) {
-                        if (!isset($items[$hierarchyClassName])) {
-                            $items[$hierarchyClassName] = [];
-                        }
-                        $items[$hierarchyClassName] = array_merge(
-                            $items[$hierarchyClassName],
-                            $fields
-                        );
+            foreach ($hierarchy as $className => $parentClasses) {
+                $currentItems = [];
+                $parentClasses = \array_reverse($parentClasses);
+                foreach ($parentClasses as $parentClass) {
+                    if (isset($items[$parentClass])) {
+                        $currentItems[] = $items[$parentClass];
                     }
+                }
+                if ($currentItems) {
+                    if (isset($items[$className])) {
+                        $currentItems[] = $items[$className];
+                    }
+                    $items[$className] = \array_merge(...$currentItems);
                 }
             }
 
