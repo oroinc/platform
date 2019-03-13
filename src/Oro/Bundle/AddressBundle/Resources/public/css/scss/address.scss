@@ -63,8 +63,8 @@
     .map-address-list {
         width: 40%;
         overflow: hidden;
-        margin: side-values(0 $address-box-margin-small/2 0 0);
-        padding: side-values(0 $address-box-margin-small/2 0 0);
+        margin-#{$end}: $address-box-margin-small/2;
+        padding-#{$end}: $address-box-margin-small/2;
 
         &:hover {
             overflow-y: auto;
@@ -72,6 +72,8 @@
     }
 
     .map-visual-frame {
+        flex-grow: 1;
+
         .alert,
         .loader-overlay {
             width: auto;
@@ -95,13 +97,12 @@
                 margin: $address-box-margin-small 0;
             }
         }
-        .map-visual {
-            margin: $address-box-margin-small 0;
-        }
     }
 
     .map-visual {
-        margin: side-values(0 $address-box-margin-medium 0 $address-box-margin-small);
+        width: 100%;
+        height: 100%;
+        min-height: $address-map-visual-frame-min-height;
 
         img {
             max-width:none;
@@ -119,8 +120,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        min-height: $address-map-visual-frame-min-height;
-        margin: auto;
+        min-height: $address-map-no-data-min-height;
 
         background: $primary-900;
         border-radius: $border-radius;
@@ -164,6 +164,7 @@
         .map-address-list {
             width: 100%;
             margin: side-values( 0 0 $address-box-margin-small 0);
+            padding-#{$end}: 0;
 
             &:hover {
                 overflow: inherit;
