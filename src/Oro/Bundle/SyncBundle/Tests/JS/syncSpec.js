@@ -38,38 +38,6 @@ define(['orosync/js/sync', 'requirejs-exposure'
             expect(exposure.retrieve('service')).toBe(service);
         });
 
-        it('setup connection_lost handler', function() {
-            sync(service);
-            expect(service.on).toHaveBeenCalledWith('connection_lost', jasmine.any(Function));
-        });
-
-        describe('handle connection_lost event', function() {
-            var connectionLostHandler;
-            beforeEach(function() {
-                sync(service);
-                connectionLostHandler = service.on.calls.mostRecent().args[1];
-            });
-
-            it('show message', function() {
-                connectionLostHandler();
-                expect(messenger.notificationMessage).toHaveBeenCalled();
-                expect(messenger.notificationMessage.calls.mostRecent().args[2]).toEqual({flash: false});
-                connectionLostHandler({retries: 1});
-                expect(messenger.notificationMessage.calls.mostRecent().args[2]).toEqual({flash: true});
-            });
-
-            it('setup connection_established handler', function() {
-                connectionLostHandler();
-                expect(service.off).toHaveBeenCalled();
-                expect(service.off.calls.mostRecent().args[1]).toEqual(jasmine.any(Function));
-                expect(service.once).toHaveBeenCalledWith('connection_established', jasmine.any(Function));
-                expect(service.once.calls.mostRecent().args[1]).toEqual(service.off.calls.mostRecent().args[1]);
-                // check connection established handler
-                (service.once.calls.mostRecent().args[1])();
-                expect(messenger.notificationFlashMessage).toHaveBeenCalled();
-            });
-        });
-
         describe('model changes subscription', function() {
             var model;
             var subscribeModel = exposure.retrieve('subscribeModel');
