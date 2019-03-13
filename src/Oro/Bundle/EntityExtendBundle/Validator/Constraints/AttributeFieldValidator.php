@@ -6,13 +6,19 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 /**
  * This validator checks if a field is an attribute.
  */
-class AttributeFieldValidator extends AbstractFieldValidator
+class AttributeFieldValidator extends ConstraintValidator
 {
     public const ALIAS = 'oro_entity_extend.validator.attribute_field';
+
+    /**
+     * @var FieldNameValidationHelper
+     */
+    protected $validationHelper;
 
     /**
      * @var ConfigProvider
@@ -25,7 +31,7 @@ class AttributeFieldValidator extends AbstractFieldValidator
      */
     public function __construct(FieldNameValidationHelper $validationHelper, ConfigProvider $attributeConfigProvider)
     {
-        parent::__construct($validationHelper);
+        $this->validationHelper = $validationHelper;
         $this->attributeConfigProvider = $attributeConfigProvider;
     }
 

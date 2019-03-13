@@ -62,9 +62,7 @@ class AttributeFieldValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->validationHelper->expects($this->any())
             ->method('normalizeFieldName')
-            ->willReturnCallback(function ($value) {
-                return $value;
-            });
+            ->willReturnArgument(0);
         $this->attributeConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with($className, true)
