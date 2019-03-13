@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional;
 
-use Gaufrette\File;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
+use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -39,7 +39,6 @@ abstract class AbstractImportExportTest extends WebTestCase
         string $expectedCsvFilePath,
         array $skippedColumns = []
     ) {
-        $from = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->client->request(
             'GET',
             $this->getUrl('oro_importexport_export_template', [
@@ -47,6 +46,10 @@ abstract class AbstractImportExportTest extends WebTestCase
                 'exportTemplateJob' => $configuration->getExportTemplateJobName(),
             ])
         );
+
+        // Take the name of the file from the header because there is no alternative way to know the filename
+        $contentDisposition = $this->client->getResponse()->headers->get('Content-Disposition');
+        preg_match('/^.*"(export_template_[a-z0-9_]+.csv)"$/', $contentDisposition, $matches);
 
         $actualExportContent = $this->client->getResponse()->getContent();
         $exportFileContent = $this->getFileContent($expectedCsvFilePath);
@@ -61,9 +64,7 @@ abstract class AbstractImportExportTest extends WebTestCase
             );
         }
         static::assertEquals($expectedData, $exportedData);
-
-        $to = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->deleteImportExportFileByPeriod($from, $to);
+        $this->deleteImportExportFile($matches[1]);
     }
 
     /**
@@ -112,7 +113,11 @@ abstract class AbstractImportExportTest extends WebTestCase
             'oro_importexport.async.save_import_export_result_processor',
             array_merge(
                 $saveResultMessageData,
-                ['jobId' => $job->getId(), 'type' => ProcessorRegistry::TYPE_EXPORT]
+                [
+                    'jobId' => $job->getId(),
+                    'type' => ProcessorRegistry::TYPE_EXPORT,
+                    'entity' => ImportExportResult::class
+                ]
             )
         );
 
@@ -522,21 +527,6 @@ abstract class AbstractImportExportTest extends WebTestCase
     protected function deleteImportExportFile(string $filename)
     {
         static::getContainer()->get('oro_importexport.file.file_manager')->deleteFile($filename);
-    }
-
-    /**
-     * @param \DateTime $from
-     * @param \DateTime $to
-     */
-    protected function deleteImportExportFileByPeriod(\DateTime $from, \DateTime $to)
-    {
-        /** @var FileManager $fileManager */
-        $fileManager = static::getContainer()->get('oro_importexport.file.file_manager');
-        $files = $fileManager->getFilesByPeriod($from, $to);
-        /** @var File $file */
-        foreach ($files as $file) {
-            $fileManager->deleteFile($file);
-        }
     }
 
     /**

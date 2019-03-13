@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor;
 use Oro\Bundle\DataGridBundle\Async\Topics;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
+use Oro\Bundle\ImportExportBundle\Handler\ExportHandler as DefaultExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Component\MessageQueue\Client\Message;
@@ -64,12 +65,11 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createTokenStorageMock(),
             $this->createDependentJobServiceMock(),
             $logger,
+            $this->createMock(DefaultExportHandler::class),
             100
         );
 
-        $message = new NullMessage();
-        $message->setBody(json_encode($messageBody));
-
+        $message = $this->createNullMessage($messageBody);
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(PreExportMessageProcessor::REJECT, $result);
@@ -78,13 +78,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testShouldReturnMessageACKOnExportSuccess()
     {
         $jobUniqueName = 'oro_datagrid.pre_export.grid_name.user_1.csv';
-        $message = new NullMessage();
-        $message->setBody(json_encode([
-            'format'     => 'csv',
-            'parameters' => ['gridName' => 'grid_name'],
-        ]));
-        $message->setMessageId(123);
-
+        $message = $this->createNullMessage(['format' => 'csv', 'parameters' => ['gridName' => 'grid_name']], 123);
         $job = $this->createJob(1);
         $childJob = $this->createJob(10, $job);
 
@@ -138,6 +132,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $tokenStorage,
             $dependentJob,
             $this->createLoggerMock(),
+            $this->createMock(DefaultExportHandler::class),
             100
         );
 
@@ -145,10 +140,12 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $exportHandler->expects($this->once())
             ->method('getExportingEntityIds')
             ->willReturn([]);
+        $exportHandler->expects($this->once())
+            ->method('getEntityName')
+            ->willReturn('Acme');
+
         $processor->setExportHandler($exportHandler);
-
         $processor->setExportIdFetcher($this->createExportIdFetcherMock());
-
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(PreExportMessageProcessor::ACK, $result);
@@ -164,6 +161,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                         'format_type'    => 'excel'
                     ],
                     'exportType'   => 'export',
+                    'entity'       => 'Acme',
                     'jobName'      => 'grid_name',
                     'outputFormat' => 'csv',
                     'jobId'        => 10
@@ -287,5 +285,22 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             UserInterface::class,
             ['getId', 'getEmail', 'getRoles', 'getPassword', 'getSalt', 'getUsername', 'eraseCredentials']
         );
+    }
+
+    /**
+     * @param array $body
+     * @param null $id
+     *
+     * @return NullMessage
+     */
+    private function createNullMessage($body = [], $id = null): NullMessage
+    {
+        $message = new NullMessage();
+        $message->setBody(json_encode($body));
+        if ($id) {
+            $message->setMessageId($id);
+        }
+
+        return $message;
     }
 }

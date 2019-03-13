@@ -10,6 +10,7 @@ oro:
             job_code.label: Job code
             job_id.label: Job ID
             owner.label: Owner
+            entity.label: Entity name
             type.label: Type
 
         action:

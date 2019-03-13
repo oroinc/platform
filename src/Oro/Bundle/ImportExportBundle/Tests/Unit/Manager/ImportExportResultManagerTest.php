@@ -39,7 +39,8 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
         $importExportResult
             ->setJobId($expected['jobId'])
             ->setType($expected['type'])
-            ->setFilename($expected['filename']);
+            ->setFilename($expected['filename'])
+            ->setEntity($expected['entity']);
 
         /** @var \PHPUnit\Framework\MockObject\MockObject */
         $entityManager = self::createMock(EntityManager::class);
@@ -59,6 +60,7 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
         $importExportResult = $this->importExportResultManager->saveResult(
             $actual['jobId'],
             $actual['type'],
+            $actual['entity'],
             $actual['owner'],
             $actual['filename']
         );
@@ -67,6 +69,7 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
         self::assertAttributeEquals($expected['type'], 'type', $importExportResult);
         self::assertAttributeEquals($expected['filename'], 'filename', $importExportResult);
         self::assertAttributeEquals($expected['owner'], 'owner', $importExportResult);
+        self::assertAttributeEquals($expected['entity'], 'entity', $importExportResult);
     }
 
     /**
@@ -85,12 +88,14 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
                     'owner' => null,
                     'type' => 'import_or_export',
                     'filename' => 'file.csv',
+                    'entity' => 'Acme'
                 ],
                 'expected' => [
                     'jobId' => 123,
                     'owner' => null,
                     'type' => 'import_or_export',
                     'filename' => 'file.csv',
+                    'entity' => 'Acme'
                 ],
             ],
             'with owner' => [
@@ -99,12 +104,14 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
                     'owner' => $user,
                     'type' => 'import_or_export',
                     'filename' => 'file.csv',
+                    'entity' => 'Acme'
                 ],
                 'expected' => [
                     'jobId' => 123,
                     'owner' => $user,
                     'type' => 'import_or_export',
                     'filename' => 'file.csv',
+                    'entity' => 'Acme'
                 ],
             ],
         ];

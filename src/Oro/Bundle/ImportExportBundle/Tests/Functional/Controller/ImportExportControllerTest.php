@@ -18,6 +18,11 @@ class ImportExportControllerTest extends WebTestCase
     use MessageQueueExtension;
     use TempDirExtension;
 
+    /**
+     * @var array
+     */
+    private $existingFiles = [];
+
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -26,6 +31,19 @@ class ImportExportControllerTest extends WebTestCase
         $this->loadFixtures([
             LoadImportExportResultData::class
         ]);
+
+        $this->existingFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
+    }
+
+    public function tearDown()
+    {
+        $tempFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
+        $diffFiles = array_diff($tempFiles, $this->existingFiles);
+        foreach ($diffFiles as $file) {
+            if ($file && file_exists($file)) {
+                unlink($file);
+            }
+        }
     }
 
     public function testShouldSendExportMessageOnInstantExportActionWithDefaultParameters()
@@ -85,7 +103,7 @@ class ImportExportControllerTest extends WebTestCase
 
     public function testDownloadFileReturns404IfFileDoesntExist()
     {
-        $undefinedJobId = 123;
+        $undefinedJobId = 999;
         $this->client->followRedirects(true);
 
         $this->client->request(
@@ -174,75 +192,71 @@ class ImportExportControllerTest extends WebTestCase
     {
         $fileName = 'oro_testLineEndings.csv';
         $importedFilePath = null;
-        try {
-            $file = $this->copyToTempDir('import_export', __DIR__ . '/Import/fixtures')
-                . DIRECTORY_SEPARATOR
-                . $fileName;
-            $csvFile = new UploadedFile(
-                $file,
-                $fileName,
-                'text/csv'
-            );
-            $this->assertEquals(
-                substr_count(file_get_contents($file), "\r\n"),
-                substr_count(file_get_contents($csvFile->getPathname()), "\r\n")
-            );
-            $this->assertEquals(
-                substr_count(file_get_contents($file), "\n"),
-                substr_count(file_get_contents($csvFile->getPathname()), "\n")
-            );
 
-            $crawler = $this->client->request(
-                'GET',
-                $this->getUrl(
-                    'oro_importexport_import_form',
-                    [
-                        '_widgetContainer' => 'dialog',
-                        '_wid' => 'test',
-                        'entity' => User::class,
-                    ]
-                )
-            );
-            $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+        $file = $this->copyToTempDir('import_export', __DIR__ . '/Import/fixtures')
+            . DIRECTORY_SEPARATOR
+            . $fileName;
+        $csvFile = new UploadedFile(
+            $file,
+            $fileName,
+            'text/csv'
+        );
+        $this->assertEquals(
+            substr_count(file_get_contents($file), "\r\n"),
+            substr_count(file_get_contents($csvFile->getPathname()), "\r\n")
+        );
+        $this->assertEquals(
+            substr_count(file_get_contents($file), "\n"),
+            substr_count(file_get_contents($csvFile->getPathname()), "\n")
+        );
 
-            $uploadFileNode = $crawler->selectButton('Submit');
-            $uploadFileForm = $uploadFileNode->form();
-            $values = [
-                'oro_importexport_import' => [
-                    '_token' => $uploadFileForm['oro_importexport_import[_token]']->getValue(),
-                    'processorAlias' => 'oro_user.add_or_replace'
-                ],
-            ];
-            $files = [
-                'oro_importexport_import' => [
-                    'file' => $csvFile
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_importexport_import_form',
+                [
+                    '_widgetContainer' => 'dialog',
+                    '_wid' => 'test',
+                    'entity' => User::class,
                 ]
-            ];
-            $this->client->request(
-                $uploadFileForm->getMethod(),
-                $this->getUrl(
-                    'oro_importexport_import_form',
-                    [
-                        '_widgetContainer' => 'dialog',
-                        '_wid' => 'test',
-                        'entity' => User::class,
-                    ]
-                ),
-                $values,
-                $files
-            );
-            $this->assertJsonResponseSuccess();
-            $importedFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
-            $importedFilePath = $importedFiles[count($importedFiles)-1];
-            $this->assertEquals(
-                substr_count(file_get_contents($file), "\n"),
-                substr_count(file_get_contents($importedFilePath), "\r\n")
-            );
-        } finally {
-            if ($importedFilePath && file_exists($importedFilePath)) {
-                unlink($importedFilePath);
-            }
-        }
+            )
+        );
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+
+        $uploadFileNode = $crawler->selectButton('Submit');
+        $uploadFileForm = $uploadFileNode->form();
+        $values = [
+            'oro_importexport_import' => [
+                '_token' => $uploadFileForm['oro_importexport_import[_token]']->getValue(),
+                'processorAlias' => 'oro_user.add_or_replace'
+            ],
+        ];
+        $files = [
+            'oro_importexport_import' => [
+                'file' => $csvFile
+            ]
+        ];
+        $this->client->request(
+            $uploadFileForm->getMethod(),
+            $this->getUrl(
+                'oro_importexport_import_form',
+                [
+                    '_widgetContainer' => 'dialog',
+                    '_wid' => 'test',
+                    'entity' => User::class,
+                ]
+            ),
+            $values,
+            $files
+        );
+        $this->assertJsonResponseSuccess();
+        $importedFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
+        $diffFiles = array_diff($importedFiles, $this->existingFiles);
+        $importedFile = reset($diffFiles);
+        $this->assertEquals(
+            substr_count(file_get_contents($file), "\n"),
+            substr_count(file_get_contents($importedFile), "\r\n")
+        );
     }
 
     public function testImportValidateExportTemplateFormNoAlias()

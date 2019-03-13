@@ -6,6 +6,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -67,6 +68,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createTokenStorageMock(),
             $this->createDependentJobMock(),
             $logger,
+            $this->createExportHandlerMock(),
             100
         );
 
@@ -80,10 +82,12 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldSetOrganizationAndACKMessage()
     {
+        $exportHandler = $this->createMock(ExportHandler::class);
         $jobUniqueName = 'oro_importexport.pre_export.test.user_1';
         $message = new NullMessage();
         $message->setBody(json_encode([
             'jobName'        => 'test',
+            'processor' => ProcessorRegistry::TYPE_EXPORT,
             'processorAlias' => 'test',
             'organizationId' => 22,
         ]));
@@ -120,12 +124,20 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('saveDependentJob')
             ->with($this->equalTo($dependentJobContext));
 
+        $exportHandler->expects($this->once())
+            ->method('getExportingEntityIds')
+            ->willReturn([]);
+        $exportHandler->expects($this->once())
+            ->method('getEntityName')
+            ->willReturn('Acme');
+
         $processor = new PreExportMessageProcessor(
             $jobRunner,
             self::getMessageProducer(),
             $this->createTokenStorageMock(),
             $dependentJob,
             $this->createLoggerMock(),
+            $exportHandler,
             100
         );
 
@@ -143,12 +155,6 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($organizationRepository);
         $processor->setDoctrineHelper($doctrineHelper);
 
-        $exportHandler = $this->createExportHandlerMock();
-        $exportHandler->expects($this->once())
-            ->method('getExportingEntityIds')
-            ->willReturn([]);
-        $processor->setExportHandler($exportHandler);
-
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(PreExportMessageProcessor::ACK, $result);
@@ -162,6 +168,8 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                     'organizationId' => '22',
                     'exportType'     => 'export',
                     'options'        => [],
+                    'processor'      => 'export',
+                    'entity'         => 'Acme',
                     'jobId'          => 10
                 ],
                 MessagePriority::LOW

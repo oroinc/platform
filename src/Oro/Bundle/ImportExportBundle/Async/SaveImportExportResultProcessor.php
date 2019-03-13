@@ -116,6 +116,7 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
     {
         $optionResolver = new OptionsResolver();
         $optionResolver->setRequired('jobId');
+        $optionResolver->setRequired('entity')->setAllowedTypes('entity', 'string');
         $optionResolver->setRequired('type')->setAllowedValues('type', [
             ProcessorRegistry::TYPE_EXPORT,
             ProcessorRegistry::TYPE_IMPORT,
@@ -154,6 +155,7 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
         $this->importExportResultManager->saveResult(
             $job->getId(),
             $parameters['type'],
+            $parameters['entity'],
             $parameters['owner'],
             $jobData['file'] ?? null
         );

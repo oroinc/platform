@@ -29,6 +29,7 @@ class OroImportExportBundle implements Migration
         $table->addColumn('filename', 'string', ['length' => 255, 'notnull' => false]);
         $table->addColumn('job_id', 'integer', ['unique' => true, 'notnull' => true]);
         $table->addColumn('type', 'string', ['unique' => false, 'length' => 255, 'notnull' => true]);
+        $table->addColumn('entity', 'string', ['unique' => false, 'length' => 255, 'notnull' => true]);
         $table->addColumn('expired', 'boolean', ['default' => '0']);
         $table->addColumn('created_at', 'datetime', []);
         $table->setPrimaryKey(['id']);

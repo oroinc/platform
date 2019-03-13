@@ -69,6 +69,7 @@ class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn(JSON::encode([
                 'jobId' => '1',
                 'type' => ProcessorRegistry::TYPE_EXPORT,
+                'entity' => 'Acme'
             ]));
 
         $job = new Job();
@@ -77,7 +78,7 @@ class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
         $this->importExportResultManager
             ->expects(self::once())
             ->method('saveResult')
-            ->with(1, ProcessorRegistry::TYPE_EXPORT, null, null);
+            ->with(1, ProcessorRegistry::TYPE_EXPORT, 'Acme', null, null);
 
         $this->jobStorage
             ->expects(self::once())
@@ -106,6 +107,7 @@ class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn(JSON::encode([
                 'jobId' => 1,
                 'type' => 'invalid_processor_type',
+                'entity' => null
             ]));
 
         $job = new Job();

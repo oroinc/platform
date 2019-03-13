@@ -7,6 +7,7 @@ services:
             - '@security.token_storage'
             - '@oro_message_queue.job.dependent_job_service'
             - '@logger'
+            - '@oro_importexport.handler.export'
             - '%oro_importexport.export.size_of_batch%'
 
     oro_importexport.async.pre_export:
@@ -15,7 +16,6 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
         calls:
-            - [setExportHandler, ['@oro_importexport.handler.export']]
             - [setDoctrineHelper, ['@oro_entity.doctrine_helper']]
 
     oro_importexport.async.export_abstract:

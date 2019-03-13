@@ -28,7 +28,8 @@ class ImportExportResultManager
 
     /**
      * @param int $jobId
-     * @param string|null $type
+     * @param string $type
+     * @param string $entity
      * @param User|null $owner
      * @param string|null $fileName
      *
@@ -39,12 +40,14 @@ class ImportExportResultManager
     public function saveResult(
         int $jobId,
         string $type,
+        string $entity,
         User $owner = null,
         string $fileName = null
     ): ImportExportResult {
         $importExportResult = new ImportExportResult();
         $importExportResult
             ->setJobId($jobId)
+            ->setEntity($entity)
             ->setFilename($fileName)
             ->setType($type);
 

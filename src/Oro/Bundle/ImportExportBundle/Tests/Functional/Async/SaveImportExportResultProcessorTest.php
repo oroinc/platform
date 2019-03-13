@@ -47,7 +47,8 @@ class SaveImportExportResultProcessorTest extends WebTestCase
         $message->setMessageId('abc');
         $message->setBody(JSON::encode([
             'jobId' => $rootJob->getId(),
-            'type' => ProcessorRegistry::TYPE_EXPORT
+            'type' => ProcessorRegistry::TYPE_EXPORT,
+            'entity' => ImportExportResult::class
         ]));
 
         $processor = $this->getContainer()->get('oro_importexport.async.save_import_export_result_processor');
@@ -58,6 +59,8 @@ class SaveImportExportResultProcessorTest extends WebTestCase
 
         self::assertEquals(ExportMessageProcessor::ACK, $processorResult);
         self::assertAttributeEquals($rootJob->getId(), 'jobId', $rootJobResult);
+        self::assertAttributeEquals(ProcessorRegistry::TYPE_EXPORT, 'type', $rootJobResult);
+        self::assertAttributeEquals(ImportExportResult::class, 'entity', $rootJobResult);
     }
 
     public function testProcessSaveJobWithInvalidData():void

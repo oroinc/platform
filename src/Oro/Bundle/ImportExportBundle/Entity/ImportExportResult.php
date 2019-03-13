@@ -84,6 +84,13 @@ class ImportExportResult implements CreatedAtAwareInterface
     protected $type;
 
     /**
+     * @var string|null
+     *
+     * @ORM\Column(type="string", length=255, name="entity", unique=false, nullable=false)
+     */
+    protected $entity;
+
+    /**
      * @var boolean
      *
      * @ORM\Column(name="expired", type="boolean", options={"default"=false})
@@ -194,6 +201,26 @@ class ImportExportResult implements CreatedAtAwareInterface
     public function setType(string $type): ImportExportResult
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getEntity(): ?string
+    {
+        return $this->entity;
+    }
+
+    /**
+     * @param string $entity
+     *
+     * @return ImportExportResult
+     */
+    public function setEntity(string $entity): ImportExportResult
+    {
+        $this->entity = $entity;
 
         return $this;
     }

@@ -20,11 +20,13 @@ class LoadImportExportResultData extends AbstractFixture
     private $importExportResults = [
         self::EXPIRED_IMPORT_EXPORT_RESULT => [
             'jobId' =>  42,
-            'expired' => true
+            'expired' => true,
+            'entity' => ImportExportResult::class
         ],
         self::NOT_EXPIRED_IMPORT_EXPORT_RESULT => [
             'jobId' =>  123,
-            'expired' => false
+            'expired' => false,
+            'entity' => ImportExportResult::class
         ]
     ];
 
@@ -38,6 +40,7 @@ class LoadImportExportResultData extends AbstractFixture
         foreach ($this->importExportResults as $reference => $data) {
             $entity = new ImportExportResult();
             $entity->setJobId($data['jobId']);
+            $entity->setEntity($data['entity']);
             $entity->setOwner($user);
             $entity->setOrganization($user->getOrganization());
             $entity->setExpired($data['expired']);

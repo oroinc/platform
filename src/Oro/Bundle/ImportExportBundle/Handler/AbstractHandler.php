@@ -92,6 +92,17 @@ abstract class AbstractHandler
     }
 
     /**
+     * @param $processorType
+     * @param $processorAlias
+     *
+     * @return string
+     */
+    public function getEntityName($processorType, $processorAlias): ?string
+    {
+        return $this->processorRegistry->getProcessorEntityName($processorType, $processorAlias);
+    }
+
+    /**
      * @param string $entityClass
      * @return string
      */
