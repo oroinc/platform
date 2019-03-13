@@ -13,8 +13,7 @@
             host: '{{ ws.host == '*' ? app.request.host : ws.host }}',
             port: {{ ws.port|json_encode|raw }},
             path: '{{ ws.path|trim('/') }}',
-            maxRetries: 3,
-            retryDelay: 30000,
+            retryDelay: 60000,
             syncTicketUrl: routing.generate('oro_sync_ticket')
         }));
     });

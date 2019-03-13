@@ -29,19 +29,6 @@ define([
             throw new Error('Synchronization service does not fit requirements');
         }
         service = serv;
-        var onConnection = function() {
-            messenger.notificationFlashMessage('success', __('sync.connection.established'));
-        };
-        service.on('connection_lost', function(data) {
-            data = data || {};
-            var attempt = data.retries || 0;
-            if (attempt) {
-                data.remain = data.maxretries - data.retries + 1;
-            }
-            messenger.notificationMessage('error',
-                __('sync.connection.lost', data, attempt), {flash: Boolean(attempt)});
-            service.off(null, onConnection).once('connection_established', onConnection);
-        });
         while (subscriptions.length) {
             service.subscribe.apply(service, subscriptions.shift());
         }
