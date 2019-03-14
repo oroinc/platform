@@ -1,6 +1,7 @@
 Oro\Bundle\IntegrationBundle\Entity\Channel:
     constraints:
-        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: name
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+            fields: [name, organization]
     properties:
         name:
             - NotBlank: ~
