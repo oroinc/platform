@@ -5,12 +5,15 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class AbstractAddressTest extends \PHPUnit\Framework\TestCase
 {
+    use EntityTrait;
+
     /**
      * @dataProvider propertiesDataProvider
      * @param string $property
@@ -35,7 +38,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $regionMock = $this->createMock('Oro\Bundle\AddressBundle\Entity\Region', array(), array('combinedCode'));
+        $regionMock = $this->createMock('Oro\Bundle\AddressBundle\Entity\Region');
 
         $createdDateTime = new \DateTime();
 
@@ -44,7 +47,6 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
             'city'         => array('city', 'city'),
             'created'      => array('created', $createdDateTime),
             'firstName'    => array('firstName', 'first_name'),
-            'id'           => array('id', 1),
             'label'        => array('label', 'Shipping'),
             'lastName'     => array('lastName', 'last name'),
             'middleName'   => array('middleName', 'middle name'),
@@ -255,7 +257,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
      */
     protected function createMockRegion($name)
     {
-        $result = $this->createMock('Oro\Bundle\AddressBundle\Entity\Region', array(), array('combinedCode'));
+        $result = $this->createMock('Oro\Bundle\AddressBundle\Entity\Region');
         $result->expects($this->any())
             ->method('__toString')
             ->will($this->returnValue($name));
@@ -305,7 +307,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
         $countryMock = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
             ->disableOriginalConstructor()
             ->getMock();
-        $regionMock = $this->createMock('Oro\Bundle\AddressBundle\Entity\Region', array(), array('combinedCode'));
+        $regionMock = $this->createMock('Oro\Bundle\AddressBundle\Entity\Region');
         return array(
             'lastName' => array('lastName', 'last name'),
             'firstName' => array('firstName', 'first_name'),
@@ -357,7 +359,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
         $result = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress');
 
         if (null !== $id) {
-            $result->setId($id);
+            $this->setValue($result, 'id', $id);
         }
 
         return $result;

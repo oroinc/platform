@@ -5,6 +5,17 @@ trusted_data:
             searchEntities:
                 currentField: true
     safe_methods:
+        Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder:
+            setMaxResults: true
+            setFirstResult: true
+            setParameter: true
+            setParameters: true
+            getMaxResults: true
+            getFirstResult: true
+            getParameter: true
+            getParameterType: true
+            getParameterTypes: true
+            getQuery: true
         Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper:
             getTableName: true
         Oro\Bundle\EntityBundle\ORM\DoctrineHelper:

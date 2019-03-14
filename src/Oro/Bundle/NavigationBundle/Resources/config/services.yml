@@ -118,6 +118,8 @@ services:
         class: '%oro_navigation.item.builder.pinbar.class%'
         arguments:
             - '@doctrine.orm.entity_manager'
+            - '@oro_navigation.utils.pinbar_tab_url_normalizer'
+            - '@oro_navigation.provider.pinbar_tab_title'
         calls:
             - [ setClassName, [ '%oro_navigation.entity.pinbar_tab.class%' ]]
             - [ setNavigationItemClassName, [ '%oro_navigation.entity.navigation_item.class%' ]]
@@ -171,50 +173,37 @@ services:
         class: '%oro_navigation.navigation_item_menu.builder.class%'
         arguments:
             - '@oro_security.token_accessor'
-            - '@doctrine.orm.entity_manager'
-            - '@oro_navigation.item.factory'
-            - '@router'
+            - '@oro_navigation.provider.navigation_items'
         tags:
             - { name: oro_menu.builder, alias: pinbar }
-            - { name: oro_featuretogle.feature, feature: email }
 
     oro_navigation.favorites_menu.builder:
         class: '%oro_navigation.navigation_item_menu.builder.class%'
         arguments:
             - '@oro_security.token_accessor'
-            - '@doctrine.orm.entity_manager'
-            - '@oro_navigation.item.factory'
-            - '@router'
+            - '@oro_navigation.provider.navigation_items'
         tags:
             - { name: oro_menu.builder, alias: favorite }
-            - { name: oro_featuretogle.feature, feature: email }
 
     oro_navigation.history_menu.builder:
         class: '%oro_navigation.navigation_history_menu.builder.class%'
         arguments:
             - '@oro_security.token_accessor'
-            - '@doctrine.orm.entity_manager'
-            - '@oro_navigation.item.factory'
-            - '@router'
-        calls:
-            - [ setMatcher, [ '@knp_menu.matcher' ]]
-            - [ setConfigManager, [ '@oro_config.user' ]]
+            - '@oro_navigation.provider.navigation_items'
+            - '@knp_menu.matcher'
+            - '@oro_menu.manipulator'
+            - '@oro_config.user'
         tags:
             - { name: oro_menu.builder, alias: history }
-            - { name: oro_featuretogle.feature, feature: email }
 
     oro_navigation.mostviewed_menu.builder:
         class: '%oro_navigation.navigation_mostviewed_menu.builder.class%'
         arguments:
             - '@oro_security.token_accessor'
-            - '@doctrine.orm.entity_manager'
-            - '@oro_navigation.item.factory'
-            - "@router"
-        calls:
-            - [ setConfigManager, [ '@oro_config.user' ]]
+            - '@oro_navigation.provider.navigation_items'
+            - '@oro_config.user'
         tags:
             - { name: oro_menu.builder, alias: mostviewed }
-            - { name: oro_featuretogle.feature, feature: email }
 
     knp_voter_request:
         class: '%oro_navigation.menu.matcher.voter.request%'
@@ -341,6 +330,12 @@ services:
         tags:
             - { name: form.type, alias: pagestate }
 
+    oro_navigation.route_collection.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_navigation_route_collection' ] ]
+
     oro_navigation.form.type.route_select:
         class: Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType
         arguments:
@@ -348,6 +343,7 @@ services:
             - '@oro_navigation.title_reader.registry'
             - '@oro_navigation.title_translator'
             - '@oro_navigation.title_service.link'
+            - '@oro_navigation.route_collection.cache'
         tags:
             - { name: form.type, alias: oro_route_choice }
 
@@ -459,6 +455,15 @@ services:
         tags:
             - { name: validator.constraint_validator }
 
+    oro_navigation.validator.unique_pinbar_tab_url:
+        class: 'Oro\Bundle\NavigationBundle\Validator\Constraints\UniquePinbarTabUrlValidator'
+        public: false
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_navigation.utils.pinbar_tab_url_normalizer'
+        tags:
+            - { name: validator.constraint_validator}
+
     oro_navigation.menu_helper.menu_update:
         class: Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper
         arguments:
@@ -529,3 +534,21 @@ services:
         arguments:
             - '@oro_scope.scope_manager'
             - '@oro_navigation.manager.menu_update'
+
+    oro_navigation.utils.pinbar_tab_url_normalizer:
+        class: 'Oro\Bundle\NavigationBundle\Utils\PinbarTabUrlNormalizer'
+
+    oro_navigation.provider.pinbar_tab_title:
+        class: 'Oro\Bundle\NavigationBundle\Provider\PinbarTabTitleProvider'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_navigation.title_service'
+
+    oro_navigation.provider.navigation_items:
+        class: 'Oro\Bundle\NavigationBundle\Provider\NavigationItemsProvider'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_navigation.item.factory'
+            - '@router'
+        tags:
+            - { name: oro_featuretogle.feature, feature: email }

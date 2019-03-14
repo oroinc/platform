@@ -7,7 +7,6 @@ use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\Event\Events;
 use Oro\Bundle\UIBundle\Provider\UserAgentProviderInterface;
-use Oro\Bundle\UIBundle\Twig\Template;
 use Oro\Bundle\UIBundle\Twig\UiExtension;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
@@ -15,6 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Twig\Template;
 
 class UiExtensionTest extends \PHPUnit\Framework\TestCase
 {

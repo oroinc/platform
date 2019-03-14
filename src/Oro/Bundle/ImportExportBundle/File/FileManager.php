@@ -76,20 +76,23 @@ class FileManager
         $files = [];
 
         foreach ($this->filesystem->keys() as $fileName) {
-            if (($file = $this->filesystem->get($fileName)) instanceof File) {
-                $mtime = $file->getMtime();
-                $mDateTime = new \DateTime();
-                $mDateTime->setTimestamp($mtime);
-
-                if ($from && $mDateTime < $from) {
-                    continue;
-                }
-                if ($to && $mDateTime > $to) {
-                    continue;
-                }
-
-                $files[$fileName] = $file;
+            if (!$this->filesystem->has($fileName)) {
+                continue;
             }
+
+            $file = $this->filesystem->get($fileName);
+            $mtime = $file->getMtime();
+            $mDateTime = new \DateTime();
+            $mDateTime->setTimestamp($mtime);
+
+            if ($from && $mDateTime < $from) {
+                continue;
+            }
+            if ($to && $mDateTime > $to) {
+                continue;
+            }
+
+            $files[$fileName] = $file;
         }
 
         return $files;

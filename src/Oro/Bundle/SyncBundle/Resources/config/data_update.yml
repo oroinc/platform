@@ -23,6 +23,7 @@ services:
         class: Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator
         arguments:
             - '@doctrine'
+            - '@oro_entity.orm.entity_class_resolver'
         tags:
             - { name: oro_sync.tag_generator }
 

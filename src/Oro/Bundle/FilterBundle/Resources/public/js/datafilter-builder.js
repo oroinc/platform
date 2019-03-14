@@ -10,7 +10,6 @@ define(function(require) {
     var FiltersManager = require('orofilter/js/collection-filters-manager');
     var FiltersTogglePlugin = require('orofilter/js/plugins/filters-toggle-plugin');
     var module = require('module');
-    var persistentStorage = require('oroui/js/persistent-storage');
     var config = module.config();
     var cachedFilters = {};
 
@@ -24,12 +23,16 @@ define(function(require) {
          */
         initBuilder: function() {
             var modules;
+            var deferred = $.Deferred();
+
             _.defaults(this.metadata, {filters: {}});
             modules = methods.collectModules.call(this);
             tools.loadModules(modules, function(modules) {
                 this.modules = modules;
-                methods.build.call(this);
+                deferred.resolve();
             }, this);
+
+            return deferred.promise();
         },
 
         /**
@@ -55,9 +58,14 @@ define(function(require) {
 
             FiltersManager = this.modules.FiltersManager || FiltersManager;
 
-            var filtersList;
+            var options = _.extend(
+                methods.combineOptions.call(this),
+                _.pick(this, 'collection'),
+                _.pick(this.metadata.options, 'defaultFiltersViewMode', 'filtersStateStorageKey',
+                    'useFiltersStateAnimationOnInit')
+            );
+
             var $filterContainer;
-            var options = methods.combineOptions.call(this);
 
             if (this.filterContainerSelector && this.$el.find(this.filterContainerSelector).length) {
                 $filterContainer = this.$el.find(this.filterContainerSelector);
@@ -65,26 +73,18 @@ define(function(require) {
                 $filterContainer = this.$el;
             }
 
-            options.collection = this.collection;
-
             if (!this.enableToggleFilters || _.result(this.metadata.options.toolbarOptions, 'hide') === true) {
-                options.viewMode = FiltersManager.MANAGE_VIEW_MODE;
+                options.forcedViewMode = FiltersManager.MANAGE_VIEW_MODE;
+            } else if (this.filtersStateElement) {
+                options.filtersStateElement = this.filtersStateElement;
             } else {
-                var storedMode = persistentStorage.getItem(FiltersManager.STORAGE_KEY);
+                var $container = this.$el.closest('body, .ui-dialog').find(options.filtersStateElement).first();
 
-                options.viewMode = storedMode !== null ? Number(storedMode) : FiltersManager.STATE_VIEW_MODE;
-
-                if (this.filtersStateElement) {
-                    options.filtersStateElement = this.filtersStateElement;
-                } else {
-                    var $container = this.$el.closest('body, .ui-dialog').find(options.filtersStateElement).first();
-
-                    options.filtersStateElement = $container.length
-                        ? $container : $('<div/>').prependTo($filterContainer);
-                }
+                options.filtersStateElement = $container.length
+                    ? $container : $('<div/>').prependTo($filterContainer);
             }
 
-            filtersList = new FiltersManager(options);
+            var filtersList = new FiltersManager(options);
             filtersList.render();
             filtersList.$el.prependTo($filterContainer);
 
@@ -199,9 +199,7 @@ define(function(require) {
 
             _.extend(self, _.pick(options, 'filtersStateElement', 'filterContainerSelector', 'enableToggleFilters'));
 
-            methods.initBuilder.call(self);
-
-            options.gridPromise.done(function(grid) {
+            $.when(options.gridPromise, methods.initBuilder.call(self)).done(function(grid) {
                 self.collection = grid.collection;
                 self.grid = grid;
                 methods.build.call(self);
@@ -214,6 +212,7 @@ define(function(require) {
             if (!_.isArray(options.metadata.plugins)) {
                 options.metadata.plugins = [];
             }
+
             if (_.result(config, 'enableToggleFilters') === false) {
                 options.enableToggleFilters = false;
             }
@@ -225,6 +224,7 @@ define(function(require) {
             if (_.isFunction(FiltersTogglePlugin.isApplicable) && FiltersTogglePlugin.isApplicable(options) === false) {
                 options.enableToggleFilters = false;
             }
+
             deferred.resolve();
         }
     };

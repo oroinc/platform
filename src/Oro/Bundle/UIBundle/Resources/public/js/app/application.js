@@ -28,7 +28,6 @@ define(function(require) {
             mediator.setHandler('hideLoading', function() {});
             mediator.setHandler('redirectTo', function() {});
             mediator.setHandler('refreshPage', function() {});
-            mediator.setHandler('updateDebugToolbar', function() {});
 
             Application.__super__.initialize.apply(this, arguments);
 

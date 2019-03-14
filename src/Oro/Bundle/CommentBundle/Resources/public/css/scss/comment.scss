@@ -125,22 +125,18 @@
 
     .comment-attachments {
         .thumbnail {
-            display: block;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             width: $comments-thumbnail-width;
             height: $comments-thumbnail-height;
 
-            text-align: center;
-
-            background:  $comments-thumbnail-background;
+            background: $comments-thumbnail-background;
             border-radius: $comments-thumbnail-border-radius;
-
-            .fa {
-                padding-top: $comments-thumbnail-icon-offset;
-                color: $comments-thumbnail-icon-color;
-            }
         }
 
         .link-to-record {
+            max-width: 100%;
             padding-top: $comment-view-base-offset;
 
             .dropdown-toggle {

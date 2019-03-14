@@ -2,32 +2,45 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Workflow\Action;
 
+use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmail;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SendEmailTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var Processor|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $emailProcessor;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityNameResolver;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $dispatcher;
+
+    /**
+     * @var EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected $emailOriginHelper;
 
     /**
      * @var SendEmail
@@ -41,24 +54,18 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Component\ConfigExpression\ContextAccessor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->emailProcessor = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->contextAccessor = $this->createMock(ContextAccessor::class);
+        $this->emailProcessor = $this->createMock(Processor::class);
+        $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
+        $this->dispatcher = $this->createMock(EventDispatcher::class);
+        $this->emailOriginHelper = $this->createMock(EmailOriginHelper::class);
 
         $this->action = new SendEmail(
             $this->contextAccessor,
             $this->emailProcessor,
             new EmailAddressHelper(),
-            $this->entityNameResolver
+            $this->entityNameResolver,
+            $this->emailOriginHelper
         );
 
         $this->action->setDispatcher($this->dispatcher);
@@ -261,18 +268,22 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
                 )
             );
 
-        $self = $this;
-        $emailUserEntity = $this->getMockBuilder('\Oro\Bundle\EmailBundle\Entity\EmailUser')
-            ->disableOriginalConstructor()
-            ->setMethods(['getEmail'])
-            ->getMock();
-        $emailEntity = $this->createMock('\Oro\Bundle\EmailBundle\Entity\Email');
+        $emailEntity = new EmailEntity();
+        $emailUserEntity = $this->createMock(EmailUser::class);
         $emailUserEntity->expects($this->any())
             ->method('getEmail')
             ->willReturn($emailEntity);
+
+        $emailOrigin = new TestEmailOrigin();
+        $this->emailOriginHelper->expects($this->once())
+            ->method('getEmailOrigin')
+            ->with($expected['from'], null)
+            ->willReturn($emailOrigin);
+
+        $self = $this;
         $this->emailProcessor->expects($this->once())
             ->method('process')
-            ->with($this->isInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email'))
+            ->with($this->isInstanceOf(Email::class), $emailOrigin)
             ->will(
                 $this->returnCallback(
                     function (Email $model) use ($emailUserEntity, $expected, $self) {

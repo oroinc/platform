@@ -11,7 +11,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -156,15 +155,15 @@ DESCRIPTION
             $command[] = '--watch';
         }
         $command[] = '--env.symfony='.$input->getOption('env');
+        $command[] = '--colors';
 
 
-        $process = $this->nodeProcessFactory->createProcess(
+        $process = $this->nodeProcessFactory->create(
             $command,
             $this->getKernel()->getProjectDir(),
             $this->buildTimeout
         );
         $output->writeln($process->getCommandLine());
-        $this->enableTty($process);
 
         if ($input->getOption('watch')) {
             $process->setTimeout(null);
@@ -207,17 +206,5 @@ DESCRIPTION
     private function getKernel(): Kernel
     {
         return $this->getApplication()->getKernel();
-    }
-
-    /**
-     * @param Process $process
-     */
-    protected function enableTty(Process $process): void
-    {
-        try {
-            $process->setTty(true);
-        } catch (RuntimeException $exception) {
-            $process->setTty(false);
-        }
     }
 }

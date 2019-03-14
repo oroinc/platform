@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
+use Oro\Bundle\ApiBundle\Provider\ResourcesCacheAccessor;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
@@ -19,7 +20,9 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
     {
         $this->cache = $this->createMock(CacheProvider::class);
 
-        $this->resourcesCache = new ResourcesCache($this->cache);
+        $this->resourcesCache = new ResourcesCache(
+            new ResourcesCacheAccessor($this->cache)
+        );
     }
 
     public function testGetAccessibleResourcesNoCache()
@@ -36,7 +39,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAccessibleResources()
     {
-        $cachedData = ['Test\Entity1', 'Test\Entity2'];
+        $cachedData = [null, ['Test\Entity1', 'Test\Entity2']];
 
         $this->cache->expects(self::once())
             ->method('fetch')
@@ -44,7 +47,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
             ->willReturn($cachedData);
 
         self::assertEquals(
-            $cachedData,
+            $cachedData[1],
             $this->resourcesCache->getAccessibleResources('1.2', new RequestType(['rest']))
         );
     }
@@ -63,9 +66,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testGetExcludedActions()
     {
-        $cachedData = [
-            'Test\Entity1' => ['delete']
-        ];
+        $cachedData = [null, ['Test\Entity1' => ['delete']]];
 
         $this->cache->expects(self::once())
             ->method('fetch')
@@ -73,7 +74,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
             ->willReturn($cachedData);
 
         self::assertEquals(
-            $cachedData,
+            $cachedData[1],
             $this->resourcesCache->getExcludedActions('1.2', new RequestType(['rest']))
         );
     }
@@ -92,10 +93,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testGetResources()
     {
-        $cachedData = [
-            'Test\Entity1' => [[]],
-            'Test\Entity2' => [['create']]
-        ];
+        $cachedData = [null, ['Test\Entity1' => [[]], 'Test\Entity2' => [['create']]]];
 
         $this->cache->expects(self::once())
             ->method('fetch')
@@ -125,7 +123,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testGetResourcesWithoutIdentifier()
     {
-        $cachedData = ['Test\Entity1', 'Test\Entity2'];
+        $cachedData = [null, ['Test\Entity1', 'Test\Entity2']];
 
         $this->cache->expects(self::once())
             ->method('fetch')
@@ -133,7 +131,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
             ->willReturn($cachedData);
 
         self::assertEquals(
-            $cachedData,
+            $cachedData[1],
             $this->resourcesCache->getResourcesWithoutIdentifier('1.2', new RequestType(['rest']))
         );
     }
@@ -161,22 +159,25 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
             ->with(
                 'resources_1.2rest',
                 [
-                    'Test\Entity1' => [[]],
-                    'Test\Entity2' => [['get', 'get_list']],
-                    'Test\Entity3' => [['create']]
+                    null,
+                    [
+                        'Test\Entity1' => [[]],
+                        'Test\Entity2' => [['get', 'get_list']],
+                        'Test\Entity3' => [['create']]
+                    ]
                 ]
             );
         $this->cache->expects(self::at(1))
             ->method('save')
             ->with(
                 'accessible_1.2rest',
-                $accessibleResources
+                [null, $accessibleResources]
             );
         $this->cache->expects(self::at(2))
             ->method('save')
             ->with(
                 'excluded_actions_1.2rest',
-                $excludedActions
+                [null, $excludedActions]
             );
 
         $this->resourcesCache->saveResources(
@@ -194,7 +195,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
             ->method('save')
             ->with(
                 'resources_wid_1.2rest',
-                ['Test\Entity1', 'Test\Entity2']
+                [null, ['Test\Entity1', 'Test\Entity2']]
             );
 
         $this->resourcesCache->saveResourcesWithoutIdentifier(

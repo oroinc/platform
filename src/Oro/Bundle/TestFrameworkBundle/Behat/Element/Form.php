@@ -43,6 +43,7 @@ class Form extends Element
             $field = $this->wrapField($label, $field);
             $field->setValue($value);
             $field->blur();
+            $this->getDriver()->waitForAjax();
         }
         if ($isEmbeddedForm) {
             $this->getDriver()->switchToWindow();
@@ -102,8 +103,15 @@ class Form extends Element
             $field = $this->wrapField($label, $field);
 
             $expectedValue = self::normalizeValue($value);
-            $fieldValue = self::normalizeValue($field->getValue());
-            self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $label));
+
+            $result = $this->spin(function () use ($field, $expectedValue) {
+                $fieldValue = self::normalizeValue($field->getValue());
+
+                // Comparison operator is not strict intentionally.
+                return $expectedValue == $fieldValue;
+            }, 3);
+
+            self::assertTrue($result, sprintf('Field "%s" value is not as expected', $label));
         }
     }
 
@@ -228,6 +236,10 @@ class Form extends Element
             return $field;
         }
 
+        if (!$field && is_array($locator)) {
+            self::fail(sprintf('Cannot find element by %s locator "%s"', $locator['type'], $locator['locator']));
+        }
+
         if ($field = $this->findFieldByLabel($locator)) {
             return $field;
         }
@@ -299,15 +311,8 @@ class Form extends Element
         $value = trim($value);
 
         if (0 === strpos($value, '[')) {
-            return self::normalizeValue(
-                array_map(
-                    'trim',
-                    explode(
-                        ',',
-                        trim($value, '[]')
-                    )
-                )
-            );
+            $value = trim($value, '[]');
+            return self::normalizeValue($value ? explode(',', $value) : []);
         }
 
         if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($value))) {
@@ -407,6 +412,18 @@ class Form extends Element
                     '%s%s',
                     $field->getXpath(),
                     '/following-sibling::span[@class="validation-failed"]'
+                )
+            );
+        }
+
+        if (!$errorSpan) {
+            // Get the validation error a level higher than the input
+            $errorSpan = $this->find(
+                'xpath',
+                sprintf(
+                    '%s%s',
+                    $field->getXpath(),
+                    '/ancestor::div[contains(@class, "validation-error")]/span[@class="validation-failed"]'
                 )
             );
         }

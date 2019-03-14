@@ -23,6 +23,7 @@ oro:
             header.label:   "Column Name"
             header.tooltip: "If blank Label will be used"
             identity.label: "Use as Identity Field"
+            identity.no: "No"
             identity.only_when_not_empty: "Only when not empty"
             identity.always: "Always"
             identity.tooltip: "If set to \"Only when not empty\", the field may be omitted in the identity when it has no value."

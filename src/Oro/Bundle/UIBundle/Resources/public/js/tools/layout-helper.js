@@ -28,7 +28,6 @@ define(function(require) {
             layout.onPageRendered(calculateHeight);
             $(window).on('resize', _.debounce(calculateHeight, 50));
             mediator.on('page:afterChange', calculateHeight);
-            mediator.on('layout:adjustReloaded', calculateHeight);
             mediator.on('layout:adjustHeight', calculateHeight);
 
             calculateHeight();

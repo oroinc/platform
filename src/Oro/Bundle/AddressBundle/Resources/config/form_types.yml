@@ -24,11 +24,16 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@form.factory'
 
+    oro_address.form.listener.address_identifier:
+        class: 'Oro\Bundle\AddressBundle\Form\EventListener\AddressIdentifierSubscriber'
+        public: false
+
     # Addresses form types
     oro_address.form.type.address:
         class: '%oro_address.form.type.address.class%'
         arguments:
             - '@oro_address.form.listener.address'
+            - '@oro_address.form.listener.address_identifier'
         tags:
              - { name: form.type, alias: oro_address }
 

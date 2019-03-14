@@ -125,6 +125,20 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
                     expect(wamp.session).toBeFalsy();
                 });
 
+                it('on reconnect reset retryCount', function() {
+                    onConnect(session);
+                    expect(wamp.session).toBe(session);
+                    expect(wamp.retryCount).toBe(0);
+
+                    onHangup(0);
+                    expect(wamp.session).toBeFalsy();
+                    expect(wamp.retryCount).toBe(1);
+
+                    onConnect(session);
+                    expect(wamp.session).toBe(session);
+                    expect(wamp.retryCount).toBe(0);
+                });
+
                 it('on hangup with error code', function() {
                     wamp.session = session;
                     onHangup(1);

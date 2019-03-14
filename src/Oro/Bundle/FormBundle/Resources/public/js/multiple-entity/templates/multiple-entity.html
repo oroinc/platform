@@ -16,14 +16,14 @@
         </div>
         <% } %>
         <h4 class="list-group-item__title">
-            <a href="<%- link %>" class="list-group-item__link entity-info" title="<%- _.escape(label) %>"><%- _.escape(label) %></a>
+            <a href="<%- link %>" class="list-group-item__link entity-info" title="<%- label %>"><%- label %></a>
         </h4>
     </div>
     <div class="list-group-item__extra-info">
         <% _.each(extraData, function(item) { %>
         <% if (!_.isUndefined(item.label)) { %>
             <% if (!item.hasOwnProperty('value') || !item.value) { item.value = _.__('N/A'); } %>
-            <div><%- _.escape(item.label) %>: <%- _.escape(item.value) %></div>
+            <div><%- item.label %>: <%- item.value %></div>
         <% } %>
         <% }); %>
     </div>

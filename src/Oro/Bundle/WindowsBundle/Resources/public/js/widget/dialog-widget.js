@@ -8,7 +8,6 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     var messenger = require('oroui/js/messenger');
     var mediator = require('oroui/js/mediator');
-    var layout = require('oroui/js/layout');
     var AbstractWidget = require('oroui/js/widget/abstract-widget');
     var StateModel = require('orowindows/js/dialog/state/model');
     var LoadingBarView = require('oroui/js/app/views/loading-bar-view');
@@ -456,7 +455,8 @@ define(function(require) {
                     }
                 }, this));
             }
-            layout.updateResponsiveLayout();
+
+            mediator.execute({name: 'responsive-layout:update', silent: true}, this.el);
         },
 
         /**
@@ -483,6 +483,8 @@ define(function(require) {
             } else {
                 dialogManager.updateIncrementalPosition(this);
             }
+
+            mediator.execute({name: 'responsive-layout:update', silent: true}, this.el);
         },
 
         internalSetDialogPosition: function(position, leftShift, topShift) {

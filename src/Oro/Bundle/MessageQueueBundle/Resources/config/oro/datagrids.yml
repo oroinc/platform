@@ -106,6 +106,8 @@ datagrids:
 
         actions:
             view:
+                label: oro.grid.action.view
+                icon: eye
                 type: navigate
                 link: child_jobs_link
                 acl_resource: oro_message_queue_job

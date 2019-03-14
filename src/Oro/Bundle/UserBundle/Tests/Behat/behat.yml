@@ -62,7 +62,11 @@ oro_behat_extension:
       selector: 'a[title="Edit profile"]'
 
     Username or Email:
-      selector: '.oro-forgot-password input[name="username"]'
+      selector: '.form-signin__fieldset input[name="username"]'
+
+    Users Grid:
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
+      selector: 'div[data-page-component-name="users-grid"]'
 
   pages:
     Login:

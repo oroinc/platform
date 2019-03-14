@@ -144,6 +144,12 @@ define(function(require) {
                 init_instance_callback: function(editor) {
                     self.removeSubview('loadingMask');
                     self.tinymceInstance = editor;
+                    self.tinymceInstance.parser.addNodeFilter('#cdata', function(nodes) {
+                        _.each(nodes, function(node) {
+                            node.value = node.value.replace(/\[CDATA\[([^]*?)\]\]/g, '$1');
+                        });
+                    });
+
                     if (!tools.isMobile()) {
                         self.tinymceInstance.on('FullscreenStateChanged', function(e) {
                             if (e.state) {

@@ -5,7 +5,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
-    var Collection = require('oronavigation/js/app/models/base/collection');
+    var BaseNavigationItemCollection = require('oronavigation/js/app/models/base/collection');
     var BaseComponent = require('oroui/js/app/components/base/component');
 
     BaseBookmarkComponent = BaseComponent.extend({
@@ -15,7 +15,11 @@ define(function(require) {
          */
         _options: {},
 
+        collectionModel: BaseNavigationItemCollection,
+
         typeName: null,
+
+        route: 'oro_api_get_navigationitems',
 
         listen: {
             'toAdd collection': 'toAdd',
@@ -34,20 +38,19 @@ define(function(require) {
          */
         initialize: function(options) {
             var $dataEl = $(options.dataSource);
-            var data = $dataEl.data('data');
             var extraOptions = $dataEl.data('options');
             $dataEl.remove();
 
-            this.collection = new Collection();
+            this.collection = new this.collectionModel;
 
             // create own property _options (not spoil prototype)
             this._options = _.defaults(_.omit(options, '_subPromises'), extraOptions);
 
             BaseBookmarkComponent.__super__.initialize.call(this, options);
 
-            var route = options._sourceElement.data('navigation-items-route');
-            if (!_.isEmpty(route)) {
-                this.collection.model.prototype.route = route;
+            this.route = options._sourceElement.data('navigation-items-route') || this.route;
+            if (!_.isEmpty(this.route)) {
+                this.collection.model = this.collection.model.extend({route: this.route});
             }
 
             var typeName = options._sourceElement.data('type-name');
@@ -55,7 +58,11 @@ define(function(require) {
                 this.typeName = typeName;
             }
 
-            this.collection.reset(data);
+            var data = $dataEl.data('data');
+            if (data) {
+                this.collection.reset(data);
+            }
+
             this._createSubViews();
         },
 

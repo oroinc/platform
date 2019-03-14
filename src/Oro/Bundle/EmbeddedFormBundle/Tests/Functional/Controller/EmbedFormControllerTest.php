@@ -6,6 +6,7 @@ use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Tests\Functional\DataFixtures\LoadEmbeddedFormData;
 use Oro\Bundle\EmbeddedFormBundle\Tests\Functional\Stubs\EmbeddedFormStub;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
 
 class EmbedFormControllerTest extends WebTestCase
 {
@@ -15,19 +16,17 @@ class EmbedFormControllerTest extends WebTestCase
         $this->loadFixtures([
             LoadEmbeddedFormData::class,
         ]);
+        $this->getContainer()
+            ->get('oro_embedded_form.manager')
+            ->addFormType(EmbeddedFormStub::class);
     }
 
     public function testSubmit()
     {
-        $this->markTestSkipped('BAP-15985: Unstable test');
-
         /** @var EmbeddedForm $feedbackForm */
         $feedbackForm = $this->getReference(LoadEmbeddedFormData::EMBEDDED_FORM);
 
-        $this->getContainer()->get('oro_embedded_form.manager')->addFormType(EmbeddedFormStub::class);
-
         $this->client->followRedirects(true);
-
         $this->client->request(
             'POST',
             $this->getUrl('oro_embedded_form_submit', ['id' => $feedbackForm->getId()]),
@@ -37,7 +36,7 @@ class EmbedFormControllerTest extends WebTestCase
                     'css' => 'input { color: red; }',
                     'successMessage' => 'Test success message',
                     'formType' => EmbeddedFormStub::class,
-                    '_token' => $this->getContainer()->get('security.csrf.token_manager')->getToken('embedded_form')
+                    '_token' => $this->getCsrfToken('embedded_form')
                 ],
             ]
         );
@@ -59,5 +58,22 @@ class EmbedFormControllerTest extends WebTestCase
         );
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCsrfToken($tokenId)
+    {
+        $container = $this->getContainer();
+
+        $session = $container->get('session');
+        $request = new Request([], [], ['_route' => 'oro_embedded_form_submit'], [$session->getName() => 'test']);
+
+        //emulation of embedded form request in order to CsrfTokenStorageDecorator set token to correct storage
+        $container->get('request_stack')
+            ->push($request);
+
+        return parent::getCsrfToken($tokenId);
     }
 }

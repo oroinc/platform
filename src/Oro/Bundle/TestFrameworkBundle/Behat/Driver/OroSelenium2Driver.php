@@ -215,8 +215,15 @@ JS;
                 return false;
             }
             
+            // Require should be available at this point.
+            // Require is absent on lightweight pages like login, forgot password, embedded forms, etc.
+            // Next checks are valid only for pages where require is loaded.
+            if (typeof require === 'undefined') {
+                return true;
+            }
+            
             try {
-                if (jQuery == null || jQuery.active) {
+                if (typeof(jQuery) === 'undefined' || jQuery == null || jQuery.active) {
                     return false;
                 }
                 

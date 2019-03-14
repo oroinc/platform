@@ -240,6 +240,12 @@ services:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesCache
         public: false
         arguments:
+            - '@oro_api.resources_cache_accessor'
+
+    oro_api.resources_cache_accessor:
+        class: Oro\Bundle\ApiBundle\Provider\ResourcesCacheAccessor
+        public: false
+        arguments:
             - '@oro_api.resources_cache.impl'
 
     oro_api.resources_cache.impl:

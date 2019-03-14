@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Category;
@@ -376,6 +377,43 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($category));
     }
 
+    /**
+     * Tests the following features:
+     * * all_text virtual field must contain actual data even if fields have been changed in listener
+     * * data that has been provided for all_text field in listeners is not lost during generation of "all_text" field
+     */
+    public function testMapObjectWithListener()
+    {
+        $product = new Product();
+        $product->setName('test product');
+        $product->setDescription('short description');
+
+        $this->dispatcher->expects($this->at(1))->method('dispatch')
+            ->with(
+                PrepareEntityMapEvent::EVENT_NAME,
+                $this->callback(
+                    function ($event) {
+                        /** @var PrepareEntityMapEvent $event */
+                        $this->assertInstanceOf(PrepareEntityMapEvent::class, $event);
+
+                        $data = $event->getData();
+                        $data[Query::TYPE_TEXT]['name'] = 'test product with changed title';
+                        $data[Query::TYPE_TEXT]['all_text'] = 'custom text';
+                        $event->setData($data);
+
+                        return true;
+                    }
+                )
+            );
+
+        $mapping = $this->mapper->mapObject($product);
+
+        $this->assertEquals(
+            'custom text test product with changed title short description',
+            $mapping[Query::TYPE_TEXT][Indexer::TEXT_ALL_DATA_FIELD]
+        );
+    }
+
     public function testGetEntitiesListAliases()
     {
         $data = $this->mapper->getEntitiesListAliases();
@@ -460,10 +498,10 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $allData = '';
 
         $allData = $this->mapper->buildAllDataField($allData, 'first second');
-        $this->assertEquals(' first second', $allData);
+        $this->assertEquals('first second', $allData);
 
         $allData = $this->mapper->buildAllDataField($allData, 'second third');
-        $this->assertEquals(' first second third', $allData);
+        $this->assertEquals('first second third', $allData);
     }
 
     /**

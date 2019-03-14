@@ -203,7 +203,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects(self::once())
             ->method('fetch')
             ->with('entity_aliases')
-            ->willReturn($storage);
+            ->willReturn([null, $storage]);
 
         $this->loader->expects(self::never())
             ->method('load');

@@ -74,6 +74,8 @@
 #dialog-extend-fixed-container {
     display: flex;
     flex-wrap: wrap-reverse;
+    height: 0;
+    overflow: visible;
 }
 
 .ui-dialog-minimized {

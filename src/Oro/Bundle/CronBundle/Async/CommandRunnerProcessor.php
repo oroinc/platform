@@ -9,42 +9,40 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
 /**
- * This processor is responsible for executing passed command with arguments
- * inside provided delayed job.
+ * This processor is responsible for executing passed command with arguments.
+ *
+ * Subscribe to `oro.cron.run_command.delayed` to prevent exceptions due to BC break
+ * if such messages is in message broker they should be executed and processed with method `runDelayedJob`
  */
-class CommandRunnerProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class CommandRunnerProcessor implements
+    MessageProcessorInterface,
+    TopicSubscriberInterface,
+    LoggerAwareInterface
 {
-    /** @var CommandRunnerInterface */
-    private $commandRunner;
-
-    /** @var LoggerInterface */
-    private $logger;
+    use LoggerAwareTrait;
 
     /** @var JobRunner */
     private $jobRunner;
 
+    /** @var CommandRunnerInterface */
+    private $commandRunner;
+
     /**
+     * @param JobRunner $jobRunner
      * @param CommandRunnerInterface $commandRunner
-     * @param JobRunner              $jobRunner
-     * @param LoggerInterface        $logger
      */
-    public function __construct(
-        CommandRunnerInterface $commandRunner,
-        JobRunner $jobRunner,
-        LoggerInterface $logger
-    ) {
+    public function __construct(JobRunner $jobRunner, CommandRunnerInterface $commandRunner)
+    {
+        $this->jobRunner = $jobRunner;
         $this->commandRunner = $commandRunner;
-        $this->jobRunner     = $jobRunner;
-        $this->logger        = $logger;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \Exception
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
@@ -55,59 +53,84 @@ class CommandRunnerProcessor implements MessageProcessorInterface, TopicSubscrib
 
             return self::REJECT;
         }
-        if (!isset($body['jobId'])) {
-            $this->logger->critical('Got invalid message: empty jobId');
-
-            return self::REJECT;
-        }
         $commandArguments = [];
         if (isset($body['arguments'])) {
             $commandArguments = $body['arguments'];
         }
         if (!is_array($commandArguments)) {
-            $this->logger->critical('Got invalid message: "arguments" must be of type array');
+            $this->logger->critical(
+                'Got invalid message: "arguments" must be of type array',
+                ['message' => $message]
+            );
 
             return self::REJECT;
         }
 
-        $result = $this->runDelayedJob($body, $body['command'], $commandArguments);
+        if (array_key_exists('jobId', $body)) {
+            $result = $this->runDelayedJob($body['jobId'], $body['command'], $commandArguments);
+        } else {
+            $result = $this->runUniqueJob($message->getMessageId(), $body['command'], $commandArguments);
+        }
 
         return $result ? self::ACK : self::REJECT;
     }
 
     /**
-     * @param array  $body
+     * @param string $ownerId
      * @param string $commandName
-     * @param array  $commandArguments
+     * @param array $commandArguments
      *
      * @return bool
-     *
-     * @throws \Exception
      */
-    protected function runDelayedJob(array $body, $commandName, array $commandArguments)
+    private function runUniqueJob($ownerId, $commandName, array $commandArguments)
     {
-        $result = $this->jobRunner->runDelayed(
-            $body['jobId'],
-            function () use ($commandName, $commandArguments) {
-                $output = $this->commandRunner->run($commandName, $commandArguments);
-                $this->logger->info(
-                    sprintf(
-                        'Ran command %s. Got output %s',
-                        $commandName,
-                        $output
-                    ),
-                    [
-                        'command'   => $commandName,
-                        'arguments' => $commandArguments,
-                        'output'    => $output
-                    ]
-                );
+        $jobName = sprintf('oro:cron:run_command:%s', $commandName);
+        if ($commandArguments) {
+            array_walk($commandArguments, function ($item, $key) use (&$jobName) {
+                if (is_array($item)) {
+                    $item = implode(',', $item);
+                }
 
-                return true;
-            }
-        );
+                $jobName .= sprintf('-%s=%s', $key, $item);
+            });
+        }
+
+        return $this->jobRunner->runUnique($ownerId, $jobName, function () use ($commandName, $commandArguments) {
+            return $this->runCommand($commandName, $commandArguments);
+        });
+    }
+
+    /**
+     * @param string $jobId
+     * @param string $commandName
+     * @param array $commandArguments
+     *
+     * @return bool
+     */
+    private function runDelayedJob($jobId, $commandName, array $commandArguments)
+    {
+        $result = $this->jobRunner->runDelayed($jobId, function () use ($commandName, $commandArguments) {
+            return $this->runCommand($commandName, $commandArguments);
+        });
 
         return $result;
+    }
+
+    /**
+     * @param string $commandName
+     * @param array $commandArguments
+     *
+     * @return bool
+     */
+    private function runCommand($commandName, array $commandArguments)
+    {
+        $output = $this->commandRunner->run($commandName, $commandArguments);
+        $this->logger->info(sprintf('Command %s was executed. Output: %s', $commandName, $output), [
+            'command' => $commandName,
+            'arguments' => $commandArguments,
+        ]);
+
+        return true;
     }
 
     /**
@@ -115,6 +138,6 @@ class CommandRunnerProcessor implements MessageProcessorInterface, TopicSubscrib
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::RUN_COMMAND_DELAYED];
+        return [Topics::RUN_COMMAND, Topics::RUN_COMMAND_DELAYED];
     }
 }

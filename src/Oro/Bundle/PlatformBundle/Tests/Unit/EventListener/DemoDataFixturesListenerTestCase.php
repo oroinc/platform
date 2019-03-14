@@ -78,7 +78,7 @@ abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestC
             ->method('enableListeners')
             ->with(self::LISTENERS);
 
-        $this->listener->onPreLoad($this->event);
+        $this->listener->onPostLoad($this->event);
     }
 
     public function testOnPostLoadWithNoDemoFixtures()
@@ -90,6 +90,6 @@ abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestC
         $this->listenerManager->expects($this->never())
             ->method('enableListeners');
 
-        $this->listener->onPreLoad($this->event);
+        $this->listener->onPostLoad($this->event);
     }
 }
