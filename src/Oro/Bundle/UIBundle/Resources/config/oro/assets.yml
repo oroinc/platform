@@ -15,6 +15,7 @@ css:
         - 'bundles/bowerassets/lightgallery/dist/css/lg-transitions.css'
         - 'bundles/bowerassets/lightgallery/dist/css/lightgallery.css'
         - 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css'
+        - 'bundles/npmassets/overlayscrollbars/css/OverlayScrollbars.css'
         - 'bundles/bowerassets/jquery-ui-multiselect-widget/jquery.multiselect.css'
         - 'bundles/bowerassets/jquery-ui-multiselect-widget/jquery.multiselect.filter.css'
 
