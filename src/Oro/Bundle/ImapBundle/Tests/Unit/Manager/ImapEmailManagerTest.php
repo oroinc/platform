@@ -283,6 +283,7 @@ class ImapEmailManagerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             ['Fri, 31 Jun 2011 10:59:59 +1100'],
+            ['Thu, 30 Jun 2011 23:59:59 0000'],
             ['Fri, 31 Jun 2011 10:59:59 +11:00 (GMT+11:00)'],
             ['Fri, 31 06 2011 10:59:59 +1100']
         ];
