@@ -10,6 +10,9 @@ use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFileSystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * This manager can be used to simplify retrieving and storing attachments.
+ */
 class FileManager extends GaufretteFileManager
 {
     /**
