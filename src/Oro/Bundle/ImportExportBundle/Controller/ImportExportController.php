@@ -416,7 +416,7 @@ class ImportExportController extends Controller
     }
 
     /**
-     * @Route("/export/download/{jobId}", name="oro_importexport_export_download")
+     * @Route("/export/download/{jobId}", name="oro_importexport_export_download", requirements={"jobId"="\d+"})
      * @ParamConverter("result", options={"mapping": {"jobId": "jobId"}})
      *
      * @param ImportExportResult $result
@@ -437,7 +437,11 @@ class ImportExportController extends Controller
     }
 
     /**
-     * @Route("/import_export/job-error-log/{jobId}.log", name="oro_importexport_job_error_log")
+     * @Route(
+     *     "/import_export/job-error-log/{jobId}.log",
+     *     name="oro_importexport_job_error_log",
+     *     requirements={"jobId"="\d+"}
+     * )
      * @ParamConverter("result", options={"mapping": {"jobId": "jobId"}})
      *
      * @param ImportExportResult $result
