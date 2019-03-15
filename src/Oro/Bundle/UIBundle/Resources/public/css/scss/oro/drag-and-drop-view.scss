@@ -1,7 +1,7 @@
 /* @theme: admin.oro; */
 
 .drag-n-drop-sorting-view {
-    width: $drag-n-drop-sorting-view-width;
+    min-width: $drag-n-drop-sorting-view-width;
     overflow: $drag-n-drop-sorting-view-overflow;
 
     &__wrapper {
