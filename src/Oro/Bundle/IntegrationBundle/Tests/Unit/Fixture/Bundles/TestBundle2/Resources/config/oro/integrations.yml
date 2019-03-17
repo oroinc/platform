@@ -3,7 +3,8 @@ integrations:
         synchronization_settings:
             schedule:
                 type: schedule_form_type
-                applicable: "@test.client->test()"
+                applicable: "@test.client->testMethod()"
             some_setting:
                 type: choice
                 applicable: [simple]
+                priority: 200
