@@ -244,7 +244,7 @@ class PdoMysql extends BaseDriver
 
         if ($setOrderBy) {
             $qb->addSelect(
-                sprintf('MATCH_AGAINST(%s.value, :value%s) * search.weight as rankField%s', $joinAlias, $index, $index)
+                "MATCH_AGAINST($joinAlias.value, :value$index 'IN BOOLEAN MODE') * search.weight as rankField$index"
             )
                 ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
         }
