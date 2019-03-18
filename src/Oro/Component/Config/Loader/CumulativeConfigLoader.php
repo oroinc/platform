@@ -5,6 +5,7 @@ namespace Oro\Component\Config\Loader;
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\ResourcesContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -63,6 +64,22 @@ class CumulativeConfigLoader
      */
     public function load(ContainerBuilder $container = null): array
     {
+        return $this->loadWithResourcesContainer($container);
+    }
+
+    /**
+     * Loads resources
+     *
+     * @deprecated This method was added to avoid BC break.
+     *             It will be removed in v4.0
+     *             in favor of load(ResourcesContainerInterface $resourcesContainer = null)
+     *
+     * @param ResourcesContainerInterface|ContainerBuilder|null $resourcesContainer
+     *
+     * @return CumulativeResourceInfo[]
+     */
+    public function loadWithResourcesContainer($resourcesContainer = null): array
+    {
         $result = [];
 
         $bundles = CumulativeResourceManager::getInstance()->getBundles();
@@ -87,8 +104,8 @@ class CumulativeConfigLoader
             }
         }
 
-        if ($container) {
-            $this->registerResources($container);
+        if ($resourcesContainer) {
+            $this->registerResourcesInResourcesContainer($resourcesContainer);
         }
 
         return $result;
@@ -102,7 +119,25 @@ class CumulativeConfigLoader
      */
     public function registerResources(ContainerBuilder $container): void
     {
-        $container->addResource($this->getResources());
+        $this->registerResourcesInResourcesContainer($container);
+    }
+
+    /**
+     * Adds a resource objects to the container.
+     * These objects will be used to monitor whether resources are up-to-date or not.
+     *
+     * @deprecated This method was added to avoid BC break.
+     *             It will be removed in v4.0
+     *             in favor of registerResources(ResourcesContainerInterface $resourcesContainer)
+     *
+     * @param ResourcesContainerInterface|ContainerBuilder $resourcesContainer
+     */
+    public function registerResourcesInResourcesContainer($resourcesContainer): void
+    {
+        if ($resourcesContainer instanceof ContainerBuilder) {
+            $resourcesContainer = new ContainerBuilderAdapter($resourcesContainer);
+        }
+        $resourcesContainer->addResource($this->getResources());
     }
 
     /**

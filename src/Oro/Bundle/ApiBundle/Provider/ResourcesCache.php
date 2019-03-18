@@ -21,12 +21,23 @@ class ResourcesCache
     /** @var CacheProvider */
     private $cache;
 
+    /** @var ConfigCacheStateRegistry|null */
+    private $configCacheStateRegistry;
+
     /**
      * @param CacheProvider $cache
      */
     public function __construct(CacheProvider $cache)
     {
         $this->cache = $cache;
+    }
+
+    /**
+     * @param ConfigCacheStateRegistry $configCacheStateRegistry
+     */
+    public function setConfigCacheStateRegistry(ConfigCacheStateRegistry $configCacheStateRegistry): void
+    {
+        $this->configCacheStateRegistry = $configCacheStateRegistry;
     }
 
     /**
@@ -39,9 +50,7 @@ class ResourcesCache
      */
     public function getAccessibleResources(string $version, RequestType $requestType): ?array
     {
-        $resources = $this->cache->fetch(
-            self::ACCESSIBLE_RESOURCES_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType)
-        );
+        $resources = $this->fetch($version, $requestType, self::ACCESSIBLE_RESOURCES_KEY_PREFIX);
 
         if (false === $resources) {
             return null;
@@ -60,9 +69,7 @@ class ResourcesCache
      */
     public function getExcludedActions(string $version, RequestType $requestType): ?array
     {
-        $excludedActions = $this->cache->fetch(
-            self::EXCLUDED_ACTIONS_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType)
-        );
+        $excludedActions = $this->fetch($version, $requestType, self::EXCLUDED_ACTIONS_KEY_PREFIX);
 
         if (false === $excludedActions) {
             return null;
@@ -81,9 +88,7 @@ class ResourcesCache
      */
     public function getResources(string $version, RequestType $requestType): ?array
     {
-        $resources = $this->cache->fetch(
-            self::RESOURCES_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType)
-        );
+        $resources = $this->fetch($version, $requestType, self::RESOURCES_KEY_PREFIX);
 
         if (false === $resources) {
             return null;
@@ -111,9 +116,7 @@ class ResourcesCache
         string $version,
         RequestType $requestType
     ): ?ApiResourceSubresources {
-        $cachedData = $this->cache->fetch(
-            self::SUBRESOURCE_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType) . $entityClass
-        );
+        $cachedData = $this->fetch($version, $requestType, self::SUBRESOURCE_KEY_PREFIX . $entityClass);
 
         if (false === $cachedData) {
             return null;
@@ -132,9 +135,7 @@ class ResourcesCache
      */
     public function getResourcesWithoutIdentifier(string $version, RequestType $requestType): ?array
     {
-        $resources = $this->cache->fetch(
-            self::RESOURCES_WITHOUT_ID_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType)
-        );
+        $resources = $this->fetch($version, $requestType, self::RESOURCES_WITHOUT_ID_KEY_PREFIX);
 
         if (false === $resources) {
             return null;
@@ -165,10 +166,9 @@ class ResourcesCache
             $allResources[$entityClass] = $this->serializeApiResource($resource);
         }
 
-        $keyIndex = $this->getCacheKeyIndex($version, $requestType);
-        $this->cache->save(self::RESOURCES_KEY_PREFIX . $keyIndex, $allResources);
-        $this->cache->save(self::ACCESSIBLE_RESOURCES_KEY_PREFIX . $keyIndex, $accessibleResources);
-        $this->cache->save(self::EXCLUDED_ACTIONS_KEY_PREFIX . $keyIndex, $excludedActions);
+        $this->save($version, $requestType, self::RESOURCES_KEY_PREFIX, $allResources);
+        $this->save($version, $requestType, self::ACCESSIBLE_RESOURCES_KEY_PREFIX, $accessibleResources);
+        $this->save($version, $requestType, self::EXCLUDED_ACTIONS_KEY_PREFIX, $excludedActions);
     }
 
     /**
@@ -183,10 +183,7 @@ class ResourcesCache
         RequestType $requestType,
         array $resourcesWithoutId
     ): void {
-        $this->cache->save(
-            self::RESOURCES_WITHOUT_ID_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType),
-            $resourcesWithoutId
-        );
+        $this->save($version, $requestType, self::RESOURCES_WITHOUT_ID_KEY_PREFIX, $resourcesWithoutId);
     }
 
     /**
@@ -198,10 +195,11 @@ class ResourcesCache
      */
     public function saveSubresources(string $version, RequestType $requestType, array $subresources): void
     {
-        $keyIndex = self::SUBRESOURCE_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType);
         foreach ($subresources as $entitySubresources) {
-            $this->cache->save(
-                $keyIndex . $entitySubresources->getEntityClass(),
+            $this->save(
+                $version,
+                $requestType,
+                self::SUBRESOURCE_KEY_PREFIX . $entitySubresources->getEntityClass(),
                 $this->serializeApiResourceSubresources($entitySubresources)
             );
         }
@@ -218,12 +216,13 @@ class ResourcesCache
     /**
      * @param string      $version
      * @param RequestType $requestType
+     * @param string      $id
      *
      * @return string
      */
-    private function getCacheKeyIndex(string $version, RequestType $requestType): string
+    private function getCacheKey(string $version, RequestType $requestType, string $id): string
     {
-        return $version . (string)$requestType;
+        return $id . $version . (string)$requestType;
     }
 
     /**
@@ -295,5 +294,47 @@ class ResourcesCache
         return [
             $serializedSubresources
         ];
+    }
+
+    /**
+     * Fetches an entry from the cache.
+     *
+     * @param string      $version     The Data API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
+     * @param string      $id          The ID of the cache entry
+     *
+     * @return mixed The cached data or FALSE, if no cache entry exists for the given ID.
+     */
+    private function fetch(string $version, RequestType $requestType, string $id)
+    {
+        $data = false;
+        $cachedData = $this->cache->fetch($this->getCacheKey($version, $requestType, $id));
+        if (false !== $cachedData) {
+            list($timestamp, $value) = $cachedData;
+            if (null === $this->configCacheStateRegistry
+                || $this->configCacheStateRegistry->getConfigCacheState($requestType)->isCacheFresh($timestamp)
+            ) {
+                $data = $value;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Puts data into the cache.
+     * If a cache entry with the given ID already exists, its data will be replaced.
+     *
+     * @param string      $version     The Data API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
+     * @param string      $id          The ID of the cache entry
+     * @param mixed       $data        The data to be saved
+     */
+    private function save(string $version, RequestType $requestType, string $id, $data): void
+    {
+        $timestamp = null === $this->configCacheStateRegistry
+            ? null
+            : $this->configCacheStateRegistry->getConfigCacheState($requestType)->getCacheTimestamp();
+        $this->cache->save($this->getCacheKey($version, $requestType, $id), [$timestamp, $data]);
     }
 }
