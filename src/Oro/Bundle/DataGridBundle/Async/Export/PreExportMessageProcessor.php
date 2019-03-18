@@ -16,6 +16,9 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Responsible for formatting body for export
+ */
 class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
 {
     /**
@@ -121,6 +124,11 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
             ],
             'exportType' => ProcessorRegistry::TYPE_EXPORT,
         ], $body);
+
+        $body['entity'] = $this->exportHandler->getEntityName(
+            $this->exportIdFetcher,
+            $body['parameters']
+        );
 
         if (! isset($body['parameters']['gridName'], $body['format'])) {
             $this->logger->critical('Got invalid message');

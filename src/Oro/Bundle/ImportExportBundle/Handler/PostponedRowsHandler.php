@@ -133,7 +133,7 @@ class PostponedRowsHandler
                 $message = new Message();
                 $message->setDelay(static::DELAY_SECONDS);
                 $message->setBody($body);
-                $this->messageProducer->send(Topics::HTTP_IMPORT, $message);
+                $this->messageProducer->send(Topics::IMPORT, $message);
             }
         );
     }

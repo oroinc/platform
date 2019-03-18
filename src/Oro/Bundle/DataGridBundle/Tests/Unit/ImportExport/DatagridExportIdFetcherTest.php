@@ -185,6 +185,54 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    public function testGetGridRootEntity()
+    {
+        $gridConfig = $this->createDataGridConfigurationMock();
+        $qb = $this->createQueryBuilderMock();
+        $qb
+            ->expects($this->any())
+            ->method('getRootEntities')
+            ->willReturn(['RootEntity']);
+        $dataSource = $this->createMock(OrmDatasource::class);
+        $dataSource
+            ->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($qb);
+        $grid = $this->createDatagridMock($gridConfig, $dataSource);
+        $grid
+            ->expects($this->once())
+            ->method('getAcceptedDatasource')
+            ->willReturn($dataSource);
+
+        $context = $this->createContextMock();
+        $context
+            ->expects($this->at(0))
+            ->method('hasOption')
+            ->with('gridName')
+            ->willReturn(true);
+
+        $manager = $this->createManagerMock();
+        $manager
+            ->expects($this->once())
+            ->method('getDatagrid')
+            ->willReturn($grid);
+
+        $gridManagerLink = $this->createGridManagerLinkMock();
+        $gridManagerLink
+            ->expects($this->once())
+            ->method('getService')
+            ->willReturn($manager);
+
+        $eventDispatcher = $this->createEventDispatcherMock();
+        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher);
+        $fetcher->setImportExportContext($context);
+
+        $this->assertEquals('RootEntity', $fetcher->getGridRootEntity());
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testShouldNotAddRequiredParametersToQuery()
     {
         $gridConfig = $this->createDatagridConfigurationMock();
