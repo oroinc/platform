@@ -15,6 +15,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Sets organization for entity if such field exists
+ */
 class OrganizationFormExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
@@ -51,6 +54,8 @@ class OrganizationFormExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        //PRE_SUBMIT needed to set correct organization before other form extensions executes their logic
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPostSubmit'], 128);
         // listener must be executed before validation
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'onPostSubmit'], 128);
     }
