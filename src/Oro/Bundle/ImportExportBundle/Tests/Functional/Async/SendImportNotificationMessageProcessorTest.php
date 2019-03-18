@@ -199,17 +199,17 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
     ) {
         $rootJob = $this->getJobProcessor()->findOrCreateRootJob(
             'test_import_message',
-            'oro:import:http:oro_test.add_or_replace:test_import_message'
+            'oro:import:oro_test.add_or_replace:test_import_message'
         );
         $childJob1 = $this->getJobProcessor()->findOrCreateChildJob(
-            'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.1',
+            'oro:import:oro_test.add_or_replace:test_import_message:chunk.1',
             $rootJob
         );
         $childJob1->setData($resultOfImportJob1);
         $this->getJobStorage()->saveJob($childJob1);
 
         $childJob2 = $this->getJobProcessor()->findOrCreateChildJob(
-            'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.2',
+            'oro:import:oro_test.add_or_replace:test_import_message:chunk.2',
             $rootJob
         );
 

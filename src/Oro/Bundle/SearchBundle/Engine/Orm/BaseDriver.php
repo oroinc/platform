@@ -634,10 +634,13 @@ abstract class BaseDriver implements DBALPersisterInterface
                 ->orderBy('orderTable.value', QueryBuilderUtil::getSortOrder($direction))
                 ->setParameter('orderField', $fieldName);
             $qb->addSelect('orderTable.value');
-        } else {
-            $qb->orderBy('search.weight', Criteria::DESC)
-                ->addOrderBy('search.id', Criteria::DESC);
         }
+
+        if (!$qb->getDQLPart('orderBy')) {
+            $qb->orderBy('search.weight', Criteria::DESC);
+        }
+
+        $qb->addOrderBy('search.id', Criteria::DESC);
     }
 
     /**

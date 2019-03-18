@@ -43,10 +43,10 @@ class ExportMessageProcessorTest extends WebTestCase
 
         $rootJob = $this->getJobProcessor()->findOrCreateRootJob(
             'test_import_message',
-            'oro:import:http:oro_test.add_or_replace:test_import_message'
+            'oro:import:oro_test.add_or_replace:test_import_message'
         );
         $childJob = $this->getJobProcessor()->findOrCreateChildJob(
-            'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.1',
+            'oro:import:oro_test.add_or_replace:test_import_message:chunk.1',
             $rootJob
         );
 
