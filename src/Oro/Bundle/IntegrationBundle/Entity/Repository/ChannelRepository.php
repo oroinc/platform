@@ -73,7 +73,7 @@ class ChannelRepository extends EntityRepository
         if ($code) {
             $queryBuilder->andWhere('status.code = :code')
                 ->setParameter('code', (string)$code);
-        };
+        }
 
         return $queryBuilder;
     }
