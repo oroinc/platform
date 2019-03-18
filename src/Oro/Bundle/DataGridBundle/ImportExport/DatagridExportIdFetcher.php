@@ -13,6 +13,9 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Responsible for finding entities for export
+ */
 class DatagridExportIdFetcher implements ContextAwareInterface
 {
     /**
@@ -65,6 +68,17 @@ class DatagridExportIdFetcher implements ContextAwareInterface
                 'Configuration of datagrid export reader must contain "gridName".'
             );
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getGridRootEntity(): string
+    {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $this->grid->getAcceptedDatasource()->getQueryBuilder();
+
+        return $queryBuilder->getRootEntities()[0];
     }
 
     /**

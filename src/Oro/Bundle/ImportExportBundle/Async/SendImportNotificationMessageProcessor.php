@@ -89,9 +89,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     {
         $body = JSON::decode($message->getBody());
 
-        if (! isset($body['rootImportJobId'], $body['process']) &&
-            ! (isset($body['userId']) || isset($body['notifyEmail']))
-        ) {
+        if (! isset($body['rootImportJobId'], $body['process'], $body['userId'])) {
             $this->logger->critical('Invalid message');
 
             return self::REJECT;
@@ -103,21 +101,15 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
             return self::REJECT;
         }
 
-        $this->recipientUserId = null;
-        if (! isset($body['notifyEmail']) || ! $body['notifyEmail']) {
-            $user = $this->doctrine->getRepository(User::class)->find($body['userId']);
-            if (! $user instanceof User) {
-                $this->logger->error(
-                    sprintf('User not found. Id: %s', $body['userId'])
-                );
+        $user = $this->doctrine->getRepository(User::class)->find($body['userId']);
+        if (! $user instanceof User) {
+            $this->logger->error(
+                sprintf('User not found. Id: %s', $body['userId'])
+            );
 
-                return self::REJECT;
-            }
-            $this->recipientUserId = $user->getId();
-            $notifyEmail = $user->getEmail();
-        } else {
-            $notifyEmail = $body['notifyEmail'];
+            return self::REJECT;
         }
+        $this->recipientUserId = $user->getId();
 
         switch ($body['process']) {
             case ProcessorRegistry::TYPE_IMPORT_VALIDATION:
@@ -136,7 +128,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
         $data = $this->importJobSummaryResultService
             ->getSummaryResultForNotification($job, $body['originFileName']);
 
-        $this->sendNotification($notifyEmail, $template, $data);
+        $this->sendNotification($user->getEmail(), $template, $data);
 
         return self::ACK;
     }

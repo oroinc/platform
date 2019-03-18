@@ -2,11 +2,26 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
-## 3.2.0-beta
+## 4.0.0-beta
 
 ### Changed
 #### UserBundle
 * API processor `oro_user.api.create.save_entity` was renamed to `oro_user.api.create.save_user`.
+
+#### ImportExportBundle
+* Introduced concept of import/export owner. Applied approach with role-based owner-based permissions to the export and import functionality.
+* Option `--email` has become required for `oro:import:file` command.
+* Removed Message Queue Topics and related Processors. All messages with this topics will be rejected:
+    * `oro.importexport.send_import_error_notification`
+    * `oro.importexport.import_http_preparing`
+    * `oro.importexport.import_http_validation_preparing`
+    * `oro.importexport.pre_cli_import`, should be used `oro.importexport.pre_import` instead.
+    * `oro.importexport.cli_import` , should be used `oro.importexport.import` instead.
+    
+### Deprecated
+#### ImportExportBundle
+* Message Queue Topic `oro.importexport.pre_http_import` is deprecated in favor of `oro.importexport.pre_import`.
+* Message Queue Topic `oro.importexport.http_import` is deprecated in favor of `oro.importexport.import`.
 
 ### Removed
 #### EmbeddedFormBundle

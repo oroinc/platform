@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async\Import;
 
-use Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor;
+use Oro\Bundle\ImportExportBundle\Async\Import\PreImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -10,7 +10,7 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
-class PreHttpImportMessageProcessorTest extends WebTestCase
+class PreImportMessageProcessorTest extends WebTestCase
 {
     use MessageQueueExtension;
 
@@ -29,7 +29,7 @@ class PreHttpImportMessageProcessorTest extends WebTestCase
     {
         $instance = $this->getPreparingHttpImportMessageProcessor();
 
-        $this->assertInstanceOf(PreHttpImportMessageProcessor::class, $instance);
+        $this->assertInstanceOf(PreImportMessageProcessor::class, $instance);
         $this->assertInstanceOf(MessageProcessorInterface::class, $instance);
     }
 
@@ -38,7 +38,9 @@ class PreHttpImportMessageProcessorTest extends WebTestCase
         $messageData = [
             'filePath' => $this->fixturePath . 'import.csv',
             'originFileName' => 'test_import.csv',
+            'fileName' => 'import.csv',
             'userId' => '1',
+            'process' => 'import',
             'jobName' => 'entity_import_from_csv',
             'processorAlias' => 'oro_test.add_or_replace',
             'options' => [],
@@ -59,7 +61,7 @@ class PreHttpImportMessageProcessorTest extends WebTestCase
             $rootJob
         );
         $this->assertMessageSent(
-            Topics::IMPORT_HTTP,
+            Topics::IMPORT,
             array_merge($messageData, ['jobId' => $childJob->getId()])
         );
 
