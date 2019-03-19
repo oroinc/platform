@@ -26,6 +26,9 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Contains methods handling email recipients
+ */
 class EmailRecipientsHelper
 {
     const ORGANIZATION_PROPERTY = 'organization';
@@ -314,6 +317,71 @@ class EmailRecipientsHelper
     }
 
     /**
+     * Prepares base64 encoded emails to be used as ids in recipients form for select2 component.
+     *
+     * @param  array|string $ids
+     *
+     * @return string;
+     */
+    public static function prepareFormRecipientIds($ids)
+    {
+        if (is_string($ids)) {
+            return base64_encode($ids);
+        }
+
+        $ids = array_map("base64_encode", $ids);
+
+        return implode(self::EMAIL_IDS_SEPARATOR, $ids);
+    }
+
+    /**
+     * Extracts base64 encoded selected email values, that are used as ids in recipients form for select2 component.
+     *
+     * @param  array|string $value
+     *
+     * @return array;
+     */
+    public static function extractFormRecipientIds($value)
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        /*
+         * str_getcsv is used to cover the case if emails are pasted directly with ";" separator
+         * and it protects from ";" used  in full email address. (example: "Recipient Name; Name2" <myemail@domain.com>)
+         */
+        $idsEncoded = str_getcsv($value, self::EMAIL_IDS_SEPARATOR);
+        $idsDecoded = array_map(function ($idEncoded) {
+            return base64_decode($idEncoded, true) ? : $idEncoded;
+        }, $idsEncoded);
+
+        return $idsDecoded;
+    }
+
+    /**
+     * @param array $emails
+     * @param object $object
+     *
+     * @return Recipient[]
+     */
+    public function createRecipientsFromEmails(array $emails, $object)
+    {
+        $objectClass = ClassUtils::getClass($object);
+        $em = $this->registry->getManagerForClass($objectClass);
+        $objectMetadata = $em->getClassMetadata($objectClass);
+
+        $recipientEntity = $this->createRecipientEntity($object, $objectMetadata);
+
+        $recipients = [];
+        foreach ($emails as $email => $name) {
+            $recipient = new Recipient($email, $name, $recipientEntity);
+            $recipients[$recipient->getIdentifier()] = $recipient;
+        }
+
+        return $recipients;
+    }
+
+    /**
      * @param QueryBuilder $qb
      * @param EmailRecipientsProviderArgs $args
      *
@@ -348,6 +416,7 @@ class EmailRecipientsHelper
 
     /**
      * @param string $className
+     *
      * @return null|string
      */
     protected function getClassLabel($className)
@@ -371,45 +440,5 @@ class EmailRecipientsHelper
         }
 
         return $this->propertyAccessor;
-    }
-
-    /**
-     * Prepares base64 encoded emails to be used as ids in recipients form for select2 component.
-     *
-     * @param  array|string $ids
-     * @return string;
-     */
-    public static function prepareFormRecipientIds($ids)
-    {
-        if (is_string($ids)) {
-            return base64_encode($ids);
-        }
-
-        $ids = array_map("base64_encode", $ids);
-
-        return implode(self::EMAIL_IDS_SEPARATOR, $ids);
-    }
-
-    /**
-     * Extracts base64 encoded selected email values, that are used as ids in recipients form for select2 component.
-     *
-     * @param  array|string $value
-     * @return array;
-     */
-    public static function extractFormRecipientIds($value)
-    {
-        if (is_array($value)) {
-            return $value;
-        }
-        /*
-         * str_getcsv is used to cover the case if emails are pasted directly with ";" separator
-         * and it protects from ";" used  in full email address. (example: "Recipient Name; Name2" <myemail@domain.com>)
-         */
-        $idsEncoded = str_getcsv($value, self::EMAIL_IDS_SEPARATOR);
-        $idsDecoded = array_map(function ($idEncoded) {
-            return base64_decode($idEncoded, true) ? : $idEncoded;
-        }, $idsEncoded);
-
-        return $idsDecoded;
     }
 }
