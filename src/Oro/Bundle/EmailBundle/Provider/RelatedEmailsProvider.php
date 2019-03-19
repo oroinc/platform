@@ -109,11 +109,11 @@ class RelatedEmailsProvider
 
         $relations = $this->entityFieldProvider->getRelations($className);
 
-        foreach ($relations as $relation) {
-            if (is_a($relation['related_entity_name'], EmailInterface::class, true)) {
-                $attributes[] = new EmailAttribute($relation['name'], true);
-            } else {
-                if ($depth > 1) {
+        if ($depth > 1) {
+            foreach ($relations as $relation) {
+                if (is_a($relation['related_entity_name'], EmailInterface::class, true)) {
+                    $attributes[] = new EmailAttribute($relation['name'], true);
+                } else {
                     $assocObject = $this->getPropertyAccessor()->getValue($object, $relation['name']);
                     if (!$assocObject instanceof \Traversable && !is_array($assocObject)) {
                         if ($assocObject) {
