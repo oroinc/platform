@@ -121,11 +121,13 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetMetaData()
     {
-        $this->acceptor->expects($this->once())->method('acceptMetadata')
+        $this->acceptor->expects($this->once())
+            ->method('acceptMetadata')
             ->with($this->isInstanceOf(MetadataObject::class));
 
-        $result = $this->grid->getMetadata();
-        $this->assertInstanceOf(MetadataObject::class, $result);
+        // Check that metadata initialized only once on repeatable calls
+        $this->grid->getMetadata();
+        $this->assertInstanceOf(MetadataObject::class, $this->grid->getMetadata());
     }
 
     public function testGetParameters()
