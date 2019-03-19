@@ -12,7 +12,6 @@
   },
   "devDependencies": {
     "autoprefixer": "^9.1.5",
-    "cache-loader": "^2.0.1",
     "css-loader": "^1.0.0",
     "deepmerge": "^2.1.1",
     "eslint": "^4.19.1",
@@ -22,7 +21,6 @@
     "file-loader": "^2.0.0",
     "file-system": "^2.2.2",
     "font-awesome": "^4.7.0",
-    "homedir": "^0.6.0",
     "jasmine-core": "2.8.0",
     "js-yaml": "^3.12.0",
     "karma": "3.1.4",
