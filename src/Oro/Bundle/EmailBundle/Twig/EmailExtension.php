@@ -10,6 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\Repository\EmailAttachmentRepository;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
+use Oro\Bundle\EmailBundle\Model\EmailHolderNameInterface;
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
@@ -117,6 +118,7 @@ class EmailExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction('oro_get_email', [$this, 'getEmail']),
+            new \Twig_SimpleFunction('oro_get_full_name_email', [$this, 'getFullNameEmail']),
             new \Twig_SimpleFunction('oro_get_email_address_name', [$this, 'getEmailAddressName']),
             new \Twig_SimpleFunction('oro_get_email_address', [$this, 'getEmailAddress']),
             new \Twig_SimpleFunction('oro_get_email_thread_attachments', [$this, 'getEmailThreadAttachments']),
@@ -143,6 +145,28 @@ class EmailExtension extends \Twig_Extension
         }
 
         return $result ?: '';
+    }
+
+    /**
+     * Gets the email address with full name of the given object
+     * If the name is not available, it defaults to $this->>getEmail()
+     *
+     * @param object $object
+     * @return string Full name and email address
+     * "Amanda Cole" <AmandaRCole@example.org>
+     */
+    public function getFullNameEmail($object)
+    {
+        if (!is_a($object, EmailHolderNameInterface::class)) {
+            return $this->getEmail($object);
+        }
+
+        $email = $this->getEmail($object);
+
+        /** @var EmailHolderNameInterface $object */
+        $name = $object->getEmailHolderName();
+
+        return $this->getEmailAddressHelper()->buildFullEmailAddress($email, $name);
     }
 
     /**
