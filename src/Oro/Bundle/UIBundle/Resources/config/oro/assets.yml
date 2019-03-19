@@ -14,7 +14,6 @@ css:
         - 'bundles/oroui/lib/minicolors/jquery.minicolors.css'
         - 'bundles/bowerassets/lightgallery/dist/css/lg-transitions.css'
         - 'bundles/bowerassets/lightgallery/dist/css/lightgallery.css'
-        - 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css'
         - 'bundles/npmassets/overlayscrollbars/css/OverlayScrollbars.css'
         - 'bundles/bowerassets/jquery-ui-multiselect-widget/jquery.multiselect.css'
         - 'bundles/bowerassets/jquery-ui-multiselect-widget/jquery.multiselect.filter.css'
@@ -23,7 +22,6 @@ css:
         - 'bundles/oroui/css/jquery-ui.grid.css'
         - 'bundles/oroui/css/jquery-ui.custom.css'
         - 'bundles/oroui/css/lightgallery/lightgallery.scss'
-        - 'bundles/oroui/css/mcustomscrollbar/jquery.mCustomScrollbar-custome.css'
 
         # custom styles
         - 'bundles/oroui/css/scss/main.scss'

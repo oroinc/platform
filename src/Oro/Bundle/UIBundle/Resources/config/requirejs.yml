@@ -141,7 +141,6 @@ config:
         'jquery.simplecolorpicker': 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.js'
         'jquery.minicolors': 'bundles/oroui/lib/minicolors/jquery.minicolors.js'
         'jquery.cookie': 'bundles/bowerassets/jquery-cookie/jquery.cookie.js'
-        'jquery.mCustomScrollbar': 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js'
         'overlayScrollbars': 'bundles/npmassets/overlayscrollbars/js/OverlayScrollbars.js'
         'styled-scroll-bar': 'bundles/oroui/js/app/plugins/styled-scroll-bar.js'
         'jquery.jstree': 'bundles/components/jstree/dist/jstree.js'

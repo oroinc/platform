@@ -102,7 +102,7 @@ define(function(require) {
                     Math.abs(this.touchEndCoords.y) <= this.maxDistanceYAxis
                 ) {
                     this.direction = this._getDirection(this.touchEndCoords.x);
-                    mediator.trigger('swipe-action-' + this.direction, this.touchEndCoords, event.target);
+                    mediator.trigger('swipe-action-' + this.direction, this.touchEndCoords, event.target, event);
                 }
             }
 

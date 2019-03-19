@@ -95,12 +95,16 @@ define(function(require) {
             return tools.unpackFromQueryString(location.search).sidebar || 'on';
         },
 
-        minimize: function() {
-            this._toggle('off');
+        minimize: function(coords, eventTarget, event) {
+            if (!event || event.pageX <= this.$(this.sidebar).width()) {
+                this._toggle('off');
+            }
         },
 
-        maximize: function() {
-            this._toggle('on');
+        maximize: function(coords, eventTarget, event) {
+            if (!event || event.pageX <= this.$(this.sidebar).width()) {
+                this._toggle('on');
+            }
         },
 
         _create: function() {
