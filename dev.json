@@ -81,7 +81,6 @@
         "bower-asset/jquery-mousewheel": "3.1.13",
         "bower-asset/jquery.numeric": "1.5.0",
         "npm-asset/jquery.uniform": "4.2.0",
-        "bower-asset/malihu-custom-scrollbar-plugin": "3.1.5",
         "npm-asset/overlayscrollbars": "1.6.*",
         "bower-asset/timepicker": "1.11.*",
         "bower-asset/datepair": "0.4.*",
@@ -141,7 +140,7 @@
         },
         "asset-packagist": {
             "type": "composer",
-            "url": "https://asset-packagist.org"
+            "url": "https://asset-packagist.orocrm.com"
         }
     },
     "minimum-stability": "dev",
