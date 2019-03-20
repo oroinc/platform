@@ -7,6 +7,8 @@ use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -73,6 +75,8 @@ class IntegrationController extends Controller
     /**
      * @Route("/schedule/{id}", requirements={"id"="\d+"}, name="oro_integration_schedule")
      * @AclAncestor("oro_integration_update")
+     * @Method({"POST"})
+     * @CsrfProtection()
      */
     public function scheduleAction(Integration $integration, Request $request)
     {

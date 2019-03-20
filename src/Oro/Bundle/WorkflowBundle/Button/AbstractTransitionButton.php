@@ -7,6 +7,9 @@ use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
+/**
+ * Abstract class for workflow transition buttons config.
+ */
 abstract class AbstractTransitionButton implements ButtonInterface
 {
     const DEFAULT_TEMPLATE = 'OroWorkflowBundle::Button\transitionButton.html.twig';
@@ -105,11 +108,12 @@ abstract class AbstractTransitionButton implements ButtonInterface
                     'originalUrl' => $showDialog ? null : $this->buttonContext->getOriginalUrl(),
                 ],
                 'executionRoute' => $this->buttonContext->getExecutionRoute(),
+                'requestMethod' => 'POST',
                 'dialogRoute' => $showDialog
                     ? $this->buttonContext->getFormDialogRoute()
                     : $this->buttonContext->getFormPageRoute(),
                 'additionalData' => $this->getDatagridData(),
-                'jsDialogWidget' => static::TRANSITION_JS_DIALOG_WIDGET,
+                'jsDialogWidget' => static::TRANSITION_JS_DIALOG_WIDGET
             ],
             $customData
         );

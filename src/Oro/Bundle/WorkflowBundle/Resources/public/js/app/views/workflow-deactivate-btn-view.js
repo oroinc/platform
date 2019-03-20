@@ -64,7 +64,7 @@ define(function(require) {
         onClick: function(e) {
             e.preventDefault();
             var el = this.$el.find(this.options.selectors.button);
-            deactivationHandler.call(el, el.prop('href'), el.data('label'));
+            deactivationHandler.call(el, el.attr('href'), el.data('label'));
         },
 
         dispose: function() {

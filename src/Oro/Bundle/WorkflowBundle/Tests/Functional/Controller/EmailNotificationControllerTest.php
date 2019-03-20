@@ -26,7 +26,7 @@ class EmailNotificationControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient([], array_merge($this->generateBasicAuthHeader(), ['HTTP_X-CSRF-Header' => 1]));
+        $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
         $this->doctrine = $this->getContainer()->get('doctrine');
         $this->loadFixtures([LoadWorkflowDefinitions::class, LoadWorkflowEmailTemplates::class]);
@@ -83,7 +83,7 @@ class EmailNotificationControllerTest extends WebTestCase
      */
     public function testDelete($id)
     {
-        $this->client->request(
+        $this->ajaxRequest(
             'DELETE',
             $this->getUrl('oro_api_delete_emailnotication', ['id' => $id])
         );

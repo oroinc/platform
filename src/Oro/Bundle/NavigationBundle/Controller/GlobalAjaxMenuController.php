@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * Ajax Global Menu Controller
  * @Route("/menu/global")
+ * @CsrfProtection()
  */
 class GlobalAjaxMenuController extends AbstractAjaxMenuController
 {

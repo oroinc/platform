@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional;
 
+use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailControllerTest extends WebTestCase
@@ -10,7 +11,7 @@ class EmailControllerTest extends WebTestCase
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
-        $this->loadFixtures(['Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData']);
+        $this->loadFixtures([LoadEmailData::class]);
     }
 
     public function testView()
@@ -150,8 +151,9 @@ class EmailControllerTest extends WebTestCase
     public function testEmailToggleSeen()
     {
         $url = $this->getUrl('oro_email_toggle_seen', ['id' => $this->getReference('emailUser_1')->getId()]);
-        $this->client->request('GET', $url);
+        $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
         $data = json_decode($result->getContent(), true);
         $this->assertTrue($data['successful']);
     }
@@ -161,13 +163,13 @@ class EmailControllerTest extends WebTestCase
         $emailId = $this->getReference('emailUser_1')->getEmail()->getId();
 
         $url = $this->getUrl('oro_email_mark_seen', ['id' => $emailId, 'status' => 1]);
-        $this->client->request('GET', $url);
+        $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
         $data = json_decode($result->getContent(), true);
         $this->assertTrue($data['successful']);
 
         $url = $this->getUrl('oro_email_mark_seen', ['id' => $emailId, 'status' => 0, 'checkThread' => 0]);
-        $this->client->request('GET', $url);
+        $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
         $data = json_decode($result->getContent(), true);
         $this->assertTrue($data['successful']);
@@ -176,7 +178,7 @@ class EmailControllerTest extends WebTestCase
     public function testMarkAllEmailsAsSeen()
     {
         $url = $this->getUrl('oro_email_mark_all_as_seen');
-        $this->client->request('GET', $url);
+        $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
         $data = json_decode($result->getContent(), true);
         $this->assertTrue($data['successful']);
@@ -194,8 +196,9 @@ class EmailControllerTest extends WebTestCase
                 'values' => $this->getReference('emailUser_for_mass_mark_test')->getId()
             ]
         );
-        $this->client->request('POST', $url);
+        $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
         $data = json_decode($result->getContent(), true);
         $this->assertTrue($data['successful'] === true);
         $this->assertTrue($data['count'] === 1);
@@ -213,8 +216,9 @@ class EmailControllerTest extends WebTestCase
                 'values' => $this->getReference('emailUser_for_mass_mark_test')->getId()
             ]
         );
-        $this->client->request('POST', $url);
+        $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
         $data = json_decode($result->getContent(), true);
         $this->assertTrue($data['successful'] === true);
         $this->assertTrue($data['count'] === 1);

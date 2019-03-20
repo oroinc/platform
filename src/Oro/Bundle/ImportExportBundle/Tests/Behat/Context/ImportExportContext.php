@@ -10,10 +10,8 @@ use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
 use Gaufrette\File;
-use Guzzle\Http\Client;
-use Guzzle\Plugin\Cookie\Cookie;
-use Guzzle\Plugin\Cookie\CookieJar\ArrayCookieJar;
-use Guzzle\Plugin\Cookie\CookiePlugin;
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -180,10 +178,12 @@ class ImportExportContext extends OroFeatureContext implements
         );
 
         $cookieJar = $this->getCookieJar($this->getSession());
-        $client = new Client($this->getSession()->getCurrentUrl());
-        $client->addSubscriber(new CookiePlugin($cookieJar));
-        $request = $client->get($url, null, ['save_to' => $this->template]);
-        $response = $request->send();
+        $client = new Client([
+            'allow_redirects' => true,
+            'cookies' => $cookieJar,
+            'save_to' => $this->template
+        ]);
+        $response = $client->get($url);
 
         self::assertEquals(200, $response->getStatusCode());
     }
@@ -651,16 +651,20 @@ class ImportExportContext extends OroFeatureContext implements
     /**
      * @param Session $session
      *
-     * @return ArrayCookieJar
+     * @return CookieJar
      */
     private function getCookieJar(Session $session)
     {
-        $cookies = $session->getDriver()->getWebDriverSession()->getCookie();
-        $cookieJar = new ArrayCookieJar();
-        foreach ($cookies as $cookie) {
-            $cookieJar->add(new Cookie($cookie));
+        $sessionCookies = $session->getDriver()->getWebDriverSession()->getCookie();
+        $cookies = [];
+        foreach ($sessionCookies as $sessionCookie) {
+            $cookie = [];
+            foreach ($sessionCookie as $key => $value) {
+                $cookie[ucwords($key, '-')] = $value;
+            }
+            $cookies[] = $cookie;
         }
 
-        return $cookieJar;
+        return new CookieJar(false, $cookies);
     }
 }

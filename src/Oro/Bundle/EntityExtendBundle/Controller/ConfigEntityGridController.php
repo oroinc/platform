@@ -11,7 +11,9 @@ use Oro\Bundle\EntityExtendBundle\Form\Type\EntityType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -56,7 +58,7 @@ class ConfigEntityGridController extends Controller
             ]
         );
 
-        if ($request->getMethod() == 'POST') {
+        if ($request->isMethod('POST')) {
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
@@ -87,7 +89,7 @@ class ConfigEntityGridController extends Controller
         /** @var ConfigManager $configManager */
         $configManager = $this->get('oro_entity_config.config_manager');
 
-        if ($request->getMethod() == 'POST') {
+        if ($request->isMethod('POST')) {
             $formData = $request->request->get('oro_entity_config_type');
             if (!$formData || !isset($formData['model']['className'])) {
                 throw new BadRequestHttpException(
@@ -130,7 +132,7 @@ class ConfigEntityGridController extends Controller
             )
         );
 
-        if ($request->getMethod() == 'POST') {
+        if ($request->isMethod('POST')) {
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
@@ -156,6 +158,8 @@ class ConfigEntityGridController extends Controller
      *      requirements={"id"="\d+"},
      *      defaults={"id"=0}
      * )
+     * @Method("DELETE")
+     * @CsrfProtection()
      */
     public function removeAction(EntityConfigModel $entity)
     {
@@ -187,6 +191,8 @@ class ConfigEntityGridController extends Controller
      *      requirements={"id"="\d+"},
      *      defaults={"id"=0}
      * )
+     * @Method("POST")
+     * @CsrfProtection()
      */
     public function unremoveAction(EntityConfigModel $entity)
     {

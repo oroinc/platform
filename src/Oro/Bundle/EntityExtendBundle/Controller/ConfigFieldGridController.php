@@ -7,6 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -96,6 +98,8 @@ class ConfigFieldGridController extends Controller
      *      requirements={"id"="\d+"},
      *      defaults={"id"=0}
      * )
+     * @Method("DELETE")
+     * @CsrfProtection()
      * @param FieldConfigModel $field
      * @return Response
      */
@@ -118,6 +122,8 @@ class ConfigFieldGridController extends Controller
      *      requirements={"id"="\d+"},
      *      defaults={"id"=0}
      * )
+     * @Method("POST")
+     * @CsrfProtection()
      * @param FieldConfigModel $field
      * @return Response
      */

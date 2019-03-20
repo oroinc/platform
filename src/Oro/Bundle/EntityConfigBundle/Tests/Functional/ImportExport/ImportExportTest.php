@@ -144,7 +144,7 @@ class ImportExportTest extends WebTestCase
         $form = $crawler->selectButton('Submit')->form();
         $form['oro_importexport_import[file]']->upload($filePath);
 
-        /** TODO Change after BAP-1813 */
+        /** Change after BAP-1813 */
         $form->getFormNode()->setAttribute(
             'action',
             sprintf(
@@ -170,8 +170,8 @@ class ImportExportTest extends WebTestCase
     protected function doImport($added, $replaced)
     {
         $this->client->followRedirects(false);
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'POST',
             $this->getUrl(
                 'oro_importexport_import_process',
                 [

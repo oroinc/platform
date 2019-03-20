@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -10,7 +11,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * Ajax User Menu Controller
  * @Route("/menu/user")
+ * @CsrfProtection()
  */
 class UserAjaxMenuController extends AbstractAjaxMenuController
 {
