@@ -125,3 +125,8 @@ services:
         public: false
         tags:
             - { name: twig.extension }
+
+    oro_importexport.manager.import_export_result_manager:
+        class: Oro\Bundle\ImportExportBundle\Manager\ImportExportResultManager
+        arguments:
+            - '@doctrine'

@@ -8,8 +8,12 @@ use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
+use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 
-abstract class AbstractImportHandler extends AbstractHandler
+/**
+ * Handles import, checks whatever job was successful otherwise fills appropriate errors array
+ */
+class ImportHandler extends AbstractHandler
 {
     /**
      * @var array
@@ -17,12 +21,20 @@ abstract class AbstractImportHandler extends AbstractHandler
     protected $configurationOptions = [];
 
     /**
+     * @var string
+     */
+    protected $importingFileName;
+
+    /**
      * @param string $process
      * @param string $jobName
      * @param string $processorAlias
      * @param array $options
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws JobRedeliveryException
      */
-    public function handle($process, $jobName, $processorAlias, array $options = [])
+    public function handle(string $process, string $jobName, string $processorAlias, array $options = []): array
     {
         switch ($process) {
             case ProcessorRegistry::TYPE_IMPORT:
@@ -44,7 +56,7 @@ abstract class AbstractImportHandler extends AbstractHandler
      * @param FileStreamWriter $writer
      * @return array
      */
-    public function splitImportFile($jobName, $processorType, FileStreamWriter $writer)
+    public function splitImportFile(string $jobName, string $processorType, FileStreamWriter $writer): array
     {
         $reader = $this->getJobReader($jobName, $processorType);
 
@@ -55,13 +67,8 @@ abstract class AbstractImportHandler extends AbstractHandler
         $this->batchFileManager->setWriter($writer);
         $this->batchFileManager->setConfigurationOptions($this->configurationOptions);
 
-        return $this->batchFileManager->splitFile($this->getImportingFileName());
+        return $this->batchFileManager->splitFile($this->importingFileName);
     }
-
-    /**
-     * @var string
-     */
-    protected $importingFileName;
 
     /**
      * Handles import validation action
@@ -72,33 +79,87 @@ abstract class AbstractImportHandler extends AbstractHandler
      *
      * @return array response parameters
      */
-    abstract public function handleImportValidation(
-        $jobName,
-        $processorAlias,
-        array $options = []
-    );
+    public function handleImportValidation(string $jobName, string $processorAlias, array $options = []): array
+    {
+        $entityName = $this->processorRegistry->getProcessorEntityName(
+            ProcessorRegistry::TYPE_IMPORT_VALIDATION,
+            $processorAlias
+        );
+
+        $jobResult = $this->executeValidation(
+            $jobName,
+            $processorAlias,
+            $options,
+            $entityName
+        );
+
+        $counts = $this->getValidationCounts($jobResult);
+
+        $errors = [];
+        if (!empty($counts['errors'])) {
+            $errors = $this->getErrors($jobResult);
+        }
+
+        return [
+            'success'        => $jobResult->isSuccessful() && isset($counts['process']) && $counts['process'] > 0,
+            'processorAlias' => $processorAlias,
+            'counts'         => $counts,
+            'errors'         => $errors,
+            'entityName'     => $entityName,
+            'options'        => $options
+        ];
+    }
 
     /**
      * Handles import action
      *
      * @param string $jobName
      * @param string $processorAlias
-     * @param array  $options
+     * @param array $options
      *
      * @return array
+     * @throws JobRedeliveryException
      */
-    abstract public function handleImport(
-        $jobName,
-        $processorAlias,
-        array $options = []
-    );
-
-    /**
-     * @return string
-     */
-    protected function getImportingFileName()
+    public function handleImport(string $jobName, string $processorAlias, array $options = []): array
     {
-        return $this->importingFileName;
+        $jobResult = $this->executeJob($jobName, $processorAlias, $options);
+
+        if ($jobResult->needRedelivery()) {
+            throw JobRedeliveryException::create();
+        }
+
+        $counts = $this->getValidationCounts($jobResult);
+        $importInfo = '';
+
+        $errors = [];
+        if (!empty($counts['errors'])) {
+            $errors = $this->getErrors($jobResult);
+        }
+
+        $isSuccessful = $jobResult->isSuccessful() && isset($counts['process']) && $counts['process'] > 0;
+
+        if ($isSuccessful) {
+            $message = $this->translator->trans('oro.importexport.import.success');
+
+            $entityName = $this->processorRegistry->getProcessorEntityName(
+                ProcessorRegistry::TYPE_IMPORT,
+                $processorAlias
+            );
+
+            $importInfo = $this->getImportInfo($counts, $entityName);
+        } else {
+            $message = $this->translator->trans('oro.importexport.import.error');
+        }
+
+        return [
+            'success' => $isSuccessful,
+            'message' => $message,
+            'importInfo' => $importInfo,
+            'errors'  => $errors,
+            'counts'  => $counts,
+            'postponedRows' => $jobResult->getContext()->getPostponedRows(),
+            'deadlockDetected' => $jobResult->getContext()->getValue('deadlockDetected')
+        ];
     }
 
     /**
@@ -124,9 +185,8 @@ abstract class AbstractImportHandler extends AbstractHandler
      *
      * @return JobResult
      */
-    protected function executeJob($jobName, $processorAlias, array $options)
+    private function executeJob($jobName, $processorAlias, array $options)
     {
-        $fileName = $this->getImportingFileName();
         $entityName = $this->processorRegistry->getProcessorEntityName(
             ProcessorRegistry::TYPE_IMPORT,
             $processorAlias
@@ -138,7 +198,7 @@ abstract class AbstractImportHandler extends AbstractHandler
                     [
                         'processorAlias' => $processorAlias,
                         'entityName' => $entityName,
-                        'filePath' => $fileName
+                        'filePath' => $this->importingFileName
                     ],
                     $options
                 )
@@ -157,7 +217,7 @@ abstract class AbstractImportHandler extends AbstractHandler
      * @param JobResult $jobResult
      * @return array
      */
-    protected function getValidationCounts(JobResult $jobResult)
+    private function getValidationCounts(JobResult $jobResult)
     {
         $context = $jobResult->getContext();
 
@@ -189,20 +249,19 @@ abstract class AbstractImportHandler extends AbstractHandler
      * @param $entityName
      * @return JobResult
      */
-    protected function executeValidation(
+    private function executeValidation(
         $jobName,
         $processorAlias,
         array $options,
         $entityName
     ) {
-        $fileName = $this->getImportingFileName();
         $configuration = [
             'import_validation' =>
                 array_merge(
                     [
                         'processorAlias' => $processorAlias,
                         'entityName' => $entityName,
-                        'filePath' => $fileName
+                        'filePath' => $this->importingFileName
                     ],
                     $options
                 )
@@ -225,7 +284,7 @@ abstract class AbstractImportHandler extends AbstractHandler
      * @param string $entityName
      * @return string
      */
-    protected function getImportInfo($counts, $entityName)
+    private function getImportInfo($counts, $entityName)
     {
         $add = 0;
         $update = 0;
@@ -246,5 +305,23 @@ abstract class AbstractImportHandler extends AbstractHandler
         );
 
         return $importInfo;
+    }
+
+    /**
+     * @param JobResult $jobResult
+     * @return array
+     */
+    private function getErrors(JobResult $jobResult)
+    {
+        $context = $jobResult->getContext();
+        $contextErrors = [];
+        if ($context) {
+            $contextErrors = $context->getErrors();
+        }
+        return array_slice(
+            array_merge($jobResult->getFailureExceptions(), $contextErrors),
+            0,
+            100
+        );
     }
 }

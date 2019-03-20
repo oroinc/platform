@@ -6,6 +6,9 @@ use Gaufrette\File;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @dbIsolationPerTest
+ */
 class CleanupStorageCommandTest extends WebTestCase
 {
     /**

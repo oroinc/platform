@@ -384,7 +384,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             return;
         }
 
-        $pattern = sprintf('/<a\s+href\s*=\s*"(.+)">%s<\/a>/', $linkCaption);
+        $pattern = sprintf('/<a\s+href\s*=\s*"([^"]+)".*>%s<\/a>/', $linkCaption);
         $matches = [];
 
         /** @var \Swift_Mime_Message $message */

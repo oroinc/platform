@@ -3,6 +3,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 
 use Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -38,6 +39,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
                 $this->createTokenStorageMock(),
                 $this->createDependentJobMock(),
                 $this->createLoggerMock(),
+                $this->createExportHandlerMock(),
                 100
             ])
             ->setMethods([
@@ -118,6 +120,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
                 $this->createTokenStorageMock(),
                 $this->createDependentJobMock(),
                 $this->createLoggerMock(),
+                $this->createExportHandlerMock(),
                 100
             ])
             ->setMethods([
@@ -204,6 +207,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
                 $tokenStorage,
                 $dependentJob,
                 $this->createLoggerMock(),
+                $this->createExportHandlerMock(),
                 100
             ])
             ->setMethods([
@@ -332,6 +336,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
                 $tokenStorage,
                 $dependentJob,
                 $this->createLoggerMock(),
+                $this->createExportHandlerMock(),
                 100
             ])
             ->setMethods([
@@ -377,7 +382,12 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
      */
     public function testShouldCreateDelayedJobAddDependentJobAndReturnACKOnEmptyExportResult()
     {
-        $messageBody = ['jobName' => 'job_name', 'exportType' => 'export_type', 'outputFormat' => 'output_format'];
+        $messageBody = [
+            'jobName' => 'job_name',
+            'exportType' => 'export_type',
+            'outputFormat' => 'output_format',
+            'entity' => 'Acme'
+        ];
         $jobUniqueName = 'job_unique_name';
         $message = new NullMessage();
         $message->setMessageId(123);
@@ -428,13 +438,19 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $dependentJobContext = $this->createDependentJobContextMock();
         $dependentJobContext
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('addDependentJob')
-            ->with(
-                Topics::POST_EXPORT,
-                $this->callback(function ($message) {
-                    return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
-                })
+            ->withConsecutive(
+                [
+                    Topics::POST_EXPORT,
+                    $this->callback(function ($message) {
+                        return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
+                    }),
+                ],
+                [
+                    Topics::SAVE_IMPORT_EXPORT_RESULT,
+                    ['jobId' => $job->getId(), 'type' => 'export_type', 'entity' => 'Acme']
+                ]
             )
         ;
 
@@ -458,6 +474,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
                 $tokenStorage,
                 $dependentJob,
                 $this->createLoggerMock(),
+                $this->createExportHandlerMock(),
                 100
             ])
             ->setMethods([
@@ -503,7 +520,12 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
      */
     public function testShouldCreateTwoDelayedJobsAddDependentJobAndReturnACKOnTwoExportResultChunks()
     {
-        $messageBody = ['jobName' => 'job_name', 'exportType' => 'export_type', 'outputFormat' => 'output_format'];
+        $messageBody = [
+            'jobName' => 'job_name',
+            'exportType' => 'export_type',
+            'outputFormat' => 'output_format',
+            'entity' => 'Acme'
+        ];
         $jobUniqueName = 'job_unique_name';
         $message = new NullMessage();
         $message->setMessageId(123);
@@ -559,13 +581,19 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $dependentJobContext = $this->createDependentJobContextMock();
         $dependentJobContext
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('addDependentJob')
-            ->with(
-                Topics::POST_EXPORT,
-                $this->callback(function ($message) {
-                    return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
-                })
+            ->withConsecutive(
+                [
+                    Topics::POST_EXPORT,
+                    $this->callback(function ($message) {
+                        return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
+                    })
+                ],
+                [
+                    Topics::SAVE_IMPORT_EXPORT_RESULT,
+                    ['jobId' => $job->getId(), 'type' => 'export_type', 'entity' => 'Acme']
+                ]
             )
         ;
 
@@ -589,6 +617,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
                 $tokenStorage,
                 $dependentJob,
                 $this->createLoggerMock(),
+                $this->createExportHandlerMock(),
                 1
             ])
             ->setMethods([
@@ -596,7 +625,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
                 'getExportingEntityIds',
                 'getDelayedJobCallback',
                 'getMessageBody',
-                'getSubscribedTopics'
+                'getSubscribedTopics',
             ])
             ->getMock()
         ;
@@ -683,6 +712,20 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     private function createLoggerMock()
     {
         return $this->createMock(LoggerInterface::class);
+    }
+
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject|ExportHandler
+     */
+    private function createExportHandlerMock()
+    {
+        $exportHandler = $this->createMock(ExportHandler::class);
+        $exportHandler
+            ->expects($this->any())
+            ->method('getEntityName')
+            ->willReturn('Acme');
+
+        return $exportHandler;
     }
 
     /**
