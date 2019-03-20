@@ -1,5 +1,4 @@
 const path = require('path');
-const homedir = require('homedir');
 const webpackMerge = require('webpack-merge');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
@@ -109,11 +108,6 @@ class ConfigBuilder {
                         {
                             test: /\.s?css$/,
                             use: [{
-                                loader: 'cache-loader',
-                                options: {
-                                    cacheDirectory: path.join(homedir(), '.webpack-cache-loader')
-                                }
-                            }, {
                                 loader: MiniCssExtractPlugin.loader,
                             }, {
                                 loader: 'css-loader',

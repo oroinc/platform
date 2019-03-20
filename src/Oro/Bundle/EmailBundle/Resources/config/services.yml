@@ -59,7 +59,6 @@ parameters:
     oro_email.emailtemplate.variable_provider.system.class: Oro\Bundle\EmailBundle\Provider\SystemVariablesProvider
     oro_email.emailtemplate.variable_provider.user.class: Oro\Bundle\EmailBundle\Provider\LoggedUserVariablesProvider
     oro_email.activity_list.provider.class: Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider
-    oro_email.related_emails.provider.class: Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider
     oro_email.email_recipients.provider.class: Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider
     oro_email.recent_email_recipients.provider.class: Oro\Bundle\EmailBundle\Provider\RecentEmailRecipientsProvider
     oro_email.context_email_recipients.provider.class: Oro\Bundle\EmailBundle\Provider\ContextEmailRecipientsProvider
@@ -807,16 +806,21 @@ services:
            - { name: oro_featuretogle.feature, feature: email }
 
     oro_email.related_emails.provider:
-        class: '%oro_email.related_emails.provider.class%'
+        class: Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider
+        arguments:
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
+            - '@oro_email.provider.email_recipients.helper'
+            - '@oro_entity.entity_field_provider'
+            - '@oro_email.email_attribute.provider'
+
+    oro_email.email_attribute.provider:
+        class: Oro\Bundle\EmailBundle\Provider\EmailAttributeProvider
         arguments:
             - '@doctrine'
             - '@oro_entity_config.config_manager'
-            - '@security.authorization_checker'
-            - '@oro_security.token_accessor'
             - '@oro_locale.formatter.name'
             - '@oro_email.email.address.helper'
-            - '@oro_email.provider.email_recipients.helper'
-            - '@oro_entity.entity_field_provider'
 
     oro_email.related_emails.provider.link:
         tags:
