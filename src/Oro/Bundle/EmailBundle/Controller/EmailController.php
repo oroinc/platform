@@ -22,7 +22,9 @@ use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducer;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -43,6 +45,8 @@ class EmailController extends Controller
 {
     /**
      * @Route("/check-smtp-connection", name="oro_email_check_smtp_connection")
+     * @Method("POST")
+     * @CsrfProtection()
      */
     public function checkSmtpConnectionAction(Request $request)
     {
@@ -56,6 +60,8 @@ class EmailController extends Controller
 
     /**
      * @Route("/purge-emails-attachments", name="oro_email_purge_emails_attachments")
+     * @Method("POST")
+     * @CsrfProtection()
      * @AclAncestor("oro_config_system")
      */
     public function purgeEmailsAttachmentsAction()
@@ -550,6 +556,9 @@ class EmailController extends Controller
      *
      * @Route("/attachment/{id}/link", name="oro_email_attachment_link", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_user_edit")
+     * @Method("POST")
+     * @CsrfProtection()
+     *
      * @param Request $request
      * @param EmailAttachment $emailAttachment
      * @return JsonResponse
@@ -620,6 +629,8 @@ class EmailController extends Controller
     /**
      * @Route("/user-sync-emails", name="oro_email_user_sync_emails")
      * @AclAncestor("oro_email_email_view")
+     * @Method("POST")
+     * @CsrfProtection()
      */
     public function userEmailsSyncAction()
     {
@@ -645,9 +656,10 @@ class EmailController extends Controller
      *
      * @Route("/toggle-seen/{id}", name="oro_email_toggle_seen", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_user_edit")
+     * @Method({"POST"})
+     * @CsrfProtection()
      *
      * @param EmailUser $emailUser
-     *
      * @return JsonResponse
      */
     public function toggleSeenAction(EmailUser $emailUser)
@@ -667,11 +679,12 @@ class EmailController extends Controller
      *      defaults={"checkThread"=true}
      * )
      * @AclAncestor("oro_email_email_user_edit")
+     * @Method("POST")
+     * @CsrfProtection()
      *
      * @param Email $email
      * @param string $status
      * @param bool $checkThread if false it will be applied for single email instead of thread
-     *
      * @return JsonResponse
      */
     public function markSeenAction(Email $email, $status, $checkThread)
@@ -686,6 +699,8 @@ class EmailController extends Controller
      *
      * @Route("/mark_all_as_seen", name="oro_email_mark_all_as_seen")
      * @AclAncestor("oro_email_email_user_edit")
+     * @Method("POST")
+     * @CsrfProtection()
      * @return JsonResponse
      */
     public function markAllEmailsAsSeenAction()
@@ -704,10 +719,11 @@ class EmailController extends Controller
 
     /**
      * @Route("/{gridName}/massAction/{actionName}", name="oro_email_mark_massaction")
+     * @CsrfProtection()
+     *
      * @param Request $request
      * @param string $gridName
      * @param string $actionName
-     *
      * @return JsonResponse
      */
     public function markMassAction(Request $request, $gridName, $actionName)

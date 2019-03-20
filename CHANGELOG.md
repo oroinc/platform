@@ -5,10 +5,71 @@ The current file describes significant changes in the code that may affect the u
 ## 4.0.0-beta
 
 ### Changed
-#### UserBundle
-* API processor `oro_user.api.create.save_entity` was renamed to `oro_user.api.create.save_user`.
+#### EmailBundle
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::checkSmtpConnectionAction` 
+ (`oro_email_check_smtp_connection` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::purgeEmailsAttachmentsAction` 
+ (`oro_email_purge_emails_attachments` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::linkAction` 
+ (`oro_email_attachment_link` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::userEmailsSyncAction` 
+ (`oro_email_user_sync_emails` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::toggleSeenAction` 
+ (`oro_email_toggle_seen` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::markSeenAction` 
+ (`oro_email_mark_seen` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::markAllEmailsAsSeenAction` 
+ (`oro_email_mark_all_as_seen` route)
+ action the request method was changed to POST. 
+
+#### EmbeddedFormBundle
+* In `Oro\Bundle\EmbeddedFormBundle\Controller\EmbeddedFormController::deleteAction` 
+ (`oro_embedded_form_delete` route)
+ action the request method was changed to DELETE. 
+* In `Oro\Bundle\EmbeddedFormBundle\Controller\EmbeddedFormController::defaultDataAction` 
+ (`oro_embedded_form_default_data` route)
+ action the request method was changed to POST. 
+
+#### EntityBundle
+* In `Oro\Bundle\EntityBundle\Controller\EntitiesController::deleteAction` 
+ (`oro_entity_delete` route)
+ action the request method was changed to DELETE. 
+
+#### EntityConfigBundle
+* In `Oro\Bundle\EntityConfigBundle\Controller\AttributeController::removeAction` 
+ (`oro_attribute_remove` route)
+ action the request method was changed to DELETE. 
+* In `Oro\Bundle\EntityConfigBundle\Controller\AttributeController::unremoveAction` 
+ (`oro_attribute_unremove` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\EntityConfigBundle\Controller\AttributeFamilyController::deleteAction` 
+ (`oro_attribute_family_delete` route)
+ action the request method was changed to DELETE. 
+
+#### EntityExtendBundle
+* In `Oro\Bundle\EntityExtendBundle\Controller\ConfigEntityGridController::removeAction` 
+ (`oro_entityextend_entity_remove` route)
+ action the request method was changed to DELETE. 
+* In `Oro\Bundle\EntityExtendBundle\Controller\ConfigEntityGridController::unremoveAction` 
+ (`oro_entityextend_field_unremove` route)
+ action the request method was changed to POST. 
 
 #### ImportExportBundle
+* In `Oro\Bundle\ImportExportBundle\Controller\ImportExportController::importValidateAction` 
+ (`oro_importexport_import_validate` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\ImportExportBundle\Controller\ImportExportController::importProcessAction` 
+ (`oro_importexport_import_process` route)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\ImportExportBundle\Controller\ImportExportController::instantExportAction` 
+ (`oro_importexport_export_instant` route)
+ action the request method was changed to POST. 
 * Introduced concept of import/export owner. Applied approach with role-based owner-based permissions to the export and import functionality.
 * Option `--email` has become required for `oro:import:file` command.
 * Removed Message Queue Topics and related Processors. All messages with this topics will be rejected:
@@ -18,6 +79,39 @@ The current file describes significant changes in the code that may affect the u
     * `oro.importexport.pre_cli_import`, should be used `oro.importexport.pre_import` instead.
     * `oro.importexport.cli_import` , should be used `oro.importexport.import` instead.
     
+#### IntegrationBundle
+* In `Oro\Bundle\IntegrationBundle\Controller\IntegrationController::scheduleAction` 
+ (`oro_integration_schedule` route)
+ action the request method was changed to POST. 
+
+#### MessageQueueBundle
+* In `Oro\Bundle\MessageQueueBundle\Controller\Api\Rest\JobController::interruptRootJobAction` 
+ (`/api/rest/{version}/message-queue/job/interrupt/{id}` path)
+ action the request method was changed to POST. 
+ 
+#### UserBundle
+ * API processor `oro_user.api.create.save_entity` was renamed to `oro_user.api.create.save_user`.
+
+#### WorkflowBundle
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\ProcessController::activateAction` 
+ (`/api/rest/{version}/process/activate/{processDefinition}` path)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\ProcessController::deactivateAction` 
+ (`/api/rest/{version}/process/deactivate/{processDefinition}` path)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::startAction` 
+ (`/api/rest/{version}/workflow/start/{workflowName}/{transitionName}` path)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::transitAction` 
+ (`/api/rest/{version}/workflow/transit/{workflowName}/{transitionName}` path)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::activateAction` 
+ (`/api/rest/{version}/workflow/activate/{workflowName}/{transitionName}` path)
+ action the request method was changed to POST. 
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::deactivateAction` 
+ (`/api/rest/{version}/workflow/deactivate/{workflowName}/{transitionName}` path)
+ action the request method was changed to POST.
+
 ### Deprecated
 #### ImportExportBundle
 * Message Queue Topic `oro.importexport.pre_http_import` is deprecated in favor of `oro.importexport.pre_import`.
@@ -27,10 +121,14 @@ The current file describes significant changes in the code that may affect the u
 #### EmbeddedFormBundle
 * Layout context parameter `embedded_form_custom_layout` has been removed. Use layout updates instead.
 
+#### UIBundle
+* Plugin `jquery.mCustomScrollbar` has been removed. Use [styled-scroll-bar](./src/Oro/Bundle/UIBundle/Resources/public/js/app/plugins/styled-scroll-bar.js)
+
 #### SecurityBundle
 * Twig function `resource_granted` has been removed. Use `is_granted` from Symfony instead.
 
 ## 3.1.4 
+[Show detailed list of changes](incompatibilities-3-1-4.md)
 
 ### Removed
 #### InstallerBundle
@@ -40,7 +138,14 @@ The current file describes significant changes in the code that may affect the u
 #### WorkflowBundle
 * Command `oro:workflow:definitions:upgrade20` was removed because it was used for 2.x version update only.
 
-## 3.1.0
+## 3.1.3 (2019-02-19)
+[Show detailed list of changes](incompatibilities-3-1-3.md)
+
+## 3.1.2 (2019-02-05)
+[Show detailed list of changes](incompatibilities-3-1-2.md)
+
+## 3.1.0 (2019-01-30)
+[Show detailed list of changes](incompatibilities-3-1.md)
 
 ### Added
 #### AssetBundle

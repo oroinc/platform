@@ -5,12 +5,16 @@ namespace Oro\Bundle\TranslationBundle\Controller;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Translation Controller
+ */
 class TranslationController extends BaseController
 {
     /**
@@ -30,6 +34,7 @@ class TranslationController extends BaseController
     /**
      * @Route("/{gridName}/massAction/{actionName}", name="oro_translation_mass_reset")
      * @AclAncestor("oro_translation_language_translate")
+     * @CsrfProtection()
      *
      * @param string $gridName
      * @param string $actionName

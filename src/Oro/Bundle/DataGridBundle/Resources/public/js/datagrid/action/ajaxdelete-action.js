@@ -20,6 +20,9 @@ define([
         /** @property {Function} */
         confirmModalConstructor: DeleteConfirmation,
 
+        /** @property {String} */
+        requestType: 'DELETE',
+
         defaultMessages: {
             confirm_title: 'Delete Confirmation',
             confirm_content: 'Are you sure you want to delete this item?',

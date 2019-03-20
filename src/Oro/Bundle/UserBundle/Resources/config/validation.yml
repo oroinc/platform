@@ -2,6 +2,9 @@ Oro\Bundle\UserBundle\Entity\User:
     constraints:
         - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: username
         - Oro\Bundle\UserBundle\Validator\Constraints\UniqueUserEmail: ~
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+              fields: [ usernameLowercase ]
+              message: 'oro.user.message.user_username_exists'
         - Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFieldsConstraint: ~
     properties:
         username:

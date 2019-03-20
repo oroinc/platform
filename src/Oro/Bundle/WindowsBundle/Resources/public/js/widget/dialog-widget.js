@@ -76,6 +76,7 @@ define(function(require) {
          * @inheritDoc
          */
         constructor: function DialogWidget() {
+            this.resetDialogPosition = _.debounce(this.resetDialogPosition.bind(this), 10);
             DialogWidget.__super__.constructor.apply(this, arguments);
         },
 

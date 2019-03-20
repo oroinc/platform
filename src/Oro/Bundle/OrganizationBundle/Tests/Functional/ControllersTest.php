@@ -11,7 +11,7 @@ class ControllersTest extends WebTestCase
     {
         $this->initClient(
             array(),
-            array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
+            $this->generateBasicAuthHeader()
         );
         $this->client->useHashNavigation(true);
     }
@@ -40,7 +40,7 @@ class ControllersTest extends WebTestCase
                 "owner" => "1"
             )
         );
-        $this->client->request('POST', $this->getUrl('oro_api_post_user'), $request);
+        $this->ajaxRequest('POST', $this->getUrl('oro_api_post_user'), $request);
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
         $result['request'] = $request;

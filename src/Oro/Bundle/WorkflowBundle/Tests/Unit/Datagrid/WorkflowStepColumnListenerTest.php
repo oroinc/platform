@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -16,6 +17,8 @@ use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\ReportBundle\Entity\Report;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
@@ -60,6 +63,11 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
     protected $workflowManagerRegistry;
 
     /**
+     * @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected $datagrid;
+
+    /**
      * @var DatagridStateProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $filtersStateProvider;
@@ -92,6 +100,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $this->filtersStateProvider = $this->createMock(DatagridStateProviderInterface::class);
+        $this->datagrid = $this->createMock(DatagridInterface::class);
 
         $this->listener = new WorkflowStepColumnListener(
             $this->doctrineHelper,
@@ -219,13 +228,22 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
      * @param array $inputConfig
      * @param array $expectedConfig
      * @param bool $multiWorkflows
+     * @param string $datagridName
      * @dataProvider buildBeforeAddColumnDataProvider
      */
-    public function testBuildBeforeAddColumn(array $inputConfig, array $expectedConfig, $multiWorkflows = true)
-    {
+    public function testBuildBeforeAddColumn(
+        array $inputConfig,
+        array $expectedConfig,
+        $multiWorkflows = true,
+        string $datagridName = 'test_datagrid_name'
+    ) {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
         $this->setUpWorkflowManagerMock(self::ENTITY_FULL_NAME, true, $multiWorkflows);
         $this->setUpConfigProviderMock(self::ENTITY_FULL_NAME);
+
+        $this->datagrid->expects($this->any())
+            ->method('getName')
+            ->willReturn($datagridName);
 
         $event = $this->createBuildBeforeEvent($inputConfig);
         $this->listener->onBuildBefore($event);
@@ -274,6 +292,70 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
+            ],
+            'simple configuration with report datagrid' => [
+                'inputConfig' => [
+                    'source' => [
+                        'query' => [
+                            'select' => [
+                                self::ALIAS . '.rootField',
+                            ],
+                            'from' => [['table' => self::ENTITY, 'alias' => self::ALIAS]],
+                        ],
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                    'columns' => [
+                        'rootField' => ['label' => 'Root field'],
+                    ],
+                ],
+                'expectedConfig' => [
+                    'source' => [
+                        'query' => [
+                            'select' => [
+                                self::ALIAS . '.rootField'
+                            ],
+                            'from' => [['table' => self::ENTITY, 'alias' => self::ALIAS]]
+                        ],
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                    'columns' => [
+                        'rootField' => ['label' => 'Root field'],
+                    ],
+                ],
+                'multiWorkflows' => true,
+                'datagridName' => Report::GRID_PREFIX . '123'
+            ],
+            'simple configuration with segment datagrid' => [
+                'inputConfig' => [
+                    'source' => [
+                        'query' => [
+                            'select' => [
+                                self::ALIAS . '.rootField',
+                            ],
+                            'from' => [['table' => self::ENTITY, 'alias' => self::ALIAS]],
+                        ],
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                    'columns' => [
+                        'rootField' => ['label' => 'Root field'],
+                    ],
+                ],
+                'expectedConfig' => [
+                    'source' => [
+                        'query' => [
+                            'select' => [
+                                self::ALIAS . '.rootField'
+                            ],
+                            'from' => [['table' => self::ENTITY, 'alias' => self::ALIAS]]
+                        ],
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                    'columns' => [
+                        'rootField' => ['label' => 'Root field'],
+                    ],
+                ],
+                'multiWorkflows' => true,
+                'datagridName' => Segment::GRID_PREFIX . '123'
             ],
             'full configuration' => [
                 'inputConfig' => [
@@ -489,6 +571,10 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
         $this->setUpWorkflowManagerMock(self::ENTITY_FULL_NAME);
         $this->setUpConfigProviderMock(self::ENTITY_FULL_NAME, true, false);
+
+        $this->datagrid->expects($this->any())
+            ->method('getName')
+            ->willReturn('test_datagrid_name');
 
         $event = $this->createBuildBeforeEvent($inputConfig);
         $this->listener->onBuildBefore($event);
@@ -877,6 +963,9 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $event->expects($this->any())->method('getConfig')->willReturn($datagridConfiguration);
+        $event->expects($this->any())
+            ->method('getDatagrid')
+            ->willReturn($this->datagrid);
 
         return $event;
     }

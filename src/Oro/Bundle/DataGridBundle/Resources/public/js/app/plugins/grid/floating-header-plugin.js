@@ -119,6 +119,8 @@ define(function(require) {
                 debouncedHideDropdowns();
                 this.checkLayout();
             }, this));
+
+            this.domCache.gridScrollableContainer.on('updateScroll', this.selectMode.bind(this));
         },
 
         fixHeaderCellWidth: function() {
@@ -412,6 +414,7 @@ define(function(require) {
             this.domCache.otherScroll.off('scroll');
             this.domCache.otherScroll.css({display: 'none'});
             this.domCache.gridScrollableContainer.css({width: ''}).removeClass('scrollbar-is-visible');
+            this.domCache.gridScrollableContainer.off('updateScroll');
             this.domCache.gridContainer.css({width: ''});
             this.$grid.css({width: ''});
             this.scrollStateModel.destroy();

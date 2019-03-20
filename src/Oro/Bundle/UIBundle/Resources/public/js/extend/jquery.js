@@ -2,11 +2,28 @@
 define(['jquery'], function($) {
     'use strict';
 
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-Header': 1
+    var getCookieValue = function(name) {
+        var value = '; ' + document.cookie;
+        var parts = value.split('; ' + name + '=');
+        if (parts.length === 2) {
+            return parts.pop().split(';').shift();
+        }
+        return '';
+    };
+
+    $.ajaxPrefilter(function(options, originalOptions, xhr) {
+        var csrfCookie = '';
+        // CSRF tokens for https connection are prefixed with "https-"
+        if (location.protocol === 'https:') {
+            csrfCookie = getCookieValue('https-_csrf');
+        } else {
+            csrfCookie = getCookieValue('_csrf');
+        }
+        if (options.url.indexOf('://') === -1 && csrfCookie.length > 0) {
+            xhr.setRequestHeader('X-CSRF-Header', csrfCookie);
         }
     });
+
     $.expr[':'].parents = function(a, i, m) {
         return $(a).parents(m[3]).length < 1;
     };

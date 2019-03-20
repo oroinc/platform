@@ -28,9 +28,6 @@ define([
             empty_selection: 'Please, select items to perform mass action.'
         },
 
-        /** @property {String} */
-        token: '',
-
         /**
          * @inheritDoc
          */
@@ -94,8 +91,6 @@ define([
 
             params[stateKey] = collection.stateHashValue();
             params = collection.processFiltersParams(params, null, 'filters');
-
-            params.token = this.token;
 
             return params;
         },
