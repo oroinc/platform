@@ -52,7 +52,6 @@ define(function(require) {
         dispose: function() {
             var parent = Dropdown._getParentFromElement(this._element);
             $(parent).off(EVENT_KEY);
-            $(document).off('mCSB.scroll' + EVENT_KEY, this._popperUpdate);
 
             if (this._dialog) {
                 $(this._dialog).off(EVENT_KEY);
@@ -108,7 +107,6 @@ define(function(require) {
             }.bind(this));
 
             $(parent).on(HIDE_EVENT, this._onHide.bind(this));
-            $(document).on('mCSB.scroll' + EVENT_KEY, this._popperUpdate);
 
             if (this._dialog) {
                 $(this._dialog).on(
