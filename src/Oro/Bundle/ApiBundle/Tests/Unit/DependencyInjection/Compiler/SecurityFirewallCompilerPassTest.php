@@ -106,14 +106,10 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('main', $contextListener->getArgument(2));
         $contextFirewallListener = $this->container->getDefinition('oro_security.context_listener.main.testFirewall');
         self::assertEquals(SecurityFirewallContextListener::class, $contextFirewallListener->getClass());
-        self::assertEquals(
-            [
-                new Reference('oro_security.context_listener.main'),
-                '%session.storage.options%',
-                new Reference('security.token_storage')
-            ],
-            $contextFirewallListener->getArguments()
-        );
+
+        self::assertEquals('oro_security.context_listener.main', (string)$contextFirewallListener->getArgument(0));
+        self::assertTrue($contextFirewallListener->hasMethodCall('setCsrfRequestManager'));
+
         self::assertEquals(SecurityFirewallExceptionListener::class, $exceptionListenerDefinition->getClass());
 
         $listeners = $contextFirewallContext->getArgument(0);

@@ -24,8 +24,8 @@ class ImportExportControllerTest extends WebTestCase
 
     public function testShouldSendExportMessageOnInstantExportActionWithDefaultParameters()
     {
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'POST',
             $this->getUrl('oro_importexport_export_instant', ['processorAlias' => 'oro_account'])
         );
 
@@ -46,8 +46,8 @@ class ImportExportControllerTest extends WebTestCase
 
     public function testShouldSendExportMessageOnInstantExportActionWithPassedParameters()
     {
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'POST',
             $this->getUrl('oro_importexport_export_instant', [
                 'processorAlias' => 'oro_account',
                 'exportJob' => JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV,
@@ -119,8 +119,8 @@ class ImportExportControllerTest extends WebTestCase
             'first' => 'first value',
             'second' => 'second value',
         ];
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'POST',
             $this->getUrl(
                 'oro_importexport_import_process',
                 [
@@ -155,8 +155,8 @@ class ImportExportControllerTest extends WebTestCase
             'first' => 'first value',
             'second' => 'second value',
         ];
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'POST',
             $this->getUrl(
                 'oro_importexport_import_validate',
                 [

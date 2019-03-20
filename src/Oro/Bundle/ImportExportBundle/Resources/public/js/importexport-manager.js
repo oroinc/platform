@@ -127,11 +127,12 @@ define(function(require) {
                     filePrefix: this.options.filePrefix
                 }));
 
-                $.getJSON(
+                $.post(
                     exportUrl,
                     function(data) {
                         exportHandler.handleExportResponse(data);
-                    }
+                    },
+                    'json'
                 );
             }
         },

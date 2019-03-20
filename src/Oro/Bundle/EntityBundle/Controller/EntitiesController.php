@@ -10,6 +10,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -20,7 +22,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 /**
  * Entities controller.
  * @Route("/entity")
- * todo: Discuss ACL permissions for controller
  */
 class EntitiesController extends Controller
 {
@@ -304,12 +305,14 @@ class EntitiesController extends Controller
      * @param string $entityName
      * @param string $id
      *
-     * @return array
+     * @return JsonResponse
      *
      * @Route(
      *      "/delete/{entityName}/item/{id}",
      *      name="oro_entity_delete"
      * )
+     * @Method("DELETE")
+     * @CsrfProtection()
      */
     public function deleteAction($entityName, $id)
     {

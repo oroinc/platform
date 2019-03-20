@@ -9,11 +9,16 @@ use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+/**
+ * Embedded Form Controller
+ */
 class EmbeddedFormController extends Controller
 {
     /**
@@ -49,6 +54,8 @@ class EmbeddedFormController extends Controller
      *      permission="DELETE",
      *      class="OroEmbeddedFormBundle:EmbeddedForm"
      * )
+     * @Method("DELETE")
+     * @CsrfProtection()
      */
     public function deleteAction(EmbeddedForm $entity)
     {
@@ -63,6 +70,8 @@ class EmbeddedFormController extends Controller
 
     /**
      * @Route("default-data/{formType}", name="oro_embedded_form_default_data")
+     * @Method("POST")
+     * @CsrfProtection()
      */
     public function defaultDataAction($formType)
     {

@@ -20,7 +20,7 @@ define(['jquery', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/me
             el.trigger('deactivation_start');
             $.ajax({
                 url: url,
-                type: 'GET',
+                type: 'POST',
                 success: function(response) {
                     if (response.message && !hideNotifications) {
                         Messenger.notificationFlashMessage('success', response.message);

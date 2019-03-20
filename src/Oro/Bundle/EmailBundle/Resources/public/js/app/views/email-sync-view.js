@@ -31,7 +31,7 @@ define(function(require) {
             }
 
             $.ajax({
-                type: 'GET',
+                type: 'POST',
                 dataType: 'json',
                 url: this.syncPath,
                 errorHandlerMessage: this.errorHandlerMessage,

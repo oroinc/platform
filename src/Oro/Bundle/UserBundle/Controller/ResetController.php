@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Controller;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Util\ObfuscatedEmailTrait;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -154,6 +155,7 @@ class ResetController extends Controller
      *     name="oro_user_mass_password_reset"
      * )
      * @AclAncestor("password_management")
+     * @CsrfProtection()
      */
     public function massPasswordResetAction(Request $request)
     {

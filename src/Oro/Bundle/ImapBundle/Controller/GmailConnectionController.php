@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\ImapBundle\Controller;
 
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
+ * Gmail Connection Controller
  * @Route("/gmail")
  */
 class GmailConnectionController extends Controller
 {
     /**
      * @Route("/connection/check", name="oro_imap_gmail_connection_check", methods={"POST"})
+     * @CsrfProtection()
      */
     public function checkAction()
     {
