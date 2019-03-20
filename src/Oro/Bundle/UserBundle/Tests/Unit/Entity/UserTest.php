@@ -420,4 +420,36 @@ class UserTest extends AbstractUserTest
 
         $this->assertEquals('john.doe@example.org', $user->getEmailLowercase());
     }
+
+    public function testSetUsernameGetUsernameLowercase()
+    {
+        $user = $this->getUser();
+        $user->setUsername('John');
+
+        $this->assertEquals('John', $user->getUsername());
+        $this->assertEquals('john', $user->getUsernameLowercase());
+    }
+
+    public function testUnserialize()
+    {
+        $serialized = [
+            'password',
+            'salt',
+            'UserName',
+            true,
+            'confirmation_token',
+            10
+        ];
+
+        $user = $this->getUser();
+        $user->unserialize(serialize($serialized));
+
+        $this->assertEquals($serialized[0], $user->getPassword());
+        $this->assertEquals($serialized[1], $user->getSalt());
+        $this->assertEquals($serialized[2], $user->getUsername());
+        $this->assertEquals(mb_strtolower($serialized[2]), $user->getUsernameLowercase());
+        $this->assertEquals($serialized[3], $user->isEnabled());
+        $this->assertEquals($serialized[4], $user->getConfirmationToken());
+        $this->assertEquals($serialized[5], $user->getId());
+    }
 }

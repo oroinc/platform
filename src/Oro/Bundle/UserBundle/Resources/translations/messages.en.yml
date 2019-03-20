@@ -187,6 +187,7 @@ oro:
         username:
             label:                   Username
             description:             The login name that the user uses to log into the system.
+        username_lowercase.label:    Username Lowercase
         organization.label:          Organization
         business_unit.label:         Business Unit
         google_id:

@@ -41,6 +41,7 @@ oro:
                 lower_case_numbers_special_chars: The password must include a lower case letter, a number and a special character
                 lower_case_upper_case_numbers_special_chars: The password must include a lower case letter, an upper case letter, a number, and a special character
             user_email_exists: This email is already registered by another user. Please provide unique email address.
+            user_username_exists: This username is already registered by another user. Please provide unique username.
             system_configuration:
                 case_insensitive:
                     collation: 'Cannot disable "Case-Insensitive Email Addresses" - the "email" columns in "oro_user" database table has case insensitive collation.'
