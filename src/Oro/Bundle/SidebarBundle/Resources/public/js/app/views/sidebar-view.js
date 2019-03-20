@@ -120,6 +120,9 @@ define(function(require) {
             });
 
             this.$('[data-role="sidebar-scroll-container"]').styledScrollBar({
+                overflowBehavior: {
+                    x: 'hidden'
+                },
                 callbacks: {
                     onScroll: _.debounce(this.updatedWidgetsPosition.bind(this), 5)
                 }

@@ -47,19 +47,24 @@ define(function(require) {
 
             this.setupDomCache();
 
-            if (!this.domCache.$container.data('oro.styledScrollBar')) {
-                this.domCache.$container.styledScrollBar({
-                    callbacks: {
-                        onScroll: _.debounce(function(event) {
-                            this.domCache.$container.trigger('updateScroll', event);
-                        }.bind(this), 5)
-                    }
-                });
-                this.domCache.$scrollbar = $(this.domCache.$container
-                    .styledScrollBar('getElements').scrollbarHorizontal.scrollbar);
-            }
+            this.domCache.$container.styledScrollBar({
+                overflowBehavior: {
+                    y: 'hidden'
+                },
+                callbacks: {
+                    onScroll: _.debounce(function(event) {
+                        this.domCache.$container.trigger('updateScroll', event);
+                    }.bind(this), 5)
+                }
+            });
+            this.domCache.$scrollbar = $(this.domCache.$container
+                .styledScrollBar('getElements').scrollbarHorizontal.scrollbar);
 
             this.delegateEvents();
+
+            var displayScrollbar = this.checkScrollbarDisplay();
+
+            this.domCache.$container.styledScrollBar(displayScrollbar ? 'update': 'sleep');
 
             StickedScrollbarPlugin.__super__.enable.apply(this, arguments);
         },
@@ -212,11 +217,15 @@ define(function(require) {
 
         updateCustomScrollbar: function() {
             this.manageScroll();
-            this.domCache.$container.styledScrollBar('update');
+            if (this.domCache.$container.data('oro.styledScrollBar')) {
+                this.domCache.$container.styledScrollBar('update');
+            }
         },
 
         onGridHeaderCellWidthBeforeUpdate: function() {
-            this.domCache.$container.styledScrollBar('update');
+            if (this.domCache.$container.data('oro.styledScrollBar')) {
+                this.domCache.$container.styledScrollBar('update');
+            }
         },
 
         onViewportChange: function(viewport) {

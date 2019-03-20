@@ -17,30 +17,19 @@
     height: 100%;
     position: relative;
     user-select: none;
-    padding-bottom: 44px;
+    padding-bottom: 88px;
 
     &.maximized {
         width: $sidebar-maximized-width;
     }
 
     &__scroll-container {
-        max-height: calc(100% - 44px);
-        margin-bottom: 44px;
+        max-height: 100%;
         overflow: auto;
         background-color: transparent;
-
-        &:after {
-            content: '';
-            position: absolute;
-            background-color: transparent;
-            width: 100%;
-            height: 44px;
-            bottom: 44px;
-        }
     }
 
     &__content {
-        max-height: 100%;
         height: 100%;
         background-color: transparent;
     }
@@ -89,6 +78,7 @@
         width: 100%;
         padding: 14px 0;
         color: $sidebar-color;
+        z-index: 1;
 
         &:hover {
             background-color: $sidebar-active-color;
@@ -113,8 +103,6 @@
     // add-widget element
     &__add-widget {
         @include fa-icon($sidebar-icon-add-widget);
-
-        margin-top: -44px;
     }
 
     // toggle element
@@ -366,11 +354,12 @@
 
 // sidebar widget icon
 .sidebar-widget-icon {
+    display: block;
     background-color: transparent;
     position: relative;
     font-size: 16px;
-    line-height: 14px;
-    vertical-align: middle;
+    height: 16px;
+    line-height: 1;
 
     &.highlight,
     &.highlight:before {
@@ -413,7 +402,7 @@
         }
 
         .item-counter {
-            top: -11px;
+            top: -10px;
             margin-#{$start}: -20px;
             margin-#{$end}: 0;
         }
