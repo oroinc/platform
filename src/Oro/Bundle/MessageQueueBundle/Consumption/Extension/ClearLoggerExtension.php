@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
+use Monolog\Handler\BufferHandler;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\TestHandler;
@@ -12,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Checks whether the container has loggers with handlers that need to be cleared after each processor,
- * and if so, removes all mesages from these handlers.
+ * and if so, removes all messages from these handlers.
  */
 class ClearLoggerExtension extends AbstractExtension
 {
@@ -36,6 +37,19 @@ class ClearLoggerExtension extends AbstractExtension
      * {@inheritdoc}
      */
     public function onPostReceived(Context $context)
+    {
+        $this->clear();
+    }
+
+    /**
+     *{@inheritdoc}
+     */
+    public function onIdle(Context $context)
+    {
+        $this->clear();
+    }
+
+    private function clear()
     {
         foreach ($this->persistentLoggers as $serviceId) {
             if ($this->container->initialized($serviceId)) {
@@ -63,7 +77,7 @@ class ClearLoggerExtension extends AbstractExtension
      */
     private function clearHandler(HandlerInterface $handler)
     {
-        if ($handler instanceof FingersCrossedHandler) {
+        if ($handler instanceof FingersCrossedHandler || $handler instanceof BufferHandler) {
             // do clear because each processor is a separate "request" for the consumer
             // and the logging should starts from the scratch for each processor
             $handler->clear();

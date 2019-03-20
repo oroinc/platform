@@ -6,6 +6,7 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildDestinationM
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProcessorRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageToArrayConverterPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMonologHandlersPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureClearersPass;
@@ -59,11 +60,14 @@ class OroMessageQueueBundleTest extends \PHPUnit\Framework\TestCase
             ->with($this->isInstanceOf(BuildMessageToArrayConverterPass::class));
         $container->expects($this->at(7))
             ->method('addCompilerPass')
-            ->with($this->isInstanceOf(ConfigureClearersPass::class));
+            ->with($this->isInstanceOf(BuildMonologHandlersPass::class));
         $container->expects($this->at(8))
             ->method('addCompilerPass')
-            ->with($this->isInstanceOf(MakeLoggerServicesPersistentPass::class));
+            ->with($this->isInstanceOf(ConfigureClearersPass::class));
         $container->expects($this->at(9))
+            ->method('addCompilerPass')
+            ->with($this->isInstanceOf(MakeLoggerServicesPersistentPass::class));
+        $container->expects($this->at(10))
             ->method('addCompilerPass')
             ->with($this->isInstanceOf(MakeAnnotationReaderServicesPersistentPass::class));
 
