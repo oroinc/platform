@@ -31,6 +31,7 @@ The current file describes significant changes in the code that may affect the u
 * Twig function `resource_granted` has been removed. Use `is_granted` from Symfony instead.
 
 ## 3.1.4 
+[Show detailed list of changes](incompatibilities-3-1-4.md)
 
 ### Removed
 #### InstallerBundle
@@ -40,7 +41,14 @@ The current file describes significant changes in the code that may affect the u
 #### WorkflowBundle
 * Command `oro:workflow:definitions:upgrade20` was removed because it was used for 2.x version update only.
 
-## 3.1.0
+## 3.1.3 (2019-02-19)
+[Show detailed list of changes](incompatibilities-3-1-3.md)
+
+## 3.1.2 (2019-02-05)
+[Show detailed list of changes](incompatibilities-3-1-2.md)
+
+## 3.1.0 (2019-01-30)
+[Show detailed list of changes](incompatibilities-3-1.md)
 
 ### Added
 #### AssetBundle
