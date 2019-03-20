@@ -60,7 +60,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v2_4';
+        return 'v2_4_1';
     }
 
     /**
@@ -196,6 +196,7 @@ class OroUserBundleInstaller implements
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('status_id', 'integer', ['notnull' => false]);
         $table->addColumn('username', 'string', ['length' => 255, 'precision' => 0]);
+        $table->addColumn('username_lowercase', 'string', ['length' => 255]);
         $table->addColumn('email', 'string', ['length' => 255, 'precision' => 0]);
         $table->addColumn('email_lowercase', 'string', ['length' => 255]);
         $table->addColumn(
@@ -225,6 +226,7 @@ class OroUserBundleInstaller implements
         $table->addColumn('createdAt', 'datetime', ['precision' => 0]);
         $table->addColumn('updatedAt', 'datetime', ['precision' => 0]);
         $table->addUniqueIndex(['username'], 'UNIQ_F82840BCF85E0677');
+        $table->addIndex(['username_lowercase'], 'idx_oro_user_username_lowercase', []);
         $table->addUniqueIndex(['email'], 'UNIQ_F82840BCE7927C74');
         $table->addIndex(['email_lowercase'], 'idx_oro_user_email_lowercase', []);
         $table->addIndex(['phone'], 'oro_idx_user_phone');
