@@ -166,6 +166,26 @@ class EntityFallbackResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->resolver->isFallbackSupported(new \stdClass(), 'testProperty', 'systemConfig'));
     }
 
+    public function testIsFallbackConfigured()
+    {
+        $this->setDefaultConfigInterfaceMock();
+        $entityConfig = $this->getEntityConfiguration();
+        $this->configInterface->expects($this->any())
+            ->method('getValues')
+            ->willReturn($entityConfig);
+
+        $this->assertTrue($this->resolver->isFallbackConfigured(
+            SystemConfigFallbackProvider::FALLBACK_ID,
+            new \stdClass(),
+            'testProperty'
+        ));
+        $this->assertFalse($this->resolver->isFallbackConfigured(
+            'some_wrong_fallback_id',
+            new \stdClass(),
+            'testProperty'
+        ));
+    }
+
     public function testGetFallbackConfigReturnsFullConfig()
     {
         $this->setDefaultConfigInterfaceMock();

@@ -7,6 +7,9 @@ use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 
+/**
+ * This trait is designed to add relations between existing entities and EntityFieldFallbackValue
+ */
 trait AddFallbackRelationTrait
 {
     /**
@@ -27,21 +30,45 @@ trait AddFallbackRelationTrait
         $fallbackList,
         $fallbackType = null
     ) {
+        $this->addFallbackRelationWithOptions(
+            $schema,
+            $extendExtension,
+            $tableName,
+            $fieldName,
+            $label,
+            $fallbackList,
+            $fallbackType ? ['fallback' => ['fallbackType' => $fallbackType]] : []
+        );
+    }
+
+    /**
+     * @param Schema $schema
+     * @param ExtendExtension $extendExtension
+     * @param string $tableName
+     * @param string $fieldName
+     * @param string $label
+     * @param array $fallbackList
+     * @param array $options
+     * @deprecated Will be replaced in 4.0 by 'addFallbackRelation' with additional parameter 'options'
+     */
+    protected function addFallbackRelationWithOptions(
+        Schema $schema,
+        ExtendExtension $extendExtension,
+        $tableName,
+        $fieldName,
+        $label,
+        $fallbackList,
+        array $options = []
+    ) {
         $table = $schema->getTable($tableName);
         $fallbackTable = $schema->getTable('oro_entity_fallback_value');
-
-        $fallbackConfig = ['fallbackList' => $fallbackList];
-        if ($fallbackType) {
-            $fallbackConfig['fallbackType'] = $fallbackType;
-        }
-
         $extendExtension->addManyToOneRelation(
             $schema,
             $table,
             $fieldName,
             $fallbackTable,
             'id',
-            [
+            array_merge_recursive([
                 'entity' => [
                     'label' => $label,
                 ],
@@ -58,8 +85,10 @@ trait AddFallbackRelationTrait
                 'datagrid' => [
                     'is_visible' => DatagridScope::IS_VISIBLE_FALSE,
                 ],
-                'fallback' => $fallbackConfig
-            ]
+                'fallback' => [
+                    'fallbackList' => $fallbackList
+                ]
+            ], $options)
         );
     }
 }
