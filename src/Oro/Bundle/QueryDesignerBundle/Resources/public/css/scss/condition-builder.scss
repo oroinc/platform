@@ -122,6 +122,7 @@
             margin: $condition-builder-close-item-margin;
             color: $condition-builder-close-item-color;
             z-index: 1;
+            padding: 0;
 
             &:before {
                 font-size: $condition-builder-close-item-size;
@@ -154,6 +155,12 @@
             &.validation-error > .btn-close {
                 margin-top: $condition-builder-close-invalid-group-margin-top;
             }
+        }
+
+        .validation-holder {
+            position: absolute;
+
+            pointer-events: none;
         }
     }
 }
