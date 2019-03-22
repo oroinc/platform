@@ -171,3 +171,10 @@ services:
             - 'oro_message_queue.message_queue_heartbeat'
         tags:
             - { name: gos_web_socket.topic }
+
+    oro_message_queue.event_listener.console_error:
+        class: Oro\Bundle\MessageQueueBundle\EventListener\ConsoleErrorListener
+        arguments:
+            - '@monolog.logger.consumer'
+        tags:
+            - { name: kernel.event_listener, event: console.error, method: onConsoleError, priority: 255 }
