@@ -4,12 +4,13 @@ namespace Oro\Bundle\EntityBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * The entity the represents a field that value can be a scalar, an array
  * or it can retrieved from another source if it does not have own value.
  * @ORM\Table(name="oro_entity_fallback_value")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValueRepository")
  * @Config()
  */
 class EntityFieldFallbackValue
@@ -26,6 +27,13 @@ class EntityFieldFallbackValue
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $id;
 
@@ -33,6 +41,13 @@ class EntityFieldFallbackValue
      * @var string
      *
      * @ORM\Column(name="fallback", type="string", length=64, nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $fallback;
 
@@ -40,6 +55,13 @@ class EntityFieldFallbackValue
      * @var mixed
      *
      * @ORM\Column(name="scalar_value", type="string", length=255, nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $scalarValue;
 
@@ -47,6 +69,13 @@ class EntityFieldFallbackValue
      * @var array
      *
      * @ORM\Column(name="array_value", type="array", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $arrayValue;
 
