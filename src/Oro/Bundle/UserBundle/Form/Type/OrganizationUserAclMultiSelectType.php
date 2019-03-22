@@ -5,6 +5,9 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type provides functionality to select an existing entity from the tree
+ */
 class OrganizationUserAclMultiSelectType extends UserMultiSelectType
 {
     /**
