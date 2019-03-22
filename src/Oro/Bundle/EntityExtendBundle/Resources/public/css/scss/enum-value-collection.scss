@@ -25,6 +25,11 @@
         #{$end}: -$tooltip-icon-container-size;
     }
 
+    .oro-item-collection {
+        padding-#{$end}: $tooltip-icon-container-size;
+        margin-#{$end}: -$tooltip-icon-container-size;
+    }
+
     .tooltip-icon-container {
         width: $tooltip-icon-container-size;
         height: $tooltip-icon-container-size;
