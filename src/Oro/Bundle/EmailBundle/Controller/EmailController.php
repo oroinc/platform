@@ -38,6 +38,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  * The controller for the email related functionality.
  *
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -47,6 +48,9 @@ class EmailController extends Controller
      * @Route("/check-smtp-connection", name="oro_email_check_smtp_connection")
      * @Method("POST")
      * @CsrfProtection()
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function checkSmtpConnectionAction(Request $request)
     {
@@ -178,6 +182,9 @@ class EmailController extends Controller
      * @Route("/view/thread/{id}", name="oro_email_thread_view", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_view")
      * @Template("OroEmailBundle:Email/Thread:view.html.twig")
+     *
+     * @param Email $entity
+     * @return array
      */
     public function viewThreadAction(Email $entity)
     {
@@ -239,6 +246,9 @@ class EmailController extends Controller
      * @Route("/view/user-thread/{id}", name="oro_email_user_thread_view", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_view")
      * @Template("OroEmailBundle:Email/Thread:userEmails.html.twig")
+     *
+     * @param Email $entity
+     * @return array
      */
     public function viewUserThreadAction(Email $entity)
     {
@@ -353,6 +363,10 @@ class EmailController extends Controller
      * )
      *
      * @Template
+     *
+     * @param string $entityClass
+     * @param mixed $entityId
+     * @return array
      */
     public function activityAction($entityClass, $entityId)
     {
@@ -433,6 +447,9 @@ class EmailController extends Controller
      * )
      * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
+     *
+     * @param Email $email
+     * @return array
      */
     public function forwardAction(Email $email)
     {
@@ -448,6 +465,9 @@ class EmailController extends Controller
      *
      * @Route("/body/{id}", name="oro_email_body", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_body_view")
+     *
+     * @param EmailBody $entity
+     * @return Response
      */
     public function bodyAction(EmailBody $entity)
     {
@@ -459,6 +479,9 @@ class EmailController extends Controller
      *
      * @Route("/attachment/{id}", name="oro_email_attachment", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_attachment_view")
+     *
+     * @param EmailAttachment $entity
+     * @return Response
      */
     public function attachmentAction(EmailAttachment $entity)
     {
@@ -745,12 +768,13 @@ class EmailController extends Controller
      * @Route("/autocomplete-recipient", name="oro_email_autocomplete_recipient")
      * @AclAncestor("oro_email_email_create")
      *
+     * @param Request $request
      * @return Response
      */
     public function autocompleteRecipientAction(Request $request)
     {
-        $query = $request->query->get('query');
-        if ($request->query->get('search_by_id', false)) {
+        $query = $request->get('query');
+        if ($request->get('search_by_id', false)) {
             $emails = EmailRecipientsHelper::extractFormRecipientIds($query);
             $results = array_map(function ($email) {
                 $recipient = $this->getEmailRecipientsHelper()->createRecipientFromEmail($email);
@@ -764,14 +788,14 @@ class EmailController extends Controller
                 ];
             }, $emails);
         } else {
-            $organization = $request->query->get('organization');
+            $organization = $request->get('organization');
             if ($organization) {
                 $organization = $this->getOrganizationRepository()->findOneByName($organization);
             }
 
             $relatedEntity = null;
-            $entityClass = $request->query->get('entityClass');
-            $entityId = $request->query->get('entityId');
+            $entityClass = $request->get('entityClass');
+            $entityId = $request->get('entityId');
             if ($entityClass && $entityId) {
                 $em = $this->getEntityManagerForClass($entityClass);
                 $relatedEntity = $em->getReference($entityClass, $entityId);
@@ -780,7 +804,7 @@ class EmailController extends Controller
                 }
             }
 
-            $limit = $request->query->get('per_page', 100);
+            $limit = $request->get('per_page', 100);
             $results = $this->getEmailRecipientsProvider()->getEmailRecipients(
                 $relatedEntity,
                 $query,

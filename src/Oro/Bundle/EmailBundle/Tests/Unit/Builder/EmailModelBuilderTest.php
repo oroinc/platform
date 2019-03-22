@@ -11,6 +11,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Form\Model\Factory;
+use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -46,7 +47,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
      * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityManager;
-    
+
     /**
      * @var EmailAttachmentProvider|\PHPUnit\Framework\MockObject\MockObject
      */
@@ -135,7 +136,8 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @param $entityClass
      * @param $entityId
-     * @param $from
+     * @param string $from
+     * @param string $to
      * @param $subject
      * @param $parentEmail
      * @param $helperDecodeClassNameCalls
@@ -152,6 +154,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $entityClass,
         $entityId,
         $from,
+        $to,
         $subject,
         $parentEmail,
         $helperDecodeClassNameCalls,
@@ -173,6 +176,11 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         }
         if ($from) {
             $this->request->query->set('from', $from);
+        }
+        if ($to) {
+            $this->request->query->set('to', $to);
+            $this->request->query->set('cc', $to);
+            $this->request->query->set('bcc', $to);
         }
         if ($subject) {
             $this->request->query->set('subject', $subject);
@@ -223,8 +231,16 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($entityId, $result->getEntityId());
         $this->assertEquals($subject, $result->getSubject());
         $this->assertEquals($from, $result->getFrom());
+
+        $expected = $to ? [$to] : [];
+        $this->assertEquals($expected, $result->getTo());
+        $this->assertEquals($expected, $result->getCc());
+        $this->assertEquals($expected, $result->getBcc());
     }
 
+    /**
+     * @return array
+     */
     public function createEmailModelProvider()
     {
         return [
@@ -232,11 +248,12 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
                 'entityClass' => 'Oro\Bundle\UserBundle\Entity\User',
                 'entityId' => 1,
                 'from' => 'from@example.com',
+                'to' => 'to@example.com',
                 'subject' => 'Subject',
                 'parentEmailId' => $this->email,
                 'helperDecodeClassNameCalls' => 1,
                 'emGetRepositoryCalls' => 1,
-                'helperPreciseFullEmailAddressCalls' => 1,
+                'helperPreciseFullEmailAddressCalls' => 4,
                 'helperGetUserCalls' => 0,
                 'helperBuildFullEmailAddress' => 0,
             ],
@@ -244,6 +261,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
                 'entityClass' => null,
                 'entityId' => null,
                 'from' => null,
+                'to' => null,
                 'subject' => null,
                 'parentEmailId' => null,
                 'helperDecodeClassNameCalls' => 0,
@@ -315,6 +333,9 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email', $result);
     }
 
+    /**
+     * @return array
+     */
     public function createReplyEmailModelProvider()
     {
         $entityOne = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
