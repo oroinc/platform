@@ -40,7 +40,6 @@ class UserMultiSelectType extends AbstractType
                 'autocomplete_alias'  => 'users',
                 'configs'             => array(
                     'multiple'                   => true,
-                    'width'                      => '400px',
                     'placeholder'                => 'oro.user.form.choose_user',
                     'allowClear'                 => true,
                     'result_template_twig'       => 'OroUserBundle:User:Autocomplete/result.html.twig',
