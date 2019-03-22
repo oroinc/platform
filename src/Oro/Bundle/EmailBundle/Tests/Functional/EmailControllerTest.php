@@ -4,7 +4,11 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional;
 
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EmailControllerTest extends WebTestCase
 {
     protected function setUp()
@@ -336,5 +340,88 @@ class EmailControllerTest extends WebTestCase
             $this->getUrl('oro_email_widget_emails')
         );
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 404);
+    }
+
+    /**
+     * @dataProvider autocompleteRecipientActionProvider
+     *
+     * @param string $method
+     * @param bool $searchById
+     */
+    public function testAutocompleteRecipientActionById(string $method, bool $searchById): void
+    {
+        /** @var User $user */
+        $user = $this->getReference('simple_user2');
+        $userString = sprintf('"%s" <%s>', $user->getFullName(), $user->getEmail());
+
+        $this->client->request(
+            $method,
+            $this->getUrl(
+                'oro_email_autocomplete_recipient',
+                [
+                    'entityClass' => User::class,
+                    'entityId' => $user->getId(),
+                    'query' => $searchById ? base64_encode($userString) : $user->getUsername(),
+                    'search_by_id' => $searchById,
+                    'per_page' => 100
+                ]
+            )
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeEquals($response, 200);
+
+        $data = json_decode($response->getContent(), true);
+        $context = ' (User)';
+        $expected = [
+            [
+                'text' => 'Contexts',
+                'children' => [
+                    [
+                        'id' => base64_encode($userString),
+                        'text' => $userString . $context,
+                        'data' => \json_encode(
+                            [
+                                'key' => $userString,
+                                'contextText' => $user->getFullName() . $context,
+                                'contextValue' => [
+                                    'entityClass' => User::class,
+                                    'entityId' => $user->getId(),
+                                ],
+                                'organization' => $user->getOrganization()->getName(),
+                            ]
+                        )
+                    ]
+                ]
+            ]
+        ];
+
+        $this->assertArrayHasKey('results', $data);
+        $this->assertEquals($searchById ? $expected[0]['children'] : $expected, $data['results']);
+    }
+
+    /**
+     * @return array
+     */
+    public function autocompleteRecipientActionProvider(): array
+    {
+        return [
+            [
+                'method' => 'GET',
+                'searchById' => false
+            ],
+            [
+                'method' => 'POST',
+                'searchById' => false
+            ],
+            [
+                'method' => 'GET',
+                'searchById' => true
+            ],
+            [
+                'method' => 'POST',
+                'searchById' => true
+            ],
+        ];
     }
 }
