@@ -9,6 +9,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type provides functionality to select an existing entity from the tree
+ */
 class UserMultiSelectType extends AbstractType
 {
     const NAME = 'oro_user_multiselect';
